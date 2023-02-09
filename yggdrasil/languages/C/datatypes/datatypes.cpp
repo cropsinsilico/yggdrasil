@@ -1925,20 +1925,32 @@ extern "C" {
     return ret;
   }
 
-  generic_t copy_generic(generic_t src) {
-    generic_t out = init_generic();
+  int copy_generic_into(generic_t* dst, generic_t src) {
     try {
+      if (!dst) {
+	ygglog_throw_error("copy_generic_into: Destination is empty.");
+      }
+      if (is_generic_init(*dst))
+	destroy_generic(dst);
+      dst[0] = init_generic();
       if (!(is_generic_init(src))) {
-	ygglog_throw_error("copy_generic: Source object not initialized.");
+	ygglog_throw_error("copy_generic_into: Source object not initialized.");
       }
       if (src.obj == NULL) {
 	ygglog_throw_error("copy_generic: Generic object class is NULL.");
       }
-      out.obj = (void*)copy_document((rapidjson::Value*)(src.obj));
+      dst->obj = (void*)copy_document((rapidjson::Value*)(src.obj));
     } catch(...) {
-      ygglog_error("copy_generic: C++ exception thrown.");
-      destroy_generic(&out);
+      ygglog_error("copy_generic_into: C++ exception thrown.");
+      destroy_generic(dst);
+      return -1;
     }
+    return 0;
+  }
+
+  generic_t copy_generic(generic_t src) {
+    generic_t out = init_generic();
+    copy_generic_into(&out, src);
     return out;
   }
 

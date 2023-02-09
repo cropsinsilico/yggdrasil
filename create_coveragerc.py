@@ -1,6 +1,7 @@
 import os
 import sys
 import site
+import argparse
 PY_MAJOR_VERSION = sys.version_info[0]
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 _on_gha = bool(os.environ.get('GITHUB_ACTIONS', False))
@@ -16,6 +17,20 @@ except ImportError:
     except ImportError:
         HandyConfigParser = None
 _package_dir = os.path.join(site.getsitepackages()[0], 'yggdrasil')
+if os.path.isdir(_package_dir):
+    ADD_PATH = _package_dir
+else:
+    ADD_PATH = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)), 'yggdrasil')
+try:
+    from yggdrasil import constants
+except ImportError:
+    sys.path.insert(0, ADD_PATH)
+    try:
+        import constants
+    finally:
+        sys.path.pop(0)
+_install_languages = None
 
 
 def add_excl_rule(excl_list, new_rule):
@@ -48,6 +63,64 @@ def rm_excl_rule(excl_list, new_rule):
     if new_rule in excl_list:
         excl_list.remove(new_rule)
     return excl_list
+
+
+def import_install_languages():
+    r"""Import install_languages from yggdrasil."""
+    global _install_languages
+    if _install_languages is None:
+        if os.path.isdir(_package_dir):
+            from yggdrasil.languages import install_languages
+        else:
+            LANG_PATH = os.path.join(
+                os.path.abspath(os.path.dirname(__file__)),
+                'yggdrasil', 'languages')
+            sys.path.insert(0, LANG_PATH)
+            try:
+                import install_languages
+            finally:
+                sys.path.pop(0)
+        _install_languages = install_languages
+    return _install_languages
+
+
+def get_covered_languages(from_env=False, args=None, **kwargs):
+    r"""Get a dictionary of languages that should be covered.
+
+    Args:
+        from_env (bool, optional): If True, the environment is checked for
+            variables of the form "INSTALL{LANGUAGE}" and the language is
+            covered if the value is '1'. If False, only installed languages
+            are covered.
+        **kwargs: Additional keyword arguments are checked for arguments
+            of the form "cover_{LANGUAGE}" and the language is covered if
+            the value is True. Passed arguments override values set from
+            checking the environment and the installed languages.
+
+    """
+    out = {}
+    if from_env:
+        for k in constants.LANGUAGES['all']:
+            v = os.environ.get(f"INSTALL{k.upper()}", None)
+            if v is not None:
+                out[k] = (v == '1')
+    else:
+        out = import_install_languages().install_all_languages(args=args)
+    # Override with passed arguments or set default to False
+    for k, v in constants.ALIASED_LANGUAGES.items():
+        for kalias in v:
+            if f"cover_{kalias}" in kwargs:
+                kwargs[f"cover_{k}"] = kwargs.pop(f"cover_{kalias}")
+    for k in constants.LANGUAGES['all']:
+        if f"cover_{k}" in kwargs:
+            out[k] = kwargs.pop(f"cover_{k}")
+        else:
+            out.setdefault(k, False)
+    if kwargs:
+        import pprint
+        raise AssertionError(f"kwargs contains unused arguments: "
+                             f"{pprint.pformat(kwargs)}")
+    return out
 
 
 def create_coveragerc(installed_languages):
@@ -168,24 +241,40 @@ def create_coveragerc(installed_languages):
     return True
 
 
-def run():
-    r"""Run coverage creation function after getting a list of installed
-    languages."""
-    if os.path.isdir(_package_dir):
-        LANG_PATH = os.path.join(_package_dir, 'languages')
-    else:
-        LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                 'yggdrasil', 'languages')
-    sys.path.insert(0, LANG_PATH)
-    try:
-        import install_languages
-    finally:
-        sys.path.pop(0)
-    installed_languages = install_languages.install_all_languages()
-    flag = create_coveragerc(installed_languages)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        "Create a coverage file based on the installed languages.")
+    parser.add_argument(
+        '--from-env', action='store_true',
+        help='Determine covered languages from environment variables')
+    for k in constants.LANGUAGES['all']:
+        parser.add_argument(
+            f'--cover-{k}', action='store_true',
+            help=f"Enable coverage of {k} language")
+    for k in constants.LANGUAGES['all']:
+        parser.add_argument(
+            f'--dont-cover-{k}', action='store_true',
+            help=(f"Disable coverage of {k} language (this overrides "
+                  f"--cover-{k}"))
+    arglist = sys.argv[1:]
+    add_args = (('-h' in arglist) or ('--help' in arglist)
+                or not parser.parse_known_args(args=arglist).from_env)
+    if add_args:
+        install_languages = import_install_languages()
+        for x in install_languages.get_language_directories():
+            with install_languages.import_language_install(
+                    x.lower()) as install:
+                if hasattr(install, 'update_argparser'):
+                    parser = install.update_argparser(parser)
+    args = parser.parse_args(args=arglist)
+    kwargs = {
+        f'cover_{k}': True for k in constants.LANGUAGES['all']
+        if getattr(args, f'cover_{k}', False)}
+    kwargs.update({
+        f'cover_{k}': False for k in constants.LANGUAGES['all']
+        if getattr(args, f'dont_cover_{k}', False)})
+    covered_languages = get_covered_languages(args.from_env,
+                                              args=args, **kwargs)
+    flag = create_coveragerc(covered_languages)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")
-
-
-if __name__ == "__main__":
-    run()

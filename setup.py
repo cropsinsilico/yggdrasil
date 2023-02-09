@@ -6,12 +6,9 @@ import json
 from setuptools import setup, find_namespace_packages, Extension
 from distutils.sysconfig import get_python_lib
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
-LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
 PYRJ_PATH = os.path.join(ROOT_PATH, '_vendor', 'python_rapidjson')
-
-sys.path.insert(0, ROOT_PATH)
+# sys.path.insert(0, ROOT_PATH)
 import versioneer  # noqa: E402
-import create_coveragerc  # noqa: E402
 ygg_ver = versioneer.get_version()
 
 
@@ -37,24 +34,6 @@ finally:
     os.chdir(pwd)
 print(f"pyrj_ext = {pyrj_ext}")
 logging.critical(f"pyrj_ext = {pyrj_ext}")
-
-
-# Don't do coverage or installation of packages for use with other languages
-# when building a source distribution
-if ((('sdist' not in sys.argv) and ('egg_info' not in sys.argv)
-     and ('bdist' not in sys.argv) and ('dist_info' not in sys.argv)
-     and ('bdist_wheel' not in sys.argv))):
-    print(f"Installing languages: {sys.argv}")
-    logging.critical(f"Installing languages: {sys.argv}")
-    sys.path.insert(0, LANG_PATH)
-    try:
-        import install_languages
-    finally:
-        sys.path.pop(0)
-    # Attempt to install languages
-    installed_languages = install_languages.install_all_languages(from_setup=True)
-    # Set coverage options in .coveragerc
-    create_coveragerc.create_coveragerc(installed_languages)
 
 
 # Create .rst README from .md and get long description
