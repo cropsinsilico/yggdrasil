@@ -1495,7 +1495,7 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
             coverage_flags += install_flags
         src_dir = os.path.dirname(os.path.dirname(__file__))
         if not os.path.isabs(src_dir):
-            src_dir = os.path.abs(src_dir)
+            src_dir = os.path.abspath(src_dir)
         cmds += [
             f"cd {src_dir}",
             f"{param.python_cmd} create_coveragerc.py {coverage_flags}",
