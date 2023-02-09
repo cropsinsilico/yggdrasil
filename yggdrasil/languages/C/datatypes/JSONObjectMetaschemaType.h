@@ -61,6 +61,7 @@ public:
       properties[itr->name.GetString()] = iprop;
     }
     update_properties(properties, true);
+    free_properties(properties);
   }
   /*!
     @brief Constructor for JSONObjectMetaschemaType from Python dictionary.
@@ -103,6 +104,7 @@ public:
       properties[ikey] = iprop;
     }
     update_properties(properties, true);
+    free_properties(properties);
 #endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
@@ -123,12 +125,15 @@ public:
     @brief Free properties.
    */
   void free_properties() {
+    free_properties(properties_);
+  }
+  void free_properties(MetaschemaTypeMap& properties) {
     MetaschemaTypeMap::iterator it;
-    for (it = properties_.begin(); it != properties_.end(); it++) {
+    for (it = properties.begin(); it != properties.end(); it++) {
       delete it->second;
       it->second = NULL;
     }
-    properties_.clear();
+    properties.clear();
   }
   /*!
     @brief Equivalence operator.

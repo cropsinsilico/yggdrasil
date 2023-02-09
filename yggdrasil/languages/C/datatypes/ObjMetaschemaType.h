@@ -1205,6 +1205,7 @@ public:
     ygglog_info("writing:\n%s",buf);
     buf[msg_len] = '\0';
     writer->String(buf, msg_len);
+    free(buf);
     return true;
   }
   /*!

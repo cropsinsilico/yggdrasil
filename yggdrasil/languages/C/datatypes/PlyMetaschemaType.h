@@ -618,6 +618,7 @@ public:
     }
     buf[msg_len] = '\0';
     writer->String(buf, (rapidjson::SizeType)msg_len);
+    free(buf);
     return true;
   }
   /*!
