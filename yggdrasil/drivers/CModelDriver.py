@@ -13,7 +13,6 @@ from yggdrasil.drivers.CompiledModelDriver import (
     get_compilation_tool)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
-from numpy import distutils as numpy_distutils
 
 
 _default_internal_libtype = 'object'
@@ -546,7 +545,11 @@ try:
 except BaseException as e:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
     _python_lib = None
-_numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
+try:
+    _numpy_inc = [np.get_include()]
+except AttributeError:  # pragma: debug
+    from numpy import distutils as numpy_distutils
+    _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
 
 
