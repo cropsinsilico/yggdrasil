@@ -2975,6 +2975,9 @@ extern "C" {
 	items_vec.push_back(iitem);
       }
       obj = new JSONArrayMetaschemaType(items_vec, "", use_generic);
+      for (i = 0; i < nitems; i++) {
+	destroy_dtype(items + i);
+      }
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_json_array: C++ exception thrown.");
@@ -2997,6 +3000,9 @@ extern "C" {
 	properties[keys[i]] = iitem;
       }
       obj = new JSONObjectMetaschemaType(properties, use_generic);
+      for (i = 0; i < nitems; i++) {
+	destroy_dtype(values + i);
+      }
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_json_object: C++ exception thrown.");
