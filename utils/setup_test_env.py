@@ -273,7 +273,7 @@ class SetupParam(object):
             else:
                 self.env_method = 'virtualenv'
         if self.build_method is None:
-            if self.fallback_to_conda:
+            if self.method_base == 'conda':
                 if self.use_mamba:
                     self.build_method = 'mamba'
                 else:
@@ -1583,14 +1583,15 @@ def install_pkg(method, param=None, without_build=False,
     if param.for_development or param.build_method == 'direct':
         # Call setup.py in separate process from the package directory
         pass
-    elif param.build_method == 'conda':
+    elif param.build_method in ('conda', 'mamba'):
         ygg_pkgs = ['yggdrasil']
         ygg_pkgs += [f'yggdrasil.{x}' for x in extras]
         cmds += install_conda_build(ygg_pkgs, param=param,
                                     return_commands=True,
                                     allow_fail=('mpi' in extras))
         cmds += summary_cmds
-    elif param.build_method == 'pip':
+    elif param.build_method in ('sdist', 'bdist',
+                                'wheel', 'bdist_wheel'):
         build_ext = None
         build_dir = 'dist'
         if param.build_method in ('sdist', 'bdist'):
@@ -1615,7 +1616,7 @@ def install_pkg(method, param=None, without_build=False,
         ]
         cmds += summary_cmds
     else:  # pragma: debug
-        raise ValueError(f"Invalid method: '{param.method}'")
+        raise ValueError(f"Invalid method: '{param.build_method}'")
     yggdrasil_installed = False
     if not force_yggdrasil:
         if param.method == 'conda':
