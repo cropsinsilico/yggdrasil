@@ -257,6 +257,7 @@ extras:
     - black
     - ipython
     - PyGithub
+    - pre-commit
 bespoke_extras:
 - astropy
 - pygments
