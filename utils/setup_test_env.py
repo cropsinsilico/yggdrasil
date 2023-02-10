@@ -500,8 +500,9 @@ class SetupParam(object):
         if 'install' in skip_types:
             return
         # Begin install_opts specific options
-        if install_opts is None:
-            install_opts = get_install_opts()
+        if not isinstance(install_opts, dict):
+            install_opts = get_install_opts(
+                empty=(install_opts == 'empty'))
         for k, v in install_opts.items():
             if k in ['os'] or args_match((f'--dont-install-{k}', ), skip):
                 continue
@@ -795,6 +796,8 @@ def get_install_opts(old=None, empty=False):
         old (dict, optional): If provided, the returned mapping will include
             the values from this dictionary, but will also be updated with any
             that are missing.
+        empty (bool, optional): If True, the returned mapping defaults to
+            not installing anything and does not specify an operating system.
 
     Returns:
         dict: Mapping between languages/packages and whether or not they
@@ -855,10 +858,10 @@ def get_install_opts(old=None, empty=False):
             'trimesh': True,
             'pygments': True,
             'omp': False,
-            'docs': False,
+            'docs': True,
             'no_sudo': False,
             'mpi': False,
-            'dev': False,
+            'dev': True,
             'testing': True,
         }
     if empty:
