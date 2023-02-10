@@ -223,7 +223,9 @@ outputs:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - PyGithub
         - black
+        - emacs
         - ipython
+        - pre-commit
   - name: yggdrasil.astropy
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

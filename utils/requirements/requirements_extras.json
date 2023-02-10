@@ -31,7 +31,8 @@
   "dev": [
     "PyGithub",
     "black",
-    "ipython"
+    "ipython",
+    "pre-commit"
   ],
   "astropy": [
     "astropy"

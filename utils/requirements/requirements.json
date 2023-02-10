@@ -519,7 +519,13 @@
     "dev": [
       "black",
       "ipython",
-      "PyGithub"
+      "PyGithub",
+      "pre-commit",
+      {
+        "emacs": {
+          "method": "conda"
+        }
+      }
     ]
   },
   "bespoke_extras": [

@@ -1484,7 +1484,7 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
     cmds = []
     install_flags = ''
     if param.install_opts['r']:
-        if param.method_base == 'conda':
+        if param.fallback_to_conda:
             R_exe = locate_conda_exe(param.conda_env, 'R',
                                      use_mamba=param.use_mamba,
                                      allow_missing=True)
