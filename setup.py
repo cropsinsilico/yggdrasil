@@ -7,7 +7,7 @@ from setuptools import setup, find_namespace_packages, Extension
 from distutils.sysconfig import get_python_lib
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 PYRJ_PATH = os.path.join(ROOT_PATH, '_vendor', 'python_rapidjson')
-# sys.path.insert(0, ROOT_PATH)
+sys.path.insert(0, ROOT_PATH)
 import versioneer  # noqa: E402
 ygg_ver = versioneer.get_version()
 
