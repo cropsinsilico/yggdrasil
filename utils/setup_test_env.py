@@ -106,7 +106,7 @@ class SetupParam(object):
                      "environment")}),
         (('--build-method', ), ['auto'], {
             'choices': ['conda', 'mamba', 'sdist', 'bdist',
-                        'wheel', 'bdist_wheel', None],
+                        'wheel', 'bdist_wheel', 'direct', None],
             'default': None,
             'help': ("Method that should be used to build "
                      "yggdrasil")}),
@@ -1168,7 +1168,10 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
     upgrade_pkgs = ['wheel', 'setuptools']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
-    if param.build_method in ('mamba', 'conda'):
+    if param.build_method == 'direct':
+        # Do nothing, package will be installed from source
+        pass
+    elif param.build_method in ('mamba', 'conda'):
         cmds += build_conda_recipe(param=param, return_commands=True,
                                    dont_test=(_is_win and _on_gha))
     elif param.build_method in ('sdist', 'bdist',
@@ -1501,7 +1504,7 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
             f"{param.python_cmd} create_coveragerc.py {coverage_flags}",
             f"cd {os.getcwd()}"]
     if not install_called:
-        cmds += [f"{param.python_cmd} yggdrasil install{install_flags}"]
+        cmds += [f"{param.python_cmd} -m yggdrasil install all{install_flags}"]
     if return_commands:
         return cmds
     call_script(cmds, param=param)
@@ -1574,18 +1577,17 @@ def install_pkg(method, param=None, without_build=False,
         x for x in req.extras(methods=['python', param.method_base])
         if param.install_opts[x]]
     # Install yggdrasil
-    if param.for_development:
+    if param.for_development or param.build_method == 'direct':
         # Call setup.py in separate process from the package directory
-        # cmds += [f"{param.python_cmd} setup.py develop"]
         pass
-    elif param.method == 'conda':
+    elif param.build_method == 'conda':
         ygg_pkgs = ['yggdrasil']
         ygg_pkgs += [f'yggdrasil.{x}' for x in extras]
         cmds += install_conda_build(ygg_pkgs, param=param,
                                     return_commands=True,
                                     allow_fail=('mpi' in extras))
         cmds += summary_cmds
-    elif param.method == 'pip':
+    elif param.build_method == 'pip':
         build_ext = None
         build_dir = 'dist'
         if param.build_method in ('sdist', 'bdist'):
@@ -1627,13 +1629,16 @@ def install_pkg(method, param=None, without_build=False,
     if not install_deps_before:
         cmds += cmds_deps
     if (((param.dry_run or (not yggdrasil_installed))
-         and param.for_development)):
+         and (param.for_development or param.build_method == 'direct'))):
         src = '.'
+        flags = ''
         if extras:
             src += f"[{','.join(extras)}]"
+        if param.for_development:
+            flags += " --editable"
         cmds += [
             f"cd {_pkg_dir}",
-            f"{param.python_cmd} -m pip install --editable {src}",
+            f"{param.python_cmd} -m pip install{flags} {src}",
             f"cd {os.getcwd()}"]
     cmds += config_pkg(param=param, return_commands=True,
                        allow_missing=False)
