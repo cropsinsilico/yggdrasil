@@ -258,7 +258,7 @@ if __name__ == "__main__":
                   f"--cover-{k}"))
     arglist = sys.argv[1:]
     add_args = (('-h' in arglist) or ('--help' in arglist)
-                or not parser.parse_known_args(args=arglist).from_env)
+                or not parser.parse_known_args(args=arglist)[0].from_env)
     if add_args:
         install_languages = import_install_languages()
         for x in install_languages.get_language_directories():
