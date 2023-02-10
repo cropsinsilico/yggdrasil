@@ -258,6 +258,8 @@ extras:
     - ipython
     - PyGithub
     - pre-commit
+    - emacs:
+        method: conda
 bespoke_extras:
 - astropy
 - pygments

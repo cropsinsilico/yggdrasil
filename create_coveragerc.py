@@ -115,7 +115,7 @@ def get_covered_languages(from_env=False, args=None, **kwargs):
         if f"cover_{k}" in kwargs:
             out[k] = kwargs.pop(f"cover_{k}")
         else:
-            out.setdefault(k, False)
+            out.setdefault(k, True)
     if kwargs:
         import pprint
         raise AssertionError(f"kwargs contains unused arguments: "
@@ -209,6 +209,8 @@ def create_coveragerc(installed_languages):
             excl_list = add_excl_rule(excl_list, vincl)
     # Language specific
     for k, v in installed_languages.items():
+        if k == 'c++':
+            k = 'cpp'
         if v:
             excl_list = add_excl_rule(excl_list, 'pragma: no %s' % k)
             excl_list = rm_excl_rule(excl_list, 'pragma: %s' % k)
@@ -267,6 +269,7 @@ if __name__ == "__main__":
                 if hasattr(install, 'update_argparser'):
                     parser = install.update_argparser(parser)
     args = parser.parse_args(args=arglist)
+    args.no_import = False
     kwargs = {
         f'cover_{k}': True for k in constants.LANGUAGES['all']
         if getattr(args, f'cover_{k}', False)}
