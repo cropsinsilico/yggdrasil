@@ -1077,6 +1077,24 @@ class ZMQComm(CommBase.CommBase):
         out['socket_type'] = 'PAIR'
         out['context'] = self.context
         return out
+
+    # This could be used to clean up file descriptors accumulated when
+    # rapidly opening and closing TCP sockets during testing
+    # @property
+    # def socket_fd(self):
+    #     r"""int: File descriptor associated with the socket."""
+    #     import psutil
+    #     proc = psutil.Process()
+    #     conn = proc.connections()
+    #     if not conn:
+    #         return None
+    #     for x in conn:
+    #         if not x.raddr:
+    #             continue
+    #         if ((x.raddr.ip == self.address_param['host']
+    #              and x.raddr.port == self.address_param['port'])):
+    #             return x.fd
+    #     return None
     
     def workcomm2header(self, work_comm, **kwargs):
         r"""Get header information from a comm.
@@ -1114,8 +1132,9 @@ class ZMQComm(CommBase.CommBase):
     def prepare_header(self, header_kwargs):
         r"""Prepare header kwargs for the communicator."""
         out = super(ZMQComm, self).prepare_header(header_kwargs)
-        out.setdefault('__meta__', {})
-        out['__meta__']['zmq_reply'] = self.set_reply_socket_send()
+        if self.is_open:
+            out.setdefault('__meta__', {})
+            out['__meta__']['zmq_reply'] = self.set_reply_socket_send()
         return out
         
     def send(self, *args, **kwargs):
