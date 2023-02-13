@@ -95,7 +95,7 @@ class TestForkComm(base_class):
             return ncomm
         return 1
 
-    @pytest.mark.flaky(max_runs=5)
+    # @pytest.mark.flaky(max_runs=5)
     def test_send_recv_eof_no_close(self, send_comm, recv_comm, do_send_recv):
         r"""Test send/recv of EOF message with no close."""
         recv_comm.close_on_eof_recv = False
