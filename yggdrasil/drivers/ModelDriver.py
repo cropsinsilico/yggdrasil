@@ -3865,7 +3865,7 @@ class ModelDriver(Driver):
                 return kwargs['native_type'], kwargs.get('json_type', kwargs)
             return kwargs['native_type']
         assert 'json_type' not in kwargs
-        json_type = kwargs.get('datatype', kwargs)
+        json_type = copy.deepcopy(kwargs.get('datatype', kwargs))
         if isinstance(json_type, dict):
             type_name = json_type.get('type', 'bytes')
         else:

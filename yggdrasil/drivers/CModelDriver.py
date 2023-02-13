@@ -1385,13 +1385,15 @@ class CModelDriver(CompiledModelDriver):
             else:  # pragma: debug
                 raise ValueError("Cannot determine precision for complex type '%s'"
                                  % grp['type'])
+            
+        elif grp['type'] == 'double':
+            out['type'] = 'float'
+            out['precision'] = 8
+        elif grp['type'] == 'float':
+            out['type'] = 'float'
+            out['precision'] = 4
         else:
-            if grp['type'] == 'double':
-                out['precision'] = 8
-            elif grp['type'] == 'float':
-                grp['type'] = 'double'
-                out['precision'] = 4
-            elif grp['type'] in ['int', 'uint']:
+            if grp['type'] in ['int', 'uint']:
                 grp['type'] += 'X_t'
                 out['precision'] = np.dtype('intc').itemsize
             out['type'] = super(CModelDriver, cls).get_json_type(grp['type'])
@@ -1402,8 +1404,6 @@ class CModelDriver(CompiledModelDriver):
             if nptr > 0:
                 if out['type'] == 'number':
                     out['type'] = 'float'
-                assert out['type'] in constants.SCALAR_TYPES + ['string',
-                                                                'length']
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
         if out['type'] in constants.SCALAR_TYPES:

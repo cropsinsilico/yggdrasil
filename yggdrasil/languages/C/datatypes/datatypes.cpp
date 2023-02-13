@@ -3288,10 +3288,12 @@ extern "C" {
 	ygglog_throw_error("create_dtype_json_object: %d items expected, but the keys and/or values parameter is NULL.", nitems);
       }
       obj = new rapidjson::Document();
+      size_t nprops = 1;
       obj->StartObject();
       obj->Key("type", 4, true);
       obj->String("object", 6, true);
       if (nitems > 0) {
+	nprops++;
 	obj->Key("properties", 10, true);
 	obj->StartObject();
 	for (i = 0; i < nitems; i++) {
@@ -3302,10 +3304,8 @@ extern "C" {
 	  }
 	}
 	obj->EndObject(nitems);
-	obj->EndObject(2);
-      } else {
-	obj->EndObject(1);
       }
+      obj->EndObject(nprops);
       obj->FinalizeFromStack();
       return create_dtype(obj, use_generic);
     } catch(...) {
