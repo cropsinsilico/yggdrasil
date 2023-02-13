@@ -1230,14 +1230,24 @@ def count_comms(communicator_types):
 @pytest.fixture(scope="session")
 def count_fds():
     r"""Count the number of file descriptors."""
-    def count_fds_w():
+    def count_fds_w(dont_subtract_closed=False):
         import psutil
         from yggdrasil import platform
         proc = psutil.Process()
         if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
+            conn = proc.connections()
             out = proc.num_fds()
+            if not dont_subtract_closed:
+                out -= len([x for x in conn if x.status == 'CLOSE'])
+            # from yggdrasil.tools import get_fds
+            # fd_list = get_fds(ignore_closed=(not dont_subtract_closed),
+            #                   ignore_kqueue=True, verbose=True,
+            #                   by_column=3)
+            # out_alt = len(fd_list)
+            # print(out_alt, out, len(conn))
+            # assert out_alt == out
         return out
     return count_fds_w
 
@@ -1359,6 +1369,8 @@ def verify_count_fds(wait_on_function, first_test, count_fds,
     global _fd_count
     _dont_verify_count_fds = False
     _fd_count = count_fds()
+    # from yggdrasil.tools import track_fds
+    # with track_fds():
     yield
     gc.collect()
     if not (first_test or _dont_verify_count_fds or platform._is_win):
