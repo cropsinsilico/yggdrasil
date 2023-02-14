@@ -1495,17 +1495,18 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
     if _on_ci or param.for_development:
         coverage_flags = ''
         if _on_ci:
-            coverage_flags += " --from-env"
+            coverage_flags += " --from-env --no-import"
         else:
             install_called = True
             coverage_flags += install_flags
         src_dir = os.path.dirname(os.path.dirname(__file__))
         if not os.path.isabs(src_dir):
             src_dir = os.path.abspath(src_dir)
+        script = os.path.join(src_dir, 'create_coveragerc.py')
+        covrc = os.path.join(src_dir, '.coveragerc')
+        coverage_flags += f' --filename={covrc}'
         cmds += [
-            f"cd {src_dir}",
-            f"{param.python_cmd} create_coveragerc.py {coverage_flags}",
-            f"cd {os.getcwd()}"]
+            f"{param.python_cmd} {script} {coverage_flags}"]
     if not install_called:
         cmds += [f"{param.python_cmd} -m yggdrasil install all{install_flags}"]
     if return_commands:

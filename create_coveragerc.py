@@ -2,6 +2,7 @@ import os
 import sys
 import site
 import argparse
+import importlib
 PY_MAJOR_VERSION = sys.version_info[0]
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 _on_gha = bool(os.environ.get('GITHUB_ACTIONS', False))
@@ -17,20 +18,7 @@ except ImportError:
     except ImportError:
         HandyConfigParser = None
 _package_dir = os.path.join(site.getsitepackages()[0], 'yggdrasil')
-if os.path.isdir(_package_dir):
-    ADD_PATH = _package_dir
-else:
-    ADD_PATH = os.path.join(
-        os.path.abspath(os.path.dirname(__file__)), 'yggdrasil')
-try:
-    from yggdrasil import constants
-except ImportError:
-    sys.path.insert(0, ADD_PATH)
-    try:
-        import constants
-    finally:
-        sys.path.pop(0)
-_install_languages = None
+_yggdrasil_submodules = {}
 
 
 def add_excl_rule(excl_list, new_rule):
@@ -65,26 +53,37 @@ def rm_excl_rule(excl_list, new_rule):
     return excl_list
 
 
-def import_install_languages():
-    r"""Import install_languages from yggdrasil."""
-    global _install_languages
-    if _install_languages is None:
-        if os.path.isdir(_package_dir):
-            from yggdrasil.languages import install_languages
-        else:
-            LANG_PATH = os.path.join(
-                os.path.abspath(os.path.dirname(__file__)),
-                'yggdrasil', 'languages')
-            sys.path.insert(0, LANG_PATH)
+def import_yggdrasil_submodule(submodule, force_isolated=False):
+    r"""Import a yggdrasil submodule."""
+    global _yggdrasil_submodules
+    fullname = f"yggdrasil.{submodule}"
+    if fullname not in _yggdrasil_submodules:
+        if force_isolated:
+            if os.path.isdir(_package_dir):
+                basedir = _package_dir
+            else:
+                basedir = os.path.join(
+                    os.path.abspath(os.path.dirname(__file__)),
+                    'yggdrasil')
+            subdir = os.path.join(basedir, *submodule.split('.')[:-1])
+            sys.path.insert(0, subdir)
             try:
-                import install_languages
+                x = importlib.import_module(submodule.split('.')[-1])
             finally:
                 sys.path.pop(0)
-        _install_languages = install_languages
-    return _install_languages
+        else:
+            x = importlib.import_module(fullname)
+        _yggdrasil_submodules[fullname] = x
+    return _yggdrasil_submodules[fullname]
 
 
-def get_covered_languages(from_env=False, args=None, **kwargs):
+def import_install_languages(**kwargs):
+    r"""Import install_languages from yggdrasil."""
+    return import_yggdrasil_submodule("languages.install_languages")
+
+
+def get_covered_languages(from_env=False, force_isolated=False,
+                          args=None, **kwargs):
     r"""Get a dictionary of languages that should be covered.
 
     Args:
@@ -98,6 +97,8 @@ def get_covered_languages(from_env=False, args=None, **kwargs):
             checking the environment and the installed languages.
 
     """
+    constants = import_yggdrasil_submodule("constants",
+                                           force_isolated=force_isolated)
     out = {}
     if from_env:
         for k in constants.LANGUAGES['all']:
@@ -105,7 +106,8 @@ def get_covered_languages(from_env=False, args=None, **kwargs):
             if v is not None:
                 out[k] = (v == '1')
     else:
-        out = import_install_languages().install_all_languages(args=args)
+        out = import_install_languages(
+            force_isolated=force_isolated).install_all_languages(args=args)
     # Override with passed arguments or set default to False
     for k, v in constants.ALIASED_LANGUAGES.items():
         for kalias in v:
@@ -123,7 +125,7 @@ def get_covered_languages(from_env=False, args=None, **kwargs):
     return out
 
 
-def create_coveragerc(installed_languages):
+def create_coveragerc(installed_languages, filename=None):
     r"""Create the coveragerc to reflect the OS, Python version, and availability
     of matlab. Parameters from the setup.cfg file will be added. If the
     .coveragerc file already exists, it will be read first before adding setup.cfg
@@ -133,6 +135,8 @@ def create_coveragerc(installed_languages):
     Args:
         installed_languages (dict): Dictionary of language/boolean key/value
             pairs indicating optional languages and their state of installation.
+        filename (str, optional): File where coveragerc should be saved.
+            Defaults to '.coveragerc' in the current directory.
 
     Returns:
         bool: True if the file was created/updated successfully, False otherwise.
@@ -143,13 +147,12 @@ def create_coveragerc(installed_languages):
     debug_msg = 'cwd = %s, os.path.dirname(__file__) = %s' % (
         os.getcwd(), os.path.dirname(__file__))
     print(debug_msg)
-    # covdir = os.path.dirname(__file__)
-    covdir = os.getcwd()
-    covrc = os.path.join(covdir, '.coveragerc')
+    if not filename:
+        filename = os.path.join(os.getcwd(), '.coveragerc')
     cp = HandyConfigParser("")
     # Read from existing .coveragerc
-    if os.path.isfile(covrc):
-        cp.read(covrc)
+    if os.path.isfile(filename):
+        cp.read(filename)
     # Read options from setup.cfg
     setup_cfg = os.path.join(os.path.dirname(__file__), 'setup.cfg')
     cp_cfg = HandyConfigParser("")
@@ -238,12 +241,13 @@ def create_coveragerc(installed_languages):
     incl_list.append(section_path)
     cp.set('run', section, '\n' + '\n'.join(incl_list))
     # Write
-    with open(covrc, 'w') as fd:
+    with open(filename, 'w') as fd:
         cp.write(fd)
     return True
 
 
 if __name__ == "__main__":
+    constants = import_yggdrasil_submodule("constants", force_isolated=True)
     parser = argparse.ArgumentParser(
         "Create a coverage file based on the installed languages.")
     parser.add_argument(
@@ -258,6 +262,12 @@ if __name__ == "__main__":
             f'--dont-cover-{k}', action='store_true',
             help=(f"Disable coverage of {k} language (this overrides "
                   f"--cover-{k}"))
+    parser.add_argument(
+        '--no-import', action='store_true',
+        help="Don't import the yggdrasil package.")
+    parser.add_argument(
+        '--filename', type=str, default=None,
+        help="File to save coveragerc to.")
     arglist = sys.argv[1:]
     add_args = (('-h' in arglist) or ('--help' in arglist)
                 or not parser.parse_known_args(args=arglist)[0].from_env)
@@ -269,15 +279,15 @@ if __name__ == "__main__":
                 if hasattr(install, 'update_argparser'):
                     parser = install.update_argparser(parser)
     args = parser.parse_args(args=arglist)
-    args.no_import = False
     kwargs = {
         f'cover_{k}': True for k in constants.LANGUAGES['all']
         if getattr(args, f'cover_{k}', False)}
     kwargs.update({
         f'cover_{k}': False for k in constants.LANGUAGES['all']
         if getattr(args, f'dont_cover_{k}', False)})
-    covered_languages = get_covered_languages(args.from_env,
-                                              args=args, **kwargs)
-    flag = create_coveragerc(covered_languages)
+    covered_languages = get_covered_languages(
+        args.from_env, force_isolated=args.no_import,
+        args=args, **kwargs)
+    flag = create_coveragerc(covered_languages, filename=args.filename)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")
