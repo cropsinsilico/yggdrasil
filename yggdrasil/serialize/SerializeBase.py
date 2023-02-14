@@ -441,7 +441,7 @@ class SerializeBase(tools.YggClass):
         if self.datatype['type'] != 'array':
             return None
         if getattr(self, 'field_units', None) is not None:
-            out = copy.deepcopy(self.field_units)
+            out = [str(units.Units(x)) for x in self.field_units]
         elif isinstance(self.datatype['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
         elif isinstance(self.datatype['items'], list):
@@ -673,6 +673,7 @@ class SerializeBase(tools.YggClass):
                     if tk == 'units':
                         if units.is_null_unit(iv):
                             continue
+                        iv = str(units.Units(iv))
                         if itype['type'] == 'number':
                             itype.update(type='scalar',
                                          subtype='float',
