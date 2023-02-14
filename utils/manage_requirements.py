@@ -1054,7 +1054,7 @@ class YggRequirement(object):
 
         """
         varients = []
-        if self.flags.get("build", False) and for_build:
+        if self.flags.get("cross_build", False) and for_build:
             varients.append("build_platform != target_platform")
         if self.os is not None:
             if self.os == 'unix':

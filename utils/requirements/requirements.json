@@ -6,6 +6,25 @@
         "method": "conda_recipe",
         "flags": {
           "build": true,
+          "build_only": true,
+          "cross_build": true
+        }
+      }
+    },
+    {
+      "{{ compiler('c') }}": {
+        "method": "conda_recipe",
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
+    {
+      "{{ compiler('cxx') }}": {
+        "method": "conda_recipe",
+        "flags": {
+          "build": true,
           "build_only": true
         }
       }
@@ -17,7 +36,6 @@
         "method": "conda"
       }
     },
-    "jsonschema==3.2.0",
     {
       "matplotlib": {
         "flags": {
@@ -39,9 +57,9 @@
       "numpy>=1.13.0": {
         "host": true,
         "flags": {
-          "build": true,
           "from_env": "NUMPY",
-          "method_in_setup": "conda"
+          "method_in_setup": "conda",
+          "build": true
         }
       }
     },
@@ -60,7 +78,8 @@
         "method": "conda_recipe",
         "host": true,
         "flags": {
-          "build": true
+          "build": true,
+          "cross_build": true
         }
       }
     },

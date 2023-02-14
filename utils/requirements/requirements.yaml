@@ -5,11 +5,21 @@ general:
       flags:
         build: True
         build_only: True
+        cross_build: True
+  - "{{ compiler('c') }}":
+      method: conda_recipe
+      flags:
+        build: True
+        build_only: True
+  - "{{ compiler('cxx') }}":
+      method: conda_recipe
+      flags:
+        build: True
+        build_only: True
   - deprecation
   - flask
   - git:
       method: conda
-  - jsonschema==3.2.0
   - matplotlib:
       flags:
         from_env: MATPLOTLIB
@@ -21,7 +31,6 @@ general:
   - numpy>=1.13.0:
       host: true
       flags:
-        build: true
         from_env: NUMPY
         method_in_setup: conda
         build: True
@@ -37,6 +46,7 @@ general:
       host: True
       flags:
         build: True
+        cross_build: True
   - pyyaml
   - pyzmq
   - requests
