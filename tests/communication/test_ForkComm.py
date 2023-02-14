@@ -95,13 +95,18 @@ class TestForkComm(base_class):
             return ncomm
         return 1
 
-    # @pytest.mark.flaky(max_runs=5)
-    def test_send_recv_eof_no_close(self, send_comm, recv_comm, do_send_recv):
+    def test_send_recv_eof_no_close(self, ncomm, send_pattern, recv_pattern,
+                                    send_comm, recv_comm, do_send_recv):
         r"""Test send/recv of EOF message with no close."""
         recv_comm.close_on_eof_recv = False
         for x in recv_comm.comm_list:
             x.close_on_eof_recv = False
+        recv_params = {}
+        if (((send_pattern in ['broadcast', 'scatter'])
+             and (recv_pattern == 'cycle'))):
+            recv_params['kwargs'] = {'timeout': 10}
         do_send_recv(send_comm, recv_comm,
+                     recv_params=recv_params,
                      send_params={'method': 'send_eof'})
 
     def test_send_recv_filter_eof(self, run_once, filtered_comms, send_comm,
