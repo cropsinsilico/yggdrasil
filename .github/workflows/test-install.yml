@@ -57,12 +57,13 @@ jobs:
         install-method:
         - pip
         test-flags1:
+        - --suite=examples --parametrize-example-name=split_and_merge --second-attempt
+          --timeout=300
+        test-flags2:
         - --long-running --suites timing demos top
         - --suite=examples --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3
         - --suite=types --skip-languages c cpp
         - --suite=types --languages c cpp
-        test-flags2:
-        - ''
         install-c:
         - true
         install-mpi:
