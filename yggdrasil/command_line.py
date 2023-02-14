@@ -1211,7 +1211,7 @@ class ygginstall(SubCommand):
           {'nargs': '*',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
            'default': [],
-           'help': 'One or more languages that should be configured.'}),
+           'help': 'One or more languages that should be installed.'}),
          (('--no-import', ),
           {'action': 'store_true',
            'help': ('Don\'t import the yggdrasil package in '
@@ -1231,6 +1231,7 @@ class ygginstall(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.languages import install_languages
+        from yggdrasil import config
         languages = args.languages
         if (((isinstance(languages, str) and (languages == 'all'))
              or (isinstance(languages, list) and ('all' in languages)))):
@@ -1242,6 +1243,8 @@ class ygginstall(SubCommand):
             CModelDriver.set_asan_env(os.environ)
         for x in languages:
             install_languages.install_language(x, args=args)
+        if not os.path.isfile(config.usr_config_file):
+            config.update_language_config(verbose=True)
 
 
 class update_config(SubCommand):
