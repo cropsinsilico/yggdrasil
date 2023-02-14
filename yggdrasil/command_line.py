@@ -1531,6 +1531,58 @@ class timing_plots(SubCommand):
             timing.plot_scalings(compare=args.comparison)
 
 
+class coveragerc(SubCommand):
+    r"""Create a .coveragerc file."""
+
+    name = "coveragerc"
+    help = (
+        "Generate a coveragerc file that covers/ignores lines based on "
+        "installed languages or options.")
+    arguments = [
+        (('--method', ),
+         {'choices': ['installed', 'env', None],
+          'default': None,
+          'help': ("Method that should be used to select languages that "
+                   "should be covered. 'env' covers languages based on "
+                   "the value of environment variables of the form "
+                   "'INSTALL{language}'. 'installed' covers languages "
+                   "that yggdrasil considers installed.")}),
+        (('--cover-languages', '--cover-language', '--cover'),
+         {'nargs': '*',
+          'choices': LANGUAGES.get('all', []),
+          'help': "Language(s) to cover."}),
+        (('--dont-cover-languages', '--dont-cover-language',
+          '--dont-cover'),
+         {'nargs': '*',
+          'choices': LANGUAGES.get('all', []),
+          'help': "Language(s) to ignore in coverage."}),
+        (('--filename', ),
+         {'type': str, 'default': None,
+          'help': "File to save coveragerc to"}),
+    ]
+
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.tools import is_lang_installed
+        from yggdrasil.config import create_coveragerc
+        covered_languages = {}
+        if args.method == 'env':
+            for k in LANGUAGES['all']:
+                v = os.environ.get(f"INSTALL{k.upper()}", None)
+                if v is not None:
+                    covered_languages[k] = (v == '1')
+        elif args.method == 'installed':
+            for k in LANGUAGES['all']:
+                covered_languages[k] = is_lang_installed(k)
+        for k in args.cover_languages:
+            covered_languages[k] = True
+        for k in args.dont_cover_languages:
+            covered_languages[k] = False
+        for k in LANGUAGES['all']:
+            covered_languages.setdefault(k, True)
+        create_coveragerc(covered_languages, filename=args.filename)
+
+
 class generate_gha_workflow(SubCommand):
     r"""Re-generate the Github actions workflow yaml."""
 
@@ -1634,7 +1686,7 @@ class main(SubCommand):
                    ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,
                    timing_plots, generate_gha_workflow,
-                   integration_service_manager]
+                   integration_service_manager, coveragerc]
 
     @classmethod
     def get_parser(cls, **kwargs):
