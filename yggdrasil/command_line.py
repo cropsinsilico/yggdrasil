@@ -1577,10 +1577,12 @@ class coveragerc(SubCommand):
         elif args.method == 'installed':
             for k in LANGUAGES['all']:
                 covered_languages[k] = is_lang_installed(k)
-        for k in args.cover_languages:
-            covered_languages[k] = True
-        for k in args.dont_cover_languages:
-            covered_languages[k] = False
+        if args.cover_languages:
+            for k in args.cover_languages:
+                covered_languages[k] = True
+        if args.dont_cover_languages:
+            for k in args.dont_cover_languages:
+                covered_languages[k] = False
         for k in LANGUAGES['all']:
             covered_languages.setdefault(k, True)
         create_coveragerc(covered_languages, filename=args.filename)
