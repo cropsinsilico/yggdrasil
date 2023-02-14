@@ -57,8 +57,8 @@ jobs:
         install-method:
         - pip
         test-flags1:
-        - --suite=examples --parametrize-example-name=split_and_merge --second-attempt
-          --timeout=300
+        - --suite=examples tests/examples/__init__.py --parametrize-example-name=split_and_merge
+          --second-attempt --timeout=300
         test-flags2:
         - --long-running --suites timing demos top
         - --suite=examples --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3
