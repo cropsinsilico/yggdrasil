@@ -861,7 +861,8 @@ class ConnectionDriver(Driver):
         if msg.header and ('model' in msg.header.get('__meta__', {})):
             self.models_recvd.setdefault(msg.header['__meta__']['model'], 0)
             self.models_recvd[msg.header['__meta__']['model']] += 1
-            if msg.header['__meta__']['model'] not in self.models['input']:
+            if ((self.models_recvd[msg.header['__meta__']['model']] == 1
+                 and msg.header['__meta__']['model'] not in self.models['input'])):
                 self.models['input'].append(msg.header['__meta__']['model'])
         if msg.flag == CommBase.FLAG_EOF:
             return self.on_eof(msg)
