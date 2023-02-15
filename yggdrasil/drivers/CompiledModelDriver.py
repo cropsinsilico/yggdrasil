@@ -2290,6 +2290,7 @@ class CompiledModelDriver(ModelDriver):
     is_build_tool = False
     allow_parallel_build = False
     locked_buildfile = None
+    kwargs_in_suffix = ['with_asan', 'disable_python_c_api', 'commtype']
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
         self.buildfile_lock = None
@@ -2335,6 +2336,19 @@ class CompiledModelDriver(ModelDriver):
                                       'Attempting to locate an alternative .')
                                      % (k, cls.language, default_tool_name))
                     setattr(cls, 'default_%s' % k, None)
+
+    @classmethod
+    def select_suffix_kwargs(cls, kwargs):
+        r"""Select suffix kwargs.
+
+        Args:
+            kwargs (dict): Keyword arguments to select suffix kwargs from.
+
+        Returns:
+            dict: Selected suffix kwargs.
+        
+        """
+        return {k: kwargs[k] for k in cls.kwargs_in_suffix if k in kwargs}
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -2876,23 +2890,20 @@ class CompiledModelDriver(ModelDriver):
             str: Full path to the object file.
 
         """
+        suffix_kws = dict(commtype=commtype,
+                          disable_python_c_api=disable_python_c_api,
+                          with_asan=with_asan)
         if isinstance(dep, tuple):
             assert len(dep) == 2
             dep_lang, dep = dep
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
                 return drv.get_dependency_object(
-                    dep, default=default, commtype=commtype,
-                    toolname=toolname,
-                    disable_python_c_api=disable_python_c_api,
-                    with_asan=with_asan)
+                    dep, default=default, toolname=toolname, **suffix_kws)
         out = None
         if dep in cls.internal_libraries:
             src = cls.get_dependency_source(dep, toolname=toolname)
-            suffix = cls.get_internal_suffix(
-                commtype=commtype,
-                disable_python_c_api=disable_python_c_api,
-                with_asan=with_asan)
+            suffix = cls.get_internal_suffix(**suffix_kws)
             dep_info = cls.get_dependency_info(dep, toolname=toolname)
             toolname = dep_info.get('toolname', toolname)
             dep_lang = dep_info.get('language', cls.language)
@@ -2949,6 +2960,9 @@ class CompiledModelDriver(ModelDriver):
                 specified dependency and default is None.
 
         """
+        suffix_kws = dict(commtype=commtype,
+                          disable_python_c_api=disable_python_c_api,
+                          with_asan=with_asan)
         if isinstance(dep, tuple):
             assert len(dep) == 2
             dep_lang, dep = dep
@@ -2956,9 +2970,7 @@ class CompiledModelDriver(ModelDriver):
                 drv = import_component('model', dep_lang)
                 return drv.get_dependency_library(
                     dep, default=default, libtype=libtype,
-                    commtype=commtype, toolname=toolname,
-                    disable_python_c_api=disable_python_c_api,
-                    with_asan=with_asan)
+                    toolname=toolname, **suffix_kws)
         libclass = None
         libinfo = {}
         if dep in cls.internal_libraries:
@@ -3009,17 +3021,12 @@ class CompiledModelDriver(ModelDriver):
                                         toolname=toolname)
                 if tool.is_gnu:
                     dll = cls.get_dependency_library(
-                        dep, libtype='shared', commtype=commtype,
-                        toolname=toolname,
-                        disable_python_c_api=disable_python_c_api,
-                        with_asan=with_asan)
+                        dep, libtype='shared', toolname=toolname,
+                        **suffix_kws)
                     out = tool.dll2a(dll)
         elif libclass == 'internal':
             src = cls.get_dependency_source(dep, toolname=toolname)
-            suffix = cls.get_internal_suffix(
-                commtype=commtype,
-                disable_python_c_api=disable_python_c_api,
-                with_asan=with_asan)
+            suffix = cls.get_internal_suffix(**suffix_kws)
             dep_lang = cls.get_dependency_info(dep, toolname=toolname).get(
                 'language', cls.language)
             tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
@@ -3281,15 +3288,13 @@ class CompiledModelDriver(ModelDriver):
             internal_dependencies, toolname=toolname)
         # Add internal libraries as objects for api
         additional_objs = kwargs.pop('additional_objs', [])
+        suffix_kws = cls.select_suffix_kwargs(kwargs)
         for x in internal_dependencies:
             libinfo = cls.get_dependency_info(x, toolname=toolname)
             if libinfo.get('libtype', None) == 'object':
                 additional_objs.append(cls.get_dependency_object(
-                    x, commtype=commtype,
-                    toolname=libinfo.get('toolname', toolname),
-                    disable_python_c_api=kwargs.get('disable_python_c_api', False),
-                    with_asan=kwargs.get('with_asan', False)))
-                                         
+                    x, toolname=libinfo.get('toolname', toolname),
+                    **suffix_kws))
         if additional_objs:
             kwargs['additional_objs'] = additional_objs
         # Add directories for internal/external dependencies
@@ -3389,22 +3394,22 @@ class CompiledModelDriver(ModelDriver):
             for k in cls.get_external_libraries(no_comm_libs=True):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
+        suffix_kws = cls.select_suffix_kwargs(kwargs)
         # Add flags for internal/external depenencies
         all_dep = internal_dependencies + external_dependencies
         for dep in cls.get_dependency_order(all_dep, toolname=toolname):
             if kwargs.get('disable_python_c_api', False) and (dep in ['python', 'numpy']):
                 continue
             dep_lib = cls.get_dependency_library(
-                dep, commtype=commtype, toolname=toolname,
-                disable_python_c_api=kwargs.get('disable_python_c_api', False),
-                with_asan=kwargs.get('with_asan', False))
+                dep, commtype=commtype, toolname=toolname, **suffix_kws)
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
                     if dep in internal_dependencies:
                         # If this is called recursively, verify that dep_lib is produced
                         # by compiling dep.
-                        cls.compile_dependencies(toolname=toolname)
+                        cls.compile_dependencies(
+                            toolname=toolname, **suffix_kws)
                     if not os.path.isfile(dep_lib):
                         raise RuntimeError(
                             ("Library for %s dependency does not "
@@ -3912,10 +3917,8 @@ class CompiledModelDriver(ModelDriver):
         compiler = cls.get_tool('compiler', toolname=kwargs.get('toolname', None),
                                 default=None)
         if compiler is not None:
-            suffix = cls.get_internal_suffix(
-                commtype=kwargs.get('commtype', None),
-                disable_python_c_api=kwargs.get('disable_python_c_api', False),
-                with_asan=kwargs.get('with_asan', False))
+            kws = cls.select_suffix_kwargs(kwargs)
+            suffix = cls.get_internal_suffix(**kws)
             suffix += compiler.get_tool_suffix()
             try:
                 cls.compile_dependencies(products=products, **kwargs)
@@ -3962,9 +3965,10 @@ class CompiledModelDriver(ModelDriver):
                                   products=self.products,
                                   toolname=self.get_tool_instance(
                                       'compiler', return_prop='name'),
-                                  suffix=('_%s' % self.name),
-                                  with_asan=self.with_asan,
-                                  disable_python_c_api=self.disable_python_c_api)
+                                  suffix=('_%s' % self.name))
+            for k in self.kwargs_in_suffix:
+                if hasattr(self, k):
+                    default_kwargs[k] = getattr(self, k)
             if not kwargs.get('dont_link', False):
                 default_kwargs.update(linker_flags=self.linker_flags)
             for k, v in default_kwargs.items():
@@ -4083,6 +4087,7 @@ class CompiledModelDriver(ModelDriver):
                 src = cls.get_dependency_source(dep, toolname=toolname)
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)
+            suffix_kws = cls.select_suffix_kwargs(kwargs)
             if kwargs['libtype'] == 'windows_import':
                 # Compile dynamic library
                 kwargs['libtype'] = 'shared'
@@ -4092,17 +4097,11 @@ class CompiledModelDriver(ModelDriver):
                 kwargs.setdefault(
                     'out', cls.get_dependency_library(
                         dep, libtype=kwargs['libtype'],
-                        commtype=kwargs.get('commtype', None),
-                        toolname=toolname,
-                        disable_python_c_api=kwargs.get('disable_python_c_api', False),
-                        with_asan=kwargs.get('with_asan', False)))
+                        toolname=toolname, **suffix_kws))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
             kwargs.setdefault('suffix', '')
-            kwargs['suffix'] += cls.get_internal_suffix(
-                commtype=kwargs.get('commtype', None),
-                disable_python_c_api=kwargs.get('disable_python_c_api', False),
-                with_asan=kwargs.get('with_asan', False))
+            kwargs['suffix'] += cls.get_internal_suffix(**suffix_kws)
             return cls.call_compiler(src, toolname=toolname, **kwargs)
         # Compile using the compiler after updating the flags
         kwargs = cls.update_compiler_kwargs(toolname=toolname, **kwargs)

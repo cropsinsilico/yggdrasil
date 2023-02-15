@@ -47,7 +47,9 @@ class OSRModelDriver(ExecutableModelDriver):
         'copy_xml_to_osr': {'type': 'boolean', 'default': False},
         'update_interval': {'type': 'object',
                             'additionalProperties': {'type': 'float'},
-                            'default': {'timesync': 1.0}}}
+                            'default': {'timesync': 1.0}},
+        'disable_python_c_api': {'type': 'boolean'},
+        'with_asan': {'type': 'boolean'}}
     executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
@@ -96,7 +98,11 @@ class OSRModelDriver(ExecutableModelDriver):
                 os.path.basename(self.model_file))
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
-        self.compile_dependencies()
+        compile_kwargs = {}
+        for k in CPPModelDriver.kwargs_in_suffix:
+            if hasattr(self, k):
+                compile_kwargs[k] = getattr(self, k)
+        self.compile_dependencies(**compile_kwargs)
         assert os.path.isfile(self.executable_path)
 
     @classmethod
@@ -134,8 +140,6 @@ class OSRModelDriver(ExecutableModelDriver):
                 compile_dependencies methods of the base classes.
 
         """
-        # TODO: Allow disable_python to be passed by setting the
-        # definition YGGDRASIL_DISABLE_PYTHON_C_API
         if (cls.repository is not None) and CPPModelDriver.is_installed():
             if not os.path.isdir(cls.repository):  # pragma: debug
                 # This will only need to be called if the tempdir was cleaned up
@@ -170,9 +174,13 @@ class OSRModelDriver(ExecutableModelDriver):
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
             flag_options = ''
-            for k in ['with_asan', 'disable_python_c_api']:
-                if kwargs.get(k, False):
-                    flag_options += f" --{k.replace('_', '-')}"
+            for k in CPPModelDriver.kwargs_in_suffix:
+                if k in ['commtype'] or not kwargs.get(k, False):
+                    continue
+                # if k in ['commtype']:
+                #     flag_options += f" --{k.replace('_', '-')}={kwargs[k]}"
+                # else:
+                flag_options += f" --{k.replace('_', '-')}"
             if flag_options:
                 env['YGG_OSR_FLAG_OPTIONS'] = flag_options.strip()
             if target != 'cleanygg':

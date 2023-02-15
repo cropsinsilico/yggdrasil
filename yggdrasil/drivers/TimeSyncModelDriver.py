@@ -224,10 +224,10 @@ class TimeSyncModelDriver(DSLModelDriver):
                     new_data = pd.DataFrame(new_data)
                     idx = table['time'].isin([t_pd])
                     if not idx.any():
-                        table = table.append(new_data, sort=False)
+                        table = pd.concat([table, new_data], sort=False)
                     elif model == client_model:
                         table = table.drop(table.index[idx])
-                        table = table.append(new_data, sort=False)
+                        table = pd.concat([table, new_data], sort=False)
                     tables[model] = table.sort_values('time')
             # Assign thread to handle checking when data is filled in
             threads[request_id] = multitasking.YggTaskLoop(
@@ -431,7 +431,7 @@ class TimeSyncModelDriver(DSLModelDriver):
         # Append
         out = pd.DataFrame()
         for k, v in table_temp.items():
-            out = out.append(v, sort=False)
+            out = pd.concat([out, v], sort=False)
         # Groupby + aggregate
         out = out.groupby('time').agg(aggregation)
         return out

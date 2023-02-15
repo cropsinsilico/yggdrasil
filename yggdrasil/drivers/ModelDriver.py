@@ -877,7 +877,7 @@ class ModelDriver(Driver):
     @classmethod
     def install_dependency(cls, package=None, package_manager=None,
                            arguments=None, command=None, always_yes=False,
-                           env=None):
+                           command_kwargs=None):
         r"""Install a dependency.
 
         Args:
@@ -893,8 +893,8 @@ class ModelDriver(Driver):
             always_yes (bool, optional): If True, the package manager will
                 not ask users for input during installation. Defaults to
                 False.
-            env (dict, optional): Environment variables to set on process
-                where installation will be done.
+            command_kwargs (dict, optional): Keyword arguments that should
+                be passed to the subprocess call for the installation.
 
         """
         assert package
@@ -912,10 +912,8 @@ class ModelDriver(Driver):
             elif platform._is_win:
                 package_manager = 'choco'
         yes_cmd = []
-        cmd_kwargs = {}
-        if env:
-            env = dict(os.environ, **env)
-            cmd_kwargs['env'] = env
+        if command_kwargs is None:
+            command_kwargs = {}
         if command:
             cmd = copy.copy(command)
         elif package_manager in ('conda', 'mamba'):
@@ -924,7 +922,7 @@ class ModelDriver(Driver):
                 # Conda/mamba commands must be run on the shell on
                 # windows as it is implemented as a batch script
                 cmd.insert(0, 'call')
-                cmd_kwargs['shell'] = True
+                command_kwargs['shell'] = True
             yes_cmd = ['-y']
         elif package_manager == 'brew':
             cmd = ['brew', 'install'] + package
@@ -956,9 +954,9 @@ class ModelDriver(Driver):
             cmd += arguments.split()
         if always_yes:
             cmd += yes_cmd
-        if cmd_kwargs.get('shell', False):
+        if command_kwargs.get('shell', False):
             cmd = ' '.join(cmd)
-        subprocess.check_call(cmd, **cmd_kwargs)
+        subprocess.check_call(cmd, **command_kwargs)
         
     def model_command(self):
         r"""Return the command that should be used to run the model.
@@ -985,11 +983,11 @@ class ModelDriver(Driver):
         raise NotImplementedError("language_executable not implemented for '%s'"
                                   % cls.language)
         
-    @classmethod
-    def compiled_with_asan(cls):
-        r"""Returns true if the compiled_with_asan flag is set."""
-        return (cls.cfg.get(
-            cls.language, 'compiled_with_asan', 'false').lower() == 'true')
+    # @classmethod
+    # def compiled_with_asan(cls):
+    #     r"""Returns true if the compiled_with_asan flag is set."""
+    #     return (cls.cfg.get(
+    #         cls.language, 'compiled_with_asan', 'false').lower() == 'true')
 
     @classmethod
     def executable_command(cls, args, unused_kwargs=None, **kwargs):
@@ -1538,8 +1536,8 @@ class ModelDriver(Driver):
         if existing is None:  # pragma: no cover
             existing = {}
         existing.update(os.environ)
-        if cls.compiled_with_asan():
-            cls.set_env_asan(existing)
+        # if cls.compiled_with_asan():
+        #     cls.set_env_asan(existing)
         return existing
 
     def set_env(self, existing=None, **kwargs):
