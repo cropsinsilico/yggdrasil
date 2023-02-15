@@ -937,11 +937,12 @@ def create_env(env_method, python, param=None, name=None, packages=None,
     existing_env = False
     env_removed = False
     if param.env_method in ('conda', 'mamba'):
-        existing_env = conda_env_exists(name, use_mamba=param.use_mamba)
+        use_mamba = (param.use_mamba and shutil('mamba'))
+        existing_env = conda_env_exists(name, use_mamba=use_mamba)
         if remove_existing and existing_env:
             assert name != 'base'
             env_dir = os.path.dirname(
-                locate_conda_bin(name, use_mamba=param.use_mamba))
+                locate_conda_bin(name, use_mamba=use_mamba))
             cmds += [f"{param.conda_exe} env remove -n {name}",
                      f"if [ -d {env_dir} ]",
                      "then",
