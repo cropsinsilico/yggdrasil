@@ -852,6 +852,7 @@ def wait_on_function(timeout, polling_interval):
 @pytest.fixture
 def run_once(request):
     r"""Fixture indicating that the test should only be run once."""
+    print("IN RUN ONCE")
     key = (request.cls, request.function.__name__)
     if key in _test_registry:
         pytest.skip(f"{request.cls.__name__}.{request.function.__name__} "
@@ -1145,6 +1146,7 @@ def patch_equality():
 _dont_verify_count_fds = False
 _dont_verify_count_comms = False
 _dont_verify_count_threads = False
+_fd_count = 0
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -1288,8 +1290,8 @@ def disable_verify_count_comms():
     global _dont_verify_count_comms
     _dont_verify_count_comms = True
     yield
-    
-    
+
+
 @pytest.fixture
 def verify_count_threads(wait_on_function):
     r"""Assert that all threads created during a test are cleaned up."""
@@ -1329,11 +1331,26 @@ def verify_count_comms(wait_on_function, count_comms, communicator_types):
                          on_timeout=on_timeout)
 
 
+@pytest.fixture(scope="session")
+def reset_count_fds(count_fds):
+    r"""Reset the global file descriptor count."""
+
+    def wrapped(value=None):
+        if value is None:
+            value = count_fds()
+        global _fd_count
+        prev_count = _fd_count
+        _fd_count = value
+        return prev_count
+    return wrapped
+    
+    
 @pytest.fixture
 def verify_count_fds(wait_on_function, first_test, count_fds,
                      init_zmq, init_mp):
     r"""Verify that file descriptors created during a test are cleaned up."""
     global _dont_verify_count_fds
+    global _fd_count
     _dont_verify_count_fds = False
     _fd_count = count_fds()
     # from yggdrasil.tools import track_fds
@@ -1352,6 +1369,8 @@ def verify_count_fds(wait_on_function, first_test, count_fds,
                     pprint.pprint(refs)
                     print(f'FDS: {count_fds()}')
                     pdb.set_trace()
+            # warnings.warn(f"{count_fds()} file descriptors are open, "
+            #               f"but the test started with {_fd_count}.")
             raise AssertionError(f"{count_fds()} file descriptors are open, "
                                  f"but the test started with {_fd_count}.")
         wait_on_function(lambda: count_fds() <= _fd_count,

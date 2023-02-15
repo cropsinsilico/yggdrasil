@@ -356,7 +356,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     @classmethod
     def call_compiler(cls, package_dir, toolname=None, flags=None,
                       language='c++', verbose=False,
-                      use_ccache=False, disable_python=False,
+                      use_ccache=False, disable_python_c_api=False,
                       with_asan=False):  # pragma: no cover
         r"""Build an R package w/ the yggdrasil compilers.
 
@@ -372,8 +372,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 process will be displayed. Defaults to False.
             use_ccache (bool, optional): If True, ccache will be added to
                 the compilation executable. Defaults to False.
-            disable_python (bool, optional): If True, the Python C API will
-                be disabled. Defaults to False.
+            disable_python_c_api (bool, optional): If True, the Python C
+                API will be disabled. Defaults to False.
 
         """
         import shutil
@@ -416,19 +416,19 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             kws = {}
             if x == 'c++':
                 kws['skip_standard_flag'] = True
-            cflags0 = drv.get_compiler_flags(for_model=True, toolname=toolname,
-                                             dry_run=True, compiler=compiler,
-                                             disable_python=disable_python,
-                                             with_asan=with_asan,
-                                             dont_link=True, **kws)
-            lflags = drv.get_linker_flags(for_model=True, toolname=toolname,
-                                          dry_run=True, libtype='shared',
-                                          with_asan=with_asan,
-                                          disable_python=disable_python)
+            cflags0 = drv.get_compiler_flags(
+                for_model=True, toolname=toolname,
+                dry_run=True, compiler=compiler,
+                disable_python_c_api=disable_python_c_api,
+                with_asan=with_asan, dont_link=True, **kws)
+            lflags = drv.get_linker_flags(
+                for_model=True, toolname=toolname,
+                dry_run=True, libtype='shared', with_asan=with_asan,
+                disable_python_c_api=disable_python_c_api)
             if language in ([drv.language] + drv.language_aliases):
-                drv.compile_dependencies(toolname=toolname,
-                                         with_asan=with_asan,
-                                         disable_python=disable_python)
+                drv.compile_dependencies(
+                    toolname=toolname, with_asan=with_asan,
+                    disable_python_c_api=disable_python_c_api)
             # Remove flags that are unnecessary
             cflags = []
             stdflags = []
@@ -571,9 +571,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 class.
 
         """
-        if cls.compiled_with_asan():
-            kwargs.setdefault('env', {})
-            cls.set_asan_env(kwargs['env'])
+        # if cls.compiled_with_asan():
+        #     kwargs.setdefault('command_kwargs', {})
+        #     kwargs['command_kwargs'].setdefault(
+        #         'env', copy.deepcopy(os.environ))
+        #     cls.set_asan_env(kwargs['command_kwargs']['env'])
         if package_manager in [None, 'cran', 'CRAN']:
             if isinstance(package, list):
                 package = (

@@ -25,9 +25,29 @@ TODO:
 ------------------
 * Fix bug where yggcompile was compiling some languages multiple times
 * Allow yggcompile to be called like yggcc
-* Add --with-asan option to compilation CLI and YAML options for enabling the Clang address sanitizer
+* Add flag (--with-asan) and YAML option (with_asan) for compiltion with the address sanitizer turned on
+* Add flag (--disable-python-c-api) and YAML option (disable_python_c_api) for disabling the Python C API
 * Allow for 128 bit types to be absent
 * Generalize option for running with a debugging tool via the --with-debugger flag for yggrun or with_debugger YAML option
+* Modify verification of file descriptor cleanup in tests to allow for persistence of a socket file descriptor if the socket is closed
+* Fix bug in connection tracking of connected models that sometimes prevented integrations from exiting for connections receiving from more than one model
+* Update setup script, including option specifically to set up a BioCro-OSR integration environment
+* Migrate creation of coveragerc into CLI
+* Fix bug where configuration was not completed after call to install from CLI, resulting in second call to install at next import
+* Make GNU linkers explicit for simplicity of inheritance from LDLinker
+* Allow compilation flag options to be passed to OSR (requires updated version of yggdrasil-enabled OSR)
+* Always run reticulate::py_config before importing R source code to prevent segfault
+* Allow R interpreter to be specified on the command line during install CLI and use that during dev setup
+* Fix bug in Mac SDKROOT configuration where it was being overwritten and stored more than once
+* Fix bug where '=' in requirement was interpreted as separator in .ini config parser by changing to use JSON to store the extra requirements
+* Change sprintf to snprintf and fix display of bytes when there is no terminating character
+* Add CLI utility for installing packages from conda recipes
+* Handle conda bug where removing env does not remove the directory and ensure that yggdrasil always installed in a fresh environment
+* Clean up leaks in temporary variables
+* Add emacs and pre-commit to dev dependencies
+* Short cut checking for R dependencies by just checking for the interface
+* Update XML for OSR example
+* Change deprecated calls to pandas DataFrame.append to concat in TimeSyncModelDriver
 
 1.8.4 (2023-01-27) Update CI to use mamba, improve dev utilities, & various bug fixes
 ------------------

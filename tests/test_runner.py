@@ -15,6 +15,14 @@ def test_get_runner():
     cr.sleep()
 
 
+def test_run_compilation_opt():
+    r"""Test run with compilation options turned on."""
+    namespace = f"test_run_asan_{uuid.uuid4}"
+    runner.run([ex_yamls['hello']['c']],
+               with_asan=True, disable_python_c_api=True,
+               namespace=namespace)
+
+
 def test_get_run():
     r"""Use run function to start a run."""
     namespace = "test_run_%s" % str(uuid.uuid4)
@@ -85,10 +93,10 @@ def test_import_as_function():
     fmodel.model_info()
     result = fmodel(**input_args)
     for x in fmodel.returns:
-        assert(x in result)
+        assert x in result
     result = fmodel(*list(input_args.values()))
     for x in fmodel.returns:
-        assert(x in result)
+        assert x in result
     fmodel.stop()
     fmodel.stop()
 
@@ -100,7 +108,7 @@ def test_import_as_function_server():
         if 'server' in x:
             yamlfile = x
             break
-    assert(yamlfile)
+    assert yamlfile
     fmodel = import_as_function(yamlfile)
     input_args = {}
     for x in fmodel.arguments:
@@ -108,10 +116,10 @@ def test_import_as_function_server():
     fmodel.model_info()
     result = fmodel(**input_args)
     for x in fmodel.returns:
-        assert(x in result)
+        assert x in result
     result = fmodel(*list(input_args.values()))
     for x in fmodel.returns:
-        assert(x in result)
+        assert x in result
     fmodel.stop()
     fmodel.stop()
 
@@ -128,7 +136,7 @@ def test_import_as_function_C():
         outputs: outputA"""
     yamlfile = os.path.join(os.path.dirname(ex_yamls['model_function']['c']),
                             'test_import.yml')
-    assert(not os.path.isfile(yamlfile))
+    assert not os.path.isfile(yamlfile)
     with open(yamlfile, 'w') as fd:
         fd.write(contents)
     try:
@@ -139,10 +147,10 @@ def test_import_as_function_C():
             input_args[x] = b'hello'
         result = fmodel(**input_args)
         for x in fmodel.returns:
-            assert(x in result)
+            assert x in result
         result = fmodel(*list(input_args.values()))
         for x in fmodel.returns:
-            assert(x in result)
+            assert x in result
         fmodel.stop()
         fmodel.stop()
     finally:
