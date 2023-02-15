@@ -1,15 +1,6 @@
-import json as stdjson
 import importlib
 from yggdrasil.serialize.SerializeBase import SerializeBase
-from yggdrasil import tools
-from yggdrasil import rapidjson as json
-try:
-    _json_encoder = json.Encoder
-    _json_decoder = json.Decoder
-except AttributeError:
-    print('RAPIDJSON:', dir(json))
-    print('RAPIDJSON FILE:', json.__file__)
-    raise
+from yggdrasil import tools, rapidjson
 
 
 def indent_char2int(indent):
@@ -50,31 +41,6 @@ def string2import(s):
     return s
 
 
-class JSONReadableEncoder(stdjson.JSONEncoder):
-    r"""Encoder class for Ygg messages."""
-
-    def default(self, o):  # pragma: no cover
-        r"""Encoder that allows for expansion types."""
-        return json.dumps(o, yggdrasil_mode=json.YM_READABLE)
-
-
-class JSONEncoder(_json_encoder):
-    r"""Encoder class for Ygg messages."""
-
-    def default(self, o):
-        r"""Encoder that allows for expansion types."""
-        return json.dumps(o)
-    
-
-class JSONDecoder(_json_decoder):
-    r"""Decoder class for Ygg messages."""
-
-    def string(self, s):
-        r"""Try to parse string with class."""
-        # TODO: Do this dynamically for classes based on an attribute
-        return string2import(s)
-
-    
 def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     r"""Encode a Python object in JSON format.
 
@@ -86,7 +52,8 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
             string. Defaults to None.
         sort_keys (bool, optional): If True, the keys will be output in sorted
             order. Defaults to True.
-        **kwargs: Additional keyword arguments are passed to json.dumps.
+        **kwargs: Additional keyword arguments are passed to
+            rapidjson.dumps.
 
     Returns:
         str, bytes: Encoded object.
@@ -100,12 +67,10 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     kwargs['sort_keys'] = sort_keys
     if 'cls' in kwargs:
         kwargs.setdefault('default', kwargs.pop('cls')().default)
-    else:
-        kwargs.setdefault('default', JSONEncoder().default)
     if fd is None:
-        return tools.str2bytes(json.dumps(obj, **kwargs))
+        return tools.str2bytes(rapidjson.dumps(obj, **kwargs))
     else:
-        return json.dump(obj, fd, **kwargs)
+        return rapidjson.dump(obj, fd, **kwargs)
 
 
 def decode_json(msg, **kwargs):
@@ -113,7 +78,8 @@ def decode_json(msg, **kwargs):
 
     Args:
         msg (str): JSON serialization to decode.
-        **kwargs: Additional keyword arguments are passed to json.loads.
+        **kwargs: Additional keyword arguments are passed to
+            rapidjson.loads.
 
     Returns:
         object: Deserialized Python object.
@@ -121,11 +87,10 @@ def decode_json(msg, **kwargs):
     """
     if isinstance(msg, (str, bytes)):
         msg_decode = tools.bytes2str(msg)
-        func_decode = json.loads
+        func_decode = rapidjson.loads
     else:
         msg_decode = msg
-        func_decode = json.load
-    func_decode = JSONDecoder()
+        func_decode = rapidjson.load
     return func_decode(msg_decode, **kwargs)
 
 
@@ -160,7 +125,8 @@ class JSONSerialize(SerializeBase):
             bytes, str: Serialized message.
 
         """
-        return encode_json(args, indent=self.indent, cls=JSONReadableEncoder)
+        return encode_json(args, indent=self.indent,
+                           yggdrasil_mode=rapidjson.YM_READABLE)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

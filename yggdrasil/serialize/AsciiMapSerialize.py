@@ -1,5 +1,4 @@
-import json
-from yggdrasil import tools, constants
+from yggdrasil import tools, constants, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -34,7 +33,6 @@ class AsciiMapSerialize(SerializeBase):
             bytes, str: Serialized message.
 
         """
-        from yggdrasil.serialize.JSONSerialize import JSONReadableEncoder
         out = ''
         order = sorted([k for k in args.keys()])
         newline_str = tools.bytes2str(self.newline)
@@ -44,7 +42,7 @@ class AsciiMapSerialize(SerializeBase):
                 raise ValueError("Serialization of non-string keys not supported.")
             out += tools.bytes2str(k)
             out += self.delimiter
-            out += json.dumps(v, cls=JSONReadableEncoder)
+            out += rapidjson.dumps(v, yggdrasil_mode=rapidjson.YM_READABLE)
             out += newline_str
         return tools.str2bytes(out)
 
@@ -70,7 +68,7 @@ class AsciiMapSerialize(SerializeBase):
                     out[kv[0]] = kv[1].strip("'")
                 else:
                     try:
-                        out[kv[0]] = json.loads(kv[1])
+                        out[kv[0]] = rapidjson.loads(kv[1])
                     except BaseException:
                         out[kv[0]] = kv[1]
             else:

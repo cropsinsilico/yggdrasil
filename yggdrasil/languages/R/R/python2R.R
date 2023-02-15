@@ -40,7 +40,7 @@ python2R <- function(pyobj) {
 	     || is(pyobj, "yggdrasil.rapidjson.units.QuantityArray")) {
     ygg_units <- reticulate::import('yggdrasil.units', convert=FALSE)
     robj_data <- python2R(ygg_units$get_data(pyobj))
-    robj_units <- python2R(ygg_units$get_units(pyobj))
+    robj_units <- python2R(ygg_units$get_units(pyobj, for_language="R"))
     out <- units::set_units(robj_data, robj_units, mode="standard")
   } else if (is(pyobj, "numpy.uint")) {
     out <- uint_to_R(pyobj)

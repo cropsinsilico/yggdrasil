@@ -1,9 +1,7 @@
 import re
-import json
 import numpy as np
-from yggdrasil import tools, units
+from yggdrasil import tools, units, rapidjson
 from yggdrasil.serialize.AsciiMapSerialize import AsciiMapSerialize
-from yggdrasil.serialize.JSONSerialize import JSONReadableEncoder
 
 
 class WOFOSTParamSerialize(AsciiMapSerialize):
@@ -50,10 +48,12 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
             elif isinstance(v, str):
                 iline += "\'%s\'" % v
             elif hasattr(v, 'units'):
-                iline += json.dumps(float(v), cls=JSONReadableEncoder)
+                iline += rapidjson.dumps(
+                    float(v), yggdrasil_mode=rapidjson.YM_READABLE)
                 iline += f'\t! [{v.units}]'
             else:
-                iline += json.dumps(v, cls=JSONReadableEncoder)
+                iline += rapidjson.dumps(
+                    v, yggdrasil_mode=rapidjson.YM_READABLE)
             lines.append(iline)
         return tools.str2bytes('\n'.join(lines))
 
@@ -150,14 +150,14 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                     v1 = match['value1'].strip('\'')
                 else:
                     try:
-                        v1 = json.loads(match['value1'])
-                    except json.decoder.JSONDecodeError:
+                        v1 = rapidjson.loads(match['value1'])
+                    except rapidjson.JSONDecodeError:
                         if match['value1'].endswith('.'):
-                            v1 = json.loads(match['value1'] + '0')
+                            v1 = rapidjson.loads(match['value1'] + '0')
                         else:  # pragma: debug
                             raise
                 if is_arr:
-                    v2 = json.loads(match['value2'])
+                    v2 = rapidjson.loads(match['value2'])
                     out[k][0].append(v1)
                     out[k][1].append(v2)
                 else:

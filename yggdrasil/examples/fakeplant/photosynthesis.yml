@@ -34,3 +34,7 @@ model:
         items:
           type: number
         allowSingular: true
+      default_file:
+        name: ./Output/photosynthesis_rate.txt
+        filetype: table
+        field_names: photosynthesis_rate

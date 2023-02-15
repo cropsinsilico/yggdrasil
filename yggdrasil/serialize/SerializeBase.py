@@ -284,14 +284,14 @@ class SerializeBase(tools.YggClass):
                                 + b'  two\t2\t2.000000\n'
                                 + b'three\t3\t3.000000\n'),
                    'objects': 2 * rows,
-                   'field_units': ['n/a', umol, 'cm']}
+                   'field_units': ['', umol, 'cm']}
             if not no_names:
                 out['field_names'] = field_names
                 for x, n in zip(out['datatype']['items'], field_names):
                     x['title'] = n
             if include_oldkws:
                 out['kwargs'].update({'format_str': table_string_fmt + '\t%d\t%f\n',
-                                      'field_units': ['n/a', umol, 'cm']})
+                                      'field_units': ['', umol, 'cm']})
                 if not no_names:
                     out['kwargs']['field_names'] = field_names
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
@@ -448,7 +448,7 @@ class SerializeBase(tools.YggClass):
             out = []
             any_units = False
             for i, x in enumerate(self.datatype['items']):
-                out.append(x.get('units', 'n/a'))
+                out.append(x.get('units', ''))
                 if len(x.get('units', '')) > 0:
                     any_units = True
             # Don't use field units if they are all defaults

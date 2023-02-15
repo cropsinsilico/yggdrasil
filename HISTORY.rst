@@ -15,6 +15,7 @@ History
 * Updated utility scripts and package parameters to build extension
 * Changed native string types in languages to be used for JSON string values
 * In C, C++, and Fortran, if Python objects will be sent/received the model must initialize Python via "init_python_API()" (a subroutine in Fortran). If a model is a wrapped function, this will be added automatically.
+* Change all JSON serialization to use rapidjson, removing JSONDecoder, JSONEncoder, & JSONEncoderReadable in the process.
 
 TODO:
 ~~~~~

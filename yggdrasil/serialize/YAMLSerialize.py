@@ -1,4 +1,5 @@
 import yaml
+from yggdrasil import rapidjson
 from yggdrasil.serialize.JSONSerialize import (
     JSONSerialize, indent_char2int, string2import)
 
@@ -26,6 +27,7 @@ def encode_yaml(obj, fd=None, indent=None,
     if fd is not None:
         assert 'stream' not in kwargs
         kwargs['stream'] = fd
+    json_kws = {}
     if sorted_dict_type is not None:
         class OrderedDumper(kwargs.get('Dumper', yaml.SafeDumper)):
             pass
@@ -41,11 +43,13 @@ def encode_yaml(obj, fd=None, indent=None,
             OrderedDumper.add_representer(x, _dict_representer)
         kwargs['Dumper'] = OrderedDumper
         
-    # class OrderedDecoder(rapidjson.Decoder):
-    #     def start_object(self):
-    #         return OrderedDict()
-    # obj = rapidjson.as_pure_json(obj, decoder=OrderedDecoder(),
-    #                              mapping_mode=rapidjson.MM_SORT_KEYS)
+        class OrderedDecoder(rapidjson.Decoder):
+            def start_object(self):
+                return sorted_dict_type[0]()
+        json_kws['decoder'] = OrderedDecoder()
+        # json_kws['mapping_mode'] = rapidjson.MM_SORT_KEYS
+    
+    obj = rapidjson.as_pure_json(obj, **json_kws)
     return yaml.dump(obj, **kwargs)
 
 

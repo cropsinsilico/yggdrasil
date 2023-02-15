@@ -150,11 +150,12 @@ def has_units(obj, check_dimensionless=False):
     return out
 
 
-def get_units(obj):
+def get_units(obj, for_language=None):
     r"""Get the string representation of the units.
 
     Args:
         obj (object): Object to get units for.
+        for_language (str, optional): Language requesting units.
 
     Returns:
         str: Units, empty if input object has none.
@@ -164,6 +165,9 @@ def get_units(obj):
         out = str(obj.units)
     else:
         out = ''
+    if for_language == "R":
+        # udunits dosn't support Δ
+        out = out.replace('Δ', '')
     return out
 
 
