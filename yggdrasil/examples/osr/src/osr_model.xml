@@ -14,8 +14,8 @@
 		<SimulaBase name="outputParameters">
 			<SimulaBase name="defaults">
 				<SimulaConstant name="startTime" type="time">0.</SimulaConstant>
-				<SimulaConstant name="endTime" type="time">50</SimulaConstant>
-				<SimulaConstant name="timeInterval" type="time">0.1</SimulaConstant>
+				<SimulaConstant name="endTime" type="time">1</SimulaConstant>
+				<SimulaConstant name="timeInterval" type="time">1.</SimulaConstant>
 			</SimulaBase>
 			<SimulaBase name="probeAllObjects">
 				<SimulaConstant name="run" type="bool">0</SimulaConstant>
@@ -23,7 +23,7 @@
 			</SimulaBase>
 			<SimulaBase name="garbageCollection">
 				<SimulaConstant name="run" type="bool">1</SimulaConstant>
-				<SimulaConstant name="startTime" type="time">5</SimulaConstant>
+				<SimulaConstant name="startTime" type="time">1</SimulaConstant>
 				<SimulaConstant name="lackTime" type="time">1</SimulaConstant>
 				<SimulaConstant name="timeInterval" type="time">1</SimulaConstant>
 			</SimulaBase>
