@@ -30,7 +30,7 @@ static char prefix_char = '#';
 
 /*! @brief C-friendly definition of MetaschemaType. */
 typedef struct dtype_t {
-  char type[COMMBUFFSIZ]; //!< Type name
+  char type[COMMBUFFSIZ + 1]; //!< Type name
   bool use_generic; //!< Flag for empty dtypes to specify generic in/out
   void *obj; //!< MetaschemaType Pointer
 } dtype_t;
@@ -1356,7 +1356,7 @@ int split_head_body(const char *buf, const size_t buf_siz,
   // Windows regex of newline is buggy
   UNUSED(buf_siz);
   size_t sind1, eind1, sind2, eind2;
-  char re_head_tag[COMMBUFFSIZ];
+  char re_head_tag[COMMBUFFSIZ + 1];
   snprintf(re_head_tag, COMMBUFFSIZ, "(%s)", MSG_HEAD_SEP);
   ret = find_match(re_head_tag, buf, &sind1, &eind1);
   if (ret > 0) {

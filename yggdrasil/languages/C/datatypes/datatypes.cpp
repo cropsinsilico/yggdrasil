@@ -257,9 +257,9 @@ JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
   // Loop over string
   int mres;
   size_t sind, eind, beg = 0, end;
-  char ifmt[FMT_LEN];
-  char re_fmt[FMT_LEN];
-  char re_fmt_eof[FMT_LEN];
+  char ifmt[FMT_LEN + 1];
+  char re_fmt[FMT_LEN + 1];
+  char re_fmt_eof[FMT_LEN + 1];
   snprintf(re_fmt, FMT_LEN, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
   snprintf(re_fmt_eof, FMT_LEN, "%%[^%s%s ]+", "\t", "\n");
   size_t iprecision = 0;
@@ -3134,11 +3134,11 @@ extern "C" {
       }
       // Format
       if (head->flags & HEAD_TYPE_IN_DATA) {
-	ret = snprintf(*buf, buf_siz, "%s%s%s%s%s", MSG_HEAD_SEP,
+	ret = snprintf(*buf, buf_siz-1, "%s%s%s%s%s", MSG_HEAD_SEP,
 		       head_buf.GetString(), MSG_HEAD_SEP,
 		       type_buf.GetString(), MSG_HEAD_SEP);
       } else {
-	ret = snprintf(*buf, buf_siz, "%s%s%s", MSG_HEAD_SEP,
+	ret = snprintf(*buf, buf_siz-1, "%s%s%s", MSG_HEAD_SEP,
 		       head_buf.GetString(), MSG_HEAD_SEP);
       }
       if ((size_t)ret > buf_siz) {
