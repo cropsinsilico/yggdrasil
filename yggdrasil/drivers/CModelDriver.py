@@ -406,7 +406,7 @@ class ClangLinker(LDLinker):
         """
         LDLinker.before_registration(cls)
         if platform._is_win:  # pragma: windows
-            # One windows clang calls the MSVC linker LINK.exe which does not
+            # On windows clang calls the MSVC linker LINK.exe which does not
             # accept rpath. Runtime libraries must be in the same directory
             # as the executable or a directory in the PATH env variable.
             cls.flag_options.pop('library_rpath', None)

@@ -1917,6 +1917,9 @@ class LinkerBase(CompilationToolBase):
         for k in kws_both:
             if k in kwargs:
                 kwargs_link[k] = kwargs[k]
+        if compiler and kwargs.get('with_asan', False) and cls.asan_flags:
+            kwargs_link.setdefault('libraries', [])
+            kwargs_link['libraries'].append(compiler.asan_library())
         return kwargs_link
 
     @classmethod
@@ -3405,13 +3408,13 @@ class CompiledModelDriver(ModelDriver):
                 dep, toolname=toolname, **suffix_kws)
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
-                     and (not os.path.isfile(dep_lib)))):  # pragma: debug
+                     and (not os.path.isfile(dep_lib)))):
                     if dep in internal_dependencies:
-                        # If this is called recursively, verify that dep_lib is produced
-                        # by compiling dep.
+                        # If this is called recursively, verify that
+                        # dep_lib is produced by compiling dep.
                         try:
                             cls.compile_dependencies(
-                                toolname=toolname, **suffix_kws)
+                                dep=dep, toolname=toolname, **suffix_kws)
                         except RecursionError:  # pragma: debug
                             print(f"dependency: {dep}\n"
                                   f"library:    {dep_lib}\n",

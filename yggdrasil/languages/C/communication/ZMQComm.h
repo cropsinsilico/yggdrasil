@@ -469,11 +469,11 @@ char *set_reply_send(const comm_t *comm) {
 		   comm->name);
       return out;
     }
-    char protocol[50] = "tcp";
-    char host[50] = "localhost";
+    char protocol[51] = "tcp";
+    char host[51] = "localhost";
     if (strcmp(host, "localhost") == 0)
       strncpy(host, "127.0.0.1", 50);
-    char address[100];
+    char address[101];
     int port = -1;
 #ifdef _OPENMP
 #pragma omp critical (zmqport)

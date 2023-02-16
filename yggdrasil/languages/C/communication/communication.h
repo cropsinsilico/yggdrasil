@@ -118,7 +118,7 @@ comm_t* get_global_scope_comm(const char *name) {
 	  break;
 	} else {
 	  const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
-	  char alt_name[100];
+	  char alt_name[101];
 	  snprintf(alt_name, 100, "%s:%s", YGG_MODEL_NAME, name);
 	  if ((strcmp(icomm->name, alt_name) == 0) && (icomm->thread_id == current_thread)) {
 	    out = icomm;
