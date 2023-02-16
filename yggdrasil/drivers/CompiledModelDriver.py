@@ -3395,21 +3395,29 @@ class CompiledModelDriver(ModelDriver):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
         suffix_kws = cls.select_suffix_kwargs(kwargs)
+        suffix_kws.setdefault('commtype', commtype)
         # Add flags for internal/external depenencies
         all_dep = internal_dependencies + external_dependencies
         for dep in cls.get_dependency_order(all_dep, toolname=toolname):
             if kwargs.get('disable_python_c_api', False) and (dep in ['python', 'numpy']):
                 continue
             dep_lib = cls.get_dependency_library(
-                dep, commtype=commtype, toolname=toolname, **suffix_kws)
+                dep, toolname=toolname, **suffix_kws)
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
                     if dep in internal_dependencies:
                         # If this is called recursively, verify that dep_lib is produced
                         # by compiling dep.
-                        cls.compile_dependencies(
-                            toolname=toolname, **suffix_kws)
+                        try:
+                            cls.compile_dependencies(
+                                toolname=toolname, **suffix_kws)
+                        except RecursionError:  # pragma: debug
+                            print(f"dependency: {dep}\n"
+                                  f"library:    {dep_lib}\n",
+                                  f"suffix_kws: {suffix_kws}\n",
+                                  f"toolname:   {toolname}")
+                            raise
                     if not os.path.isfile(dep_lib):
                         raise RuntimeError(
                             ("Library for %s dependency does not "
@@ -3973,6 +3981,7 @@ class CompiledModelDriver(ModelDriver):
                 default_kwargs.update(linker_flags=self.linker_flags)
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
+            suffix_kws = self.select_suffix_kwargs(kwargs)
             if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
                  and (not kwargs['overwrite']))):
                 self.debug("Result already exists: %s", kwargs['out'])
@@ -3983,7 +3992,7 @@ class CompiledModelDriver(ModelDriver):
             try:
                 if not kwargs.get('dry_run', False):
                     self.compile_dependencies_instance(
-                        toolname=kwargs['toolname'])
+                        toolname=kwargs['toolname'], **suffix_kws)
                 return self.call_compiler(source_files, **kwargs)
             except BaseException:
                 self.cleanup_products()
@@ -4011,11 +4020,12 @@ class CompiledModelDriver(ModelDriver):
                 differentiate between different dependencies.
 
         """
+        out = _system_suffix
         if disable_python_c_api:
-            return _system_suffix + '_nopython'
+            out += '_nopython'
         if with_asan:
-            return _system_suffix + '_asan'
-        return _system_suffix
+            out += '_asan'
+        return out
 
     @classmethod
     def call_compiler(cls, src, language=None, toolname=None, dont_build=None,
