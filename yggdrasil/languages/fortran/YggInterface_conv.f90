@@ -4,6 +4,7 @@ function yggarr2ygggeneric(input) result(out)
   type(ygggeneric) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function yggarr2ygggeneric
   
 function yggmap2ygggeneric(input) result(out)
@@ -11,6 +12,7 @@ function yggmap2ygggeneric(input) result(out)
   type(ygggeneric) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function yggmap2ygggeneric
   
 function yggschema2ygggeneric(input) result(out)
@@ -18,6 +20,7 @@ function yggschema2ygggeneric(input) result(out)
   type(ygggeneric) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function yggschema2ygggeneric
   
 function yggpyinst2ygggeneric(input) result(out)
@@ -25,6 +28,7 @@ function yggpyinst2ygggeneric(input) result(out)
   type(ygggeneric) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function yggpyinst2ygggeneric
 
 function ygggeneric2yggarr(input) result(out)
@@ -32,6 +36,7 @@ function ygggeneric2yggarr(input) result(out)
   type(yggarr) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function ygggeneric2yggarr
 
 function ygggeneric2yggmap(input) result(out)
@@ -39,6 +44,7 @@ function ygggeneric2yggmap(input) result(out)
   type(yggmap) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function ygggeneric2yggmap
 
 function ygggeneric2yggschema(input) result(out)
@@ -46,6 +52,7 @@ function ygggeneric2yggschema(input) result(out)
   type(yggschema) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function ygggeneric2yggschema
 
 function ygggeneric2yggpyinst(input) result(out)
@@ -53,25 +60,23 @@ function ygggeneric2yggpyinst(input) result(out)
   type(yggpyinst) :: out
   out%prefix = input%prefix
   out%obj = input%obj
+  out%allocator = input%allocator
 end function ygggeneric2yggpyinst
 
 function yggpython2yggpython(input) result(out)
   type(yggpython) :: input
   type(yggpython) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
 end function yggpython2yggpython
 
 function yggpyfunc2yggpython(input) result(out)
   type(yggpyfunc) :: input
   type(yggpython) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
 end function yggpyfunc2yggpython
 
 function yggpython2yggpyfunc(input) result(out)
   type(yggpython) :: input
   type(yggpyfunc) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
 end function yggpython2yggpyfunc

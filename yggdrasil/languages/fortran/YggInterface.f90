@@ -1009,30 +1009,32 @@ module fygg
   type, bind(c) :: yggarr
      character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped array.
+     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggarr
   !> @brief Wrapper for a mapping of generic objects (stored in a generic object).
   type, bind(c) :: yggmap
      character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped mapping.
+     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggmap
   !> @brief Wrapper for a schema (stored in a generic object).
   type, bind(c) :: yggschema
      character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped schema.
+     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggschema
   !> @brief  Wrapper for a Python instance (stored in a generic object).
   type, bind(c) :: yggpyinst
      character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped Python instance.
+     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggpyinst
   !> @brief Wrapper for a Python function.
   type, bind(c) :: yggpyfunc
-     character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped Python instance.
   end type yggpyfunc
   !> @brief Wrapper for a Python object.
   type, bind(c) :: yggpython
-     character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped Python instance.
   end type yggpython
   !> @brief Ply structure.
@@ -3143,6 +3145,19 @@ contains
        out = .true.
     end if
   end function is_generic_init
+  !> @brief Copy a generic object into another.
+  !> @param[in,out] dst Generic object to copy into.
+  !> @param[in] src A generic object to copy.
+  subroutine copy_generic_into(dst, src)
+    implicit none
+    type(ygggeneric), target :: dst
+    type(ygggeneric), intent(in) :: src
+    integer(kind=c_int) :: c_out
+    c_out = copy_generic_into_c(c_loc(dst), src)
+    if (c_out.ne.0) then
+       stop "Error copying generic object."
+    end if
+  end subroutine copy_generic_into
   !> @brief Copy a generic object.
   !> @param[in] src A generic object to copy.
   !> @returns A copy of src.

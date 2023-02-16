@@ -108,12 +108,13 @@ generic_t init_generic_array_f();
 generic_t init_generic_map_f();
 /* generic_t create_generic_f(void* type_class, void* data, size_t nbytes); */
 int free_generic_f(void* x);
+int copy_generic_into_f(void* dst, generic_t src);
 generic_t copy_generic_f(generic_t src);
 int is_generic_init_f(generic_t x);
 void display_generic_f(generic_t x);
 int add_generic_array_f(generic_t arr, generic_t x);
-int set_generic_array_f(generic_t arr, size_t i, generic_t x);
-int get_generic_array_f(generic_t arr, size_t i, void *x, int copy);
+int set_generic_array_f(generic_t arr, const size_t i, generic_t x);
+int get_generic_array_f(generic_t arr, const size_t i, void *x, int copy);
 int set_generic_object_f(generic_t arr, const char* k, generic_t x);
 int get_generic_object_f(generic_t arr, const char* k, void *x, int copy);
 // Python interface

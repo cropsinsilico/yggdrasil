@@ -643,6 +643,15 @@
        type(ygggeneric), value, intent(in) :: x
        integer(kind=c_int) :: out
      end function is_generic_init_c
+     function copy_generic_into_c(dst, src) result(out) &
+          bind(c, name="copy_generic_into_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(c_ptr), value :: dst
+       type(ygggeneric), value, intent(in) :: src
+       integer(kind=c_int) :: out
+     end function copy_generic_into_c
      function copy_generic_c(src) result(out) &
           bind(c, name="copy_generic_f")
        import :: ygggeneric

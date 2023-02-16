@@ -101,7 +101,7 @@ extern "C" {
 #include <math.h> // Required to prevent error when using mingw on windows
 #ifdef YGGDRASIL_DISABLE_PYTHON_C_API
 #ifndef PyObject
-#define PyObject void
+#define PyObject void*
 #endif
 #ifndef npy_intp
 #define npy_intp int

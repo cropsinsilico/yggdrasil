@@ -382,6 +382,10 @@ int free_generic_f(void* x) {
   return destroy_generic((generic_t*)x);
 }
 
+int copy_generic_into_f(void* dst, generic_t src) {
+  return copy_generic_into((generic_t*)dst, src);
+}
+
 generic_t copy_generic_f(generic_t src) {
   return copy_generic(src);
 }
@@ -398,11 +402,11 @@ int add_generic_array_f(generic_t arr, generic_t x) {
   return add_generic_array(arr, x);
 }
 
-int set_generic_array_f(generic_t arr, size_t i, generic_t x) {
+int set_generic_array_f(generic_t arr, const size_t i, generic_t x) {
   return set_generic_array(arr, i, x);
 }
 
-int get_generic_array_f(generic_t arr, size_t i, void* x, int copy) {
+int get_generic_array_f(generic_t arr, const size_t i, void* x, int copy) {
   return get_generic_array(arr, i, (generic_t*)x, copy);
 }
 

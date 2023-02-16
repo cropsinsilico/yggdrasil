@@ -232,48 +232,38 @@ generic_t copy_generic(generic_t src);
  */
 void display_generic(generic_t x);
 
+
+#define NESTED_BASICS_(base, idx, idxType)	\
+  void* generic_ ## base ## _get_item(generic_t x, idxType idx, const char *type); \
+  int generic_ ## base ## _get_item_nbytes(generic_t x, idxType idx, const char *type); \
+  void* generic_ ## base ## _get_scalar(generic_t x, idxType idx, const char *subtype, const size_t precision); \
+  size_t generic_ ## base ## _get_1darray(generic_t x, idxType idx, const char *subtype, const size_t precision, void** data); \
+  size_t generic_ ## base ## _get_ndarray(generic_t x, idxType idx, const char *subtype, const size_t precision, void** data, size_t** shape); \
+  int generic_ ## base ## _set_item(generic_t x, idxType idx, const char *type, void* value); \
+  int generic_ ## base ## _set_scalar(generic_t x, idxType idx,		\
+				      void* value,			\
+				      const char *subtype,		\
+				      const size_t precision,		\
+				      const char *units);		\
+  int generic_ ## base ## _set_1darray(generic_t x, idxType idx,	\
+				       void* value,			\
+				       const char *subtype,		\
+				       const size_t precision,		\
+				       const size_t length,		\
+				       const char *units);		\
+  int generic_ ## base ## _set_ndarray(generic_t x, idxType idx,	\
+				       void* value,			\
+				       const char *subtype,		\
+				       const size_t precision,		\
+				       const size_t ndim,		\
+				       const size_t* shape,		\
+				       const char *units);
   
-/*!
-  @brief Return the recovered generic structure if one is present in
-  the variable argument list.
-  @param[in] nargs size_t Number of argument present in ap.
-  @param[in] ap va_list_t Variable argument list.
-  @returns generic_t Generic structure if one is present.
- */
-/* generic_t get_generic_va(size_t nargs, va_list_t ap); */
+  NESTED_BASICS_(array, index, const size_t)
+  NESTED_BASICS_(map, key, const char*)
 
-
-/*!
-  @brief Return the recovered generic structure if one is present in
-  the variable argument list.
-  @param[in] nargs size_t Number of argument present in ap.
-  @param[in] ap va_list_t Variable argument list.
-  @returns generic_t* Generic structure if one is present, NULL otherwise.
- */
-/* generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap); */
-
-
-/*!
-  @brief Return the recovered generic structure if one is present in
-  the variable argument list by removing it.
-  @param[in] nargs size_t* Pointer to number of arguments present in ap
-  that will be decremented by 1.
-  @param[in] ap va_list_t* Pointer to variable argument list.
-  @returns generic_t Generic structure if one is present.
- */
-/* generic_t pop_generic_va(size_t* nargs, va_list_t* ap); */
-
-
-/*!
-  @brief Return the recovered generic structure if one is present in
-  the variable argument list by removing it.
-  @param[in] nargs size_t* Pointer to number of arguments present in ap
-  that will be decremented by 1.
-  @param[in] ap va_list_t* Pointer to variable argument list.
-  @returns generic_t* Generic structure if one is present, NULL otherwise.
- */
-/* generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap); */
-
+#undef NESTED_BASICS_
+    
 /*!
   @brief Add an element to the end of an array of generic elements.
   @param[in] arr generic_t Array to add element to.
@@ -290,7 +280,7 @@ int add_generic_array(generic_t arr, generic_t x);
   @param[in] x generic_t Element to add.
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
-int set_generic_array(generic_t arr, size_t i, generic_t x);
+int set_generic_array(generic_t arr, const size_t i, generic_t x);
 
 
 /*!
@@ -303,7 +293,7 @@ int set_generic_array(generic_t arr, size_t i, generic_t x);
     will be returned.
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
-int get_generic_array(generic_t arr, size_t i, generic_t *x, int copy);
+int get_generic_array(generic_t arr, const size_t i, generic_t *x, int copy);
 
 
 /*!
@@ -341,32 +331,12 @@ int get_generic_object(generic_t arr, const char* k, generic_t *x, int copy);
 size_t generic_array_get_size(generic_t x);
 
 /*!
-  @brief Get an item from an array for types that don't require additional parameters.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be returned.
-  @param[in] type const char* Type of value expected.
-  @returns void* Pointer to data for array item.
- */
-void* generic_array_get_item(generic_t x, const size_t index,
-			     const char *type);
-
-/*!
-  @brief Set an item in an array for types that don't require additional parameters.
-  @param[in] x generic_t Generic object that is presumed to contain an array.
-  @param[in] index size_t Index for value that should be set.
-  @param[in] type const char* Type of value expected.
-  @param[in] value Pointer to data for array item.
-  @returns -1 if there is an error, 0 otherwise.
- */
-int generic_array_set_item(generic_t x, const size_t index,
-			   const char *type, void* value);
-  
-/*!
   @brief Get the number of elements in an map object.
   @param[in] x generic_t Generic object that is presumed to contain a map.
   @returns size_t Number of elements in map.
  */
 size_t generic_map_get_size(generic_t x);
+
 /*!
   @brief Determine if a map object has a certain key.
   @param[in] x generic_t Generic object that is presumed to contain a map.
@@ -374,6 +344,7 @@ size_t generic_map_get_size(generic_t x);
   @returns int 1 if the key is present, 0 otherwise.
  */
 int generic_map_has_key(generic_t x, char* key);
+
 /*!
   @brief Get the keys in a map object.
   @param[in] x generic_t Generic object that is presumed to contain a map.
@@ -384,46 +355,8 @@ size_t generic_map_get_keys(generic_t x, char*** keys);
 
 // TODO: Copy docs
 
-void* generic_array_get_scalar(generic_t x, const size_t index,
-			       const char * subtype, const size_t precision);
-size_t generic_array_get_1darray(generic_t x, const size_t index,
-				 const char* subtype, const size_t precision, void** data);
-size_t generic_array_get_ndarray(generic_t x, const size_t index,
-				 const char* subtype, const size_t precision,
-				 void** data, size_t** shape);
-int generic_array_set_scalar(generic_t x, const size_t index, void* value,
-			     const char* subtype, const size_t precision,
-			     const char *units);
-int generic_array_set_1darray(generic_t x, const size_t index, void* value,
-			      const char* subtype, const size_t precision,
-			      const size_t length, const char *units);
-int generic_array_set_ndarray(generic_t x, const size_t index, void* value,
-			      const char* subtype, const size_t precision,
-			      const size_t ndim, const size_t* shape,
-			      const char *units);
 void* generic_get_item(generic_t x, const char *type);
-void* generic_map_get_item(generic_t x, const char* key, const char *type);
-void* generic_map_get_scalar(generic_t x, const char* key,
-			     const char * subtype, const size_t precision);
-size_t generic_map_get_1darray(generic_t x, const char* key,
-			       const char* subtype, const size_t precision,
-			       void** data);
-size_t generic_map_get_ndarray(generic_t x, const char* key,
-			       const char* subtype, const size_t precision,
-			       void** data, size_t** shape);
 int generic_set_item(generic_t x, const char *type, void* value);
-int generic_map_set_item(generic_t x, const char* key,
-			 const char* type, void* value);
-int generic_map_set_scalar(generic_t x, const char* key, void* value,
-			   const char* subtype, const size_t precision,
-			   const char *units);
-int generic_map_set_1darray(generic_t x, const char* key, void* value,
-			    const char* subtype, const size_t precision,
-			    const size_t length, const char *units);
-int generic_map_set_ndarray(generic_t x, const char* key, void* value,
-			    const char* subtype, const size_t precision,
-			    const size_t ndim, const size_t* shape,
-			    const char *units);
   
 #define NESTED_BASE_SET_(base, idx, idxType, name, ...)			\
   int generic_ ## base ## _set_ ## name(generic_t x, idxType idx, __VA_ARGS__)

@@ -303,7 +303,7 @@ function yggarg_scalar_yggpython(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "python"
-  y%ptr = c_loc(xp%prefix)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpython
 function yggarg_scalar_yggpyfunc(x) result(y)
@@ -313,7 +313,7 @@ function yggarg_scalar_yggpyfunc(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "class"
-  y%ptr = c_loc(xp%prefix)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpyfunc
 function yggarg_scalar_yggptr(x) result(y)

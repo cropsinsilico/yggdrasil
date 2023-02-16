@@ -2263,7 +2263,7 @@ extern "C" {
     return out;
   }
   // TODO: Cleanup temporary item created during setting
-#define NESTED_GET_(base, idx, idxType)					\
+#define NESTED_BASICS_(base, idx, idxType)					\
   void* generic_ ## base ## _get_item(generic_t x, idxType idx, const char *type) { \
     try {								\
       generic_t tmp;							\
@@ -2404,10 +2404,10 @@ extern "C" {
     return GENERIC_SUCCESS_;						\
   }
 
-  NESTED_GET_(array, index, const size_t)
-  NESTED_GET_(map, key, const char*)
+  NESTED_BASICS_(array, index, const size_t)
+  NESTED_BASICS_(map, key, const char*)
   
-#undef NESTED_GET_
+#undef NESTED_BASICS_
   
   int add_generic_array(generic_t arr, generic_t x) {
     int out = GENERIC_SUCCESS_;
@@ -2438,7 +2438,7 @@ extern "C" {
     return out;
   }
 
-  int set_generic_array(generic_t arr, size_t i, generic_t x) {
+  int set_generic_array(generic_t arr, const size_t i, generic_t x) {
     int out = GENERIC_SUCCESS_;
     try {
       if (!(is_generic_init(arr))) {
@@ -2473,7 +2473,7 @@ extern "C" {
     return out;
   }
 
-  int get_generic_array(generic_t arr, size_t i, generic_t *x, int copy) {
+  int get_generic_array(generic_t arr, const size_t i, generic_t *x, int copy) {
     int out = GENERIC_SUCCESS_;
     x[0] = init_generic();
     try {
@@ -2948,7 +2948,9 @@ extern "C" {
   void destroy_python(python_t *x) {
     if (x != NULL) {
       if (x->obj != NULL) {
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
 	Py_DECREF(x->obj);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 	x->obj = NULL;
       }
     }
@@ -2957,7 +2959,9 @@ extern "C" {
   python_t copy_python(python_t x) {
     python_t out = init_python();
     if (x.obj != NULL) {
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
       Py_INCREF(x.obj);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
       out.obj = x.obj;
     }
     return out;
@@ -2965,7 +2969,9 @@ extern "C" {
 
   void display_python(python_t x) {
     if (x.obj != NULL) {
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
       PyObject_Print_STDOUT(x.obj);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     } else {
       printf("NULL");
     }
