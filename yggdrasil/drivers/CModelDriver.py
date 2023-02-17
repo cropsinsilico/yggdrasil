@@ -42,15 +42,17 @@ def get_OSX_SYSROOT():
             fname_try.append(cfg_sdkroot)
         if os.environ.get('SDKROOT', False):
             fname_try.append(os.environ['SDKROOT'])
-            # fname_try.insert(0, os.environ['SDKROOT'])
         if xcode_dir is not None:
-            fname_base = os.path.join(xcode_dir, 'Platforms',
-                                      'MacOSX.platform', 'Developer',
-                                      'SDKs', 'MacOSX%s.sdk')
-            fname_try += [
-                fname_base % os.environ.get('MACOSX_DEPLOYMENT_TARGET', ''),
-                fname_base % '',
-                os.path.join(xcode_dir, 'SDKs', 'MacOSX.sdk')]
+            bases_try = [
+                os.path.join(xcode_dir, 'SDKs', 'MacOSX%s.sdk'),
+                os.path.join(xcode_dir, 'Platforms',
+                             'MacOSX.platform', 'Developer',
+                             'SDKs', 'MacOSX%s.sdk')]
+            vers_try = ['11.0', '']  # 11.0 used by conda-forge
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
+                vers_try.insert(0, os.environ['MACOSX_DEPLOYMENT_TARGET'])
+            for v in vers_try:
+                fname_try += [x % v for x in bases_try]
         for fcheck in fname_try:
             if os.path.isdir(fcheck):
                 fname = fcheck
