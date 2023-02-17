@@ -3134,11 +3134,11 @@ extern "C" {
       }
       // Format
       if (head->flags & HEAD_TYPE_IN_DATA) {
-	ret = snprintf(*buf, buf_siz-1, "%s%s%s%s%s", MSG_HEAD_SEP,
+	ret = snprintf(*buf, buf_siz, "%s%s%s%s%s", MSG_HEAD_SEP,
 		       head_buf.GetString(), MSG_HEAD_SEP,
 		       type_buf.GetString(), MSG_HEAD_SEP);
       } else {
-	ret = snprintf(*buf, buf_siz-1, "%s%s%s", MSG_HEAD_SEP,
+	ret = snprintf(*buf, buf_siz, "%s%s%s", MSG_HEAD_SEP,
 		       head_buf.GetString(), MSG_HEAD_SEP);
       }
       if ((size_t)ret > buf_siz) {

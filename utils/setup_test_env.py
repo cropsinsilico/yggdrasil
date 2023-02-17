@@ -937,7 +937,7 @@ def create_env(env_method, python, param=None, name=None, packages=None,
     existing_env = False
     env_removed = False
     if param.env_method in ('conda', 'mamba'):
-        use_mamba = (param.use_mamba and shutil('mamba'))
+        use_mamba = (param.use_mamba and shutil.which('mamba'))
         existing_env = conda_env_exists(name, use_mamba=use_mamba)
         if remove_existing and existing_env:
             assert name != 'base'

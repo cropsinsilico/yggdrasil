@@ -1241,6 +1241,7 @@ class CompilationToolBase(object):
                     raise RuntimeError("Product not removed: %s" % out)
             if (not dry_run) and (os.path.isfile(out) or os.path.isdir(out)):
                 cls.append_product(products, args, out)
+                logger.debug(f"Output already exists: {out}")
                 return out
             kwargs['outfile'] = out
         # Get command
@@ -1766,6 +1767,7 @@ class CompilerBase(CompilationToolBase):
             for x in [fname, fname_src]:
                 if os.path.isfile(x):
                     os.remove(x)
+        logger.debug(f"ASAN Library: {lib}")
         cls._language_cache['asan_library'] = lib
         return lib
 
@@ -1918,8 +1920,16 @@ class LinkerBase(CompilationToolBase):
             if k in kwargs:
                 kwargs_link[k] = kwargs[k]
         if compiler and kwargs.get('with_asan', False) and cls.asan_flags:
-            kwargs_link.setdefault('libraries', [])
-            kwargs_link['libraries'].append(compiler.asan_library())
+            # kwargs_link.setdefault('libraries', [])
+            # kwargs_link['libraries'].append(compiler.asan_library())
+            kwargs_link.setdefault('library_dirs', [])
+            kwargs_link['library_dirs'].append(
+                os.path.dirname(compiler.asan_library()))
+            if ((cls.tooltype == 'linker'
+                 and 'library_rpath' in cls.flag_options)):
+                kwargs_link.setdefault('library_rpath', [])
+                kwargs_link['library_rpath'].append(
+                    os.path.dirname(compiler.asan_library()))
         return kwargs_link
 
     @classmethod
@@ -2990,7 +3000,10 @@ class CompiledModelDriver(ModelDriver):
             return ''
         # Do substitution when windows_import specified
         if libtype == 'windows_import':
-            libtype = 'static'
+            if libclass == 'internal':
+                libtype = 'shared'
+            else:
+                libtype = 'static'
         # Check that libtype is valid
         libtype_list = ['static', 'shared']
         if libtype not in libtype_list:
