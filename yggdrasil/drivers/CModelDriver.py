@@ -292,7 +292,8 @@ class MSVCCompiler(CCompilerBase):
                              flag_options=OrderedDict(
                                  [('library_libs', ''),
                                   ('library_libs_nonstd', ''),
-                                  ('library_dirs', '/LIBPATH:%s')]),
+                                  ('library_dirs', '/LIBPATH:%s'),
+                                  ('import_lib', '/IMPLIB:%s')]),
                              shared_library_flag='/DLL',
                              search_path_envvar=['LIB'],
                              search_path_flags=None)
