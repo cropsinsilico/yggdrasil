@@ -470,9 +470,9 @@ char *set_reply_send(const comm_t *comm) {
       return out;
     }
     char protocol[51] = "tcp";
-    char host[51] = "localhost";
-    if (strcmp(host, "localhost") == 0)
-      strncpy(host, "127.0.0.1", 50);
+    char host[51] = "127.0.0.1"; // "localhost";
+    /* if (strcmp(host, "localhost") == 0) */
+    /*   strncpy(host, "127.0.0.1", 50); */
     char address[101];
     int port = -1;
 #ifdef _OPENMP
