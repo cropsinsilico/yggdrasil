@@ -747,7 +747,7 @@ class CommBase(tools.YggClass):
                 partial_datatype = {
                     k: kwargs[k] for k in list(
                         rapidjson.get_metaschema()['properties'].keys())
-                    if k in kwargs and k not in ['pattern']}
+                    if k in kwargs and k not in ['pattern', 'args']}
                 if partial_datatype:
                     seri_kws.setdefault('partial_datatype',
                                         partial_datatype)
