@@ -273,7 +273,7 @@ class SerializeBase(tools.YggClass):
                                            'subtype': 'float', 'precision': 8,
                                            'units': 'cm'}]},
                    'contents': (b'# name\tcount\tsize\n'
-                                + b'# n/a\t\xce\xbcmol\tcm\n'
+                                + b'# \t\xce\xbcmol\tcm\n'
                                 + b'# '
                                 + table_string_fmt.encode('utf8')
                                 + b'\t%d\t%f\n'

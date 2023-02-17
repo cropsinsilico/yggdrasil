@@ -1298,7 +1298,7 @@ int document_set_vargs(rapidjson::Value& document,
 	size_t** mem_len_ref = NULL;
 	if (!pop_va_list_mem(ap, mem, mem_ref, allow_realloc))
 	  return 0;
-	if ((has_shape || table_nelements) && !ap.for_fortran) {
+	if ((has_shape && !ap.for_fortran) || table_nelements) {
 	  if (table_nelements)
 	    len = table_nelements;
 	  // len = 0;
