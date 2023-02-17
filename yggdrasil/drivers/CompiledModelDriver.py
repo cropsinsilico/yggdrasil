@@ -1763,6 +1763,10 @@ class CompilerBase(CompilationToolBase):
                 lib = subprocess.check_output(
                     [cls.get_executable(),
                      f'-print-file-name={lib}']).decode('utf-8').strip()
+            if os.path.isfile(lib):
+                lib = os.path.abspath(lib)
+            else:
+                lib = None
         finally:
             for x in [fname, fname_src]:
                 if os.path.isfile(x):
@@ -1922,14 +1926,14 @@ class LinkerBase(CompilationToolBase):
         if compiler and kwargs.get('with_asan', False) and cls.asan_flags:
             # kwargs_link.setdefault('libraries', [])
             # kwargs_link['libraries'].append(compiler.asan_library())
-            kwargs_link.setdefault('library_dirs', [])
-            kwargs_link['library_dirs'].append(
-                os.path.dirname(compiler.asan_library()))
-            if ((cls.tooltype == 'linker'
-                 and 'library_rpath' in cls.flag_options)):
-                kwargs_link.setdefault('library_rpath', [])
-                kwargs_link['library_rpath'].append(
-                    os.path.dirname(compiler.asan_library()))
+            if compiler.asan_library():
+                asan_dir = os.path.dirname(compiler.asan_library())
+                kwargs_link.setdefault('library_dirs', [])
+                kwargs_link['library_dirs'].append(asan_dir)
+                if ((cls.tooltype == 'linker'
+                     and 'library_rpath' in cls.flag_options)):
+                    kwargs_link.setdefault('library_rpath', [])
+                    kwargs_link['library_rpath'].append(asan_dir)
         return kwargs_link
 
     @classmethod
@@ -3000,10 +3004,10 @@ class CompiledModelDriver(ModelDriver):
             return ''
         # Do substitution when windows_import specified
         if libtype == 'windows_import':
-            if libclass == 'internal':
-                libtype = 'shared'
-            else:
-                libtype = 'static'
+            # if libclass == 'internal':
+            #     libtype = 'shared'
+            # else:
+            libtype = 'static'
         # Check that libtype is valid
         libtype_list = ['static', 'shared']
         if libtype not in libtype_list:
@@ -4114,15 +4118,17 @@ class CompiledModelDriver(ModelDriver):
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)
             suffix_kws = cls.select_suffix_kwargs(kwargs)
+            libtype_name = kwargs['libtype']
             if kwargs['libtype'] == 'windows_import':
                 # Compile dynamic library
                 kwargs['libtype'] = 'shared'
+                libtype_name = 'static'
             if kwargs['libtype'] == 'header_only':
                 return src
             elif kwargs['libtype'] in ['static', 'shared']:
                 kwargs.setdefault(
                     'out', cls.get_dependency_library(
-                        dep, libtype=kwargs['libtype'],
+                        dep, libtype=libtype_name,
                         toolname=toolname, **suffix_kws))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
