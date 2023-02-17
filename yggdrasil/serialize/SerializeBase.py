@@ -73,6 +73,7 @@ class SerializeBase(tools.YggClass):
         kwargs = self.extra_kwargs
         self.extra_kwargs = {}
         self._tmp = {}
+        self._initialized = False
         # Update datatype from other keyword arguments
         if self.datatype is None:
             self.datatype = self.default_datatype
@@ -83,8 +84,7 @@ class SerializeBase(tools.YggClass):
     @property
     def initialized(self):
         r"""bool: True if the serializer has been initialized."""
-        # return self.datatype is not None
-        return self.datatype != self.default_datatype
+        return self._initialized or self.datatype != self.default_datatype
 
     @staticmethod
     def before_registration(cls):
@@ -491,7 +491,7 @@ class SerializeBase(tools.YggClass):
             serializer = {}
         if 'datatype' not in serializer:
             serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
-        self.update_serializer(**serializer)
+        self.update_serializer(from_message=True, **serializer)
 
     def initialize_from_metadata(self, metadata):
         r"""Initialize a serializer based on received metadata. This method
@@ -508,7 +508,7 @@ class SerializeBase(tools.YggClass):
         self.update_serializer(**metadata.get('serializer', {}))
 
     def update_serializer(self, skip_type=False, seritype=None,
-                          datatype=None, **kwargs):
+                          datatype=None, from_message=False, **kwargs):
         r"""Update serializer with provided information.
 
         Args:
@@ -538,20 +538,21 @@ class SerializeBase(tools.YggClass):
             old_datatype = None
             if self.initialized:
                 old_datatype = copy.deepcopy(self.datatype)
-            elif self.default_datatype:
-                old_datatype = copy.deepcopy(self.default_datatype)
             if datatype is None:
                 datatype = {}
             # Update datatype from oldstyle keywords in extra_kwargs
-            if datatype != self.default_datatype:
+            if from_message or datatype != self.default_datatype:
                 datatype = self.update_typedef_from_oldstyle(datatype)
             if 'type' in datatype:
                 # TODO: Fix push/pull of schema properties
                 if ((self.partial_datatype
-                     and datatype != self.default_datatype)):
+                     and (from_message
+                          or datatype != self.default_datatype))):
                     datatype.update(self.partial_datatype)
                 self.datatype = rapidjson.normalize(datatype,
                                                     {'type': 'schema'})
+                if from_message:
+                    self._initialized = True
                 if ((self.datatype['type'] == 'array'
                      and isinstance(self.datatype.get('items', None), list)
                      and len(self.datatype['items']) == 1)):
@@ -559,7 +560,7 @@ class SerializeBase(tools.YggClass):
                 # elif self.datatype['type'] not in ['array', 'object']:
                 #     self.datatype['allowNested'] = True
             # Check to see if new datatype is compatible with new one
-            if old_datatype != self.default_datatype and datatype:
+            if old_datatype and datatype:
                 rapidjson.compare_schemas(self.datatype, old_datatype)
                 self.partial_datatype = None
         # Enfore that strings used with messages are in bytes
