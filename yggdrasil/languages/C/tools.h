@@ -204,6 +204,14 @@ static int _ygg_error_flag = 0;
 #endif
 #define UNUSED(arg) ((void)&(arg))
 
+#define YGG_BEGIN_VAR_ARGS(name, first_arg, nargs, realloc)	\
+  va_list name ## _va;						\
+  va_start(name ## _va, first_arg);				\
+  va_list_t ap = init_va_list(name ## _va, &nargs, realloc)
+#define YGG_END_VAR_ARGS(name)			\
+  end_va_list(&name)
+  // va_end(name)
+
 /*! @brief Memory to allow thread association to be set via macro. */
 static int global_thread_id = -1;
 #define ASSOCIATED_WITH_THREAD(COMM, THREAD) global_thread_id = THREAD; COMM; global_thread_id = -1;
@@ -222,19 +230,6 @@ unsigned long ptr2seed(void *ptr) {
   unsigned long seed = (unsigned long)(v & 0xFFFFFFFFLL);
   return seed;
 };
-
-
-/*! @brief Structure used to wrap va_list and allow pointer passing.
-@param va va_list Wrapped variable argument list.
-*/
-typedef struct va_list_t {
-  va_list va;  //!< Traditional variable argument list.
-  size_t nargs_; //!< Storage for number of remaining arguments if not provided as a pointer.
-  size_t *nargs; //!< The number of remaining arguments.
-  void **ptrs; //!< Variable arguments stored as pointers.
-  int iptr; //!< The index of the current variable argument pointer.
-  int for_fortran; //!< Flag that is 1 if this structure will be accessed by fortran.
-} va_list_t;
 
 
 /*! @brief Structure used to wrap Python objects. */
@@ -510,103 +505,6 @@ int is_send(const char *buf) {
   return not_empty_match("send", buf);
 };
 
-  
-/*!
-  @brief Initialize a variable argument list from an existing va_list.
-  @returns va_list_t New variable argument list structure.
- */
-static inline
-va_list_t init_va_list(size_t *nargs) {
-  va_list_t out;
-  out.nargs_ = 0;
-  out.nargs = nargs;
-  out.ptrs = NULL;
-  out.iptr = 0;
-  out.for_fortran = 0;
-  return out;
-};
-
-
-/*! Initialize a variable argument list from an array of pointers.
-  @param[in] nptrs Number of pointers.
-  @param[in] ptrs Array of pointers. 
-  @returns va_list_t New variable argument list structure.
-*/
-static inline
-va_list_t init_va_ptrs(const size_t nptrs, void** ptrs) {
-  va_list_t out;
-  out.nargs_ = nptrs;
-  out.nargs = &out.nargs_;
-  out.ptrs = ptrs;
-  out.iptr = 0;
-  out.for_fortran = 0;
-  return out;
-};
-  
-
-/*! Finalize a variable argument list.
-  @param[in] ap va_list_t Variable argument list.
-*/
-static inline
-void end_va_list(va_list_t *ap) {
-  if (!(ap->ptrs)) {
-    va_end(ap->va);
-  }
-};
-
-  
-/*! Copy a variable argument list.
-  @param[in] ap va_list_t Variable argument list structure to copy.
-  @returns va_list_t New variable argument list structure.
-*/
-static inline
-va_list_t copy_va_list(va_list_t ap) {
-  va_list_t out;
-  out.nargs_ = ap.nargs[0];
-  out.nargs = &(out.nargs_);
-  if (ap.ptrs) {
-    out.ptrs = ap.ptrs;
-    out.iptr = ap.iptr;
-  } else {
-    out.ptrs = NULL;
-    out.iptr = 0;
-    va_copy(out.va, ap.va);
-  }
-  out.for_fortran = ap.for_fortran;
-  return out;
-};
-
-
-/*! @brief Method for skipping a number of bytes in the argument list.
-  @param[in] ap va_list_t* Structure containing variable argument list.
-  @param[in] nbytes size_t Number of bytes that should be skipped.
- */
-static inline
-void va_list_t_skip(va_list_t *ap, size_t nbytes) {
-  if (ap->nargs[0] == 0) {
-    ygglog_error("va_list_t_skip: No more arguments");
-    return;
-  }
-  if (ap->ptrs) {
-    ap->iptr++;
-  } else {
-    if (nbytes == sizeof(void*)) {
-      va_arg(ap->va, void*);
-    } else if (nbytes == sizeof(size_t)) {
-      va_arg(ap->va, size_t);
-    } else if (nbytes == sizeof(char*)) {
-      va_arg(ap->va, char*);
-    } else {
-      printf("WARNING: Cannot get argument of size %ld.\n", nbytes);
-      va_arg(ap->va, void*);
-      // va_arg(ap->va, char[nbytes]);
-    }
-  }
-  if (ap->nargs[0] > 0)
-    ap->nargs[0]--;
-};
-
-  
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif

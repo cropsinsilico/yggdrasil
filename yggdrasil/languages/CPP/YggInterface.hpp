@@ -128,10 +128,12 @@ public:
    */
   int recv(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 0, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vcommRecv(_pi, 0, ap);
+    end_va_list(&ap);
+    // va_end(va);
     return ret;
   }
 
@@ -147,10 +149,12 @@ public:
    */
   int recvRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 1, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vcommRecv(_pi, 1, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
   
@@ -179,10 +183,12 @@ public:
    */
   int recv_nolimit(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vyggRecv(_pi, 0, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vyggRecv(_pi, 0, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
   
@@ -308,10 +314,12 @@ public:
   */
   int send(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vyggSend(_pi, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vyggSend(_pi, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
 
@@ -336,10 +344,12 @@ public:
   */
   int send_nolimit(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vyggSend(_pi, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vyggSend(_pi, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
 
@@ -406,10 +416,12 @@ public:
   */
   int send(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcSend(_pi, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vrpcSend(_pi, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
 
@@ -425,10 +437,12 @@ public:
    */
   int recv(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcRecv(_pi, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vrpcRecv(_pi, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
 
@@ -446,10 +460,12 @@ public:
    */
   int recvRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcRecvRealloc(_pi, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vrpcRecvRealloc(_pi, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
 };
@@ -569,10 +585,12 @@ public:
   int call(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcCall(_cpi, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vrpcCall(_cpi, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
   
@@ -594,10 +612,12 @@ public:
   int callRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcCallRealloc(_cpi, va);
-    va_end(va.va);
+    va_list va;
+    va_start(va, nargs);
+    va_list_t ap = init_va_list(va, &nargs_copy);
+    int ret = vrpcCallRealloc(_cpi, ap);
+    // va_end(va);
+    end_va_list(&ap);
     return ret;
   }
   

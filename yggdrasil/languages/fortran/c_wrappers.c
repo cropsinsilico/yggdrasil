@@ -244,8 +244,10 @@ int ygg_send_var_f(const void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_send_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  return vcommSend((const comm_t*)yggQ, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
+  int out = vcommSend((const comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
@@ -253,9 +255,10 @@ int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 0, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
+  int out = vcommRecv((comm_t*)yggQ, 0, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
@@ -263,9 +266,10 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 1, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
+  int out = vcommRecv((comm_t*)yggQ, 1, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int rpc_send_f(const void *yggQ, int nargs, void *args) {
@@ -285,9 +289,10 @@ int rpc_call_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 0, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, 0, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
@@ -295,9 +300,10 @@ int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 1, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, 1, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 // Ply interface

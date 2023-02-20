@@ -1232,7 +1232,7 @@ int comm_recv_nolimit(comm_t *x, char **data, const size_t len) {
  */
 static
 int vcommSend(const comm_t *x, va_list_t ap) {
-  ygglog_debug("vcommSend: Formatting %lu arguments.", ap.nargs[0]);
+  ygglog_debug("vcommSend: Formatting %lu arguments.", size_va_list(ap));
   int ret = -1;
   if ((x == NULL) || (!(x->flags & COMM_FLAG_VALID))) {
     ygglog_error("vcommSend: Invalid comm");
@@ -1254,7 +1254,7 @@ int vcommSend(const comm_t *x, va_list_t ap) {
   if (update_dtype_from_generic_ap(datatype, ap) < 0) {
     return -1;
   }
-  size_t nargs_orig = ap.nargs[0];
+  size_t nargs_orig = size_va_list(ap);
   ret = serialize_dtype(datatype, &buf, &buf_siz, 1, ap);
   if (ret < 0) {
     ygglog_error("vcommSend(%s): serialization error", x->name);
@@ -1263,12 +1263,12 @@ int vcommSend(const comm_t *x, va_list_t ap) {
   }
   ret = comm_send(x, buf, ret);
   ygglog_debug("vcommSend(%s): comm_send returns %d, nargs (remaining) = %d",
-	       x->name, ret, ap.nargs[0]);
+	       x->name, ret, size_va_list(ap));
   free(buf);
   if (ret < 0) {
     return ret;
   } else {
-    return (int)(nargs_orig - ap.nargs[0]);
+    return (int)(nargs_orig - size_va_list(ap));
   }
 };
 
@@ -1284,11 +1284,10 @@ int vcommSend(const comm_t *x, va_list_t ap) {
 */
 static
 int ncommSend(const comm_t *x, size_t nargs, ...) {
-  va_list_t ap = init_va_list(&nargs);
-  va_start(ap.va, nargs);
+  YGG_BEGIN_VAR_ARGS(ap, nargs, nargs, false);
   ygglog_debug("ncommSend: nargs = %d", nargs);
   int ret = vcommSend(x, ap);
-  va_end(ap.va);
+  YGG_END_VAR_ARGS(ap);
   return ret;
 };
 #define commSend(x, ...) ncommSend(x, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
@@ -1298,10 +1297,6 @@ int ncommSend(const comm_t *x, size_t nargs, ...) {
   Receive a message smaller than YGG_MSG_MAX bytes from an input comm and parse
   it using the associated format string.
   @param[in] x comm_t structure for comm that message should be sent to.
-  @param[in] allow_realloc int If 1, variables being filled are assumed to be
-  pointers to pointers for heap memory. If 0, variables are assumed to be pointers
-  to stack memory. If allow_realloc is set to 1, but stack variables are passed,
-  a segfault can occur.
   @param[out] ap va_list arguments that should be assigned by parsing the
   received message using sscanf. As these are being assigned, they should be
   pointers to memory that has already been allocated.
@@ -1310,9 +1305,9 @@ int ncommSend(const comm_t *x, size_t nargs, ...) {
   returned if EOF is received.
  */
 static
-int vcommRecv(comm_t *x, const int allow_realloc, va_list_t ap) {
+int vcommRecv(comm_t *x, va_list_t ap) {
   int ret = -1;
-  ygglog_debug("vcommRecv: Parsing %lu arguments.", ap.nargs[0]);
+  ygglog_debug("vcommRecv: Parsing %lu arguments.", size_va_list(ap));
   if ((x == NULL) || (!(x->flags & COMM_FLAG_VALID))) {
     ygglog_error("vcommRecv: Invalid comm");
     return ret;
@@ -1338,7 +1333,7 @@ int vcommRecv(comm_t *x, const int allow_realloc, va_list_t ap) {
     comm_t *handle = (comm_t*)(x->handle);
     datatype = handle->datatype;
   }
-  ret = deserialize_dtype(datatype, buf, ret, allow_realloc, ap);
+  ret = deserialize_dtype(datatype, buf, ret, ap);
   if (ret < 0) {
     ygglog_error("vcommRecv(%s): error deserializing message (ret=%d)",
 		 x->name, ret);
@@ -1368,11 +1363,10 @@ int vcommRecv(comm_t *x, const int allow_realloc, va_list_t ap) {
  */
 static
 int ncommRecv(comm_t *x, const int allow_realloc, size_t nargs, ...) {
-  va_list_t ap = init_va_list(&nargs);
-  va_start(ap.va, nargs);
+  YGG_BEGIN_VAR_ARGS(ap, nargs, nargs, allow_realloc);
   ygglog_debug("ncommRecv: nargs = %d", nargs);
-  int ret = vcommRecv(x, allow_realloc, ap);
-  va_end(ap.va);
+  int ret = vcommRecv(x, ap);
+  YGG_END_VAR_ARGS(ap);
   return ret;
 };
 #define commRecvStack(x, ...) ncommRecv(x, 0, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)

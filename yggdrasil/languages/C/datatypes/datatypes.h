@@ -39,6 +39,13 @@ typedef struct generic_t {
   void *allocator; //!< Allocator for rapidjson::Value stored in obj.
 } generic_t;
 
+/*! @brief Structure used to wrap va_list and allow pointer passing.
+@param va va_list Wrapped variable argument list.
+*/
+typedef struct va_list_t {
+  void* va;
+} va_list_t;
+
 /*! @brief C-friendly definition of vector object. */
 typedef generic_t json_array_t;
 
@@ -1011,15 +1018,11 @@ int update_precision_dtype(dtype_t* dtype,
   @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @param[in] buf character pointer to serialized message.
   @param[in] buf_siz size_t Size of buf.
-  @param[in] allow_realloc int If 1, variables being filled are assumed to be
-  pointers to pointers for heap memory. If 0, variables are assumed to be pointers
-  to stack memory. If allow_realloc is set to 1, but stack variables are passed,
-  a segfault can occur.
   @param[in] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
 */
-int deserialize_dtype(const dtype_t *dtype, const char *buf, const size_t buf_siz,
-		      const int allow_realloc, va_list_t ap);
+int deserialize_dtype(const dtype_t *dtype, const char *buf,
+		      const size_t buf_siz, va_list_t ap);
 
 
 /*!
@@ -1163,6 +1166,53 @@ void display_ply(ply_t p);
  */
 int init_python_API();
 
+/*!
+  @brief Initialize a variable argument list from an existing va_list.
+  @param[in] va va_list to wrap.
+  @param[in] nargs Pointer to argument count.
+  @param[in] allow_realloc If true, arguments in va will be reallocated
+    as necessary to receiving message contents.
+  @returns va_list_t New variable argument list structure.
+ */
+va_list_t init_va_list(va_list va, size_t *nargs, bool allow_realloc);
+
+/*! Initialize a variable argument list from an array of pointers.
+  @param[in] nptrs Number of pointers.
+  @param[in] ptrs Array of pointers.
+  @param[in] for_fortran If 1, it is assumed that the passed pointers are
+    passed from the fortran interface.
+  @returns va_list_t New variable argument list structure.
+*/
+va_list_t init_va_ptrs(const size_t nptrs, void** ptrs, int for_fortran);
+
+/*! Finalize a variable argument list.
+  @param[in] ap va_list_t Variable argument list.
+*/
+void end_va_list(va_list_t *ap);
+
+/*! Get the number of arguments remaining in a variable argument list.
+  @param[in] ap Variable argument list.
+  @returns Number of arguments remaining.
+ */
+size_t size_va_list(va_list_t va);
+
+/*! Set the size of the variable argument list.
+  @param[in] ap Variable argument list.
+  @param[in] nargs Pointer to argument count.
+ */
+void set_va_list_size(va_list_t va, size_t* nargs);
+
+/*! Copy a variable argument list.
+  @param[in] ap va_list_t Variable argument list structure to copy.
+  @returns va_list_t New variable argument list structure.
+*/
+va_list_t copy_va_list(va_list_t ap);
+  
+/*! @brief Method for skipping a number of bytes in the argument list.
+  @param[in] ap va_list_t* Structure containing variable argument list.
+  @param[in] nbytes size_t Number of bytes that should be skipped.
+ */
+void va_list_t_skip(va_list_t *ap, const size_t nbytes);
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
