@@ -126,6 +126,12 @@
         "{{ compiler('cxx') }}": {
           "method": "conda_recipe"
         }
+      },
+      {
+        "compiler-rt": {
+          "method": "conda",
+          "os": "osx"
+        }
       }
     ],
     "fortran": {

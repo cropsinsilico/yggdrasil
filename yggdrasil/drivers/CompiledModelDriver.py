@@ -1289,15 +1289,20 @@ class CompilationToolBase(object):
         # Check for output
         if (not skip_flags):
             if (out != 'clean'):
-                if not (os.path.isfile(out)
-                        or os.path.isdir(out)):  # pragma: debug
-                    logger.error('%s\n%s' % (' '.join(cmd), output))
-                    raise RuntimeError(("%s tool, %s, failed to produce "
-                                        "result '%s'")
-                                       % (cls.tooltype.title(), cls.toolname, out))
-                logger.debug("%s %s produced %s"
-                             % (cls.tooltype.title(), cls.toolname, out))
-                cls.append_product(products, args, out)
+                expected_products = [out]
+                if kwargs.get('import_lib', False):
+                    expected_products.append(kwargs['import_lib'])
+                for x in expected_products:
+                    if not (os.path.isfile(x)
+                            or os.path.isdir(x)):  # pragma: debug
+                        logger.error('%s\n%s' % (' '.join(cmd), output))
+                        raise RuntimeError(
+                            f"{cls.tooltype.title()} tool, {cls.toolname}"
+                            f", failed to produce result \'{x}\'")
+                    cls.append_product(products, args, x)
+                logger.debug(
+                    f"{cls.tooltype.title()} {cls.toolname} produced "
+                    f"{expected_products}")
             return out
         if cache_key:
             cls._language_cache[cache_key] = output
@@ -3004,9 +3009,6 @@ class CompiledModelDriver(ModelDriver):
             return ''
         # Do substitution when windows_import specified
         if libtype == 'windows_import':
-            # if libclass == 'internal':
-            #     libtype = 'shared'
-            # else:
             libtype = 'static'
         # Check that libtype is valid
         libtype_list = ['static', 'shared']
@@ -3419,7 +3421,8 @@ class CompiledModelDriver(ModelDriver):
         # Add flags for internal/external depenencies
         all_dep = internal_dependencies + external_dependencies
         for dep in cls.get_dependency_order(all_dep, toolname=toolname):
-            if kwargs.get('disable_python_c_api', False) and (dep in ['python', 'numpy']):
+            if kwargs.get('disable_python_c_api', False) and (dep in ['python', 'numpy',
+                                                                      'python_wrapper']):
                 continue
             dep_lib = cls.get_dependency_library(
                 dep, toolname=toolname, **suffix_kws)
@@ -4118,20 +4121,23 @@ class CompiledModelDriver(ModelDriver):
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)
             suffix_kws = cls.select_suffix_kwargs(kwargs)
-            libtype_name = kwargs['libtype']
-            if kwargs['libtype'] == 'windows_import':
+            windows_import = (kwargs['libtype'] == 'windows_import')
+            if windows_import:
                 # Compile dynamic library
                 kwargs['libtype'] = 'shared'
-                libtype_name = 'static'
             if kwargs['libtype'] == 'header_only':
                 return src
             elif kwargs['libtype'] in ['static', 'shared']:
                 kwargs.setdefault(
                     'out', cls.get_dependency_library(
-                        dep, libtype=libtype_name,
+                        dep, libtype=kwargs['libtype'],
                         toolname=toolname, **suffix_kws))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
+                if windows_import:
+                    kwargs.setdefault(
+                        'import_lib',
+                        os.path.splitext(kwargs['out'])[0] + '.lib')
             kwargs.setdefault('suffix', '')
             kwargs['suffix'] += cls.get_internal_suffix(**suffix_kws)
             return cls.call_compiler(src, toolname=toolname, **kwargs)

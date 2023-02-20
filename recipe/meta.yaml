@@ -94,6 +94,7 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - cmake  # [not win]
+        - compiler-rt  # [osx]
         - make  # [not win]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
