@@ -61,6 +61,9 @@ extras:
         method: conda_recipe
     - "{{ compiler('cxx') }}":
         method: conda_recipe
+    - compiler-rt:
+        method: conda
+        os: osx
   fortran:
     requires_extras: [c]
     requirements:

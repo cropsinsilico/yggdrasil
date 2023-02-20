@@ -3421,7 +3421,8 @@ class CompiledModelDriver(ModelDriver):
         # Add flags for internal/external depenencies
         all_dep = internal_dependencies + external_dependencies
         for dep in cls.get_dependency_order(all_dep, toolname=toolname):
-            if kwargs.get('disable_python_c_api', False) and (dep in ['python', 'numpy']):
+            if kwargs.get('disable_python_c_api', False) and (dep in ['python', 'numpy',
+                                                                      'python_wrapper']):
                 continue
             dep_lib = cls.get_dependency_library(
                 dep, toolname=toolname, **suffix_kws)

@@ -345,7 +345,7 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
-    asan_flags = ['-fsanitize=address', '-static-libasan']
+    asan_flags = ['-fsanitize=address']
 
     @classmethod
     def tool_version(cls, **kwargs):
