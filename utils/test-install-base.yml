@@ -225,7 +225,9 @@ jobs:
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
-      run: yggconfig --allow-multiple-omp
+      run: |
+        install_name_tool -change "@rpath/libc++abi.dylib" "/usr/lib/libc++abi.dylib" $CONDA_PREFIX/lib/libc++.dylib
+        yggconfig --allow-multiple-omp
     # ========================================================
 
     - name: Verify installation

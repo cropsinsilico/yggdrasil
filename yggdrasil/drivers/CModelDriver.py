@@ -165,7 +165,7 @@ class GCCCompiler(CCompilerBase):
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
     asan_flags = ['-fsanitize=address']
-    asan_libenv = 'LD_PRELOAD'
+    preload_env = 'LD_PRELOAD'
     object_tool = "ldd"
 
     @classmethod
@@ -235,7 +235,7 @@ class ClangCompiler(CCompilerBase):
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
     asan_flags = ['-fsanitize=address']
-    asan_libenv = 'DYLD_INSERT_LIBRARIES'
+    preload_env = 'DYLD_INSERT_LIBRARIES'
     object_tool = "otool -L"
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
@@ -585,9 +585,11 @@ class CModelDriver(CompiledModelDriver):
         'numpy': {'include': os.path.join(_numpy_inc[0], 'numpy',
                                           'arrayobject.h'),
                   'libtype': 'header_only',
-                  'language': 'c'},
+                  'language': 'c',
+                  'for_python_api': True},
         'python': {'include': os.path.join(_python_inc, 'Python.h'),
-                   'language': 'c'}}
+                   'language': 'c',
+                   'for_python_api': True}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'language': 'c',
@@ -623,6 +625,7 @@ class CModelDriver(CompiledModelDriver):
                            'libtype': 'shared',
                            'external_dependencies': ['python', 'numpy'],
                            'linker_language': 'c',
+                           'for_python_api': True,
                            'include_dirs': [_top_lang_dir]}}
     type_map = {
         'comm': 'comm_t*',

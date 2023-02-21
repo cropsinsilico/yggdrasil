@@ -405,19 +405,15 @@ class FortranModelDriver(CompiledModelDriver):
                 if not v.is_installed():
                     continue
                 if k == 'clang++':
-                    cxx_lib = 'c++'
                     if not add_cxx_lib:
-                        add_cxx_lib = cxx_lib
+                        add_cxx_lib = 'c++'
                 else:
                     # GNU takes precedence when present
-                    cxx_lib = 'stdc++'
-                    add_cxx_lib = cxx_lib
+                    add_cxx_lib = 'stdc++'
             if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
                 cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
                 cls.internal_libraries['fygg']['external_dependencies'].append(
                     add_cxx_lib)
-                # if platform._is_win:  # pragma: windows
-                #     cls.external_libraries[cxx_lib]['libtype'] = 'windows_import'
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
