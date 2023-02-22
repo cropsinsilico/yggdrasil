@@ -1825,12 +1825,12 @@ class CompilerBase(CompilationToolBase):
         """
         if isinstance(libs, str):
             libs = [libs]
-        if cls.preload_env and libs:
-            if cls.preload_env in env:
-                libs = [env[cls.preload_env]] + libs
-            env[cls.preload_env] = ';'.join(libs)
-            logger.info(f"PRELOAD ENV ({cls.preload_env}): "
-                        f"{env[cls.preload_env]}")
+        if cls.preload_envvar and libs:
+            if cls.preload_envvar in env:
+                libs = [env[cls.preload_envvar]] + libs
+            env[cls.preload_envvar] = ';'.join(libs)
+            logger.info(f"PRELOAD ENV ({cls.preload_envvar}): "
+                        f"{env[cls.preload_envvar]}")
             preload_file = '/etc/ld.so.preload'
             if os.path.isfile(preload_file):
                 contents = open(preload_file, 'r').read()

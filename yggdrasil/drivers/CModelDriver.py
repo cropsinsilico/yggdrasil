@@ -165,7 +165,7 @@ class GCCCompiler(CCompilerBase):
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
     asan_flags = ['-fsanitize=address']
-    preload_env = 'LD_PRELOAD'
+    preload_envvar = 'LD_PRELOAD'
     object_tool = "ldd"
 
     @classmethod
@@ -235,7 +235,7 @@ class ClangCompiler(CCompilerBase):
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
     asan_flags = ['-fsanitize=address']
-    preload_env = 'DYLD_INSERT_LIBRARIES'
+    preload_envvar = 'DYLD_INSERT_LIBRARIES'
     object_tool = "otool -L"
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
