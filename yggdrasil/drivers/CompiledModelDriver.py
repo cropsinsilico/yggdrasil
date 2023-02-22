@@ -374,7 +374,6 @@ class CompilationToolBase(object):
     is_build_tool = False
     tool_suffix_format = '_%sx'
     asan_flags = None
-    asan_libenv = None
     object_tool = None
     _language_ext = None  # only update once per class
     _language_cache = {}
@@ -1842,9 +1841,8 @@ class CompilerBase(CompilationToolBase):
     @classmethod
     def init_asan_env(cls, out):
         r"""Add environment variables to preload the ASAN libraries."""
-        if not (cls.asan_flags and cls.asan_libenv and cls.object_tool
-                and not platform._is_win):
-            return {}
+        if not cls.asan_flags:
+            return out
         lib = cls.asan_library()
         if lib:
             cls.preload_env(lib, out)
@@ -1859,8 +1857,7 @@ class CompilerBase(CompilationToolBase):
     @classmethod
     def asan_library(cls):
         r"""Return the address sanitizer library."""
-        if not (cls.asan_flags and cls.object_tool
-                and not platform._is_win):
+        if not (cls.asan_flags and cls.object_tool):
             return None
         if 'asan_library' in cls._language_cache:
             return cls._language_cache['asan_library']
