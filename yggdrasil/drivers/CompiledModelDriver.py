@@ -1047,7 +1047,7 @@ class CompilationToolBase(object):
                 kws_out['build_library'] = True
             fname = cls.get_output_file(fname, **kws_out)
         fname = '*'.join(os.path.splitext(fname))
-        search_list = cls.get_search_path(**kwargs)
+        search_list = cls.get_search_path(libtype=libtype, **kwargs)
         # On windows search for both gnu and msvc library
         # naming conventions
         if platform._is_win:  # pragma: windows
@@ -1830,6 +1830,13 @@ class CompilerBase(CompilationToolBase):
             if cls.preload_env in env:
                 libs = [env[cls.preload_env]] + libs
             env[cls.preload_env] = ';'.join(libs)
+            logger.info(f"PRELOAD ENV ({cls.preload_env}): "
+                        f"{env[cls.preload_env]}")
+            preload_file = '/etc/ld.so.preload'
+            if os.path.isfile(preload_file):
+                contents = open(preload_file, 'r').read()
+                logger.info(f"PRELOAD FILE ({preload_file}):\n"
+                            f"{contents}")
         return env
 
     @classmethod
@@ -1841,6 +1848,12 @@ class CompilerBase(CompilationToolBase):
         lib = cls.asan_library()
         if lib:
             cls.preload_env(lib, out)
+        asan_options = out.get('ASAN_OPTIONS', '')
+        if asan_options:
+            asan_options += ':'
+        asan_options += 'verify_asan_link_order=0'
+        out['ASAN_OPTIONS'] = asan_options
+        logger.info(f"ASAN_OPTIONS: {asan_options}")
         return out
 
     @classmethod

@@ -226,7 +226,8 @@ jobs:
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
       run: |
-        install_name_tool -change "@rpath/libc++abi.dylib" "/usr/lib/libc++abi.dylib" $CONDA_PREFIX/lib/libc++.dylib
+        # install_name_tool -change "@rpath/libc++abi.dylib" "/usr/lib/libc++abi.dylib" $CONDA_PREFIX/lib/libc++.dylib
+        install_name_tool -change "@rpath/libc++abi.dylib" "/usr/lib/libc++abi.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
         yggconfig --allow-multiple-omp
     # ========================================================
 
