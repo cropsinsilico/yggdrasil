@@ -16,7 +16,7 @@ def test_get_runner():
 
 
 @pytest.mark.language('c++')
-def test_run_compilation_opt():
+def test_run_compilation_opt(requires_asan):
     r"""Test run with compilation options turned on."""
     namespace = f"test_run_compilation_opt_{uuid.uuid4()}"
     runner.run([ex_yamls['gs_lesson3']['cpp']],

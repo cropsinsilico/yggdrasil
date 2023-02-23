@@ -165,9 +165,9 @@ class TestExampleTypes(base_class):
     @pytest.fixture(scope="class")
     def env(self, example_name, language, typename, using_pointers,
             using_generics, split_array, dont_add_lengths,
-            length_prefix, example_module):
+            length_prefix, example_module, asan_installed):
         r"""dict: Environment variables set for the test."""
-        with_asan = (language in ['c', 'c++', 'cpp'])
+        with_asan = (language in ['c', 'c++', 'cpp'] and asan_installed)
         # and typename not in ['instance', 'class', 'function'])
         kwargs = {}
         assign_kws = {}
