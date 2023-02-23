@@ -1326,7 +1326,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            logger.info('Command: "%s"' % ' '.join(cmd))
+            logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = output.decode("utf-8")
@@ -1829,13 +1829,13 @@ class CompilerBase(CompilationToolBase):
             if cls.preload_envvar in env:
                 libs = [env[cls.preload_envvar]] + libs
             env[cls.preload_envvar] = ';'.join(libs)
-            logger.info(f"PRELOAD ENV ({cls.preload_envvar}): "
-                        f"{env[cls.preload_envvar]}")
+            logger.debug(f"PRELOAD ENV ({cls.preload_envvar}): "
+                         f"{env[cls.preload_envvar]}")
             preload_file = '/etc/ld.so.preload'
             if os.path.isfile(preload_file):
                 contents = open(preload_file, 'r').read()
-                logger.info(f"PRELOAD FILE ({preload_file}):\n"
-                            f"{contents}")
+                logger.debug(f"PRELOAD FILE ({preload_file}):\n"
+                             f"{contents}")
         return env
 
     @classmethod
@@ -1851,7 +1851,7 @@ class CompilerBase(CompilationToolBase):
             asan_options += ':'
         asan_options += 'verify_asan_link_order=0'
         out['ASAN_OPTIONS'] = asan_options
-        logger.info(f"ASAN_OPTIONS: {asan_options}")
+        logger.debug(f"ASAN_OPTIONS: {asan_options}")
         return out
 
     @classmethod
@@ -1864,6 +1864,8 @@ class CompilerBase(CompilationToolBase):
         try:
             fname = 'a.out'
             fname_src = 'a.c'
+            if cls.languages[0] == 'c++':
+                fname_src += 'pp'
             with open(fname_src, 'w') as fd:
                 fd.write('void foo() {}')
             cmds = [' '.join(cls.get_executable_command(
@@ -1882,6 +1884,8 @@ class CompilerBase(CompilationToolBase):
                 lib = os.path.abspath(lib)
             else:
                 lib = None
+        except subprocess.CalledProcessError:
+            lib = None
         finally:
             for x in [fname, fname_src]:
                 if os.path.isfile(x):
