@@ -374,11 +374,11 @@ class TestCompiledModelDriver(model_base_class):
         r"""Test executable_command."""
         with pytest.raises(ValueError):
             python_class.executable_command(['test'], exec_type='invalid')
-        python_class.executable_command(['test'])
         if python_class.get_tool('compiler').no_separate_linking:
             with pytest.raises(RuntimeError):
                 python_class.executable_command(['test'], exec_type='linker')
         else:
+            python_class.executable_command(['test'], dont_link=True)
             python_class.executable_command(['test'], exec_type='linker')
 
     def test_compiler_call(self, python_class):
