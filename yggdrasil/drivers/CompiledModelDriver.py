@@ -1326,7 +1326,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            logger.info('Command: "%s"' % ' '.join(cmd))
+            logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = output.decode("utf-8")
@@ -1825,40 +1825,38 @@ class CompilerBase(CompilationToolBase):
         """
         if isinstance(libs, str):
             libs = [libs]
-        if cls.preload_env and libs:
-            if cls.preload_env in env:
-                libs = [env[cls.preload_env]] + libs
-            env[cls.preload_env] = ';'.join(libs)
-            logger.info(f"PRELOAD ENV ({cls.preload_env}): "
-                        f"{env[cls.preload_env]}")
-            preload_file = '/etc/ld.so.preload'
-            if os.path.isfile(preload_file):
-                contents = open(preload_file, 'r').read()
-                logger.info(f"PRELOAD FILE ({preload_file}):\n"
-                            f"{contents}")
+        if cls.preload_envvar and libs:
+            if cls.preload_envvar in env:  # pragma: no cover
+                libs = [env[cls.preload_envvar]] + libs
+            env[cls.preload_envvar] = ';'.join(libs)
+            logger.debug(f"PRELOAD ENV ({cls.preload_envvar}): "
+                         f"{env[cls.preload_envvar]}")
+            # preload_file = '/etc/ld.so.preload'
+            # if os.path.isfile(preload_file):
+            #     contents = open(preload_file, 'r').read()
+            #     logger.debug(f"PRELOAD FILE ({preload_file}):\n"
+            #                  f"{contents}")
         return env
 
     @classmethod
     def init_asan_env(cls, out):
         r"""Add environment variables to preload the ASAN libraries."""
-        if not cls.asan_flags:
-            return out
-        lib = cls.asan_library()
-        if lib:
-            cls.preload_env(lib, out)
-        asan_options = out.get('ASAN_OPTIONS', '')
-        if asan_options:
-            asan_options += ':'
-        asan_options += 'verify_asan_link_order=0'
-        out['ASAN_OPTIONS'] = asan_options
-        logger.info(f"ASAN_OPTIONS: {asan_options}")
+        if cls.asan_flags:
+            lib = cls.asan_library()
+            if lib:
+                cls.preload_env(lib, out)
+            asan_options = out.get('ASAN_OPTIONS', '')
+            if asan_options:
+                asan_options += ':'
+            asan_options += 'verify_asan_link_order=0'
+            out['ASAN_OPTIONS'] = asan_options
+            logger.debug(f"ASAN_OPTIONS: {asan_options}")
         return out
 
     @classmethod
     def asan_library(cls):
         r"""Return the address sanitizer library."""
-        if not (cls.asan_flags and cls.object_tool):
-            return None
+        assert cls.asan_flags and cls.object_tool
         if 'asan_library' in cls._language_cache:
             return cls._language_cache['asan_library']
         try:
@@ -1882,6 +1880,8 @@ class CompilerBase(CompilationToolBase):
                 lib = os.path.abspath(lib)
             else:
                 lib = None
+        except subprocess.CalledProcessError:
+            lib = None
         finally:
             for x in [fname, fname_src]:
                 if os.path.isfile(x):
@@ -3561,10 +3561,10 @@ class CompiledModelDriver(ModelDriver):
                                   f"suffix_kws: {suffix_kws}\n",
                                   f"toolname:   {toolname}")
                             raise
-                    if not os.path.isfile(dep_lib):
+                    if not os.path.isfile(dep_lib):  # pragma: debug
                         raise RuntimeError(
-                            ("Library for %s dependency does not "
-                             "exist: '%s'.") % (dep, dep_lib))
+                            f"Library for {dep} dependency does not "
+                            f"exist: 'dep_lib'.")
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):
@@ -4210,7 +4210,7 @@ class CompiledModelDriver(ModelDriver):
             for k, v in cls.get_dependency_info(dep, toolname=toolname).items():
                 if k == 'directory':
                     kwargs.setdefault('working_dir', v)
-                elif k == 'toolname':
+                if k == 'toolname':
                     toolname = v
                 elif k == 'for_python_api':
                     if not kwargs.get('dry_run', False):

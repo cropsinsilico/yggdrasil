@@ -1166,6 +1166,24 @@ def init_zmq():
         s.close()
 
 
+@pytest.fixture(scope="session")
+def asan_installed():
+    r"""Determine if ASAN is available."""
+    from yggdrasil.drivers.CompiledModelDriver import (
+        find_compilation_tool, get_compilation_tool)
+    compiler = find_compilation_tool('compiler', 'c', allow_failure=True)
+    if compiler:
+        compiler = get_compilation_tool('compiler', compiler)
+    return compiler and compiler.asan_library()
+
+
+@pytest.fixture
+def requires_asan(asan_installed):
+    r"""Skip a test if it requires non-existent ASAN."""
+    if not asan_installed:
+        pytest.skip("ASAN library not available")
+
+
 # @pytest.fixture(autouse=True)
 # def ensure_gc():
 #     gc.collect()

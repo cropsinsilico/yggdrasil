@@ -144,9 +144,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
 
         """
         # Short cut by checking if yggdrasil installed
-        if cls.is_interface_installed():
-            return True
-        return super(RModelDriver, cls).are_dependencies_installed(**kwargs)
+        if not cls.is_interface_installed():  # pragma: config
+            return super(RModelDriver, cls).are_dependencies_installed(**kwargs)
+        return True
             
     @classmethod
     def is_library_installed(cls, lib, **kwargs):
