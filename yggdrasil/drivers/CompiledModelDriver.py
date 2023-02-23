@@ -4210,7 +4210,7 @@ class CompiledModelDriver(ModelDriver):
             for k, v in cls.get_dependency_info(dep, toolname=toolname).items():
                 if k == 'directory':
                     kwargs.setdefault('working_dir', v)
-                elif k == 'toolname':
+                if k == 'toolname':
                     toolname = v
                 elif k == 'for_python_api':
                     if not kwargs.get('dry_run', False):

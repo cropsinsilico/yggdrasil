@@ -69,7 +69,6 @@ def test_locate_library_file():
     from yggdrasil.drivers.CModelDriver import CModelDriver
     compiler = CModelDriver.get_tool('compiler').__class__
     files = {}
-    print(CModelDriver.external_libraries['zmq'])
     fname = None
     libtype = None
     for k in ['shared', 'static']:
@@ -375,6 +374,7 @@ class TestCompiledModelDriver(model_base_class):
         r"""Test executable_command."""
         with pytest.raises(ValueError):
             python_class.executable_command(['test'], exec_type='invalid')
+        python_class.executable_command(['test'])
         if python_class.get_tool('compiler').no_separate_linking:
             with pytest.raises(RuntimeError):
                 python_class.executable_command(['test'], exec_type='linker')
