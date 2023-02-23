@@ -63,6 +63,33 @@ def test_get_compilation_tool():
             == 'invalid')
 
 
+@pytest.mark.language('c')
+def test_locate_library_file():
+    r"""Test locate_file method for compiler."""
+    from yggdrasil.drivers.CModelDriver import CModelDriver
+    compiler = CModelDriver.get_tool('compiler').__class__
+    files = {}
+    print(CModelDriver.external_libraries['zmq'])
+    fname = None
+    libtype = None
+    for k in ['shared', 'static']:
+        fname = CModelDriver.external_libraries['zmq'].get(k, '')
+        libtype = k
+        if os.path.isfile(fname):
+            break
+    else:
+        pytest.skip("Test library (zmq) doesn't exist")
+    assert compiler.locate_file(fname) == fname
+    assert compiler.locate_file('zmq', libtype=libtype) == fname
+    if libtype == 'static':
+        assert compiler.archiver().locate_file('zmq') == fname
+    if libtype == 'shared':
+        assert compiler.linker().locate_file('zmq') == fname
+    if platform._is_win:
+        assert (compiler.locate_file('zmq', libtype='windows_import')
+                == files['shared'])
+
+
 def test_CompilationToolBase():
     r"""Test error in CompilationToolBase."""
     with pytest.raises(RuntimeError):

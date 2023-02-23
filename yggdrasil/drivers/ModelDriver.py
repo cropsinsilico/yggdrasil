@@ -1430,7 +1430,7 @@ class ModelDriver(Driver):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
         for k in cls._config_keys:
-            if k in kwargs:
+            if k in kwargs:  # pragma: config
                 cfg.set(cls.language, k, kwargs[k])
         cls.after_registration(cls, cfg=cfg, second_pass=True)
         return out
@@ -1497,27 +1497,27 @@ class ModelDriver(Driver):
                     out.update(model_env[base_name])
         return out
 
-    @classmethod
-    def set_asan_env(cls, env, compiler=None):
-        r"""Add flags in the case that the program being run links against
-        a shared ASAN library.
+    # @classmethod
+    # def set_asan_env(cls, env, compiler=None):
+    #     r"""Add flags in the case that the program being run links against
+    #     a shared ASAN library.
 
-        Args:
-            env (dict): Environment variables dictionary to add library to.
-            compiler (Compiler): Compiler that should be used to determine
-                the location of the ASAN library. Defaults to the C compiler.
+    #     Args:
+    #         env (dict): Environment variables dictionary to add library to.
+    #         compiler (Compiler): Compiler that should be used to determine
+    #             the location of the ASAN library. Defaults to the C compiler.
 
-        Returns:
-            dict: Environment variables dictionary.
+    #     Returns:
+    #         dict: Environment variables dictionary.
 
-        """
-        if compiler is None:
-            drv = cls
-            if cls._language != 'c':
-                drv = import_component('model', 'c')
-            compiler = drv.get_tool('compiler')
-        compiler.init_asan_env(env)
-        return env
+    #     """
+    #     if compiler is None:
+    #         drv = cls
+    #         if cls._language != 'c':
+    #             drv = import_component('model', 'c')
+    #         compiler = drv.get_tool('compiler')
+    #     compiler.init_asan_env(env)
+    #     return env
 
     @classmethod
     def set_env_class(cls, existing=None, **kwargs):
@@ -1537,7 +1537,7 @@ class ModelDriver(Driver):
             existing = {}
         existing.update(os.environ)
         # if cls.compiled_with_asan():
-        #     cls.set_env_asan(existing)
+        #     cls.set_asan_env(existing)
         return existing
 
     def set_env(self, existing=None, **kwargs):

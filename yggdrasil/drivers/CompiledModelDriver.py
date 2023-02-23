@@ -1826,46 +1826,42 @@ class CompilerBase(CompilationToolBase):
         if isinstance(libs, str):
             libs = [libs]
         if cls.preload_envvar and libs:
-            if cls.preload_envvar in env:
+            if cls.preload_envvar in env:  # pragma: no cover
                 libs = [env[cls.preload_envvar]] + libs
             env[cls.preload_envvar] = ';'.join(libs)
             logger.debug(f"PRELOAD ENV ({cls.preload_envvar}): "
                          f"{env[cls.preload_envvar]}")
-            preload_file = '/etc/ld.so.preload'
-            if os.path.isfile(preload_file):
-                contents = open(preload_file, 'r').read()
-                logger.debug(f"PRELOAD FILE ({preload_file}):\n"
-                             f"{contents}")
+            # preload_file = '/etc/ld.so.preload'
+            # if os.path.isfile(preload_file):
+            #     contents = open(preload_file, 'r').read()
+            #     logger.debug(f"PRELOAD FILE ({preload_file}):\n"
+            #                  f"{contents}")
         return env
 
     @classmethod
     def init_asan_env(cls, out):
         r"""Add environment variables to preload the ASAN libraries."""
-        if not cls.asan_flags:
-            return out
-        lib = cls.asan_library()
-        if lib:
-            cls.preload_env(lib, out)
-        asan_options = out.get('ASAN_OPTIONS', '')
-        if asan_options:
-            asan_options += ':'
-        asan_options += 'verify_asan_link_order=0'
-        out['ASAN_OPTIONS'] = asan_options
-        logger.debug(f"ASAN_OPTIONS: {asan_options}")
+        if cls.asan_flags:
+            lib = cls.asan_library()
+            if lib:
+                cls.preload_env(lib, out)
+            asan_options = out.get('ASAN_OPTIONS', '')
+            if asan_options:
+                asan_options += ':'
+            asan_options += 'verify_asan_link_order=0'
+            out['ASAN_OPTIONS'] = asan_options
+            logger.debug(f"ASAN_OPTIONS: {asan_options}")
         return out
 
     @classmethod
     def asan_library(cls):
         r"""Return the address sanitizer library."""
-        if not (cls.asan_flags and cls.object_tool):
-            return None
+        assert cls.asan_flags and cls.object_tool
         if 'asan_library' in cls._language_cache:
             return cls._language_cache['asan_library']
         try:
             fname = 'a.out'
             fname_src = 'a.c'
-            if cls.languages[0] == 'c++':
-                fname_src += 'pp'
             with open(fname_src, 'w') as fd:
                 fd.write('void foo() {}')
             cmds = [' '.join(cls.get_executable_command(
@@ -3565,10 +3561,10 @@ class CompiledModelDriver(ModelDriver):
                                   f"suffix_kws: {suffix_kws}\n",
                                   f"toolname:   {toolname}")
                             raise
-                    if not os.path.isfile(dep_lib):
+                    if not os.path.isfile(dep_lib):  # pragma: debug
                         raise RuntimeError(
-                            ("Library for %s dependency does not "
-                             "exist: '%s'.") % (dep, dep_lib))
+                            f"Library for {dep} dependency does not "
+                            f"exist: 'dep_lib'.")
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):
