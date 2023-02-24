@@ -68,7 +68,6 @@ def test_locate_library_file():
     r"""Test locate_file method for compiler."""
     from yggdrasil.drivers.CModelDriver import CModelDriver
     compiler = CModelDriver.get_tool('compiler').__class__
-    files = {}
     fname = None
     libtype = None
     for k in ['shared', 'static']:
@@ -86,7 +85,7 @@ def test_locate_library_file():
         assert compiler.linker().locate_file('zmq') == fname
     if platform._is_win:
         assert (compiler.locate_file('zmq', libtype='windows_import')
-                == files['shared'])
+                == fname)
 
 
 def test_CompilationToolBase():
