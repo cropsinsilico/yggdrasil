@@ -36,6 +36,8 @@ static int ply_add_elements_from_dict(PyObject *self, PyObject* kwargs, bool pre
 static PyObject* ply_richcompare(PyObject *self, PyObject *other, int op);
 static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_add_elements(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_as_trimesh(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_from_trimesh(PyObject* cls, PyObject* args, PyObject* kwargs);
 static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
@@ -68,6 +70,8 @@ static PyObject* objwavefront_element2dict(const ObjElement* x, bool includeCode
 static PyObject* objwavefront_richcompare(PyObject *self, PyObject *other, int op);
 static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_as_trimesh(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_from_trimesh(PyObject* cls, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
@@ -90,6 +94,229 @@ static PyObject* objwavefront_add_colors(PyObject* self, PyObject* args, PyObjec
 static PyObject* objwavefront_get_colors(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront__getstate__(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront__setstate__(PyObject* self, PyObject* state);
+
+
+///////////////////////
+// Trimesh utilities //
+///////////////////////
+
+PyObject* import_trimesh_class() {
+    PyObject* trimesh = PyImport_ImportModule("trimesh");
+    if (trimesh == NULL)
+	return NULL;
+    PyObject* out = PyObject_GetAttrString(trimesh, "Trimesh");
+    Py_DECREF(trimesh);
+    return out;
+}
+PyObject* trimesh2dict(PyObject* solf) {
+    PyObject* trimeshClass = import_trimesh_class();
+    if (trimeshClass == NULL) {
+	PyErr_Format(PyExc_ImportError, "Trimesh not available");
+	return NULL;
+    }
+    if (!PyObject_IsInstance(solf, trimeshClass)) {
+	Py_DECREF(trimeshClass);
+	PyErr_Format(PyExc_TypeError, "Input is not a trimesh class.");
+	return NULL;
+    }
+    Py_DECREF(trimeshClass);
+    PyObject* vertices = PyObject_GetAttrString(solf, "vertices");
+    if (vertices == NULL)
+	return NULL;
+    PyObject* visual = PyObject_GetAttrString(solf, "visual");
+    if (visual == NULL) {
+	Py_DECREF(vertices);
+	return NULL;
+    }
+    PyObject* vertex_colors = PyObject_GetAttrString(visual, "vertex_colors");
+    Py_DECREF(visual);
+    if (vertex_colors == NULL) {
+	Py_DECREF(vertices);
+	return NULL;
+    }
+    PyObject* slice1 = PySlice_New(NULL, NULL, NULL);
+    if (slice1 == NULL) {
+	Py_DECREF(vertex_colors);
+	Py_DECREF(vertices);
+	return NULL;
+    }
+    PyObject* end = PyLong_FromLong(3);
+    if (end == NULL) {
+	Py_DECREF(slice1);
+	Py_DECREF(vertex_colors);
+	Py_DECREF(vertices);
+	return NULL;
+    }
+    PyObject* slice2 = PySlice_New(NULL, end, NULL);
+    Py_DECREF(end);
+    if (slice2 == NULL) {
+	Py_DECREF(slice1);
+	Py_DECREF(vertex_colors);
+	Py_DECREF(vertices);
+	return NULL;
+    }
+    PyObject* slices = PyTuple_Pack(2, slice1, slice2);
+    if (slices == NULL) {
+	Py_DECREF(slice2);
+	Py_DECREF(slice1);
+	Py_DECREF(vertex_colors);
+	Py_DECREF(vertices);
+	return NULL;
+    }
+    PyObject* vertex_colors_sliced = PyObject_GetItem(vertex_colors, slices);
+    Py_DECREF(vertex_colors);
+    Py_DECREF(slices);
+    if (vertex_colors_sliced == NULL) {
+	Py_DECREF(vertices);
+	return NULL;
+    }
+    PyObject* faces = PyObject_GetAttrString(solf, "faces");
+    if (faces == NULL) {
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	return NULL;
+    }
+    PyObject* astypeMethod = PyUnicode_FromString("astype");
+    if (astypeMethod == NULL) {
+	Py_DECREF(faces);
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	return NULL;
+    }
+    PyObject* int32 = PyUnicode_FromString("int32");
+    if (int32 == NULL) {
+	Py_DECREF(faces);
+	Py_DECREF(astypeMethod);
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	return NULL;
+    }
+    PyObject* faces_int32 = PyObject_CallMethodObjArgs(faces, astypeMethod, int32, NULL);
+    Py_DECREF(faces);
+    Py_DECREF(astypeMethod);
+    Py_DECREF(int32);
+    if (faces_int32 == NULL) {
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	return NULL;
+    }
+    PyObject* dict_kwargs = PyDict_New();
+    if (dict_kwargs == NULL) {
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	Py_DECREF(faces_int32);
+	return NULL;
+    }
+    PyObject* numpy = PyImport_ImportModule("numpy");
+    if (numpy == NULL) {
+	Py_DECREF(dict_kwargs);
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	Py_DECREF(faces_int32);
+	PyErr_Format(PyExc_ImportError, "Numpy not available");
+	return NULL;
+    }
+    PyObject* ndarray = PyObject_GetAttrString(numpy, "ndarray");
+    Py_DECREF(numpy);
+    if (ndarray == NULL) {
+	Py_DECREF(dict_kwargs);
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	Py_DECREF(faces_int32);
+	return NULL;
+    }
+    PyObject* viewMethod = PyUnicode_FromString("view");
+    if (viewMethod == NULL) {
+	Py_DECREF(dict_kwargs);
+	Py_DECREF(vertices);
+	Py_DECREF(vertex_colors_sliced);
+	Py_DECREF(faces_int32);
+	Py_DECREF(ndarray);
+	return NULL;
+    }
+#define ADD_KEY_(name, var)					\
+    PyObject* var ## _array = PyObject_CallMethodObjArgs(var, viewMethod, ndarray); \
+    if (PyObject_Size(var ## _array) > 0) {				\
+	if (PyDict_SetItemString(dict_kwargs, #name, var ## _array) < 0) { \
+	    Py_DECREF(dict_kwargs);					\
+	    Py_DECREF(vertices);					\
+	    Py_DECREF(vertex_colors_sliced);				\
+	    Py_DECREF(faces_int32);					\
+	    return NULL;						\
+	}								\
+    }									\
+    Py_DECREF(var ## _array)
+    ADD_KEY_(vertex, vertices);
+    ADD_KEY_(vertex_colors, vertex_colors_sliced);
+    ADD_KEY_(face, faces_int32);
+#undef ADD_KEY_
+    Py_DECREF(vertices);
+    Py_DECREF(vertex_colors_sliced);
+    Py_DECREF(faces_int32);
+    Py_DECREF(viewMethod);
+    Py_DECREF(ndarray);
+    return dict_kwargs;
+}
+PyObject* dict2trimesh(PyObject* solf, PyObject* add_kwargs,
+		       bool decIndex=false) {
+    PyObject* trimeshClass = import_trimesh_class();
+    if (trimeshClass == NULL) {
+	PyErr_Format(PyExc_ImportError, "Trimesh not available");
+	return NULL;
+    }
+    PyObject* kwargs = PyDict_New();
+    if (kwargs == NULL) {
+	Py_DECREF(trimeshClass);
+	return NULL;
+    }
+    PyObject* x = NULL;
+#define ADD_KEY_(nameA, nameB)						\
+    x = PyDict_GetItemString(solf, #nameA);				\
+    if (x == NULL) {							\
+	x = Py_None;							\
+    } else if (decIndex && std::string(#nameA) == std::string("face")) { \
+	PyObject* inc = PyLong_FromLong(1);				\
+	if (PyNumber_InPlaceSubtract(x, inc) == NULL) {			\
+	    Py_DECREF(inc);						\
+	    Py_DECREF(trimeshClass);					\
+	    Py_DECREF(kwargs);						\
+	    return NULL;						\
+	}								\
+	Py_DECREF(inc);							\
+    }									\
+    if (PyDict_SetItemString(kwargs, #nameB, x) < 0) {			\
+	Py_DECREF(trimeshClass);					\
+	Py_DECREF(kwargs);						\
+	return NULL;							\
+    }
+    ADD_KEY_(vertex, vertices)
+    ADD_KEY_(vertex_colors, vertex_colors)
+    ADD_KEY_(face, faces)
+#undef ADD_KEY_
+    if (PyDict_SetItemString(kwargs, "process", Py_False) < 0) {
+	Py_DECREF(trimeshClass);
+	Py_DECREF(kwargs);
+	return NULL;
+    }
+    PyObject* args = PyTuple_New(0);
+    if (args == NULL) {
+	Py_DECREF(trimeshClass);
+	Py_DECREF(kwargs);
+	return NULL;
+    }
+    if (add_kwargs != NULL) {
+	if (PyDict_Update(kwargs, add_kwargs) < 0) {
+	    Py_DECREF(trimeshClass);
+	    Py_DECREF(args);
+	    Py_DECREF(kwargs);
+	}
+    }
+    PyObject* out = PyObject_Call(trimeshClass, args, kwargs);
+    Py_DECREF(trimeshClass);
+    Py_DECREF(args);
+    Py_DECREF(kwargs);
+    return out;
+}
 
 
 /////////
@@ -117,6 +344,12 @@ static PyMethodDef ply_methods[] = {
      "Get all elements of a given type."},
     {"add_elements", (PyCFunction) ply_add_elements,
      METH_VARARGS, "Add elements of a given type."},
+    {"as_trimesh", (PyCFunction) ply_as_trimesh,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get the structure as a Trimesh mesh."},
+    {"from_trimesh", (PyCFunction) ply_from_trimesh,
+     METH_VARARGS | METH_CLASS,
+     "Create a Ply object from a Trimesh mesh."},
     {"as_dict", (PyCFunction) ply_as_dict,
      METH_VARARGS | METH_KEYWORDS,
      "Get the structure as a dictionary."},
@@ -225,6 +458,155 @@ static PyTypeObject Ply_Type = {
 };
 
 
+//////////////////
+// ObjWavefront //
+//////////////////
+
+
+typedef struct {
+    PyObject_HEAD
+    ObjWavefront *obj;
+} ObjWavefrontObject;
+
+
+PyDoc_STRVAR(objwavefront_doc,
+             "ObjWavefront(vertices, faces=None, edges=None)\n"
+             "\n"
+             "Create and return a new ObjWavefront instance from the given"
+             " set of vertices, faces, and edges.");
+
+
+// Handle missing properties
+static PyMethodDef objwavefront_methods[] = {
+    {"get_elements", (PyCFunction) objwavefront_get_elements,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get all elements of a given type."},
+    {"add_elements", (PyCFunction) objwavefront_add_elements,
+     METH_VARARGS, "Add elements of a given type."},
+    {"as_trimesh", (PyCFunction) objwavefront_as_trimesh,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get the structure as a Trimesh mesh."},
+    {"from_trimesh", (PyCFunction) objwavefront_from_trimesh,
+     METH_VARARGS | METH_CLASS,
+     "Create a ObjWavefront object from a Trimesh mesh."},
+    {"as_dict", (PyCFunction) objwavefront_as_dict,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get the structure as a dictionary."},
+    {"from_dict", (PyCFunction) objwavefront_from_dict,
+     METH_VARARGS | METH_CLASS,
+     "Create a ObjWavefront instance from a dictionary of elements."},
+    {"as_array_dict", (PyCFunction) objwavefront_as_array_dict,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get the structure as a dictionary of arrays."},
+    {"from_array_dict", (PyCFunction) objwavefront_from_array_dict,
+     METH_VARARGS | METH_CLASS,
+     "Create a ObjWavefront instance from a dictionary of element arrays."},
+    {"as_list", (PyCFunction) objwavefront_as_list,
+     METH_NOARGS,
+     "Get the structure as a list of elements."},
+    {"from_list", (PyCFunction) objwavefront_from_list,
+     METH_VARARGS | METH_CLASS,
+     "Create a ObjWavefront instance from a list of elements."},
+    {"count_elements", (PyCFunction) objwavefront_count_elements,
+     METH_VARARGS,
+     "Get the number of elements of a given type in the structure."},
+    {"append", (PyCFunction) objwavefront_append,
+     METH_VARARGS,
+     "Append another 3D structure."},
+    {"merge", (PyCFunction) objwavefront_merge,
+     METH_VARARGS,
+     "Merge this structure with one or more other 3D structures and return the result."},
+    {"items", (PyCFunction) objwavefront_items,
+     METH_NOARGS,
+     "Get the dict-like list of items in the structure."},
+    {"get_colors", (PyCFunction) objwavefront_get_colors,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get colors associated with elements of a given type."},
+    {"add_colors", (PyCFunction) objwavefront_add_colors,
+     METH_VARARGS,
+     "Set colors associated with elements of a given type."},
+    {"__getstate__", (PyCFunction) objwavefront__getstate__,
+     METH_NOARGS,
+     "Get the instance state."},
+    {"__setstate__", (PyCFunction) objwavefront__setstate__,
+     METH_O,
+     "Set the instance state."},
+    {NULL}  /* Sentinel */
+};
+
+
+static PyGetSetDef objwavefront_properties[] = {
+    {"bounds", objwavefront_bounds_get, NULL,
+     "The minimum & maximum bounds for the structure in x, y, & z.", NULL},
+    {"mesh", objwavefront_mesh_get, NULL,
+     "The 3D mesh representing the faces in the structure.", NULL},
+    {"nvert", objwavefront_nvert, NULL,
+     "The number of vertices in the structure.", NULL},
+    {"nface", objwavefront_nface, NULL,
+     "The number of faces in the structure.", NULL},
+    {NULL}
+};
+
+
+static PyMappingMethods objwavefront_mapping = {
+    objwavefront_size, objwavefront_subscript, NULL
+};
+
+static PySequenceMethods objwavefront_seq = {
+    objwavefront_size, NULL, NULL, NULL, NULL, NULL, NULL,
+    objwavefront_contains,
+    NULL, NULL
+};
+
+
+static PyTypeObject ObjWavefront_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "rapidjson.geometry.ObjWavefront",  /* tp_name */
+    sizeof(ObjWavefrontObject),         /* tp_basicsize */
+    0,                                  /* tp_itemsize */
+    (destructor) objwavefront_dealloc,  /* tp_dealloc */
+    0,                                  /* tp_print */
+    0,                                  /* tp_getattr */
+    0,                                  /* tp_setattr */
+    0,                                  /* tp_compare */
+    0,                                  /* tp_repr */
+    0,                                  /* tp_as_number */
+    &objwavefront_seq,                  /* tp_as_sequence */
+    &objwavefront_mapping,              /* tp_as_mapping */
+    0,                                  /* tp_hash */
+    0,                                  /* tp_call */
+    objwavefront_str,                   /* tp_str */
+    0,                                  /* tp_getattro */
+    0,                                  /* tp_setattro */
+    0,                                  /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
+    objwavefront_doc,                   /* tp_doc */
+    0,                                  /* tp_traverse */
+    0,                                  /* tp_clear */
+    objwavefront_richcompare,           /* tp_richcompare */
+    0,                                  /* tp_weaklistoffset */
+    0,                                  /* tp_iter */
+    0,                                  /* tp_iternext */
+    objwavefront_methods,               /* tp_methods */
+    0,                                  /* tp_members */
+    objwavefront_properties,            /* tp_getset */
+    0,                                  /* tp_base */
+    0,                                  /* tp_dict */
+    0,                                  /* tp_descr_get */
+    0,                                  /* tp_descr_set */
+    0,                                  /* tp_dictoffset */
+    0,                                  /* tp_init */
+    0,                                  /* tp_alloc */
+    objwavefront_new,                   /* tp_new */
+    PyObject_Del,                       /* tp_free */
+};
+
+
+/////////////////
+// Ply Methods //
+/////////////////
+
+
 static void ply_dealloc(PyObject* self)
 {
     PlyObject* s = (PlyObject*) self;
@@ -251,6 +633,10 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
     if (vertObject != NULL &&
 	PyObject_IsInstance(vertObject, (PyObject*)&Ply_Type)) {
 	v->ply = new Ply(*(((PlyObject*)vertObject)->ply));
+	vertObject = NULL;
+    } else if (vertObject != NULL &&
+	       PyObject_IsInstance(vertObject, (PyObject*)&ObjWavefront_Type)) {
+	v->ply = new Ply(*(((ObjWavefrontObject*)vertObject)->obj));
 	vertObject = NULL;
     } else {
 	v->ply = new Ply();
@@ -835,6 +1221,56 @@ static PyObject* ply_add_elements(PyObject* self, PyObject* args, PyObject* kwar
     
 }
 
+
+static PyObject* ply_as_trimesh(PyObject* self, PyObject* args, PyObject* kwargs) {
+    PyObject* dict_args = PyTuple_New(0);
+    if (dict_args == NULL)
+	return NULL;
+    PyObject* dict_kwargs = PyDict_New();
+    if (dict_kwargs == NULL) {
+	Py_DECREF(dict_args);
+	return NULL;
+    }
+    if (PyDict_SetItemString(dict_kwargs, "as_array", Py_True) < 0) {
+	Py_DECREF(dict_args);
+	Py_DECREF(dict_kwargs);
+	return NULL;
+    }
+    PyObject* mesh_dict = ply_as_dict(self, dict_args, dict_kwargs);
+    Py_DECREF(dict_args);
+    Py_DECREF(dict_kwargs);
+    PyObject* out = dict2trimesh(mesh_dict, kwargs);
+    Py_DECREF(mesh_dict);
+    return out;
+}
+static PyObject* ply_from_trimesh(PyObject* cls, PyObject* args, PyObject* kwargs) {
+    PyObject* solf = NULL;
+    if (!PyArg_ParseTuple(args, "O:", &solf))
+	return NULL;
+    PyObject* geom_kwargs = trimesh2dict(solf);
+    if (geom_kwargs == NULL) {
+	return NULL;
+    }
+    PyObject* dict_args = PyTuple_Pack(1, geom_kwargs);
+    if (dict_args == NULL) {
+	Py_DECREF(geom_kwargs);
+	return NULL;
+    }
+    PyObject* dict_kwargs = PyDict_New();
+    if (dict_kwargs == NULL) {
+	Py_DECREF(dict_args);
+	return NULL;
+    }
+    if (PyDict_SetItemString(dict_kwargs, "as_array", Py_True) < 0) {
+	Py_DECREF(dict_args);
+	Py_DECREF(dict_kwargs);
+	return NULL;
+    }
+    PyObject* out = ply_from_dict(cls, dict_args, dict_kwargs);
+    Py_DECREF(dict_args);
+    Py_DECREF(dict_kwargs);
+    return out;
+}
 
 static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
     int asArray = 0;
@@ -1517,142 +1953,9 @@ static PyObject* ply__setstate__(PyObject* self, PyObject* state) {
 }
 
 
-//////////////////
-// ObjWavefront //
-//////////////////
-
-
-typedef struct {
-    PyObject_HEAD
-    ObjWavefront *obj;
-} ObjWavefrontObject;
-
-
-PyDoc_STRVAR(objwavefront_doc,
-             "ObjWavefront(vertices, faces=None, edges=None)\n"
-             "\n"
-             "Create and return a new ObjWavefront instance from the given"
-             " set of vertices, faces, and edges.");
-
-
-// Handle missing properties
-static PyMethodDef objwavefront_methods[] = {
-    {"get_elements", (PyCFunction) objwavefront_get_elements,
-     METH_VARARGS | METH_KEYWORDS,
-     "Get all elements of a given type."},
-    {"add_elements", (PyCFunction) objwavefront_add_elements,
-     METH_VARARGS, "Add elements of a given type."},
-    {"as_dict", (PyCFunction) objwavefront_as_dict,
-     METH_VARARGS | METH_KEYWORDS,
-     "Get the structure as a dictionary."},
-    {"from_dict", (PyCFunction) objwavefront_from_dict,
-     METH_VARARGS | METH_CLASS,
-     "Create a ObjWavefront instance from a dictionary of elements."},
-    {"as_array_dict", (PyCFunction) objwavefront_as_array_dict,
-     METH_VARARGS | METH_KEYWORDS,
-     "Get the structure as a dictionary of arrays."},
-    {"from_array_dict", (PyCFunction) objwavefront_from_array_dict,
-     METH_VARARGS | METH_CLASS,
-     "Create a ObjWavefront instance from a dictionary of element arrays."},
-    {"as_list", (PyCFunction) objwavefront_as_list,
-     METH_NOARGS,
-     "Get the structure as a list of elements."},
-    {"from_list", (PyCFunction) objwavefront_from_list,
-     METH_VARARGS | METH_CLASS,
-     "Create a ObjWavefront instance from a list of elements."},
-    {"count_elements", (PyCFunction) objwavefront_count_elements,
-     METH_VARARGS,
-     "Get the number of elements of a given type in the structure."},
-    {"append", (PyCFunction) objwavefront_append,
-     METH_VARARGS,
-     "Append another 3D structure."},
-    {"merge", (PyCFunction) objwavefront_merge,
-     METH_VARARGS,
-     "Merge this structure with one or more other 3D structures and return the result."},
-    {"items", (PyCFunction) objwavefront_items,
-     METH_NOARGS,
-     "Get the dict-like list of items in the structure."},
-    {"get_colors", (PyCFunction) objwavefront_get_colors,
-     METH_VARARGS | METH_KEYWORDS,
-     "Get colors associated with elements of a given type."},
-    {"add_colors", (PyCFunction) objwavefront_add_colors,
-     METH_VARARGS,
-     "Set colors associated with elements of a given type."},
-    {"__getstate__", (PyCFunction) objwavefront__getstate__,
-     METH_NOARGS,
-     "Get the instance state."},
-    {"__setstate__", (PyCFunction) objwavefront__setstate__,
-     METH_O,
-     "Set the instance state."},
-    {NULL}  /* Sentinel */
-};
-
-
-static PyGetSetDef objwavefront_properties[] = {
-    {"bounds", objwavefront_bounds_get, NULL,
-     "The minimum & maximum bounds for the structure in x, y, & z.", NULL},
-    {"mesh", objwavefront_mesh_get, NULL,
-     "The 3D mesh representing the faces in the structure.", NULL},
-    {"nvert", objwavefront_nvert, NULL,
-     "The number of vertices in the structure.", NULL},
-    {"nface", objwavefront_nface, NULL,
-     "The number of faces in the structure.", NULL},
-    {NULL}
-};
-
-
-static PyMappingMethods objwavefront_mapping = {
-    objwavefront_size, objwavefront_subscript, NULL
-};
-
-static PySequenceMethods objwavefront_seq = {
-    objwavefront_size, NULL, NULL, NULL, NULL, NULL, NULL,
-    objwavefront_contains,
-    NULL, NULL
-};
-
-
-static PyTypeObject ObjWavefront_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "rapidjson.geometry.ObjWavefront",  /* tp_name */
-    sizeof(ObjWavefrontObject),         /* tp_basicsize */
-    0,                                  /* tp_itemsize */
-    (destructor) objwavefront_dealloc,  /* tp_dealloc */
-    0,                                  /* tp_print */
-    0,                                  /* tp_getattr */
-    0,                                  /* tp_setattr */
-    0,                                  /* tp_compare */
-    0,                                  /* tp_repr */
-    0,                                  /* tp_as_number */
-    &objwavefront_seq,                  /* tp_as_sequence */
-    &objwavefront_mapping,              /* tp_as_mapping */
-    0,                                  /* tp_hash */
-    0,                                  /* tp_call */
-    objwavefront_str,                   /* tp_str */
-    0,                                  /* tp_getattro */
-    0,                                  /* tp_setattro */
-    0,                                  /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
-    objwavefront_doc,                   /* tp_doc */
-    0,                                  /* tp_traverse */
-    0,                                  /* tp_clear */
-    objwavefront_richcompare,           /* tp_richcompare */
-    0,                                  /* tp_weaklistoffset */
-    0,                                  /* tp_iter */
-    0,                                  /* tp_iternext */
-    objwavefront_methods,               /* tp_methods */
-    0,                                  /* tp_members */
-    objwavefront_properties,            /* tp_getset */
-    0,                                  /* tp_base */
-    0,                                  /* tp_dict */
-    0,                                  /* tp_descr_get */
-    0,                                  /* tp_descr_set */
-    0,                                  /* tp_dictoffset */
-    0,                                  /* tp_init */
-    0,                                  /* tp_alloc */
-    objwavefront_new,                   /* tp_new */
-    PyObject_Del,                       /* tp_free */
-};
+//////////////////////////
+// ObjWavefront Methods //
+//////////////////////////
 
 
 static void objwavefront_dealloc(PyObject* self)
@@ -1681,6 +1984,10 @@ static PyObject* objwavefront_new(PyTypeObject* type, PyObject* args, PyObject* 
     if (vertObject != NULL &&
 	PyObject_IsInstance(vertObject, (PyObject*)&ObjWavefront_Type)) {
 	v->obj = (ObjWavefront*)(((ObjWavefrontObject*)vertObject)->obj->copy());
+	vertObject = NULL;
+    } else if (vertObject != NULL &&
+	       PyObject_IsInstance(vertObject, (PyObject*)&Ply_Type)) {
+	v->obj = new ObjWavefront(*(((PlyObject*)vertObject)->ply));
 	vertObject = NULL;
     } else {
 	v->obj = new ObjWavefront();
@@ -2360,6 +2667,57 @@ static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObj
     
 }
 
+
+
+static PyObject* objwavefront_as_trimesh(PyObject* self, PyObject* args, PyObject* kwargs) {
+    PyObject* dict_args = PyTuple_New(0);
+    if (dict_args == NULL)
+	return NULL;
+    PyObject* dict_kwargs = PyDict_New();
+    if (dict_kwargs == NULL) {
+	Py_DECREF(dict_args);
+	return NULL;
+    }
+    if (PyDict_SetItemString(dict_kwargs, "as_array", Py_True) < 0) {
+	Py_DECREF(dict_args);
+	Py_DECREF(dict_kwargs);
+	return NULL;
+    }
+    PyObject* mesh_dict = objwavefront_as_dict(self, dict_args, dict_kwargs);
+    Py_DECREF(dict_args);
+    Py_DECREF(dict_kwargs);
+    PyObject* out = dict2trimesh(mesh_dict, kwargs, true);
+    Py_DECREF(mesh_dict);
+    return out;
+}
+static PyObject* objwavefront_from_trimesh(PyObject* cls, PyObject* args, PyObject* kwargs) {
+    PyObject* solf = NULL;
+    if (!PyArg_ParseTuple(args, "O:", &solf))
+	return NULL;
+    PyObject* geom_kwargs = trimesh2dict(solf);
+    if (geom_kwargs == NULL) {
+	return NULL;
+    }
+    PyObject* dict_args = PyTuple_Pack(1, geom_kwargs);
+    if (dict_args == NULL) {
+	Py_DECREF(geom_kwargs);
+	return NULL;
+    }
+    PyObject* dict_kwargs = PyDict_New();
+    if (dict_kwargs == NULL) {
+	Py_DECREF(dict_args);
+	return NULL;
+    }
+    if (PyDict_SetItemString(dict_kwargs, "as_array", Py_True) < 0) {
+	Py_DECREF(dict_args);
+	Py_DECREF(dict_kwargs);
+	return NULL;
+    }
+    PyObject* out = objwavefront_from_dict(cls, dict_args, dict_kwargs);
+    Py_DECREF(dict_args);
+    Py_DECREF(dict_kwargs);
+    return out;
+}
 
 static PyObject* objwavefront_as_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
     int asArray = 0;
