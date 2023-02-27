@@ -256,26 +256,39 @@ def display_source_diff(fname1, fname2, number_lines=False,
     print(lines)
     
 
-def get_fds(by_column=None):  # pragma: debug
+def get_fds(by_column=None, ignore_closed=False, ignore_kqueue=False,
+            ignore_cwd=False, ignore_types=None, verbose=False):  # pragma: debug
     r"""Get a list of open file descriptors."""
     out = subprocess.check_output(
         'lsof -p {} | grep -v txt'.format(os.getpid()), shell=True)
+    if verbose:
+        print(f'{len(out.splitlines()) - 1}\n' + out.decode('utf8'))
     out = out.splitlines()[1:]
+    if ignore_closed:
+        out = [x for x in out if not x.endswith(b'(CLOSED)')]
+    if ignore_kqueue:
+        out = [x for x in out if not x.endswith(b'state=0xa')]
+    if ignore_cwd:
+        out = [x for x in out if x.split()[3] != b'cwd']
+    if ignore_types:
+        out = [x for x in out
+               if x.split()[4].decode('utf8') not in ignore_types]
     if by_column is not None:
         return {x.split()[by_column]: x for x in out}
     return out
 
 
 @contextlib.contextmanager
-def track_fds(prefix=''):  # pragma: debug
-    fds0 = get_fds(by_column=3)
+def track_fds(prefix='', **kwargs):  # pragma: debug
+    kwargs['by_column'] = 3
+    fds0 = get_fds(**kwargs)
     yield
-    fds1 = get_fds(by_column=3)
+    fds1 = get_fds(**kwargs)
     new_fds = set(fds1.keys()) - set(fds0.keys())
     diff = [fds1[k] for k in sorted(new_fds)]
     if diff:
         print(f'{prefix}{len(diff)} fds\n\t' + '\n\t'.join(
-            [str(x) for x in diff]))
+            [x.decode('utf8') for x in diff]))
     
 
 def get_shell():
@@ -732,6 +745,24 @@ def get_supported_platforms():
 
     """
     return copy.deepcopy(platform._supported_platforms)
+
+
+def resolve_language_aliases(language):
+    r"""Get a list of languages, replacing any aliases.
+
+    Args:
+        language (str, list): One or more language.
+
+    Returns:
+        str, list: Aliased language(s).
+
+    """
+    if isinstance(language, (list, tuple)):
+        return [resolve_language_aliases(x) for x in language]
+    for k, v in constants.ALIASED_LANGUAGES.items():
+        if language in v:
+            return k
+    return language
 
 
 def is_language_alias(x, language):

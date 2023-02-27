@@ -907,22 +907,13 @@ class YggRequirement(object):
             install_param['file_flag'] = '-r'
             install_param['quote_constraints'] = True
             args += [param.python_cmd, '-m', 'pip', 'install']
-            if param.verbose:
-                args.append('--verbose')
+            args += param.pip_flags.split()
             if param.user:
                 args.append('--user')
         elif method == 'conda':
             install_param['file_flag'] = '--file'
             args = [param.conda_exe, 'install']
-            if param.always_yes:
-                args.append('-y')
-            if param.verbose:
-                args.append('-vvv')
-            else:
-                args.append('-v')
-                # args.append('-q')
-            if param.conda_env:
-                args += ['--name', param.conda_env]
+            args += param.conda_flags.split()
             if param.user:
                 args.append('--user')
         elif param.only_python or method.endswith('skip'):

@@ -61,6 +61,10 @@ public:
    */
   static python_t copy_python_t(python_t x) {
     python_t out = init_python();
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    UNUSED(x);
+    ygglog_throw_error("PyObjMetaschemaType::copy_python_t: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     strncpy(out.name, x.name, PYTHON_NAME_SIZE);
     out.args = NULL;
     if (x.args != NULL) {
@@ -77,6 +81,7 @@ public:
       // Increment reference count for underlying Python object
       out.obj = Py_BuildValue("O", x.obj);
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return out;
   }
   /*!
@@ -84,6 +89,10 @@ public:
     @param[in] x python_t* Pointer to Python object structure that should be freed.
   */
   static void free_python_t(python_t *x) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    UNUSED(x);
+    ygglog_throw_error("PyObjMetaschemaType::free_python_t: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (x != NULL) {
       x->name[0] = '\0';
       if (x->args != NULL) {
@@ -101,17 +110,22 @@ public:
 	x->obj = NULL;
       }
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
     @brief Display a Python object structure.
     @param[in] x python_t Structure containing Python object to display.
   */
   static void display_python_t(python_t x) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("display_python: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (x.obj != NULL) {
       if (PyObject_Print_STDOUT(x.obj) < 0) {
 	ygglog_throw_error("display_python: Failed to print the Python object.");
       }
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
     @brief Copy data wrapped in YggGeneric class.
@@ -215,15 +229,20 @@ public:
     @returns PyObject* Python object.
    */
   PyObject* import_python(const char* name) const {
+    PyObject *py_function = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("PyObjMetaschemaType::import_python: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     PyObject *py_class = import_python_class("yggdrasil.metaschema.datatypes.ClassMetaschemaType",
 					     "ClassMetaschemaType",
 					     "PyObjMetaschemaType::import_python: ");
-    PyObject *py_function = PyObject_CallMethod(py_class, "decode_data",
-    						"ss", name, NULL);
+    py_function = PyObject_CallMethod(py_class, "decode_data",
+				      "ss", name, NULL);
     Py_DECREF(py_class);
     if (py_function == NULL) {
       ygglog_throw_error("PyObjMetaschemaType::import_python: Failed to import Python object: '%s'.", name);
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return py_function;
   }
   /*!
@@ -232,7 +251,11 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   YggGeneric* python2c(PyObject* pyobj) const override {
-    YggGeneric* cobj = new YggGeneric(this, NULL, 0);
+    YggGeneric* cobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("PyObjMetaschemaType::python2c: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+    cobj = new YggGeneric(this, NULL, 0);
     void** data = cobj->get_data_pointer();
     python_t* idata = (python_t*)realloc(data[0], nbytes());
     if (idata == NULL) {
@@ -256,6 +279,7 @@ public:
 		     PYTHON_NAME_SIZE);
     Py_DECREF(py_name);
     data[0] = (void*)idata;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return cobj;
   }
   /*!

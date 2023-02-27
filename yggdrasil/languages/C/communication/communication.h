@@ -121,7 +121,7 @@ comm_t* get_global_scope_comm(const char *name) {
 	} else {
 	  const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
 	  char alt_name[100];
-	  sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+	  snprintf(alt_name, 100, "%s:%s", YGG_MODEL_NAME, name);
 	  if ((strcmp(icomm->name, alt_name) == 0) && (icomm->thread_id == current_thread)) {
 	    out = icomm;
 	    break;
@@ -282,9 +282,11 @@ void clean_comms(void) {
     // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
     ygg_zsys_shutdown();
 #endif
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
     if (Py_IsInitialized()) {
       Py_Finalize();
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   /* printf(""); */
     clean_called = 1;
 #ifdef _OPENMP
@@ -456,7 +458,7 @@ comm_t* new_comm(char *address, const char *direction,
     ret->flags = ret->flags & ~COMM_FLAG_VALID;
   } else {
     if (strlen(ret->name) == 0) {
-      sprintf(ret->name, "temp.%s", ret->address);
+      snprintf(ret->name, COMM_NAME_SIZE, "temp.%s", ret->address);
     }
     flag = register_comm(ret);
     if (flag < 0) {
@@ -657,7 +659,7 @@ static
 comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
 				       const size_t len) {
   comm_head_t head = init_header(len, NULL, NULL);
-  sprintf(head.id, "%d", rand());
+  snprintf(head.id, COMMBUFFSIZ, "%d", rand());
   char *model_name = getenv("YGG_MODEL_NAME");
   if (model_name != NULL) {
     strcpy(head.model, model_name);
@@ -1268,7 +1270,7 @@ int comm_recv_nolimit(comm_t *x, char **data, const size_t len) {
   YGG_MSG_MAX or cannot be encoded, it will not be sent.  
   @param[in] x comm_t* structure for comm that message should be sent to.
   @param[in] nargs size_t Number of arguments in the variable argument list.
-  @param[in] ap va_list arguments to be formatted into a message using sprintf.
+  @param[in] ap va_list arguments to be formatted into a message using snprintf.
   @returns int Number of arguments formatted if send succesfull, -1 if send
   unsuccessful.
  */
@@ -1320,7 +1322,7 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
   is then sent to the specified output comm.
   @param[in] x comm_t structure for comm that message should be sent to.
   @param[in] nargs size_t Number of variable arguments provided.
-  @param[in] ... Arguments to be formatted into a message using sprintf.
+  @param[in] ... Arguments to be formatted into a message using snprintf.
   @returns int Number of arguments formatted if send succesfull, -1 if send
   unsuccessful.
 */

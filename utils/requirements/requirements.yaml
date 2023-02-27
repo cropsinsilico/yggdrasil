@@ -61,6 +61,9 @@ extras:
         method: conda_recipe
     - "{{ compiler('cxx') }}":
         method: conda_recipe
+    - compiler-rt:
+        method: conda
+        os: osx
   fortran:
     requires_extras: [c]
     requirements:
@@ -257,6 +260,9 @@ extras:
     - black
     - ipython
     - PyGithub
+    - pre-commit
+    - emacs:
+        method: conda
 bespoke_extras:
 - astropy
 - pygments

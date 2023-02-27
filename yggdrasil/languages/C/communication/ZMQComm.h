@@ -469,11 +469,11 @@ char *set_reply_send(const comm_t *comm) {
 		   comm->name);
       return out;
     }
-    char protocol[50] = "tcp";
-    char host[50] = "localhost";
-    if (strcmp(host, "localhost") == 0)
-      strncpy(host, "127.0.0.1", 50);
-    char address[100];
+    char protocol[51] = "tcp";
+    char host[51] = "127.0.0.1"; // "localhost";
+    /* if (strcmp(host, "localhost") == 0) */
+    /*   strncpy(host, "127.0.0.1", 50); */
+    char address[101];
     int port = -1;
 #ifdef _OPENMP
 #pragma omp critical (zmqport)
@@ -485,7 +485,7 @@ char *set_reply_send(const comm_t *comm) {
       _last_port_set = 1;
       ygglog_debug("_last_port = %d", _last_port);
     }
-    sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
+    snprintf(address, 100, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
     port = zsock_bind(zrep->sockets[0], "%s", address);
     if (port != -1)
       _last_port = port;
@@ -497,7 +497,7 @@ char *set_reply_send(const comm_t *comm) {
 		   comm->name, address);
       return out;
     }
-    sprintf(address, "%s://%s:%d", protocol, host, port);
+    snprintf(address, 100, "%s://%s:%d", protocol, host, port);
     zrep->addresses = (char**)malloc(sizeof(char*));
     zrep->addresses[0] = (char*)malloc((strlen(address) + 1)*sizeof(char));
     strncpy(zrep->addresses[0], address, strlen(address) + 1);
@@ -676,8 +676,8 @@ int new_zmq_address(comm_t *comm) {
 #endif
     while (key == 0) key = rand();
     if (strlen(comm->name) == 0)
-      sprintf(comm->name, "tempnewZMQ-%d", key);
-    sprintf(address, "%s://%s", protocol, comm->name);
+      snprintf(comm->name, COMM_NAME_SIZE, "tempnewZMQ-%d", key);
+    snprintf(address, 100, "%s://%s", protocol, comm->name);
   } else {
 #ifdef _OPENMP
 #pragma omp critical (zmqport)
@@ -689,7 +689,7 @@ int new_zmq_address(comm_t *comm) {
       _last_port_set = 1;
       ygglog_debug("_last_port = %d", _last_port);
     }
-   sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
+   snprintf(address, 100, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
 #ifdef _OPENMP
   }
 #endif
@@ -722,7 +722,7 @@ int new_zmq_address(comm_t *comm) {
   if ((strcmp(protocol, "inproc") != 0) &&
       (strcmp(protocol, "ipc") != 0)) {
     _last_port = port;
-    sprintf(address, "%s://%s:%d", protocol, host, port);
+    snprintf(address, 100, "%s://%s:%d", protocol, host, port);
   }
 #ifdef _OPENMP
   }
@@ -730,7 +730,7 @@ int new_zmq_address(comm_t *comm) {
   strncpy(comm->address, address, COMM_ADDRESS_SIZE);
   ygglog_debug("new_zmq_address: Bound socket to %s", comm->address);
   if (strlen(comm->name) == 0)
-    sprintf(comm->name, "tempnewZMQ-%d", port);
+    snprintf(comm->name, COMM_NAME_SIZE, "tempnewZMQ-%d", port);
   comm->handle = (void*)s;
   // Init reply
   int ret = init_zmq_reply(comm);
@@ -767,7 +767,7 @@ int init_zmq_comm(comm_t *comm) {
   }
   ygglog_debug("init_zmq_address: Connected socket to %s", comm->address);
   if (strlen(comm->name) == 0)
-    sprintf(comm->name, "tempinitZMQ-%s", comm->address);
+    snprintf(comm->name, COMM_NAME_SIZE, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer
   comm->handle = (void*)s;
   ret = init_zmq_reply(comm);

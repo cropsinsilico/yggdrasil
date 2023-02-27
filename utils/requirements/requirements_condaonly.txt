@@ -1,4 +1,5 @@
 cmake; platform_system != 'Windows'  # [conda,c]
+compiler-rt; platform_system == 'Darwin'  # [conda,c]
 czmq             # [conda,zmq,c]
 fortran-compiler; platform_system != 'Windows'  # [conda,fortran,c]
 git              # [conda]

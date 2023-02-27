@@ -30,7 +30,7 @@ static char prefix_char = '#';
 
 /*! @brief C-friendly definition of MetaschemaType. */
 typedef struct dtype_t {
-  char type[COMMBUFFSIZ]; //!< Type name
+  char type[COMMBUFFSIZ + 1]; //!< Type name
   bool use_generic; //!< Flag for empty dtypes to specify generic in/out
   void *obj; //!< MetaschemaType Pointer
 } dtype_t;
@@ -60,7 +60,11 @@ typedef python_t python_function_t;
 typedef generic_t python_instance_t;
 
 /*! @brief Macro wrapping call to PyObject_CallFunction. */
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+#define call_python(x, format, ...) NULL
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
 #define call_python(x, format, ...) PyObject_CallFunction(x.obj, format, __VA_ARGS__)
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 
 /*! @brief Aliases to allow differentiation in parsing model definition. */
 typedef char* unicode_t;
@@ -178,6 +182,15 @@ generic_t create_generic(dtype_t* type_class, void* data, size_t nbytes);
   @returns int -1 if unsuccessful, 0 otherwise.
  */
 int destroy_generic(generic_t* x);
+
+
+/*!
+  @brief Copy data from one generic object into another.
+  @param[in,out] dst Pointer to destination object.
+  @param[in] src Source object.
+  @returns int -1 if unsuccessful, 0 otherwise.
+*/
+int copy_generic_into(generic_t* dst, generic_t src);
 
 
 /*!
@@ -1343,8 +1356,8 @@ int split_head_body(const char *buf, const size_t buf_siz,
   // Windows regex of newline is buggy
   UNUSED(buf_siz);
   size_t sind1, eind1, sind2, eind2;
-  char re_head_tag[COMMBUFFSIZ];
-  sprintf(re_head_tag, "(%s)", MSG_HEAD_SEP);
+  char re_head_tag[COMMBUFFSIZ + 1];
+  snprintf(re_head_tag, COMMBUFFSIZ, "(%s)", MSG_HEAD_SEP);
   ret = find_match(re_head_tag, buf, &sind1, &eind1);
   if (ret > 0) {
     sind = sind1;

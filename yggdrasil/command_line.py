@@ -232,7 +232,18 @@ class yggrun(SubCommand):
         (('--validate', ),
          {'action': 'store_true',
           'help': ('Validate the run via model validation commands on '
-                   'completion.')})]
+                   'completion.')}),
+        (('--with-debugger', ),
+         {'type': str,
+          'help': ('Run all models with a specific debuggin tool. If '
+                   'quoted, this can also include flags for the tool.')}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': 'Compile models with the address sanitizer enabled.'}),
+    ]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -260,7 +271,10 @@ class yggrun(SubCommand):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
                        production_run=args.production_run,
                        mpi_tag_start=args.mpi_tag_start,
-                       validate=args.validate)
+                       validate=args.validate,
+                       with_debugger=args.with_debugger,
+                       disable_python_c_api=args.disable_python_c_api,
+                       with_asan=args.with_asan)
 
 
 class integration_service_manager(SubCommand):
@@ -490,7 +504,14 @@ class ygginfo(SubCommand):
                            ' pass to the tool when it is called.')}),
                 (('--fullpath', ),
                  {'action': 'store_true',
-                  'help': 'Get the full path to the tool exectuable.'})],
+                  'help': 'Get the full path to the tool exectuable.'}),
+                (('--disable-python-c-api', ),
+                 {'action': 'store_true',
+                  'help': 'Disable access to the Python C API from yggdrasil.'}),
+                (('--with-asan', ),
+                 {'action': 'store_true',
+                  'help': "Compile with Clang ASAN if available."}),
+            ],
             parsers=[
                 ArgumentParser(
                     name='compiler',
@@ -516,7 +537,9 @@ class ygginfo(SubCommand):
                 if args.tool == 'compiler':
                     flags = drv.get_compiler_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True, dont_link=True)
+                        dry_run=True, dont_link=True,
+                        disable_python_c_api=args.disable_python_c_api,
+                        with_asan=args.with_asan)
                     if '/link' in flags:  # pragma: windows
                         flags = flags[:flags.index('/link')]
                     for k in ['-c']:
@@ -531,7 +554,9 @@ class ygginfo(SubCommand):
                         libtype = 'object'
                     flags = drv.get_linker_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True, libtype=libtype)
+                        dry_run=True, libtype=libtype,
+                        disable_python_c_api=args.disable_python_c_api,
+                        with_asan=args.with_asan)
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
                     out = out.replace('/', '-')
@@ -889,7 +914,7 @@ class validate_yaml(SubCommand):
 class yggcc(SubCommand):
     r"""Compile a program."""
 
-    name = "compile"
+    name = "compile-model"
     help = ("Compile a program from source files for use in an "
             "yggdrasil integration.")
     arguments = [
@@ -914,7 +939,13 @@ class yggcc(SubCommand):
          {'action': 'store_true', 'help': "Run compilation with ccache."}),
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
-                   "(only used if the specified language is R).")})]
+                   "(only used if the specified language is R).")}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."})]
 
     @classmethod
     def func(cls, args):
@@ -928,7 +959,9 @@ class yggcc(SubCommand):
                 args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
         drv = import_component('model', args.language)
         kws = {'toolname': args.toolname, 'flags': args.flags,
-               'use_ccache': args.use_ccache}
+               'use_ccache': args.use_ccache,
+               'disable_python_c_api': args.disable_python_c_api,
+               'with_asan': args.with_asan}
         if (args.language in ['r', 'R']) and args.Rpkg_language:
             kws['language'] = args.Rpkg_language
         print("executable: %s" % drv.call_compiler(args.source, **kws))
@@ -937,7 +970,7 @@ class yggcc(SubCommand):
 class yggcompile(SubCommand):
     r"""Compile interface library/libraries."""
 
-    name = "compile-deps"
+    name = "compile"
     help = ("Compile yggdrasil dependency libraries. Existing "
             "libraries are first deleted.")
     arguments = [
@@ -946,30 +979,94 @@ class yggcompile(SubCommand):
           # 'choices': (['all'] + LANGUAGES_WITH_ALIASES.get('compiled', [])
           #             + LANGUAGES_WITH_ALIASES.get('compiled_dsl', [])),
           'help': ("One or more languages to compile dependencies "
-                   "for.")}),
+                   "for, source files to compile into an executable, "
+                   "or the directory containing an R package.")}),
         (('--toolname', ),
-         {'help': "Name of compilation tool that should be used"})]
+         {'help': "Name of compilation tool that should be used"}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+        (('--force-source', ),
+         {'action': 'store_true',
+          'help': ("Force all arguments passed to the language parameter "
+                   "to be treated as source files to be compiled.")}),
+        (('--source-language', ),
+         {'default': None,
+          # 'choices': [None] + LANGUAGES_WITH_ALIASES['all'],
+          'help': ("Language of the source code. If not provided, "
+                   "the language will be determined from the "
+                   "source extension.")}),
+        (('--flags', ),
+         {'nargs': '*',
+          'help': ("Additional flags that should be added to the "
+                   "compilation command if source files are provided.")}),
+        (('--use-ccache', ),
+         {'action': 'store_true',
+          'help': "Run source compilation with ccache."}),
+        (('--Rpkg-language', ),
+         {'help': ("Language that R package is written in "
+                   "(only used if the provided source language is R).")})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil.components import import_component
-        yggclean.func(args, verbose=False)
         error_on_missing = (not getattr(args, 'all_languages', False))
         missing = []
-        for lang in args.language:
-            import_component('model', lang).cleanup_dependencies()
+        languages = []
+        sources = []
+        for x in args.language:
+            if ((x in LANGUAGES_WITH_ALIASES['all']
+                 and not args.force_source)):
+                languages.append(x)
+            else:
+                sources.append(x)
+        if languages:
+            args.languages = languages
+            yggclean.func(args, verbose=False)
+        for lang in list(languages):
+            drv = import_component('model', lang)
+            drv.cleanup_dependencies(
+                disable_python_c_api=args.disable_python_c_api,
+                with_asan=args.with_asan)
+            # Prevent language from being recompiled more than
+            # once as a dependency
+            for base_lang in drv.base_languages:
+                if base_lang in languages:
+                    languages.remove(base_lang)
+        kwargs = {'toolname': args.toolname,
+                  'disable_python_c_api': args.disable_python_c_api,
+                  'with_asan': args.with_asan}
+        for lang in languages:
             drv = import_component('model', lang)
             if ((hasattr(drv, 'compile_dependencies')
                  and (not getattr(drv, 'is_build_tool', False)))):
                 if drv.is_installed():
-                    drv.compile_dependencies(toolname=args.toolname)
+                    drv.compile_dependencies(**kwargs)
                 else:
                     missing.append(lang)
         if error_on_missing and missing:  # pragma: debug
-            raise Exception(("One or more of the requested languages "
-                             "are not fully installed for use with "
-                             "yggdrasil: %s") % missing)
-
+            raise Exception(f"One or more of the requested languages "
+                            f"are not fully installed for use with "
+                            f"yggdrasil: {missing}")
+        if sources:
+            kwargs.update(
+                use_ccache=args.use_ccache,
+                flags=args.flags)
+            if args.source_language is None:
+                if ((len(sources) == 1 and os.path.isdir(sources[0])
+                     and os.path.isdir(os.path.join(sources[0], 'R')))):
+                    args.source_language = 'R'
+                else:
+                    args.source_language = constants.EXT2LANG[
+                        os.path.splitext(sources[0])]
+            drv = import_component('model', args.source_language)
+            if (args.source_language in ['r', 'R']) and args.Rpkg_language:
+                kwargs['language'] = args.Rpkg_language
+            print(f"executable: {drv.call_compiler(sources, **kwargs)}")
+            
 
 class yggclean(SubCommand):
     r"""Cleanup dependency files."""
@@ -1057,7 +1154,14 @@ class cc_flags(cc_toolname):
           'help': 'Get the compilation flags used for C++ programs.'}),
         (('--toolname', ),
          {'default': None,
-          'help': 'Name of the tool that associated flags be returned for.'})]
+          'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+    ]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -1078,7 +1182,14 @@ class ld_flags(cc_toolname):
           'help': 'Get the compilation flags used for C++ programs.'}),
         (('--toolname', ),
          {'default': None,
-          'help': 'Name of the tool that associated flags be returned for.'})]
+          'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+    ]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -1103,6 +1214,9 @@ class ygginstall(SubCommand):
           {'action': 'store_true',
            'help': ('Don\'t import the yggdrasil package in '
                     'calling the installation script.')}),
+         (('--with-asan', ),
+          {'action': 'store_true',
+           'help': "Load ASAN library before running executables."}),
          ]
     )
 
@@ -1120,6 +1234,10 @@ class ygginstall(SubCommand):
              or (isinstance(languages, list) and ('all' in languages)))):
             languages = [x.lower() for x in
                          install_languages.get_language_directories()]
+        if args.with_asan:
+            assert not args.no_import
+            from yggdrasil.drivers.CModelDriver import CModelDriver
+            CModelDriver.set_asan_env(os.environ)
         for x in languages:
             install_languages.install_language(x, args=args)
 
@@ -1133,12 +1251,12 @@ class update_config(SubCommand):
         [(('languages', ),
           {'nargs': '*',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
-           'default': [],
+           'default': ['all'],
            'help': 'One or more languages that should be configured.'}),
          (('--languages', ),
           {'nargs': '+', 'dest': 'languages_flag',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
-           'default': [],
+           'default': ['all'],
            'help': 'One or more languages that should be configured.'}),
          (('--show-file', ),
           {'action': 'store_true',

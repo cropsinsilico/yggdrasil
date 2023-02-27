@@ -368,7 +368,14 @@ public:
     case T_BYTES: {
       // TODO: Handle array of char arrays
       char* arg = (char*)(data->get_data());
-      std::cout << arg << std::endl;
+      for (i = 0; i < data->get_nbytes(); i++) {
+	std::cout << arg[i];
+      }
+      // if (data->get_nbytes() > 0) {
+      // 	char* arg = (char*)(data->get_data());
+      // 	std::cout << arg;
+      // }
+      std::cout << std::endl;
       return;
     }
     case T_UNICODE: {
@@ -584,6 +591,9 @@ public:
     @param[in, out] dims npy_intp** Address of pointer to memory where dimensions should be stored.
    */
   virtual void numpy_dims(int *nd, npy_intp **dims) const {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("ScalarMetaschemaType::numpy_dims: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     nd[0] = 1;
     npy_intp *idims = (npy_intp*)realloc(dims[0], sizeof(npy_intp));
     if (idims == NULL) {
@@ -591,6 +601,7 @@ public:
     }
     idims[0] = 1;
     dims[0] = idims;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
     @brief Update the type object with info from another type object.
@@ -890,7 +901,11 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   YggGeneric* python2c(PyObject* pyobj) const override {
-    YggGeneric* cobj = new YggGeneric(this, NULL, 0);
+    YggGeneric* cobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("ScalarMetaschemaType::python2c: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+    cobj = new YggGeneric(this, NULL, 0);
     void** data = cobj->get_data_pointer();
     if ((size_t)(PyArray_NBYTES(pyobj)) != nbytes()) {
       ygglog_throw_error("ScalarMetaschemaType::python2c: Python object has a size of %lu bytes, but %lu were expected.",
@@ -902,6 +917,7 @@ public:
     }
     memcpy(idata, PyArray_DATA(pyobj), nbytes());
     data[0] = idata;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return cobj;
   }
   /*!
@@ -911,6 +927,10 @@ public:
    */
   PyObject* c2python(YggGeneric* cobj) const override {
     initialize_python("ScalarMetaschemaType::c2python: ");
+    PyObject* pyobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("ScalarMetaschemaType::c2python: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     int nd = 1;
     npy_intp* dims = NULL;
     numpy_dims(&nd, &dims);
@@ -1023,13 +1043,14 @@ public:
 			 subtype_);
     }
     }
-    PyObject* pyobj = PyArray_New(&PyArray_Type, nd, dims, np_type,
-    				  nullptr, data, (int)itemsize, flags, nullptr);
+    pyobj = PyArray_New(&PyArray_Type, nd, dims, np_type,
+			nullptr, data, (int)itemsize, flags, nullptr);
     if (pyobj == NULL) {
       ygglog_throw_error("MetaschemaType::c2python: Creation of Numpy array failed.");
     }
     if (dims != NULL)
       free(dims);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return pyobj;
   }
 
@@ -1933,6 +1954,9 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     @param[in, out] dims npy_intp** Address of pointer to memory where dimensions should be stored.
    */
   void numpy_dims(int *nd, npy_intp **dims) const override {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("OneDArrayMetaschemaType::numpy_dims: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     nd[0] = 1;
     npy_intp *idim = (npy_intp*)realloc(dims[0], sizeof(npy_intp));
     if (idim == NULL) {
@@ -1940,6 +1964,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     }
     idim[0] = (npy_intp)(length());
     dims[0] = idim;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
     @brief Update the type object with info from another type object.
@@ -2158,6 +2183,9 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(const rapidjson::Value &type_doc,
 NDArrayMetaschemaType::NDArrayMetaschemaType(PyObject* pyobj,
 					     const bool use_generic) :
   ScalarMetaschemaType(pyobj, use_generic) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("NDArrayMetaschemaType: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   update_type("ndarray");
   // Shape
   PyObject* pyshape = get_item_python_dict(pyobj, "shape",
@@ -2177,6 +2205,7 @@ NDArrayMetaschemaType::NDArrayMetaschemaType(PyObject* pyobj,
   } else {
     _variable_shape = false;
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 NDArrayMetaschemaType::NDArrayMetaschemaType(const NDArrayMetaschemaType &other) :
   NDArrayMetaschemaType(other.subtype(), other.precision(),
@@ -2209,6 +2238,9 @@ void NDArrayMetaschemaType::display(const char* indent) const {
 };
 PyObject* NDArrayMetaschemaType::as_python_dict() const {
   PyObject* out = ScalarMetaschemaType::as_python_dict();
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("NDArrayMetaschemaType::as_python_dict: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   PyObject* pyshape = PyList_New(ndim());
   if (pyshape == NULL) {
     ygglog_throw_error("NDArrayMetaschemaType::as_python_dict: Failed to create new Python list for shape.");
@@ -2222,6 +2254,7 @@ PyObject* NDArrayMetaschemaType::as_python_dict() const {
   set_item_python_dict(out, "shape", pyshape,
 		       "NDArrayMetaschemaType::as_python_dict: ",
 		       T_ARRAY);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   return out;
 };
 const size_t NDArrayMetaschemaType::ndim() const {
@@ -2245,6 +2278,9 @@ const bool NDArrayMetaschemaType::variable_nelements() const {
   return _variable_shape;
 };
 void NDArrayMetaschemaType::numpy_dims(int *nd, npy_intp **dims) const {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("NDArrayMetaschemaType::numpy_dims: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   int i;
   nd[0] = (int)ndim();
   npy_intp *idim = (npy_intp*)realloc(dims[0], nd[0]*sizeof(npy_intp));
@@ -2255,6 +2291,7 @@ void NDArrayMetaschemaType::numpy_dims(int *nd, npy_intp **dims) const {
     idim[i] = (npy_intp)(shape_[i]);
   }
   dims[0] = idim;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 size_t NDArrayMetaschemaType::nargs_exp() const {
   size_t out = 1;

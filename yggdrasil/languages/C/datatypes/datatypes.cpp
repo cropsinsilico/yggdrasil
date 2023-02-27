@@ -257,11 +257,11 @@ JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
   // Loop over string
   int mres;
   size_t sind, eind, beg = 0, end;
-  char ifmt[FMT_LEN];
-  char re_fmt[FMT_LEN];
-  char re_fmt_eof[FMT_LEN];
-  sprintf(re_fmt, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
-  sprintf(re_fmt_eof, "%%[^%s%s ]+", "\t", "\n");
+  char ifmt[FMT_LEN + 1];
+  char re_fmt[FMT_LEN + 1];
+  char re_fmt_eof[FMT_LEN + 1];
+  snprintf(re_fmt, FMT_LEN, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
+  snprintf(re_fmt_eof, FMT_LEN, "%%[^%s%s ]+", "\t", "\n");
   size_t iprecision = 0;
   while (beg < strlen(format_str)) {
     char isubtype[FMT_LEN] = "";
@@ -688,21 +688,33 @@ extern "C" {
     return ret;
   }
 
-  generic_t copy_generic(generic_t src) {
-    generic_t out = init_generic();
+  int copy_generic_into(generic_t* dst, generic_t src) {
     try {
+      if (!dst) {
+	ygglog_throw_error("copy_generic_into: Destination is empty.");
+      }
+      if (is_generic_init(*dst))
+	destroy_generic(dst);
+      dst[0] = init_generic();
       if (!(is_generic_init(src))) {
-	ygglog_throw_error("copy_generic: Source object not initialized.");
+	ygglog_throw_error("copy_generic_into: Source object not initialized.");
       }
       YggGeneric* src_obj = (YggGeneric*)(src.obj);
       if (src_obj == NULL) {
-	ygglog_throw_error("copy_generic: Generic object class is NULL.");
+	ygglog_throw_error("copy_generic_into: Generic object class is NULL.");
       }
-      out.obj = src_obj->copy();
+      dst->obj = src_obj->copy();
     } catch(...) {
-      ygglog_error("copy_generic: C++ exception thrown.");
-      destroy_generic(&out);
+      ygglog_error("copy_generic_into: C++ exception thrown.");
+      destroy_generic(dst);
+      return -1;
     }
+    return 0;
+  }
+
+  generic_t copy_generic(generic_t src) {
+    generic_t out = init_generic();
+    copy_generic_into(&out, src);
     return out;
   }
 
@@ -2963,6 +2975,9 @@ extern "C" {
 	items_vec.push_back(iitem);
       }
       obj = new JSONArrayMetaschemaType(items_vec, "", use_generic);
+      for (i = 0; i < nitems; i++) {
+	destroy_dtype(items + i);
+      }
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_json_array: C++ exception thrown.");
@@ -2985,6 +3000,9 @@ extern "C" {
 	properties[keys[i]] = iitem;
       }
       obj = new JSONObjectMetaschemaType(properties, use_generic);
+      for (i = 0; i < nitems; i++) {
+	destroy_dtype(values + i);
+      }
       return create_dtype(obj);
     } catch(...) {
       ygglog_error("create_dtype_json_object: C++ exception thrown.");

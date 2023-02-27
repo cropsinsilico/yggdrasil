@@ -107,6 +107,12 @@
         "{{ compiler('cxx') }}": {
           "method": "conda_recipe"
         }
+      },
+      {
+        "compiler-rt": {
+          "method": "conda",
+          "os": "osx"
+        }
       }
     ],
     "fortran": {
@@ -514,7 +520,13 @@
     "dev": [
       "black",
       "ipython",
-      "PyGithub"
+      "PyGithub",
+      "pre-commit",
+      {
+        "emacs": {
+          "method": "conda"
+        }
+      }
     ]
   },
   "bespoke_extras": [

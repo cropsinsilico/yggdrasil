@@ -69,7 +69,7 @@ int init_ascii_table_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_table_address(comm_t *comm) {
-  sprintf(comm->name, "tempASCIITable.%d", _yggAsciiTablesCreated);
+  snprintf(comm->name, COMM_NAME_SIZE, "tempASCIITable.%d", _yggAsciiTablesCreated);
   int ret = init_ascii_table_comm(comm);
   _yggAsciiTablesCreated++;
   return ret;
@@ -93,7 +93,7 @@ int init_ascii_table_array_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_table_array_address(comm_t *comm) {
-  sprintf(comm->name, "tempASCIITableArray.%d", _yggAsciiTablesCreated);
+  snprintf(comm->name, COMM_NAME_SIZE, "tempASCIITableArray.%d", _yggAsciiTablesCreated);
   int ret = init_ascii_table_array_comm(comm);
   _yggAsciiTablesCreated++;
   return ret;

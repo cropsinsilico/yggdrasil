@@ -6,7 +6,6 @@ import pprint
 import shutil
 import subprocess
 import difflib
-import copy
 from datetime import datetime
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
@@ -105,6 +104,12 @@ class SetupParam(object):
             'default': None,
             'help': ("Method that should be used to create an "
                      "environment")}),
+        (('--build-method', ), ['auto'], {
+            'choices': ['conda', 'mamba', 'sdist', 'bdist',
+                        'wheel', 'bdist_wheel', 'direct', None],
+            'default': None,
+            'help': ("Method that should be used to build "
+                     "yggdrasil")}),
         (('--python', '--python-version'), [], {
             'type': str,
             'help': "Python version that should be installed"}),
@@ -126,10 +131,13 @@ class SetupParam(object):
             'default': None,
             'help': ("Conda or virtualenv environment that packages "
                      "should be installed in.")}),
-        ('--verbose', ['run'], {
+        (('--verbose', '-v'), ['run'], {
             'action': 'store_true',
             'help': "Turn up verbosity of output."}),
-        ('--always-yes', ['run'], {
+        (('--quiet', '-q'), ['run'], {
+            'action': 'store_true',
+            'help': "Turn off output."}),
+        (('--always-yes', '-y'), ['run'], {
             'action': 'store_true',
             'help': "Don't ask for user input to run commands."}),
         (('--only-python', '--python-only'), ['install'], {
@@ -167,6 +175,13 @@ class SetupParam(object):
             'default': None,
             'help': ("Fallback to installing non-python dependencies "
                      "using mamba/conda")}),
+        ('--remove-existing', ['auto'], {
+            'action': 'store_true',
+            'help': ("Remove any existing environment with the same "
+                     "name as the one being created.")}),
+        ('--allow-missing', ['auto'], {
+            'action': 'store_true',
+            'help': "Ignore requirements with no valid options."}),
     ]
 
     def __init__(self, method=None, install_opts=None,
@@ -178,7 +193,10 @@ class SetupParam(object):
                 setattr(self, k, kwargs.pop(k))
             else:
                 setattr(self, k, self.get_default(k))
+        if kwargs:
+            print(kwargs)
         assert not kwargs
+        self.conda_flags_general = ''
         self.conda_flags = ''
         self.pip_flags = ''
         if not self.python:
@@ -200,6 +218,11 @@ class SetupParam(object):
                 self.method = self.env_method
             elif self.env_method == 'virtualenv':
                 self.method = 'pip'
+            elif self.build_method in ('conda', 'mamba'):
+                self.method = self.build_method
+            elif self.build_method in ('sdist', 'bdist', 'wheel',
+                                       'bdist_wheel'):
+                self.method = 'pip'
             elif CONDA_ENV:
                 self.method = 'conda'
             else:
@@ -209,17 +232,25 @@ class SetupParam(object):
             self.method = self.method.replace('mamba', 'conda')
         if self.always_yes:
             self.conda_flags += ' -y'
+            self.conda_flags_general += ' -y'
             # self.pip_flags += ' -y'
         if self.verbose:
-            self.conda_flags += ' -vvv'
+            self.conda_flags += ' -v'
+            self.conda_flags_general += ' -v'
             self.pip_flags += ' --verbose'
-        # else:
-        #     self.conda_flags += '-q'
+        elif self.quiet:
+            self.conda_flags += ' -q'
+            self.conda_flags_general += ' -q'
+            self.pip_flags += ' -q'
         if self.method.endswith('-dev'):
             self.method_base = self.method.split('-dev')[0]
             self.for_development = True
         else:
             self.method_base = self.method
+        if (((self.env_method == 'mamba'
+              or self.build_method == 'mamba')
+             and self.method_base != 'conda')):
+            self.use_mamba = True
         self.conda_exe_config = CONDA_CMD
         if self.use_mamba:
             self.conda_exe = MAMBA_CMD
@@ -241,6 +272,14 @@ class SetupParam(object):
                     self.env_method = 'conda'
             else:
                 self.env_method = 'virtualenv'
+        if self.build_method is None:
+            if self.method_base == 'conda':
+                if self.use_mamba:
+                    self.build_method = 'mamba'
+                else:
+                    self.build_method = 'conda'
+            else:
+                self.build_method = 'wheel'
         if self.env_name and self.env_method in ('conda', 'mamba'):
             self.conda_env = self.env_name
         else:
@@ -277,7 +316,8 @@ class SetupParam(object):
             if self.deps_method == 'supplemental':
                 if not (self.for_development or self.method == 'pip'):
                     # Pip extras installed directly as extras do not
-                    # seem to work when installing from a sdist
+                    # seem to work when installing from a sdist, but
+                    # maybe they will work with bdist?
                     for k in ['python', self.method_base,
                               f'{self.method_base}_skip']:
                         if k in self.valid_methods:
@@ -295,6 +335,10 @@ class SetupParam(object):
                     self.valid_methods.remove(k)
         # print(f"deps_method = {self.deps_method}, "
         #       f"valid_methods = {self.valid_methods}")
+        self.conda_flags = self.conda_flags.strip()
+        self.pip_flags = self.pip_flags.strip()
+        self.conda_initialized = []
+        self.call_kws = {}
 
     @classmethod
     def find_args(cls, x):
@@ -453,16 +497,42 @@ class SetupParam(object):
         if kwargs:
             pprint.pprint(kwargs)
         assert not kwargs  # Use all keyword arguments
-        add_install_opts_args(parser, install_opts=install_opts)
+        if 'install' in skip_types:
+            return
+        # Begin install_opts specific options
+        if not isinstance(install_opts, dict):
+            install_opts = get_install_opts(
+                empty=(install_opts == 'empty'))
+        for k, v in install_opts.items():
+            if k in ['os'] or args_match((f'--dont-install-{k}', ), skip):
+                continue
+            elif k == 'no_sudo':
+                parser.add_argument(
+                    '--no-sudo', action='store_true',
+                    help="Don't use sudo during installation.")
+                continue
+            if v:
+                parser.add_argument(
+                    '--dont-install-%s' % k, action='store_true',
+                    help=("Don't install %s" % k))
+            else:
+                parser.add_argument(
+                    '--install-%s' % k, action='store_true',
+                    help=("Install %s" % k))
+            
 
-
-def get_summary_commands(param=None, **kwargs):
+def get_summary_commands(param=None, conda_env=None,
+                         allow_missing_python=False, **kwargs):
     r"""Get commands to use to summarize the state of the environment.
 
     Args:
-        use_mamba (bool, optional): If True, use mamba in place of conda.
         param (SetupParam, optional): Parameters controlling setup. If
             not provided, parameters will be generated from kwargs.
+        conda_env (str, optional): Conda environment to print a summary
+            of if different than the one provided by param.
+        allow_missing_python (bool, optional): If True, don't raise an
+            error if the Python executable cannot be located. Defaults
+            to False.
         **kwargs: Keyword arguments are passed to SetupParam if param
             is not provided.
 
@@ -471,13 +541,26 @@ def get_summary_commands(param=None, **kwargs):
 
     """
     if param is None:
-        param = SetupParam(**kwargs)
-    out = [f"{param.python_cmd} --version",
-           f"{param.python_cmd} -m pip list"]
+        param = SetupParam(env_name=conda_env, **kwargs)
+    if param.quiet and not param.verbose:
+        return []
+    if conda_env is None:
+        conda_env = param.conda_env
+    python_cmd = param.python_cmd
+    if conda_env != param.conda_env:
+        python_cmd = locate_conda_exe(conda_env, 'python',
+                                      use_mamba=param.use_mamba,
+                                      allow_missing=allow_missing_python)
+        if allow_missing_python and not os.path.isfile(python_cmd):
+            python_cmd = None
+    out = []
+    if python_cmd:
+        out += [f"{python_cmd} --version",
+                f"{python_cmd} -m pip list"]
     if CONDA_ENV:
         flags = ''
-        if param.conda_env:
-            flags = f'--name {param.conda_env}'
+        if conda_env:
+            flags = f'--name {conda_env}'
         out += [f"echo 'CONDA_PREFIX={CONDA_PREFIX}'",
                 f"{param.conda_exe} info",
                 f"{param.conda_exe} list {flags}",
@@ -505,7 +588,7 @@ def call_conda_command(args, use_mamba=False, **kwargs):
 
 
 def call_script(lines, force_bash=False, verbose=False, dry_run=False,
-                call_kws=None):
+                call_kws=None, use_shell=False, param=None):
     r"""Write lines to a script and call it.
 
     Args:
@@ -518,8 +601,14 @@ def call_script(lines, force_bash=False, verbose=False, dry_run=False,
             commands. Defaults to False.
         call_kws (dict, optional): Keyword arguments that should be
             passed to the subprocess call.
+        use_shell (bool, optional): If True, execute as a shell and
+            source the script. Defaults to False.
 
     """
+    if param is not None:
+        verbose = param.verbose
+        dry_run = param.dry_run
+        call_kws = param.call_kws
     # if _on_gha:
     verbose = True
     if call_kws is None:
@@ -545,6 +634,8 @@ def call_script(lines, force_bash=False, verbose=False, dry_run=False,
             lines = [lines[0].split('#')[0].strip()]
         if verbose:
             for i in range(len(lines) - 1, 0, -1):
+                if lines[i].startswith(('if ', 'then', 'fi')):
+                    continue
                 line_str = lines[i].replace('"', '\\"')
                 lines.insert(i, f'echo "CALLING: {line_str}"')
         if _is_win and (not force_bash):  # pragma: windows
@@ -568,7 +659,11 @@ def call_script(lines, force_bash=False, verbose=False, dry_run=False,
             if _is_win:  # pragma: windows
                 call_cmd = [os.environ['COMSPEC'], '/c', 'call', fname]
             else:
-                call_cmd = ['./%s' % fname]
+                if use_shell:
+                    call_kws['shell'] = True
+                    call_cmd = f"bash -i {fname}"
+                else:
+                    call_cmd = [f'./{fname}']
                 os.chmod(fname, 0o755)
             subprocess.check_call(call_cmd, **call_kws)
         except subprocess.CalledProcessError:
@@ -620,11 +715,18 @@ def locate_conda_bin(conda_env, use_mamba=False):
     if conda_env is None:
         conda_env = CONDA_ENV
     assert CONDA_ROOT
-    conda_prefix = os.path.join(CONDA_ROOT, 'envs')
-    if sys.platform in ['win32', 'cygwin']:
-        out = os.path.join(conda_prefix, conda_env, 'Scripts')
+    if CONDA_ENV and CONDA_ROOT.endswith(CONDA_ENV):
+        conda_prefix = os.path.dirname(CONDA_ROOT)
     else:
-        out = os.path.join(conda_prefix, conda_env, 'bin')
+        conda_prefix = os.path.join(CONDA_ROOT, 'envs')
+    if conda_env == 'base':
+        conda_prefix = os.path.dirname(conda_prefix)
+    else:
+        conda_prefix = os.path.join(conda_prefix, conda_env)
+    if sys.platform in ['win32', 'cygwin']:
+        out = os.path.join(conda_prefix, 'Scripts')
+    else:
+        out = os.path.join(conda_prefix, 'bin')
     return out
 
 
@@ -678,8 +780,10 @@ def locate_conda_exe(conda_env, name, use_mamba=False,
     try:
         assert os.path.isfile(out)
     except AssertionError:
+        out_orig = out
         out = os.path.expanduser(os.path.join('~', '.conda', 'envs', name))
         if not os.path.isfile(out):
+            print(f"File missing: {out_orig}")
             raise
     return out
 
@@ -692,6 +796,8 @@ def get_install_opts(old=None, empty=False):
         old (dict, optional): If provided, the returned mapping will include
             the values from this dictionary, but will also be updated with any
             that are missing.
+        empty (bool, optional): If True, the returned mapping defaults to
+            not installing anything and does not specify an operating system.
 
     Returns:
         dict: Mapping between languages/packages and whether or not they
@@ -752,10 +858,10 @@ def get_install_opts(old=None, empty=False):
             'trimesh': True,
             'pygments': True,
             'omp': False,
-            'docs': False,
+            'docs': True,
             'no_sudo': False,
             'mpi': False,
-            'dev': False,
+            'dev': True,
             'testing': True,
         }
     if empty:
@@ -780,38 +886,9 @@ def get_install_opts(old=None, empty=False):
     return out
 
 
-def add_install_opts_args(parser, install_opts=None):
-    r"""Add arguments to a parser for installation options.
-
-    Args:
-        parser (argparse.ArgumentParser): Parser to add arguments to.
-        install_opts (dict, optional): Existing installation options
-            that should be used to set the flags. Create using
-            get_install_opts if not provided.
-
-    """
-    if install_opts is None:
-        install_opts = get_install_opts()
-    for k, v in install_opts.items():
-        if k in ['os']:
-            continue
-        elif k == 'no_sudo':
-            parser.add_argument(
-                '--no-sudo', action='store_true',
-                help="Don't use sudo during installation.")
-            continue
-        if v:
-            parser.add_argument(
-                '--dont-install-%s' % k, action='store_true',
-                help=("Don't install %s" % k))
-        else:
-            parser.add_argument(
-                '--install-%s' % k, action='store_true',
-                help=("Install %s" % k))
-
-
 def create_env(env_method, python, param=None, name=None, packages=None,
-               init=_on_ci, populate=False, **kwargs):
+               populate=False, allow_missing=False,
+               remove_existing=False, return_commands=False, **kwargs):
     r"""Setup an environment for yggdrasil installation.
 
     Args:
@@ -826,20 +903,24 @@ def create_env(env_method, python, param=None, name=None, packages=None,
             on the method and Python version.
         packages (list, optional): Packages that should be installed
             in the new environment. Defaults to None and is ignored.
-        init (bool, optional): If True, the environment management
-            program is first configured as if it is on CI so that some
-            interactive aspects will be disabled. Default is set based
-            on the presence of CI environment variables (it currently
-            checks for Github Actions, Travis CI, and Appveyor).
         populate (bool, optional): If True, the environment will be
             populated. Defaults to False.
+        allow_missing (bool, optional): If True, requirements
+            without valid options will be ignored. Defaults to
+            False.
+        remove_existing (bool, optional): If True, remove any existing
+            environment with the specified name. Defaults to False.
+        return_commands (bool, optional): If True, the commands
+            necessary to build the package are returned instead of
+            running them. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
 
     """
     if param is None:
         if name:
             kwargs['env_name'] = name
-        param = SetupParam(env_method=env_method, python=python,
-                           **kwargs)
+        param = SetupParam(env_method=env_method, python=python, **kwargs)
     python = param.python
     if name is None:
         name = param.env_name
@@ -853,28 +934,33 @@ def create_env(env_method, python, param=None, name=None, packages=None,
     #     # Not strictly required, but useful for determine the versions of
     #     # dependencies required by packages during testing
     #     packages.append('requests')
+    existing_env = False
+    env_removed = False
     if param.env_method in ('conda', 'mamba'):
-        conda_exe_config = param.conda_exe_config
-        conda_exe = param.conda_exe
-        if (((not param.dry_run)
-             and conda_env_exists(name, use_mamba=param.use_mamba))):
+        use_mamba = (param.use_mamba and shutil.which('mamba'))
+        existing_env = conda_env_exists(name, use_mamba=use_mamba)
+        if remove_existing and existing_env:
+            assert name != 'base'
+            env_dir = os.path.dirname(
+                locate_conda_bin(name, use_mamba=use_mamba))
+            cmds += [f"{param.conda_exe} env remove -n {name}",
+                     f"if [ -d {env_dir} ]",
+                     "then",
+                     f"  rm -rf {env_dir}",
+                     "fi"]
+            existing_env = False
+            env_removed = True
+        if (not param.dry_run) and existing_env:
             print(f"Conda env with name '{name}' already exists.")
             if not populate:
                 return
         else:
-            if init:
-                cmds += [
-                    # Configure conda
-                    f"{conda_exe_config} config --set always_yes yes --set changeps1 no",
-                    f"{conda_exe_config} config --set channel_priority strict",
-                    f"{conda_exe_config} config --prepend channels conda-forge",
-                    f"{conda_exe_config} update -q {param.env_method}",
-                    # f"{conda_exe_config} config --set allow_conda_downgrades true",
-                    # f"{conda_exe} install -n root conda=4.9",
-                ]
+            cmds += setup_conda(param=param, conda_env='base',
+                                return_commands=True,
+                                skip_update=(_is_win and _on_gha))
             cmds += [
-                (f"{conda_exe} create -q -n {name} python={python} "
-                 + ' '.join(packages))
+                (f"{param.conda_exe} create {param.conda_flags_general} "
+                 f"-n {name} python={python} {' '.join(packages)}")
             ]
     elif param.env_method == 'virtualenv':
         python_cmd = param.python_cmd
@@ -911,10 +997,152 @@ def create_env(env_method, python, param=None, name=None, packages=None,
         raise ValueError(f"Unsupported environment management method:"
                          f" '{param.env_method}'")
     if populate:
+        if param.fallback_to_conda:
+            # Prevent update of a fresh env
+            cmds += setup_conda(param=param, return_commands=True,
+                                skip_update=(not existing_env))
         cmds += install_pkg(param.method, param=param,
-                            return_commands=True)
-    call_script(cmds, verbose=param.verbose,
-                dry_run=param.dry_run)
+                            return_commands=True,
+                            allow_missing=allow_missing,
+                            force_yggdrasil=env_removed)
+    if return_commands:
+        return cmds
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+
+
+def install_conda_recipe(recipe='recipe', package=None, param=None,
+                         return_commands=False, dont_test=False,
+                         varient_config_files=None, without_build=False,
+                         **kwargs):
+    r"""Build and install a package from a conda recipe.
+
+    Args:
+        recipe (str, optional): Directory containing the recipe. Defaults
+            to 'recipe' indicating a directory in the current directory.
+        package (str, list, optional): Package(s) to install from the
+            recipe. If not provided, all packages from the recipe will be
+            installed.
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to build the package are returned instead of
+            running them. Defaults to False.
+        dont_test (bool, optional): If True, the tests will not be run as
+            part of the build process. Defaults to False.
+        varient_config_files (list, optional): One or more varient config
+            files to build for.
+        without_build (bool, optional): If True, the package will not
+            be built prior to install. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if param is None:
+        kwargs.setdefault('method', 'mamba')
+        param = SetupParam(method, **kwargs)
+    summary_cmds = get_summary_commands(param=param)
+    cmds = []
+    if not without_build:
+        cmds += build_conda_recipe(
+            recipe, param=param, return_commands=True,
+            dont_test=dont_test,
+            varient_config_files=varient_config_files)
+    cmds += summary_cmds
+    if package is None:
+        package = []
+        with open(os.path.join(recipe, 'meta.yaml'), 'r') as fd:
+            lines = fd.read()
+            idx = lines.find('\noutputs:')
+            if idx != -1:
+                while idx != -1:
+                    idx = lines.find('\n  - name:', idx)
+                    if idx == -1:
+                        break
+                    idx += len('\n  - name:')
+                    package.append(lines[idx:].splitlines()[0].strip())
+            else:
+                idx = lines.find('\npackage:')
+                assert idx != -1
+                idx = lines.find('name:', idx)
+                assert idx != -1
+                idx += len('name:')
+                package.append(lines[idx:].splitlines()[0].strip())
+    cmds += install_conda_build(package, param=param, return_commands=True)
+    if return_commands:
+        return cmds
+    cmds += summary_cmds
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+    return cmds
+
+
+def build_conda_recipe(recipe='recipe', param=None,
+                       return_commands=False, dont_test=False,
+                       varient_config_files=None, **kwargs):
+    r"""Build a conda recipe.
+
+    Args:
+        recipe (str, optional): Directory containing the recipe. Defaults
+            to 'recipe' indicating a directory in the current directory.
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to build the package are returned instead of
+            running them. Defaults to False.
+        dont_test (bool, optional): If True, the tests will not be run as
+            part of the build process. Defaults to False.
+        varient_config_files (list, optional): One or more varient config
+            files to build for.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if param is None:
+        kwargs.setdefault('build_method', 'mamba')
+        param = SetupParam(**kwargs)
+    cmds = []
+    conda_env = CONDA_ENV
+    conda_idx = CONDA_INDEX
+    if param.use_mamba:
+        conda_build = f"{CONDA_CMD} mambabuild"
+        build_pkgs = ["boa"]
+    else:
+        conda_build = f"{CONDA_CMD} build"
+        build_pkgs = ["conda-build", "conda-verify"]
+    if param.verbose:
+        build_flags = ''
+    else:
+        build_flags = '-q'
+    # Must always build in base to avoid errors (and don't change the
+    # version of Python used in the environment)
+    # https://github.com/conda/conda/issues/9124
+    # https://github.com/conda/conda/issues/7758#issuecomment-660328841
+    assert conda_env == 'base' or param.dry_run
+    assert conda_idx
+    # Might invalidate cache
+    cmds += [f"{CONDA_CMD} clean --all {param.conda_flags_general}"]
+    cmds += setup_conda(param=param, conda_env=conda_env,
+                        return_commands=True,
+                        skip_update=(_is_win and _on_gha))
+    if not dont_test:
+        # The tests issue a command that is too long for the
+        # windows command prompt which is used to build the conda
+        # package on Github Actions
+        build_flags += ' --no-test'
+    if varient_config_files:
+        build_flags += (
+            f" --variant-config-files {' '.join(varient_config_files)}")
+    cmds += [
+        f"{param.conda_exe} install -n base "
+        f"{param.conda_flags_general} {' '.join(build_pkgs)}",
+        f"{conda_build} recipe --python {param.python} {build_flags}"
+    ]
+    cmds.append(f"{param.conda_exe} index {conda_idx}")
+    if return_commands:
+        return cmds
+    if cmds:
+        call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+    print(f"CONDA_IDX = {conda_idx}")
+    assert (conda_idx and os.path.isdir(conda_idx))
 
 
 def build_pkg(method, param=None, return_commands=False, **kwargs):
@@ -933,63 +1161,42 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
 
     """
     if param is None:
-        param = SetupParam(method, **kwargs)
+        param = SetupParam(build_method=method, **kwargs)
     cmds = []
+    # Setup conda
+    if param.build_method in ('mamba', 'conda'):
+        cmds += setup_conda(param=param, conda_env='base',
+                            return_commands=True,
+                            skip_update=(_is_win and _on_gha))
     # Upgrade pip and setuptools and wheel to get clean install
     upgrade_pkgs = ['wheel', 'setuptools']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
-    if param.method == 'conda':
-        conda_env = CONDA_ENV
-        conda_idx = CONDA_INDEX
-        if param.use_mamba:
-            conda_build = f"{CONDA_CMD} mambabuild"
-            build_pkgs = ["boa"]
-        else:
-            conda_build = f"{CONDA_CMD} build"
-            build_pkgs = ["conda-build", "conda-verify"]
+    if param.build_method == 'direct':
+        # Do nothing, package will be installed from source
+        pass
+    elif param.build_method in ('mamba', 'conda'):
+        cmds += build_conda_recipe(param=param, return_commands=True,
+                                   dont_test=(_is_win and _on_gha))
+    elif param.build_method in ('sdist', 'bdist',
+                                'wheel', 'bdist_wheel'):
+        build_method = param.build_method
+        if build_method == 'wheel':
+            # pip wheel . --no-deps
+            build_method = 'bdist_wheel'
         if param.verbose:
             build_flags = ''
         else:
-            build_flags = '-q'
-        # Must always build in base to avoid errors (and don't change the
-        # version of Python used in the environment)
-        # https://github.com/conda/conda/issues/9124
-        # https://github.com/conda/conda/issues/7758#issuecomment-660328841
-        assert conda_env == 'base' or param.dry_run
-        assert conda_idx
-        if _on_gha:
-            cmds += [
-                f"{param.conda_exe_config} config --prepend channels"
-                f" conda-forge",
-                f"{param.conda_exe} update -q {param.method}",
-            ]
-        if _is_win and _on_gha:
-            # The tests issue a command that is too long for the
-            # windows command prompt which is used to build the conda
-            # package on Github Actions
-            build_flags += ' --no-test'
-        cmds += [
-            f"{param.conda_exe} clean --all"]  # Might invalidate cache
-        if not (_is_win and _on_gha):
-            cmds += [f"{param.conda_exe} update --all"]
-        cmds += [
-            f"{param.conda_exe} install -q -n base " + ' '.join(build_pkgs),
-            f"{conda_build} recipe --python {param.python} {build_flags}"
-        ]
-        cmds.append(f"{param.conda_exe} index {conda_idx}")
-    elif param.method == 'pip':
-        if param.verbose:
+            # build_flags = '--quiet'
             build_flags = ''
-        else:
-            build_flags = '--quiet'
         # Install from source dist
         cmds += [f"{param.python_cmd} -m pip install --upgrade "
                  + ' '.join(upgrade_pkgs)]
-        cmds += [f"{param.python_cmd} setup.py {build_flags} sdist"]
+        cmds += [f"{param.python_cmd} setup.py {build_flags} {build_method}"]
     else:  # pragma: debug
-        raise ValueError(f"Method must be 'conda', 'mamba', or 'pip', not"
-                         f" '{param.method}'")
+        raise ValueError(f"Method must be 'conda', 'mamba', 'sdist',"
+                         f" 'bdist', or 'wheel', not"
+                         f" '{param.build_method}'")
     summary_cmds = get_summary_commands(param)
     if cmds:
         cmds += summary_cmds
@@ -997,23 +1204,90 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
         return cmds
     if cmds:
         cmds = summary_cmds + cmds
-        if param.use_mamba and not shutil.which('mamba'):
-            cmds_after = cmds
-            cmds = get_summary_commands()
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+
+
+def setup_conda(param=None, return_commands=False, conda_env=None,
+                skip_update=False, **kwargs):
+    r"""Setup conda for an installation.
+
+    Args:
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to build the package are returned instead of
+            running them. Defaults to False.
+        conda_env (str, optional): Environment to call update in.
+        skip_update (bool, optional): If True, don't update packages.
+            Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if param is None:
+        param = SetupParam(conda_env=conda_env, **kwargs)
+    if conda_env is None:
+        conda_env = param.conda_env
+    cmds = []
+    if conda_env in param.conda_initialized:
+        return cmds
+    if not param.conda_initialized:
+        if _on_ci:
             cmds += [
-                f"{CONDA_CMD} config --prepend channels conda-forge",
-                f"{CONDA_CMD} config --remove channels defaults",
-                f"{CONDA_CMD} config --set channel_priority strict",
+                f"{param.conda_exe_config} config --set always_yes yes "
+                f"--set changeps1 no"]
+        cmds += [
+            f"{param.conda_exe_config} config --prepend channels conda-forge",
+            f"{param.conda_exe_config} config --set channel_priority strict",
+        ]
+    # Refresh channel
+    # https://github.com/conda/conda/issues/8051
+    if _on_gha:
+        # These commands will not be valid for mamba
+        # cmds += [
+        #     f"{param.conda_exe} install -n root conda=4.9",
+        #     f"{param.conda_exe_config} config --set "
+        #     f" allow_conda_downgrades true",
+        # ]
+        if 'defaults' in call_conda_command(
+                [param.conda_exe_config, 'config', '--get', 'channels'],
+                use_mamba=param.use_mamba):
+            cmds += [
+                f"{param.conda_exe_config} config --remove channels defaults",
             ]
-            if not (_is_win and _on_gha):
-                cmds += [f"{CONDA_CMD} update --all"]
-            cmds += [f"{CONDA_CMD} install mamba -c conda-forge"]
-            cmds += cmds_after
-        call_script(cmds, verbose=param.verbose,
-                    dry_run=param.dry_run)
-    if param.method == 'conda':  # and not param.use_mamba:
-        print(f"CONDA_IDX = {conda_idx}")
-        assert (conda_idx and os.path.isdir(conda_idx))
+        cmds += [
+            f"{param.conda_exe_config} config --remove channels conda-forge",
+            f"{param.conda_exe_config} config --prepend channels conda-forge",
+        ]
+    flags = param.conda_flags_general
+    flags_env = flags
+    if conda_env is not None:
+        flags_env += f" -n {conda_env}"
+    conda_exe = param.conda_exe
+    mamba_missing = (param.use_mamba
+                     and not (shutil.which('mamba')
+                              or param.conda_initialized))
+    if mamba_missing:
+        conda_exe = param.conda_exe_config
+    if not (skip_update or (_is_win and _on_gha)):
+        cmds += [f"{conda_exe} update --all {flags_env}"]
+        cmds += get_summary_commands(param, conda_env=conda_env)
+    if _on_gha and not (mamba_missing or param.conda_initialized):
+        cmds += [f"{conda_exe} update {param.method_base} {flags} -n base"]
+        cmds += get_summary_commands(param=param, conda_env='base',
+                                     allow_missing_python=True)
+    # To allow installation of an old version of conda
+    # if not (param.use_mamba or param.conda_initialized):
+    #     cmds += [
+    #         f"{param.conda_exe_config} config --set allow_conda_downgrades true",
+    #         f"{param.conda_exe} install -n root conda=4.9",
+    #     ]
+    if mamba_missing:
+        cmds += [f"{conda_exe} install mamba -c conda-forge -n base {flags}"]
+    param.conda_initialized.append(conda_env)
+    if return_commands:
+        return cmds
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
 
 
 def preinstall_deps(method, param=None, return_commands=False,
@@ -1051,20 +1325,10 @@ def preinstall_deps(method, param=None, return_commands=False,
         if param.method != 'conda':
             cmds += [f"{param.python_cmd} -m pip uninstall -y "
                      + ' '.join(version_specified)]
-    # Refresh channel
-    # https://github.com/conda/conda/issues/8051
-    if param.fallback_to_conda and _on_gha:
-        cmds += [
-            f"{param.conda_exe_config} config --set channel_priority strict",
-            # These commands will not be valid for mamba
-            # f"{param.conda_exe} install -n root conda=4.9",
-            # f"{param.conda_exe_config} config --set "
-            # f" allow_conda_downgrades true",
-            f"{param.conda_exe_config} config --remove channels conda-forge",
-            f"{param.conda_exe_config} config --prepend channels conda-forge",
-        ]
-    if param.fallback_to_conda and not no_packages:
-        cmds.append(f"{param.conda_exe} update --all")
+    if param.fallback_to_conda:
+        cmds += setup_conda(param=param, return_commands=True,
+                            skip_update=no_packages)
+    # TODO: This could be moved to setup_conda
     if _on_gha and _is_unix and param.fallback_to_conda:
         if param.conda_env:
             conda_prefix = os.path.join(conda_root, 'envs',
@@ -1085,7 +1349,8 @@ def preinstall_deps(method, param=None, return_commands=False,
 
 
 def install_deps(method, param=None, return_commands=False,
-                 do_preinstall=False, req=None, **kwargs):
+                 do_preinstall=False, req=None,
+                 allow_missing=False, **kwargs):
     r"""Install the package dependencies.
     
     Args:
@@ -1101,6 +1366,9 @@ def install_deps(method, param=None, return_commands=False,
             prepare for installation. Defaults to False.
         req (YggRequirements, optional): Existing set of requirements
             to use.
+        allow_missing (bool, optional): If True, requirements
+            without valid options will be ignored. Defaults to
+            False.
         **kwargs: Additional keyword arguments are passed to
             SetupParam.
 
@@ -1117,6 +1385,7 @@ def install_deps(method, param=None, return_commands=False,
             cmds += get_summary_commands(param)
     cmds += install_requirements(param,
                                  return_commands=True,
+                                 allow_missing=allow_missing,
                                  req=req)
     summary_cmds = get_summary_commands(param=param)
     if cmds:
@@ -1130,9 +1399,126 @@ def install_deps(method, param=None, return_commands=False,
     return cmds
 
 
+def install_conda_build(package, param=None, return_commands=False,
+                        allow_fail=False, **kwargs):
+    r"""Install a package from a local conda build.
+
+    Args:
+        package (str, list): Name(s) of the package(s) to install.
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to install the package are returned instead of
+            running them. Defaults to False.
+        allow_fail (bool, optional): If True, the install command will be
+            allowed to fail. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if isinstance(package, list):
+        package = ' '.join(package)
+    if param is None:
+        kwargs.setdefault('method', 'mamba')
+        param = SetupParam(**kwargs)
+    conda_exe_config = CONDA_CMD
+    if param.use_mamba:
+        conda_exe = MAMBA_CMD
+        conda_idx = CONDA_INDEX  # 'local'
+    else:
+        conda_exe = CONDA_CMD
+        conda_idx = CONDA_INDEX
+    if not (conda_idx and os.path.isdir(conda_idx)):
+        print(f"conda_idx = {conda_idx}")
+    assert (conda_idx and os.path.isdir(conda_idx))
+    # Install from conda build
+    # Assumes that the target environment is active
+    install_flags = param.conda_flags
+    if not param.use_mamba:
+        install_flags += ' --update-deps'
+    if _is_win:
+        index_channel = conda_idx
+    else:
+        index_channel = f"file:/{conda_idx}"
+    allow_fail_str = ''
+    if allow_fail:
+        allow_fail_str = " # [ALLOW FAIL]"
+    cmds = [
+        f"{conda_exe_config} config --prepend channels {index_channel}",
+        # Related issues if this stops working again
+        # https://github.com/conda/conda/issues/466#issuecomment-378050252
+        f"{conda_exe} install {install_flags} -c"
+        f" {index_channel} {package}{allow_fail_str}"
+        # Required for non-strict channel priority
+        # https://github.com/conda-forge/conda-forge.github.io/pull/670
+        # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
+        # packages.html?highlight=openblas#installing-numpy-with-blas-variants
+        # f"{conda_exe} install {install_flags} --update-deps -c
+        #   {index_channel} yggdrasil \"blas=*=openblas\""
+    ]
+    if return_commands:
+        return cmds
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
+    return cmds
+
+
+def config_pkg(param=None, return_commands=False, allow_missing=False,
+               **kwargs):
+    r"""Configure yggdrasil after installation.
+
+    Args:
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        return_commands (bool, optional): If True, the commands
+            necessary to install the package are returned instead of
+            running them. Defaults to False.
+        allow_missing (bool, optional): If True, allow for missing
+            executables under the assumption that these commands will
+            only be called after the executable is installed. Defaults
+            to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+    
+    """
+    if param is None:
+        param = SetupParam(method, **kwargs)
+    cmds = []
+    install_flags = ''
+    if param.install_opts['r']:
+        if param.fallback_to_conda:
+            R_exe = locate_conda_exe(param.conda_env, 'R',
+                                     use_mamba=param.use_mamba,
+                                     allow_missing=True)
+            install_flags += f" --r-interpreter={R_exe}"
+        elif _on_gha and _is_unix and not param.install_opts['no_sudo']:
+            install_flags += ' --sudoR'
+    install_called = False
+    if _on_ci or param.for_development:
+        coverage_flags = ''
+        if _on_ci:
+            coverage_flags += " --from-env"
+        else:
+            install_called = True
+            coverage_flags += install_flags
+        src_dir = os.path.dirname(os.path.dirname(__file__))
+        if not os.path.isabs(src_dir):
+            src_dir = os.path.abspath(src_dir)
+        cmds += [
+            f"cd {src_dir}",
+            f"{param.python_cmd} create_coveragerc.py {coverage_flags}",
+            f"cd {os.getcwd()}"]
+    if not install_called:
+        cmds += [f"{param.python_cmd} -m yggdrasil install all{install_flags}"]
+    if return_commands:
+        return cmds
+    call_script(cmds, param=param)
+    return cmds
+
+
 def install_pkg(method, param=None, without_build=False,
                 without_deps=False, install_deps_before=False,
-                return_commands=False, **kwargs):
+                return_commands=False, allow_missing=False,
+                force_yggdrasil=False, **kwargs):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
@@ -1154,6 +1540,11 @@ def install_pkg(method, param=None, without_build=False,
         return_commands (bool, optional): If True, the commands
             necessary to install the package are returned instead of
             running them. Defaults to False.
+        allow_missing (bool, optional): If True, requirements
+            without valid options will be ignored. Defaults to
+            False.
+        force_yggdrasil (bool, optional): Force installation of yggdrasil
+            reguardless of if it is already installed. Defaults to False.
         **kwargs: Additional keyword arguments are passed to
             SetupParam.
 
@@ -1173,7 +1564,7 @@ def install_pkg(method, param=None, without_build=False,
     if param.for_development:
         without_build = True
     if not without_build:
-        cmds += build_pkg(param.method, param=param,
+        cmds += build_pkg(param.build_method, param=param,
                           return_commands=True)
     cmds_deps = []
     cmds += preinstall_deps(param.method_base,
@@ -1182,121 +1573,83 @@ def install_pkg(method, param=None, without_build=False,
     req = YggRequirements.from_file()
     if not without_deps:
         cmds_deps += install_deps(param.method_base, param=param,
-                                  return_commands=True, req=req)
+                                  return_commands=True, req=req,
+                                  allow_missing=allow_missing)
     if install_deps_before:
         cmds += cmds_deps
     extras = [
         x for x in req.extras(methods=['python', param.method_base])
         if param.install_opts[x]]
     # Install yggdrasil
-    if param.for_development:
+    if param.for_development or param.build_method == 'direct':
         # Call setup.py in separate process from the package directory
-        # cmds += [f"{param.python_cmd} setup.py develop"]
         pass
-    elif param.method == 'conda':
-        conda_exe_config = CONDA_CMD
-        if param.use_mamba:
-            conda_exe = MAMBA_CMD
-            conda_idx = CONDA_INDEX  # 'local'
-        else:
-            conda_exe = CONDA_CMD
-            conda_idx = CONDA_INDEX
-        if not (conda_idx and os.path.isdir(conda_idx)):
-            print(f"conda_idx = {conda_idx}")
-        assert (conda_idx and os.path.isdir(conda_idx))
-        # Install from conda build
-        # Assumes that the target environment is active
-        install_flags = param.conda_flags
-        if not param.use_mamba:
-            install_flags += ' --update-deps'
-        if _is_win:
-            index_channel = conda_idx
-        else:
-            index_channel = f"file:/{conda_idx}"
+    elif param.build_method in ('conda', 'mamba'):
         ygg_pkgs = ['yggdrasil']
         ygg_pkgs += [f'yggdrasil.{x}' for x in extras]
-        cmds += [
-            f"{conda_exe_config} config --prepend channels {index_channel}",
-            # Related issues if this stops working again
-            # https://github.com/conda/conda/issues/466#issuecomment-378050252
-            f"{conda_exe} install {install_flags} -c"
-            f" {index_channel} {' '.join(ygg_pkgs)}"
-            # Required for non-strict channel priority
-            # https://github.com/conda-forge/conda-forge.github.io/pull/670
-            # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
-            # packages.html?highlight=openblas#installing-numpy-with-blas-variants
-            # f"{conda_exe} install {install_flags} --update-deps -c
-            #   {index_channel} yggdrasil \"blas=*=openblas\""
-        ]
-        if 'mpi' in extras:
-            assert ' install ' in cmds[-1]
-            cmds[-1] += " # [ALLOW FAIL]"
+        cmds += install_conda_build(ygg_pkgs, param=param,
+                                    return_commands=True,
+                                    allow_fail=('mpi' in extras))
         cmds += summary_cmds
-    elif param.method == 'pip':
+    elif param.build_method in ('sdist', 'bdist',
+                                'wheel', 'bdist_wheel'):
+        build_ext = None
+        build_dir = 'dist'
+        if param.build_method in ('sdist', 'bdist'):
+            build_ext = '.tar.gz'
+        elif param.build_method in ('bdist_wheel', 'wheel'):
+            build_ext = '.whl'
+        else:
+            raise NotImplementedError(param.build_method)
+        build_dist = os.path.join(build_dir, f"*{build_ext}")
         if _is_win:  # pragma: windows
             cmds += [
-                "for %%a in (\"dist\\*.tar.gz\") do set YGGSDIST=%%a",
+                f"for %%a in (\"{build_dist}\")"
+                f" do set YGGSDIST=%%a",
                 "echo %YGGSDIST%"
             ]
-            sdist = "%YGGSDIST%"
-        else:
-            sdist = "dist/*.tar.gz"
+            build_dist = "%YGGSDIST%"
         # if extras:
-        #     sdist += f"[{','.join(extras)}]"
+        #     build_dist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
-            f" {param.pip_flags} {sdist}",
-            f"{param.python_cmd} create_coveragerc.py"
+            f" {param.pip_flags} {build_dist}",
         ]
         cmds += summary_cmds
     else:  # pragma: debug
-        raise ValueError(f"Invalid method: '{param.method}'")
+        raise ValueError(f"Invalid method: '{param.build_method}'")
     yggdrasil_installed = False
-    if param.method == 'conda':
-        try:
-            locate_conda_exe(param.conda_env, 'yggdrasil',
-                             use_mamba=param.use_mamba)
-            yggdrasil_installed = True
-        except AssertionError:
-            pass
-    else:
-        yggdrasil_installed = (locate_exe('yggdrasil') is not None)
+    if not force_yggdrasil:
+        if param.method == 'conda':
+            try:
+                locate_conda_exe(param.conda_env, 'yggdrasil',
+                                 use_mamba=param.use_mamba)
+                yggdrasil_installed = True
+            except AssertionError:
+                pass
+        else:
+            yggdrasil_installed = (locate_exe('yggdrasil') is not None)
     if yggdrasil_installed and not param.dry_run:
         cmds = []
     if not install_deps_before:
         cmds += cmds_deps
     if (((param.dry_run or (not yggdrasil_installed))
-         and param.for_development)):
+         and (param.for_development or param.build_method == 'direct'))):
         src = '.'
+        flags = ''
         if extras:
             src += f"[{','.join(extras)}]"
+        if param.for_development:
+            flags += " --editable"
         cmds += [
             f"cd {_pkg_dir}",
-            f"{param.python_cmd} -m pip install --editable {src}",
+            f"{param.python_cmd} -m pip install{flags} {src}",
             f"cd {os.getcwd()}"]
-    # Follow up if on Unix as R installation may require sudo
-    if param.install_opts['r'] and _is_unix:
-        # TODO: Fix location of R executable
-        R_cmd = f"{param.python_cmd} -m yggdrasil install r"
-        if not param.install_opts['no_sudo']:
-            R_cmd += ' --sudoR'
-        cmds.append(R_cmd)
-    call_kws = {}
-    if param.method == 'conda':
-        env = copy.copy(os.environ)
-        if (not param.install_opts['no_sudo']) and param.install_opts['r']:
-            env['YGG_USE_SUDO_FOR_R'] = '1'
-        src_dir = os.path.join(os.getcwd(),
-                               os.path.dirname(os.path.dirname(__file__)))
-        cmds += [
-            f"cd {src_dir}",
-            f"{param.python_cmd} create_coveragerc.py",
-            f"cd {os.getcwd()}"]
-        call_kws['env'] = env
+    cmds += config_pkg(param=param, return_commands=True,
+                       allow_missing=False)
     if return_commands:
         return cmds
-    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run,
-                call_kws=call_kws)
+    call_script(cmds, param=param)
 
 
 def verify_pkg(install_opts=None):
@@ -1446,6 +1799,86 @@ def log_environment(new_filename='new_environment_log.txt',
         print('\n'.join(diff))
 
 
+def setup_biocro_osr_integration(integration_dir, param=None,
+                                 allow_missing=False,
+                                 return_commands=False,
+                                 remove_existing=False, **kwargs):
+    r"""Setup a yggdrasil dev environment for running BioCro-OSR integrations.
+
+    Args:
+        integration_dir (str): Directory where the integration repo is
+            cloned.
+        param (SetupParam, optional): Parameters defining setup. If
+            not provided, one will be created from kwargs.
+        allow_missing (bool, optional): If True, requirements
+            without valid options will be ignored. Defaults to
+            False.
+        return_commands (bool, optional): If True, the commands
+            necessary to install the package are returned instead of
+            running them. Defaults to False.
+        remove_existing (bool, optional): If True, remove any existing
+            environment with the specified name. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to
+            SetupParam.
+
+    """
+    if not os.path.isabs(integration_dir):
+        integration_dir = os.path.abspath(integration_dir)
+    if param is None:
+        param = SetupParam(**kwargs)
+    cmds = []
+    config_flags = [
+        f"--osr-repository-path={integration_dir}/models/OpenSimRoot",
+        "--disable-languages=matlab"]
+    if _is_osx:
+        sudo_cmd = ''
+        if not param.install_opts['no_sudo']:
+            sudo_cmd = 'sudo '
+        cmds += [
+            'export MACOSX_DEPLOYMENT_TARGET=11.0',
+            'export CONDA_BUILD_SYSROOT="$(xcode-select -p)/SDKs/'
+            'MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"',
+            'if [ ! -d "$CONDA_BUILD_SYSROOT" -a ! -h "$CONDA_BUILD_SYSROOT" ]',
+            'then',
+            '  curl -L -O https://github.com/phracker/MacOSX-SDKs/'
+            'releases/download/11.0-11.1/MacOSX'
+            '${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz',
+            ('  ' + sudo_cmd
+             + 'tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz '
+             + '-C \"$(dirname \"$CONDA_BUILD_SYSROOT\")\"'),
+            'fi',
+        ]
+        config_flags.append("--macos-sdkroot=$CONDA_BUILD_SYSROOT")
+    if param.fallback_to_conda:
+        cmds += setup_conda(param=param, return_commands=True,
+                            conda_env='base')
+    cmds += create_env(param.env_method, param.python, param=param,
+                       populate=True, allow_missing=allow_missing,
+                       remove_existing=remove_existing,
+                       return_commands=True)
+    os.environ['PATH'] = os.pathsep.join([
+        locate_conda_bin(param.conda_env, use_mamba=param.use_mamba),
+        os.environ['PATH']])
+    if param.fallback_to_conda and param.conda_env:
+        # TODO: Activate venv?
+        cmds += [f"{param.conda_exe} activate {param.conda_env}"]
+    cmds += [
+        f"{param.python_cmd} -m yggdrasil config {' '.join(config_flags)}",
+        f"{param.python_cmd} -m yggdrasil compile c cpp fortran osr",
+        f"cd {integration_dir}/models/biocro-mlm",
+        "if [ -f \"src/BioCro.dylib\" ]",
+        "then",
+        "  rm src/*.o src/*.dylib src/*/*.o",
+        "fi",
+        f"{param.python_cmd} -m yggdrasil compile ./",
+        f"cd {os.getcwd()}",
+        "ygginfo --verbose"]
+    if return_commands:
+        return cmds
+    call_script(cmds, verbose=param.verbose, dry_run=param.dry_run,
+                use_shell=True)
+
+
 if __name__ == "__main__":
     install_opts = get_install_opts()
     parser = argparse.ArgumentParser(
@@ -1462,9 +1895,22 @@ if __name__ == "__main__":
         env_method_required=True,
         python_required=True,
         env_name_help="Name that should be used for the environment.",
-        include=['env_method'],
+        include=['env_method', 'remove_existing', 'allow_missing'],
         skip=['target_os', 'method'],
         skip_types=['install'])
+    # Production environment setup
+    parser_pro = subparsers.add_parser(
+        'proenv',
+        help=("Create and populate a production environment "
+              "for testing yggdrasil."))
+    SetupParam.add_parser_args(
+        parser_pro,
+        python_required=True,
+        include=['env_method', 'build_method', 'remove_existing',
+                 'allow_missing'],
+        env_method_default='mamba',
+        env_name_help="Name that should be used for the environment.",
+        skip=['for_development', 'deps_method', 'user'])
     # Development environment setup
     parser_dev = subparsers.add_parser(
         'devenv',
@@ -1473,7 +1919,7 @@ if __name__ == "__main__":
     SetupParam.add_parser_args(
         parser_dev,
         python_required=True,
-        include=['env_method'],
+        include=['env_method', 'remove_existing', 'allow_missing'],
         env_method_default='mamba',
         env_name_help="Name that should be used for the environment.",
         skip=['for_development', 'deps_method', 'user'])
@@ -1482,7 +1928,7 @@ if __name__ == "__main__":
         'devenv-matrix', help="Setup a matrix of environments.")
     SetupParam.add_parser_args(
         parser_devmat,
-        include=['env_method'],
+        include=['env_method', 'remove_existing', 'allow_missing'],
         env_method_default='mamba',
         skip=['for_development', 'deps_method', 'user',
               'method', 'python', 'env_name'],
@@ -1499,14 +1945,19 @@ if __name__ == "__main__":
     # Build package
     parser_bld = subparsers.add_parser(
         'build', help="Build the package.")
-    SetupParam.add_parser_args(parser_bld,
-                               skip=['target_os', 'env_name'],
-                               skip_types=['install'])
+    SetupParam.add_parser_args(
+        parser_bld,
+        skip=['target_os', 'env_name', 'method'],
+        skip_types=['install'],
+        include=['build_method'],
+        build_method_required=True)
     # Install dependencies
     parser_dep = subparsers.add_parser(
         'deps', help="Install the package dependencies.")
-    SetupParam.add_parser_args(parser_dep, skip=['python'],
-                               deps_method_default="supplemental")
+    SetupParam.add_parser_args(
+        parser_dep, skip=['python'],
+        deps_method_default="supplemental",
+        include=['allow_missing'])
     # Install package
     parser_pkg = subparsers.add_parser(
         'install', help="Install the package.")
@@ -1516,6 +1967,7 @@ if __name__ == "__main__":
         method_choices=['conda', 'pip', 'mamba',
                         'conda-dev', 'pip-dev', 'mamba-dev'],
         method_help="Method that should be used to install yggdrasil.",
+        include=['build_method', 'allow_missing'],
         additional_args=[
             (('--without-build', ),
              {'action': 'store_true',
@@ -1527,6 +1979,84 @@ if __name__ == "__main__":
               'help': ("Perform installation steps without installing "
                        "dependencies first (assuming the depdnencies "
                        "were already installed).")}),
+        ])
+    # Install recipe
+    parser_rcp = subparsers.add_parser(
+        'install-recipe', help="Install a package from a conda recipe.")
+    SetupParam.add_parser_args(
+        parser_rcp,
+        skip=['target_os', 'use_mamba', 'method'],
+        skip_types=['install'],
+        include=['user', 'build_method'],
+        build_method_choices=['mamba', 'conda'],
+        build_method_default='mamba',
+        additional_args=[
+            (('--recipe', ),
+             {'type': str, 'default': 'recipe',
+              'help': "Location of conda recipe to build and install."}),
+            (('--packages', ),
+             {'nargs': '*',
+              'help': ("One or more packages to install from the "
+                       "recipe. Defaults to all of the package in the "
+                       "recipe.")}),
+            (('--dont-test', ),
+             {'action': 'store_true',
+              'help': "Don't run tests as part of the build process."}),
+        ])
+    # Install recipe
+    parser_rcp = subparsers.add_parser(
+        'install-recipe', help="Install a package from a conda recipe.")
+    SetupParam.add_parser_args(
+        parser_rcp,
+        skip=['target_os', 'use_mamba', 'method'],
+        skip_types=['install'],
+        include=['user', 'build_method'],
+        build_method_choices=['mamba', 'conda'],
+        build_method_default='mamba',
+        additional_args=[
+            (('--recipe', ),
+             {'type': str, 'default': 'recipe',
+              'help': "Location of conda recipe to build and install."}),
+            (('--packages', ),
+             {'nargs': '*',
+              'help': ("One or more packages to install from the "
+                       "recipe. Defaults to all of the package in the "
+                       "recipe.")}),
+            (('--dont-test', ),
+             {'action': 'store_true',
+              'help': "Don't run tests as part of the build process."}),
+        ])
+    # Install recipe
+    parser_rcp = subparsers.add_parser(
+        'install-recipe', help="Install a package from a conda recipe.")
+    SetupParam.add_parser_args(
+        parser_rcp,
+        skip=['target_os', 'use_mamba'],
+        skip_types=['install'],
+        include=['user'],
+        method_choices=['mamba', 'conda'],
+        method_default='mamba',
+        method_optional=True,
+        additional_args=[
+            (('--recipe', ),
+             {'type': str, 'default': 'recipe',
+              'help': "Location of conda recipe to build and install."}),
+            (('--packages', ),
+             {'nargs': '*',
+              'help': ("One or more packages to install from the "
+                       "recipe. Defaults to all of the package in the "
+                       "recipe.")}),
+            (('--dont-test', ),
+             {'action': 'store_true',
+              'help': "Don't run tests as part of the build process."}),
+            (('--varient-config-files', '-m'),
+             {'nargs': '+',
+              'help': "YAML files for varients that should be built."}),
+            (('--without-build', ),
+             {'action': 'store_true',
+              'help': ("Perform installation steps without building "
+                       "first (assuming the package was already "
+                       "built).")}),
         ])
     # Installation verification
     parser_ver = subparsers.add_parser(
@@ -1543,19 +2073,48 @@ if __name__ == "__main__":
         '--old-filename', default='old_environment_log.txt',
         help=("File containing previous environment log that the new "
               "log should be diffed against."))
+    # Setup biocro
+    parser_biocro_osr = subparsers.add_parser(
+        'biocro-osr',
+        help="Set up an environment for BioCro-OSR integration")
+    SetupParam.add_parser_args(
+        parser_biocro_osr,
+        python_default='3.9',
+        include=['env_method', 'remove_existing', 'allow_missing'],
+        method_optional=True,
+        method_default='mamba',
+        env_method_default='mamba',
+        env_name_default='biocro',
+        env_name_help="Name that should be used for the environment.",
+        skip=['for_development', 'deps_method', 'user', 'target-os',
+              'install-r', 'dont-install-r', 'python_only'],
+        additional_args=[
+            (('integration_dir', ),
+             {'type': str,
+              'help': "Directory where the integration repo is cloned."}),
+        ])
     # Call methods
     args = parser.parse_args()
     if args.operation in ['env', 'setup']:
         param = SetupParam.from_args(args, install_opts,
                                      env_created=True)
-        create_env(args.env_method, args.python, param=param)
+        create_env(args.env_method, args.python, param=param,
+                   remove_existing=args.remove_existing)
+    elif args.operation == 'proenv':
+        args.deps_method = 'env'
+        param = SetupParam.from_args(args, install_opts,
+                                     env_created=True)
+        create_env(args.env_method, args.python, param=param,
+                   populate=True, allow_missing=args.allow_missing,
+                   remove_existing=args.remove_existing)
     elif args.operation == 'devenv':
         args.for_development = True
         args.deps_method = 'env'
         param = SetupParam.from_args(args, install_opts,
                                      env_created=True)
         create_env(args.env_method, args.python, param=param,
-                   populate=True)
+                   populate=True, allow_missing=args.allow_missing,
+                   remove_existing=args.remove_existing)
     elif args.operation == 'devenv-matrix':
         args.for_development = True
         args.deps_method = 'env'
@@ -1569,21 +2128,41 @@ if __name__ == "__main__":
                 param = SetupParam.from_args(args, install_opts,
                                              env_created=True)
                 create_env(args.env_method, args.python, param=param,
-                           populate=True)
+                           populate=True, allow_missing=args.allow_missing,
+                           remove_existing=args.remove_existing)
     elif args.operation == 'build':
         param = SetupParam.from_args(args, install_opts)
-        build_pkg(args.method, param=param)
+        build_pkg(args.build_method, param=param)
     elif args.operation == 'deps':
         param = SetupParam.from_args(args, install_opts)
-        install_deps(args.method, param=param, do_preinstall=True)
+        install_deps(args.method, param=param, do_preinstall=True,
+                     allow_missing=args.allow_missing)
     elif args.operation == 'install':
         param = SetupParam.from_args(args, install_opts)
         install_pkg(args.method, param=param, python=args.python,
                     without_build=args.without_build,
-                    without_deps=args.without_deps)
+                    without_deps=args.without_deps,
+                    allow_missing=args.allow_missing)
+    elif args.operation == 'install-recipe':
+        param = SetupParam.from_args(args, install_opts)
+        install_conda_recipe(recipe=args.recipe, package=args.packages,
+                             param=param, dont_test=args.dont_test,
+                             varient_config_files=args.varient_config_files,
+                             without_build=args.without_build)
     elif args.operation == 'verify':
         param = SetupParam.from_args(args, install_opts)
         verify_pkg(install_opts=param.install_opts)
     elif args.operation == 'log':
         log_environment(new_filename=args.new_filename,
                         old_filename=args.old_filename)
+    elif args.operation == 'biocro-osr':
+        args.for_development = True
+        args.deps_method = 'env'
+        args.install_r = True
+        args.dont_install_r = False
+        param = SetupParam.from_args(args, install_opts,
+                                     env_created=True)
+        setup_biocro_osr_integration(
+            args.integration_dir, param=param,
+            allow_missing=args.allow_missing,
+            remove_existing=args.remove_existing)

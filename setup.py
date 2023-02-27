@@ -6,32 +6,12 @@ import json
 from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
-import create_coveragerc
 ygg_ver = versioneer.get_version()
-ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
-LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
-
-
-# Import script from inside package
-sys.path.insert(0, LANG_PATH)
-try:
-    import install_languages
-finally:
-    sys.path.pop(0)
 
 
 print("In setup.py", sys.argv)
 logging.critical("In setup.py: %s" % sys.argv)
         
-
-# Don't do coverage or installation of packages for use with other languages
-# when building a source distribution
-if 'sdist' not in sys.argv:
-    # Attempt to install languages
-    installed_languages = install_languages.install_all_languages(from_setup=True)
-    # Set coverage options in .coveragerc
-    create_coveragerc.create_coveragerc(installed_languages)
-
 
 # Create .rst README from .md and get long description
 if os.path.isfile('README.rst'):

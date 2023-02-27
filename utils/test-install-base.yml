@@ -23,6 +23,7 @@ env:
   INSTALLPYGMENTS: 1
   INSTALLOMP: 1
   INSTALLMPI: 1
+  INSTALLMATLAB: 0
   USEVIRTUALENV: 0
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX:
@@ -224,7 +225,9 @@ jobs:
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
-      run: yggconfig --allow-multiple-omp
+      run: |
+        install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+        yggconfig --allow-multiple-omp
     # ========================================================
 
     - name: Verify installation
@@ -247,7 +250,7 @@ jobs:
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all --second-attempt
 
     - name: Run generated test script (1st)
       timeout-minutes: 120
@@ -258,7 +261,7 @@ jobs:
     - name: Re-run test script failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
 
     - name: Run tests (2nd)
       timeout-minutes: 120
@@ -269,7 +272,7 @@ jobs:
     - name: Re-run test failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all --second-attempt
 
     - name: Run generated test script (2nd)
       timeout-minutes: 120
@@ -280,7 +283,7 @@ jobs:
     - name: Re-run test script failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=none --second-attempt
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
 
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main

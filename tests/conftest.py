@@ -12,7 +12,8 @@ import subprocess
 import contextlib
 from yggdrasil import platform, constants
 from yggdrasil.tools import (
-    get_supported_lang, get_supported_comm, get_supported_type)
+    get_supported_lang, get_supported_comm, get_supported_type,
+    resolve_language_aliases)
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import _on_mpi
 logger = logging.getLogger(__name__)
@@ -849,6 +850,7 @@ def wait_on_function(timeout, polling_interval):
 @pytest.fixture
 def run_once(request):
     r"""Fixture indicating that the test should only be run once."""
+    print("IN RUN ONCE")
     key = (request.cls, request.function.__name__)
     if key in _test_registry:
         pytest.skip(f"{request.cls.__name__}.{request.function.__name__} "
@@ -872,9 +874,14 @@ def pprint_diff():
 @pytest.fixture(scope="session")
 def check_required_languages(pytestconfig):
     r"""Check if a set of languages is enabled/disabled."""
+    enabled = resolve_language_aliases(
+        pytestconfig.getoption("--language"))
+    disabled = resolve_language_aliases(
+        pytestconfig.getoption("--skip-language"))
+
     def check_required_languages_w(required_languages):
-        enabled = pytestconfig.getoption("--language")
-        disabled = pytestconfig.getoption("--skip-language")
+        required_languages = resolve_language_aliases(
+            required_languages)
         if enabled and (not all(x in enabled for x in required_languages)):
             pytest.skip(f"One or more required languages "
                         f"({required_languages}) not enabled")
@@ -1155,6 +1162,7 @@ def patch_equality():
 _dont_verify_count_fds = False
 _dont_verify_count_comms = False
 _dont_verify_count_threads = False
+_fd_count = 0
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -1172,6 +1180,24 @@ def init_zmq():
         import zmq
         s = _global_context.socket(zmq.PUSH)
         s.close()
+
+
+@pytest.fixture(scope="session")
+def asan_installed():
+    r"""Determine if ASAN is available."""
+    from yggdrasil.drivers.CompiledModelDriver import (
+        find_compilation_tool, get_compilation_tool)
+    compiler = find_compilation_tool('compiler', 'c', allow_failure=True)
+    if compiler:
+        compiler = get_compilation_tool('compiler', compiler)
+    return compiler and compiler.asan_library()
+
+
+@pytest.fixture
+def requires_asan(asan_installed):
+    r"""Skip a test if it requires non-existent ASAN."""
+    if not asan_installed:
+        pytest.skip("ASAN library not available")
 
 
 # @pytest.fixture(autouse=True)
@@ -1222,14 +1248,24 @@ def count_comms(communicator_types):
 @pytest.fixture(scope="session")
 def count_fds():
     r"""Count the number of file descriptors."""
-    def count_fds_w():
+    def count_fds_w(dont_subtract_closed=False):
         import psutil
         from yggdrasil import platform
         proc = psutil.Process()
         if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
+            conn = proc.connections()
             out = proc.num_fds()
+            if not dont_subtract_closed:
+                out -= len([x for x in conn if x.status == 'CLOSE'])
+            # from yggdrasil.tools import get_fds
+            # fd_list = get_fds(ignore_closed=(not dont_subtract_closed),
+            #                   ignore_kqueue=True, verbose=True,
+            #                   by_column=3)
+            # out_alt = len(fd_list)
+            # print(out_alt, out, len(conn))
+            # assert out_alt == out
         return out
     return count_fds_w
 
@@ -1288,8 +1324,8 @@ def disable_verify_count_comms():
     global _dont_verify_count_comms
     _dont_verify_count_comms = True
     yield
-    
-    
+
+
 @pytest.fixture
 def verify_count_threads(wait_on_function):
     r"""Assert that all threads created during a test are cleaned up."""
@@ -1329,13 +1365,30 @@ def verify_count_comms(wait_on_function, count_comms, communicator_types):
                          on_timeout=on_timeout)
 
 
+@pytest.fixture(scope="session")
+def reset_count_fds(count_fds):
+    r"""Reset the global file descriptor count."""
+
+    def wrapped(value=None):
+        if value is None:
+            value = count_fds()
+        global _fd_count
+        prev_count = _fd_count
+        _fd_count = value
+        return prev_count
+    return wrapped
+    
+    
 @pytest.fixture
 def verify_count_fds(wait_on_function, first_test, count_fds,
                      init_zmq, init_mp):
     r"""Verify that file descriptors created during a test are cleaned up."""
     global _dont_verify_count_fds
+    global _fd_count
     _dont_verify_count_fds = False
-    nfds = count_fds()
+    _fd_count = count_fds()
+    # from yggdrasil.tools import track_fds
+    # with track_fds():
     yield
     gc.collect()
     if not (first_test or _dont_verify_count_fds or platform._is_win):
@@ -1350,9 +1403,11 @@ def verify_count_fds(wait_on_function, first_test, count_fds,
                     pprint.pprint(refs)
                     print(f'FDS: {count_fds()}')
                     pdb.set_trace()
+            # warnings.warn(f"{count_fds()} file descriptors are open, "
+            #               f"but the test started with {_fd_count}.")
             raise AssertionError(f"{count_fds()} file descriptors are open, "
-                                 f"but the test started with {nfds}.")
-        wait_on_function(lambda: count_fds() <= nfds,
+                                 f"but the test started with {_fd_count}.")
+        wait_on_function(lambda: count_fds() <= _fd_count,
                          on_timeout=on_timeout)
 
 

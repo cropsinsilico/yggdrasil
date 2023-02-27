@@ -83,14 +83,14 @@ class InterpretedModelDriver(ModelDriver):
                          'key': 'interpreter_flags',
                          'type': list}]
 
-    def __init__(self, name, args, **kwargs):
-        super(InterpretedModelDriver, self).__init__(name, args, **kwargs)
-        # Set defaults from attributes
-        for k0 in ['interpreter']:
-            for k in [k0, '%s_flags' % k0]:
-                v = getattr(self, k, None)
-                if v is None:
-                    setattr(self, k, getattr(self, 'default_%s' % k))
+    # def __init__(self, name, args, **kwargs):
+    #     super(InterpretedModelDriver, self).__init__(name, args, **kwargs)
+    #     # Set defaults from attributes
+    #     for k0 in ['interpreter']:
+    #         for k in [k0, '%s_flags' % k0]:
+    #             v = getattr(self, k, None)
+    #             if v is None:
+    #                 setattr(self, k, getattr(self, 'default_%s' % k))
 
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -138,6 +138,10 @@ class InterpretedModelDriver(ModelDriver):
         if out is None:
             raise NotImplementedError("Interpreter not set for language '%s'."
                                       % cls.language)
+        if not os.path.isfile(out):
+            out_full = shutil.which(out)
+            if out_full:
+                out = out_full
         return out
 
     @classmethod

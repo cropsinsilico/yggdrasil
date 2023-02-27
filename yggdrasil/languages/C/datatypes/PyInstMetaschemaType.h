@@ -337,6 +337,9 @@ public:
    */
   size_t update_from_serialization_args(size_t *nargs, va_list_t &ap) override {
     size_t out = MetaschemaType::update_from_serialization_args(nargs, ap);
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("PyObjMetaschemaType::update_from_serialization_args: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (use_generic())
       return out;
     ygglog_throw_error("PyObjMetaschemaType::update_from_serialization_args: Not implemented");
@@ -382,6 +385,7 @@ public:
 	// update_kwargs_type(new_kwargs_type,);
       }
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return out;
   }
   /*!
@@ -390,11 +394,15 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   YggGeneric* python2c(PyObject* pyobj) const override {
+    YggGeneric* cobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("PyInstMetaschemaType::python2c: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (args_type_ == NULL)
       ygglog_throw_error("PyInstMetaschemaType::python2c: Args type is NULL.");
     if (kwargs_type_ == NULL)
       ygglog_throw_error("PyInstMetaschemaType::python2c: Kwargs type is NULL.");
-    YggGeneric* cobj = new YggGeneric(this, NULL, 0);
+    cobj = new YggGeneric(this, NULL, 0);
     void** data = cobj->get_data_pointer();
     python_t* idata = (python_t*)realloc(data[0], nbytes());
     if (idata == NULL) {
@@ -425,6 +433,7 @@ public:
     data[0] = (void*)idata;
     Py_DECREF(py_args);
     Py_DECREF(py_kwargs);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return cobj;
   }
 
@@ -532,6 +541,14 @@ public:
    */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) const override {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    UNUSED(data);
+    UNUSED(allow_realloc);
+    UNUSED(nargs);
+    UNUSED(ap);
+    ygglog_throw_error("PyInstMetaschemaType::decode_data: Python disabled");
+    return false;
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (args_type_ == NULL) {
       ygglog_throw_error("PyInstMetaschemaType::decode_data: Args type is not initialize.");
     }
@@ -609,6 +626,7 @@ public:
     Py_DECREF(py_args);
     Py_DECREF(py_kwargs);
     return true;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
 
 private:

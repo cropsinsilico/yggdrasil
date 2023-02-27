@@ -165,8 +165,10 @@ class TestExampleTypes(base_class):
     @pytest.fixture(scope="class")
     def env(self, example_name, language, typename, using_pointers,
             using_generics, split_array, dont_add_lengths,
-            length_prefix, example_module):
+            length_prefix, example_module, asan_installed):
         r"""dict: Environment variables set for the test."""
+        with_asan = (language in ['c', 'c++', 'cpp'] and asan_installed)
+        # and typename not in ['instance', 'class', 'function'])
         kwargs = {}
         assign_kws = {}
         if language in ['c', 'c++', 'cpp']:
@@ -180,6 +182,8 @@ class TestExampleTypes(base_class):
         modelfile = os.path.join(os.path.dirname(__file__), example_name,
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
+        if with_asan:
+            drv.compile_dependencies(with_asan=True)
         if using_generics and drv.is_typed:
             testtype = {'type': 'any'}
         else:
@@ -221,12 +225,18 @@ class TestExampleTypes(base_class):
         env['TEST_LANGUAGE'] = language
         env['TEST_LANGUAGE_EXT'] = language_ext
         env['TEST_TYPENAME'] = typename
+        lines = []
+        if with_asan:
+            lines += ['with_asan: True']
+            if typename in ['instance', 'class', 'function']:
+                env['ASAN_OPTIONS'] = 'detect_leaks=0'
+            # else:
+            #     env['ASAN_OPTIONS'] = 'detect_leaks=1'
         if (language in ['c', 'fortran']) and (not using_generics):
             yaml_fields['vars'] = True
             if typename in ['array', 'object']:
                 yaml_fields['dtype'] = True
         if any(list(yaml_fields.values())):
-            lines = []
             for io, io_vars in zip(['input', 'output'],
                                    [inputs, outputs]):
                 lines += [io + 's:',
@@ -250,6 +260,7 @@ class TestExampleTypes(base_class):
                         if "units: ''" in x:
                             continue
                         lines.append('    ' + x)
+        if lines:
             env['TEST_MODEL_IO'] = '\n    '.join(lines) + '\n'
         else:
             env['TEST_MODEL_IO'] = ''

@@ -109,6 +109,12 @@ class GFortranCompiler(FortranCompilerBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
     default_archiver = 'ar'
+    # GNU ASAN not currently installed with gfortran on osx
+    # asan_flags = ['-fsanitize=address']
+    # linker_attributes = dict(
+    #     FortranCompilerBase.linker_attributes,
+    #     asan_flags=['-fsanitize=address', '-shared-libasan'])
+    # f'-l{CModelDriver.ClangCompiler.asan_library()}'])
 
 
 # class IFortCompiler(FortranCompilerBase):
@@ -399,19 +405,15 @@ class FortranModelDriver(CompiledModelDriver):
                 if not v.is_installed():
                     continue
                 if k == 'clang++':
-                    cxx_lib = 'c++'
                     if not add_cxx_lib:
-                        add_cxx_lib = cxx_lib
+                        add_cxx_lib = 'c++'
                 else:
                     # GNU takes precedence when present
-                    cxx_lib = 'stdc++'
-                    add_cxx_lib = cxx_lib
+                    add_cxx_lib = 'stdc++'
             if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
                 cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
                 cls.internal_libraries['fygg']['external_dependencies'].append(
                     add_cxx_lib)
-                # if platform._is_win:  # pragma: windows
-                #     cls.external_libraries[cxx_lib]['libtype'] = 'windows_import'
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
@@ -461,13 +463,15 @@ class FortranModelDriver(CompiledModelDriver):
         return super(FortranModelDriver, self).compile_model(**kwargs)
 
     @classmethod
-    def get_internal_suffix(cls, commtype=None):
+    def get_internal_suffix(cls, commtype=None, **kwargs):
         r"""Determine the suffix that should be used for internal libraries.
 
         Args:
             commtype (str, optional): If provided, this is the communication
                 type that should be used for the model. If None, the
                 default comm is used.
+            **kwargs: Additional keyword arguments will be passed to the
+                parent class's method.
 
         Returns:
             str: Suffix that should be added to internal libraries to
@@ -475,7 +479,7 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = super(FortranModelDriver, cls).get_internal_suffix(
-            commtype=commtype)
+            commtype=commtype, **kwargs)
         if commtype is None:
             commtype = tools.get_default_comm()
         out += '_%s' % commtype[:3].lower()

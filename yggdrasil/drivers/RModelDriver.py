@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import logging
+import warnings
 from collections import OrderedDict
 from yggdrasil import serialize, platform, constants
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
@@ -71,7 +72,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'call': 'c(flag, {inputs}) %<-% {channel_obj}$call({outputs})',
     }
     function_param = {
-        'import': 'source(\"{filename}\")',
+        'import': 'reticulate::py_config(); source(\"{filename}\")',
         'istype': 'is({variable}, \"{type}\")',
         'len': 'length({variable})',
         'index': '{variable}[[{index}]]',
@@ -133,6 +134,20 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     zero_based = False
 
     @classmethod
+    def are_dependencies_installed(cls, **kwargs):
+        r"""Determine if the dependencies are installed for the interface (not
+        including dependencies needed by a particular communication type).
+
+        Returns:
+            bool: True if the dependencies are installed. False otherwise.
+
+        """
+        # Short cut by checking if yggdrasil installed
+        if not cls.is_interface_installed():  # pragma: config
+            return super(RModelDriver, cls).are_dependencies_installed(**kwargs)
+        return True
+            
+    @classmethod
     def is_library_installed(cls, lib, **kwargs):
         r"""Determine if a dependency is installed.
 
@@ -178,19 +193,31 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 method.
 
         """
-        if self.with_valgrind:
-            interp = kwargs.pop('interpreter', self.get_interpreter())
-            interp_flags = kwargs.pop('interpreter_flags', [])
-            if 'Rscript' in interp:
-                interp = 'R'.join(interp.rsplit('Rscript', 1))
-                interp_flags = []
-                kwargs['skip_interpreter_flags'] = True
-            interp_flags += [
-                '--vanilla', '-d', 'valgrind %s'
-                % ' '.join(self.valgrind_flags), '-f']
-            kwargs['interpreter'] = interp
-            kwargs['interpreter_flags'] = interp_flags
+        if self.with_debugger:
+            # This dosn't appear to work as all arguments besides the
+            # debugger argument (-d) are passed to the debugger and there
+            # does not appear to be a method of running anything from
+            # the command line where the debugger is called.
+            # cmd = self.model_command()
+            # assert len(cmd) == 1
+            # interp = kwargs.pop('interpreter', self.get_interpreter())
+            # interp_flags = kwargs.pop('interpreter_flags', [])
+            # if 'Rscript' in interp:
+            #     interp = 'R'.join(interp.rsplit('Rscript', 1))
+            #     interp_flags = []
+            #     kwargs['skip_interpreter_flags'] = True
+            # interp_flags += ['--vanilla', '-d']
+            # if ' ' in self.with_debugger:
+            #     interp_flags += [f"\"{self.with_debugger}\""]
+            # else:
+            #     interp_flags += [f"{self.with_debugger}"]
+            # interp_flags += ['-f']
+            # kwargs['command'] = [interp] + interp_flags
+            # # kwargs['interpreter'] = interp
+            # # kwargs['interpreter_flags'] = interp_flags
+            # kwargs['debug_flags'] = []
             kwargs['debug_flags'] = []
+            warnings.warn("R does not support command line debugging.")
         return super(RModelDriver, self).run_model(*args, **kwargs)
         
     def set_env(self, **kwargs):
@@ -207,6 +234,10 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             search_dirs = c_linker.get_search_path(env_only=True)
             out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
                                                       add_to_front=True)
+        # TODO: Set DYLD_INSERT_LIBRARIES to clang dynamic library
+        # on OSX when with_asan is True. R_TESTS may need to be
+        # modified so this variable is set when the tests are run.
+        # $(clang -print-file-name=libclang_rt.asan_osx_dynamic.dylib)
         return out
         
     @classmethod
@@ -324,7 +355,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     @classmethod
     def call_compiler(cls, package_dir, toolname=None, flags=None,
                       language='c++', verbose=False,
-                      use_ccache=False):  # pragma: no cover
+                      use_ccache=False, disable_python_c_api=False,
+                      with_asan=False):  # pragma: no cover
         r"""Build an R package w/ the yggdrasil compilers.
 
         Args:
@@ -339,6 +371,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 process will be displayed. Defaults to False.
             use_ccache (bool, optional): If True, ccache will be added to
                 the compilation executable. Defaults to False.
+            disable_python_c_api (bool, optional): If True, the Python C
+                API will be disabled. Defaults to False.
 
         """
         import shutil
@@ -366,7 +400,12 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         for x in constants.LANGUAGES['compiled']:
             # for x in [language]:
             drv = import_component('model', x)
-            compiler = drv.get_tool('compiler', toolname=toolname)
+            try:
+                compiler = drv.get_tool('compiler', toolname=toolname)
+            except NotImplementedError:
+                if language in [drv.language] + drv.language_aliases:
+                    raise
+                continue
             # archiver = compiler.archiver()
             env = drv.set_env_compiler(existing=env, compiler=compiler)
             cexec = compiler.get_executable(full_path=True)
@@ -376,11 +415,19 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             kws = {}
             if x == 'c++':
                 kws['skip_standard_flag'] = True
-            cflags0 = drv.get_compiler_flags(for_model=True, toolname=toolname,
-                                             dry_run=True, compiler=compiler,
-                                             dont_link=True, **kws)
-            lflags = drv.get_linker_flags(for_model=True, toolname=toolname,
-                                          dry_run=True, libtype='shared')
+            cflags0 = drv.get_compiler_flags(
+                for_model=True, toolname=toolname,
+                dry_run=True, compiler=compiler,
+                disable_python_c_api=disable_python_c_api,
+                with_asan=with_asan, dont_link=True, **kws)
+            lflags = drv.get_linker_flags(
+                for_model=True, toolname=toolname,
+                dry_run=True, libtype='shared', with_asan=with_asan,
+                disable_python_c_api=disable_python_c_api)
+            if language in ([drv.language] + drv.language_aliases):
+                drv.compile_dependencies(
+                    toolname=toolname, with_asan=with_asan,
+                    disable_python_c_api=disable_python_c_api)
             # Remove flags that are unnecessary
             cflags = []
             stdflags = []
@@ -414,6 +461,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         try:
             if os.path.isfile(makevar):
                 shutil.move(makevar, makevar_copy)
+            if not os.path.isdir(os.path.dirname(makevar)):
+                os.mkdir(os.path.dirname(makevar))
             with open(makevar, 'w') as fd:
                 for k, v in new_env.items():
                     if k.startswith('PKG_'):
@@ -423,6 +472,10 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             if verbose:
                 with open(makevar, 'r') as fd:
                     print(fd.read())
+            # TODO: Set DYLD_INSERT_LIBRARIES to clang dynamic library
+            # on OSX when with_asan is True. R_TESTS may need to be
+            # modified so this variable is set when the tests are run.
+            # $(clang -print-file-name=libclang_rt.asan_osx_dynamic.dylib)
             subprocess.check_call(cmd, env=env)
         finally:
             os.remove(makevar)
@@ -517,6 +570,11 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 class.
 
         """
+        # if cls.compiled_with_asan():
+        #     kwargs.setdefault('command_kwargs', {})
+        #     kwargs['command_kwargs'].setdefault(
+        #         'env', copy.deepcopy(os.environ))
+        #     cls.set_asan_env(kwargs['command_kwargs']['env'])
         if package_manager in [None, 'cran', 'CRAN']:
             if isinstance(package, list):
                 package = (

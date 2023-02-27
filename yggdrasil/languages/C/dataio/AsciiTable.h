@@ -438,8 +438,8 @@ int at_set_format_typ(asciiTable_t *t) {
   int mres;
   size_t sind, eind;
   char re_fmt[FMT_LEN];
-  sprintf(re_fmt, "%%[^%s%s]+[%s%s]",
-	  (*t).column, (*t).f.newline, (*t).column, (*t).f.newline);
+  snprintf(re_fmt, FMT_LEN, "%%[^%s%s]+[%s%s]",
+	   (*t).column, (*t).f.newline, (*t).column, (*t).f.newline);
   while (beg < strlen((*t).format_str)) {
     mres = find_match(re_fmt, (*t).format_str + beg, &sind, &eind);
     if (mres < 0) {

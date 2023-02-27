@@ -45,9 +45,9 @@ typedef enum comm_enum comm_type;
 typedef struct comm_t {
   comm_type type; //!< Comm type.
   void *other; //!< Pointer to additional information for the comm.
-  char name[COMM_NAME_SIZE]; //!< Comm name.
-  char address[COMM_ADDRESS_SIZE]; //!< Comm address.
-  char direction[COMM_DIR_SIZE]; //!< send or recv for direction messages will go.
+  char name[COMM_NAME_SIZE + 1]; //!< Comm name.
+  char address[COMM_ADDRESS_SIZE + 1]; //!< Comm address.
+  char direction[COMM_DIR_SIZE + 1]; //!< send or recv for direction messages will go.
   int flags; //!< Flags describing the status of the comm.
   int *const_flags;  //!< Flags describing the status of the comm that can be est for const.
   void *handle; //!< Pointer to handle for comm.
@@ -214,7 +214,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
     model_name = getenv("YGG_MODEL_NAME");
     address = getenv(full_name);
     if ((address == NULL) && (model_name != NULL)) {
-      char prefix[COMM_NAME_SIZE];
+      char prefix[COMM_NAME_SIZE + 1];
       snprintf(prefix, COMM_NAME_SIZE, "%s:", model_name);
       if (strncmp(prefix, full_name, strlen(prefix)) != 0) {
 	strcat(prefix, full_name);

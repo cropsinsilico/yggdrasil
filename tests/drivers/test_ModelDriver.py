@@ -123,7 +123,7 @@ class TestModelDriver(base_class):
             getattr(drv, 'numeric_logging_level')
             drv.start()
             drv.wait(False)
-            assert(not drv.errors)
+            assert not drv.errors
             drv.cleanup()
         return run_model_instance_w
 
@@ -157,31 +157,31 @@ class TestModelDriver(base_class):
 
     def test_is_installed(self, python_class, is_installed):
         r"""Assert that the tested model driver is installed."""
-        assert(python_class.is_installed())
+        assert python_class.is_installed()
 
     def test_comm_installed(self, python_class):
         r"""Tests for getting installed comm while skipping config."""
-        assert(python_class.is_comm_installed()
-               == python_class.is_comm_installed(skip_config=True))
-        assert(python_class.is_comm_installed(commtype='invalid',
-                                              skip_config=True) is False)
+        assert (python_class.is_comm_installed()
+                == python_class.is_comm_installed(skip_config=True))
+        assert (python_class.is_comm_installed(commtype='invalid',
+                                               skip_config=True) is False)
         
     def test_language_version(self, python_class, is_installed):
         r"""Test language version."""
-        assert(python_class.language_version())
+        assert python_class.language_version()
 
     def test_python2language(self, python_class, testing_options,
                              nested_approx, pandas_equality_patch):
         r"""Test python2language."""
         for a, b in testing_options.get('python2language', []):
-            assert(python_class.python2language(a) == nested_approx(b))
+            assert python_class.python2language(a) == nested_approx(b)
         
     def test_is_library_installed(self, python_class, testing_options):
         r"""Test is_library_installed for invalid library."""
         for x in testing_options.get('valid_libraries', []):
-            assert(python_class.is_library_installed(x) is True)
+            assert python_class.is_library_installed(x) is True
         for x in testing_options.get('invalid_libraries', []):
-            assert(python_class.is_library_installed(x) is False)
+            assert python_class.is_library_installed(x) is False
         
     def test_run_model(self, run_model_instance, testing_options):
         r"""Test running script used without debug."""
@@ -209,15 +209,26 @@ class TestModelDriver(base_class):
             if os.path.isfile(valgrind_log):
                 os.remove(valgrind_log)
     
+    @pytest.mark.skipif(platform._is_mac, reason="Valgrind slow on Mac")
+    @pytest.mark.skipif(platform._is_win, reason="No valgrind on windows")
+    @pytest.mark.skipif(shutil.which('valgrind') is None,
+                        reason="Valgrind not installed.")
+    def test_valgrind_debugger(self, working_dir, uuid,
+                               run_model_instance, testing_options):
+        r"""Test running with valgrind passed as with_debugger."""
+        if testing_options.get('requires_partner', False):
+            pytest.skip("requires partner model to run")
+        run_model_instance(with_debugger='valgrind')
+    
     @pytest.mark.skipif(platform._is_win or platform._is_mac,
                         reason="No strace on Windows or MacOS")
     @pytest.mark.skipif(shutil.which('strace') is None,
                         reason="strace not installed.")
-    def test_strace(self, run_model_instance, testing_options):
-        r"""Test running with strace."""
+    def test_strace_debugger(self, run_model_instance, testing_options):
+        r"""Test running with strace passed as with_debugger."""
         if testing_options.get('requires_partner', False):
             pytest.skip("requires partner model to run")
-        run_model_instance(with_valgrind=False, with_strace=True)
+        run_model_instance(with_debugger='strace')
         
     # Tests for code generation
     def test_invalid_function_param(self, python_class, instance_kwargs,
@@ -242,12 +253,12 @@ class TestModelDriver(base_class):
     def test_get_native_type(self, python_class, code_types):
         r"""Test translation to native type."""
         for a, b in code_types:
-            assert(python_class.get_native_type(datatype=a) == b)
+            assert python_class.get_native_type(datatype=a) == b
             if not isinstance(a, dict):
-                assert(
+                assert (
                     python_class.get_native_type(datatype={'type': a}) == b)
                 if a in ['float', 'int', 'uint']:
-                    assert(python_class.get_native_type(
+                    assert (python_class.get_native_type(
                         datatype={'type': 'scalar', 'subtype': a}) == b)
                 
     def test_write_declaration(self, python_class, code_types):
@@ -295,7 +306,7 @@ class TestModelDriver(base_class):
                                                    prefix='dummy',
                                                    suffix='dummy')
             lines2 = python_class.write_executable(lines1)
-            assert(lines1 == lines2)
+            assert lines1 == lines2
             # Don't run this because it is invalid
 
     def test_error_code(self, python_class, is_installed):
@@ -317,8 +328,8 @@ class TestModelDriver(base_class):
                                  guess_at_outputs_in_inputs=False, **kwargs):
             if declare_functions_as_var is None:
                 declare_functions_as_var = False
-            assert(inputs is not None)
-            assert(outputs is not None)
+            assert inputs is not None
+            assert outputs is not None
             if outputs_in_inputs is None:
                 outputs_in_inputs = python_class.outputs_in_inputs
             flag_var = {'name': 'flag',
@@ -361,8 +372,8 @@ class TestModelDriver(base_class):
                     kwargs.pop('outputs_in_inputs')
                 parsed = python_class.parse_function_definition(
                     None, 'test_function', **kwargs)
-                assert(len(parsed.get('inputs', [])) == len(inputs))
-                assert(len(parsed.get('outputs', [])) == len(outputs))
+                assert len(parsed.get('inputs', [])) == len(inputs)
+                assert len(parsed.get('outputs', [])) == len(outputs)
             except BaseException:  # pragma: debug
                 pprint.pprint(definition)
                 if parsed:
@@ -374,11 +385,11 @@ class TestModelDriver(base_class):
                 raise
             if inputs:
                 for xp, x0 in zip(parsed['inputs'], inputs):
-                    assert(xp['name'] == x0['name'])
+                    assert xp['name'] == x0['name']
                     x0.update(xp)
             if outputs:
                 for xp, x0 in zip(parsed['outputs'], outputs):
-                    assert(xp['name'] == x0['name'])
+                    assert xp['name'] == x0['name']
                     x0.update(xp)
             # Lines required to set up the function call
             lines = []
@@ -500,7 +511,7 @@ class TestModelDriver(base_class):
         if python_class.function_param is None:
             return
         for line, kwargs, splits in testing_options.get('split_lines', []):
-            assert(python_class.split_line(line, **kwargs) == splits)
+            assert python_class.split_line(line, **kwargs) == splits
 
     def test_install_model_dependencies(self, python_class, testing_options):
         r"""Test install_model_dependencies."""

@@ -193,6 +193,9 @@ class ModelDriver(Driver):
         additional_dependencies (dict, optional): A mapping between languages
             and lists of packages in those languages that are required by the
             model.
+        with_debugger (str, optional): Debugger tool that should be used
+            to run models. This string should include the tool executable
+            and any flags that should be passed to it.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -408,6 +411,7 @@ class ModelDriver(Driver):
                                   {'type': 'array',
                                    'items': {'type': 'string'}}]}}}]}}],
             'default': False},
+        'with_debugger': {'type': 'string'},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
                          'default': ['-e', 'trace=memory'],
@@ -521,12 +525,23 @@ class ModelDriver(Driver):
         self.queue_thread = None
         self.event_process_kill_called = multitasking.Event()
         self.event_process_kill_complete = multitasking.Event()
-        # Strace/valgrind
-        if self.with_strace and self.with_valgrind:
-            raise RuntimeError("Trying to run with strace and valgrind.")
-        if (((self.with_strace or self.with_valgrind)
-             and platform._is_win)):  # pragma: windows
-            raise RuntimeError("strace/valgrind options invalid on windows.")
+        # Tools
+        if self.with_debugger == 'valgrind':
+            self.with_debugger += ' --leak-check=full --show-leak-kinds=all'
+        elif self.with_debugger == 'strace':
+            self.with_debugger += ' -e trace=memory'
+        if self.with_strace:
+            # TODO: deprecate with_strace, strace_flags
+            assert not (self.with_debugger or self.with_valgrind)
+            self.with_debugger = 'strace ' + ' '.join(self.strace_flags)
+        if self.with_valgrind:
+            # TODO: deprecate with_valgrind, valgrind_flags
+            assert not (self.with_debugger or self.with_strace)
+            self.with_debugger = 'valgrind ' + ' '.join(self.valgrind_flags)
+        if ((platform._is_win and self.with_debugger
+             and self.with_debugger.startswith(('strace', 'valgrind')))):
+            raise RuntimeError("strace and valgrind are not available "
+                               "on Windows")
         self.model_index = model_index
         self.copy_index = copy_index
         self.clients = clients
@@ -861,7 +876,8 @@ class ModelDriver(Driver):
 
     @classmethod
     def install_dependency(cls, package=None, package_manager=None,
-                           arguments=None, command=None, always_yes=False):
+                           arguments=None, command=None, always_yes=False,
+                           command_kwargs=None):
         r"""Install a dependency.
 
         Args:
@@ -877,6 +893,8 @@ class ModelDriver(Driver):
             always_yes (bool, optional): If True, the package manager will
                 not ask users for input during installation. Defaults to
                 False.
+            command_kwargs (dict, optional): Keyword arguments that should
+                be passed to the subprocess call for the installation.
 
         """
         assert package
@@ -894,7 +912,8 @@ class ModelDriver(Driver):
             elif platform._is_win:
                 package_manager = 'choco'
         yes_cmd = []
-        cmd_kwargs = {}
+        if command_kwargs is None:
+            command_kwargs = {}
         if command:
             cmd = copy.copy(command)
         elif package_manager in ('conda', 'mamba'):
@@ -903,7 +922,7 @@ class ModelDriver(Driver):
                 # Conda/mamba commands must be run on the shell on
                 # windows as it is implemented as a batch script
                 cmd.insert(0, 'call')
-                cmd_kwargs['shell'] = True
+                command_kwargs['shell'] = True
             yes_cmd = ['-y']
         elif package_manager == 'brew':
             cmd = ['brew', 'install'] + package
@@ -935,9 +954,9 @@ class ModelDriver(Driver):
             cmd += arguments.split()
         if always_yes:
             cmd += yes_cmd
-        if cmd_kwargs.get('shell', False):
+        if command_kwargs.get('shell', False):
             cmd = ' '.join(cmd)
-        subprocess.check_call(cmd, **cmd_kwargs)
+        subprocess.check_call(cmd, **command_kwargs)
         
     def model_command(self):
         r"""Return the command that should be used to run the model.
@@ -964,6 +983,12 @@ class ModelDriver(Driver):
         raise NotImplementedError("language_executable not implemented for '%s'"
                                   % cls.language)
         
+    # @classmethod
+    # def compiled_with_asan(cls):
+    #     r"""Returns true if the compiled_with_asan flag is set."""
+    #     return (cls.cfg.get(
+    #         cls.language, 'compiled_with_asan', 'false').lower() == 'true')
+
     @classmethod
     def executable_command(cls, args, unused_kwargs=None, **kwargs):
         r"""Compose a command for running a program using the exectuable for
@@ -1053,11 +1078,13 @@ class ModelDriver(Driver):
         subprocess.check_call(self.validation_command.split(),
                               cwd=self.working_dir)
         
-    def run_model(self, return_process=True, **kwargs):
+    def run_model(self, command=None, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
         run_executable.
 
         Args:
+            command (list, optional): Command to run. Defaults to None
+                and is created by the model_command method.
             return_process (bool, optional): If True, the process running
                 the model is returned. If False, the process will block until
                 the model finishes running. Defaults to True.
@@ -1065,16 +1092,17 @@ class ModelDriver(Driver):
 
         """
         env = self.set_env()
-        command = self.model_command()
-        if self.with_strace or self.with_valgrind:
-            kwargs.setdefault('debug_flags', self.debug_flags)
+        if command is None:
+            command = self.model_command()
+        if self.with_debugger:
+            kwargs.setdefault('debug_flags', self.with_debugger.split())
         self.debug('Working directory: %s', self.working_dir)
         self.debug('Command: %s', ' '.join(command))
         self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
         # Update keywords
         # NOTE: Setting forward_signals to False allows faster debugging
-        # but should not be used in deployment for cases where models are not
-        # running locally.
+        # but should not be used in deployment for cases where models are
+        # not running locally.
         default_kwargs = dict(env=env, working_dir=self.working_dir,
                               forward_signals=False,
                               shell=platform._is_win)
@@ -1082,29 +1110,6 @@ class ModelDriver(Driver):
             kwargs.setdefault(k, v)
         return self.run_executable(command, return_process=return_process, **kwargs)
 
-    @property
-    def debug_flags(self):
-        r"""list: Flags that should be prepended to an executable command to
-        enable debugging."""
-        pre_args = []
-        if self.with_strace:
-            if platform._is_linux:
-                pre_args += ['strace'] + self.strace_flags
-            else:  # pragma: debug
-                raise RuntimeError("strace not supported on this OS.")
-            # TODO: dtruss cannot be run without sudo, sudo cannot be
-            # added to the model process command if it is not in the original
-            # yggdrasil CLI call, and must be tested with an executable that
-            # is not "signed with restricted entitlements" (which most built-in
-            # utilities (e.g. sleep) are).
-            # elif platform._is_mac:
-            #     if 'sudo' in sys.argv:
-            #         pre_args += ['sudo']
-            #     pre_args += ['dtruss']
-        elif self.with_valgrind:
-            pre_args += ['valgrind'] + self.valgrind_flags
-        return pre_args
-        
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):
         r"""Determine the version of this language.
@@ -1385,7 +1390,7 @@ class ModelDriver(Driver):
         return True
     
     @classmethod
-    def configure(cls, cfg):
+    def configure(cls, cfg, **kwargs):
         r"""Add configuration options for this language.
 
         Args:
@@ -1424,6 +1429,9 @@ class ModelDriver(Driver):
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
+        for k in cls._config_keys:
+            if k in kwargs:  # pragma: config
+                cfg.set(cls.language, k, kwargs[k])
         cls.after_registration(cls, cfg=cfg, second_pass=True)
         return out
 
@@ -1489,6 +1497,28 @@ class ModelDriver(Driver):
                     out.update(model_env[base_name])
         return out
 
+    # @classmethod
+    # def set_asan_env(cls, env, compiler=None):
+    #     r"""Add flags in the case that the program being run links against
+    #     a shared ASAN library.
+
+    #     Args:
+    #         env (dict): Environment variables dictionary to add library to.
+    #         compiler (Compiler): Compiler that should be used to determine
+    #             the location of the ASAN library. Defaults to the C compiler.
+
+    #     Returns:
+    #         dict: Environment variables dictionary.
+
+    #     """
+    #     if compiler is None:
+    #         drv = cls
+    #         if cls._language != 'c':
+    #             drv = import_component('model', 'c')
+    #         compiler = drv.get_tool('compiler')
+    #     compiler.init_asan_env(env)
+    #     return env
+
     @classmethod
     def set_env_class(cls, existing=None, **kwargs):
         r"""Set environment variables that are instance independent.
@@ -1506,6 +1536,8 @@ class ModelDriver(Driver):
         if existing is None:  # pragma: no cover
             existing = {}
         existing.update(os.environ)
+        # if cls.compiled_with_asan():
+        #     cls.set_asan_env(existing)
         return existing
 
     def set_env(self, existing=None, **kwargs):
@@ -1906,7 +1938,7 @@ class ModelDriver(Driver):
         remove_products(products, source_products)
             
     @classmethod
-    def cleanup_dependencies(cls, products=[], verbose=False):
+    def cleanup_dependencies(cls, products=[], verbose=False, **kws):
         r"""Cleanup dependencies."""
         for x in products:
             if os.path.isfile(x):
@@ -2249,9 +2281,9 @@ class ModelDriver(Driver):
         if yml.get('is_server', False):
             assert isinstance(yml['is_server'], dict)
         if cls.function_param is None:
-            raise ValueError(("Language %s is not parameterized "
-                              "and so functions cannot be automatically "
-                              "wrapped as a model.") % cls.language)
+            raise ValueError(f"Language {cls.language} is not parameterized "
+                             f"and so functions cannot be automatically "
+                             f"wrapped as a model.")
         source_files = cls.identify_source_files(**yml)
         if not source_files:  # pragma: debug
             raise ValueError("Could not identify any source files.")

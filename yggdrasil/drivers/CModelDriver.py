@@ -13,7 +13,6 @@ from yggdrasil.drivers.CompiledModelDriver import (
     get_compilation_tool)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
-from numpy import distutils as numpy_distutils
 
 
 _default_internal_libtype = 'object'
@@ -41,16 +40,19 @@ def get_OSX_SYSROOT():
         cfg_sdkroot = ygg_cfg.get('c', 'macos_sdkroot', None)
         if cfg_sdkroot:
             fname_try.append(cfg_sdkroot)
-        if xcode_dir is not None:
-            fname_base = os.path.join(xcode_dir, 'Platforms',
-                                      'MacOSX.platform', 'Developer',
-                                      'SDKs', 'MacOSX%s.sdk')
-            fname_try += [
-                fname_base % os.environ.get('MACOSX_DEPLOYMENT_TARGET', ''),
-                fname_base % '',
-                os.path.join(xcode_dir, 'SDKs', 'MacOSX.sdk')]
         if os.environ.get('SDKROOT', False):
-            fname_try.insert(0, os.environ['SDKROOT'])
+            fname_try.append(os.environ['SDKROOT'])
+        if xcode_dir is not None:
+            bases_try = [
+                os.path.join(xcode_dir, 'SDKs', 'MacOSX%s.sdk'),
+                os.path.join(xcode_dir, 'Platforms',
+                             'MacOSX.platform', 'Developer',
+                             'SDKs', 'MacOSX%s.sdk')]
+            vers_try = ['11.0', '']  # 11.0 used by conda-forge
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
+                vers_try.insert(0, os.environ['MACOSX_DEPLOYMENT_TARGET'])
+            for v in vers_try:
+                fname_try += [x % v for x in bases_try]
         for fcheck in fname_try:
             if os.path.isdir(fcheck):
                 fname = fcheck
@@ -78,22 +80,23 @@ class CCompilerBase(CompilerBase):
     search_regex = [r'(?:#include <...> search starts here:)|'
                     r'(?: ([^\n]+?)(?: \(framework directory\))?)\n']
 
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration including things like platform dependent properties and
-        checking environment variables for default settings.
-        """
-        if platform._is_mac:
-            cls.linker_attributes = dict(cls.linker_attributes,
-                                         search_path_flags=['-Xlinker', '-v'],
-                                         search_regex=[r'\t([^\t\n]+)\n'],
-                                         search_regex_begin='Library search paths:')
-        elif platform._is_linux:
-            cls.linker_attributes = dict(cls.linker_attributes,
-                                         search_path_flags=['-Xlinker', '--verbose'],
-                                         search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        CompilerBase.before_registration(cls)
+    # This is only needed if one of the linkers is created from the compiler
+    # @staticmethod
+    # def before_registration(cls):
+    #     r"""Operations that should be performed to modify class attributes prior
+    #     to registration including things like platform dependent properties and
+    #     checking environment variables for default settings.
+    #     """
+    #     if platform._is_mac:
+    #         cls.linker_attributes = dict(cls.linker_attributes,
+    #                                      search_path_flags=['-Xlinker', '-v'],
+    #                                      search_regex=[r'\t([^\t\n]+)\n'],
+    #                                      search_regex_begin='Library search paths:')
+    #     elif platform._is_linux:
+    #         cls.linker_attributes = dict(cls.linker_attributes,
+    #                                      search_path_flags=['-Xlinker', '--verbose'],
+    #                                      search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+    #     CompilerBase.before_registration(cls)
 
     @classmethod
     def set_env(cls, *args, **kwargs):
@@ -151,14 +154,19 @@ class GCCCompiler(CCompilerBase):
     toolname = 'gcc'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
-    linker_attributes = dict(
-        CCompilerBase.linker_attributes,
-        flag_options=OrderedDict(
-            list(LinkerBase.flag_options.items())
-            + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
-            + [('library_rpath', '-Wl,-rpath')]))
+    default_linker = 'gcc'
+    is_linker = False
+    # linker_attributes = dict(
+    #     CCompilerBase.linker_attributes,
+    #     flag_options=OrderedDict(
+    #         list(LinkerBase.flag_options.items())
+    #         + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
+    #         + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
+    asan_flags = ['-fsanitize=address']
+    preload_envvar = 'LD_PRELOAD'
+    object_tool = "ldd"
 
     @classmethod
     def is_installed(cls):
@@ -169,10 +177,11 @@ class GCCCompiler(CCompilerBase):
 
         """
         out = super(GCCCompiler, cls).is_installed()
+        # Disable gcc when it is an alias for clang
         if out and platform._is_mac:  # pragma: debug
-            ver = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+            ver = cls.tool_version()
             if 'clang' in ver:
-                out = False  # Disable gcc when it is an alias for clang
+                out = False
         return out
 
     def dll2a(cls, dll, dst=None, overwrite=False):
@@ -225,6 +234,9 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
+    asan_flags = ['-fsanitize=address']
+    preload_envvar = 'DYLD_INSERT_LIBRARIES'
+    object_tool = "otool -L"
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
     is_linker = False
@@ -280,7 +292,8 @@ class MSVCCompiler(CCompilerBase):
                              flag_options=OrderedDict(
                                  [('library_libs', ''),
                                   ('library_libs_nonstd', ''),
-                                  ('library_dirs', '/LIBPATH:%s')]),
+                                  ('library_dirs', '/LIBPATH:%s'),
+                                  ('import_lib', '/IMPLIB:%s')]),
                              shared_library_flag='/DLL',
                              search_path_envvar=['LIB'],
                              search_path_flags=None)
@@ -314,8 +327,7 @@ class MSVCCompiler(CCompilerBase):
             str: Version of the tool.
 
         """
-        out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
+        out = super(MSVCCompiler, cls).tool_version()
         if 'Copyright' not in out:  # pragma: debug
             raise RuntimeError("Version call failed: %s" % out)
         return out.split('Copyright')[0]
@@ -333,6 +345,7 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+    asan_flags = ['-fsanitize=address']
 
     @classmethod
     def tool_version(cls, **kwargs):
@@ -345,17 +358,30 @@ class LDLinker(LinkerBase):
             str: Version of the tool.
 
         """
-        out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
-        if platform._is_mac:
-            regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
-        else:
-            regex = (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
-                     r'(?P<version>\d+(?:\.\d+){0,2})')
-        match = re.search(regex, out)
+        out = super(LDLinker, cls).tool_version(**kwargs)
+        for regex in [r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
+                      (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
+                       r'(?P<version>\d+(?:\.\d+){0,2})')]:
+            match = re.search(regex, out)
+            if match is not None:
+                break
         if match is None:  # pragma: debug
-            raise RuntimeError("Could not locate version in string: %s" % out)
+            raise RuntimeError(f"Could not locate version in string: {out}")
         return match.group('version')
+
+
+class GCCLinker(LDLinker):
+    r"""Interface class for gcc linker (calls to ld)."""
+    toolname = GCCCompiler.toolname
+    aliases = GCCCompiler.aliases
+    languages = GCCCompiler.languages
+    platforms = GCCCompiler.platforms
+    default_executable = GCCCompiler.default_executable
+    toolset = GCCCompiler.toolset
+    search_path_flags = ['-Xlinker', '--verbose']
+    search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
+    flag_options = OrderedDict(LDLinker.flag_options,
+                               **{'library_rpath': '-Wl,-rpath'})
 
 
 class ClangLinker(LDLinker):
@@ -373,6 +399,7 @@ class ClangLinker(LDLinker):
                                **{'linker-version': '-mlinker-version=%s',
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
+    asan_flags = ['-fsanitize=address', '-shared-libasan']
 
     @staticmethod
     def before_registration(cls):
@@ -382,11 +409,29 @@ class ClangLinker(LDLinker):
         """
         LDLinker.before_registration(cls)
         if platform._is_win:  # pragma: windows
-            # One windows clang calls the MSVC linker LINK.exe which does not
+            # On windows clang calls the MSVC linker LINK.exe which does not
             # accept rpath. Runtime libraries must be in the same directory
             # as the executable or a directory in the PATH env variable.
             cls.flag_options.pop('library_rpath', None)
 
+    @classmethod
+    def tool_version(cls, **kwargs):
+        r"""Determine the version of this tool.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of the tool.
+
+        """
+        out = super(LDLinker, cls).tool_version(**kwargs)
+        regex = r'clang version (?P<version>\d+\.\d+\.\d+)'
+        match = re.search(regex, out)
+        if match is None:  # pragma: debug
+            raise RuntimeError(f"Could not locate version in string: {out}")
+        return match.group('version')
+        
     @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of linker flags."""
@@ -396,10 +441,8 @@ class ClangLinker(LDLinker):
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
-        out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
-        regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
-        match = re.search(regex, out)
-        if (match is not None) and (int(match.group('version')) >= 10):
+        ver = cls.tool_version()
+        if int(ver.split('.')[0]) >= 10:
             ld_version = LDLinker.tool_version()
             if float(ld_version.split('.')[0]) < 520:  # pragma: version
                 # No longer covered as the default conda
@@ -437,6 +480,7 @@ class ARArchiver(ArchiverBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIBRARY_PATH']
+    asan_flags = []
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -447,6 +491,7 @@ class LibtoolArchiver(ArchiverBase):
     static_library_flag = '-static'  # This is the default
     toolset = 'clang'
     search_path_envvar = ['LIBRARY_PATH']
+    asan_flags = []
     
 
 class MSVCArchiver(ArchiverBase):
@@ -503,7 +548,11 @@ try:
 except BaseException as e:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
     _python_lib = None
-_numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
+try:
+    _numpy_inc = [np.get_include()]
+except AttributeError:  # pragma: debug
+    from numpy import distutils as numpy_distutils
+    _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
 
 
@@ -511,6 +560,7 @@ class CModelDriver(CompiledModelDriver):
     r"""Class for running C models."""
 
     _schema_subtype_description = ('Model is written in C.')
+    _deprecated_drivers = ['GCCModelDriver']
     language = 'c'
     language_ext = ['.c', '.h']
     interface_library = 'ygg'
@@ -535,9 +585,11 @@ class CModelDriver(CompiledModelDriver):
         'numpy': {'include': os.path.join(_numpy_inc[0], 'numpy',
                                           'arrayobject.h'),
                   'libtype': 'header_only',
-                  'language': 'c'},
+                  'language': 'c',
+                  'for_python_api': True},
         'python': {'include': os.path.join(_python_inc, 'Python.h'),
-                   'language': 'c'}}
+                   'language': 'c',
+                   'for_python_api': True}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'language': 'c',
@@ -573,6 +625,7 @@ class CModelDriver(CompiledModelDriver):
                            'libtype': 'shared',
                            'external_dependencies': ['python', 'numpy'],
                            'linker_language': 'c',
+                           'for_python_api': True,
                            'include_dirs': [_top_lang_dir]}}
     type_map = {
         'comm': 'comm_t*',
@@ -659,15 +712,15 @@ class CModelDriver(CompiledModelDriver):
                             '{use_generic})'),
         'init_type_empty': ('create_dtype_empty({use_generic})'),
         'init_type_schema': ('create_dtype_schema({use_generic})'),
-        'copy_array': '{name} = copy_json_array({value});',
-        'copy_object': '{name} = copy_json_object({value});',
-        'copy_schema': '{name} = copy_schema({value});',
+        'copy_array': 'copy_generic_into(&{name}, {value});',
+        'copy_object': 'copy_generic_into(&{name}, {value});',
+        'copy_schema': 'copy_generic_into(&{name}, {value});',
         'copy_ply': '{name} = copy_ply({value});',
         'copy_obj': '{name} = copy_obj({value});',
         'copy_class': '{name} = copy_python({value});',
         'copy_function': '{name} = copy_python({value});',
-        'copy_instance': '{name} = copy_generic({value});',
-        'copy_any': '{name} = copy_generic({value});',
+        'copy_instance': 'copy_generic_into(&{name}, {value});',
+        'copy_any': 'copy_generic_into(&{name}, {value});',
         'free_array': 'free_json_array({variable});',
         'free_object': 'free_json_object({variable});',
         'free_schema': 'free_schema({variable});',
@@ -832,15 +885,16 @@ class CModelDriver(CompiledModelDriver):
                 raise ValueError("Path to vcpkg root directory "
                                  "does not exist: %s." % vcpkg_dir)
             cfg.set(cls._language, 'vcpkg_dir', vcpkg_dir)
-        if macos_sdkroot is None:
-            macos_sdkroot = _osx_sysroot
-        if macos_sdkroot is not None:
-            if not os.path.isdir(macos_sdkroot):  # pragma: debug
-                raise ValueError("Path to MacOS SDK root directory "
-                                 "does not exist: %s." % macos_sdkroot)
-            cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
-        # Call __func__ to avoid direct invoking of class which dosn't exist
-        # in after_registration where this is called
+        if cls._language == 'c':
+            if macos_sdkroot is None:
+                macos_sdkroot = cfg.get('c', 'macos_sdkroot', _osx_sysroot)
+            if macos_sdkroot is not None:
+                if not os.path.isdir(macos_sdkroot):  # pragma: debug
+                    raise ValueError(f"Path to MacOS SDK root directory "
+                                     f"does not exist: {macos_sdkroot}")
+                cfg.set('c', 'macos_sdkroot', macos_sdkroot)
+        # Call __func__ to avoid direct invoking of class which dosn't
+        # exist in after_registration where this is called
         out = CompiledModelDriver.configure.__func__(cls, cfg, **kwargs)
         # Change configuration to be directory containing include files
         rjlib = cfg.get(cls._language, 'rapidjson_include', None)
@@ -1824,10 +1878,13 @@ class CModelDriver(CompiledModelDriver):
                     raise RuntimeError("Length must be set in order "
                                        "to write array assignments.")
                 elif (dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
-                      in ['bytes']):
-                    src_var_length = '(strlen(%s)+1)' % src_var['name']
+                      in ['bytes', 'string']):
+                    src_var_length = 'strlen(%s)' % src_var['name']
                 else:
-                    src_var_length = '(strlen4(%s)+1)' % src_var['name']
+                    src_var_length = 'strlen4(%s)' % src_var['name']
+            if ((dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
+                 in ['bytes', 'string', 'unicode'])):
+                src_var_length = f"({src_var_length}+1)"
             src_var_dtype = cls.get_native_type(**src_var)
             if src_var_dtype in ['bytes_t', 'unicode_t', 'string_t']:
                 src_var_dtype = 'char*'

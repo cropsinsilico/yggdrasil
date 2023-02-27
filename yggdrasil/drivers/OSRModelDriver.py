@@ -47,7 +47,9 @@ class OSRModelDriver(ExecutableModelDriver):
         'copy_xml_to_osr': {'type': 'boolean', 'default': False},
         'update_interval': {'type': 'object',
                             'additionalProperties': {'type': 'float'},
-                            'default': {'timesync': 1.0}}}
+                            'default': {'timesync': 1.0}},
+        'disable_python_c_api': {'type': 'boolean'},
+        'with_asan': {'type': 'boolean'}}
     executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
@@ -96,7 +98,11 @@ class OSRModelDriver(ExecutableModelDriver):
                 os.path.basename(self.model_file))
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
-        self.compile_dependencies()
+        compile_kwargs = {}
+        for k in CPPModelDriver.kwargs_in_suffix:
+            if hasattr(self, k):
+                compile_kwargs[k] = getattr(self, k)
+        self.compile_dependencies(**compile_kwargs)
         assert os.path.isfile(self.executable_path)
 
     @classmethod
@@ -119,7 +125,8 @@ class OSRModelDriver(ExecutableModelDriver):
             lib, **kwargs)  # pragma: debug
 
     @classmethod
-    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None):
+    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None,
+                             **kwargs):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
 
         Args:
@@ -129,6 +136,8 @@ class OSRModelDriver(ExecutableModelDriver):
             toolname (str, optional): C++ compiler that should be used. Forced
                 to be 'cl.exe' on windows. Otherwise the default C++ compiler will
                 be used.
+            **kwargs: Additional keyword arguments are passed to the
+                compile_dependencies methods of the base classes.
 
         """
         if (cls.repository is not None) and CPPModelDriver.is_installed():
@@ -164,10 +173,21 @@ class OSRModelDriver(ExecutableModelDriver):
                 cwd = os.path.join(cwd, 'StaticBuild_win64')
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
+            flag_options = ''
+            for k in CPPModelDriver.kwargs_in_suffix:
+                if k in ['commtype'] or not kwargs.get(k, False):
+                    continue
+                # if k in ['commtype']:
+                #     flag_options += f" --{k.replace('_', '-')}={kwargs[k]}"
+                # else:
+                flag_options += f" --{k.replace('_', '-')}"
+            if flag_options:
+                env['YGG_OSR_FLAG_OPTIONS'] = flag_options.strip()
             if target != 'cleanygg':
                 for x in cls.base_languages:
                     base_cls = import_component('model', x)
-                    base_cls.compile_dependencies(toolname=toolname)
+                    base_cls.compile_dependencies(toolname=toolname,
+                                                  **kwargs)
             elif not os.path.isfile(cls.executable_path):
                 return
             cmd = ['make', target] + flags

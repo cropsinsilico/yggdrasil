@@ -74,6 +74,9 @@ public:
 		 const bool always_generic=false) :
     type_((const char*)malloc(STRBUFF)), type_code_(-1), updated_(false),
     nbytes_(0), use_generic_(use_generic), always_generic_(always_generic) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("MetaschemaType: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (always_generic_)
       update_use_generic(true);
     if (!(PyDict_Check(pyobj))) {
@@ -84,6 +87,7 @@ public:
 			   "MetaschemaType: type: ",
 			   T_STRING, STRBUFF);
     update_type(ctype);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
     @brief Copy constructor.
@@ -149,10 +153,15 @@ public:
     @returns PyObject* Python dictionary.
    */
   virtual PyObject* as_python_dict() const {
-    PyObject* out = PyDict_New();
+    PyObject* out = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("MetaschemaType::as_python_dict: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+    out = PyDict_New();
     set_item_python_dict_c(out, "type", type_,
 			   "MetaschemaType::as_python_dict: type: ",
 			   T_STRING, STRBUFF);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return out;
   }
   /*!
@@ -672,7 +681,11 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   virtual YggGeneric* python2c(PyObject* pyobj) const {
-    YggGeneric* cobj = new YggGeneric(this, NULL, 0);
+    YggGeneric* cobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("MetaschemaType::python2c: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+    cobj = new YggGeneric(this, NULL, 0);
     void** data = cobj->get_data_pointer();
     void* idata = (void*)realloc(data[0], nbytes());
     if (idata == NULL) {
@@ -711,6 +724,7 @@ public:
       cobj->set_nbytes(strlen((char*)idata));
     }
     data[0] = idata;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return cobj;
   }
   /*!
@@ -720,6 +734,9 @@ public:
    */
   virtual PyObject* c2python(YggGeneric *cobj) const {
     PyObject *pyobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("MetaschemaType::c2python: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     void *src = cobj->get_data();
     size_t precision = 0;
     switch (type_code_) {
@@ -749,6 +766,7 @@ public:
     pyobj = convert_c2python(src, type_code_,
 			     "MetaschemaType::c2python: ",
 			     precision);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return pyobj;
   }
   /*!
@@ -1741,7 +1759,6 @@ size_t YggGeneric::get_data_map_size() const {
   return map->size();
 };
 bool YggGeneric::has_data_map_key(char* key) const {
-  size_t i;
   if (type->type_code() != T_OBJECT) {
     ygglog_throw_error("YggGeneric::get_data_map_keys: Object is not a map.");
   }

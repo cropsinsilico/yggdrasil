@@ -61,6 +61,7 @@ public:
       properties[itr->name.GetString()] = iprop;
     }
     update_properties(properties, true);
+    free_properties(properties);
   }
   /*!
     @brief Constructor for JSONObjectMetaschemaType from Python dictionary.
@@ -73,6 +74,9 @@ public:
 			   const char prop_key[100]="properties") :
     // Always generic
     MetaschemaType(pyobj, true) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("JSONObjectMetaschemaType: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     UNUSED(use_generic);
     prop_key_[0] = '\0';
     strncpy(prop_key_, prop_key, 100);
@@ -100,6 +104,8 @@ public:
       properties[ikey] = iprop;
     }
     update_properties(properties, true);
+    free_properties(properties);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   }
   /*!
     @brief Copy constructor.
@@ -119,12 +125,15 @@ public:
     @brief Free properties.
    */
   void free_properties() {
+    free_properties(properties_);
+  }
+  void free_properties(MetaschemaTypeMap& properties) {
     MetaschemaTypeMap::iterator it;
-    for (it = properties_.begin(); it != properties_.end(); it++) {
+    for (it = properties.begin(); it != properties.end(); it++) {
       delete it->second;
       it->second = NULL;
     }
-    properties_.clear();
+    properties.clear();
   }
   /*!
     @brief Equivalence operator.
@@ -188,6 +197,9 @@ public:
    */
   PyObject* as_python_dict() const override {
     PyObject* out = MetaschemaType::as_python_dict();
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("JSONObjectMetaschemaType::as_python_dict: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     PyObject* pyprops = PyDict_New();
     MetaschemaTypeMap::const_iterator it;
     for (it = properties_.begin(); it != properties_.end(); it++) {
@@ -199,6 +211,7 @@ public:
     set_item_python_dict(out, prop_key_, pyprops,
 			 "JSONObjectMetaschemaType::as_python_dict: ",
 			 T_OBJECT);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return out;
   }
   /*!
@@ -519,6 +532,10 @@ public:
     @returns YggGeneric* Pointer to C object.
    */
   YggGeneric* python2c(PyObject* pyobj) const override {
+    YggGeneric* cobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("JSONObjectMetaschemaType::python2c: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
     if (!(PyDict_Check(pyobj))) {
       ygglog_throw_error("JSONObjectMetaschemaType::python2c: Python object must be a dict.");
     }
@@ -536,7 +553,8 @@ public:
       YggGeneric *ic_item = it->second->python2c(ipy_item);
       (*cmap)[it->first] = ic_item;
     }
-    YggGeneric* cobj = new YggGeneric(this, cmap);
+    cobj = new YggGeneric(this, cmap);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return cobj;
   }
   /*!
@@ -546,7 +564,11 @@ public:
    */
   PyObject* c2python(YggGeneric* cobj) const override {
     initialize_python("JSONObjectMetaschemaType::c2python: ");
-    PyObject *pyobj = PyDict_New();
+    PyObject *pyobj = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+    ygglog_throw_error("JSONObjectMetaschemaType::c2python: Python disabled");
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+    pyobj = PyDict_New();
     if (pyobj == NULL) {
       ygglog_throw_error("JSONObjectMetaschemaType::c2python: Failed to create new Python dict.");
     }
@@ -566,6 +588,7 @@ public:
 	ygglog_throw_error("JSONObjectMetaschemaType::c2python: Error setting item %s in the Python dict.", it->first.c_str());
       }
     }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     return pyobj;
   }
 

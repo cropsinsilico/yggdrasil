@@ -503,11 +503,17 @@ void initialize_python(const char* error_prefix="") {
 PyObject* import_python_module(const char* module_name,
 			       const char* error_prefix="") {
   initialize_python(error_prefix);
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  PyObject* out = NULL;
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   PyObject* out = PyImport_ImportModule(module_name);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   if (out == NULL) {
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
     // if (PyErr_Occurred()) {
     PyErr_Print();
     //}
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
     ygglog_throw_error("%simport_python_module: Failed to import Python module '%s'.",
 		       error_prefix, module_name);
   }
@@ -524,16 +530,25 @@ PyObject* import_python_module(const char* module_name,
  */
 PyObject* import_python_class(const char* module_name, const char* class_name,
 			      const char* error_prefix="") {
+  PyObject *out = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  UNUSED(module_name);
+  UNUSED(class_name);
+  ygglog_throw_error("%simport_python_class: Python disabled", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   PyObject *py_module = import_python_module(module_name,
 					     error_prefix);
-  PyObject *out = PyObject_GetAttrString(py_module, class_name);
-  Py_DECREF(py_module);
+  if (py_module) { 
+      out = PyObject_GetAttrString(py_module, class_name);
+      Py_DECREF(py_module);
+  }
   if (out == NULL) {
     //if (PyErr_Occurred()) {
     PyErr_Print();
     //}
     ygglog_throw_error("import_python_class: Failed to import Python class '%s'.", class_name);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   return out;
 };
 
@@ -546,10 +561,14 @@ PyObject* import_python_class(const char* module_name, const char* class_name,
  */
 void check_python_object(PyObject *pyobj, int type_code=-1,
 			 const char* prefix="") {
-  char type_name[100] = "";
-  int result = 0;
   if (type_code < 0)
     return;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  UNUSED(pyobj);
+  ygglog_throw_error("%scheck_python_object: Python disabled.", prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+  char type_name[100] = "";
+  int result = 0;
   switch (type_code) {
   case T_ARRAY: {
     result = PyList_Check(pyobj);
@@ -606,6 +625,7 @@ void check_python_object(PyObject *pyobj, int type_code=-1,
     PyErr_Print();
     ygglog_throw_error("%scheck_python_object: Python error.", prefix);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 
@@ -625,6 +645,11 @@ void convert_python2c(PyObject *pyobj, void *dst, int type_code,
   if (dst == NULL) {
     ygglog_throw_error("%sconvert_python2c: Destination is NULL.", error_prefix);
   }
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  UNUSED(pyobj);
+  UNUSED(precision);
+  ygglog_throw_error("%sconvert_python2c: Python disabled.", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   // check_python_object(pyobj, type_code, error_prefix);
   char type_name[100] = "";
   switch (type_code) {
@@ -803,6 +828,7 @@ void convert_python2c(PyObject *pyobj, void *dst, int type_code,
   if (PyErr_Occurred() != NULL) {
     ygglog_throw_error("%sconvert_python2c: Python error.", error_prefix);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 /*!
@@ -823,6 +849,10 @@ PyObject* convert_c2python(const void *src, int type_code,
   if (src == NULL) {
     ygglog_throw_error("%sconvert_c2python: C pointer is NULL.", error_prefix);
   }
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sconvert_c2python: Python disabled.", error_prefix);
+  return dst;
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   char type_name[100] = "";
   switch (type_code) {
   case T_ARRAY: {
@@ -977,6 +1007,7 @@ PyObject* convert_c2python(const void *src, int type_code,
     ygglog_throw_error("%sconvert_c2python: Python error.", error_prefix);
   }
   return dst;
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 /*!
@@ -987,7 +1018,10 @@ PyObject* convert_c2python(const void *src, int type_code,
  */
 PyObject* new_python_list(int N, const char* error_prefix="") {
   initialize_python(error_prefix);
-  PyObject *out = PyList_New(N);
+  PyObject *out = NULL;
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
+  out = PyList_New(N);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   if (out == NULL) {
     ygglog_throw_error("%sFailed to initialize Python list.");
   }
@@ -1001,7 +1035,10 @@ PyObject* new_python_list(int N, const char* error_prefix="") {
  */
 PyObject* new_python_dict(const char* error_prefix="") {
   initialize_python(error_prefix);
-  PyObject *out = PyDict_New();
+  PyObject *out = NULL;
+#ifndef YGGDRASIL_DISABLE_PYTHON_C_API
+  out = PyDict_New();
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   if (out == NULL) {
     ygglog_throw_error("%sFailed to initialize Python dict.");
   }
@@ -1019,12 +1056,16 @@ PyObject* new_python_dict(const char* error_prefix="") {
 void set_item_python_list(PyObject *pyobj, size_t index,
 			  PyObject *item, const char* error_prefix="",
 			  int type_code=-1) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   check_python_object(pyobj, (int)T_ARRAY, error_prefix);
   check_python_object(item, type_code, error_prefix);
   if (PyList_SetItem(pyobj, index, item) < 0) {
     ygglog_throw_error("%sFailed to set element %zu.",
 		       error_prefix, index);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 /*!
@@ -1039,10 +1080,15 @@ void set_item_python_list(PyObject *pyobj, size_t index,
 void set_item_python_list_c(PyObject *pyobj, size_t index, const void *item,
 			    const char* error_prefix="",
 			    int type_code=-1, size_t precision=0) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+  return;
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   PyObject *py_item = convert_c2python(item, type_code, error_prefix,
 				       precision);
   return set_item_python_list(pyobj, index, py_item,
 			      error_prefix, type_code);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 /*!
@@ -1056,12 +1102,16 @@ void set_item_python_list_c(PyObject *pyobj, size_t index, const void *item,
 void set_item_python_dict(PyObject *pyobj, const char* key,
 			  PyObject *item, const char* error_prefix="",
 			  int type_code=-1) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   check_python_object(pyobj, T_OBJECT, error_prefix);
   check_python_object(item, type_code, error_prefix);
   if (PyDict_SetItemString(pyobj, key, item) < 0) {
     ygglog_throw_error("%sFailed to set element %s.",
 		       error_prefix, key);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 /*!
@@ -1076,10 +1126,15 @@ void set_item_python_dict(PyObject *pyobj, const char* key,
 void set_item_python_dict_c(PyObject *pyobj, const char* key,
 			    const void *item, const char* error_prefix="",
 			    int type_code=-1, size_t precision=0) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+  return;
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   PyObject *py_item = convert_c2python(item, type_code, error_prefix,
 				       precision);
   return set_item_python_dict(pyobj, key, py_item,
 			      error_prefix, type_code);
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 /*!
@@ -1095,7 +1150,11 @@ PyObject *get_item_python_list(PyObject *pyobj, size_t index,
 			       const char* error_prefix="",
 			       int type_code=-1,
 			       bool allow_null=false) {
-  PyObject *out = PyList_GetItem(pyobj, index);
+  PyObject *out = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+  out = PyList_GetItem(pyobj, index);
   if ((out == NULL) && (!(allow_null))) {
     ygglog_throw_error("%sFailed to get element %zu.",
 		       error_prefix, index);
@@ -1103,6 +1162,7 @@ PyObject *get_item_python_list(PyObject *pyobj, size_t index,
   if (out != NULL) {
     check_python_object(pyobj, type_code, error_prefix);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   return out;
 };
 
@@ -1120,11 +1180,15 @@ void get_item_python_list_c(PyObject *pyobj, size_t index, void *dst,
 			    const char* error_prefix="",
 			    int type_code=-1, size_t precision=0,
 			    bool allow_null=false) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   PyObject *out = get_item_python_list(pyobj, index, error_prefix,
 				       type_code, allow_null);
   if (out != NULL) {
     convert_python2c(out, dst, type_code, error_prefix, precision);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 /*!
@@ -1140,7 +1204,11 @@ PyObject *get_item_python_dict(PyObject *pyobj, const char* key,
 			       const char* error_prefix="",
 			       int type_code=-1,
 			       bool allow_null=false) {
-  PyObject *out = PyDict_GetItemString(pyobj, key);
+  PyObject *out = NULL;
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+  out = PyDict_GetItemString(pyobj, key);
   if ((out == NULL) && (!(allow_null))) {
     ygglog_throw_error("%sFailed to get element for key '%s'.",
 		       error_prefix, key);
@@ -1148,6 +1216,7 @@ PyObject *get_item_python_dict(PyObject *pyobj, const char* key,
   if (out != NULL) {
     check_python_object(pyobj, type_code, error_prefix);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   return out;
 };
 
@@ -1165,11 +1234,15 @@ void get_item_python_dict_c(PyObject *pyobj, const char* key,
 			    void *dst, const char* error_prefix="",
 			    int type_code=-1, size_t precision=0,
 			    bool allow_null=false) {
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+  ygglog_throw_error("%sPython disabled", error_prefix);
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
   PyObject *out = get_item_python_dict(pyobj, key, error_prefix,
 				       type_code, allow_null);
   if (out != NULL) {
     convert_python2c(out, dst, type_code, error_prefix, precision);
   }
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 };
 
 
