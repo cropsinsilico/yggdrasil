@@ -3278,7 +3278,7 @@ class CompiledModelDriver(ModelDriver):
                     drv = import_component('model', d_lang)
                 sub_deps = [(d_lang, x) for x in
                             drv.get_dependency_order(d[1], **kws)]
-                if not sub_deps:
+                if not sub_deps:  # pragma: debug
                     continue
             else:
                 dep_info = cls.get_dependency_info(d, toolname=toolname, default={})
