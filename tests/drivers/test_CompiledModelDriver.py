@@ -68,24 +68,23 @@ def test_locate_library_file():
     r"""Test locate_file method for compiler."""
     from yggdrasil.drivers.CModelDriver import CModelDriver
     compiler = CModelDriver.get_tool('compiler').__class__
-    fname = None
-    libtype = None
+    files = {}
     for k in ['shared', 'static']:
         fname = CModelDriver.external_libraries['zmq'].get(k, '')
-        libtype = k
         if os.path.isfile(fname):
-            break
-    else:
+            files[k] = fname
+    if not files:
         pytest.skip("Test library (zmq) doesn't exist")
-    assert compiler.locate_file(fname) == fname
-    assert compiler.locate_file('zmq', libtype=libtype) == fname
-    if libtype == 'static':
-        assert compiler.archiver().locate_file('zmq') == fname
-    if libtype == 'shared':
-        assert compiler.linker().locate_file('zmq') == fname
-    if platform._is_win:
+    for libtype, fname in files.items():
+        assert compiler.locate_file(fname) == fname
+        assert compiler.locate_file('zmq', libtype=libtype) == fname
+        if libtype == 'static':
+            assert compiler.archiver().locate_file('zmq') == fname
+        if libtype == 'shared':
+            assert compiler.linker().locate_file('zmq') == fname
+    if platform._is_win and 'shared' in files:
         assert (compiler.locate_file('zmq', libtype='windows_import')
-                == fname)
+                == files['shared'])
 
 
 def test_CompilationToolBase():
