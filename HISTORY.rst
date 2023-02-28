@@ -2,7 +2,7 @@
 History
 =======
 
-1.8.5 (2023-??-??) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
+1.8.5 (2023-02-28) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
 ------------------
 * Fix bug where yggcompile was compiling some languages multiple times
 * Allow yggcompile to be called like yggcc
