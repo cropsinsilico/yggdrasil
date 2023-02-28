@@ -1,6 +1,7 @@
 #include "../tools.h"
 #include "datatypes.h"
 #include "utils.h"
+#include "serialization.h"
 
 #define RAPIDJSON_YGGDRASIL
 #include "rapidjson/document.h"
@@ -23,8 +24,6 @@
 
 // C++ functions
 rapidjson::Document::AllocatorType& generic_allocator(generic_t& x) {
-  if (x.allocator)
-    return ((rapidjson::Document::AllocatorType*)(x.allocator))[0];
   if (x.obj == NULL)
     ygglog_throw_error("generic_allocator: Not initialized");
   return ((rapidjson::Document*)(x.obj))->GetAllocator();
@@ -41,139 +40,35 @@ rapidjson::Document::AllocatorType& dtype_allocator(dtype_t& x) {
   return s->GetAllocator();
 };
 
-rapidjson::Document* type_from_doc(const rapidjson::Value &type_doc) {
-  if (!(type_doc.IsObject()))
-    ygglog_throw_error("type_from_doc: Parsed document is not an object.");
-  if (!(type_doc.HasMember("serializer") || !type_doc["serializer"].IsObject()))
-    ygglog_throw_error("type_from_doc: Parsed document does not have a serializer field");
-  if (!(type_doc["serializer"].HasMember("datatype")) || !type_doc["serializer"]["datatype"].IsObject())
-    ygglog_throw_error("type_from_doc: Parsed document does not have datatype field");
-  rapidjson::Document* out = new rapidjson::Document;
-  type_doc["serializer"]["datatype"].Accept(*out);
-  out->FinalizeFromStack();
-  return out;
-};
+// rapidjson::Document* type_from_doc(const rapidjson::Value &type_doc) {
+//   if (!(type_doc.IsObject()))
+//     ygglog_throw_error("type_from_doc: Parsed document is not an object.");
+//   if (!(type_doc.HasMember("serializer") || !type_doc["serializer"].IsObject()))
+//     ygglog_throw_error("type_from_doc: Parsed document does not have a serializer field");
+//   if (!(type_doc["serializer"].HasMember("datatype")) || !type_doc["serializer"]["datatype"].IsObject())
+//     ygglog_throw_error("type_from_doc: Parsed document does not have datatype field");
+//   rapidjson::Document* out = new rapidjson::Document;
+//   type_doc["serializer"]["datatype"].Accept(*out);
+//   out->FinalizeFromStack();
+//   return out;
+// };
 
 
-rapidjson::Document* type_from_header_doc(const rapidjson::Value &header_doc) {
-  if (!(header_doc.IsObject()))
-    ygglog_throw_error("type_from_header_doc: Parsed document is not an object.");
-  if (!(header_doc.HasMember("serializer")))
-    ygglog_throw_error("type_from_header_doc: Parsed header dosn't contain serializer information.");
-  if (!(header_doc["serializer"].IsObject()))
-    ygglog_throw_error("type_from_header_doc: Serializer info in parsed header is not an object.");
-  if (!(header_doc["serializer"].HasMember("datatype")))
-    ygglog_throw_error("type_from_header_doc: Parsed header dosn't contain type information.");
-  if (!(header_doc["serializer"]["datatype"].IsObject()))
-    ygglog_throw_error("type_from_header_doc: Type information in parsed header is not an object.");
-  // TODO: Add information from header_doc like format_str?
-  return type_from_doc(header_doc["serializer"]["datatype"]);
-};
+// rapidjson::Document* type_from_header_doc(const rapidjson::Value &header_doc) {
+//   if (!(header_doc.IsObject()))
+//     ygglog_throw_error("type_from_header_doc: Parsed document is not an object.");
+//   if (!(header_doc.HasMember("serializer")))
+//     ygglog_throw_error("type_from_header_doc: Parsed header dosn't contain serializer information.");
+//   if (!(header_doc["serializer"].IsObject()))
+//     ygglog_throw_error("type_from_header_doc: Serializer info in parsed header is not an object.");
+//   if (!(header_doc["serializer"].HasMember("datatype")))
+//     ygglog_throw_error("type_from_header_doc: Parsed header dosn't contain type information.");
+//   if (!(header_doc["serializer"]["datatype"].IsObject()))
+//     ygglog_throw_error("type_from_header_doc: Type information in parsed header is not an object.");
+//   // TODO: Add information from header_doc like format_str?
+//   return type_from_doc(header_doc["serializer"]["datatype"]);
+// };
 
-
-bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
-  // Type
-  if (!(head_doc.IsObject())) {
-    ygglog_error("update_header_from_doc: head document must be an object.");
-    return false;
-  }
-  // Meta
-  if (!(head_doc.HasMember("__meta__"))) {
-    ygglog_error("update_header_from_doc: No __meta__ information in the header.");
-    return false;
-  }
-  rapidjson::Value &meta_doc = head_doc["__meta__"];
-  // Size
-  if (!(meta_doc.IsObject())) {
-    ygglog_error("update_header_from_doc: __meta__ is not an object.");
-    return false;
-  }
-  if (!(meta_doc.HasMember("size"))) {
-    ygglog_error("update_header_from_doc: No size information in the header.");
-    return false;
-  }
-  if (!(meta_doc["size"].IsInt())) {
-    ygglog_error("update_header_from_doc: Size is not integer.");
-    return false;
-  }
-  head.size = (size_t)(meta_doc["size"].GetInt());
-  if (head.bodysiz < head.size) {
-    head.flags = head.flags | HEAD_FLAG_MULTIPART;
-  } else {
-    head.flags = head.flags & ~HEAD_FLAG_MULTIPART;
-  }
-  // Flag specifying that type is in data
-  if (meta_doc.HasMember("in_data")) {
-    if (!(meta_doc["in_data"].IsBool())) {
-      ygglog_error("update_header_from_doc: in_data is not boolean.");
-      return false;
-    }
-    if (meta_doc["in_data"].GetBool()) {
-      head.flags = head.flags | HEAD_META_IN_DATA;
-    } else {
-      head.flags = head.flags & ~HEAD_META_IN_DATA;
-    }
-  }
-  // String fields
-  const char **n;
-  const char *string_fields[] = {"address", "id", "request_id", "response_address",
-				 "zmq_reply", "zmq_reply_worker",
-				 "model", ""};
-  n = string_fields;
-  while (strcmp(*n, "") != 0) {
-    if (meta_doc.HasMember(*n)) {
-      if (!(meta_doc[*n].IsString())) {
-	ygglog_error("update_header_from_doc: '%s' is not a string.", *n);
-	return false;
-      }
-      char *target = NULL;
-      size_t target_size = COMMBUFFSIZ;
-      if (strcmp(*n, "address") == 0) {
-	target = head.address;
-      } else if (strcmp(*n, "id") == 0) {
-	target = head.id;
-      } else if (strcmp(*n, "request_id") == 0) {
-	target = head.request_id;
-      } else if (strcmp(*n, "response_address") == 0) {
-	target = head.response_address;
-      } else if (strcmp(*n, "zmq_reply") == 0) {
-	target = head.zmq_reply;
-      } else if (strcmp(*n, "zmq_reply_worker") == 0) {
-	target = head.zmq_reply_worker;
-      } else if (strcmp(*n, "model") == 0) {
-	target = head.model;
-      } else {
-	ygglog_error("update_header_from_doc: '%s' not handled.", *n);
-	return false;
-      }
-      const char *str = meta_doc[*n].GetString();
-      size_t len = meta_doc[*n].GetStringLength();
-      if (len > target_size) {
-	ygglog_error("update_header_from_doc: Size of value for key '%s' (%d) exceeds size of target buffer (%d).",
-		     *n, len, target_size);
-	return false;
-      }
-      strncpy(target, str, target_size);
-    }
-    n++;
-  }
-  rapidjson::Document* metadata = new rapidjson::Document();
-  if (!head_doc.Accept(*(metadata))) {
-    ygglog_error("update_header_from_doc: Error copying header data.");
-    return false;
-  }
-  metadata->FinalizeFromStack();
-  head.metadata = (void*)metadata;
-  if (head_doc.HasMember("serializer") &&
-      head_doc["serializer"].IsObject() &&
-      head_doc["serializer"].HasMember("datatype") &&
-      head_doc["serializer"]["datatype"].IsObject()) {
-    head.dtype = (void*)(&((*metadata)["serializer"]["datatype"]));
-  }
-  
-  // Return
-  return true;
-};
 
 bool add_dtype(rapidjson::Document* d,
 	       const char* type, const char* subtype,
@@ -262,48 +157,15 @@ rapidjson::Document* copy_document(rapidjson::Value* rhs) {
   return out;
 }
 
-std::string document2string(rapidjson::Value* rhs, const char* indent="") {
+void display_document(rapidjson::Value* rhs, const char* indent="") {
   if (rhs == NULL) {
     ygglog_error("document2string: NULL document");
-    return std::string("");
+    printf("\n");
+    return;
   }
-  rapidjson::StringBuffer sb;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb, 0, strlen(indent));
-  writer.SetYggdrasilMode(true);
-  if (!rhs->Accept(writer)) {
-    ygglog_error("document2string: Error in Accept(writer)");
-    return std::string("");
-  }
-  return std::string(sb.GetString());
-}
-
-void display_document(rapidjson::Value* rhs, const char* indent="") {
-  std::string s = document2string(rhs, indent);
+  std::string s = document2string(*rhs, indent);
   printf("%s\n", s.c_str());
 }
-
-int deserialize_cpp(const char* buf, size_t buf_siz,
-		    rapidjson::DocumentType& schema,
-		    rapidjson::VarArgsList& ap) {
-  size_t nargs_orig = ap.get_nargs();
-  Document d;
-  rapidjson::StringStream s(buf);
-  if (!d.ParseStream(s)) {
-    ygglog_throw_error("deserialize: Error parsing JSON");
-  }
-  // TODO: Initialize schema?
-  // if (schema.IsNull()) {
-  //   schema = encode_schema(d);
-  // } else {
-  if (!normalize_document(&d, &schema))
-    return -1;
-  // }
-  if (!d.ApplyVarArgs(&schema, ap, rapidjson::kSetVarArgsFlag)) {
-    ygglog_throw_error("deserialize: Error setting arguments from JSON document");
-  }
-  return (int)(nargs_orig - ap.get_nargs());
-}
-		 
 
 rapidjson::Document* create_dtype_format_class(const char *format_str,
 					       const int as_array = 0) {
@@ -468,29 +330,6 @@ void throw_validator_error(const char* source, Validator& n) {
   ygglog_throw_error("%s:\n%s\n", source, sb.GetString());
 }
 
-int normalize_document(rapidjson::Document* d, rapidjson::Document* s,
-		       bool dont_raise=false) {
-  if (d == NULL)
-    return 0;
-  if (s == NULL)
-    return 0;
-  rapidjson::SchemaDocument sd(*s);
-  rapidjson::SchemaNormalizer normalizer(sd);
-  if (!d->Accept(normalizer)) {
-    if (dont_raise)
-      return 0;
-    display_document(d);
-    throw_validator_error("normalize_document", normalizer);
-  }
-  if (normalizer.WasNormalized()) {
-    d->SetNull();
-    if (!normalizer.GetNormalized().Accept(*d))
-      return 0;
-    d->FinalizeFromStack();
-  }
-  return 1;
-}
-
 void dtype_schema(rapidjson::Value& s,
 		  typename rapidjson::Document::AllocatorType& allocator,
 		  bool is_metadata = false) {
@@ -539,8 +378,9 @@ dtype_t* create_dtype(rapidjson::Document* document=NULL,
     } else {
       rapidjson::Document s;
       dtype_schema(s, s.GetAllocator(), is_metadata);
-      if (!normalize_document(document, &s)) {
-	ygglog_throw_error("create_dtype: Failed to normalize schema.");
+      rapidjson::StringBuffer sb;
+      if (!document->Normalize(s, &sb)) {
+	ygglog_throw_error("create_dtype: Failed to normalize schema:\n%s", sb.GetString());
       }
       allocator = &(document->GetAllocator());
       if (is_metadata) {
@@ -564,103 +404,6 @@ dtype_t* create_dtype(rapidjson::Document* document=NULL,
   return out;
 };
 
-
-rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
-						const int no_type,
-						const bool meta_only=false) {
-  rapidjson::StringBuffer head_buf;
-  rapidjson::Writer<rapidjson::StringBuffer> head_writer(head_buf);
-  rapidjson::Document* metadata = (rapidjson::Document*)(head.metadata);
-  rapidjson::Value* datatype = (rapidjson::Value*)(head.dtype);
-  head_writer.StartObject();
-  // Metadata
-  head_writer.Key("__meta__");
-  head_writer.StartObject();
-  head_writer.Key("size");
-  head_writer.Int((int)(head.size));
-  if (head.flags & HEAD_META_IN_DATA) {
-    head_writer.Key("in_data");
-    head_writer.Bool(true);
-  }
-  // Metadata strings
-  const char **n;
-  const char *string_fields[] = {"address", "id", "request_id", "response_address",
-				 "zmq_reply", "zmq_reply_worker",
-				 "model", ""};
-  n = string_fields;
-  while (strcmp(*n, "") != 0) {
-    const char *target = NULL;
-    if (strcmp(*n, "address") == 0) {
-      target = head.address;
-    } else if (strcmp(*n, "id") == 0) {
-      target = head.id;
-    } else if (strcmp(*n, "request_id") == 0) {
-      target = head.request_id;
-    } else if (strcmp(*n, "response_address") == 0) {
-      target = head.response_address;
-    } else if (strcmp(*n, "zmq_reply") == 0) {
-      target = head.zmq_reply;
-    } else if (strcmp(*n, "zmq_reply_worker") == 0) {
-      target = head.zmq_reply_worker;
-    } else if (strcmp(*n, "model") == 0) {
-      target = head.model;
-    } else {
-      ygglog_throw_error("format_comm_header_json: '%s' not handled.", *n);
-    }
-    if (strlen(target) > 0) {
-      head_writer.Key(*n);
-      head_writer.String(target);
-    }
-    n++;
-  }
-  head_writer.EndObject();
-  if (meta_only) {
-    head_writer.EndObject();
-    return head_buf;
-  }
-  // Type
-  // if ((!(head.flags & HEAD_META_IN_DATA)) && !no_type && head.dtype != NULL) {
-  //   head_writer.Key("serializer");
-  //   head_writer.StartObject();
-  //   head_writer.Key("datatype");
-  //   rapidjson::Document* datatype = (rapidjson::Document*)(head.dtype);
-  //   if (!datatype.Accept(head_writer))
-  //     ygglog_throw_error("format_comm_header_json: Error encoding type.");
-  //   if (metadata && metadata->IsObject() && metadata->HasMember("serializer")) {
-  //     for (typename rapidjson::Document::ConstMemberIterator it = (*metadata)["serializer"].MemberBegin();
-  // 	   it != (*metadata)["serializer"].MemberEnd(); it++) {
-  // 	if (strcmp(it->first.GetString(), "datatype") == 0)
-  // 	  continue;
-  // 	head_writer.Key(it->first.GetString(), it->first.GetStringLength(), true);
-  // 	if (!it->second.Accept(head_writer))
-  // 	  ygglog_throw_error("format_comm_header_json: Error encoding serializer");
-  //     }
-  //   }
-  //   head_writer.EndObject();
-  // }
-  // Additional header kwargs
-  if (metadata && metadata->IsObject()) {
-    for (typename rapidjson::Document::ConstMemberIterator it = metadata->MemberBegin();
-	 it != metadata->MemberEnd(); it++) {
-      if (((head.flags & HEAD_META_IN_DATA) || no_type) &&
-	  strcmp(it->name.GetString(), "serializer") == 0)
-	continue;
-      head_writer.Key(it->name.GetString(), it->name.GetStringLength(), true);
-      if (!it->value.Accept(head_writer))
-	ygglog_throw_error("format_comm_header_json: Error adding user metadata");
-    }
-  } else if (datatype && datatype->IsObject() &&
-	     !((head.flags & HEAD_META_IN_DATA) || no_type)) {
-    head_writer.Key("serializer", 10, true);
-    head_writer.StartObject();
-    head_writer.Key("datatype", 8, true);
-    if (!datatype->Accept(head_writer))
-      ygglog_throw_error("format_comm_header_json: Error adding datatype");
-    head_writer.EndObject();
-  }
-  head_writer.EndObject();
-  return head_buf;
-};
 
 rapidjson::Document* type_from_pyobj(PyObject* pyobj) {
   rapidjson::Value d(pyobj);
@@ -907,16 +650,6 @@ int document_count_vargs(rapidjson::Value& document,
   return 1;
 }
 
-int args2document(rapidjson::Document* document, rapidjson::Value* schema,
-		  rapidjson::VarArgList& ap) {
-  if (schema == NULL)
-    ygglog_throw_error("args2document: schema is NULL");
-  if (document == NULL)
-    ygglog_throw_error("args2document: document is NULL");
-  if (!document->GetVarArgs(*schema, ap, *document))
-    return 0;
-  return 1;
-};
 
 const char* schema2name(rapidjson::Document* schema) {
   if (schema == NULL || !schema->IsObject() || !schema->HasMember("type"))
@@ -1016,21 +749,6 @@ void document_check_yggtype(rapidjson::Value* d, std::string& type,
 // C exposed functions
 extern "C" {
 
-  void* type_from_doc_c(const void* type_doc) {
-    rapidjson::Document* out = NULL;
-    try {
-      const rapidjson::Value* type_doc_cpp = (const rapidjson::Value*)type_doc;
-      out = type_from_doc(*type_doc_cpp);
-    } catch(...) {
-      ygglog_error("type_from_doc_c: C++ exception thrown.");
-      if (out != NULL) {
-	delete out;
-	out = NULL;
-      }
-    }
-    return (void*)out;
-  }
-
   void* type_from_pyobj_c(PyObject* pyobj) {
     rapidjson::Document* out = NULL;
     try {
@@ -1072,9 +790,7 @@ extern "C" {
   
   generic_t init_generic() {
     generic_t out;
-    out.prefix = prefix_char;
     out.obj = NULL;
-    out.allocator = NULL;
     return out;
   }
 
@@ -1099,49 +815,23 @@ extern "C" {
     return out;
   }
 
-  int is_generic_flag(char x) {
-    if (x == prefix_char)
-      return 1;
-    else
-      return 0;
-  }
-
   int is_generic_init(generic_t x) {
-    return is_generic_flag(x.prefix);
+    return true;
   }
   
-  // generic_t create_generic(dtype_t* type_struct, void* data, size_t nbytes) {
-  //   generic_t out = init_generic();
-  //   try {
-  //     MetaschemaType* type = dtype2class(type_struct);
-  //     YggGeneric* obj = new YggGeneric(type, data, nbytes);
-  //     out.obj = (void*)obj;
-  //   } catch(...) {
-  //     ygglog_error("create_generic: C++ exception thrown.");
-  //     destroy_generic(&out);
-  //   }
-  //   return out;
-  // }
-
   int destroy_generic(generic_t* x) {
     int ret = 0;
     if (x != NULL) {
       if (is_generic_init(*x)) {
-	x->prefix = ' ';
 	if (x->obj != NULL) {
-	  if (x->allocator != NULL) {
+	  try {
+	    rapidjson::Document* obj = (rapidjson::Document*)(x->obj);
+	    delete obj;
 	    x->obj = NULL;
-	  } else {
-	    try {
-	      rapidjson::Document* obj = (rapidjson::Document*)(x->obj);
-	      delete obj;
-	      x->obj = NULL;
-	    } catch (...) {
-	      ygglog_error("destroy_generic: C++ exception thrown in destructor for rapidjson::Document.");
-	      ret = -1;
-	    }
+	  } catch (...) {
+	    ygglog_error("destroy_generic: C++ exception thrown in destructor for rapidjson::Document.");
+	    ret = -1;
 	  }
-	  x->allocator = NULL;
 	}
       }
     }
@@ -1490,7 +1180,7 @@ extern "C" {
   void* generic_ ## base ## _get_item(generic_t x, idxType idx, const char *type) { \
     try {								\
       generic_t tmp;							\
-      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+      if (get_generic_ ## base ## _ref(x, idx, &tmp) != GENERIC_SUCCESS_) { \
 	return NULL;							\
       }									\
       return generic_get_item(tmp, type);				\
@@ -1502,7 +1192,7 @@ extern "C" {
   int generic_ ## base ## _get_item_nbytes(generic_t x, idxType idx, const char *type) { \
     try {								\
       generic_t tmp;							\
-      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+      if (get_generic_ ## base ## _ref(x, idx, &tmp) != GENERIC_SUCCESS_) { \
 	return 0;							\
       }									\
       return generic_get_item_nbytes(tmp, type);			\
@@ -1514,7 +1204,7 @@ extern "C" {
   void* generic_ ## base ## _get_scalar(generic_t x, idxType idx, const char *subtype, const size_t precision) { \
     try {								\
       generic_t tmp;							\
-      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+      if (get_generic_ ## base ## _ref(x, idx, &tmp) != GENERIC_SUCCESS_) { \
 	return NULL;							\
       }									\
       return generic_get_scalar(tmp, subtype, precision);		\
@@ -1526,7 +1216,7 @@ extern "C" {
   size_t generic_ ## base ## _get_1darray(generic_t x, idxType idx, const char *subtype, const size_t precision, void** data) { \
     try {								\
       generic_t tmp;							\
-      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+      if (get_generic_ ## base ## _ref(x, idx, &tmp) != GENERIC_SUCCESS_) { \
 	return 0;							\
       }									\
       return generic_get_1darray(tmp, subtype, precision, data);	\
@@ -1538,7 +1228,7 @@ extern "C" {
   size_t generic_ ## base ## _get_ndarray(generic_t x, idxType idx, const char *subtype, const size_t precision, void** data, size_t** shape) { \
     try {								\
       generic_t tmp;							\
-      if (get_generic_ ## base(x, idx, &tmp, false) != GENERIC_SUCCESS_) { \
+      if (get_generic_ ## base ## _ref(x, idx, &tmp) != GENERIC_SUCCESS_) { \
 	return 0;							\
       }									\
       return generic_get_ndarray(tmp, subtype, precision, data, shape);	\
@@ -1696,34 +1386,45 @@ extern "C" {
     return out;
   }
 
-  int get_generic_array(generic_t arr, const size_t i, generic_t *x, int copy) {
+  int get_generic_array_ref(generic_t arr, const size_t i, generic_t *x) {
     int out = GENERIC_SUCCESS_;
     x[0] = init_generic();
     try {
       if (!(is_generic_init(arr))) {
-	ygglog_throw_error("get_generic_array: Array is not a generic object.");
+	ygglog_throw_error("get_generic_array_ref: Array is not a generic object.");
       }
       if (arr.obj == NULL) {
-	ygglog_throw_error("get_generic_array: Array is NULL.");
+	ygglog_throw_error("get_generic_array_ref: Array is NULL.");
       }
       rapidjson::Value* arr_obj = (rapidjson::Value*)(arr.obj);
       if (!arr_obj->IsArray()) {
-	ygglog_throw_error("get_generic_array: Document is not an array.");
+	ygglog_throw_error("get_generic_array_ref: Document is not an array.");
       }
       if (arr_obj->Size() <= i) {
-	ygglog_throw_error("get_generic_array: Document only has %d elements", (int)(arr_obj->Size()));
+	ygglog_throw_error("get_generic_array_ref: Document only has %d elements", (int)(arr_obj->Size()));
       }
-      if (copy) {
-	rapidjson::Document* cpy = new rapidjson::Document();
-	if (!(*arr_obj)[i].Accept(*cpy)) {
-	  ygglog_throw_error("get_generic_array: Error in Accept");
-	}
-	cpy->FinalizeFromStack();
-	x[0].obj = (void*)cpy;
-      } else {
-	x[0].obj = (void*)(&((*arr_obj)[i]));
-	x[0].allocator = (void*)(&generic_allocator(arr));
+      x[0].obj = (void*)(&((*arr_obj)[i]));
+      // x[0].allocator = (void*)(&generic_allocator(arr));
+    } catch (...) {
+      ygglog_error("get_generic_array_ref: C++ exception thrown.");
+      out = GENERIC_ERROR_;
+    }
+    return out;
+  }
+  int get_generic_array(generic_t arr, const size_t i, generic_t *x) {
+    int out = GENERIC_SUCCESS_;
+    generic_t tmp;
+    if (get_generic_array_ref(arr, i, &tmp) != GENERIC_SUCCESS_)
+      return GENERIC_ERROR_;
+    try {
+      x[0] = init_generic();
+      rapidjson::Value* src = (rapidjson::Value*)(tmp.obj);
+      rapidjson::Document* cpy = new rapidjson::Document();
+      if (!(src->Accept(*cpy))) {
+	ygglog_throw_error("get_generic_array: Error in Accept");
       }
+      cpy->FinalizeFromStack();
+      x[0].obj = (void*)cpy;
     } catch (...) {
       ygglog_error("get_generic_array: C++ exception thrown.");
       out = GENERIC_ERROR_;
@@ -1767,37 +1468,48 @@ extern "C" {
     return out;
   }
 
-  int get_generic_object(generic_t arr, const char* k, generic_t *x, int copy) {
+  int get_generic_object_ref(generic_t arr, const char* k, generic_t *x) {
     int out = 0;
     x[0] = init_generic();
     try {
       if (!(is_generic_init(arr))) {
-	ygglog_throw_error("get_generic_object: Object is not a generic object.");
+	ygglog_throw_error("get_generic_object_ref: Object is not a generic object.");
       }
       if (arr.obj == NULL) {
-	ygglog_throw_error("get_generic_object: Object is NULL.");
+	ygglog_throw_error("get_generic_object_ref: Object is NULL.");
       }
       rapidjson::Value* arr_obj = (rapidjson::Value*)(arr.obj);
       if (!arr_obj->IsObject()) {
-	ygglog_throw_error("get_generic_object: Document is not an object.");
+	ygglog_throw_error("get_generic_object_ref: Document is not an object.");
       }
       if (!arr_obj->HasMember(k)) {
-	ygglog_throw_error("get_generic_object: Document does not have the requested key.");
+	ygglog_throw_error("get_generic_object_ref: Document does not have the requested key.");
       }
-      if (copy) {
-	rapidjson::Document* cpy = new rapidjson::Document();
-	if (!(*arr_obj)[k].Accept(*cpy)) {
-	  ygglog_throw_error("get_generic_object: Error in Accept");
-	}
-	cpy->FinalizeFromStack();
-	x[0].obj = (void*)cpy;
-      } else {
-	x[0].obj = (void*)(&((*arr_obj)[k]));
-	x[0].allocator = (void*)(&generic_allocator(arr));
+      x[0].obj = (void*)(&((*arr_obj)[k]));
+      // x[0].allocator = (void*)(&generic_allocator(arr));
+    } catch (...) {
+      ygglog_error("get_generic_object_ref: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+  int get_generic_object(generic_t arr, const char* k, generic_t *x) {
+    int out = GENERIC_SUCCESS_;
+    generic_t tmp;
+    if (get_generic_object_ref(arr, k, &tmp) != GENERIC_SUCCESS_)
+      return GENERIC_ERROR_;
+    try {
+      x[0] = init_generic();
+      rapidjson::Value* src = (rapidjson::Value*)(tmp.obj);
+      rapidjson::Document* cpy = new rapidjson::Document();
+      if (!(src->Accept(*cpy))) {
+	ygglog_throw_error("get_generic_object: Error in Accept");
       }
+      cpy->FinalizeFromStack();
+      x[0].obj = (void*)cpy;
     } catch (...) {
       ygglog_error("get_generic_object: C++ exception thrown.");
-      out = 1;
+      out = GENERIC_ERROR_;
     }
     return out;
   }
@@ -1816,7 +1528,7 @@ extern "C" {
   type generic_ ## base ## _get_ ## name(generic_t x, idxType idx, __VA_ARGS__) { \
     generic_t item;							\
     type out = defV;							\
-    if (get_generic_ ## base(x, (idxType)idx, &item, false) != GENERIC_SUCCESS_) { \
+    if (get_generic_ ## base ## _ref(x, (idxType)idx, &item) != GENERIC_SUCCESS_) { \
       return out;							\
     }									\
     out = generic_get_ ## name(item, UNPACK_MACRO args);		\
@@ -1826,7 +1538,7 @@ extern "C" {
   type generic_ ## base ## _get_ ## name(generic_t x, idxType idx) {	\
     generic_t item;							\
     type out = defV;							\
-    if (get_generic_ ## base(x, (idxType)idx, &item, false) != GENERIC_SUCCESS_) { \
+    if (get_generic_ ## base ## _ref(x, (idxType)idx, &item) != GENERIC_SUCCESS_) { \
       return out;							\
     }									\
     out = generic_get_ ## name(item);					\
@@ -1845,12 +1557,12 @@ extern "C" {
 #define STD_JSON_NESTED_(name)						\
   generic_t generic_array_get_ ## name(generic_t x, const size_t index) { \
     generic_t item;							\
-    get_generic_array(x, index, &item, true);				\
+    get_generic_array(x, index, &item);					\
     return item;							\
   }									\
   generic_t generic_map_get_ ## name(generic_t x, const char* key) {	\
     generic_t item;							\
-    get_generic_object(x, key, &item, true);				\
+    get_generic_object(x, key, &item);					\
     return item;							\
   }									\
   int generic_array_set_ ## name(generic_t x, const size_t index, generic_t item) { \
@@ -2210,7 +1922,7 @@ extern "C" {
     }
   }
 
-  int skip_va_elements(const dtype_t* dtype, va_list_t *ap, bool pointers) {
+  int skip_va_elements(const dtype_t* dtype, va_list_t *ap, bool set) {
     if (dtype == NULL) {
       return 0;
     }
@@ -2218,9 +1930,9 @@ extern "C" {
       return 0;
     }
     rapidjson::Document tmp;
-    return (int)tmp.GetVarArgs(((rapidjson::Value*)(dtype->schema))[0],
-			       ((rapidjson::VarArgList*)(ap->va))[0],
-			       tmp, 0, true, pointers);
+    return (int)tmp.SkipVarArgs(((rapidjson::Value*)(dtype->schema))[0],
+				((rapidjson::VarArgList*)(ap->va))[0],
+				set);
   }
   
   int is_empty_dtype(const dtype_t* dtype) {
@@ -2350,17 +2062,6 @@ extern "C" {
       return create_dtype(NULL, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_empty: C++ exception thrown.");
-      return NULL;
-    }
-  }
-
-  dtype_t* create_dtype_doc(void* type_doc, const bool use_generic) {
-    rapidjson::Document* obj = NULL;
-    try {
-      obj = (rapidjson::Document*)type_from_doc_c(type_doc);
-      return create_dtype(obj, use_generic);
-    } catch(...) {
-      ygglog_error("create_dtype_doc: C++ exception thrown.");
       return NULL;
     }
   }
@@ -2613,54 +2314,63 @@ extern "C" {
   dtype_t* create_dtype_any(const bool use_generic) {
     return create_dtype_default("any", use_generic);
   }
-  int format_comm_header(comm_head_t* head, char **buf, size_t buf_siz,
-			 const size_t max_header_size, const int no_type) {
+
+#define HEADER_GET_SET_METHOD_(type, method)				\
+  int header_GetMeta ## method(comm_head_t head,			\
+			       const char* name, type* x) {		\
+    try {								\
+      if (!head.head)							\
+	return 0;							\
+      Header* head_ = (Header*)(head.head);				\
+      x[0] = head_->GetMeta ## method(name);				\
+      return 1;								\
+    } catch(...) {							\
+      invalidate_header(&head);						\
+      return 0;								\
+    }									\
+  }									\
+  int header_SetMeta ## method(comm_head_t* head,			\
+			       const char* name, type x) {		\
+    if (!head)								\
+      return 0;								\
+    try {								\
+      if (!head->head)							\
+	return 0;							\
+      Header* head_ = (Header*)(head->head);				\
+      return static_cast<int>(head_->SetMeta ## method(name, x));	\
+    } catch(...) {							\
+      invalidate_header(head);						\
+      return 0;								\
+    }									\
+  }
+  HEADER_GET_SET_METHOD_(int, Int)
+  HEADER_GET_SET_METHOD_(bool, Bool)
+  HEADER_GET_SET_METHOD_(const char*, String)
+#undef HEADER_GET_SET_METHOD_
+  int header_SetMetaID(comm_head_t* head, const char* name,
+		       const char** id) {
+    if (!head)
+      return 0;
     try {
-      // JSON Serialization
-      rapidjson::StringBuffer head_buf = format_comm_header_json(*head, no_type);
-      rapidjson::StringBuffer type_buf;
-      // Check size
-      int ret;
-#ifdef _WIN32
-      ret = _scprintf("%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-#else
-      ret = snprintf(*buf, 0, "%s%s%s", MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-#endif
-      if (ret > max_header_size) {
-	type_buf = format_comm_header_json(*head, no_type, true);
-	head->flags = head->flags | HEAD_META_IN_DATA;
-	head->size = head->size + strlen(MSG_HEAD_SEP) + strlen(type_buf.GetString());
-	head_buf = format_comm_header_json(*head, no_type);
-#ifdef _WIN32
-	ret = _scprintf("%s%s%s%s%s", MSG_HEAD_SEP,
-			head_buf.GetString(), MSG_HEAD_SEP,
-			type_buf.GetString(), MSG_HEAD_SEP);
-#else
-	ret = snprintf(*buf, 0, "%s%s%s%s%s", MSG_HEAD_SEP,
-		       head_buf.GetString(), MSG_HEAD_SEP,
-		       type_buf.GetString(), MSG_HEAD_SEP);
-#endif
-      }
-      // Realloc if necessary
-      if ((size_t)ret > buf_siz) {
-	buf_siz = (size_t)(ret+1);
-	buf[0] = (char*)realloc(buf[0], buf_siz);
-      }
-      // Format
-      if (head->flags & HEAD_META_IN_DATA) {
-	ret = snprintf(*buf, buf_siz, "%s%s%s%s%s", MSG_HEAD_SEP,
-		       head_buf.GetString(), MSG_HEAD_SEP,
-		       type_buf.GetString(), MSG_HEAD_SEP);
-      } else {
-	ret = snprintf(*buf, buf_siz, "%s%s%s", MSG_HEAD_SEP,
-		       head_buf.GetString(), MSG_HEAD_SEP);
-      }
-      if ((size_t)ret > buf_siz) {
-	ygglog_error("format_comm_header: Header size (%d) exceeds buffer size (%lu): '%s%s%s'.",
-		     ret, buf_siz, MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
-	return -1;
-      }
-      ygglog_debug("format_comm_header: Header = '%s'", *buf);
+      if (!head->head)
+	return 0;
+      Header* head_ = (Header*)(head->head);
+      return static_cast<int>(head_->SetMetaID(name, id));
+    } catch(...) {
+      invalidate_header(head);
+      return 0;
+    }
+  }
+  
+  int format_comm_header(comm_head_t* head, char **headbuf,
+			 const char* buf, size_t buf_siz,
+			 const size_t max_size, const int no_type) {
+    try {
+      Header* head_ = (Header*)(head->head);
+      int ret = static_cast<int>(head_->format(buf, buf_siz,
+					       max_size, (bool)no_type));
+      headbuf[0] = head_->data_;
+      ygglog_debug("format_comm_header: Message = '%100s...'", *headbuf);
       return ret;
     } catch(...) {
       ygglog_error("format_comm_header: C++ exception thrown.");
@@ -2668,72 +2378,119 @@ extern "C" {
     }
   }
 
-  int parse_type_in_data(char **buf, const size_t buf_siz,
-			 comm_head_t* head) {
-    size_t typesiz;
-    int ret;
-    size_t sind, eind;
+  comm_head_t init_header() {
+    comm_head_t out;
+    out.head = NULL;
+    out.flags = NULL;
+    out.size_data = NULL;
+    out.size_curr = NULL;
+    out.size_head = NULL;
+    out.size_buff = NULL;
+    out.metadata = NULL;
     try {
-      ret = find_match(MSG_HEAD_SEP, *buf, &sind, &eind);
-      if (ret < 0) {
-	ygglog_error("parse_type_in_data: Error locating head separation tag.");
-	return -1;
+      Header* head = new Header();
+      out.head = (void*)head;
+      out.flags = &(head->flags);
+      out.size_data = &(head->size_data);
+      out.size_curr = &(head->size_curr);
+      out.size_head = &(head->size_head);
+      out.size_buff = &(head->size_buff);
+      out.metadata = &(head->metadata);
+    } catch(...) {
+      ygglog_error("create_send_header: C++ exception thrown.");
+      invalidate_header(&out);
+    }
+    return out;
+  }
+
+  comm_head_t create_send_header(dtype_t *datatype) {
+				 
+    comm_head_t out = init_header();
+    if (header_is_valid(out)) {
+      try {
+	Header* head = (Header*)(out.head);
+	rapidjson::Document* metadata = (rapidjson::Document*)(datatype->metadata);
+	rapidjson::Value* schema = (rapidjson::Value*)(datatype->schema);
+	head->for_send(metadata, schema);
+      } catch(...) {
+	ygglog_error("create_send_header: C++ exception thrown.");
+	invalidate_header(&out);
       }
-      // type = *buf;
-      typesiz = sind;
-      rapidjson::Document type_doc;
-      type_doc.Parse(*buf, typesiz);
-      head->dtype = create_dtype(type_from_header_doc(type_doc));
-      ret = buf_siz - eind;
-      memmove(*buf, *buf + eind, ret);
-      return ret;
+    }
+    return out;
+  }
+
+  comm_head_t create_recv_header(char** data, const size_t len,
+				 size_t msg_len, int allow_realloc,
+				 int temp) {
+    comm_head_t out = init_header();
+    if (header_is_valid(out)) {
+      try {
+	Header* head = (Header*)(out.head);
+	head->for_recv(data, len, msg_len,
+		       (bool)allow_realloc, (bool)temp);
+      } catch(...) {
+	ygglog_error("create_recv_header: C++ exception thrown.");
+	invalidate_header(&out);
+      }
+    }
+    return out;
+  }
+
+  int destroy_header(comm_head_t* x) {
+    try {
+      if (x->head) {
+	Header* head = (Header*)(x->head);
+	x->head = NULL;
+	x->flags = NULL;
+	x->size_data = NULL;
+	x->size_curr = NULL;
+	x->size_head = NULL;
+	x->size_buff = NULL;
+	x->metadata = NULL;
+	delete head;
+      }
+    } catch(...) {
+      ygglog_error("destroy_header: C++ exception thrown.");
+      return -1;
+    }
+    return 0;
+  }
+
+  void invalidate_header(comm_head_t* x) {
+    if (!x->head)
+      return;
+    Header* head_ = (Header*)(x->head);
+    head_->flags &= ~HEAD_FLAG_VALID;
+  }
+  int header_is_valid(const comm_head_t head) {
+    if (!head.head)
+      return 0;
+    Header* head_ = (Header*)(head.head);
+    return (head_->flags & HEAD_FLAG_VALID);
+  }
+  int header_is_multipart(const comm_head_t head) {
+    if (!head.head)
+      return 0;
+    Header* head_ = (Header*)(head.head);
+    return (head_->flags & HEAD_FLAG_MULTIPART);
+  }
+
+  void* header_schema(comm_head_t head) {
+    if (!head.head)
+      return NULL;
+    Header* head_ = (Header*)(head.head);
+    return (void*)(head_->schema);
+  }
+
+  int finalize_header_recv(comm_head_t head, dtype_t* dtype) {
+    try {
+      Header* head_ = (Header*)(head.head);
+      head_->finalize_recv();
+      return update_dtype(dtype, header_schema(head));
     } catch(...) {
       ygglog_error("parse_type_in_data: C++ exception thrown.");
       return -1;
-    }
-  }
-
-  comm_head_t parse_comm_header(const char *buf, const size_t buf_siz) {
-    comm_head_t out = init_header(0, NULL, NULL);
-    int ret;
-    char *head = NULL;
-    size_t headsiz;
-    try {
-      // Split header/body
-      ret = split_head_body(buf, buf_siz, &head, &headsiz);
-      if (ret < 0) {
-	ygglog_error("parse_comm_header: Error splitting head and body.");
-	out.flags = out.flags & ~HEAD_FLAG_VALID;
-	if (head != NULL) 
-	  free(head);
-	return out;
-      }
-      out.bodybeg = headsiz + 2*strlen(MSG_HEAD_SEP);
-      out.bodysiz = buf_siz - out.bodybeg;
-      // Handle raw data without header
-      if (headsiz == 0) {
-	out.flags = out.flags & ~HEAD_FLAG_MULTIPART;
-	out.size = out.bodysiz;
-	free(head);
-	return out;
-      }
-      // Parse header
-      rapidjson::Document head_doc;
-      head_doc.Parse(head, headsiz);
-      if (!(update_header_from_doc(out, head_doc))) {
-	ygglog_error("parse_comm_header: Error updating header from JSON doc.");
-	out.flags = out.flags & ~HEAD_FLAG_VALID;
-	free(head);
-	return out;
-      }
-      free(head);
-      return out;
-    } catch(...) {
-      ygglog_error("parse_comm_header: C++ exception thrown.");
-      out.flags = out.flags & ~HEAD_FLAG_VALID;
-      if (head != NULL)
-	free(head);
-      return out;
     }
   }
 
@@ -2816,8 +2573,10 @@ extern "C" {
     }
     try {
       generic_t gen_arg;
-      if (!((rapidjson::VarArgList*)(ap.va))->get(gen_arg))
+      if (!((rapidjson::VarArgList*)(ap.va))->get(gen_arg)) {
+	ygglog_throw_error("update_dtype_from_generic_ap: Error getting generic argument.");
 	return -1;
+      }
       if (!(is_generic_init(gen_arg))) {
 	ygglog_throw_error("update_dtype_from_generic_ap: Type expects generic object, but provided object is not generic.");
       } else {
@@ -2865,23 +2624,6 @@ extern "C" {
     return 0;
   }
 
-  int serialize_document(char **buf, size_t *buf_siz, void* document) {
-    rapidjson::Value* d = (rapidjson::Value*)document;
-    if (d == NULL)
-      return 0;
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    if (!d->Accept(writer))
-      return 0;
-    if ((size_t)(buffer.GetLength() + 1) > buf_siz[0]) {
-      buf_siz[0] = (size_t)(buffer.GetLength() + 1);
-      buf[0] = (char*)realloc(buf[0], buf_siz[0]);
-    }
-    memcpy(buf[0], buffer.GetString(), (size_t)(buffer.GetLength()));
-    buf[0][(size_t)(buffer.GetLength())] = '\0';
-    return 1;
-  }
-
   int deserialize_dtype(const dtype_t *dtype, const char *buf,
 			const size_t buf_siz, va_list_t ap) {
     try {
@@ -2890,8 +2632,8 @@ extern "C" {
 	ygglog_throw_error("deserialize_dtype: Empty schema.");
 	return -1;
       }
-      rapidjson::DocumentType* schema = (rapidjson::DocumentType*)(dtype->schema);
-      return deserialize_cpp(buf, buf_siz, schema, va);
+      rapidjson::Value* schema = (rapidjson::Value*)(dtype->schema);
+      return deserialize_args(buf, buf_siz, *schema, *va);
     } catch (...) {
       ygglog_error("deserialize_dtype: C++ exception thrown.");
       if (d != NULL)
@@ -2904,12 +2646,12 @@ extern "C" {
 		      const int allow_realloc, va_list_t ap) {
     try {
       rapidjson::VarArgList* va = (rapidjson::VarArgList*)(ap.va);
-      rapidjson::Document d;
-      if (!args2document(&d, (rapidjson::Value*)(dtype->schema), *va))
+      if (dtype->schema == NULL) {
+	ygglog_throw_error("deserialize_dtype: Empty schema.");
 	return -1;
-      if (!serialize_document(buf, buf_siz, (void*)(&d)))
-	return -1;
-      return (int)strlen(buf[0]);
+      }
+      rapidjson::Value* schema = (rapidjson::Value*)(dtype->schema);
+      return serialize_args(buf, buf_siz, *schema, *va);
     } catch(...) {
       ygglog_error("serialize_dtype: C++ exception thrown.");
       return -1;
@@ -2935,16 +2677,6 @@ extern "C" {
   obj_t init_obj() {
     obj_t x;
     x.obj = NULL;
-    x.nvert = 0;
-    x.ntexc = 0;
-    x.nnorm = 0;
-    x.nparam = 0;
-    x.npoint = 0;
-    x.nline = 0;
-    x.nface = 0;
-    x.ncurve = 0;
-    x.ncurve2 = 0;
-    x.nsurf = 0;
     return x;
   }
 
@@ -2957,22 +2689,6 @@ extern "C" {
       } else {
 	x->obj = objw;
       }
-      std::map<std::string,size_t> counts = objw->element_counts();
-#define SET_COUNTS_(ele, Ndst)						\
-      if (counts.find(#ele) != counts.end()) {				\
-	Ndst = (int)(counts[#ele]);					\
-      }
-      SET_COUNTS_(v, x->nvert);
-      SET_COUNTS_(vt, x->ntexc);
-      SET_COUNTS_(vn, x->nnorm);
-      SET_COUNTS_(vp, x->nparam);
-      SET_COUNTS_(p, x->npoint);
-      SET_COUNTS_(l, x->nline);
-      SET_COUNTS_(f, x->nface);
-      SET_COUNTS_(curv, x->ncurve);
-      SET_COUNTS_(curv2, x->ncurve2);
-      SET_COUNTS_(surf, x->nsurf);
-#undef SET_COUNTS_
     }
   }
 
@@ -3014,14 +2730,28 @@ extern "C" {
     return display_obj_indent(p, "");
   }
 
+  int nelements_obj(obj_t p, const char* name) {
+    if (p.obj == NULL) {
+      ygglog_error("nelements_obj: ObjWavefront object is NULL.");
+      return -1;
+    }
+    try {
+      rapidjson::ObjWavefront* obj = (rapidjson::ObjWavefront*)(p.obj);
+      size_t N = obj->count_elements(std::string(name));
+      return static_cast<int>(N);
+    } catch (...) {
+      ygglog_error("nelements_obj: Error getting number of '%s' elements", name);
+      return -1;
+    }
+  }
 
   // Ply wrapped methods
   ply_t init_ply() {
     ply_t x;
     x.obj = NULL;
-    x.nvert = 0;
-    x.nedge = 0;
-    x.nface = 0;
+    // x.nvert = 0;
+    // x.nedge = 0;
+    // x.nface = 0;
     return x;
   }
 
@@ -3041,9 +2771,9 @@ extern "C" {
       if (counts.find(#ele) != counts.end()) {				\
 	Ndst = (int)(counts[#ele]);					\
       }
-      SET_COUNTS_(vertex, x->nvert)
-      SET_COUNTS_(edge, x->nedge)
-      SET_COUNTS_(face, x->nface)
+      // SET_COUNTS_(vertex, x->nvert)
+      // SET_COUNTS_(edge, x->nedge)
+      // SET_COUNTS_(face, x->nface)
       #undef SET_COUNTS_
     }
   }
@@ -3087,6 +2817,21 @@ extern "C" {
     return display_ply_indent(p, "");
   }
 
+  int nelements_ply(ply_t p, const char* name) {
+    if (p.obj == NULL) {
+      ygglog_error("nelements_ply: Ply object is NULL.");
+      return -1;
+    }
+    try {
+      rapidjson::Ply* ply = (rapidjson::Ply*)(p.obj);
+      size_t N = ply->count_elements(std::string(name));
+      return static_cast<int>(N);
+    } catch (...) {
+      ygglog_error("nelements_ply: Error getting number of '%s' elements", name);
+      return -1;
+    }
+  }
+  
   int init_python_API() {
     try {
 #ifndef YGGDRASIL_DISABLE_PYTHON_C_API
@@ -3099,26 +2844,43 @@ extern "C" {
     return 0;
   }
   
-  va_list_t init_va_list(va_list va, size_t *nargs, bool allow_realloc) {
+  va_list_t init_va_list(size_t *nargs, int allow_realloc,
+			 int for_c) {
     va_list_t out;
-    rapidjson::VarArgList* out_va = new rapidjson::VarArgList(va, nargs, allow_realloc);
+    rapidjson::VarArgList* out_va = new rapidjson::VarArgList(nargs, allow_realloc, for_c);
     out.va = (void*)out_va;
     return out;
   }
 
-  va_list_t init_va_ptrs(const size_t nptrs, void** ptrs, int for_fortran) {
+  va_list_t init_va_ptrs(const size_t nptrs, void** ptrs, int allow_realloc,
+			 int for_fortran) {
     va_list_t out;
-    rapidjson::VarArgList* va = new rapidjson::VarArgList(nptrs, ptrs, for_fortran);
+    rapidjson::VarArgList* va = new rapidjson::VarArgList(nptrs, ptrs, allow_realloc, for_fortran);
     out.va = (void*)va;
     return out;
+  }
+  
+  va_list* get_va_list(va_list_t ap) {
+    rapidjson::VarArgList* va = (rapidjson::VarArgList*)(ap.va);
+    if (!va)
+      return NULL;
+    return &(va->va);
   }
   
   void end_va_list(va_list_t *ap) {
     rapidjson::VarArgList* va = (rapidjson::VarArgList*)(ap->va);
     if (va) {
-      va->end();
+      size_t nargs = va->get_nargs();
+      if (nargs != 0)
+	ygglog_error("%d arguments unused", (int)nargs);
       delete va;
       ap->va = nullptr;
+    }
+  }
+  void clear_va_list(va_list_t *ap) {
+    rapidjson::VarArgList* va = (rapidjson::VarArgList*)(ap->va);
+    if (va) {
+      va->clear();
     }
   }
   size_t size_va_list(va_list_t va) {

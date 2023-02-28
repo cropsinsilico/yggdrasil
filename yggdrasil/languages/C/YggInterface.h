@@ -620,7 +620,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecv(rpc, ap) vcommRecv(rpc, 0, ap)
+#define vrpcRecv(rpc, ap) vcommRecv(rpc, ap)
 
 /*!
   @brief Receive a message from a comm into variables in a variable argument
@@ -634,7 +634,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecvRealloc(rpc, ap) vcommRecv(rpc, 1, ap)
+#define vrpcRecvRealloc(rpc, ap) vcommRecv(rpc, ap)
 
 /*!
   @brief Format and send a message to an RPC output queue.

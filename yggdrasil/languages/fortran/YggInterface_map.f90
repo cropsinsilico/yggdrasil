@@ -6,7 +6,7 @@ subroutine generic_map_get_generic(x, key, out)
   character(len=*), intent(in) :: key
   type(ygggeneric), pointer, intent(out) :: out
   integer(kind=c_int) :: flag
-  flag = get_generic_object(x, key, out, 0)
+  flag = get_generic_object(x, key, out)
   if (flag.ne.0) then
      stop "generic_map_get_generic: Error extracting generic object."
   end if

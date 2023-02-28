@@ -1159,7 +1159,9 @@ class CModelDriver(CompiledModelDriver):
                          and (not v.get('is_length_var', False))
                          and (v['datatype']['type'] not in
                               ['any', 'object', 'array', 'schema',
-                               'instance', '1darray', 'ndarray'])
+                               'instance', '1darray', 'ndarray',
+                               'ply', 'obj'])
+                         # TODO: allow ply_t/obj_t to be passed by pointer
                          and (cls.function_param['recv_function']
                               == cls.function_param['recv_heap']))):
                         v['allow_realloc'] = True

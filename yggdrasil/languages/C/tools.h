@@ -161,32 +161,13 @@ typedef struct complex_long_double_t {
 #define ygg_getpid getpid
 #endif
 
-#define STRBUFF 100
-  
-/*! @brief Maximum message size. */
-#ifdef IPCDEF
-#define YGG_MSG_MAX 2048
-#else
-#define YGG_MSG_MAX 1048576
-#endif
-/*! @brief End of file message. */
-#define YGG_MSG_EOF "EOF!!!"
-/*! @brief End of client message. */
-#define YGG_CLIENT_EOF "YGG_END_CLIENT"
-/*! @brief Resonable size for buffer. */
-#define YGG_MSG_BUF 2048
-/*! @brief Sleep time in micro-seconds */
-#define YGG_SLEEP_TIME ((int)250000)
-/*! @brief Size for buffers to contain names of Python objects. */
-#define PYTHON_NAME_SIZE 1000
+#include "constants.h"
 
-/*! @brief Define old style names for compatibility. */
-#define PSI_MSG_MAX YGG_MSG_MAX
-#define PSI_MSG_BUF YGG_MSG_BUF
-#define PSI_MSG_EOF YGG_MSG_EOF
+#define STRBUFF 100
 #ifdef PSI_DEBUG
 #define YGG_DEBUG PSI_DEBUG
 #endif
+  
 static int _ygg_error_flag = 0;
 
 /*! @brief Define macros to allow counts of variables. */
@@ -204,13 +185,16 @@ static int _ygg_error_flag = 0;
 #endif
 #define UNUSED(arg) ((void)&(arg))
 
+#define YGG_BEGIN_VAR_ARGS_CPP(name, first_arg, nargs, realloc)	\
+  va_list_t name = init_va_list(&nargs, realloc, 0);		\
+  va_list* name ## _va = get_va_list(name);			\
+  va_start(*name ## _va, first_arg)
 #define YGG_BEGIN_VAR_ARGS(name, first_arg, nargs, realloc)	\
-  va_list name ## _va;						\
-  va_start(name ## _va, first_arg);				\
-  va_list_t ap = init_va_list(name ## _va, &nargs, realloc)
+  va_list_t name = init_va_list(&nargs, realloc, 1);		\
+  va_list* name ## _va = get_va_list(name);			\
+  va_start(*name ## _va, first_arg)
 #define YGG_END_VAR_ARGS(name)			\
   end_va_list(&name)
-  // va_end(name)
 
 /*! @brief Memory to allow thread association to be set via macro. */
 static int global_thread_id = -1;

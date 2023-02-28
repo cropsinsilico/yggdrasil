@@ -1,6 +1,7 @@
 #include <iostream>
 // Include methods for input/output channels
 #include "YggInterface.hpp"
+#include "datatypes/serialization.h"
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
@@ -9,7 +10,7 @@ int main(int argc, char *argv[]) {
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
-  generic_t vec = init_generic();
+  rapidjson::Document vec;
 
   // Loop until there is no longer input or the queues are closed
   while (flag >= 0) {
@@ -24,12 +25,12 @@ int main(int argc, char *argv[]) {
     }
 
     // Print received message
-    printf("Model A:\n");
-    display_generic(vec);
+    std::cerr << "Model A:" << std::endl <<
+      document2string(vec) << std::endl;
 
     // Send output to output channel
     // If there is an error, the flag will be negative
-    flag = out_channel.send(1, vec);
+    flag = out_channel.send(1, &vec);
     if (flag < 0) {
       std::cout << "Model A: Error sending output." << std::endl;
       break;
@@ -37,9 +38,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  // Free dynamically allocated generic structure
-  free_generic(&vec);
-  
   return 0;
 }
 

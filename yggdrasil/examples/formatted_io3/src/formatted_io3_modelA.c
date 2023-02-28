@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
   yggAsciiArrayOutput_t out_channel = yggAsciiArrayOutput("outputA", "%6s\t%d\t%f\n");
 
   // Declare resulting variables and create buffer for received message
-  size_t nrows;
+  size_t nrows = 0;
   int flag = 1;
   char *name = NULL;
   int *count = NULL;

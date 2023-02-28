@@ -422,7 +422,7 @@ int init_comm_type(comm_t *x) {
   @returns comm_t* Pointer to comm structure.
  */
 static
-comm_t* new_comm(char *address, const char *direction,
+comm_t* new_comm(const char *address, const char *direction,
 		 const comm_type t, dtype_t* datatype) {
   comm_t *ret = new_comm_base(address, direction, t, datatype);
   if (ret == NULL) {
@@ -639,7 +639,7 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
   } else {
     datatype = x->datatype;
   }
-  comm_head_t head = create_send_header(data, len, datatype);
+  comm_head_t head = create_send_header(datatype);
   const comm_t *x0;
   if (x->type == SERVER_COMM) {
     if (!(is_eof(data))) {
@@ -649,11 +649,14 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
     if (x0 == NULL) {
       ygglog_error("comm_send_multipart_header(%s): no response comm registered",
 		   x->name);
-      head.flags = head.flags & ~HEAD_FLAG_VALID;
+      invalidate_header(&head);
       return head;
     }
     // This gives the server access to the ID of the message last received
-    strcpy(head.id, x->address);
+    if (!header_SetMetaString(&head, "id", x->address)) {
+      invalidate_header(&head);
+      return head;
+    }
   } else if (x->type == CLIENT_COMM) {
     if (!(is_eof(data))) {
       head = client_response_header(x, head);
@@ -667,11 +670,14 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
     char *reply_address = set_reply_send(x0);
     if (reply_address == NULL) {
       ygglog_error("comm_send_multipart_header: Could not set reply address.");
-      head.flags = head.flags & ~HEAD_FLAG_VALID;
+      invalidate_header(&head);
       return head;
     }
-    strcpy(head.zmq_reply, reply_address);
-    ygglog_debug("reply_address = %s\n", head.zmq_reply);
+    if (!header_SetMetaString(&head, "zmq_reply", reply_address)) {
+      invalidate_header(&head);
+      return head;
+    }
+    ygglog_debug("reply_address = %s\n", reply_address);
   }
   return head;
 };
@@ -685,8 +691,6 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
 */
 static
 int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
-  //char headbuf[YGG_MSG_BUF];
-  size_t headbuf_len = YGG_MSG_BUF;
   int headlen = 0, ret = -1;
   comm_t* xmulti = NULL;
   int no_type = is_eof(data);
@@ -696,70 +700,53 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   }
   // Get header
   comm_head_t head = comm_send_multipart_header(x, data, len);
-  if (!(head.flags & HEAD_FLAG_VALID)) {
+  if (!header_is_valid(head)) {
     ygglog_error("comm_send_multipart: Invalid header generated.");
     return -1;
   }
-  char *headbuf = (char*)malloc(headbuf_len);
-  if (headbuf == NULL) {
-    ygglog_error("comm_send_multipart: Failed to malloc headbuf.");
+  char* headbuf = NULL; // Header will handle allocation/deallocation
+  size_t size_max = x->maxMsgSize - x->msgBufSize;
+  headlen = format_comm_header(&head, &headbuf, data, len, size_max, no_type);
+  if (headlen < 0) {
+    ygglog_error("comm_send_multipart: Failed to format header.");
+    destroy_header(&head);
     return -1;
   }
-  // Try to send body in header
-  if (len < (x->maxMsgSize - x->msgBufSize)) {
-    headlen = format_comm_header(&head, &headbuf, headbuf_len,
-				 x->maxMsgSize - x->msgBufSize,
-				 no_type);
-    if (headlen < 0) {
-      ygglog_error("comm_send_multipart: Failed to format header.");
-      free(headbuf);
-      return -1;
-    }
-    if (((size_t)headlen + len) < (x->maxMsgSize - x->msgBufSize)) {
-      if (((size_t)headlen + len + 1) > headbuf_len) {
-        char *t_headbuf = (char*)realloc(headbuf, (size_t)headlen + len + 1);
-        if (t_headbuf == NULL) {
-          ygglog_error("comm_send_multipart: Failed to realloc headbuf.");
-	  free(headbuf);
-          return -1;          
-        }
-	headbuf = t_headbuf;
-        headbuf_len = (size_t)headlen + len + 1;
-      }
-      head.flags = head.flags & ~HEAD_FLAG_MULTIPART;
-      memcpy(headbuf + headlen, data, len);
-      headlen += (int)len;
-      headbuf[headlen] = '\0';
-    }
-  }
-  // Get head string
-  if (head.flags & HEAD_FLAG_MULTIPART) {
+  // Update header with parameters for sending in multiple parts
+  if (header_is_multipart(head)) {
     // Get address for new comm and add to header
     xmulti = new_comm(NULL, "send", x->type, NULL);
     if ((xmulti == NULL) || (!(xmulti->flags & COMM_FLAG_VALID))) {
       ygglog_error("comm_send_multipart: Failed to initialize a new comm.");
-      free(headbuf);
+      destroy_header(&head);
       return -1;
     }
     xmulti->const_flags[0] = xmulti->const_flags[0] | COMM_EOF_SENT | COMM_EOF_RECV;
     xmulti->flags = xmulti->flags | COMM_FLAG_WORKER;
-    strcpy(head.address, xmulti->address);
+    if (!header_SetMetaString(&head, "address", xmulti->address)) {
+      ygglog_error("comm_send_multipart: Error setting address");
+      destroy_header(&head);
+      return -1;
+    }
     if (xmulti->type == ZMQ_COMM) {
       char *reply_address = set_reply_send(xmulti);
       if (reply_address == NULL) {
 	ygglog_error("comm_send_multipart: Could not set worker reply address.");
 	return -1;
       }
-      strcpy(head.zmq_reply_worker, reply_address);
+      if (!header_SetMetaString(&head, "zmq_reply_worker", reply_address)) {
+	ygglog_error("comm_send_multipart: Error setting zmq_reply_worker");
+	destroy_header(&head);
+	return -1;
+      }
       ygglog_debug("comm_send_multipart: zmq worker reply address is '%s'",
-		   head.zmq_reply_worker);
+		   reply_address);
     }
-    headlen = format_comm_header(&head, &headbuf, headbuf_len,
-				 x->maxMsgSize - x->msgBufSize,
+    headlen = format_comm_header(&head, &headbuf, data, len, size_max,
 				 no_type);
     if (headlen < 0) {
       ygglog_error("comm_send_multipart: Failed to format header.");
-      free(headbuf);
+      destroy_header(&head);
       if (xmulti != NULL) {
 	free_comm(xmulti);
       }
@@ -767,79 +754,55 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
     }
   }
   // Send header
-  size_t data_in_header = 0;
-  if ((head.flags & HEAD_META_IN_DATA) && ((size_t)headlen > (x->maxMsgSize - x->msgBufSize))) {
-    ret = comm_send_single(x, headbuf, x->maxMsgSize - x->msgBufSize);
-    data_in_header = headlen - (x->maxMsgSize - x->msgBufSize);
-  } else {
-    ret = comm_send_single(x, headbuf, headlen);
+  size_t prev = 0, msgsiz = 0;
+  msgsiz = headlen;
+  if (headlen > size_max) {
+    msgsiz = size_max;
+    prev += size_max;
   }
+  ret = comm_send_single(x, headbuf, msgsiz);
   if (ret < 0) {
     ygglog_error("comm_send_multipart: Failed to send header.");
     if (xmulti != NULL) {
       free_comm(xmulti);
     }
-    free(headbuf);
+    destroy_header(&head);
     return -1;
   }
-  if (!(head.flags & HEAD_FLAG_MULTIPART)) {
-    ygglog_debug("comm_send_multipart(%s): %d bytes completed", x->name, head.size);
-    free(headbuf);
+  if (!header_is_multipart(head)) {
+    ygglog_debug("comm_send_multipart(%s): %d bytes completed", x->name, headlen);
+    destroy_header(&head);
     return ret;
   }
-  // Send data stored in header
-  size_t msgsiz;
-  size_t prev = headlen - data_in_header;
+  // Send data
+  size_t size_max_multi = xmulti->maxMsgSize - xmulti->msgBufSize;
   while (prev < (size_t)headlen) {
-    if ((headlen - prev) > (xmulti->maxMsgSize - xmulti->msgBufSize)) {
-      msgsiz = xmulti->maxMsgSize - xmulti->msgBufSize;
-    } else {
-      msgsiz = headlen - prev;
-    }
+    msgsiz = headlen - prev;
+    if (msgsiz > size_max_multi)
+      msgsiz = size_max_multi;
     ret = comm_send_single(xmulti, headbuf + prev, msgsiz);
     if (ret < 0) {
-      ygglog_debug("comm_send_multipart(%s): send of data in header interupted at %d of %d bytes.",
-		   x->name, prev - (headlen - data_in_header), data_in_header);
-      break;
-    }
-    prev += msgsiz;
-    ygglog_debug("comm_send_multipart(%s): %d of %d bytes sent from data in header",
-		 x->name, prev - (headlen - data_in_header), data_in_header);
-  }
-  head.size = head.size - data_in_header;
-  if (ret < 0) {
-    ygglog_error("comm_send_multipart: Failed to send data from header.");
-    if (xmulti != NULL) {
-      free_comm(xmulti);
-    }
-    free(headbuf);
-    return -1;
-  }
-  // Send multipart
-  prev = 0;
-  while (prev < head.size) {
-    if ((head.size - prev) > (xmulti->maxMsgSize - xmulti->msgBufSize)) {
-      msgsiz = xmulti->maxMsgSize - xmulti->msgBufSize;
-    } else {
-      msgsiz = head.size - prev;
-    }
-    ret = comm_send_single(xmulti, data + prev, msgsiz);
-    if (ret < 0) {
-      ygglog_debug("comm_send_multipart(%s): send interupted at %d of %d bytes.",
-		   x->name, prev, head.size);
+      ygglog_debug("comm_send_multipart(%s): send interupted at %d of %d bytes",
+		   x->name, prev, headlen);
       break;
     }
     prev += msgsiz;
     ygglog_debug("comm_send_multipart(%s): %d of %d bytes sent",
-		 x->name, prev, head.size);
+		 x->name, prev, headlen);
   }
-  if (ret == 0)
-    ygglog_debug("comm_send_multipart(%s): %d bytes completed", x->name, head.size);
+  if (ret < 0) {
+    ygglog_error("comm_send_multipart: Failed to send data.");
+    if (xmulti != NULL) {
+      free_comm(xmulti);
+    }
+    destroy_header(&head);
+    return -1;
+  }
   // Free multipart
   if (xmulti != NULL) {
     free_comm(xmulti);
   }
-  free(headbuf);
+  destroy_header(&head);
   if (ret >= 0)
     x->const_flags[0] = x->const_flags[0] | COMM_FLAGS_USED;
   return ret;
@@ -869,7 +832,7 @@ int comm_send(const comm_t *x, const char *data, const size_t len) {
   int sending_eof = 0;
   if (is_eof(data)) {
     if (x->const_flags[0] & COMM_EOF_SENT) {
-      ygglog_debug("comm_send(%s): EOF already sent", x->name);
+      ygglog_error("comm_send(%s): EOF already sent", x->name);
       return ret;
     } else if (!(check_threaded_eof(x))) {
       ygglog_debug("comm_send(%s): EOF not sent on other threads", x->name);
@@ -971,15 +934,13 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
     return ret;
   }
   usleep(100);
-  comm_head_t head = parse_comm_header(*data, headlen);
-  if (!(head.flags & HEAD_FLAG_VALID)) {
+  // TODO: Use headlen instead of len?
+  comm_head_t head = create_recv_header(data, len, headlen, allow_realloc, 0);
+  if (!header_is_valid(head)) {
     ygglog_error("comm_recv_multipart(%s): Error parsing header.", x->name);
     ret = -1;
   } else {
-    // Move body to front of data and return if EOF
-    memmove(*data, *data + head.bodybeg, head.bodysiz);
-    (*data)[head.bodysiz] = '\0';
-    if (is_eof(*data)) {
+    if (head.flags[0] & HEAD_FLAG_EOF) {
       ygglog_debug("comm_recv_multipart(%s): EOF received.", x->name);
       x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV;
       destroy_header(&head);
@@ -998,37 +959,32 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       destroy_header(&head);
       return -1;
     }
-    if ((!(x->const_flags[0] & COMM_FLAGS_USED)) &&
-	(updtype->schema == NULL) &&
-	(!(head.flags & HEAD_META_IN_DATA))) {
-      ygglog_debug("comm_recv_multipart(%s): Updating datatype to '%s'",
-		   x->name, schema2name_c(head.dtype));
-      ret = update_dtype(updtype, head.dtype);
-      if (ret != 0) {
-	ygglog_error("comm_recv_multipart(%s): Error updating datatype.", x->name);
-	destroy_header(&head);
-	return -1;
-      }
-    } else if (head.dtype != NULL) {
+    void* head_schema = header_schema(head);
+    if (head_schema != NULL) {
       ygglog_debug("comm_recv_multipart(%s): Updating existing datatype to '%s' from '%s'",
-		   x->name, schema2name_c(head.dtype), schema2name_c(updtype->schema));
-      ret = update_dtype(updtype, head.dtype);
+		   x->name, schema2name_c(head_schema), schema2name_c(updtype->schema));
+      ret = update_dtype(updtype, head_schema);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
 	destroy_header(&head);
 	return -1;
       }
     }
-    if (head.flags & HEAD_FLAG_MULTIPART) {
+    if (header_is_multipart(head)) {
       ygglog_debug("comm_recv_multipart(%s): Message is multipart", x->name);
       // Return early if header contained entire message
-      if (head.size == head.bodysiz) {
+      if (head.size_data[0] == head.size_curr[0]) {
         x->const_flags[0] = x->const_flags[0] | COMM_FLAGS_USED;
 	destroy_header(&head);
-	return (int)(head.bodysiz);
+	return (int)(head.size_curr[0]);
       }
       // Get address for new comm
-      comm_t* xmulti = new_comm(head.address, "recv", x->type, NULL);
+      const char* address;
+      if (!header_GetMetaString(head, "address", &address)) {
+	destroy_header(&head);
+	return -1;
+      }
+      comm_t* xmulti = new_comm(address, "recv", x->type, NULL);
       if ((xmulti == NULL) || (!(xmulti->flags & COMM_FLAG_VALID))) {
 	ygglog_error("comm_recv_multipart: Failed to initialize a new comm.");
 	destroy_header(&head);
@@ -1037,7 +993,13 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       xmulti->const_flags[0] = xmulti->const_flags[0] | COMM_EOF_SENT | COMM_EOF_RECV;
       xmulti->flags = xmulti->flags | COMM_FLAG_WORKER;
       if (xmulti->type == ZMQ_COMM) {
-	int reply_socket = set_reply_recv(xmulti, head.zmq_reply_worker);
+	const char* zmq_reply_worker;
+	if (!header_GetMetaString(head, "zmq_reply_worker",
+				  &zmq_reply_worker)) {
+	  destroy_header(&head);
+	  return -1;
+	}
+	int reply_socket = set_reply_recv(xmulti, zmq_reply_worker);
 	if (reply_socket < 0) {
 	  ygglog_error("comm_recv_multipart: Failed to set worker reply address.");
 	  destroy_header(&head);
@@ -1045,67 +1007,33 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	}
       }
       // Receive parts of message
-      size_t prev = head.bodysiz;
+      size_t prev = head.size_curr[0];
       size_t msgsiz = 0;
-      // Reallocate data if necessary
-      if ((head.size + 1) > len) {
-	if (allow_realloc) {
-	  char *t_data = (char*)realloc(*data, head.size + 1);
-	  if (t_data == NULL) {
-	    ygglog_error("comm_recv_multipart(%s): Failed to realloc buffer",
-			 x->name);
-	    free(*data);
-	    free_comm(xmulti);
-	    destroy_header(&head);
-	    return -1;
-	  }
-	  *data = t_data;
- 	} else {
-	  ygglog_error("comm_recv_multipart(%s): buffer is not large enough",
-		       x->name);
-	  free_comm(xmulti);
-	  destroy_header(&head);
-	  return -1;
-	}
-      }
       ret = -1;
-      char *pos = (*data) + prev;
-      while (prev < head.size) {
-	msgsiz = head.size - prev + 1;
+      char *pos = (*data) + head.size_curr[0];
+      while (head.size_curr[0] < head.size_data[0]) {
+	msgsiz = head.size_data[0] - head.size_curr[0] + 1;
 	ret = comm_recv_single(xmulti, &pos, msgsiz, 0);
 	if (ret < 0) {
 	  ygglog_debug("comm_recv_multipart(%s): recv interupted at %d of %d bytes.",
-		       x->name, prev, head.size);
+		       x->name, head.size_curr[0], head.size_data[0]);
 	  break;
 	}
-	prev += ret;
+	head.size_curr[0] += ret;
 	pos += ret;
 	ygglog_debug("comm_recv_multipart(%s): %d of %d bytes received",
-		     x->name, prev, head.size);
+		     x->name, head.size_curr[0], head.size_data[0]);
       }
-      if ((ret > 0) && (head.flags & HEAD_META_IN_DATA)) {
-	ygglog_debug("comm_recv_multipart(%s): Extracting type from data.");
-	ret = parse_type_in_data(data, prev, &head);
-	if (ret > 0) {
-	  prev = ret;
-	  ret = update_dtype(updtype, head.dtype);
-	  if (ret != 0) {
-	    ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
-	    destroy_header(&head);
-	    return -1;
-	  } else {
-	    ret = (int)prev;
-	  }
-	}
-      }
+      if (ret > 0) 
+	ret = finalize_header_recv(head, updtype);
       if (ret > 0) {
 	ygglog_debug("comm_recv_multipart(%s): %d bytes completed", x->name, prev);
-	ret = (int)prev;
+	ret = (int)(head.size_curr[0]);
       }
       free_comm(xmulti);
     } else {
       ygglog_debug("comm_recv_multipart(%s): Message not multipart", x->name);
-      ret = (int)(head.bodysiz);
+      ret = (int)(head.size_data[0]);
     }
   }
   if (ret >= 0)
@@ -1252,6 +1180,7 @@ int vcommSend(const comm_t *x, va_list_t ap) {
   }
   // Update datatype if not yet set and object being sent includes type
   if (update_dtype_from_generic_ap(datatype, ap) < 0) {
+    ygglog_error("vcommSend(%s): Error updating dtype from generic", x->name);
     return -1;
   }
   size_t nargs_orig = size_va_list(ap);
@@ -1313,20 +1242,16 @@ int vcommRecv(comm_t *x, va_list_t ap) {
     return ret;
   }
   // Receive message
-  size_t buf_siz = YGG_MSG_BUF;
-  /* char *buf = NULL; */
-  char *buf = (char*)malloc(buf_siz);
-  if (buf == NULL) {
-    ygglog_error("vcommRecv(%s): Failed to alloc buffer", x->name);
-    return -1;
-  }
-  ret = comm_recv_nolimit(x, &buf, buf_siz);
+  char *buf = NULL;
+  size_t buf_siz = 0;
+  ret = comm_recv_realloc(x, &buf, buf_siz);
   if (ret < 0) {
-    // ygglog_error("vcommRecv(%s): Error receiving.", x->name);
+    if (ret == -2)
+      clear_va_list(&ap);
     free(buf);
     return ret;
   }
-  ygglog_debug("vcommRecv(%s): comm_recv returns %d: %.10s...", x->name, ret, buf);
+  ygglog_debug("vcommRecv(%s): comm_recv returns %d: %.100s...", x->name, ret, buf);
   // Deserialize message
   dtype_t *datatype = x->datatype;
   if (x->type == SERVER_COMM) {

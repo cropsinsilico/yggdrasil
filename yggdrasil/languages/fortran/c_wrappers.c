@@ -244,7 +244,7 @@ int ygg_send_var_f(const void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_send_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
   int out = vcommSend((const comm_t*)yggQ, ap);
   end_va_list(&ap);
   return out;
@@ -255,8 +255,8 @@ int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
-  int out = vcommRecv((comm_t*)yggQ, 0, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vcommRecv((comm_t*)yggQ, ap);
   end_va_list(&ap);
   return out;
 }
@@ -266,8 +266,8 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
-  int out = vcommRecv((comm_t*)yggQ, 1, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1, 1);
+  int out = vcommRecv((comm_t*)yggQ, ap);
   end_va_list(&ap);
   return out;
 }
@@ -289,8 +289,8 @@ int rpc_call_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
-  int out = vrpcCallBase((comm_t*)yggQ, 0, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, ap);
   end_va_list(&ap);
   return out;
 }
@@ -300,8 +300,8 @@ int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1);
-  int out = vrpcCallBase((comm_t*)yggQ, 1, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, ap);
   end_va_list(&ap);
   return out;
 }
@@ -336,6 +336,11 @@ void display_ply_f(ply_t p) {
   display_ply(p);
 }
 
+int nelements_ply_f(ply_t p, const char* name) {
+  return nelements_ply(p, name);
+}
+
+
 // Obj interface
 obj_t init_obj_f() {
   return init_obj();
@@ -364,6 +369,10 @@ void display_obj_indent_f(obj_t p, const char *indent) {
 
 void display_obj_f(obj_t p) {
   display_obj(p);
+}
+
+int nelements_obj_f(obj_t p, const char* name) {
+  return nelements_obj(p, name);
 }
 
 
@@ -412,16 +421,24 @@ int set_generic_array_f(generic_t arr, const size_t i, generic_t x) {
   return set_generic_array(arr, i, x);
 }
 
-int get_generic_array_f(generic_t arr, const size_t i, void* x, int copy) {
-  return get_generic_array(arr, i, (generic_t*)x, copy);
+int get_generic_array_f(generic_t arr, const size_t i, void* x) {
+  return get_generic_array(arr, i, (generic_t*)x);
+}
+
+int get_generic_array_ref_f(generic_t arr, const size_t i, void* x) {
+  return get_generic_array_ref(arr, i, (generic_t*)x);
 }
 
 int set_generic_object_f(generic_t arr, const char* k, generic_t x) {
   return set_generic_object(arr, k, x);
 }
 
-int get_generic_object_f(generic_t arr, const char* k, void* x, int copy) {
-  return get_generic_object(arr, k, (generic_t*)x, copy);
+int get_generic_object_f(generic_t arr, const char* k, void* x) {
+  return get_generic_object(arr, k, (generic_t*)x);
+}
+
+int get_generic_object_ref_f(generic_t arr, const char* k, void* x) {
+  return get_generic_object_ref(arr, k, (generic_t*)x);
 }
 
 // Python interface

@@ -560,6 +560,14 @@
        implicit none
        type(yggply), value, intent(in) :: p
      end subroutine display_ply_c
+     function nelements_ply_c(p, name) result(out) bind(c, name="nelements_ply_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_int
+       import :: yggply
+       implicit none
+       type(yggply), value, intent(in) :: p
+       character(kind=c_char), dimension(*), intent(in) :: name
+       integer(kind=c_int) :: out
+     end function nelements_ply_c
 
      ! Obj interface
      function init_obj_c() result(out) bind(c, name="init_obj_f")
@@ -597,6 +605,14 @@
        implicit none
        type(yggobj), value, intent(in) :: p
      end subroutine display_obj_c
+     function nelements_obj_c(p, name) result(out) bind(c, name="nelements_obj_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_int
+       import :: yggobj
+       implicit none
+       type(yggobj), value, intent(in) :: p
+       character(kind=c_char), dimension(*), intent(in) :: name
+       integer(kind=c_int) :: out
+     end function nelements_obj_c
 
      ! Generic interface
      function init_generic_c() result(out) &
@@ -683,7 +699,7 @@
        type(ygggeneric), value, intent(in) :: x
        integer(kind=c_int) :: out
      end function set_generic_array_c
-     function get_generic_array_c(arr, i, x, copy) result(out) &
+     function get_generic_array_c(arr, i, x) result(out) &
           bind(c, name="get_generic_array_f")
        use, intrinsic :: iso_c_binding, only: c_int, c_size_t, c_ptr
        import :: ygggeneric
@@ -691,9 +707,18 @@
        type(ygggeneric), value, intent(in) :: arr
        integer(kind=c_size_t), value, intent(in) :: i
        type(c_ptr), value :: x
-       integer(kind=c_int), value, intent(in) :: copy
        integer(kind=c_int) :: out
      end function get_generic_array_c
+     function get_generic_array_ref_c(arr, i, x) result(out) &
+          bind(c, name="get_generic_array_ref_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_size_t, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value, intent(in) :: arr
+       integer(kind=c_size_t), value, intent(in) :: i
+       type(c_ptr), value :: x
+       integer(kind=c_int) :: out
+     end function get_generic_array_ref_c
      function set_generic_object_c(arr, k, x) result(out) &
           bind(c, name="set_generic_object_f")
        use, intrinsic :: iso_c_binding, only: c_int, c_char
@@ -704,7 +729,7 @@
        type(ygggeneric), value, intent(in) :: x
        integer(kind=c_int) :: out
      end function set_generic_object_c
-     function get_generic_object_c(arr, k, x, copy) result(out) &
+     function get_generic_object_c(arr, k, x) result(out) &
           bind(c, name="get_generic_object_f")
        use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr
        import :: ygggeneric
@@ -712,9 +737,18 @@
        type(ygggeneric), value :: arr
        character(kind=c_char), dimension(*), intent(in) :: k
        type(c_ptr), value :: x
-       integer(kind=c_int), value, intent(in) :: copy
        integer(kind=c_int) :: out
      end function get_generic_object_c
+     function get_generic_object_ref_c(arr, k, x) result(out) &
+          bind(c, name="get_generic_object_ref_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: arr
+       character(kind=c_char), dimension(*), intent(in) :: k
+       type(c_ptr), value :: x
+       integer(kind=c_int) :: out
+     end function get_generic_object_ref_c
 
      ! Python interface
      function init_python_c() result(out) &

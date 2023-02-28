@@ -2752,9 +2752,11 @@ class ModelDriver(Driver):
                                    imports={'filename': model_file,
                                             'function': model_function})
         if verbose:  # pragma: debug
-            logger.info('\n' + '\n'.join(out))
+            logger.info('\n' + '\n'.join(
+                [f"{i + 1:3}: {x}" for i, x in enumerate(out)]))
         else:
-            logger.debug('\n' + '\n'.join(out))
+            logger.debug('\n' + '\n'.join(
+                [f"{i + 1:3}: {x}" for i, x in enumerate(out)]))
         return out
 
     @classmethod

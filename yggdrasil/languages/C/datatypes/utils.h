@@ -55,6 +55,7 @@ size_t count_matches_raise(const char *regex_text, const char *to_match) {
   @param[out] eind size_t ** indices of where matches ends.
   @return size_t Number of matches/submatches found.
 */
+static inline
 size_t find_matches_raise(const char *regex_text, const char *to_match,
         size_t **sind, size_t **eind) {
   int out = find_matches(regex_text, to_match, sind, eind);
@@ -76,6 +77,7 @@ size_t find_matches_raise(const char *regex_text, const char *to_match,
   @return size_t Number of matches found. -1 is returned if the regex could not be
   compiled.
 */
+static inline
 size_t find_match_raise(const char *regex_text, const char *to_match,
             size_t *sind, size_t *eind) {
   int out = find_match(regex_text, to_match, sind, eind);
