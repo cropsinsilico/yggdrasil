@@ -35,12 +35,12 @@ if __name__ == "__main__":
         "Update the model form schema via pull request to the"
         "cropsinsilico/model_submission_form repository.")
     parser.add_argument(
-        '--token',
+        '--token', type=str,
         help=("Github authentication token that should be used to open the "
               "pull request. The token must have write access to the "
               "cropsinsilico/model_submission_form repository."))
     args = parser.parse_args()
     if args.token is None:
         args.token = os.environ.get('YGGDRASIL_UPDATE_TOKEN', None)
-    assert(args.token)
+    assert args.token
     update_schema = update_schema(args.token)
