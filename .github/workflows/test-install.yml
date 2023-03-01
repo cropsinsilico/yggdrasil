@@ -1621,7 +1621,7 @@ jobs:
 
         '
     - name: Publish package to PyPI
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
         password: ${{ secrets.pypi }}
@@ -1683,4 +1683,5 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Update the form
-      run: python utils/update_form_schema.py
+      run: python utils/update_form_schema.py --token=${{ secrets.YGGDRASIL_UPDATE_TOKEN
+        }}
