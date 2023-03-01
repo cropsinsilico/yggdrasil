@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>osr &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>osr &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -27,14 +24,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -84,7 +85,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">osr</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/examples/osr.rst.txt" rel="nofollow"> View page source</a>
@@ -98,7 +99,7 @@
   <section id="osr">
 <span id="osr-rst"></span><h1>osr<a class="headerlink" href="#osr" title="Permalink to this heading">¶</a></h1>
 <p>Two models run in a time step synchonization pattern where one of the models is the OpenSimRoot simulation code and the other is a dummy stand in. This example demonstrates how to run OSR simulations as part of yggdrasil integrations and the use of the <cite>timesync</cite> model parameter and communication pattern.</p>
-<div class="contents local topic" id="contents">
+<nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#c-version" id="id2">C Version</a></p></li>
 <li><p><a class="reference internal" href="#id1" id="id3">C++ Version</a></p></li>
@@ -107,9 +108,9 @@
 <li><p><a class="reference internal" href="#python-version" id="id6">Python Version</a></p></li>
 <li><p><a class="reference internal" href="#r-version" id="id7">R Version</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="c-version">
-<h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="cp">#define _USE_MATH_DEFINES  </span><span class="c1">// Required to use M_PI with MSVC</span>
 <span class="linenos">  2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
@@ -367,24 +368,25 @@
 <span class="linenos">14</span><span class="w">    </span><span class="nt">copy_xml_to_osr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 <span class="linenos">15</span><span class="w">    </span><span class="nt">update_interval</span><span class="p">:</span>
 <span class="linenos">16</span><span class="w">      </span><span class="nt">timesync</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
-<span class="linenos">17</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">other_model</span>
-<span class="linenos">18</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos">19</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
-<span class="linenos">20</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/other_model.c</span>
-<span class="linenos">21</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
-<span class="linenos">22</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hr</span>
-<span class="linenos">23</span><span class="w">    </span><span class="nt">timesync</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos">24</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">25</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span>
-<span class="linenos">26</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">27</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">other_model_output.txt</span>
-<span class="linenos">28</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos">29</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">17</span><span class="w">    </span><span class="nt">disable_python_c_api</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">18</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">other_model</span>
+<span class="linenos">19</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos">20</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos">21</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/other_model.c</span>
+<span class="linenos">22</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="linenos">23</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hr</span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">timesync</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">28</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">other_model_output.txt</span>
+<span class="linenos">29</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">30</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span>
 </pre></div>
 </div>
 </section>
 <section id="id1">
-<h2><a class="toc-backref" href="#id3">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="cp">#define _USE_MATH_DEFINES  </span><span class="c1">// Required to use M_PI with MSVC</span>
 <span class="linenos">  2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
@@ -659,7 +661,7 @@
 </div>
 </section>
 <section id="fortran-version">
-<h2><a class="toc-backref" href="#id4">Fortran Version</a><a class="headerlink" href="#fortran-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Fortran Version</a><a class="headerlink" href="#fortran-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>program main
 <span class="linenos">  2</span>  use fygg
@@ -949,7 +951,7 @@
 </div>
 </section>
 <section id="matlab-version">
-<h2><a class="toc-backref" href="#id5">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">timesync</span><span class="p">(</span>t_step, t_units<span class="p">)</span>
 <span class="linenos"> 2</span>
@@ -1178,7 +1180,7 @@
 </div>
 </section>
 <section id="python-version">
-<h2><a class="toc-backref" href="#id6">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
@@ -1416,7 +1418,7 @@
 </div>
 </section>
 <section id="r-version">
-<h2><a class="toc-backref" href="#id7">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>library(yggdrasil)
 <span class="linenos"> 2</span>

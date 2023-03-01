@@ -95,6 +95,8 @@ timesync                                       If set, the model is assumed to c
 valgrind_flags            array                Flags to pass to valgrind. Defaults to [].                                      
 validation_command        string               Path to a validation command that can be used to verify that the model ran as   
                                                expected. A non-zero return code is taken to indicate failure.                  
+with_debugger             string               Debugger tool that should be used to run models. This string should include the 
+                                               tool executable and any flags that should be passed to it.                      
 with_strace               boolean              If True, the command is run with strace (on Linux) or dtrace (on MacOS).        
                                                Defaults to False.                                                              
 with_valgrind             boolean              If True, the command is run with valgrind. Defaults to False.                   

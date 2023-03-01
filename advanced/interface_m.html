@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matlab Interface &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>Matlab Interface &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -29,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -104,7 +105,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Advanced</a></li>
           <li class="breadcrumb-item"><a href="model_interface.html">Model Interface</a></li>
       <li class="breadcrumb-item active">Matlab Interface</li>
@@ -131,19 +132,18 @@
 </pre></div>
 </div>
 </p>
-<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s1">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s1">&#39;output_channel_name&#39;</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s1">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s1">&#39;output_channel_name&#39;</span><span class="p">);</span>
 <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">output1</span><span class="p">,</span> <span class="n">output2</span><span class="p">,</span> <span class="o">...</span><span class="p">);</span>
 </pre></div>
 </div>
- </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>type</strong> – The name of the Python interface that should be called (e.g. <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggInput">YggInput</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggOutput">YggOutput</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcClient">YggRpcClient</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcServer">YggRpcServer</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggInterface.YggTimesync">YggTimesync</a>) </p></li>
 <li><p><strong>varargin</strong> – Additional parameters will be passed to the Python interface function.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>out python object returned by the called class/function.</p>
 </dd>
 </dl>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C++ Interface &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>C++ Interface &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -29,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -104,7 +105,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Advanced</a></li>
           <li class="breadcrumb-item"><a href="model_interface.html">Model Interface</a></li>
       <li class="breadcrumb-item active">C++ Interface</li>
@@ -135,7 +136,7 @@
 <span id="_CPPv3N8YggInput8YggInputEPKc"></span><span id="_CPPv2N8YggInput8YggInputEPKc"></span><span id="YggInput::YggInput__cCP"></span><span class="target" id="class_ygg_input_1aba0f47fe2b945efbf029e0a27c14f979"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </p>
 </dd>
 </dl>
@@ -146,7 +147,7 @@
 <span id="_CPPv3N8YggInput8YggInputEKNSt6stringE"></span><span id="_CPPv2N8YggInput8YggInputEKNSt6stringE"></span><span id="YggInput::YggInput__ssC"></span><span class="target" id="class_ygg_input_1a0f72f542fd32105e6dc847e7a2d395e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> w/ C++ std::string. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> const std::string Name of input queue. This should be the argument to an input driver in the yaml specification file. </p>
 </dd>
 </dl>
@@ -163,7 +164,7 @@
 <span id="_CPPv3N8YggInput8YggInputEPKcPKc"></span><span id="_CPPv2N8YggInput8YggInputEPKcPKc"></span><span id="YggInput::YggInput__cCP.cCP"></span><span class="target" id="class_ygg_input_1a574f0975187b352ccc7a39b3d97da65b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fmt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> with format. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
 <li><p><strong>fmt</strong> – <strong>[in]</strong> character pointer to format string for parsing messages. </p></li>
@@ -177,7 +178,7 @@
 <span id="_CPPv3N8YggInput8YggInputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N8YggInput8YggInputEKNSt6stringEKNSt6stringE"></span><span id="YggInput::YggInput__ssC.ssC"></span><span class="target" id="class_ygg_input_1a029acfa98a88b2722925e3b8c7e28d95"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> with format. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> const std::string Name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
 <li><p><strong>fmt</strong> – <strong>[in]</strong> const std::string Format string for parsing messages. </p></li>
@@ -191,7 +192,7 @@
 <span id="_CPPv3N8YggInput8YggInputEPKcP7dtype_t"></span><span id="_CPPv2N8YggInput8YggInputEPKcP7dtype_t"></span><span id="YggInput::YggInput__cCP.dtype_tP"></span><span class="target" id="class_ygg_input_1abbe2d7834803896167c977b7489b3302"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">datatype</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEPKcP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for YggIntput with explicit datatype. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
 <li><p><strong>datatype</strong> – <strong>[in]</strong> Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. containing type information. </p></li>
@@ -205,7 +206,7 @@
 <span id="_CPPv3N8YggInput8YggInputEKNSt6stringEP7dtype_t"></span><span id="_CPPv2N8YggInput8YggInputEKNSt6stringEP7dtype_t"></span><span id="YggInput::YggInput__ssC.dtype_tP"></span><span class="target" id="class_ygg_input_1ab9d33891400732ed2e89b69045a08ee7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">datatype</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEKNSt6stringEP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for YggIntput with explicit datatype. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> const std::string Name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
 <li><p><strong>datatype</strong> – <strong>[in]</strong> Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. containing type information. </p></li>
@@ -231,7 +232,7 @@
 <span id="_CPPv3N8YggInput2piEv"></span><span id="_CPPv2N8YggInput2piEv"></span><span id="YggInput::pi"></span><span class="target" id="class_ygg_input_1af94fea380a83a0f2f43c89fbd8cc2ba7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">yggInput_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pi</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput2piEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Return the yggInput_t structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>yggInput_t structure underlying the class. </p>
 </dd>
 </dl>
@@ -242,13 +243,13 @@
 <span id="_CPPv3N8YggInput4recvEPcK6size_t"></span><span id="_CPPv2N8YggInput4recvEPcK6size_t"></span><span id="YggInput::recv__cP.sC"></span><span class="target" id="class_ygg_input_1a730e7c5e58c5ef5cf2b7e0c9660db18e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recv</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput4recvEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message shorter than YGG_MSG_MAX from the input queue. See ygg_recv in YggInterface.h for additional details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – <strong>[out]</strong> character pointer to allocated buffer where the message should be saved. </p></li>
 <li><p><strong>len</strong> – <strong>[in]</strong> size_t length of the allocated message buffer in bytes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int -1 if message could not be received. Length of the received message if message was received. </p>
 </dd>
 </dl>
@@ -259,13 +260,13 @@
 <span id="_CPPv3N8YggInput4recvEKiz"></span><span id="_CPPv2N8YggInput4recvEKiz"></span><span id="YggInput::recv__iC.z"></span><span class="target" id="class_ygg_input_1a6b6493c28a41c6f66302d31bb634aa1e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recv</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message shorter than YGG_MSG_MAX from the input queue. See yggRecv from YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[out]</strong> mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -276,13 +277,13 @@
 <span id="_CPPv3N8YggInput11recvReallocEKiz"></span><span id="_CPPv2N8YggInput11recvReallocEKiz"></span><span id="YggInput::recvRealloc__iC.z"></span><span class="target" id="class_ygg_input_1a38b8271f204d0c1ea5d258453ec657b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recvRealloc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput11recvReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message from the input queue, allowing destination variables to be reallocated. The pointers passed must be on heap. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[out]</strong> mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -293,13 +294,13 @@
 <span id="_CPPv3N8YggInput12recv_nolimitEPPcK6size_t"></span><span id="_CPPv2N8YggInput12recv_nolimitEPPcK6size_t"></span><span id="YggInput::recv_nolimit__cPP.sC"></span><span class="target" id="class_ygg_input_1ad513540a2cc8c69009fa05a2498628f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recv_nolimit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput12recv_nolimitEPPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message larger than YGG_MSG_MAX from the input queue. See ygg_recv_nolimit in YggInterface.h for additional details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – <strong>[out]</strong> character pointer to allocated buffer where the message should be saved. </p></li>
 <li><p><strong>len</strong> – <strong>[in]</strong> size_t length of the allocated message buffer in bytes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int -1 if message could not be received. Length of the received message if message was received. </p>
 </dd>
 </dl>
@@ -310,13 +311,13 @@
 <span id="_CPPv3N8YggInput12recv_nolimitEKiz"></span><span id="_CPPv2N8YggInput12recv_nolimitEKiz"></span><span id="YggInput::recv_nolimit__iC.z"></span><span class="target" id="class_ygg_input_1ac5edea68d3188b1e22a08aa9ce42c28b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recv_nolimit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput12recv_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message larger than YGG_MSG_MAX from the input queue. See yggRecv from YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[out]</strong> mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -340,7 +341,7 @@
 <span id="_CPPv3N9YggOutput9YggOutputEPKc"></span><span id="_CPPv2N9YggOutput9YggOutputEPKc"></span><span id="YggOutput::YggOutput__cCP"></span><span class="target" id="class_ygg_output_1aec62c628332beba733a65bc603be7cb7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </p>
 </dd>
 </dl>
@@ -351,7 +352,7 @@
 <span id="_CPPv3N9YggOutput9YggOutputEKNSt6stringE"></span><span id="_CPPv2N9YggOutput9YggOutputEKNSt6stringE"></span><span id="YggOutput::YggOutput__ssC"></span><span class="target" id="class_ygg_output_1a136a57e7c5a5b5ba1a18cf8ee539b528"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> const std::string name of output queue. This should be the argument to an output driver in the yaml specification file. </p>
 </dd>
 </dl>
@@ -362,7 +363,7 @@
 <span id="_CPPv3N9YggOutput9YggOutputEPKcPKc"></span><span id="_CPPv2N9YggOutput9YggOutputEPKcPKc"></span><span id="YggOutput::YggOutput__cCP.cCP"></span><span class="target" id="class_ygg_output_1ac731249ebab6b5de86909960cdf2ac46"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fmt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with format. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
 <li><p><strong>fmt</strong> – <strong>[in]</strong> character pointer to format string for formatting variables. </p></li>
@@ -376,7 +377,7 @@
 <span id="_CPPv3N9YggOutput9YggOutputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N9YggOutput9YggOutputEKNSt6stringEKNSt6stringE"></span><span id="YggOutput::YggOutput__ssC.ssC"></span><span class="target" id="class_ygg_output_1aa4d817e109c18517b98c3084784d5d58"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with format. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> const std::string name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
 <li><p><strong>fmt</strong> – <strong>[in]</strong> const std::string format string for formatting variables. </p></li>
@@ -390,7 +391,7 @@
 <span id="_CPPv3N9YggOutput9YggOutputEPKcP7dtype_t"></span><span id="_CPPv2N9YggOutput9YggOutputEPKcP7dtype_t"></span><span id="YggOutput::YggOutput__cCP.dtype_tP"></span><span class="target" id="class_ygg_output_1a0fb4628536eac0775a73e2d6a0a52d81"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">datatype</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEPKcP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with explicit datatype. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
 <li><p><strong>datatype</strong> – <strong>[in]</strong> Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. </p></li>
@@ -404,7 +405,7 @@
 <span id="_CPPv3N9YggOutput9YggOutputEKNSt6stringEP7dtype_t"></span><span id="_CPPv2N9YggOutput9YggOutputEKNSt6stringEP7dtype_t"></span><span id="YggOutput::YggOutput__ssC.dtype_tP"></span><span class="target" id="class_ygg_output_1aef16c78409a2d133d2d33d580ede6243"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">datatype</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEKNSt6stringEP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with explicit datatype. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> const std::string name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
 <li><p><strong>datatype</strong> – <strong>[in]</strong> Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. </p></li>
@@ -436,7 +437,7 @@
 <span id="_CPPv3N9YggOutput2piEv"></span><span id="_CPPv2N9YggOutput2piEv"></span><span id="YggOutput::pi"></span><span class="target" id="class_ygg_output_1a66b1230c544de87b95ec351d18ca5abe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">yggOutput_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pi</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput2piEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Return the yggOutput_t structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>yggOutput_t structure underlying the class. </p>
 </dd>
 </dl>
@@ -447,13 +448,13 @@
 <span id="_CPPv3N9YggOutput4sendEPKcK6size_t"></span><span id="_CPPv2N9YggOutput4sendEPKcK6size_t"></span><span id="YggOutput::send__cCP.sC"></span><span class="target" id="class_ygg_output_1a9896b233529d284c9d2d9ea6b818c903"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput4sendEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a message smaller than YGG_MSG_MAX to the output queue. If the message is larger than YGG_MSG_MAX an error code will be returned. See ygg_send in YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – <strong>[in]</strong> character pointer to message that should be sent. </p></li>
 <li><p><strong>len</strong> – <strong>[in]</strong> size_t length of message to be sent. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 if send succesfull, -1 if send unsuccessful. </p>
 </dd>
 </dl>
@@ -464,13 +465,13 @@
 <span id="_CPPv3N9YggOutput4sendEKiz"></span><span id="_CPPv2N9YggOutput4sendEKiz"></span><span id="YggOutput::send__iC.z"></span><span class="target" id="class_ygg_output_1ae174c7badb998a6c6c7ca0e1c9caf12a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a message smaller than YGG_MSG_MAX to the output queue. See yggSend from YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[in]</strong> arguments for formatting. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -481,13 +482,13 @@
 <span id="_CPPv3N9YggOutput12send_nolimitEPKcK6size_t"></span><span id="_CPPv2N9YggOutput12send_nolimitEPKcK6size_t"></span><span id="YggOutput::send_nolimit__cCP.sC"></span><span class="target" id="class_ygg_output_1a82db25848c7a96e112e314c2efb64bd3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send_nolimit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput12send_nolimitEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a message larger than YGG_MSG_MAX to the output queue. See ygg_send_nolimit in YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – <strong>[in]</strong> character pointer to message that should be sent. </p></li>
 <li><p><strong>len</strong> – <strong>[in]</strong> size_t length of message to be sent. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 if send succesfull, -1 if send unsuccessful. </p>
 </dd>
 </dl>
@@ -498,13 +499,13 @@
 <span id="_CPPv3N9YggOutput12send_nolimitEKiz"></span><span id="_CPPv2N9YggOutput12send_nolimitEKiz"></span><span id="YggOutput::send_nolimit__iC.z"></span><span class="target" id="class_ygg_output_1a34346f05bb083d5bf8672ef59b86e82d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send_nolimit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput12send_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a message larger than YGG_MSG_MAX to the output queue. See yggSend from YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[in]</strong> arguments for formatting. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -515,7 +516,7 @@
 <span id="_CPPv3N9YggOutput8send_eofEv"></span><span id="_CPPv2N9YggOutput8send_eofEv"></span><span id="YggOutput::send_eof"></span><span class="target" id="class_ygg_output_1a24cbf867657171eed5a4ad166d466b3b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send_eof</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput8send_eofEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send EOF message to output file, closing it. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int 0 if send was succesfull. All other values indicate errors. </p>
 </dd>
 </dl>
@@ -557,7 +558,7 @@
 <span id="_CPPv3N6YggRpc2piEv"></span><span id="_CPPv2N6YggRpc2piEv"></span><span id="YggRpc::pi"></span><span class="target" id="class_ygg_rpc_1ac7e39cad4e77a0b5e29b371da6e34338"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">yggRpc_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pi</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6YggRpc2piEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Return the yggRpc_t structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>yggRpc_t structure underlying the class. </p>
 </dd>
 </dl>
@@ -568,13 +569,13 @@
 <span id="_CPPv3N6YggRpc4sendEKiz"></span><span id="_CPPv2N6YggRpc4sendEKiz"></span><span id="YggRpc::send__iC.z"></span><span class="target" id="class_ygg_rpc_1ab5b618d5e5d61d5d66c24d117b1ed66c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6YggRpc4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a message to an RPC output queue. See rpcSend from YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[in]</strong> arguments for formatting. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -585,13 +586,13 @@
 <span id="_CPPv3N6YggRpc4recvEKiz"></span><span id="_CPPv2N6YggRpc4recvEKiz"></span><span id="YggRpc::recv__iC.z"></span><span class="target" id="class_ygg_rpc_1a95d9822a90d6299add4ff615a4187b0f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recv</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6YggRpc4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message from an RPC input queue. See rpcRecv from YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[out]</strong> mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -602,13 +603,13 @@
 <span id="_CPPv3N6YggRpc11recvReallocEKiz"></span><span id="_CPPv2N6YggRpc11recvReallocEKiz"></span><span id="YggRpc::recvRealloc__iC.z"></span><span class="target" id="class_ygg_rpc_1aaa05e7b5d147b501b0b934f2fca72cad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recvRealloc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6YggRpc11recvReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message from an RPC input queue, allowing destination memory to be reallocated as necessary. See rpcRecv from YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[out]</strong> mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned and reallocated if they are not large enough, they should be references to pointer for heap memory that may or may not have already been allocated. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -630,7 +631,7 @@
 <span id="_CPPv3N12YggRpcServer12YggRpcServerEPKcPKcPKc"></span><span id="_CPPv2N12YggRpcServer12YggRpcServerEPKcPKcPKc"></span><span id="YggRpcServer::YggRpcServer__cCP.cCP.cCP"></span><span class="target" id="class_ygg_rpc_server_1aefbc1c6bdff7dc8417cb2357e8d83326"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggRpcServer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">inFormat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">outFormat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcServer12YggRpcServerEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer name used for input and output queues. </p></li>
 <li><p><strong>inFormat</strong> – <strong>[in]</strong> character pointer to format that should be used for parsing input. </p></li>
@@ -645,7 +646,7 @@
 <span id="_CPPv3N12YggRpcServer12YggRpcServerEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N12YggRpcServer12YggRpcServerEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="YggRpcServer::YggRpcServer__ssC.ssC.ssC"></span><span class="target" id="class_ygg_rpc_server_1a1c9108f613eb9db937f93e09edbe47da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggRpcServer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">inFormat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">outFormat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcServer12YggRpcServerEKNSt6stringEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant std::string name used for input and output queues. </p></li>
 <li><p><strong>inFormat</strong> – <strong>[in]</strong> const std::string format that should be used for parsing input. </p></li>
@@ -660,7 +661,7 @@
 <span id="_CPPv3N12YggRpcServer12YggRpcServerEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="_CPPv2N12YggRpcServer12YggRpcServerEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="YggRpcServer::YggRpcServer__ssC.dtype_tP.dtype_tP"></span><span class="target" id="class_ygg_rpc_server_1a705cc9e1a535de27171bccd45008e3d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggRpcServer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">inType</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">outType</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcServer12YggRpcServerEKNSt6stringEP7dtype_tP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a> with explicit datatype. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant std::string name used for input and output queues. </p></li>
 <li><p><strong>inType</strong> – <strong>[in]</strong> Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be received by the server </p></li>
@@ -693,7 +694,7 @@
 <span id="_CPPv3N12YggRpcClient12YggRpcClientEPKcPKcPKc"></span><span id="_CPPv2N12YggRpcClient12YggRpcClientEPKcPKcPKc"></span><span id="YggRpcClient::YggRpcClient__cCP.cCP.cCP"></span><span class="target" id="class_ygg_rpc_client_1a89d4a24359bc25ac8a789e580be6dcca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggRpcClient</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">outFormat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">inFormat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClient12YggRpcClientEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer name used for input and output queues. </p></li>
 <li><p><strong>outFormat</strong> – <strong>[in]</strong> character pointer to format that should be used for formatting output. </p></li>
@@ -708,7 +709,7 @@
 <span id="_CPPv3N12YggRpcClient12YggRpcClientEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N12YggRpcClient12YggRpcClientEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="YggRpcClient::YggRpcClient__ssC.ssC.ssC"></span><span class="target" id="class_ygg_rpc_client_1a4cbe97d0da08652966ffbfaaadec25db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggRpcClient</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">outFormat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">inFormat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClient12YggRpcClientEKNSt6stringEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant std::string name used for input and output queues. </p></li>
 <li><p><strong>outFormat</strong> – <strong>[in]</strong> const std::string format that should be used for formatting output. </p></li>
@@ -723,7 +724,7 @@
 <span id="_CPPv3N12YggRpcClient12YggRpcClientEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="_CPPv2N12YggRpcClient12YggRpcClientEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="YggRpcClient::YggRpcClient__ssC.dtype_tP.dtype_tP"></span><span class="target" id="class_ygg_rpc_client_1a6f4d2d4e2a2ad421d590a8f5f30c53e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggRpcClient</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">outType</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">inType</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClient12YggRpcClientEKNSt6stringEP7dtype_tP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a> with explicit datatype. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant std::string name used for input and output queues. </p></li>
 <li><p><strong>outType</strong> – <strong>[in]</strong> Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be sent by the client. </p></li>
@@ -738,13 +739,13 @@
 <span id="_CPPv3N12YggRpcClient4callEKiz"></span><span id="_CPPv2N12YggRpcClient4callEKiz"></span><span id="YggRpcClient::call__iC.z"></span><span class="target" id="class_ygg_rpc_client_1a55f72ecc97b158b846f87db3909aa109"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">call</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClient4callEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response, preserving the current sizes of memory at the provided output variable references. See rpcCall in YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[inout]</strong> mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -755,13 +756,13 @@
 <span id="_CPPv3N12YggRpcClient11callReallocEKiz"></span><span id="_CPPv2N12YggRpcClient11callReallocEKiz"></span><span id="YggRpcClient::callRealloc__iC.z"></span><span class="target" id="class_ygg_rpc_client_1a14f610175520f43683277e6d0e857521"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">callRealloc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClient11callReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response, allowing the memory pointed to by the pointers that the output variables reference to be reallocated. See rpcCall in YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nargs</strong> – <strong>[in]</strong> int Number of arguments being passed. </p></li>
 <li><p><strong>...</strong> – <strong>[inout]</strong> mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be references to pointers for heap memory that may or may not have already been allocated. These will be reallocated if they are not large enough to receive data from the incoming message. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
 </dd>
 </dl>
@@ -783,7 +784,7 @@
 <span id="_CPPv3N11YggTimesync11YggTimesyncEPKcPKc"></span><span id="_CPPv2N11YggTimesync11YggTimesyncEPKcPKc"></span><span id="YggTimesync::YggTimesync__cCP.cCP"></span><span class="target" id="class_ygg_timesync_1a62c34e85bd2cfb6e2039fc35011d389f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggTimesync</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;timesync&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t_units</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggTimesync11YggTimesyncEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_timesync"><span class="std std-ref">YggTimesync</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer name used for input and output queues. </p></li>
 <li><p><strong>t_units</strong> – <strong>[in]</strong> const char* Units that should be used for the timestep. “” indicates no units. </p></li>
@@ -797,7 +798,7 @@
 <span id="_CPPv3N11YggTimesync11YggTimesyncEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N11YggTimesync11YggTimesyncEKNSt6stringEKNSt6stringE"></span><span id="YggTimesync::YggTimesync__ssC.ssC"></span><span class="target" id="class_ygg_timesync_1a647be82b8ab939533b7d7d18a39949d3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggTimesync</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;timesync&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t_units</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggTimesync11YggTimesyncEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_timesync"><span class="std std-ref">YggTimesync</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> const std::string name used for input and output queues. </p></li>
 <li><p><strong>t_units</strong> – <strong>[in]</strong> const std::string Units that should be used for the timestep. “” indicates no units. </p></li>
@@ -823,7 +824,7 @@
 <span id="_CPPv3N18YggAsciiFileOutput18YggAsciiFileOutputEPKc"></span><span id="_CPPv2N18YggAsciiFileOutput18YggAsciiFileOutputEPKc"></span><span id="YggAsciiFileOutput::YggAsciiFileOutput__cCP"></span><span class="target" id="class_ygg_ascii_file_output_1a78d01d8df0ffbcfead79239f3f2c7127"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiFileOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiFileOutput18YggAsciiFileOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p>
 </dd>
 </dl>
@@ -834,7 +835,7 @@
 <span id="_CPPv3N18YggAsciiFileOutput18YggAsciiFileOutputEKNSt6stringE"></span><span id="_CPPv2N18YggAsciiFileOutput18YggAsciiFileOutputEKNSt6stringE"></span><span id="YggAsciiFileOutput::YggAsciiFileOutput__ssC"></span><span class="target" id="class_ygg_ascii_file_output_1ac42c78d2a253bfe07c0a723e58719f76"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiFileOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiFileOutput18YggAsciiFileOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p>
 </dd>
 </dl>
@@ -851,10 +852,10 @@
 <span id="_CPPv3N18YggAsciiFileOutput9send_lineEPKc"></span><span id="_CPPv2N18YggAsciiFileOutput9send_lineEPKc"></span><span id="YggAsciiFileOutput::send_line__cCP"></span><span class="target" id="class_ygg_ascii_file_output_1ae2e007c16ee63830950a96426ef3ca27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send_line</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiFileOutput9send_lineEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a single line to a file or queue. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>line</strong> – <strong>[in]</strong> character pointer to line that should be sent. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 if send was succesfull. All other values indicate errors. </p>
 </dd>
 </dl>
@@ -877,7 +878,7 @@
 <span id="_CPPv3N17YggAsciiFileInput17YggAsciiFileInputEPKc"></span><span id="_CPPv2N17YggAsciiFileInput17YggAsciiFileInputEPKc"></span><span id="YggAsciiFileInput::YggAsciiFileInput__cCP"></span><span class="target" id="class_ygg_ascii_file_input_1a4a6dea325297ce6b1760802084710457"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiFileInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggAsciiFileInput17YggAsciiFileInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -888,7 +889,7 @@
 <span id="_CPPv3N17YggAsciiFileInput17YggAsciiFileInputEKNSt6stringE"></span><span id="_CPPv2N17YggAsciiFileInput17YggAsciiFileInputEKNSt6stringE"></span><span id="YggAsciiFileInput::YggAsciiFileInput__ssC"></span><span class="target" id="class_ygg_ascii_file_input_1a530010a4c044f659a357bef146678ade"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiFileInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggAsciiFileInput17YggAsciiFileInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -905,13 +906,13 @@
 <span id="_CPPv3N17YggAsciiFileInput9recv_lineEPcK6size_t"></span><span id="_CPPv2N17YggAsciiFileInput9recv_lineEPcK6size_t"></span><span id="YggAsciiFileInput::recv_line__cP.sC"></span><span class="target" id="class_ygg_ascii_file_input_1ac15bc27aab4ada3f7d859d867370ac52"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recv_line</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggAsciiFileInput9recv_lineEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a single line from an associated file or queue. See af_recv_line in YggInterface.h for details. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>line</strong> – <strong>[out]</strong> character pointer to allocate memory where the received line should be stored. </p></li>
 <li><p><strong>n</strong> – <strong>[in]</strong> size_t Size of the allocated memory block in bytes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int Number of bytes read/received. Negative values indicate that there was either an error or the EOF message was received. </p>
 </dd>
 </dl>
@@ -934,7 +935,7 @@
 <span id="_CPPv3N19YggAsciiTableOutput19YggAsciiTableOutputEPKcPKc"></span><span id="_CPPv2N19YggAsciiTableOutput19YggAsciiTableOutputEPKcPKc"></span><span id="YggAsciiTableOutput::YggAsciiTableOutput__cCP.cCP"></span><span class="target" id="class_ygg_ascii_table_output_1aa60a0f295fa67e3714434da40bffd24e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiTableOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">format_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggAsciiTableOutput19YggAsciiTableOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p></li>
 <li><p><strong>format_str</strong> – <strong>[in]</strong> character pointer to format string that should be used to format rows into table lines. </p></li>
@@ -948,7 +949,7 @@
 <span id="_CPPv3N19YggAsciiTableOutput19YggAsciiTableOutputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N19YggAsciiTableOutput19YggAsciiTableOutputEKNSt6stringEKNSt6stringE"></span><span id="YggAsciiTableOutput::YggAsciiTableOutput__ssC.ssC"></span><span class="target" id="class_ygg_ascii_table_output_1a2e5184a7b1e45c6f626476cd5793e9b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiTableOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggAsciiTableOutput19YggAsciiTableOutputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p></li>
 <li><p><strong>format_str</strong> – <strong>[in]</strong> const std::string format string that should be used to format rows into table lines. </p></li>
@@ -974,7 +975,7 @@
 <span id="_CPPv3N19YggAsciiArrayOutput19YggAsciiArrayOutputEPKcPKc"></span><span id="_CPPv2N19YggAsciiArrayOutput19YggAsciiArrayOutputEPKcPKc"></span><span id="YggAsciiArrayOutput::YggAsciiArrayOutput__cCP.cCP"></span><span class="target" id="class_ygg_ascii_array_output_1abfa5acaa3865ea11a4ca813d037ea46b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiArrayOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">format_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggAsciiArrayOutput19YggAsciiArrayOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p></li>
 <li><p><strong>format_str</strong> – <strong>[in]</strong> character pointer to format string that should be used to format arrays into a table. </p></li>
@@ -988,7 +989,7 @@
 <span id="_CPPv3N19YggAsciiArrayOutput19YggAsciiArrayOutputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N19YggAsciiArrayOutput19YggAsciiArrayOutputEKNSt6stringEKNSt6stringE"></span><span id="YggAsciiArrayOutput::YggAsciiArrayOutput__ssC.ssC"></span><span class="target" id="class_ygg_ascii_array_output_1a688566fde6dad057859c3cb50fd18ae0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiArrayOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggAsciiArrayOutput19YggAsciiArrayOutputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p></li>
 <li><p><strong>format_str</strong> – <strong>[in]</strong> const std::string format string that should be used to format arrays into a table. </p></li>
@@ -1014,7 +1015,7 @@
 <span id="_CPPv3N18YggAsciiTableInput18YggAsciiTableInputEPKc"></span><span id="_CPPv2N18YggAsciiTableInput18YggAsciiTableInputEPKc"></span><span id="YggAsciiTableInput::YggAsciiTableInput__cCP"></span><span class="target" id="class_ygg_ascii_table_input_1a4fa28562e167dc357d0fb7da430410e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiTableInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiTableInput18YggAsciiTableInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_input"><span class="std std-ref">YggAsciiTableInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1025,7 +1026,7 @@
 <span id="_CPPv3N18YggAsciiTableInput18YggAsciiTableInputEKNSt6stringE"></span><span id="_CPPv2N18YggAsciiTableInput18YggAsciiTableInputEKNSt6stringE"></span><span id="YggAsciiTableInput::YggAsciiTableInput__ssC"></span><span class="target" id="class_ygg_ascii_table_input_1a8bf8df289b4ca5491d23846fd7de07c3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiTableInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiTableInput18YggAsciiTableInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_input"><span class="std std-ref">YggAsciiTableInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -1048,7 +1049,7 @@
 <span id="_CPPv3N18YggAsciiArrayInput18YggAsciiArrayInputEPKc"></span><span id="_CPPv2N18YggAsciiArrayInput18YggAsciiArrayInputEPKc"></span><span id="YggAsciiArrayInput::YggAsciiArrayInput__cCP"></span><span class="target" id="class_ygg_ascii_array_input_1a8ba211a2cc09444d739bd3c8b292c56e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiArrayInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiArrayInput18YggAsciiArrayInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_input"><span class="std std-ref">YggAsciiArrayInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1059,7 +1060,7 @@
 <span id="_CPPv3N18YggAsciiArrayInput18YggAsciiArrayInputEKNSt6stringE"></span><span id="_CPPv2N18YggAsciiArrayInput18YggAsciiArrayInputEKNSt6stringE"></span><span id="YggAsciiArrayInput::YggAsciiArrayInput__ssC"></span><span class="target" id="class_ygg_ascii_array_input_1a2d439a0ded0a3241ac06e65d69a31324"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAsciiArrayInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiArrayInput18YggAsciiArrayInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_input"><span class="std std-ref">YggAsciiArrayInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -1081,7 +1082,7 @@
 <span id="_CPPv3N12YggPlyOutput12YggPlyOutputEPKc"></span><span id="_CPPv2N12YggPlyOutput12YggPlyOutputEPKc"></span><span id="YggPlyOutput::YggPlyOutput__cCP"></span><span class="target" id="class_ygg_ply_output_1a9e7364baeb21266dffad8e65717cf276"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggPlyOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggPlyOutput12YggPlyOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p>
 </dd>
 </dl>
@@ -1092,7 +1093,7 @@
 <span id="_CPPv3N12YggPlyOutput12YggPlyOutputEKNSt6stringE"></span><span id="_CPPv2N12YggPlyOutput12YggPlyOutputEKNSt6stringE"></span><span id="YggPlyOutput::YggPlyOutput__ssC"></span><span class="target" id="class_ygg_ply_output_1a5686defd48cd16d40c1a354077b461a9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggPlyOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggPlyOutput12YggPlyOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p>
 </dd>
 </dl>
@@ -1120,7 +1121,7 @@
 <span id="_CPPv3N11YggPlyInput11YggPlyInputEPKc"></span><span id="_CPPv2N11YggPlyInput11YggPlyInputEPKc"></span><span id="YggPlyInput::YggPlyInput__cCP"></span><span class="target" id="class_ygg_ply_input_1a73faabdc73a209fa4b13da504f8c7621"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggPlyInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggPlyInput11YggPlyInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1131,7 +1132,7 @@
 <span id="_CPPv3N11YggPlyInput11YggPlyInputEKNSt6stringE"></span><span id="_CPPv2N11YggPlyInput11YggPlyInputEKNSt6stringE"></span><span id="YggPlyInput::YggPlyInput__ssC"></span><span class="target" id="class_ygg_ply_input_1ae286df0fd7275d7e6c1b1b77ec2c47ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggPlyInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggPlyInput11YggPlyInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -1159,7 +1160,7 @@
 <span id="_CPPv3N12YggObjOutput12YggObjOutputEPKc"></span><span id="_CPPv2N12YggObjOutput12YggObjOutputEPKc"></span><span id="YggObjOutput::YggObjOutput__cCP"></span><span class="target" id="class_ygg_obj_output_1a8308d4249eeabe76289aa0567bf705cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggObjOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggObjOutput12YggObjOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p>
 </dd>
 </dl>
@@ -1170,7 +1171,7 @@
 <span id="_CPPv3N12YggObjOutput12YggObjOutputEKNSt6stringE"></span><span id="_CPPv2N12YggObjOutput12YggObjOutputEKNSt6stringE"></span><span id="YggObjOutput::YggObjOutput__ssC"></span><span class="target" id="class_ygg_obj_output_1a2d1d58351559d030f7bd544b4ac3d3d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggObjOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggObjOutput12YggObjOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p>
 </dd>
 </dl>
@@ -1198,7 +1199,7 @@
 <span id="_CPPv3N11YggObjInput11YggObjInputEPKc"></span><span id="_CPPv2N11YggObjInput11YggObjInputEPKc"></span><span id="YggObjInput::YggObjInput__cCP"></span><span class="target" id="class_ygg_obj_input_1a82b3d8d0a4edff3e11b195551622f3af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggObjInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggObjInput11YggObjInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1209,7 +1210,7 @@
 <span id="_CPPv3N11YggObjInput11YggObjInputEKNSt6stringE"></span><span id="_CPPv2N11YggObjInput11YggObjInputEKNSt6stringE"></span><span id="YggObjInput::YggObjInput__ssC"></span><span class="target" id="class_ygg_obj_input_1aeec33f6dbb852a51d49139d6b7373459"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggObjInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggObjInput11YggObjInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -1237,7 +1238,7 @@
 <span id="_CPPv3N16YggGenericOutput16YggGenericOutputEPKc"></span><span id="_CPPv2N16YggGenericOutput16YggGenericOutputEPKc"></span><span id="YggGenericOutput::YggGenericOutput__cCP"></span><span class="target" id="class_ygg_generic_output_1ae798e92ca4ee16168f65b7893fb4ca0d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggGenericOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16YggGenericOutput16YggGenericOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_output"><span class="std std-ref">YggGenericOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p>
 </dd>
 </dl>
@@ -1248,7 +1249,7 @@
 <span id="_CPPv3N16YggGenericOutput16YggGenericOutputEKNSt6stringE"></span><span id="_CPPv2N16YggGenericOutput16YggGenericOutputEKNSt6stringE"></span><span id="YggGenericOutput::YggGenericOutput__ssC"></span><span class="target" id="class_ygg_generic_output_1aad8817d32094157f8a6826f2d434ec32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggGenericOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16YggGenericOutput16YggGenericOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_output"><span class="std std-ref">YggGenericOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p>
 </dd>
 </dl>
@@ -1276,7 +1277,7 @@
 <span id="_CPPv3N15YggGenericInput15YggGenericInputEPKc"></span><span id="_CPPv2N15YggGenericInput15YggGenericInputEPKc"></span><span id="YggGenericInput::YggGenericInput__cCP"></span><span class="target" id="class_ygg_generic_input_1a3a1429caa5c941f459d55764380a744c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggGenericInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15YggGenericInput15YggGenericInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_input"><span class="std std-ref">YggGenericInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1287,7 +1288,7 @@
 <span id="_CPPv3N15YggGenericInput15YggGenericInputEKNSt6stringE"></span><span id="_CPPv2N15YggGenericInput15YggGenericInputEKNSt6stringE"></span><span id="YggGenericInput::YggGenericInput__ssC"></span><span class="target" id="class_ygg_generic_input_1aabc650f8c2f1ae21ad2e7761a1d58bcc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggGenericInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15YggGenericInput15YggGenericInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_input"><span class="std std-ref">YggGenericInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -1315,7 +1316,7 @@
 <span id="_CPPv3N12YggAnyOutput12YggAnyOutputEPKc"></span><span id="_CPPv2N12YggAnyOutput12YggAnyOutputEPKc"></span><span id="YggAnyOutput::YggAnyOutput__cCP"></span><span class="target" id="class_ygg_any_output_1a54ea8ff9b045967317278fe85ededb7f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAnyOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggAnyOutput12YggAnyOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_output"><span class="std std-ref">YggAnyOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p>
 </dd>
 </dl>
@@ -1326,7 +1327,7 @@
 <span id="_CPPv3N12YggAnyOutput12YggAnyOutputEKNSt6stringE"></span><span id="_CPPv2N12YggAnyOutput12YggAnyOutputEKNSt6stringE"></span><span id="YggAnyOutput::YggAnyOutput__ssC"></span><span class="target" id="class_ygg_any_output_1a27da1b2c59636aa9b6dd1723b05f7d1a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAnyOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggAnyOutput12YggAnyOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_output"><span class="std std-ref">YggAnyOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p>
 </dd>
 </dl>
@@ -1354,7 +1355,7 @@
 <span id="_CPPv3N11YggAnyInput11YggAnyInputEPKc"></span><span id="_CPPv2N11YggAnyInput11YggAnyInputEPKc"></span><span id="YggAnyInput::YggAnyInput__cCP"></span><span class="target" id="class_ygg_any_input_1ae386bfbd2774d6340c6e4c63cf7a5d40"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAnyInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggAnyInput11YggAnyInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_input"><span class="std std-ref">YggAnyInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1365,7 +1366,7 @@
 <span id="_CPPv3N11YggAnyInput11YggAnyInputEKNSt6stringE"></span><span id="_CPPv2N11YggAnyInput11YggAnyInputEKNSt6stringE"></span><span id="YggAnyInput::YggAnyInput__ssC"></span><span class="target" id="class_ygg_any_input_1ae955b09f3038c8ae8ff3b3e1486a26d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggAnyInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggAnyInput11YggAnyInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_input"><span class="std std-ref">YggAnyInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -1393,7 +1394,7 @@
 <span id="_CPPv3N18YggJSONArrayOutput18YggJSONArrayOutputEPKc"></span><span id="_CPPv2N18YggJSONArrayOutput18YggJSONArrayOutputEPKc"></span><span id="YggJSONArrayOutput::YggJSONArrayOutput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_array_output_1a070c025415903b9fbbc557d2deaf30ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONArrayOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_output"><span class="std std-ref">YggJSONArrayOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p>
 </dd>
 </dl>
@@ -1404,7 +1405,7 @@
 <span id="_CPPv3N18YggJSONArrayOutput18YggJSONArrayOutputEKNSt6stringE"></span><span id="_CPPv2N18YggJSONArrayOutput18YggJSONArrayOutputEKNSt6stringE"></span><span id="YggJSONArrayOutput::YggJSONArrayOutput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_array_output_1a4313c953e15225e07462d0c1bc894ea5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONArrayOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_output"><span class="std std-ref">YggJSONArrayOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p>
 </dd>
 </dl>
@@ -1432,7 +1433,7 @@
 <span id="_CPPv3N17YggJSONArrayInput17YggJSONArrayInputEPKc"></span><span id="_CPPv2N17YggJSONArrayInput17YggJSONArrayInputEPKc"></span><span id="YggJSONArrayInput::YggJSONArrayInput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_array_input_1aca27550e0c3b7cb11b82a5dd78de6a45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONArrayInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggJSONArrayInput17YggJSONArrayInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_input"><span class="std std-ref">YggJSONArrayInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1443,7 +1444,7 @@
 <span id="_CPPv3N17YggJSONArrayInput17YggJSONArrayInputEKNSt6stringE"></span><span id="_CPPv2N17YggJSONArrayInput17YggJSONArrayInputEKNSt6stringE"></span><span id="YggJSONArrayInput::YggJSONArrayInput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_array_input_1ad5095fa61ce1af33ea776ba8d453988b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONArrayInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggJSONArrayInput17YggJSONArrayInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_input"><span class="std std-ref">YggJSONArrayInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>
@@ -1471,7 +1472,7 @@
 <span id="_CPPv3N19YggJSONObjectOutput19YggJSONObjectOutputEPKc"></span><span id="_CPPv2N19YggJSONObjectOutput19YggJSONObjectOutputEPKc"></span><span id="YggJSONObjectOutput::YggJSONObjectOutput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_object_output_1a345d5c25b82e58e845ba6e76e3379b4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONObjectOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_output"><span class="std std-ref">YggJSONObjectOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an output channel. </p>
 </dd>
 </dl>
@@ -1482,7 +1483,7 @@
 <span id="_CPPv3N19YggJSONObjectOutput19YggJSONObjectOutputEKNSt6stringE"></span><span id="_CPPv2N19YggJSONObjectOutput19YggJSONObjectOutputEKNSt6stringE"></span><span id="YggJSONObjectOutput::YggJSONObjectOutput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_object_output_1ad67cf15f1a09b7fd70dadb5e8a963c36"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONObjectOutput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_output"><span class="std std-ref">YggJSONObjectOutput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an output channel. </p>
 </dd>
 </dl>
@@ -1510,7 +1511,7 @@
 <span id="_CPPv3N18YggJSONObjectInput18YggJSONObjectInputEPKc"></span><span id="_CPPv2N18YggJSONObjectInput18YggJSONObjectInputEPKc"></span><span id="YggJSONObjectInput::YggJSONObjectInput__cCP"></span><span class="target" id="class_ygg_j_s_o_n_object_input_1a56e7663ae4d100f9f3323037bc17e342"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONObjectInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONObjectInput18YggJSONObjectInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_input"><span class="std std-ref">YggJSONObjectInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant character pointer to the name of an input channel. </p>
 </dd>
 </dl>
@@ -1521,7 +1522,7 @@
 <span id="_CPPv3N18YggJSONObjectInput18YggJSONObjectInputEKNSt6stringE"></span><span id="_CPPv2N18YggJSONObjectInput18YggJSONObjectInputEKNSt6stringE"></span><span id="YggJSONObjectInput::YggJSONObjectInput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_object_input_1a4193ab059c81a87dd9b740cf35b2e14b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggJSONObjectInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONObjectInput18YggJSONObjectInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_input"><span class="std std-ref">YggJSONObjectInput</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> constant std::string the name of an input channel. </p>
 </dd>
 </dl>

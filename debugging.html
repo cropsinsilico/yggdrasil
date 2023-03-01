@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Debugging &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>Debugging &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -98,7 +99,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Debugging</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/debugging.rst.txt" rel="nofollow"> View page source</a>
@@ -173,10 +174,10 @@
 </div>
 <blockquote>
 <div><p><strong>Possible Cause:</strong> You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion <a class="reference external" href="https://github.com/conda-forge/compilers-feedstock/issues/6">here</a>). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors.</p>
-<p><strong>Solution:</strong> Download an older SDK (10.9 works well) and point the conda compilers to it using the steps below.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
+<p><strong>Solution:</strong> Download an older SDK (10.9 works well for pre-Apple silicon Macs, but 11.0 should be used for Macs with the M1/M2 chips and arm64 architechture) and point the conda compilers to it using the steps below. If you use a version other than 11.0, check the location of that release’s download directly at <a class="reference external" href="https://github.com/phracker/MacOSX-SDKs/releases">https://github.com/phracker/MacOSX-SDKs/releases</a> to verify what the directory containing it is as it will be version dependent (step 3).:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-11.0}
 $ export CONDA_BUILD_SYSROOT=&quot;$(xcode-select -p)/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk&quot;
-$ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
+$ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/11.0-11.1/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
 $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;$CONDA_BUILD_SYSROOT&quot;)&quot;  # This may require sudo
 </pre></div>
 </div>

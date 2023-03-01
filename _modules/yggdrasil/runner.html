@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.runner &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>yggdrasil.runner &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -11,9 +11,6 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -26,14 +23,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">yggdrasil.runner</li>
       <li class="wy-breadcrumbs-aside">
@@ -364,6 +365,12 @@
 <span class="sd">        validate (bool, optional): If True, the validation scripts for each</span>
 <span class="sd">            modle (if present), will be run after the integration finishes</span>
 <span class="sd">            running. Defaults to False.</span>
+<span class="sd">        with_debugger (str, optional): Tool (and any flags for the tool)</span>
+<span class="sd">            that should be used to run models.</span>
+<span class="sd">        disable_python_c_api (bool, optional): If True, the Python C API will</span>
+<span class="sd">            be disabled. Defaults to False.</span>
+<span class="sd">        with_asan (bool, optional): Compile and run all models with the</span>
+<span class="sd">            address sanitizer. Defaults to False.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        namespace (str): Name that should be used to uniquely identify any</span>
@@ -383,7 +390,12 @@
                  <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">connection_task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span>
                  <span class="n">as_service</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">complete_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">partial_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">production_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">mpi_tag_start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">mpi_tag_start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">with_debugger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disable_python_c_api</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">with_asan</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">kwargs_models</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;with_debugger&#39;</span><span class="p">:</span> <span class="n">with_debugger</span><span class="p">,</span>
+                         <span class="s1">&#39;disable_python_c_api&#39;</span><span class="p">:</span> <span class="n">disable_python_c_api</span><span class="p">,</span>
+                         <span class="s1">&#39;with_asan&#39;</span><span class="p">:</span> <span class="n">with_asan</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mpi_comm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;runner&#39;</span>
         <span class="k">if</span> <span class="n">MPI</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -428,6 +440,11 @@
                 <span class="n">partial_commtype</span><span class="o">=</span><span class="n">partial_commtype</span><span class="p">,</span> <span class="n">yaml_param</span><span class="o">=</span><span class="n">yaml_param</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">connectiondrivers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivers</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drivers</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DummyModelDriver&#39;</span><span class="p">:</span>
                     <span class="n">x</span><span class="p">[</span><span class="s1">&#39;runner&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>

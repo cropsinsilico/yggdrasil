@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.command_line &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>yggdrasil.command_line &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -11,9 +11,6 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -26,14 +23,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">yggdrasil.command_line</li>
       <li class="wy-breadcrumbs-aside">
@@ -329,7 +330,18 @@
         <span class="p">((</span><span class="s1">&#39;--validate&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Validate the run via model validation commands on &#39;</span>
-                   <span class="s1">&#39;completion.&#39;</span><span class="p">)})]</span>
+                   <span class="s1">&#39;completion.&#39;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-debugger&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Run all models with a specific debuggin tool. If &#39;</span>
+                   <span class="s1">&#39;quoted, this can also include flags for the tool.&#39;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--disable-python-c-api&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Disable access to the Python C API from yggdrasil.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Compile models with the address sanitizer enabled.&#39;</span><span class="p">}),</span>
+    <span class="p">]</span>
 
 <div class="viewcode-block" id="yggrun.add_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggrun.add_arguments">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -357,7 +369,10 @@
             <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">,</span> <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span>
                        <span class="n">production_run</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">,</span>
                        <span class="n">mpi_tag_start</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mpi_tag_start</span><span class="p">,</span>
-                       <span class="n">validate</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">validate</span><span class="p">)</span></div></div>
+                       <span class="n">validate</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">validate</span><span class="p">,</span>
+                       <span class="n">with_debugger</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_debugger</span><span class="p">,</span>
+                       <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+                       <span class="n">with_asan</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="integration_service_manager"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.integration_service_manager">[docs]</a><span class="k">class</span> <span class="nc">integration_service_manager</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
@@ -587,7 +602,14 @@
                            <span class="s1">&#39; pass to the tool when it is called.&#39;</span><span class="p">)}),</span>
                 <span class="p">((</span><span class="s1">&#39;--fullpath&#39;</span><span class="p">,</span> <span class="p">),</span>
                  <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Get the full path to the tool exectuable.&#39;</span><span class="p">})],</span>
+                  <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Get the full path to the tool exectuable.&#39;</span><span class="p">}),</span>
+                <span class="p">((</span><span class="s1">&#39;--disable-python-c-api&#39;</span><span class="p">,</span> <span class="p">),</span>
+                 <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Disable access to the Python C API from yggdrasil.&#39;</span><span class="p">}),</span>
+                <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
+                 <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Compile with Clang ASAN if available.&quot;</span><span class="p">}),</span>
+            <span class="p">],</span>
             <span class="n">parsers</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">ArgumentParser</span><span class="p">(</span>
                     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span>
@@ -613,7 +635,9 @@
                 <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">tool</span> <span class="o">==</span> <span class="s1">&#39;compiler&#39;</span><span class="p">:</span>
                     <span class="n">flags</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span>
                         <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">toolname</span><span class="p">,</span>
-                        <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+                        <span class="n">with_asan</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">)</span>
                     <span class="k">if</span> <span class="s1">&#39;/link&#39;</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
                         <span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">[:</span><span class="n">flags</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;/link&#39;</span><span class="p">)]</span>
                     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-c&#39;</span><span class="p">]:</span>
@@ -628,7 +652,9 @@
                         <span class="n">libtype</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
                     <span class="n">flags</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_linker_flags</span><span class="p">(</span>
                         <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">toolname</span><span class="p">,</span>
-                        <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="n">libtype</span><span class="p">)</span>
+                        <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="n">libtype</span><span class="p">,</span>
+                        <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+                        <span class="n">with_asan</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows:</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
@@ -986,7 +1012,7 @@
 <div class="viewcode-block" id="yggcc"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggcc">[docs]</a><span class="k">class</span> <span class="nc">yggcc</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile a program.&quot;&quot;&quot;</span>
 
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;compile&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;compile-model&quot;</span>
     <span class="n">help</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Compile a program from source files for use in an &quot;</span>
             <span class="s2">&quot;yggdrasil integration.&quot;</span><span class="p">)</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span>
@@ -1011,7 +1037,13 @@
          <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Run compilation with ccache.&quot;</span><span class="p">}),</span>
         <span class="p">((</span><span class="s1">&#39;--Rpkg-language&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Language that R package is written in &quot;</span>
-                   <span class="s2">&quot;(only used if the specified language is R).&quot;</span><span class="p">)})]</span>
+                   <span class="s2">&quot;(only used if the specified language is R).&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--disable-python-c-api&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Disable access to the Python C API from yggdrasil.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Compile with Clang ASAN if available.&quot;</span><span class="p">})]</span>
 
 <div class="viewcode-block" id="yggcc.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggcc.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
@@ -1025,7 +1057,9 @@
                 <span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">EXT2LANG</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
         <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;toolname&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">toolname</span><span class="p">,</span> <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">flags</span><span class="p">,</span>
-               <span class="s1">&#39;use_ccache&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">use_ccache</span><span class="p">}</span>
+               <span class="s1">&#39;use_ccache&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">use_ccache</span><span class="p">,</span>
+               <span class="s1">&#39;disable_python_c_api&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+               <span class="s1">&#39;with_asan&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">}</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">Rpkg_language</span><span class="p">:</span>
             <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">Rpkg_language</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;executable: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">drv</span><span class="o">.</span><span class="n">call_compiler</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">))</span></div></div>
@@ -1034,7 +1068,7 @@
 <div class="viewcode-block" id="yggcompile"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggcompile">[docs]</a><span class="k">class</span> <span class="nc">yggcompile</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile interface library/libraries.&quot;&quot;&quot;</span>
 
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;compile-deps&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;compile&quot;</span>
     <span class="n">help</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Compile yggdrasil dependency libraries. Existing &quot;</span>
             <span class="s2">&quot;libraries are first deleted.&quot;</span><span class="p">)</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span>
@@ -1043,30 +1077,94 @@
           <span class="c1"># &#39;choices&#39;: ([&#39;all&#39;] + LANGUAGES_WITH_ALIASES.get(&#39;compiled&#39;, [])</span>
           <span class="c1">#             + LANGUAGES_WITH_ALIASES.get(&#39;compiled_dsl&#39;, [])),</span>
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;One or more languages to compile dependencies &quot;</span>
-                   <span class="s2">&quot;for.&quot;</span><span class="p">)}),</span>
+                   <span class="s2">&quot;for, source files to compile into an executable, &quot;</span>
+                   <span class="s2">&quot;or the directory containing an R package.&quot;</span><span class="p">)}),</span>
         <span class="p">((</span><span class="s1">&#39;--toolname&#39;</span><span class="p">,</span> <span class="p">),</span>
-         <span class="p">{</span><span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Name of compilation tool that should be used&quot;</span><span class="p">})]</span>
+         <span class="p">{</span><span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Name of compilation tool that should be used&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--disable-python-c-api&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Disable access to the Python C API from yggdrasil.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Compile with Clang ASAN if available.&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--force-source&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Force all arguments passed to the language parameter &quot;</span>
+                   <span class="s2">&quot;to be treated as source files to be compiled.&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--source-language&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="c1"># &#39;choices&#39;: [None] + LANGUAGES_WITH_ALIASES[&#39;all&#39;],</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Language of the source code. If not provided, &quot;</span>
+                   <span class="s2">&quot;the language will be determined from the &quot;</span>
+                   <span class="s2">&quot;source extension.&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--flags&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Additional flags that should be added to the &quot;</span>
+                   <span class="s2">&quot;compilation command if source files are provided.&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--use-ccache&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Run source compilation with ccache.&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--Rpkg-language&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Language that R package is written in &quot;</span>
+                   <span class="s2">&quot;(only used if the provided source language is R).&quot;</span><span class="p">)})]</span>
 
 <div class="viewcode-block" id="yggcompile.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggcompile.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
-        <span class="n">yggclean</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">error_on_missing</span> <span class="o">=</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;all_languages&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
-            <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">()</span>
+        <span class="n">languages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">x</span> <span class="ow">in</span> <span class="n">LANGUAGES_WITH_ALIASES</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]</span>
+                 <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">force_source</span><span class="p">)):</span>
+                <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">languages</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">languages</span> <span class="o">=</span> <span class="n">languages</span>
+            <span class="n">yggclean</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">languages</span><span class="p">):</span>
+            <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+            <span class="n">drv</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">(</span>
+                <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+                <span class="n">with_asan</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">)</span>
+            <span class="c1"># Prevent language from being recompiled more than</span>
+            <span class="c1"># once as a dependency</span>
+            <span class="k">for</span> <span class="n">base_lang</span> <span class="ow">in</span> <span class="n">drv</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">base_lang</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
+                    <span class="n">languages</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">base_lang</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;toolname&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">toolname</span><span class="p">,</span>
+                  <span class="s1">&#39;disable_python_c_api&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+                  <span class="s1">&#39;with_asan&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
             <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">((</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">drv</span><span class="p">,</span> <span class="s1">&#39;compile_dependencies&#39;</span><span class="p">)</span>
                  <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">drv</span><span class="p">,</span> <span class="s1">&#39;is_build_tool&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))):</span>
                 <span class="k">if</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
-                    <span class="n">drv</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="n">toolname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">toolname</span><span class="p">)</span>
+                    <span class="n">drv</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">error_on_missing</span> <span class="ow">and</span> <span class="n">missing</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">((</span><span class="s2">&quot;One or more of the requested languages &quot;</span>
-                             <span class="s2">&quot;are not fully installed for use with &quot;</span>
-                             <span class="s2">&quot;yggdrasil: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">missing</span><span class="p">)</span></div></div>
-
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;One or more of the requested languages &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;are not fully installed for use with &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;yggdrasil: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sources</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">use_ccache</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">use_ccache</span><span class="p">,</span>
+                <span class="n">flags</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">flags</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">source_language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                     <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;R&#39;</span><span class="p">)))):</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">source_language</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">source_language</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">EXT2LANG</span><span class="p">[</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+            <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">source_language</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">source_language</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">Rpkg_language</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">Rpkg_language</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;executable: </span><span class="si">{</span><span class="n">drv</span><span class="o">.</span><span class="n">call_compiler</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span><span class="w"> </span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+            
 
 <div class="viewcode-block" id="yggclean"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggclean">[docs]</a><span class="k">class</span> <span class="nc">yggclean</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup dependency files.&quot;&quot;&quot;</span>
@@ -1154,7 +1252,14 @@
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Get the compilation flags used for C++ programs.&#39;</span><span class="p">}),</span>
         <span class="p">((</span><span class="s1">&#39;--toolname&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of the tool that associated flags be returned for.&#39;</span><span class="p">})]</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of the tool that associated flags be returned for.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--disable-python-c-api&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Disable access to the Python C API from yggdrasil.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Compile with Clang ASAN if available.&quot;</span><span class="p">}),</span>
+    <span class="p">]</span>
 
 <div class="viewcode-block" id="cc_flags.parse_args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.cc_flags.parse_args">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1175,7 +1280,14 @@
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Get the compilation flags used for C++ programs.&#39;</span><span class="p">}),</span>
         <span class="p">((</span><span class="s1">&#39;--toolname&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of the tool that associated flags be returned for.&#39;</span><span class="p">})]</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of the tool that associated flags be returned for.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--disable-python-c-api&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Disable access to the Python C API from yggdrasil.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Compile with Clang ASAN if available.&quot;</span><span class="p">}),</span>
+    <span class="p">]</span>
 
 <div class="viewcode-block" id="ld_flags.parse_args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ld_flags.parse_args">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1200,6 +1312,9 @@
           <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
            <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t import the yggdrasil package in &#39;</span>
                     <span class="s1">&#39;calling the installation script.&#39;</span><span class="p">)}),</span>
+         <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
+          <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Load ASAN library before running executables.&quot;</span><span class="p">}),</span>
          <span class="p">]</span>
     <span class="p">)</span>
 
@@ -1217,6 +1332,10 @@
              <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;all&#39;</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">)))):</span>
             <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
                          <span class="n">install_languages</span><span class="o">.</span><span class="n">get_language_directories</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_import</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
+            <span class="n">CModelDriver</span><span class="o">.</span><span class="n">set_asan_env</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
             <span class="n">install_languages</span><span class="o">.</span><span class="n">install_language</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span></div></div>
 
@@ -1230,12 +1349,12 @@
         <span class="p">[((</span><span class="s1">&#39;languages&#39;</span><span class="p">,</span> <span class="p">),</span>
           <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
            <span class="c1"># &#39;choices&#39;: [&#39;all&#39;] + LANGUAGES_WITH_ALIASES.get(&#39;all&#39;, []),</span>
-           <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
+           <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">],</span>
            <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;One or more languages that should be configured.&#39;</span><span class="p">}),</span>
          <span class="p">((</span><span class="s1">&#39;--languages&#39;</span><span class="p">,</span> <span class="p">),</span>
           <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;languages_flag&#39;</span><span class="p">,</span>
            <span class="c1"># &#39;choices&#39;: [&#39;all&#39;] + LANGUAGES_WITH_ALIASES.get(&#39;all&#39;, []),</span>
-           <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
+           <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">],</span>
            <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;One or more languages that should be configured.&#39;</span><span class="p">}),</span>
          <span class="p">((</span><span class="s1">&#39;--show-file&#39;</span><span class="p">,</span> <span class="p">),</span>
           <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>

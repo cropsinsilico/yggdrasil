@@ -1327,6 +1327,10 @@
             "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
             "type": "string"
         },
+        "with_debugger": {
+            "description": "Debugger tool that should be used to run models. This string should include the tool executable and any flags that should be passed to it.",
+            "type": "string"
+        },
         "builddir": {
             "description": "Directory where the build should be saved. Defaults to <sourcedir>/build. It can be relative to working_dir or absolute.",
             "type": "string",
@@ -1400,6 +1404,25 @@
                 }
             }
         },
+        "disable_python_c_api": {
+            "description": "If True, the Python C API will be disabled. Defaults to False.",
+            "type": "boolean",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "c",
+                        "c++",
+                        "cpp",
+                        "cxx",
+                        "fortran",
+                        "make",
+                        "osr"
+                    ]
+                }
+            },
+            "format": "checkbox"
+        },
         "env_compiler": {
             "description": "Environment variable where the compiler executable should be stored for use within the Makefile. If not provided, this will be determined by the target language driver.",
             "type": "string",
@@ -1467,7 +1490,7 @@
         },
         "linker_flags": {
             "default": [],
-            "description": "Flags that should be passed to the linker during compilation. If nto provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
+            "description": "Flags that should be passed to the linker during compilation. If not provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
             "items": {
                 "type": "string"
             },
@@ -1595,6 +1618,25 @@
                     ]
                 }
             }
+        },
+        "with_asan": {
+            "description": "If True, the model will be compiled and linked with the address sanitizer enabled (if there is one available for the selected compiler).",
+            "type": "boolean",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "cmake",
+                        "c",
+                        "c++",
+                        "cpp",
+                        "cxx",
+                        "fortran",
+                        "make",
+                        "osr"
+                    ]
+                }
+            },
+            "format": "checkbox"
         },
         "interpreter": {
             "description": "Name or path of interpreter executable that should be used to run the model. If not provided, the interpreter will be determined based on configuration options for the language (if present) and the default_interpreter class attribute.",

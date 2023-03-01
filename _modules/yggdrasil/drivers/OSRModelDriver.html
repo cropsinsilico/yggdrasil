@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -11,9 +11,6 @@
   <![endif]-->
   
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -26,14 +23,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
       <li class="breadcrumb-item active">yggdrasil.drivers.OSRModelDriver</li>
@@ -145,7 +146,9 @@
         <span class="s1">&#39;copy_xml_to_osr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;update_interval&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">},</span>
-                            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}}}</span>
+                            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}},</span>
+        <span class="s1">&#39;disable_python_c_api&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;with_asan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">}}</span>
     <span class="n">executable_type</span> <span class="o">=</span> <span class="s1">&#39;dsl&#39;</span>
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;osr&#39;</span>
     <span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.xml&#39;</span>
@@ -194,7 +197,11 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
         <span class="c1"># if not (isinstance(self.executable_path, str)</span>
         <span class="c1">#         and os.path.isfile(self.executable_path)):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">()</span>
+        <span class="n">compile_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">kwargs_in_suffix</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+                <span class="n">compile_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="o">**</span><span class="n">compile_kwargs</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OSRModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
@@ -217,7 +224,8 @@
             <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># pragma: debug</span></div>
 
 <div class="viewcode-block" id="OSRModelDriver.compile_dependencies"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.compile_dependencies">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">compile_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;OpenSimRootYgg&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compile_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;OpenSimRootYgg&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile the OpenSimRoot executable with the yggdrasil flag set.</span>
 
 <span class="sd">        Args:</span>
@@ -227,6 +235,8 @@
 <span class="sd">            toolname (str, optional): C++ compiler that should be used. Forced</span>
 <span class="sd">                to be &#39;cl.exe&#39; on windows. Otherwise the default C++ compiler will</span>
 <span class="sd">                be used.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                compile_dependencies methods of the base classes.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
@@ -262,10 +272,21 @@
                 <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;StaticBuild_win64&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;StaticBuild&#39;</span><span class="p">)</span>
+            <span class="n">flag_options</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">kwargs_in_suffix</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="c1"># if k in [&#39;commtype&#39;]:</span>
+                <span class="c1">#     flag_options += f&quot; --{k.replace(&#39;_&#39;, &#39;-&#39;)}={kwargs[k]}&quot;</span>
+                <span class="c1"># else:</span>
+                <span class="n">flag_options</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; --</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">flag_options</span><span class="p">:</span>
+                <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_OSR_FLAG_OPTIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flag_options</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">target</span> <span class="o">!=</span> <span class="s1">&#39;cleanygg&#39;</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
                     <span class="n">base_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-                    <span class="n">base_cls</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span>
+                    <span class="n">base_cls</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
+                                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">executable_path</span><span class="p">):</span>
                 <span class="k">return</span>
             <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="n">target</span><span class="p">]</span> <span class="o">+</span> <span class="n">flags</span>

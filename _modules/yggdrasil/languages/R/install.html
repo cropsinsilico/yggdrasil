@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -11,9 +11,6 @@
   <![endif]-->
   
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
         <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -26,14 +23,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../../languages.html">yggdrasil.languages</a></li>
       <li class="breadcrumb-item active">yggdrasil.languages.R.install</li>
@@ -137,6 +138,8 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--update-r-requirements&#39;</span><span class="p">,</span> <span class="s1">&#39;--update_r_requirements&#39;</span><span class="p">,</span>
                         <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Update the requirements.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--r-interpreter&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;R executable to use during installation.&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parser</span></div>
 
 
@@ -318,11 +321,13 @@
     <span class="k">return</span> <span class="kc">True</span></div>
 
             
-<div class="viewcode-block" id="call_R"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.call_R">[docs]</a><span class="k">def</span> <span class="nf">call_R</span><span class="p">(</span><span class="n">R_cmd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="call_R"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.call_R">[docs]</a><span class="k">def</span> <span class="nf">call_R</span><span class="p">(</span><span class="n">R_cmd</span><span class="p">,</span> <span class="n">R_exe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call R commands, checking output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        R_cmd (list): List of R commands to run.</span>
+<span class="sd">        R_exe (str, optional): Rscript executable that should be used to</span>
+<span class="sd">            call the script.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to make_call.</span>
 
 <span class="sd">    Returns:</span>
@@ -335,10 +340,11 @@
         <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">R_cmd</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running:</span><span class="se">\n</span><span class="s1">    &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">    &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">R_cmd</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">Rexe</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;Rscript&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">Rexe</span><span class="p">:</span>
-            <span class="n">Rexe</span> <span class="o">=</span> <span class="s1">&#39;Rscript&#39;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">make_call</span><span class="p">([</span><span class="n">Rexe</span><span class="p">,</span> <span class="n">R_script</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">R_exe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">R_exe</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;Rscript&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">R_exe</span><span class="p">:</span>
+                <span class="n">R_exe</span> <span class="o">=</span> <span class="s1">&#39;Rscript&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">make_call</span><span class="p">([</span><span class="n">R_exe</span><span class="p">,</span> <span class="n">R_script</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">R_script</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
@@ -409,7 +415,7 @@
 
 
 <div class="viewcode-block" id="install"><a class="viewcode-back" href="../../../../yggdrasil.languages.R.html#yggdrasil.languages.R.install.install">[docs]</a><span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_sudo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">update_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">update_requirements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">R_exe</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Attempt to install the R interface.</span>
 
 <span class="sd">    Args:</span>
@@ -425,6 +431,8 @@
 <span class="sd">        update_requirements (bool, optional): If True, the requirements will be</span>
 <span class="sd">            updated. Defaults to False. Setting this to True, sets</span>
 <span class="sd">            skip_requirements to False.</span>
+<span class="sd">        R_exe (str, optional): Rscript executable that should be used to</span>
+<span class="sd">            call the script.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if install succeded, False otherwise.</span>
@@ -444,10 +452,14 @@
     <span class="k">if</span> <span class="n">update_requirements</span><span class="p">:</span>
         <span class="n">skip_requirements</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="c1"># Set platform dependent things</span>
-    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;win32&#39;</span><span class="p">,</span> <span class="s1">&#39;cygwin&#39;</span><span class="p">]:</span>
-        <span class="n">R_exe</span> <span class="o">=</span> <span class="s1">&#39;R.exe&#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">R_exe</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
+    <span class="k">if</span> <span class="n">R_exe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">R_exe</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">r_interpreter</span>
+    <span class="k">if</span> <span class="n">R_exe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;win32&#39;</span><span class="p">,</span> <span class="s1">&#39;cygwin&#39;</span><span class="p">]:</span>
+            <span class="n">R_exe</span> <span class="o">=</span> <span class="s1">&#39;R.exe&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">R_exe</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
+    <span class="n">Rscript_exe</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">R_exe</span><span class="p">),</span> <span class="s2">&quot;Rscript&quot;</span><span class="p">)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;cwd&#39;</span><span class="p">:</span> <span class="n">lang_dir</span><span class="p">,</span> <span class="s1">&#39;with_sudo&#39;</span><span class="p">:</span> <span class="n">with_sudo</span><span class="p">}</span>
     <span class="c1"># Write Makevars for conda installation</span>
     <span class="n">makevars</span> <span class="o">=</span> <span class="kc">None</span>
@@ -459,14 +471,16 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_requirements</span><span class="p">:</span>
             <span class="c1"># TEMP FIX FOR RCPP</span>
             <span class="c1"># if not install_packages([&#39;Rcpp&#39;], update=update_requirements,</span>
-            <span class="c1">#                         repos=&quot;https://rcppcore.github.io/drat&quot;, **kwargs):</span>
+            <span class="c1">#                         repos=&quot;https://rcppcore.github.io/drat&quot;,</span>
+            <span class="c1">#                         R_exe=Rscript_exe, **kwargs):</span>
             <span class="c1">#     logger.error(&quot;Failed to install Rcpp dependency&quot;)</span>
             <span class="c1">#     restore_makevars(makevars, old_makevars)</span>
             <span class="c1">#     return False</span>
             <span class="n">requirements</span> <span class="o">=</span> <span class="n">requirements_from_description</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;BUILDDOCS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
                 <span class="n">requirements</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;roxygen2&#39;</span><span class="p">,</span> <span class="s1">&#39;Rd2md&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">install_packages</span><span class="p">(</span><span class="n">requirements</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update_requirements</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">install_packages</span><span class="p">(</span><span class="n">requirements</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update_requirements</span><span class="p">,</span>
+                                    <span class="n">R_exe</span><span class="o">=</span><span class="n">Rscript_exe</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to install dependencies&quot;</span><span class="p">)</span>
                 <span class="n">restore_makevars</span><span class="p">(</span><span class="n">makevars</span><span class="p">,</span> <span class="n">old_makevars</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -484,7 +498,7 @@
         <span class="n">R_call</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;install.packages(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">, verbose=TRUE,&quot;</span>
                   <span class="s2">&quot;INSTALL_opts=c(</span><span class="se">\&quot;</span><span class="s2">--no-multiarch</span><span class="se">\&quot;</span><span class="s2">),&quot;</span>
                   <span class="s2">&quot;repos=NULL, type=</span><span class="se">\&quot;</span><span class="s2">source</span><span class="se">\&quot;</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">package_name</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">call_R</span><span class="p">([</span><span class="n">R_call</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">call_R</span><span class="p">([</span><span class="n">R_call</span><span class="p">],</span> <span class="n">R_exe</span><span class="o">=</span><span class="n">Rscript_exe</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error installing R interface from the built package.&quot;</span><span class="p">)</span>
             <span class="n">restore_makevars</span><span class="p">(</span><span class="n">makevars</span><span class="p">,</span> <span class="n">old_makevars</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>

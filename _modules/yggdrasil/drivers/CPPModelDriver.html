@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -11,9 +11,6 @@
   <![endif]-->
   
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -26,14 +23,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
       <li class="breadcrumb-item active">yggdrasil.drivers.CPPModelDriver</li>
@@ -102,7 +103,7 @@
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">,</span> <span class="n">MSVCCompiler</span><span class="p">,</span>
-    <span class="n">ClangLinker</span><span class="p">)</span>
+    <span class="n">GCCLinker</span><span class="p">,</span> <span class="n">ClangLinker</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="CPPCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">CPPCompilerBase</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
@@ -153,6 +154,8 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for G++ compiler/linker.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;g++&#39;</span>
     <span class="n">aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gnu-c++&#39;</span><span class="p">]</span>
+    <span class="n">default_linker</span> <span class="o">=</span> <span class="s1">&#39;g++&#39;</span>
+    <span class="n">is_linker</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="GPPCompiler.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.GPPCompiler.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">skip_standard_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -254,9 +257,19 @@
         <span class="k">return</span> <span class="n">MSVCCompiler</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="GPPLinker"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.GPPLinker">[docs]</a><span class="k">class</span> <span class="nc">GPPLinker</span><span class="p">(</span><span class="n">GCCLinker</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang++ linker (calls to ld).&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="n">GPPCompiler</span><span class="o">.</span><span class="n">toolname</span>
+    <span class="n">aliases</span> <span class="o">=</span> <span class="n">GPPCompiler</span><span class="o">.</span><span class="n">aliases</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="n">GPPCompiler</span><span class="o">.</span><span class="n">languages</span>
+    <span class="n">default_executable</span> <span class="o">=</span> <span class="n">GPPCompiler</span><span class="o">.</span><span class="n">default_executable</span>
+    <span class="n">toolset</span> <span class="o">=</span> <span class="n">GPPCompiler</span><span class="o">.</span><span class="n">toolset</span></div>
+
+
 <div class="viewcode-block" id="ClangPPLinker"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPLinker">[docs]</a><span class="k">class</span> <span class="nc">ClangPPLinker</span><span class="p">(</span><span class="n">ClangLinker</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang++ linker (calls to ld).&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">toolname</span>
+    <span class="n">aliases</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">aliases</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">languages</span>
     <span class="n">default_executable</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">default_executable</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">toolset</span></div>
@@ -264,7 +277,6 @@
 
 <div class="viewcode-block" id="CPPModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CPPModelDriver</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running C++ models.&quot;&quot;&quot;</span>
-                
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is written in C++.&#39;</span><span class="p">)</span>
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
     <span class="n">language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.CPP&#39;</span><span class="p">,</span> <span class="s1">&#39;.cxx&#39;</span><span class="p">,</span> <span class="s1">&#39;.C&#39;</span><span class="p">,</span> <span class="s1">&#39;.c++&#39;</span><span class="p">,</span> <span class="s1">&#39;.cc&#39;</span><span class="p">,</span> <span class="s1">&#39;.cp&#39;</span><span class="p">,</span> <span class="s1">&#39;.tcc&#39;</span><span class="p">,</span>

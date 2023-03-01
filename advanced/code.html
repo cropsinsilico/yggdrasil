@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Code &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>Code &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -29,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -104,7 +105,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Advanced</a></li>
       <li class="breadcrumb-item active">Code</li>
       <li class="wy-breadcrumbs-aside">
@@ -365,6 +366,7 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CModelDriver.ClangCompiler"><code class="docutils literal notranslate"><span class="pre">ClangCompiler</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CModelDriver.ClangLinker"><code class="docutils literal notranslate"><span class="pre">ClangLinker</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CModelDriver.GCCCompiler"><code class="docutils literal notranslate"><span class="pre">GCCCompiler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CModelDriver.GCCLinker"><code class="docutils literal notranslate"><span class="pre">GCCLinker</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CModelDriver.LDLinker"><code class="docutils literal notranslate"><span class="pre">LDLinker</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CModelDriver.LibtoolArchiver"><code class="docutils literal notranslate"><span class="pre">LibtoolArchiver</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CModelDriver.MSVCArchiver"><code class="docutils literal notranslate"><span class="pre">MSVCArchiver</span></code></a></li>
@@ -378,6 +380,7 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.ClangPPCompiler"><code class="docutils literal notranslate"><span class="pre">ClangPPCompiler</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.ClangPPLinker"><code class="docutils literal notranslate"><span class="pre">ClangPPLinker</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.GPPCompiler"><code class="docutils literal notranslate"><span class="pre">GPPCompiler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.GPPLinker"><code class="docutils literal notranslate"><span class="pre">GPPLinker</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CPPModelDriver.MSVCPPCompiler"><code class="docutils literal notranslate"><span class="pre">MSVCPPCompiler</span></code></a></li>
 </ul>
 </li>
@@ -389,9 +392,7 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.CompilerBase"><code class="docutils literal notranslate"><span class="pre">CompilerBase</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.DummyLinkerBase"><code class="docutils literal notranslate"><span class="pre">DummyLinkerBase</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.GCCLinker"><code class="docutils literal notranslate"><span class="pre">GCCLinker</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.GFortranLinker"><code class="docutils literal notranslate"><span class="pre">GFortranLinker</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.GPPLinker"><code class="docutils literal notranslate"><span class="pre">GPPLinker</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.LinkerBase"><code class="docutils literal notranslate"><span class="pre">LinkerBase</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.LockedFile"><code class="docutils literal notranslate"><span class="pre">LockedFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.CompiledModelDriver.MSVCLinker"><code class="docutils literal notranslate"><span class="pre">MSVCLinker</span></code></a></li>
@@ -1622,6 +1623,7 @@
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.tools.pprint_encoded"><code class="docutils literal notranslate"><span class="pre">pprint_encoded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.tools.print_encoded"><code class="docutils literal notranslate"><span class="pre">print_encoded()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.tools.remove_path"><code class="docutils literal notranslate"><span class="pre">remove_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.tools.resolve_language_aliases"><code class="docutils literal notranslate"><span class="pre">resolve_language_aliases()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.tools.safe_eval"><code class="docutils literal notranslate"><span class="pre">safe_eval()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.tools.sleep"><code class="docutils literal notranslate"><span class="pre">sleep()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.tools.str2bytes"><code class="docutils literal notranslate"><span class="pre">str2bytes()</span></code></a></li>

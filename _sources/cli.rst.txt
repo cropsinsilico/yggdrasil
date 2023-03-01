@@ -19,7 +19,7 @@ Command Line Interface (CLI)
 ``yggcc`` Command
 *****************
 
-Alias for ``yggdrasil compile``
+Alias for ``yggdrasil compile-model``
 
 
 .. _cli_yggccflags_rst:
@@ -57,7 +57,7 @@ Alias for ``yggdrasil clean``
 ``yggcompile`` Command
 **********************
 
-Alias for ``yggdrasil compile-deps``
+Alias for ``yggdrasil compile``
 
 
 .. _cli_yggconfig_rst:

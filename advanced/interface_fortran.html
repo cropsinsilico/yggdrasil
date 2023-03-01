@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fortran Interface &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>Fortran Interface &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -29,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -104,7 +105,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Advanced</a></li>
           <li class="breadcrumb-item"><a href="model_interface.html">Model Interface</a></li>
       <li class="breadcrumb-item active">Fortran Interface</li>
@@ -135,10 +136,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 </div>
  </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> Integer that unsigned integer object should be initialized with. The kind of input integer will determine the precision of the unsigned int object. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A ygguint instance.</p>
 </dd>
 </dl>
@@ -149,7 +150,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv312display_null7yggnull"></span><span id="_CPPv212display_null7yggnull"></span><span id="display_null__yggnull"></span><span class="target" id="_ygg_interface_8f90_1aeae347bd3c498f2370993efcf273c2e9"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">display_null</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47yggnull" title="yggnull"><span class="n"><span class="pre">yggnull</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412display_null7yggnull" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Display a null object (for completeness). </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> Instance to display. </p>
 </dd>
 </dl>
@@ -165,7 +166,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv311ygglog_infoA_9character"></span><span id="_CPPv211ygglog_infoA_9character"></span><span id="ygglog_info__characterA"></span><span class="target" id="_ygg_interface_8f90_1acbf607fbfeb247a8064eb49b0db4548b"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygglog_info</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411ygglog_infoA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write a log message at the INFO level. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fmt</strong> – <strong>[in]</strong> Log message. </p>
 </dd>
 </dl>
@@ -176,7 +177,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv312ygglog_debugA_9character"></span><span id="_CPPv212ygglog_debugA_9character"></span><span id="ygglog_debug__characterA"></span><span class="target" id="_ygg_interface_8f90_1ae26e086355f1a5a9b99a436beebbaf29"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygglog_debug</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygglog_debugA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write a log message at the DEBUG level. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fmt</strong> – <strong>[in]</strong> Log message. </p>
 </dd>
 </dl>
@@ -187,7 +188,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv312ygglog_errorA_9character"></span><span id="_CPPv212ygglog_errorA_9character"></span><span id="ygglog_error__characterA"></span><span class="target" id="_ygg_interface_8f90_1a71611f853410ed373ce9a76a368bf658"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygglog_error</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygglog_errorA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write a log message at the ERROR level. This will also cause the calling model to return an error code on exit. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fmt</strong> – <strong>[in]</strong> Log message. </p>
 </dd>
 </dl>
@@ -198,10 +199,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv310ygg_outputA_9character"></span><span id="_CPPv210ygg_outputA_9character"></span><span id="ygg_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1a2ca63cf677da4472d72c100dfbc82935"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ygg_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -212,10 +213,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv39ygg_inputA_9character"></span><span id="_CPPv29ygg_inputA_9character"></span><span id="ygg_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a202f148676579e01b0e72797c83d2506"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ygg_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -226,13 +227,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv315ygg_output_typeA_9character8yggdtype"></span><span id="_CPPv215ygg_output_typeA_9character8yggdtype"></span><span id="ygg_output_type__characterA.yggdtype"></span><span class="target" id="_ygg_interface_8f90_1a6a9416bde76faaf1357f2c730afb0002"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_output_type</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">datatype</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415ygg_output_typeA_9character8yggdtype" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm that will send a specific data type. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a structure defining the datatype of outgoing messages. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>datatype</strong> – <strong>[in]</strong> Data structure containing type information. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -243,13 +244,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314ygg_input_typeA_9character8yggdtype"></span><span id="_CPPv214ygg_input_typeA_9character8yggdtype"></span><span id="ygg_input_type__characterA.yggdtype"></span><span class="target" id="_ygg_interface_8f90_1a1a915d56273508f402d8b3d5d93196f4"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_input_type</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">datatype</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_input_typeA_9character8yggdtype" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm that will receive a specific data type. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a structure defining the datatype of incoming messages. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>datatype</strong> – <strong>[in]</strong> Data structure containing type information. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -260,13 +261,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314ygg_output_fmtA_9characterA_9character"></span><span id="_CPPv214ygg_output_fmtA_9characterA_9character"></span><span id="ygg_output_fmt__characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1a74166492a76405abd6ca706b7b78622b"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_output_fmt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_output_fmtA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm with a type specified via a C-style format string. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>fmt</strong> – <strong>[in]</strong> C-style format string that should be used to determine the type of data that will be sent. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -277,13 +278,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv313ygg_input_fmtA_9characterA_9character"></span><span id="_CPPv213ygg_input_fmtA_9characterA_9character"></span><span id="ygg_input_fmt__characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1ad0ca54749b81d99a4ad426b99e4d0b68"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_input_fmt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_input_fmtA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm with a type specified via a C-style format string. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>fmt</strong> – <strong>[in]</strong> C-style format string that should be used to determine the type of data that will be received. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -294,10 +295,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv321ygg_ascii_file_outputA_9character"></span><span id="_CPPv221ygg_ascii_file_outputA_9character"></span><span id="ygg_ascii_file_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1ab039e73c41ed93c7cb05b7800a232ad1"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ascii_file_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_ascii_file_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an ASCII file output comm. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm sends string output line-by-line. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -308,10 +309,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320ygg_ascii_file_inputA_9character"></span><span id="_CPPv220ygg_ascii_file_inputA_9character"></span><span id="ygg_ascii_file_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a32620e40816bceb42c1d55dabbb4234f"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ascii_file_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420ygg_ascii_file_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an ASCII file input comm. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm receives string input line-by-line. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -322,13 +323,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322ygg_ascii_table_outputA_9characterA_9character"></span><span id="_CPPv222ygg_ascii_table_outputA_9characterA_9character"></span><span id="ygg_ascii_table_output__characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1a68e3bcc08e7e9a1ef0d194a7ea07af20"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ascii_table_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format_str</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422ygg_ascii_table_outputA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an ASCII table output comm. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm outputs table rows one at a time and formats them using the provided format_str. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>format_str</strong> – <strong>[in]</strong> C-style format string that should be used to format table rows. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -339,10 +340,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv321ygg_ascii_table_inputA_9character"></span><span id="_CPPv221ygg_ascii_table_inputA_9character"></span><span id="ygg_ascii_table_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a9ef209681e4c9f5ab1adb9c8d6bf9cfc"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ascii_table_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_ascii_table_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an ASCII table input comm. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm receives table rows one at a time. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -353,13 +354,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322ygg_ascii_array_outputA_9characterA_9character"></span><span id="_CPPv222ygg_ascii_array_outputA_9characterA_9character"></span><span id="ygg_ascii_array_output__characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1ac32da038119cda329e630de54ffd6871"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ascii_array_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format_str</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422ygg_ascii_array_outputA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an ASCII table array output comm. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm outputs table columns as arrays and formats rows using the provided format_str. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>format_str</strong> – <strong>[in]</strong> C-style format string that should be used to format table rows. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -370,10 +371,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv321ygg_ascii_array_inputA_9character"></span><span id="_CPPv221ygg_ascii_array_inputA_9character"></span><span id="ygg_ascii_array_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a66d8288d21fa4106321506b817ba241f"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ascii_array_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_ascii_array_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an ASCII table array input comm. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm receives table columns as arrays. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -384,10 +385,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314ygg_ply_outputA_9character"></span><span id="_CPPv214ygg_ply_outputA_9character"></span><span id="ygg_ply_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1a036ff6524d5e1e3257b3ab9a08973c81"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ply_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_ply_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm that sends Ply data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only sends Ply data contained in yggply structures. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -398,10 +399,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv313ygg_ply_inputA_9character"></span><span id="_CPPv213ygg_ply_inputA_9character"></span><span id="ygg_ply_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a6fcd37cf20dcf32c6fd31e9705c7e3ed"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_ply_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_ply_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm that receives Ply data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only receives Ply data into yggply structures. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -412,10 +413,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314ygg_obj_outputA_9character"></span><span id="_CPPv214ygg_obj_outputA_9character"></span><span id="ygg_obj_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1a3c576ce9662425de37e67672d6fd0779"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_obj_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_obj_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm that sends Obj data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only sends Obj data contained in yggobj structures. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -426,10 +427,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv313ygg_obj_inputA_9character"></span><span id="_CPPv213ygg_obj_inputA_9character"></span><span id="ygg_obj_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1aa982ff36687a47ead1952a08aa96b18a"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_obj_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_obj_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm that receives Obj data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only receives Obj data into yggobj structures. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -440,10 +441,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318ygg_generic_outputA_9character"></span><span id="_CPPv218ygg_generic_outputA_9character"></span><span id="ygg_generic_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1abcbbd91de407fcdd56d0947bcdd1b202"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_generic_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418ygg_generic_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm that sends generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -454,10 +455,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv317ygg_generic_inputA_9character"></span><span id="_CPPv217ygg_generic_inputA_9character"></span><span id="ygg_generic_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a9a84f2785e72d2374c93b6cbb5537a3f"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_generic_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ygg_generic_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm that receives generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -468,10 +469,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314ygg_any_outputA_9character"></span><span id="_CPPv214ygg_any_outputA_9character"></span><span id="ygg_any_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1ae1f0bf1442979f81649e783501cd7719"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_any_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_any_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm that sends generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -482,10 +483,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv313ygg_any_inputA_9character"></span><span id="_CPPv213ygg_any_inputA_9character"></span><span id="ygg_any_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a43ba879457301881e66c1815a88bf3b0"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_any_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_any_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm that receives generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -496,10 +497,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv321ygg_json_array_outputA_9character"></span><span id="_CPPv221ygg_json_array_outputA_9character"></span><span id="ygg_json_array_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1a361a5727ec0541a6918b57bf2dcea65a"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_json_array_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_json_array_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm that sends JSON arrays of generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -510,10 +511,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320ygg_json_array_inputA_9character"></span><span id="_CPPv220ygg_json_array_inputA_9character"></span><span id="ygg_json_array_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1a4ddd8d20704d4b4cdd3cb49622fe6375"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_json_array_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420ygg_json_array_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm that receives JSON arrays of generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -524,10 +525,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322ygg_json_object_outputA_9character"></span><span id="_CPPv222ygg_json_object_outputA_9character"></span><span id="ygg_json_object_output__characterA"></span><span class="target" id="_ygg_interface_8f90_1acb9847a3d58a89133f0b0fece57213cb"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_json_object_output</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422ygg_json_object_outputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an output comm that sends JSON objects of generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Output comm structure. </p>
 </dd>
 </dl>
@@ -538,10 +539,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv321ygg_json_object_inputA_9character"></span><span id="_CPPv221ygg_json_object_inputA_9character"></span><span id="ygg_json_object_input__characterA"></span><span class="target" id="_ygg_interface_8f90_1af22689790d7fbbeb12b4634b5fe22cc5"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_json_object_input</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_json_object_inputA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for an input comm that receives JSON objects of generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Input comm structure. </p>
 </dd>
 </dl>
@@ -552,14 +553,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314ygg_rpc_clientA_9characterA_9characterA_9character"></span><span id="_CPPv214ygg_rpc_clientA_9characterA_9characterA_9character"></span><span id="ygg_rpc_client__characterA.characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1ab6f1df7ff116b80fd61b517d265822c6"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_rpc_client</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out_fmt_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_fmt_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_rpc_clientA_9characterA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for a client-side RPC comm. Create a yggcomm structure for the client side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by format strings. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>out_fmt_in</strong> – <strong>[in]</strong> C-style format string defining how client requests (outgoing messages) should be formatted. </p></li>
 <li><p><strong>in_fmt_in</strong> – <strong>[in]</strong> C-style format string defining how client responses (incoming messages) should be parsed. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Client comm structure. </p>
 </dd>
 </dl>
@@ -570,14 +571,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314ygg_rpc_serverA_9characterA_9characterA_9character"></span><span id="_CPPv214ygg_rpc_serverA_9characterA_9characterA_9character"></span><span id="ygg_rpc_server__characterA.characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1ac50c256973788ad08680860c4d5bb9bd"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_rpc_server</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_fmt_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out_fmt_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_rpc_serverA_9characterA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for a server-side RPC comm. Create a yggcomm structure for the server side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by format strings. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>in_fmt_in</strong> – <strong>[in]</strong> C-style format string defining how requests (incoming messages) should be parsed. </p></li>
 <li><p><strong>out_fmt_in</strong> – <strong>[in]</strong> C-style format string defining how responses (outgoing messages) should be formatted. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Server comm structure. </p>
 </dd>
 </dl>
@@ -588,14 +589,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv319ygg_rpc_client_typeA_9character8yggdtype8yggdtype"></span><span id="_CPPv219ygg_rpc_client_typeA_9character8yggdtype8yggdtype"></span><span id="ygg_rpc_client_type__characterA.yggdtype.yggdtype"></span><span class="target" id="_ygg_interface_8f90_1a682b07c46af53910fc4d085a4b4cd655"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_rpc_client_type</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">out_type_in</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_type_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419ygg_rpc_client_typeA_9character8yggdtype8yggdtype" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for a client-side RPC comm with explicit datatypes. Create a yggcomm structure for the client side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by datatype structures. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>out_type_in</strong> – <strong>[in]</strong> Datatype structure containing information on the type of data that requests (outgoing messages) will contain. </p></li>
 <li><p><strong>in_type_in</strong> – <strong>[in]</strong> Datatype structure containing information on the type of data that responses (incoming messages) will contain. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Client comm structure. </p>
 </dd>
 </dl>
@@ -606,14 +607,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv319ygg_rpc_server_typeA_9character8yggdtype8yggdtype"></span><span id="_CPPv219ygg_rpc_server_typeA_9character8yggdtype8yggdtype"></span><span id="ygg_rpc_server_type__characterA.yggdtype.yggdtype"></span><span class="target" id="_ygg_interface_8f90_1a51c5d53632b3e495bf4e0fc81a808fb7"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_rpc_server_type</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_type_in</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">out_type_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419ygg_rpc_server_typeA_9character8yggdtype8yggdtype" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for a server-side RPC comm with explicit datatypes. Create a yggcomm structure for the server side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by datatype structures. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>in_type_in</strong> – <strong>[in]</strong> Datatype structure containing information on the type of data that requests (incoming messages) will contain. </p></li>
 <li><p><strong>out_type_in</strong> – <strong>[in]</strong> Datatype structure containing information on the type of data that responses (outgoing messages) will contain. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Server comm structure. </p>
 </dd>
 </dl>
@@ -624,13 +625,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv312ygg_timesyncA_9characterA_9character"></span><span id="_CPPv212ygg_timesyncA_9characterA_9character"></span><span id="ygg_timesync__characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1ab320c2b5d9ac28a2033a22908f0e11f5"></span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_timesync</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygg_timesyncA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for a timesync comm. Create a yggcomm structure for a timesync channel based on a provided name that is used to locate a particular comm address stored in an environment variable. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the channel. </p></li>
 <li><p><strong>units</strong> – <strong>[in]</strong> Units that outgoing time steps will be in. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Timesync comm structure. </p>
 </dd>
 </dl>
@@ -641,10 +642,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318create_dtype_empty7logical"></span><span id="_CPPv218create_dtype_empty7logical"></span><span id="create_dtype_empty__logical"></span><span class="target" id="_ygg_interface_8f90_1af8f24fe4e19c5e96bf8afae35cddd788"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_empty</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418create_dtype_empty7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create an empty data type. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -655,13 +656,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv319create_dtype_python5c_ptr7logical"></span><span id="_CPPv219create_dtype_python5c_ptr7logical"></span><span id="create_dtype_python__c_ptr.logical"></span><span class="target" id="_ygg_interface_8f90_1a944ed995e5bcae6cb3c4f5907ea2635e"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_python</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pyobj</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_python5c_ptr7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type based on a Python dictionary. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pyobj</strong> – <strong>[in]</strong> A Python dictionary containing data type information. </p></li>
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -672,10 +673,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv319create_dtype_direct7logical"></span><span id="_CPPv219create_dtype_direct7logical"></span><span id="create_dtype_direct__logical"></span><span class="target" id="_ygg_interface_8f90_1a32b777a8409adbf8e4bc783a56298522"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_direct</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_direct7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a direct data type for handling byte messages. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -686,13 +687,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320create_dtype_defaultA_9character7logical"></span><span id="_CPPv220create_dtype_defaultA_9character7logical"></span><span id="create_dtype_default__characterA.logical"></span><span class="target" id="_ygg_interface_8f90_1aea481d2bb236cdd1512a60d81644a8b8"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_default</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typename</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420create_dtype_defaultA_9character7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for one of the simple JSON data types (e.g. number, integer, string). </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>typename</strong> – <strong>[in]</strong> Name of the JSON data type that the type object should be initialized for. </p></li>
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -703,7 +704,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv319create_dtype_scalarA_9character7integerA_9character7logical"></span><span id="_CPPv219create_dtype_scalarA_9character7integerA_9character7logical"></span><span id="create_dtype_scalar__characterA.integer.characterA.logical"></span><span class="target" id="_ygg_interface_8f90_1ac3afb70a56b77b5fdc5c04809f55c33e"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_scalar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_scalarA_9character7integerA_9character7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling scalars with fixed precision. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subtype</strong> – <strong>[in]</strong> Name of the scalar data type. (e.g. int, uint, float, complex, bytes, unicode) </p></li>
 <li><p><strong>precision</strong> – <strong>[in]</strong> Precision (in bits) of the scalar type. </p></li>
@@ -711,7 +712,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -722,7 +723,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320create_dtype_1darrayA_9character7integer7integerA_9character7logical"></span><span id="_CPPv220create_dtype_1darrayA_9character7integer7integerA_9character7logical"></span><span id="create_dtype_1darray__characterA.integer.integer.characterA.logical"></span><span class="target" id="_ygg_interface_8f90_1ad5dbd44fbbdbb4e42900a23368a34151"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_1darray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420create_dtype_1darrayA_9character7integer7integerA_9character7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling 1D arrays with fixed precision. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subtype</strong> – <strong>[in]</strong> Name of the 1D array element data type (e.g. int, uint, float, complex, bytes, unicode). </p></li>
 <li><p><strong>precision</strong> – <strong>[in]</strong> Precision (in bits) of the array element type. </p></li>
@@ -731,7 +732,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -742,7 +743,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320create_dtype_ndarrayA_9character7integer7integerA_7integerA_9character7logical"></span><span id="_CPPv220create_dtype_ndarrayA_9character7integer7integerA_7integerA_9character7logical"></span><span id="create_dtype_ndarray__characterA.integer.integer.integerA.characterA.logical"></span><span class="target" id="_ygg_interface_8f90_1a471e80cc655f5e8fd8c21a0197d7c15d"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_ndarray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ndim</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">shape</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420create_dtype_ndarrayA_9character7integer7integerA_7integerA_9character7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling 1D arrays with fixed precision. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>subtype</strong> – <strong>[in]</strong> Name of the 1D array element data type (e.g. int, uint, float, complex, bytes, unicode). </p></li>
 <li><p><strong>precision</strong> – <strong>[in]</strong> Precision (in bits) of the array element type. </p></li>
@@ -752,7 +753,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -763,14 +764,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv323create_dtype_json_array7integerA_8yggdtype7logical"></span><span id="_CPPv223create_dtype_json_array7integerA_8yggdtype7logical"></span><span id="create_dtype_json_array__integer.yggdtypeA.logical"></span><span class="target" id="_ygg_interface_8f90_1a027b738664a2f7b57b5d5ec5cff194bc"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_json_array</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nitems</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">items</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423create_dtype_json_array7integerA_8yggdtype7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling JSON arrays. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nitems</strong> – <strong>[in]</strong> The number of items that will be in the arrays. </p></li>
 <li><p><strong>items</strong> – <strong>[in]</strong> Data types for each element in the arrays. </p></li>
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -781,7 +782,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv324create_dtype_json_object7integerA_A_9characterA_8yggdtype7logical"></span><span id="_CPPv224create_dtype_json_object7integerA_A_9characterA_8yggdtype7logical"></span><span id="create_dtype_json_object__integer.characterAA.yggdtypeA.logical"></span><span class="target" id="_ygg_interface_8f90_1ae8e0702255688e5bcb212b9189942964"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_json_object</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nitems</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">keys</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424create_dtype_json_object7integerA_A_9characterA_8yggdtype7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling JSON object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nitems</strong> – <strong>[in]</strong> The number of items that will be in the objects. </p></li>
 <li><p><strong>keys</strong> – <strong>[in]</strong> The keys that will be in the objects. </p></li>
@@ -789,7 +790,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -800,10 +801,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv316create_dtype_ply7logical"></span><span id="_CPPv216create_dtype_ply7logical"></span><span id="create_dtype_ply__logical"></span><span class="target" id="_ygg_interface_8f90_1a9451cfb985d075eed461f2801c3574c1"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_ply</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416create_dtype_ply7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling Ply meshes. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -814,10 +815,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv316create_dtype_obj7logical"></span><span id="_CPPv216create_dtype_obj7logical"></span><span id="create_dtype_obj__logical"></span><span class="target" id="_ygg_interface_8f90_1a0619ae22461130999541af51a3f4f25c"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_obj</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416create_dtype_obj7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling Obj meshes. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -828,14 +829,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv319create_dtype_formatA_9character7integer7logical"></span><span id="_CPPv219create_dtype_formatA_9character7integer7logical"></span><span id="create_dtype_format__characterA.integer.logical"></span><span class="target" id="_ygg_interface_8f90_1a772b756979261a8cf6573860a339379f"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_format</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format_str</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">as_array</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_formatA_9character7integer7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type based on a C-style format string. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>format_str</strong> – <strong>[in]</strong> A C-style format string. </p></li>
 <li><p><strong>as_array</strong> – <strong>[in]</strong> If True, the data type will expect arrays (one for each field in the format string). If False, the data type will expect scalars. </p></li>
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -846,13 +847,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318create_dtype_pyobjA_9character7logical"></span><span id="_CPPv218create_dtype_pyobjA_9character7logical"></span><span id="create_dtype_pyobj__characterA.logical"></span><span class="target" id="_ygg_interface_8f90_1a81cc8598ac394eadd6dd21dae752b601"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_pyobj</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typename</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418create_dtype_pyobjA_9character7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling Python objects. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>typename</strong> – <strong>[in]</strong> Type of Python object. (e.g. instance or class) </p></li>
 <li><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -863,10 +864,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv319create_dtype_schema7logical"></span><span id="_CPPv219create_dtype_schema7logical"></span><span id="create_dtype_schema__logical"></span><span class="target" id="_ygg_interface_8f90_1a41e4594679e30ebd8cae06c3a859b9e8"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_schema</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_schema7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for handling schemas. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -877,10 +878,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv316create_dtype_any7logical"></span><span id="_CPPv216create_dtype_any7logical"></span><span id="create_dtype_any__logical"></span><span class="target" id="_ygg_interface_8f90_1a3c0b9b6cfc76070e5c3587d691b61164"></span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_any</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416create_dtype_any7logical" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a data type for any data type. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>use_generic</strong> – <strong>[in]</strong> True if the data type should expect generic datatypes. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A data type object. </p>
 </dd>
 </dl>
@@ -891,14 +892,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38ygg_send7yggcommA_9character7integer"></span><span id="_CPPv28ygg_send7yggcommA_9character7integer"></span><span id="ygg_send__yggcomm.characterA.integer"></span><span class="target" id="_ygg_interface_8f90_1a288ecbce8989c6ccec11a967bcfaaa1e"></span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_send</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">ygg_q</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ygg_send7yggcommA_9character7integer" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send raw bytes data from a character array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> Output/RPC/Timesync comm. </p></li>
 <li><p><strong>data</strong> – <strong>[in]</strong> Array of bytes to send. </p></li>
 <li><p><strong>data_len</strong> – <strong>[in]</strong> Number of bytes from data to send. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
 </dd>
 </dl>
@@ -909,14 +910,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38ygg_recv7yggcommA_9character7integer"></span><span id="_CPPv28ygg_recv7yggcommA_9character7integer"></span><span id="ygg_recv__yggcomm.characterA.integer"></span><span class="target" id="_ygg_interface_8f90_1a2ff8bd18c1526ecbd7efe226624f4b2f"></span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_recv</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">ygg_q</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ygg_recv7yggcommA_9character7integer" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive raw bytes data into a character array that cannot be resized. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> Input/RPC/Timesync comm. </p></li>
 <li><p><strong>data</strong> – <strong>[in]</strong> Array to receive bytes into. </p></li>
 <li><p><strong>data_len</strong> – <strong>[in]</strong> Variable where the size of the received message should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the receive. </p>
 </dd>
 </dl>
@@ -927,14 +928,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv316ygg_send_nolimit7yggcomm9yggchar_r7integer"></span><span id="_CPPv216ygg_send_nolimit7yggcomm9yggchar_r7integer"></span><span id="ygg_send_nolimit__yggcomm.yggchar_r.integer"></span><span class="target" id="_ygg_interface_8f90_1a29bb0767c9f6e58b989d0b7d4283d811"></span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_send_nolimit</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">ygg_q</span></span>, <a class="reference internal" href="#_CPPv49yggchar_r" title="yggchar_r"><span class="n"><span class="pre">yggchar_r</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ygg_send_nolimit7yggcomm9yggchar_r7integer" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send raw bytes data from a character array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> Output/RPC/Timesync comm. </p></li>
 <li><p><strong>data</strong> – <strong>[in]</strong> Array of bytes to send. </p></li>
 <li><p><strong>data_len</strong> – <strong>[in]</strong> Number of bytes from data to send. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
 </dd>
 </dl>
@@ -945,14 +946,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv316ygg_recv_nolimit7yggcomm9yggchar_r7integer"></span><span id="_CPPv216ygg_recv_nolimit7yggcomm9yggchar_r7integer"></span><span id="ygg_recv_nolimit__yggcomm.yggchar_r.integer"></span><span class="target" id="_ygg_interface_8f90_1a82a5a266c2981444d57bead84a8e2ba9"></span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ygg_recv_nolimit</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47yggcomm" title="yggcomm"><span class="n"><span class="pre">yggcomm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">ygg_q</span></span>, <a class="reference internal" href="#_CPPv49yggchar_r" title="yggchar_r"><span class="n"><span class="pre">yggchar_r</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ygg_recv_nolimit7yggcomm9yggchar_r7integer" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive raw bytes data into a character array that can be resized. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> Input/RPC/Timesync comm. </p></li>
 <li><p><strong>data</strong> – <strong>[in]</strong> Array to receive bytes into. </p></li>
 <li><p><strong>data_len</strong> – <strong>[in]</strong> Variable where the size of the received message should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the receive. </p>
 </dd>
 </dl>
@@ -969,13 +970,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 </div>
  </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> Output/RPC/Timesync comm. </p></li>
 <li><p><strong>args</strong> – <strong>[in]</strong> One or more variables to send. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send.</p>
 </dd>
 </dl>
@@ -994,14 +995,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 </div>
  </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> RPC/Timesync comm. </p></li>
 <li><p><strong>oargs</strong> – <strong>[in]</strong> One or more variables to send in the request. </p></li>
 <li><p><strong>iargs</strong> – <strong>[inout]</strong> One or more variables to receive the response into that cannot be resized. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call.</p>
 </dd>
 </dl>
@@ -1020,14 +1021,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 </div>
  </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> RPC/Timesync comm. </p></li>
 <li><p><strong>oargs</strong> – <strong>[in]</strong> One or more variables to send in the request. </p></li>
 <li><p><strong>iargs</strong> – <strong>[inout]</strong> One or more variables to receive the response into that can be resized. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call.</p>
 </dd>
 </dl>
@@ -1044,13 +1045,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 </div>
  </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> Output/RPC/Timesync comm. </p></li>
 <li><p><strong>args</strong> – <strong>[inout]</strong> One or more variables to receive into. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send.</p>
 </dd>
 </dl>
@@ -1067,13 +1068,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 </div>
  </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ygg_q</strong> – <strong>[in]</strong> Output/RPC/Timesync comm. </p></li>
 <li><p><strong>args</strong> – <strong>[inout]</strong> One or more variables to receive into. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send.</p>
 </dd>
 </dl>
@@ -1084,7 +1085,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38init_plyv"></span><span id="_CPPv28init_plyv"></span><span id="init_ply"></span><span class="target" id="_ygg_interface_8f90_1acc060b8a80642524f11f3a5ec07915eb"></span><span class="n"><span class="pre">yggply</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init_ply</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48init_plyv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialize a ply mesh instance. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A ply mesh. </p>
 </dd>
 </dl>
@@ -1095,7 +1096,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38free_ply6yggply"></span><span id="_CPPv28free_ply6yggply"></span><span id="free_ply__yggply"></span><span class="target" id="_ygg_interface_8f90_1a666cfdc11e35e1f5a4108a72e57bc2a9"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_ply</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggply</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_ply6yggply" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Free a ply mesh instance. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> The ply mesh to free. </p>
 </dd>
 </dl>
@@ -1106,10 +1107,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38copy_ply6yggply"></span><span id="_CPPv28copy_ply6yggply"></span><span id="copy_ply__yggply"></span><span class="target" id="_ygg_interface_8f90_1a9ded9540d99787287306bbdbd69fb4e6"></span><span class="n"><span class="pre">yggply</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">copy_ply</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggply</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48copy_ply6yggply" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Copy a ply mesh instance. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> The ply mesh to copy. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the mesh. </p>
 </dd>
 </dl>
@@ -1120,7 +1121,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318display_ply_indent6yggplyA_9character"></span><span id="_CPPv218display_ply_indent6yggplyA_9character"></span><span id="display_ply_indent__yggply.characterA"></span><span class="target" id="_ygg_interface_8f90_1a0e91211b53fc4047d98b80dcc167b500"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">display_ply_indent</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggply</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">indent</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418display_ply_indent6yggplyA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Display the contents of a ply mesh with a certain indentation. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p</strong> – <strong>[in]</strong> The ply mesh to display. </p></li>
 <li><p><strong>indent</strong> – <strong>[in]</strong> The indentation to use for each line. </p></li>
@@ -1134,7 +1135,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv311display_ply6yggply"></span><span id="_CPPv211display_ply6yggply"></span><span id="display_ply__yggply"></span><span class="target" id="_ygg_interface_8f90_1a2a1e30ccaf45a355c614897888b6c10c"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">display_ply</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggply</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411display_ply6yggply" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Display the contents of a ply mesh. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> The ply mesh to display. </p>
 </dd>
 </dl>
@@ -1145,7 +1146,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38init_objv"></span><span id="_CPPv28init_objv"></span><span id="init_obj"></span><span class="target" id="_ygg_interface_8f90_1a4841ec2b5688854604f09ab46ff0d66e"></span><span class="n"><span class="pre">yggobj</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init_obj</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48init_objv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialize an obj mesh instance. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An obj mesh. </p>
 </dd>
 </dl>
@@ -1156,7 +1157,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38free_obj6yggobj"></span><span id="_CPPv28free_obj6yggobj"></span><span id="free_obj__yggobj"></span><span class="target" id="_ygg_interface_8f90_1ad3c161a301b52569e32f4a017abd786c"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_obj</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggobj</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_obj6yggobj" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Free an obj mesh instance. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> The obj mesh to free. </p>
 </dd>
 </dl>
@@ -1167,10 +1168,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv38copy_obj6yggobj"></span><span id="_CPPv28copy_obj6yggobj"></span><span id="copy_obj__yggobj"></span><span class="target" id="_ygg_interface_8f90_1a6ad6a19d776be74dc4da00b5ee12aee3"></span><span class="n"><span class="pre">yggobj</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">copy_obj</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggobj</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48copy_obj6yggobj" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Copy an obj mesh instance. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> The obj mesh to copy. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the mesh. </p>
 </dd>
 </dl>
@@ -1181,7 +1182,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318display_obj_indent6yggobjA_9character"></span><span id="_CPPv218display_obj_indent6yggobjA_9character"></span><span id="display_obj_indent__yggobj.characterA"></span><span class="target" id="_ygg_interface_8f90_1a199c2d0824a1c19e5e2bfd4d9eb86b30"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">display_obj_indent</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggobj</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">indent</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418display_obj_indent6yggobjA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Display the contents of a obj mesh with a certain indentation. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p</strong> – <strong>[in]</strong> The obj mesh to display. </p></li>
 <li><p><strong>indent</strong> – <strong>[in]</strong> The indentation to use for each line. </p></li>
@@ -1195,7 +1196,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv311display_obj6yggobj"></span><span id="_CPPv211display_obj6yggobj"></span><span id="display_obj__yggobj"></span><span class="target" id="_ygg_interface_8f90_1a1aca21b770513738f842f29afa198974"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">display_obj</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggobj</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411display_obj6yggobj" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Display the contents of a obj mesh. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> The obj mesh to display. </p>
 </dd>
 </dl>
@@ -1206,7 +1207,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv312init_genericv"></span><span id="_CPPv212init_genericv"></span><span id="init_generic"></span><span class="target" id="_ygg_interface_8f90_1a962be5d028681f3aff146bdedca34c13"></span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init_generic</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Initialize a generic object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A new generic object. </p>
 </dd>
 </dl>
@@ -1217,7 +1218,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318init_generic_arrayv"></span><span id="_CPPv218init_generic_arrayv"></span><span id="init_generic_array"></span><span class="target" id="_ygg_interface_8f90_1a0f9e7e33e32c9a4fd2ce87858356bcee"></span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init_generic_array</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Initialize an array of generic objects. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A new generic object array. </p>
 </dd>
 </dl>
@@ -1228,7 +1229,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv316init_generic_mapv"></span><span id="_CPPv216init_generic_mapv"></span><span id="init_generic_map"></span><span class="target" id="_ygg_interface_8f90_1a9e007f29dd188a02f30ce09c52d1328b"></span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init_generic_map</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Initialize a mapping of generic objects. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A new generic object map. </p>
 </dd>
 </dl>
@@ -1239,13 +1240,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314create_generic8yggdtype6yggptr"></span><span id="_CPPv214create_generic8yggdtype6yggptr"></span><span id="create_generic__yggdtype.yggptr"></span><span class="target" id="_ygg_interface_8f90_1ae412471366eef839a31877f624c4c685"></span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_generic</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv48yggdtype" title="yggdtype"><span class="n"><span class="pre">yggdtype</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">type_class</span></span>, <a class="reference internal" href="#_CPPv46yggptr" title="yggptr"><span class="n"><span class="pre">yggptr</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414create_generic8yggdtype6yggptr" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a generic object from a type and some data. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>type_class</strong> – <strong>[in]</strong> The data type associated with the data pointer. </p></li>
 <li><p><strong>data</strong> – <strong>[in]</strong> A pointer to data of an arbitrary type defined by type_class. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A new generic object containing the provided data. </p>
 </dd>
 </dl>
@@ -1256,7 +1257,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv312free_generic10ygggeneric"></span><span id="_CPPv212free_generic10ygggeneric"></span><span id="free_generic__ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1ac377646d814cbc1498bcd58dbbfd1425"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_generic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412free_generic10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Free a generic object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> A generic object to free. </p>
 </dd>
 </dl>
@@ -1267,10 +1268,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv315is_generic_init10ygggeneric"></span><span id="_CPPv215is_generic_init10ygggeneric"></span><span id="is_generic_init__ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1a06e5b54c7e19c4736963ccb8f419c378"></span><span class="n"><span class="pre">logical</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_generic_init</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415is_generic_init10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Check if a generic object has been initialized. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> A generic object. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>.true. if the object has been initialized, .false. otherwise. </p>
 </dd>
 </dl>
@@ -1281,10 +1282,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv312copy_generic10ygggeneric"></span><span id="_CPPv212copy_generic10ygggeneric"></span><span id="copy_generic__ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1aa064633b7aeb179839eb79e6d250ccb3"></span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">copy_generic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">src</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412copy_generic10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Copy a generic object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>src</strong> – <strong>[in]</strong> A generic object to copy. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of src. </p>
 </dd>
 </dl>
@@ -1295,7 +1296,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv315display_generic10ygggeneric"></span><span id="_CPPv215display_generic10ygggeneric"></span><span id="display_generic__ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1a30aea63dfee6acef5e214f7af8a6b89a"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">display_generic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415display_generic10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Display a generic object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> A generic object to display. </p>
 </dd>
 </dl>
@@ -1306,13 +1307,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv317add_generic_array10ygggeneric10ygggeneric"></span><span id="_CPPv217add_generic_array10ygggeneric10ygggeneric"></span><span id="add_generic_array__ygggeneric.ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1a9cbcf2c53e7c03c4092871c39e87af6a"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">add_generic_array</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">arr</span></span>, <span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417add_generic_array10ygggeneric10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Add an element to the end of an array of generic elements. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>arr</strong> – <strong>[in]</strong> Array to add element to. </p></li>
 <li><p><strong>x</strong> – <strong>[in]</strong> Element to add. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A flag that is 1 if there is an error and 0 otherwise. </p>
 </dd>
 </dl>
@@ -1323,14 +1324,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv317set_generic_array10ygggeneric7integer10ygggeneric"></span><span id="_CPPv217set_generic_array10ygggeneric7integer10ygggeneric"></span><span id="set_generic_array__ygggeneric.integer.ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1aa9925cde799ffe01de0b6589ece711f7"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_generic_array</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">arr</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417set_generic_array10ygggeneric7integer10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set an element in the array at a given index to a new value. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>arr</strong> – <strong>[in]</strong> Array to add element to. </p></li>
 <li><p><strong>i</strong> – <strong>[in]</strong> Index where element should be added. </p></li>
 <li><p><strong>x</strong> – <strong>[in]</strong> Element to add. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A flag that is 1 if there is an error and 0 otherwise. </p>
 </dd>
 </dl>
@@ -1341,14 +1342,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv317get_generic_array10ygggeneric7integer10ygggeneric"></span><span id="_CPPv217get_generic_array10ygggeneric7integer10ygggeneric"></span><span id="get_generic_array__ygggeneric.integer.ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1a957c4b8bdcc47ff728b55ff4157eb914"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_generic_array</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">arr</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417get_generic_array10ygggeneric7integer10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get an element from an array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>arr</strong> – <strong>[in]</strong> Array to get element from. </p></li>
 <li><p><strong>i</strong> – <strong>[in]</strong> Index of element to get. </p></li>
 <li><p><strong>x</strong> – <strong>[out]</strong> Pointer to address where element should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A flag that is 1 if there is an error and 0 otherwise. </p>
 </dd>
 </dl>
@@ -1359,14 +1360,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318set_generic_object10ygggenericA_9character10ygggeneric"></span><span id="_CPPv218set_generic_object10ygggenericA_9character10ygggeneric"></span><span id="set_generic_object__ygggeneric.characterA.ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1ae244b00b9921a6fe60e6f9622f6acb65"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_generic_object</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">arr</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418set_generic_object10ygggenericA_9character10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set an element in the object at for a given key to a new value. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>arr</strong> – <strong>[in]</strong> Object to add element to. </p></li>
 <li><p><strong>k</strong> – <strong>[in]</strong> Key where element should be added. </p></li>
 <li><p><strong>x</strong> – <strong>[in]</strong> Element to add. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A flag that is 1 if there is an error and 0 otherwise. </p>
 </dd>
 </dl>
@@ -1377,14 +1378,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv318get_generic_object10ygggenericA_9character10ygggeneric"></span><span id="_CPPv218get_generic_object10ygggenericA_9character10ygggeneric"></span><span id="get_generic_object__ygggeneric.characterA.ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1acc293a67b18b093a0021434a3f78ede4"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_generic_object</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">arr</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418get_generic_object10ygggenericA_9character10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get an element from an object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>arr</strong> – <strong>[in]</strong> Object to get element from. </p></li>
 <li><p><strong>k</strong> – <strong>[in]</strong> Key of element to return. </p></li>
 <li><p><strong>x</strong> – <strong>[out]</strong> Pointer to address where element should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A flag that is 1 if there is an error and 0 otherwise. </p>
 </dd>
 </dl>
@@ -1395,7 +1396,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv311init_pythonv"></span><span id="_CPPv211init_pythonv"></span><span id="init_python"></span><span class="target" id="_ygg_interface_8f90_1a78852f270dd58cdadcd97d87a6920dd8"></span><span class="n"><span class="pre">yggpython</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init_python</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411init_pythonv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialize a Python object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A Python object. </p>
 </dd>
 </dl>
@@ -1406,7 +1407,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv311free_python9yggpython"></span><span id="_CPPv211free_python9yggpython"></span><span id="free_python__yggpython"></span><span class="target" id="_ygg_interface_8f90_1a32fb6a3a9596461499a35181fd0caa40"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_python</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggpython</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411free_python9yggpython" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Free a Python object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> The Python object to free. </p>
 </dd>
 </dl>
@@ -1417,10 +1418,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv311copy_python9yggpython"></span><span id="_CPPv211copy_python9yggpython"></span><span id="copy_python__yggpython"></span><span class="target" id="_ygg_interface_8f90_1a2ae0ba1ac443517254a5920ad7f2079e"></span><span class="n"><span class="pre">yggpython</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">copy_python</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggpython</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411copy_python9yggpython" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Copy a Python object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> The Python object to copy. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the Python object. </p>
 </dd>
 </dl>
@@ -1431,7 +1432,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv314display_python9yggpython"></span><span id="_CPPv214display_python9yggpython"></span><span id="display_python__yggpython"></span><span class="target" id="_ygg_interface_8f90_1aac996ac64f32210106661eb89a8ee476"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">display_python</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggpython</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414display_python9yggpython" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Display a Python object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> The Python object to display. </p>
 </dd>
 </dl>
@@ -1442,10 +1443,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322generic_array_get_size10ygggeneric"></span><span id="_CPPv222generic_array_get_size10ygggeneric"></span><span id="generic_array_get_size__ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1aebe989238aee2fb97f77662b27fd05ec"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_get_size</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_array_get_size10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the number of elements in an array object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of elements in array. </p>
 </dd>
 </dl>
@@ -1456,14 +1457,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322generic_array_get_item10ygggeneric7integerA_9character"></span><span id="_CPPv222generic_array_get_item10ygggeneric7integerA_9character"></span><span id="generic_array_get_item__ygggeneric.integer.characterA"></span><span class="target" id="_ygg_interface_8f90_1aa97c25092ad72060467f415e86214976"></span><span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_get_item</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typename</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_array_get_item10ygggeneric7integerA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get an item from an array for types that don’t require additional parameters. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be returned. </p></li>
 <li><p><strong>typename</strong> – <strong>[in]</strong> Type of value expected. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Pointer to data for array item. </p>
 </dd>
 </dl>
@@ -1474,13 +1475,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv329generic_array_get_item_nbytes10ygggeneric7integer"></span><span id="_CPPv229generic_array_get_item_nbytes10ygggeneric7integer"></span><span id="generic_array_get_item_nbytes__ygggeneric.integer"></span><span class="target" id="_ygg_interface_8f90_1a44bad7683d5309810358a4356c65063f"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_get_item_nbytes</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429generic_array_get_item_nbytes10ygggeneric7integer" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the size of an item from an array in bytes. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that the size should be returned for. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Size of the item in bytes. </p>
 </dd>
 </dl>
@@ -1491,7 +1492,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv324generic_array_get_scalar10ygggeneric7integerA_9character7integer"></span><span id="_CPPv224generic_array_get_scalar10ygggeneric7integerA_9character7integer"></span><span id="generic_array_get_scalar__ygggeneric.integer.characterA.integer"></span><span class="target" id="_ygg_interface_8f90_1a7f358547aa79035ba1a2ba777aac1a06"></span><span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_get_scalar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424generic_array_get_scalar10ygggeneric7integerA_9character7integer" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get a scalar item from an array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be returned. </p></li>
@@ -1499,7 +1500,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>precision</strong> – <strong>[in]</strong> Precision (in bits) of scalar value expected. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Pointer to data for the array item. </p>
 </dd>
 </dl>
@@ -1510,7 +1511,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv325generic_array_get_1darray10ygggeneric7integerA_9character7integer5c_ptr"></span><span id="_CPPv225generic_array_get_1darray10ygggeneric7integerA_9character7integer5c_ptr"></span><span id="generic_array_get_1darray__ygggeneric.integer.characterA.integer.c_ptr"></span><span class="target" id="_ygg_interface_8f90_1a8b561b5459c1bc2449e8e779990375c4"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_get_1darray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_get_1darray10ygggeneric7integerA_9character7integer5c_ptr" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get a 1D array item from an array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be returned. </p></li>
@@ -1519,7 +1520,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>data</strong> – <strong>[out]</strong> Pointer to memory that should be reallocated to store the 1D array. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of elements in the array. </p>
 </dd>
 </dl>
@@ -1530,7 +1531,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv325generic_array_get_ndarray10ygggeneric7integerA_9character7integer5c_ptr"></span><span id="_CPPv225generic_array_get_ndarray10ygggeneric7integerA_9character7integer5c_ptr"></span><span id="generic_array_get_ndarray__ygggeneric.integer.characterA.integer.c_ptr"></span><span class="target" id="_ygg_interface_8f90_1aac432179fed33569e6354d008c9fd6af"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_get_ndarray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_get_ndarray10ygggeneric7integerA_9character7integer5c_ptr" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get an ND array item from an array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be returned. </p></li>
@@ -1539,7 +1540,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>data</strong> – <strong>[out]</strong> Pointer to memory that should be reallocated to store the ND array. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The shape of the ND array (size in each dimension). </p>
 </dd>
 </dl>
@@ -1550,7 +1551,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322generic_array_set_item10ygggeneric7integerA_9character5c_ptr"></span><span id="_CPPv222generic_array_set_item10ygggeneric7integerA_9character5c_ptr"></span><span id="generic_array_set_item__ygggeneric.integer.characterA.c_ptr"></span><span class="target" id="_ygg_interface_8f90_1a3af643ef8271bc15115488727973b0fb"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_set_item</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typename</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_array_set_item10ygggeneric7integerA_9character5c_ptr" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set an item in an array for types that don’t require additional information. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be set. </p></li>
@@ -1566,7 +1567,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv324generic_array_set_scalar10ygggeneric7integer5c_ptrA_9character7integerA_9character"></span><span id="_CPPv224generic_array_set_scalar10ygggeneric7integer5c_ptrA_9character7integerA_9character"></span><span id="generic_array_set_scalar__ygggeneric.integer.c_ptr.characterA.integer.characterA"></span><span class="target" id="_ygg_interface_8f90_1a1e49e8aa3518de4818e88bc58b680e99"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_set_scalar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424generic_array_set_scalar10ygggeneric7integer5c_ptrA_9character7integerA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set a scalar value in an array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be set. </p></li>
@@ -1584,7 +1585,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv325generic_array_set_1darray10ygggeneric7integer5c_ptrA_9character7integer7integerA_9character"></span><span id="_CPPv225generic_array_set_1darray10ygggeneric7integer5c_ptrA_9character7integer7integerA_9character"></span><span id="generic_array_set_1darray__ygggeneric.integer.c_ptr.characterA.integer.integer.characterA"></span><span class="target" id="_ygg_interface_8f90_1a49f6c7620dafac09a446ebfb588a537d"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_set_1darray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_set_1darray10ygggeneric7integer5c_ptrA_9character7integer7integerA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set a 1d array value in an array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be set. </p></li>
@@ -1603,7 +1604,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv325generic_array_set_ndarray10ygggeneric7integer5c_ptrA_9character7integerA_7integerA_9character"></span><span id="_CPPv225generic_array_set_ndarray10ygggeneric7integer5c_ptrA_9character7integerA_7integerA_9character"></span><span id="generic_array_set_ndarray__ygggeneric.integer.c_ptr.characterA.integer.integerA.characterA"></span><span class="target" id="_ygg_interface_8f90_1a4ffdc1993a55e96617c78282ea4eda69"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_array_set_ndarray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">shape</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_set_ndarray10ygggeneric7integer5c_ptrA_9character7integerA_7integerA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set a nd array value from an array. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>index</strong> – <strong>[in]</strong> Index for value that should be set. </p></li>
@@ -1622,10 +1623,10 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320generic_map_get_size10ygggeneric"></span><span id="_CPPv220generic_map_get_size10ygggeneric"></span><span id="generic_map_get_size__ygggeneric"></span><span class="target" id="_ygg_interface_8f90_1a5a5f88090ee8910b5d15f8e6b683a833"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_get_size</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_get_size10ygggeneric" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the number of elements in an map object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of elements in map. </p>
 </dd>
 </dl>
@@ -1636,13 +1637,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320generic_map_get_keys10ygggenericA_A_9character"></span><span id="_CPPv220generic_map_get_keys10ygggenericA_A_9character"></span><span id="generic_map_get_keys__ygggeneric.characterAA"></span><span class="target" id="_ygg_interface_8f90_1a1f6c4b599478b5ffae845a33f66c2121"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_get_keys</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">keys</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_get_keys10ygggenericA_A_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the keys in a map object. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>keys</strong> – <strong>[out]</strong> Pointer to memory where array of keys should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of keys in map. </p>
 </dd>
 </dl>
@@ -1653,14 +1654,14 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320generic_map_get_item10ygggenericA_9characterA_9character"></span><span id="_CPPv220generic_map_get_item10ygggenericA_9characterA_9character"></span><span id="generic_map_get_item__ygggeneric.characterA.characterA"></span><span class="target" id="_ygg_interface_8f90_1a661a71ff320ae66842180209d62c78e2"></span><span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_get_item</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typename</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_get_item10ygggenericA_9characterA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get an item from a map for types that don’t require additional parameters. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be returned. </p></li>
 <li><p><strong>typename</strong> – <strong>[in]</strong> Type of value expected. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Pointer to data for map item. </p>
 </dd>
 </dl>
@@ -1671,13 +1672,13 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv327generic_map_get_item_nbytes10ygggenericA_9character"></span><span id="_CPPv227generic_map_get_item_nbytes10ygggenericA_9character"></span><span id="generic_map_get_item_nbytes__ygggeneric.characterA"></span><span class="target" id="_ygg_interface_8f90_1a82f851de8756d21e31df6c0c3807b0e9"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_get_item_nbytes</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427generic_map_get_item_nbytes10ygggenericA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the size of an item from a map in bytes. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key for value that the size should be returned for. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Size of the item in bytes. </p>
 </dd>
 </dl>
@@ -1688,7 +1689,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322generic_map_get_scalar10ygggenericA_9characterA_9character7integer"></span><span id="_CPPv222generic_map_get_scalar10ygggenericA_9characterA_9character7integer"></span><span id="generic_map_get_scalar__ygggeneric.characterA.characterA.integer"></span><span class="target" id="_ygg_interface_8f90_1aa81d7895c2d23c4193d19ff52e25344d"></span><span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_get_scalar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_map_get_scalar10ygggenericA_9characterA_9character7integer" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get a scalar value from a map. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be returned. </p></li>
@@ -1696,7 +1697,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>precision</strong> – <strong>[in]</strong> Precision of scalar that is expected. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Pointer to scalar data. </p>
 </dd>
 </dl>
@@ -1707,7 +1708,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv323generic_map_get_1darray10ygggenericA_9characterA_9character7integer5c_ptr"></span><span id="_CPPv223generic_map_get_1darray10ygggenericA_9characterA_9character7integer5c_ptr"></span><span id="generic_map_get_1darray__ygggeneric.characterA.characterA.integer.c_ptr"></span><span class="target" id="_ygg_interface_8f90_1af0817dfeb1714b32eaba67eddb4db060"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_get_1darray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_get_1darray10ygggenericA_9characterA_9character7integer5c_ptr" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get a 1d array value from a map. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be returned. </p></li>
@@ -1716,7 +1717,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>data</strong> – <strong>[out]</strong> Pointer to pointer that should be reallocated to store the data. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of elements in the data. </p>
 </dd>
 </dl>
@@ -1727,7 +1728,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv323generic_map_get_ndarray10ygggenericA_9characterA_9character7integer5c_ptr"></span><span id="_CPPv223generic_map_get_ndarray10ygggenericA_9characterA_9character7integer5c_ptr"></span><span id="generic_map_get_ndarray__ygggeneric.characterA.characterA.integer.c_ptr"></span><span class="target" id="_ygg_interface_8f90_1a5448fbb2dd767ff129f57a0f9927ba46"></span><span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_get_ndarray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_get_ndarray10ygggenericA_9characterA_9character7integer5c_ptr" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get a nd array value from a map. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be returned. </p></li>
@@ -1736,7 +1737,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <li><p><strong>data</strong> – <strong>[out]</strong> Pointer to array that should be reallocated to store the data. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Shape of the array (size in each dimension). </p>
 </dd>
 </dl>
@@ -1747,7 +1748,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv320generic_map_set_item10ygggenericA_9characterA_9character5c_ptr"></span><span id="_CPPv220generic_map_set_item10ygggenericA_9characterA_9character5c_ptr"></span><span id="generic_map_set_item__ygggeneric.characterA.characterA.c_ptr"></span><span class="target" id="_ygg_interface_8f90_1af2bc2442007e29e4339683ea3e39c943"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_set_item</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">typename</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_set_item10ygggenericA_9characterA_9character5c_ptr" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set an item from a map for types that don’t require additional parameters. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be set. </p></li>
@@ -1763,7 +1764,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv322generic_map_set_scalar10ygggenericA_9character5c_ptrA_9character7integerA_9character"></span><span id="_CPPv222generic_map_set_scalar10ygggenericA_9character5c_ptrA_9character7integerA_9character"></span><span id="generic_map_set_scalar__ygggeneric.characterA.c_ptr.characterA.integer.characterA"></span><span class="target" id="_ygg_interface_8f90_1ac2fa796274c25dffad43ca3a9a89fbaa"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_set_scalar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_map_set_scalar10ygggenericA_9character5c_ptrA_9character7integerA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set a scalar value in a map. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be set. </p></li>
@@ -1781,7 +1782,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv323generic_map_set_1darray10ygggenericA_9character5c_ptrA_9character7integer7integerA_9character"></span><span id="_CPPv223generic_map_set_1darray10ygggenericA_9character5c_ptrA_9character7integer7integerA_9character"></span><span id="generic_map_set_1darray__ygggeneric.characterA.c_ptr.characterA.integer.integer.characterA"></span><span class="target" id="_ygg_interface_8f90_1aaa67c60dc3bde138551efdbb6e283b41"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_set_1darray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_set_1darray10ygggenericA_9character5c_ptrA_9character7integer7integerA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set a 1d array value in a map. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be set. </p></li>
@@ -1800,7 +1801,7 @@ Interface members: <div class="highlight-default notranslate"><div class="highli
 <span id="_CPPv323generic_map_set_ndarray10ygggenericA_9character5c_ptrA_9character7integerA_7integerA_9character"></span><span id="_CPPv223generic_map_set_ndarray10ygggenericA_9character5c_ptrA_9character7integerA_7integerA_9character"></span><span id="generic_map_set_ndarray__ygggeneric.characterA.c_ptr.characterA.integer.integerA.characterA"></span><span class="target" id="_ygg_interface_8f90_1a4d950e1632292a38684fe4c5b5130b02"></span><span class="n"><span class="pre">subroutine</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generic_map_set_ndarray</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ygggeneric</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">c_ptr</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">subtype</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">precision</span></span>, <span class="n"><span class="pre">integer</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">shape</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="n"><span class="pre">character</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">units_in</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_set_ndarray10ygggenericA_9character5c_ptrA_9character7integerA_7integerA_9character" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set a nd array value in a map. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – <strong>[in]</strong> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>key</strong> – <strong>[in]</strong> Key string for value that should be set. </p></li>

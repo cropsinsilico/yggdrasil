@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -64,8 +65,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#run">run</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#info">info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#validate">validate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compile-model">compile-model</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#compile">compile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#compile-deps">compile-deps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#clean">clean</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#install">install</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#config">config</a></li>
@@ -140,7 +141,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Command Line Interface (CLI)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
@@ -156,7 +157,7 @@
 <section id="yggdrasil-command">
 <span id="cli-yggdrasil-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> Command<a class="headerlink" href="#yggdrasil-command" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggdrasil</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
-                 <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">deps</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">metaschema</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">}</span>
+                 <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">model</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">metaschema</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">}</span>
                  <span class="o">...</span>
 </pre></div>
 </div>
@@ -172,7 +173,7 @@
 <h3>subcommands<a class="headerlink" href="#subcommands" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>subcommand</kbd></dt>
-<dd><p>Possible choices: run, info, validate, compile, compile-deps, clean, install, config, metaschema, schema, model-form-schema, dev-update, timing, gha, integration-service-manager</p>
+<dd><p>Possible choices: run, info, validate, compile-model, compile, clean, install, config, metaschema, schema, model-form-schema, dev-update, timing, gha, integration-service-manager</p>
 </dd>
 </dl>
 </section>
@@ -182,7 +183,9 @@
 <h4>run<a class="headerlink" href="#run" title="Permalink to this heading">¶</a></h4>
 <p>Run an integration.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mpi</span> <span class="n">WITH_MPI</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mpi</span><span class="o">-</span><span class="n">tag</span><span class="o">-</span><span class="n">start</span> <span class="n">MPI_TAG_START</span><span class="p">]</span>
-              <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">debugger</span> <span class="n">WITH_DEBUGGER</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
               <span class="p">[</span><span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">CLIENT_LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">components</span><span class="p">]</span>
               <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">messages</span> <span class="p">{</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">,</span><span class="n">First</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">namespace</span> <span class="n">NAMESPACE</span><span class="p">]</span>
               <span class="p">[</span><span class="o">--</span><span class="n">host</span> <span class="n">HOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vhost</span> <span class="n">VHOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">user</span> <span class="n">USER</span><span class="p">]</span>
@@ -212,6 +215,17 @@
 </dd>
 <dt><kbd>--validate</kbd></dt>
 <dd><p>Validate the run via model validation commands on completion.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-debugger</kbd></dt>
+<dd><p>Run all models with a specific debuggin tool. If quoted, this can also include flags for the tool.</p>
+</dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile models with the address sanitizer enabled.</p>
 <p>Default: False</p>
 </dd>
 <dt><kbd>--loglevel</kbd></dt>
@@ -302,11 +316,12 @@
 <h6>compiler<a class="headerlink" href="#compiler" title="Permalink to this heading">¶</a></h6>
 <p>Get information about a compiler.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">compiler</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
+                        <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span>
                         <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
 <section id="positional-arguments_repeat1">
-<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat1" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Positional Arguments<a class="headerlink" href="#positional-arguments_repeat1" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
@@ -315,7 +330,7 @@
 </dl>
 </section>
 <section id="named-arguments_repeat3">
-<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat3" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Named Arguments<a class="headerlink" href="#named-arguments_repeat3" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
@@ -326,6 +341,14 @@
 </dd>
 <dt><kbd>--fullpath</kbd></dt>
 <dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile with Clang ASAN if available.</p>
 <p>Default: False</p>
 </dd>
 </dl>
@@ -335,12 +358,12 @@
 <h6>linker<a class="headerlink" href="#linker" title="Permalink to this heading">¶</a></h6>
 <p>Get information about a linker.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">linker</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
-                      <span class="p">[</span><span class="o">--</span><span class="n">library</span><span class="p">]</span>
+                      <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">library</span><span class="p">]</span>
                       <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
 <section id="positional-arguments_repeat2">
-<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat2" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Positional Arguments<a class="headerlink" href="#positional-arguments_repeat2" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
@@ -349,7 +372,7 @@
 </dl>
 </section>
 <section id="named-arguments_repeat4">
-<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat4" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Named Arguments<a class="headerlink" href="#named-arguments_repeat4" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
@@ -360,6 +383,14 @@
 </dd>
 <dt><kbd>--fullpath</kbd></dt>
 <dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile with Clang ASAN if available.</p>
 <p>Default: False</p>
 </dd>
 <dt><kbd>--library</kbd></dt>
@@ -373,11 +404,12 @@
 <h6>archiver<a class="headerlink" href="#archiver" title="Permalink to this heading">¶</a></h6>
 <p>Get information about a archiver.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">info</span> <span class="n">archiver</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fullpath</span><span class="p">]</span>
+                        <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span>
                         <span class="p">{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">}</span>
 </pre></div>
 </div>
 <section id="positional-arguments_repeat3">
-<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat3" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Positional Arguments<a class="headerlink" href="#positional-arguments_repeat3" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
 <dd><p>Possible choices: c, c++, cpp, cxx, fortran</p>
@@ -386,7 +418,7 @@
 </dl>
 </section>
 <section id="named-arguments_repeat5">
-<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat5" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Named Arguments<a class="headerlink" href="#named-arguments_repeat5" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of tool to get information for. If not provided, information for the default tool will be returned.</p>
@@ -397,6 +429,14 @@
 </dd>
 <dt><kbd>--fullpath</kbd></dt>
 <dd><p>Get the full path to the tool exectuable.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile with Clang ASAN if available.</p>
 <p>Default: False</p>
 </dd>
 </dl>
@@ -433,13 +473,14 @@
 </dl>
 </section>
 </section>
-<section id="compile">
-<h4>compile<a class="headerlink" href="#compile" title="Permalink to this heading">¶</a></h4>
+<section id="compile-model">
+<h4>compile-model<a class="headerlink" href="#compile-model" title="Permalink to this heading">¶</a></h4>
 <p>Compile a program from source files for use in an yggdrasil integration.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">language</span> <span class="p">{</span><span class="kc">None</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">}]</span>
-                  <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="o">...</span><span class="p">]]]</span>
-                  <span class="p">[</span><span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">ccache</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">Rpkg</span><span class="o">-</span><span class="n">language</span> <span class="n">RPKG_LANGUAGE</span><span class="p">]</span>
-                  <span class="n">source</span> <span class="p">[</span><span class="n">source</span> <span class="o">...</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span><span class="o">-</span><span class="n">model</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">language</span> <span class="p">{</span><span class="kc">None</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">cpp</span><span class="p">,</span><span class="n">cxx</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">r</span><span class="p">}]</span>
+                        <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">flags</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="o">...</span><span class="p">]]]</span>
+                        <span class="p">[</span><span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">ccache</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">Rpkg</span><span class="o">-</span><span class="n">language</span> <span class="n">RPKG_LANGUAGE</span><span class="p">]</span>
+                        <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span>
+                        <span class="n">source</span> <span class="p">[</span><span class="n">source</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 <section id="positional-arguments_repeat5">
@@ -470,20 +511,33 @@
 <dt><kbd>--Rpkg-language</kbd></dt>
 <dd><p>Language that R package is written in (only used if the specified language is R).</p>
 </dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile with Clang ASAN if available.</p>
+<p>Default: False</p>
+</dd>
 </dl>
 </section>
 </section>
-<section id="compile-deps">
-<h4>compile-deps<a class="headerlink" href="#compile-deps" title="Permalink to this heading">¶</a></h4>
+<section id="compile">
+<h4>compile<a class="headerlink" href="#compile" title="Permalink to this heading">¶</a></h4>
 <p>Compile yggdrasil dependency libraries. Existing libraries are first deleted.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span><span class="o">-</span><span class="n">deps</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="nb">compile</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">force</span><span class="o">-</span><span class="n">source</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="n">source</span><span class="o">-</span><span class="n">language</span> <span class="n">SOURCE_LANGUAGE</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="n">flags</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="p">[</span><span class="n">FLAGS</span> <span class="o">...</span><span class="p">]]]</span> <span class="p">[</span><span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">ccache</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="n">Rpkg</span><span class="o">-</span><span class="n">language</span> <span class="n">RPKG_LANGUAGE</span><span class="p">]</span>
+                  <span class="p">[</span><span class="n">language</span> <span class="p">[</span><span class="n">language</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
 <section id="positional-arguments_repeat6">
 <h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat6" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>language</kbd></dt>
-<dd><p>One or more languages to compile dependencies for.</p>
+<dd><p>One or more languages to compile dependencies for, source files to compile into an executable, or the directory containing an R package.</p>
 <p>Default: [‘all’]</p>
 </dd>
 </dl>
@@ -493,6 +547,31 @@
 <dl class="option-list">
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of compilation tool that should be used</p>
+</dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile with Clang ASAN if available.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--force-source</kbd></dt>
+<dd><p>Force all arguments passed to the language parameter to be treated as source files to be compiled.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--source-language</kbd></dt>
+<dd><p>Language of the source code. If not provided, the language will be determined from the source extension.</p>
+</dd>
+<dt><kbd>--flags</kbd></dt>
+<dd><p>Additional flags that should be added to the compilation command if source files are provided.</p>
+</dd>
+<dt><kbd>--use-ccache</kbd></dt>
+<dd><p>Run source compilation with ccache.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--Rpkg-language</kbd></dt>
+<dd><p>Language that R package is written in (only used if the provided source language is R).</p>
 </dd>
 </dl>
 </section>
@@ -516,7 +595,7 @@
 <section id="install">
 <h4>install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h4>
 <p>Complete yggdrasil installation for one or more languages.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">install</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">import</span><span class="p">]</span> <span class="p">[</span><span class="n">languages</span> <span class="p">[</span><span class="n">languages</span> <span class="o">...</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">install</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">import</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span> <span class="p">[</span><span class="n">languages</span> <span class="p">[</span><span class="n">languages</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
 <section id="positional-arguments_repeat8">
@@ -535,6 +614,10 @@
 <dd><p>Don’t import the yggdrasil package in calling the installation script.</p>
 <p>Default: False</p>
 </dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Load ASAN library before running executables.</p>
+<p>Default: False</p>
+</dd>
 </dl>
 </section>
 </section>
@@ -551,6 +634,9 @@
                  <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">++-</span><span class="n">linker</span> <span class="n">C</span><span class="o">++</span><span class="n">_LINKER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fortran</span><span class="o">-</span><span class="n">linker</span> <span class="n">FORTRAN_LINKER</span><span class="p">]</span>
                  <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">-</span><span class="n">archiver</span> <span class="n">C_ARCHIVER</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">c</span><span class="o">++-</span><span class="n">archiver</span> <span class="n">C</span><span class="o">++</span><span class="n">_ARCHIVER</span><span class="p">]</span>
                  <span class="p">[</span><span class="o">--</span><span class="n">fortran</span><span class="o">-</span><span class="n">archiver</span> <span class="n">FORTRAN_ARCHIVER</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">matlab</span><span class="o">-</span><span class="n">engine</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">python</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">matlab</span><span class="o">-</span><span class="n">engine</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">python</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hide</span><span class="o">-</span><span class="n">matlab</span><span class="o">-</span><span class="n">libiomp</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">restore</span><span class="o">-</span><span class="n">matlab</span><span class="o">-</span><span class="n">libiomp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">osr</span><span class="o">-</span><span class="n">repository</span><span class="o">-</span><span class="n">path</span> <span class="n">REPOSITORY</span><span class="p">]</span>
                  <span class="p">[</span><span class="n">languages</span> <span class="p">[</span><span class="n">languages</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
@@ -559,7 +645,7 @@
 <dl class="option-list">
 <dt><kbd>languages</kbd></dt>
 <dd><p>One or more languages that should be configured.</p>
-<p>Default: []</p>
+<p>Default: [‘all’]</p>
 </dd>
 </dl>
 </section>
@@ -568,7 +654,7 @@
 <dl class="option-list">
 <dt><kbd>--languages</kbd></dt>
 <dd><p>One or more languages that should be configured.</p>
-<p>Default: []</p>
+<p>Default: [‘all’]</p>
 </dd>
 <dt><kbd>--show-file</kbd></dt>
 <dd><p>Print the path to the config file without updating it.</p>
@@ -628,6 +714,21 @@
 </dd>
 <dt><kbd>--fortran-archiver</kbd></dt>
 <dd><p>Name or path to archiver that should be used to create static libraries for models written in fortran.</p>
+</dd>
+<dt><kbd>--disable-matlab-engine-for-python</kbd></dt>
+<dd><p>Disable use of the Matlab engine for Python.</p>
+</dd>
+<dt><kbd>--enable-matlab-engine-for-python</kbd></dt>
+<dd><p>Enable use of the Matlab engine for Python.</p>
+</dd>
+<dt><kbd>--hide-matlab-libiomp</kbd></dt>
+<dd><p>Hide the version of libiomp installed by Matlab by slightly changing the filename so that the conda version of libomp is used instead. This helps to solve the error “OMP: Error #15: Initializing libomp.dylib…” that can occur when using a conda environment. The hidden file location will be set in the configuration file and can be restored via the ‘–restore-matlab-libiomp’ option.</p>
+</dd>
+<dt><kbd>--restore-matlab-libiomp</kbd></dt>
+<dd><p>Restore the version of libiomp installed by Matlab. (See help for ‘–hide-matlab-libiomp’)</p>
+</dd>
+<dt><kbd>--osr-repository-path</kbd></dt>
+<dd><p>The full path to the OpenSimRoot repository.</p>
 </dd>
 </dl>
 </section>
@@ -809,7 +910,7 @@
 </pre></div>
 </div>
 <section id="named-arguments_repeat15">
-<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat15" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Named Arguments<a class="headerlink" href="#named-arguments_repeat15" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>--remote-url</kbd></dt>
 <dd><p>URL that will be used to access the service manager and running integrations by remote requests. If not provided, the environment variable YGGDRASIL_SERVICE_HOST_URL will be used if it is set. If it is not set, the local <code class="docutils literal notranslate"><span class="pre">address</span></code> will be used under the assumption that the service manager and integration services will only be connected to by local integrations.</p>
@@ -845,7 +946,7 @@
 </pre></div>
 </div>
 <section id="named-arguments_repeat16">
-<h7>Named Arguments<a class="headerlink" href="#named-arguments_repeat16" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Named Arguments<a class="headerlink" href="#named-arguments_repeat16" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>--integration-name</kbd></dt>
 <dd><p>Name of integration to stop. If not provided, the service manager will be stopped as will all of the running services.</p>
@@ -869,7 +970,7 @@
 </pre></div>
 </div>
 <section id="positional-arguments_repeat10">
-<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat10" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Positional Arguments<a class="headerlink" href="#positional-arguments_repeat10" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>integration-name</kbd></dt>
 <dd><p>The name that the integration should be registered under or the path to a YAML file containing a list of one or more mappings between name and YAML specification files for integrations that should be registered.</p>
@@ -887,7 +988,7 @@
 </pre></div>
 </div>
 <section id="positional-arguments_repeat11">
-<h7>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat11" title="Permalink to this heading">¶</a></h7>
+<h6 aria-level="7">Positional Arguments<a class="headerlink" href="#positional-arguments_repeat11" title="Permalink to this heading">¶</a></h6>
 <dl class="option-list">
 <dt><kbd>integration-name</kbd></dt>
 <dd><p>The name of the integration to remove from the registry or the path to a YAML file containing a list of one or more mappings between integration name and YAML specification files for integrations that should be unregistered.</p>
@@ -901,11 +1002,12 @@
 </section>
 <section id="yggcc-command">
 <span id="cli-yggcc-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcc</span></code> Command<a class="headerlink" href="#yggcc-command" title="Permalink to this heading">¶</a></h2>
-<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile</span></code></p>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile-model</span></code></p>
 </section>
 <section id="yggccflags-command">
 <span id="cli-yggccflags-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggccflags</span></code> Command<a class="headerlink" href="#yggccflags-command" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggccflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggccflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span>
 </pre></div>
 </div>
 <section id="named-arguments">
@@ -917,6 +1019,14 @@
 </dd>
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of the tool that associated flags be returned for.</p>
+</dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile with Clang ASAN if available.</p>
+<p>Default: False</p>
 </dd>
 </dl>
 </section>
@@ -946,7 +1056,7 @@
 </section>
 <section id="yggcompile-command">
 <span id="cli-yggcompile-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggcompile</span></code> Command<a class="headerlink" href="#yggcompile-command" title="Permalink to this heading">¶</a></h2>
-<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile-deps</span></code></p>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">compile</span></code></p>
 </section>
 <section id="yggconfig-command">
 <span id="cli-yggconfig-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> Command<a class="headerlink" href="#yggconfig-command" title="Permalink to this heading">¶</a></h2>
@@ -970,7 +1080,8 @@
 </section>
 <section id="yggldflags-command">
 <span id="cli-yggldflags-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggldflags</span></code> Command<a class="headerlink" href="#yggldflags-command" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggldflags</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpp</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">toolname</span> <span class="n">TOOLNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span>
 </pre></div>
 </div>
 <section id="named-arguments">
@@ -982,6 +1093,14 @@
 </dd>
 <dt><kbd>--toolname</kbd></dt>
 <dd><p>Name of the tool that associated flags be returned for.</p>
+</dd>
+<dt><kbd>--disable-python-c-api</kbd></dt>
+<dd><p>Disable access to the Python C API from yggdrasil.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--with-asan</kbd></dt>
+<dd><p>Compile with Clang ASAN if available.</p>
+<p>Default: False</p>
 </dd>
 </dl>
 </section>

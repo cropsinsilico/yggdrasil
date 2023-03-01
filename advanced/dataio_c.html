@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C DataIO API &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>C DataIO API &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -29,14 +26,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -107,7 +108,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Advanced</a></li>
           <li class="breadcrumb-item"><a href="code.html">Code</a></li>
           <li class="breadcrumb-item"><a href="code_c.html">C Code</a></li>
@@ -149,10 +150,10 @@
 <span id="_CPPv310af_is_openK11asciiFile_t"></span><span id="_CPPv210af_is_openK11asciiFile_t"></span><span id="af_is_open__asciiFile_tC"></span><span class="target" id="_ascii_file_8h_1a47a6fed432d1842f8da133abcc44a88c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_is_open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410af_is_openK11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine if the file is open. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 1 if open, 0 if closed. </p>
 </dd>
 </dl>
@@ -163,10 +164,10 @@
 <span id="_CPPv37af_openP11asciiFile_t"></span><span id="_CPPv27af_openP11asciiFile_t"></span><span id="af_open__asciiFile_tP"></span><span class="target" id="_ascii_file_8h_1a4c6f40e8e6773279180c65e89cede010"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_open</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47af_openP11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Open the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 if opened successfully, -1 otherwise. </p>
 </dd>
 </dl>
@@ -177,10 +178,10 @@
 <span id="_CPPv38af_closeP11asciiFile_t"></span><span id="_CPPv28af_closeP11asciiFile_t"></span><span id="af_close__asciiFile_tP"></span><span class="target" id="_ascii_file_8h_1a0527ea4a37b370f03fe6da956ff82051"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48af_closeP11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Close the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 if closed successfully, -1 otherwise. </p>
 </dd>
 </dl>
@@ -191,13 +192,13 @@
 <span id="_CPPv313af_is_commentK11asciiFile_tPKc"></span><span id="_CPPv213af_is_commentK11asciiFile_tPKc"></span><span id="af_is_comment__asciiFile_tC.cCP"></span><span class="target" id="_ascii_file_8h_1a2563193ae51f894e0c1c66c465b001c7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_is_comment</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413af_is_commentK11asciiFile_tPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Check if string starts with a comment. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
 <li><p><strong>line</strong> – <strong>[in]</strong> constant character pointer to string that should be checked. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 1 if line starts with a comment, 0 otherwise. </p>
 </dd>
 </dl>
@@ -208,14 +209,14 @@
 <span id="_CPPv326af_readline_full_noreallocK11asciiFile_tPc6size_t"></span><span id="_CPPv226af_readline_full_noreallocK11asciiFile_tPc6size_t"></span><span id="af_readline_full_norealloc__asciiFile_tC.cP.s"></span><span class="target" id="_ascii_file_8h_1a51e5de1c6872390470c3e66717477d83"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_readline_full_norealloc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426af_readline_full_noreallocK11asciiFile_tPc6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a single line from the file without realloc. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
 <li><p><strong>line</strong> – <strong>[out]</strong> constant character pointer to buffer where the read line should be stored. If line is not large enough to hold the read line, an error will be returned. </p></li>
 <li><p><strong>n</strong> – <strong>[in]</strong> Size of allocated buffer. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters read, -1 on failure. </p>
 </dd>
 </dl>
@@ -226,14 +227,14 @@
 <span id="_CPPv316af_readline_fullK11asciiFile_tPPcP6size_t"></span><span id="_CPPv216af_readline_fullK11asciiFile_tPPcP6size_t"></span><span id="af_readline_full__asciiFile_tC.cPP.sP"></span><span class="target" id="_ascii_file_8h_1abe2de982da7e4bc735994b9b8c1925b1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_readline_full</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416af_readline_fullK11asciiFile_tPPcP6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a single line from the file with realloc. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
 <li><p><strong>line</strong> – <strong>[out]</strong> constant character pointer to pointer to buffer where the read line should be stored. If line is not large enough to hold the read line, it will be reallocated. </p></li>
 <li><p><strong>n</strong> – <strong>[in]</strong> Pointer to size of allocated buffer. If line is not large enough to hold the read line and is reallocated, n will be changed to the new size. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters read, -1 on failure. </p>
 </dd>
 </dl>
@@ -244,13 +245,13 @@
 <span id="_CPPv317af_writeline_fullK11asciiFile_tPKc"></span><span id="_CPPv217af_writeline_fullK11asciiFile_tPKc"></span><span id="af_writeline_full__asciiFile_tC.cCP"></span><span class="target" id="_ascii_file_8h_1ae1b11621aad35b3a39ebb6f36385cf94"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_writeline_full</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417af_writeline_fullK11asciiFile_tPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write a single line to the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </p></li>
 <li><p><strong>line</strong> – <strong>[out]</strong> constant character pointer to string that should be written. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters written, -1 on failure. </p>
 </dd>
 </dl>
@@ -261,14 +262,14 @@
 <span id="_CPPv39af_updateP11asciiFile_tPKcPKc"></span><span id="_CPPv29af_updateP11asciiFile_tPKcPKc"></span><span id="af_update__asciiFile_tP.cCP.cCP"></span><span class="target" id="_ascii_file_8h_1affb789e2968d0c952d24c8b5b64b5320"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">af_update</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">io_mode</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49af_updateP11asciiFile_tPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Update an existing <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> asciiFile_t* Address of file structure to update. </p></li>
 <li><p><strong>filepath</strong> – <strong>[in]</strong> constant character pointer to file path. </p></li>
 <li><p><strong>io_mode</strong> – <strong>[in]</strong> constant character pointer to I/O mode. “r” for read, “w” for write. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int -1 if there is an error, 0 otherwise. </p>
 </dd>
 </dl>
@@ -279,7 +280,7 @@
 <span id="_CPPv39asciiFilePKcPKcPKcPKc"></span><span id="_CPPv29asciiFilePKcPKcPKcPKc"></span><span id="asciiFile__cCP.cCP.cCP.cCP"></span><span class="target" id="_ascii_file_8h_1a90670937615370b08cd7dfafad8fbbba"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411asciiFile_t" title="asciiFile_t"><span class="n"><span class="pre">asciiFile_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">asciiFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">io_mode</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">comment</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">newline</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49asciiFilePKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filepath</strong> – <strong>[in]</strong> constant character pointer to file path. </p></li>
 <li><p><strong>io_mode</strong> – <strong>[in]</strong> const character pointer to I/O mode. “r” for read, “w” for write. </p></li>
@@ -287,7 +288,7 @@
 <li><p><strong>newline</strong> – <strong>[in]</strong> const character pointer to character(s) that should indicate a newline. If NULL, newline is set to “\n”. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> File structure. </p>
 </dd>
 </dl>
@@ -440,10 +441,10 @@
 <span id="_CPPv321count_complex_formatsPKc"></span><span id="_CPPv221count_complex_formatsPKc"></span><span id="count_complex_formats__cCP"></span><span class="target" id="_ascii_table_8h_1aaec1ba2d1988e74fe162386f0677fcf2"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">count_complex_formats</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fmt_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421count_complex_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Count format specifiers for complex numbers. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fmt_str</strong> – <strong>[in]</strong> constant character pointer to string that should be searched for format specifiers. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int Number of complex format specifiers found. </p>
 </dd>
 </dl>
@@ -454,10 +455,10 @@
 <span id="_CPPv313count_formatsPKc"></span><span id="_CPPv213count_formatsPKc"></span><span id="count_formats__cCP"></span><span class="target" id="_ascii_table_8h_1a2059b2fabbacee5e6de895822beb99cd"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">count_formats</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fmt_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413count_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Count how many % format specifiers there are in format string. Formats are found by counting the number of matches to the regular expression adapted from <a class="reference external" href="https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex">https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex</a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fmt_str</strong> – <strong>[in]</strong> constant character pointer to string that should be searched for format specifiers. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int Number of format specifiers found. </p>
 </dd>
 </dl>
@@ -468,13 +469,13 @@
 <span id="_CPPv316simplify_formatsPcK6size_t"></span><span id="_CPPv216simplify_formatsPcK6size_t"></span><span id="simplify_formats__cP.sC"></span><span class="target" id="_ascii_table_8h_1a9d0443ed02f7b09068f88be2a00f4dd9"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">simplify_formats</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fmt_str</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt_len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416simplify_formatsPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Remove extra format characters that confusing sscanf. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fmt_str</strong> – <strong>[in]</strong> character pointer to string that should be modified. </p></li>
 <li><p><strong>fmt_len</strong> – <strong>[in]</strong> constant size_t, length of the fmt_str buffer. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int -1 on failure if the regex could not be compiled or the buffer is not big enough to contain the result. If succesful, the new length of buf is returned. </p>
 </dd>
 </dl>
@@ -485,10 +486,10 @@
 <span id="_CPPv37at_openP12asciiTable_t"></span><span id="_CPPv27at_openP12asciiTable_t"></span><span id="at_open__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aa392a2b640022f5fc7f928660f3d4859"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_open</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47at_openP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Open the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 if opened successfully, -1 otherwise. </p>
 </dd>
 </dl>
@@ -499,10 +500,10 @@
 <span id="_CPPv38at_closeP12asciiTable_t"></span><span id="_CPPv28at_closeP12asciiTable_t"></span><span id="at_close__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aafdce9672f7a9645a1a7b9af886727ea"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48at_closeP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Close the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 if ocloseded successfully, -1 otherwise. </p>
 </dd>
 </dl>
@@ -513,7 +514,7 @@
 <span id="_CPPv324at_readline_full_reallocK12asciiTable_tPPcK6size_tKi"></span><span id="_CPPv224at_readline_full_reallocK12asciiTable_tPPcK6size_tKi"></span><span id="at_readline_full_realloc__asciiTable_tC.cPP.sC.iC"></span><span class="target" id="_ascii_table_8h_1ae9ea1b6f4cc50b7cd38a10b52c065c23"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_readline_full_realloc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buf</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len_buf</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">allow_realloc</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424at_readline_full_reallocK12asciiTable_tPPcK6size_tKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file until one is returned that is not a comment. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>buf</strong> – <strong>[out]</strong> pointer to memory where read line should be stored. </p></li>
@@ -521,7 +522,7 @@
 <li><p><strong>allow_realloc</strong> – <strong>[in]</strong> const int If 1, the buffer will be realloced if it is not large enought. Otherwise an error will be returned. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters read. -1 on failure. </p>
 </dd>
 </dl>
@@ -532,14 +533,14 @@
 <span id="_CPPv316at_readline_fullK12asciiTable_tPcK6size_t"></span><span id="_CPPv216at_readline_fullK12asciiTable_tPcK6size_t"></span><span id="at_readline_full__asciiTable_tC.cP.sC"></span><span class="target" id="_ascii_table_8h_1a155a43f52185fe1a3ac93c5e00cc9f2d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_readline_full</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buf</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len_buf</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416at_readline_fullK12asciiTable_tPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file until one is returned that is not a comment. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>buf</strong> – <strong>[out]</strong> pointer to memory where read line should be stored. </p></li>
 <li><p><strong>len_buf</strong> – <strong>[in]</strong> Size of buffer where line should be stored. The the message is larger than len_buf, an error will be returned. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters read. -1 on failure. </p>
 </dd>
 </dl>
@@ -550,13 +551,13 @@
 <span id="_CPPv317at_writeline_fullK12asciiTable_tPKc"></span><span id="_CPPv217at_writeline_fullK12asciiTable_tPKc"></span><span id="at_writeline_full__asciiTable_tC.cCP"></span><span class="target" id="_ascii_table_8h_1a5b94012427bf984488a3b569dd497c94"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_writeline_full</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_writeline_fullK12asciiTable_tPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write a line to the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>line</strong> – <strong>[in]</strong> Pointer to line that should be written. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters written. -1 on failure. </p>
 </dd>
 </dl>
@@ -567,14 +568,14 @@
 <span id="_CPPv316at_vbytes_to_rowK12asciiTable_tPKc7va_list"></span><span id="_CPPv216at_vbytes_to_rowK12asciiTable_tPKc7va_list"></span><span id="at_vbytes_to_row__asciiTable_tC.cCP.va_list"></span><span class="target" id="_ascii_table_8h_1a15cc80a333c1f3b387261829b099c7bf"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_vbytes_to_row</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">line</span></span>, <span class="n"><span class="pre">va_list</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416at_vbytes_to_rowK12asciiTable_tPKc7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Parse a line to get row columns. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>line</strong> – <strong>[in]</strong> Pointer to memory containing the line to be parsed. </p></li>
 <li><p><strong>ap</strong> – <strong>[out]</strong> va_list Pointers to variables where parsed arguments should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of arguments filled. -1 on failure. </p>
 </dd>
 </dl>
@@ -585,7 +586,7 @@
 <span id="_CPPv316at_vrow_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="_CPPv216at_vrow_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="at_vrow_to_bytes__asciiTable_tC.cP.sC.va_list"></span><span class="target" id="_ascii_table_8h_1a86b717123c59f37e39cabe1d5e4d9f94"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_vrow_to_bytes</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buf</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">buf_siz</span></span>, <span class="n"><span class="pre">va_list</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416at_vrow_to_bytesK12asciiTable_tPcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format arguments to form a line. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>buf</strong> – <strong>[out]</strong> Pointer to memory where the formated row should be stored. </p></li>
@@ -593,7 +594,7 @@
 <li><p><strong>ap</strong> – <strong>[in]</strong> va_list Variables that should be formatted using the format string to create a line in the table. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters written. -1 on failure. </p>
 </dd>
 </dl>
@@ -604,13 +605,13 @@
 <span id="_CPPv312at_vreadlineK12asciiTable_t7va_list"></span><span id="_CPPv212at_vreadlineK12asciiTable_t7va_list"></span><span id="at_vreadline__asciiTable_tC.va_list"></span><span class="target" id="_ascii_table_8h_1a5d3bdde3a0beb050a8699e7d7907d4e6"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_vreadline</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="n"><span class="pre">va_list</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412at_vreadlineK12asciiTable_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file and parse it. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>ap</strong> – <strong>[out]</strong> va_list Pointers to variables where parsed arguments should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters read. -1 on failure. </p>
 </dd>
 </dl>
@@ -621,13 +622,13 @@
 <span id="_CPPv313at_vwritelineK12asciiTable_t7va_list"></span><span id="_CPPv213at_vwritelineK12asciiTable_t7va_list"></span><span id="at_vwriteline__asciiTable_tC.va_list"></span><span class="target" id="_ascii_table_8h_1a2ad380bc74295b4f561d5d496c558843"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_vwriteline</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="n"><span class="pre">va_list</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413at_vwritelineK12asciiTable_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format arguments to form a line and write it to the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>ap</strong> – <strong>[out]</strong> va_list Variables that should be formatted using the format string to create a line in the table. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters written. -1 on failure. </p>
 </dd>
 </dl>
@@ -638,13 +639,13 @@
 <span id="_CPPv311at_readlineK12asciiTable_tz"></span><span id="_CPPv211at_readlineK12asciiTable_tz"></span><span id="at_readline__asciiTable_tC.z"></span><span class="target" id="_ascii_table_8h_1ae69d8028086c1dfbc9d1f3c47d2b58cd"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_readline</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411at_readlineK12asciiTable_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Read a line from the file and parse it. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>...</strong> – <strong>[out]</strong> Pointers to variables where parsed arguments should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters read. -1 on failure. </p>
 </dd>
 </dl>
@@ -655,13 +656,13 @@
 <span id="_CPPv312at_writelineK12asciiTable_tz"></span><span id="_CPPv212at_writelineK12asciiTable_tz"></span><span id="at_writeline__asciiTable_tC.z"></span><span class="target" id="_ascii_table_8h_1a3537e4479c4c6146115a606c4be89fb0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_writeline</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412at_writelineK12asciiTable_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format arguments to form a line and write it to the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>...</strong> – <strong>[out]</strong> Variables that should be formatted using the format string to create a line in the table. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters written. -1 on failure. </p>
 </dd>
 </dl>
@@ -672,10 +673,10 @@
 <span id="_CPPv314at_writeformatK12asciiTable_t"></span><span id="_CPPv214at_writeformatK12asciiTable_t"></span><span id="at_writeformat__asciiTable_tC"></span><span class="target" id="_ascii_table_8h_1a99cf4e10276fa57632a44489ce1883ce"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_writeformat</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414at_writeformatK12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Write the format string the the file, prepending it with a comment. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int On success, the number of characters written. -1 on failure. </p>
 </dd>
 </dl>
@@ -686,10 +687,10 @@
 <span id="_CPPv322at_discover_format_strP12asciiTable_t"></span><span id="_CPPv222at_discover_format_strP12asciiTable_t"></span><span id="at_discover_format_str__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a065c972ea3d12c9c0b3b18f60ae2fb67"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_discover_format_str</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422at_discover_format_strP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Try to find the format string in the file. The format string is assumed to start with a comment. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>0 on success, -1 on failure. </p>
 </dd>
 </dl>
@@ -700,10 +701,10 @@
 <span id="_CPPv312at_set_ncolsP12asciiTable_t"></span><span id="_CPPv212at_set_ncolsP12asciiTable_t"></span><span id="at_set_ncols__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a0603f9b3c88d350047d07d7ae1be7885"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_set_ncols</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412at_set_ncolsP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set the number of columns by counting the format specifiers. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int The number of columns counted. Negative values indicate errors. </p>
 </dd>
 </dl>
@@ -714,10 +715,10 @@
 <span id="_CPPv317at_set_format_sizP12asciiTable_t"></span><span id="_CPPv217at_set_format_sizP12asciiTable_t"></span><span id="at_set_format_siz__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aaf2ff73c9e5029825d7da00efc5d37c4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_set_format_siz</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_set_format_sizP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine the column sizes based on the types. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that sizes will be added to. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 on success, -1 on failure. </p>
 </dd>
 </dl>
@@ -728,10 +729,10 @@
 <span id="_CPPv317at_set_format_typP12asciiTable_t"></span><span id="_CPPv217at_set_format_typP12asciiTable_t"></span><span id="at_set_format_typ__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1ab0a82f6cbb7d372d6ea2fbab1da2d4af"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_set_format_typ</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_set_format_typP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine the column types by parsing the format string. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that types will be added to. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int 0 on success, -1 on failure. TODO: switch to regex </p>
 </dd>
 </dl>
@@ -742,7 +743,7 @@
 <span id="_CPPv318at_vbytes_to_arrayK12asciiTable_tPKcK6size_t7va_list"></span><span id="_CPPv218at_vbytes_to_arrayK12asciiTable_tPKcK6size_t7va_list"></span><span id="at_vbytes_to_array__asciiTable_tC.cCP.sC.va_list"></span><span class="target" id="_ascii_table_8h_1a3238694543600c033723a12a910b8671"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_vbytes_to_array</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_siz</span></span>, <span class="n"><span class="pre">va_list</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418at_vbytes_to_arrayK12asciiTable_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Convert data into arrays for columns. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>data</strong> – <strong>[in]</strong> constant character pointer to memory containing data that should be parsed. </p></li>
@@ -750,7 +751,7 @@
 <li><p><strong>ap</strong> – <strong>[out]</strong> va_list Pointers to pointers to memory where columns should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int Number of rows read on success, -1 on failure. </p>
 </dd>
 </dl>
@@ -761,7 +762,7 @@
 <span id="_CPPv318at_varray_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="_CPPv218at_varray_to_bytesK12asciiTable_tPcK6size_t7va_list"></span><span id="at_varray_to_bytes__asciiTable_tC.cP.sC.va_list"></span><span class="target" id="_ascii_table_8h_1aa847c52c2fc553e909e1f3e64c6683de"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_varray_to_bytes</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_siz</span></span>, <span class="n"><span class="pre">va_list</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418at_varray_to_bytesK12asciiTable_tPcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Encode a set of arrays as bytes. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>data</strong> – <strong>[out]</strong> Pointer to memory where encoded arrays should be stored. </p></li>
@@ -769,7 +770,7 @@
 <li><p><strong>ap</strong> – <strong>[in]</strong> va_list Pointers to memory where column data is stored. The first argument in this set should be an integer, the number of rows in each column array. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int Number of bytes written. If larger than data_siz, the message will not be written to data and data should be resized first. </p>
 </dd>
 </dl>
@@ -780,7 +781,7 @@
 <span id="_CPPv317at_bytes_to_arrayK12asciiTable_tPc6size_tz"></span><span id="_CPPv217at_bytes_to_arrayK12asciiTable_tPc6size_tz"></span><span id="at_bytes_to_array__asciiTable_tC.cP.s.z"></span><span class="target" id="_ascii_table_8h_1abb03c7592c2a72561831107582c3abb0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_bytes_to_array</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_siz</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_bytes_to_arrayK12asciiTable_tPc6size_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Convert data into arrays for columns. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>data</strong> – <strong>[in]</strong> constant character pointer to memory containing data that should be parsed. </p></li>
@@ -788,7 +789,7 @@
 <li><p><strong>...</strong> – <strong>[out]</strong> Pointers to pointers to memory where columns should be stored. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int Number of rows read on success, -1 on failure. </p>
 </dd>
 </dl>
@@ -799,7 +800,7 @@
 <span id="_CPPv317at_array_to_bytesK12asciiTable_tPcK6size_tz"></span><span id="_CPPv217at_array_to_bytesK12asciiTable_tPcK6size_tz"></span><span id="at_array_to_bytes__asciiTable_tC.cP.sC.z"></span><span class="target" id="_ascii_table_8h_1a8ea70b93e3bdcfe6c8f6861b023e60c1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_array_to_bytes</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">data_siz</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417at_array_to_bytesK12asciiTable_tPcK6size_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Encode a set of arrays as bytes. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p></li>
 <li><p><strong>data</strong> – <strong>[out]</strong> Pointer to memory where encoded arrays should be stored. </p></li>
@@ -807,7 +808,7 @@
 <li><p><strong>...</strong> – <strong>[in]</strong> Pointers to memory where column data is stored. The first argument in this set should be an integer, the number of rows in each column array. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int Number of bytes written. If larger than data_siz, the message will not be written to data and data should be resized first. </p>
 </dd>
 </dl>
@@ -818,7 +819,7 @@
 <span id="_CPPv310at_cleanupP12asciiTable_t"></span><span id="_CPPv210at_cleanupP12asciiTable_t"></span><span id="at_cleanup__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a4334fe77589dbea1626482da3fa54abb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_cleanup</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410at_cleanupP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deallocate and clean up <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> – <strong>[in]</strong> <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
 </dd>
 </dl>
@@ -829,14 +830,14 @@
 <span id="_CPPv39at_updateP12asciiTable_tPKcPKc"></span><span id="_CPPv29at_updateP12asciiTable_tPKcPKc"></span><span id="at_update__asciiTable_tP.cCP.cCP"></span><span class="target" id="_ascii_table_8h_1a634dcd21905d98fe7550716a06c6bf82"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">at_update</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">io_mode</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49at_updateP12asciiTable_tPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Update an existing <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> – <strong>[in]</strong> asciiTable_t* Address of table structure to update. </p></li>
 <li><p><strong>filepath</strong> – <strong>[in]</strong> constant character pointer to file path. </p></li>
 <li><p><strong>io_mode</strong> – <strong>[in]</strong> constant character pointer to I/O mode. “r” for read, “w” for write. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>int -1 if there is an error, 0 otherwise. </p>
 </dd>
 </dl>
@@ -847,7 +848,7 @@
 <span id="_CPPv310asciiTablePKcPKcPKcPKcPKcPKc"></span><span id="_CPPv210asciiTablePKcPKcPKcPKcPKcPKc"></span><span id="asciiTable__cCP.cCP.cCP.cCP.cCP.cCP"></span><span class="target" id="_ascii_table_8h_1a2cc033a42c5436c373793d378b806e9c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412asciiTable_t" title="asciiTable_t"><span class="n"><span class="pre">asciiTable_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">asciiTable</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">io_mode</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">format_str</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">comment</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">column</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">newline</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410asciiTablePKcPKcPKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filepath</strong> – <strong>[in]</strong> constant character pointer to file path. </p></li>
 <li><p><strong>io_mode</strong> – <strong>[in]</strong> constant character pointer to I/O mode. “r” for read, “w” for write. </p></li>
@@ -857,7 +858,7 @@
 <li><p><strong>newline</strong> – <strong>[in]</strong> const character pointer to character(s) that should indicate a newline. If NULL, newline is set to “\n”. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </p>
 </dd>
 </dl>

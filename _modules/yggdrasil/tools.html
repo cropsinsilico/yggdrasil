@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.tools &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>yggdrasil.tools &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -11,9 +11,6 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -26,14 +23,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">yggdrasil.tools</li>
       <li class="wy-breadcrumbs-aside">
@@ -353,26 +354,39 @@
     <span class="nb">print</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="get_fds"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.get_fds">[docs]</a><span class="k">def</span> <span class="nf">get_fds</span><span class="p">(</span><span class="n">by_column</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+<div class="viewcode-block" id="get_fds"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.get_fds">[docs]</a><span class="k">def</span> <span class="nf">get_fds</span><span class="p">(</span><span class="n">by_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_closed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore_kqueue</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">ignore_cwd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of open file descriptors.&quot;&quot;&quot;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
         <span class="s1">&#39;lsof -p </span><span class="si">{}</span><span class="s1"> | grep -v txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()),</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">ignore_closed</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;(CLOSED)&#39;</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">ignore_kqueue</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;state=0xa&#39;</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">ignore_cwd</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="sa">b</span><span class="s1">&#39;cwd&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ignore_types</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span>
+               <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignore_types</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">by_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="n">by_column</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="track_fds"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.track_fds">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-<span class="k">def</span> <span class="nf">track_fds</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-    <span class="n">fds0</span> <span class="o">=</span> <span class="n">get_fds</span><span class="p">(</span><span class="n">by_column</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">track_fds</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;by_column&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">fds0</span> <span class="o">=</span> <span class="n">get_fds</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">yield</span>
-    <span class="n">fds1</span> <span class="o">=</span> <span class="n">get_fds</span><span class="p">(</span><span class="n">by_column</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">fds1</span> <span class="o">=</span> <span class="n">get_fds</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">new_fds</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">fds1</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">fds0</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="p">[</span><span class="n">fds1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">new_fds</span><span class="p">)]</span>
     <span class="k">if</span> <span class="n">diff</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="si">}</span><span class="s1"> fds</span><span class="se">\n\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">diff</span><span class="p">]))</span></div>
+            <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">diff</span><span class="p">]))</span></div>
     
 
 <div class="viewcode-block" id="get_shell"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.get_shell">[docs]</a><span class="k">def</span> <span class="nf">get_shell</span><span class="p">():</span>
@@ -829,6 +843,24 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_supported_platforms</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="resolve_language_aliases"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.resolve_language_aliases">[docs]</a><span class="k">def</span> <span class="nf">resolve_language_aliases</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of languages, replacing any aliases.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        language (str, list): One or more language.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Aliased language(s).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">resolve_language_aliases</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">language</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALIASED_LANGUAGES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">language</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">k</span>
+    <span class="k">return</span> <span class="n">language</span></div>
 
 
 <div class="viewcode-block" id="is_language_alias"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.tools.is_language_alias">[docs]</a><span class="k">def</span> <span class="nf">is_language_alias</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">language</span><span class="p">):</span>

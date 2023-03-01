@@ -1,28 +1,31 @@
 .. _class_table_CompiledModelDriver_args_rst:
 
-==============   ================================================================================   ========   ===========
-Option           Description                                                                        Required   Type       
-==============   ================================================================================   ========   ===========
-args             The model executable and any arguments that should be passed to the model          X          str or list
-                 executable.                                                                                              
-name             Driver name.                                                                       X          str        
-compiler         Command or path to executable that should be used to compile the model. If not                str        
-                 provided, the compiler will be determined based on configuration options for the                         
-                 language (if present) and the registered compilers that are available on the                             
-                 current operating system.                                                                                
-compiler_flags   Flags that should be passed to the compiler during compilation. If nto provided,              list       
-                 the compiler flags will be determined based on configuration options for the                             
-                 language (if present), the compiler defaults, and the default_compiler_flags                             
-                 class attribute.                                                                                         
-linker           Command or path to executable that should be used to link the model. If not                   str        
-                 provided, the linker will be determined based on configuration options for the                           
-                 language (if present) and the registered linkers that are available on the                               
-                 current operating system                                                                                 
-linker_flags     Flags that should be passed to the linker during compilation. If nto provided,                list       
-                 the linker flags will be determined based on configuration options for the                               
-                 language (if present), the linker defaults, and the default_linker_flags class                           
-                 attribute.                                                                                               
-source_files     Source files that should be compiled into an executable. Defaults to an empty                 list       
-                 list and the driver will search for a source file based on the model executable                          
-                 (the first model argument).                                                                              
-==============   ================================================================================   ========   ===========
+====================   ================================================================================   ========   ===========
+Option                 Description                                                                        Required   Type       
+====================   ================================================================================   ========   ===========
+args                   The model executable and any arguments that should be passed to the model          X          str or list
+                       executable.                                                                                              
+name                   Driver name.                                                                       X          str        
+compiler               Command or path to executable that should be used to compile the model. If not                str        
+                       provided, the compiler will be determined based on configuration options for the                         
+                       language (if present) and the registered compilers that are available on the                             
+                       current operating system.                                                                                
+compiler_flags         Flags that should be passed to the compiler during compilation. If nto provided,              list       
+                       the compiler flags will be determined based on configuration options for the                             
+                       language (if present), the compiler defaults, and the default_compiler_flags                             
+                       class attribute.                                                                                         
+disable_python_c_api   If True, the Python C API will be disabled. Defaults to False.                                bool       
+linker                 Command or path to executable that should be used to link the model. If not                   str        
+                       provided, the linker will be determined based on configuration options for the                           
+                       language (if present) and the registered linkers that are available on the                               
+                       current operating system                                                                                 
+linker_flags           Flags that should be passed to the linker during compilation. If not provided,                list       
+                       the linker flags will be determined based on configuration options for the                               
+                       language (if present), the linker defaults, and the default_linker_flags class                           
+                       attribute.                                                                                               
+source_files           Source files that should be compiled into an executable. Defaults to an empty                 list       
+                       list and the driver will search for a source file based on the model executable                          
+                       (the first model argument).                                                                              
+with_asan              If True, the model will be compiled and linked with the address sanitizer                     bool       
+                       enabled (if there is one available for the selected compiler).                                           
+====================   ================================================================================   ========   ===========

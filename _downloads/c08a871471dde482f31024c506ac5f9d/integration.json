@@ -1954,6 +1954,10 @@
                             "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
                             "type": "string"
                         },
+                        "with_debugger": {
+                            "description": "Debugger tool that should be used to run models. This string should include the tool executable and any flags that should be passed to it.",
+                            "type": "string"
+                        },
                         "with_strace": {
                             "default": false,
                             "description": "If True, the command is run with strace (on Linux) or dtrace (on MacOS). Defaults to False.",
@@ -1992,6 +1996,10 @@
                             "description": "Build type/configuration that should be built. Defaults to 'Release'.",
                             "type": "string"
                         },
+                        "disable_python_c_api": {
+                            "description": "If True, the Python C API will be disabled. Defaults to False.",
+                            "type": "boolean"
+                        },
                         "env_compiler": {
                             "description": "Environment variable where the compiler executable should be stored for use within the Makefile. If not provided, this will be determined by the target language driver.",
                             "type": "string"
@@ -2014,7 +2022,7 @@
                         },
                         "linker_flags": {
                             "default": [],
-                            "description": "Flags that should be passed to the linker during compilation. If nto provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
+                            "description": "Flags that should be passed to the linker during compilation. If not provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
                             "items": {
                                 "type": "string"
                             },
@@ -2061,6 +2069,10 @@
                                 "type": "string"
                             },
                             "type": "array"
+                        },
+                        "with_asan": {
+                            "description": "If True, the model will be compiled and linked with the address sanitizer enabled (if there is one available for the selected compiler).",
+                            "type": "boolean"
                         },
                         "interpreter": {
                             "description": "Name or path of interpreter executable that should be used to run the model. If not provided, the interpreter will be determined based on configuration options for the language (if present) and the default_interpreter class attribute.",
@@ -2340,6 +2352,10 @@
                                     "description": "Build type/configuration that should be built. Defaults to 'Release'.",
                                     "type": "string"
                                 },
+                                "disable_python_c_api": {
+                                    "description": "If True, the Python C API will be disabled. Defaults to False.",
+                                    "type": "boolean"
+                                },
                                 "env_compiler": {
                                     "description": "Environment variable where the compiler executable should be stored for use within the Makefile. If not provided, this will be determined by the target language driver.",
                                     "type": "string"
@@ -2370,7 +2386,7 @@
                                 },
                                 "linker_flags": {
                                     "default": [],
-                                    "description": "Flags that should be passed to the linker during compilation. If nto provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
+                                    "description": "Flags that should be passed to the linker during compilation. If not provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
                                     "items": {
                                         "type": "string"
                                     },
@@ -2417,6 +2433,10 @@
                                         "type": "string"
                                     },
                                     "type": "array"
+                                },
+                                "with_asan": {
+                                    "description": "If True, the model will be compiled and linked with the address sanitizer enabled (if there is one available for the selected compiler).",
+                                    "type": "boolean"
                                 }
                             },
                             "title": "yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver",
@@ -2438,6 +2458,10 @@
                                     },
                                     "type": "array"
                                 },
+                                "disable_python_c_api": {
+                                    "description": "If True, the Python C API will be disabled. Defaults to False.",
+                                    "type": "boolean"
+                                },
                                 "language": {
                                     "default": "executable",
                                     "description": "Model is written in C.",
@@ -2452,7 +2476,7 @@
                                 },
                                 "linker_flags": {
                                     "default": [],
-                                    "description": "Flags that should be passed to the linker during compilation. If nto provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
+                                    "description": "Flags that should be passed to the linker during compilation. If not provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
                                     "items": {
                                         "type": "string"
                                     },
@@ -2465,6 +2489,10 @@
                                         "type": "string"
                                     },
                                     "type": "array"
+                                },
+                                "with_asan": {
+                                    "description": "If True, the model will be compiled and linked with the address sanitizer enabled (if there is one available for the selected compiler).",
+                                    "type": "boolean"
                                 }
                             },
                             "title": "yggdrasil.drivers.CModelDriver.CModelDriver",
@@ -2486,6 +2514,10 @@
                                     },
                                     "type": "array"
                                 },
+                                "disable_python_c_api": {
+                                    "description": "If True, the Python C API will be disabled. Defaults to False.",
+                                    "type": "boolean"
+                                },
                                 "language": {
                                     "default": "executable",
                                     "description": "Model is written in C++.",
@@ -2502,7 +2534,7 @@
                                 },
                                 "linker_flags": {
                                     "default": [],
-                                    "description": "Flags that should be passed to the linker during compilation. If nto provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
+                                    "description": "Flags that should be passed to the linker during compilation. If not provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
                                     "items": {
                                         "type": "string"
                                     },
@@ -2515,6 +2547,10 @@
                                         "type": "string"
                                     },
                                     "type": "array"
+                                },
+                                "with_asan": {
+                                    "description": "If True, the model will be compiled and linked with the address sanitizer enabled (if there is one available for the selected compiler).",
+                                    "type": "boolean"
                                 }
                             },
                             "title": "yggdrasil.drivers.CPPModelDriver.CPPModelDriver",
@@ -2585,6 +2621,10 @@
                                     },
                                     "type": "array"
                                 },
+                                "disable_python_c_api": {
+                                    "description": "If True, the Python C API will be disabled. Defaults to False.",
+                                    "type": "boolean"
+                                },
                                 "language": {
                                     "default": "executable",
                                     "description": "Model is written in Fortran.",
@@ -2599,7 +2639,7 @@
                                 },
                                 "linker_flags": {
                                     "default": [],
-                                    "description": "Flags that should be passed to the linker during compilation. If nto provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
+                                    "description": "Flags that should be passed to the linker during compilation. If not provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
                                     "items": {
                                         "type": "string"
                                     },
@@ -2621,6 +2661,10 @@
                                         "f2008"
                                     ],
                                     "type": "string"
+                                },
+                                "with_asan": {
+                                    "description": "If True, the model will be compiled and linked with the address sanitizer enabled (if there is one available for the selected compiler).",
+                                    "type": "boolean"
                                 }
                             },
                             "title": "yggdrasil.drivers.FortranModelDriver.FortranModelDriver",
@@ -2697,6 +2741,10 @@
                                     },
                                     "type": "array"
                                 },
+                                "disable_python_c_api": {
+                                    "description": "If True, the Python C API will be disabled. Defaults to False.",
+                                    "type": "boolean"
+                                },
                                 "env_compiler": {
                                     "description": "Environment variable where the compiler executable should be stored for use within the Makefile. If not provided, this will be determined by the target language driver.",
                                     "type": "string"
@@ -2727,7 +2775,7 @@
                                 },
                                 "linker_flags": {
                                     "default": [],
-                                    "description": "Flags that should be passed to the linker during compilation. If nto provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
+                                    "description": "Flags that should be passed to the linker during compilation. If not provided, the linker flags will be determined based on configuration options for the language (if present), the linker defaults, and the default_linker_flags class attribute.",
                                     "items": {
                                         "type": "string"
                                     },
@@ -2779,6 +2827,10 @@
                                         "type": "string"
                                     },
                                     "type": "array"
+                                },
+                                "with_asan": {
+                                    "description": "If True, the model will be compiled and linked with the address sanitizer enabled (if there is one available for the selected compiler).",
+                                    "type": "boolean"
                                 }
                             },
                             "title": "yggdrasil.drivers.MakeModelDriver.MakeModelDriver",
@@ -2831,6 +2883,9 @@
                                     "description": "If True, the XML file(s) will be copied to the OSR repository InputFiles direcitory before running. This is necessary if the XML file(s) use any of the files located there since OSR always assumes the included file paths are relative. Defaults to False.",
                                     "type": "boolean"
                                 },
+                                "disable_python_c_api": {
+                                    "type": "boolean"
+                                },
                                 "language": {
                                     "default": "executable",
                                     "description": "Model is an OSR model.",
@@ -2864,6 +2919,9 @@
                                     },
                                     "description": "Max simulation interval at which synchronization should occur (in days). Defaults to 1.0 if not provided. If the XML input file loads additional export modules that output at a shorter rate, the existing table of values will be extrapolated.",
                                     "type": "object"
+                                },
+                                "with_asan": {
+                                    "type": "boolean"
                                 }
                             },
                             "title": "yggdrasil.drivers.OSRModelDriver.OSRModelDriver",

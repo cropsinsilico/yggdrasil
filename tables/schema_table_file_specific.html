@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -27,14 +24,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -84,7 +85,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">&lt;no title&gt;</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tables/schema_table_file_specific.rst.txt" rel="nofollow"> View page source</a>
@@ -96,12 +97,6 @@
            <div itemprop="articleBody">
              
   <table class="docutils align-default" id="schema-table-file-specific-rst">
-<colgroup>
-<col style="width: 8%" />
-<col style="width: 8%" />
-<col style="width: 37%" />
-<col style="width: 47%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
 <th class="head"><p>Type</p></th>
@@ -113,13 +108,13 @@
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘pickle’, ‘ply’, ‘map’, ‘pandas’, ‘json’, ‘mat’, ‘wofost’, ‘table’, ‘netcdf’, ‘yaml’]</p></td>
+<td><p>[‘pandas’, ‘ply’, ‘mat’, ‘pickle’, ‘json’, ‘map’, ‘netcdf’, ‘yaml’, ‘obj’, ‘wofost’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘pickle’, ‘ply’, ‘map’, ‘pandas’, ‘json’, ‘mat’, ‘wofost’, ‘table’, ‘netcdf’, ‘yaml’]</p></td>
+<td><p>[‘pandas’, ‘ply’, ‘mat’, ‘pickle’, ‘json’, ‘map’, ‘netcdf’, ‘yaml’, ‘obj’, ‘wofost’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -131,7 +126,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘table’, ‘map’, ‘pandas’, ‘wofost’]</p></td>
+<td><p>[‘map’, ‘pandas’, ‘wofost’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -147,7 +142,7 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘pickle’, ‘ply’, ‘map’, ‘pandas’, ‘json’, ‘mat’, ‘wofost’, ‘table’, ‘netcdf’, ‘yaml’]</p></td>
+<td><p>[‘pandas’, ‘ply’, ‘mat’, ‘pickle’, ‘json’, ‘map’, ‘netcdf’, ‘yaml’, ‘obj’, ‘wofost’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -188,7 +183,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>

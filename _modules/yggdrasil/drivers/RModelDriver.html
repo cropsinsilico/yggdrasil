@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.8.4 documentation</title>
+  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.8.5 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -11,9 +11,6 @@
   <![endif]-->
   
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -26,14 +23,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            yggdrasil
           </a>
               <div class="version">
-                v1.8.4
+                v1.8.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +84,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../drivers.html">yggdrasil.drivers</a></li>
       <li class="breadcrumb-item active">yggdrasil.drivers.RModelDriver</li>
@@ -101,6 +102,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="kn">import</span> <span class="n">InterpretedModelDriver</span>
@@ -169,7 +171,7 @@
         <span class="s1">&#39;call&#39;</span><span class="p">:</span> <span class="s1">&#39;c(flag, </span><span class="si">{inputs}</span><span class="s1">) %&lt;-% </span><span class="si">{channel_obj}</span><span class="s1">$call(</span><span class="si">{outputs}</span><span class="s1">)&#39;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;source(</span><span class="se">\&quot;</span><span class="si">{filename}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;reticulate::py_config(); source(</span><span class="se">\&quot;</span><span class="si">{filename}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;istype&#39;</span><span class="p">:</span> <span class="s1">&#39;is(</span><span class="si">{variable}</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{type}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;len&#39;</span><span class="p">:</span> <span class="s1">&#39;length(</span><span class="si">{variable}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{variable}</span><span class="s1">[[</span><span class="si">{index}</span><span class="s1">]]&#39;</span><span class="p">,</span>
@@ -230,6 +232,20 @@
     <span class="n">brackets</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
     <span class="n">zero_based</span> <span class="o">=</span> <span class="kc">False</span>
 
+<div class="viewcode-block" id="RModelDriver.are_dependencies_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.are_dependencies_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">are_dependencies_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the dependencies are installed for the interface (not</span>
+<span class="sd">        including dependencies needed by a particular communication type).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the dependencies are installed. False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Short cut by checking if yggdrasil installed</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_interface_installed</span><span class="p">():</span>  <span class="c1"># pragma: config</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">are_dependencies_installed</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+            
 <div class="viewcode-block" id="RModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
@@ -276,19 +292,31 @@
 <span class="sd">                method.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_valgrind</span><span class="p">:</span>
-            <span class="n">interp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;interpreter&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">())</span>
-            <span class="n">interp_flags</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;interpreter_flags&#39;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="k">if</span> <span class="s1">&#39;Rscript&#39;</span> <span class="ow">in</span> <span class="n">interp</span><span class="p">:</span>
-                <span class="n">interp</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">interp</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;Rscript&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-                <span class="n">interp_flags</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_interpreter_flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">interp_flags</span> <span class="o">+=</span> <span class="p">[</span>
-                <span class="s1">&#39;--vanilla&#39;</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;valgrind </span><span class="si">%s</span><span class="s1">&#39;</span>
-                <span class="o">%</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valgrind_flags</span><span class="p">),</span> <span class="s1">&#39;-f&#39;</span><span class="p">]</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;interpreter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">interp</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;interpreter_flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">interp_flags</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_debugger</span><span class="p">:</span>
+            <span class="c1"># This dosn&#39;t appear to work as all arguments besides the</span>
+            <span class="c1"># debugger argument (-d) are passed to the debugger and there</span>
+            <span class="c1"># does not appear to be a method of running anything from</span>
+            <span class="c1"># the command line where the debugger is called.</span>
+            <span class="c1"># cmd = self.model_command()</span>
+            <span class="c1"># assert len(cmd) == 1</span>
+            <span class="c1"># interp = kwargs.pop(&#39;interpreter&#39;, self.get_interpreter())</span>
+            <span class="c1"># interp_flags = kwargs.pop(&#39;interpreter_flags&#39;, [])</span>
+            <span class="c1"># if &#39;Rscript&#39; in interp:</span>
+            <span class="c1">#     interp = &#39;R&#39;.join(interp.rsplit(&#39;Rscript&#39;, 1))</span>
+            <span class="c1">#     interp_flags = []</span>
+            <span class="c1">#     kwargs[&#39;skip_interpreter_flags&#39;] = True</span>
+            <span class="c1"># interp_flags += [&#39;--vanilla&#39;, &#39;-d&#39;]</span>
+            <span class="c1"># if &#39; &#39; in self.with_debugger:</span>
+            <span class="c1">#     interp_flags += [f&quot;\&quot;{self.with_debugger}\&quot;&quot;]</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     interp_flags += [f&quot;{self.with_debugger}&quot;]</span>
+            <span class="c1"># interp_flags += [&#39;-f&#39;]</span>
+            <span class="c1"># kwargs[&#39;command&#39;] = [interp] + interp_flags</span>
+            <span class="c1"># # kwargs[&#39;interpreter&#39;] = interp</span>
+            <span class="c1"># # kwargs[&#39;interpreter_flags&#39;] = interp_flags</span>
+            <span class="c1"># kwargs[&#39;debug_flags&#39;] = []</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;debug_flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;R does not support command line debugging.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="RModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -305,6 +333,10 @@
             <span class="n">search_dirs</span> <span class="o">=</span> <span class="n">c_linker</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">(</span><span class="n">env_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">paths_to_add</span><span class="o">=</span><span class="n">search_dirs</span><span class="p">,</span>
                                                       <span class="n">add_to_front</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># TODO: Set DYLD_INSERT_LIBRARIES to clang dynamic library</span>
+        <span class="c1"># on OSX when with_asan is True. R_TESTS may need to be</span>
+        <span class="c1"># modified so this variable is set when the tests are run.</span>
+        <span class="c1"># $(clang -print-file-name=libclang_rt.asan_osx_dynamic.dylib)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="RModelDriver.comm_atexit"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.comm_atexit">[docs]</a>    <span class="nd">@classmethod</span>
@@ -422,7 +454,8 @@
 <div class="viewcode-block" id="RModelDriver.call_compiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.call_compiler">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">call_compiler</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package_dir</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">language</span><span class="o">=</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                      <span class="n">use_ccache</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+                      <span class="n">use_ccache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">disable_python_c_api</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">with_asan</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build an R package w/ the yggdrasil compilers.</span>
 
 <span class="sd">        Args:</span>
@@ -437,6 +470,8 @@
 <span class="sd">                process will be displayed. Defaults to False.</span>
 <span class="sd">            use_ccache (bool, optional): If True, ccache will be added to</span>
 <span class="sd">                the compilation executable. Defaults to False.</span>
+<span class="sd">            disable_python_c_api (bool, optional): If True, the Python C</span>
+<span class="sd">                API will be disabled. Defaults to False.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">shutil</span>
@@ -464,7 +499,12 @@
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">LANGUAGES</span><span class="p">[</span><span class="s1">&#39;compiled&#39;</span><span class="p">]:</span>
             <span class="c1"># for x in [language]:</span>
             <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-            <span class="n">compiler</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">compiler</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">language</span> <span class="ow">in</span> <span class="p">[</span><span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">]</span> <span class="o">+</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_aliases</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="k">continue</span>
             <span class="c1"># archiver = compiler.archiver()</span>
             <span class="n">env</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">set_env_compiler</span><span class="p">(</span><span class="n">existing</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="n">compiler</span><span class="p">)</span>
             <span class="n">cexec</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_executable</span><span class="p">(</span><span class="n">full_path</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -474,11 +514,19 @@
             <span class="n">kws</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;c++&#39;</span><span class="p">:</span>
                 <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;skip_standard_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">cflags0</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span><span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
-                                             <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="n">compiler</span><span class="p">,</span>
-                                             <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
-            <span class="n">lflags</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_linker_flags</span><span class="p">(</span><span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
-                                          <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;shared&#39;</span><span class="p">)</span>
+            <span class="n">cflags0</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span>
+                <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
+                <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="n">compiler</span><span class="p">,</span>
+                <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+                <span class="n">with_asan</span><span class="o">=</span><span class="n">with_asan</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+            <span class="n">lflags</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_linker_flags</span><span class="p">(</span>
+                <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
+                <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="n">with_asan</span><span class="o">=</span><span class="n">with_asan</span><span class="p">,</span>
+                <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">disable_python_c_api</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">language</span> <span class="ow">in</span> <span class="p">([</span><span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">]</span> <span class="o">+</span> <span class="n">drv</span><span class="o">.</span><span class="n">language_aliases</span><span class="p">):</span>
+                <span class="n">drv</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span>
+                    <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span> <span class="n">with_asan</span><span class="o">=</span><span class="n">with_asan</span><span class="p">,</span>
+                    <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">disable_python_c_api</span><span class="p">)</span>
             <span class="c1"># Remove flags that are unnecessary</span>
             <span class="n">cflags</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">stdflags</span> <span class="o">=</span> <span class="p">[]</span>
@@ -512,6 +560,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">makevar</span><span class="p">):</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">makevar</span><span class="p">,</span> <span class="n">makevar_copy</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">makevar</span><span class="p">)):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">makevar</span><span class="p">))</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">makevar</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">new_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PKG_&#39;</span><span class="p">):</span>
@@ -521,6 +571,10 @@
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">makevar</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="c1"># TODO: Set DYLD_INSERT_LIBRARIES to clang dynamic library</span>
+            <span class="c1"># on OSX when with_asan is True. R_TESTS may need to be</span>
+            <span class="c1"># modified so this variable is set when the tests are run.</span>
+            <span class="c1"># $(clang -print-file-name=libclang_rt.asan_osx_dynamic.dylib)</span>
             <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">makevar</span><span class="p">)</span>
@@ -615,6 +669,11 @@
 <span class="sd">                class.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if cls.compiled_with_asan():</span>
+        <span class="c1">#     kwargs.setdefault(&#39;command_kwargs&#39;, {})</span>
+        <span class="c1">#     kwargs[&#39;command_kwargs&#39;].setdefault(</span>
+        <span class="c1">#         &#39;env&#39;, copy.deepcopy(os.environ))</span>
+        <span class="c1">#     cls.set_asan_env(kwargs[&#39;command_kwargs&#39;][&#39;env&#39;])</span>
         <span class="k">if</span> <span class="n">package_manager</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cran&#39;</span><span class="p">,</span> <span class="s1">&#39;CRAN&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="n">package</span> <span class="o">=</span> <span class="p">(</span>
