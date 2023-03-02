@@ -21,6 +21,8 @@ TODO:
 ~~~~~
 
 * Fix bug where datatype parameters in communicators are not passed to the datatype during normalization (currently handle on python side)
+* Update docs to indicate the use of extended rapidjson in installation and units sections (go through all docs to identify other places)
+* Update type tables
 
 1.8.5 (2023-03-01) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
 ------------------
