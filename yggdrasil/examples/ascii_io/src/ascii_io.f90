@@ -7,7 +7,7 @@ program main
   integer :: error_code = 0
   type(yggcomm) :: file_input, file_output, &
        table_input, table_output, array_input, array_output
-  integer(kind=c_size_t), target :: line_size = LINE_SIZE_MAX
+  integer(kind=c_size_t), target :: line_size = BSIZE
   type(yggchar_r) :: line  ! Wrapped to be reallocatable
   character(len=BSIZE), target :: name
   integer(kind=c_size_t), target :: name_siz = BSIZE

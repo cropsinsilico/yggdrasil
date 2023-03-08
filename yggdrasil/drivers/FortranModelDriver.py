@@ -375,6 +375,10 @@ class FortranModelDriver(CompiledModelDriver):
             r'(?:\s*,\s*(?P<parameter>parameter))?'
             r'(?:\s*,\s*intent\((?P<intent>.*?)\))?')
     }
+    default_type_precision = {
+        'real': 4,
+        'integer': 4
+    }
     outputs_in_inputs = True
     include_channel_obj = True
     is_typed = True
@@ -605,6 +609,8 @@ class FortranModelDriver(CompiledModelDriver):
             out['precision'] = int(grp['precision'])
             if grp['type'] == 'complex':
                 out['precision'] *= 2
+        elif grp['type'] in cls.default_type_precision:
+            out['precision'] = cls.default_type_precision[grp['type']]
         if (((grp.get('precision', False) or (grp['type'] == 'logical'))
              and (grp['type'] != 'ygguintX'))):
             grp['type'] += '(kind = X)'

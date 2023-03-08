@@ -102,8 +102,10 @@ static PyObject* objwavefront__setstate__(PyObject* self, PyObject* state);
 
 PyObject* import_trimesh_class() {
     PyObject* trimesh = PyImport_ImportModule("trimesh");
-    if (trimesh == NULL)
+    if (trimesh == NULL) {
+	PyErr_Clear();
 	return NULL;
+    }
     PyObject* out = PyObject_GetAttrString(trimesh, "Trimesh");
     Py_DECREF(trimesh);
     return out;

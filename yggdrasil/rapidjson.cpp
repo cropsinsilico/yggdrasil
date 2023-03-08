@@ -3326,10 +3326,14 @@ PythonAccept(
 	    Py_DECREF(ply_args);
 	    if (object_ply == NULL)
 		return false;
-	    Value* x = new Value();
-	    x->SetPlyRaw(*object_ply->ply, &allocator);
+	    if (object_ply->ply == NULL) {
+		Py_DECREF(object_ply);
+		return false;
+	    }
+	    Value x;
+	    x.SetPlyRaw(*(object_ply->ply), &allocator);
 	    Py_DECREF((PyObject*)object_ply);
-	    bool ret = x->Accept(*handler);
+	    bool ret = x.Accept(*handler);
 	    if (!ret)
 		PyErr_Format(PyExc_TypeError, "Error serializing Trimesh instance as Ply instance");
 	    return ret;
@@ -3415,7 +3419,7 @@ static bool python2document(PyObject* jsonObject, Document& d,
         Py_BEGIN_ALLOW_THREADS
         error = d.Parse(jsonStr).HasParseError();
         Py_END_ALLOW_THREADS
-	if (error && expectsString) {
+	if ((error || d.IsNumber()) && expectsString) {
 	    error = (!PythonAccept(&d, jsonObject, numberMode, datetimeMode,
 				   uuidMode, bytesMode, iterableMode,
 				   mappingMode, yggdrasilMode));
@@ -4955,25 +4959,29 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
 {
     PyObject* jsonObject;
     PyObject* relativePathRootObj = NULL;
+    int notEncoded = -1;
     static char const* kwlist[] = {
 	"obj",
 	"relative_path_root",
+	"not_encoded",
 	NULL
     };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$O",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$Op",
 				     (char**) kwlist,
 				     &jsonObject,
-				     &relativePathRootObj))
+				     &relativePathRootObj,
+				     &notEncoded))
         return NULL;
 
     ValidatorObject* v = (ValidatorObject*) self;
     Document d;
     bool isEmptyString = false;
+    bool forceObject = (notEncoded > 0);
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
 			 v->mappingMode, v->yggdrasilMode, v->expectsString,
-			 false, false, &isEmptyString))
+			 false, forceObject, &isEmptyString))
 	return NULL;
 
     SchemaValidator validator(*v->schema);
@@ -5961,25 +5969,29 @@ static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwarg
 {
     PyObject* jsonObject;
     PyObject* relativePathRootObj = NULL;
+    int notEncoded = -1;
     static char const* kwlist[] = {
 	"obj",
 	"relative_path_root",
+	"not_encoded",
 	NULL
     };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$O",
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$Op",
 				     (char**) kwlist,
 				     &jsonObject,
-				     &relativePathRootObj))
+				     &relativePathRootObj,
+				     &notEncoded))
         return NULL;
 
     NormalizerObject* v = (NormalizerObject*) self;
     Document d;
     bool isEmptyString = false;
+    bool forceObject = (notEncoded > 0);
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
 			 v->mappingMode, v->yggdrasilMode, v->expectsString,
-			 false, false, &isEmptyString))
+			 false, forceObject, &isEmptyString))
 	return NULL;
     
     SchemaNormalizer normalizer(*((NormalizerObject*) self)->schema);
@@ -6154,17 +6166,27 @@ static PyObject* normalizer_normalize(PyObject* self, PyObject* args, PyObject* 
 static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* kwargs)
 {
     PyObject* jsonObject;
+    int notEncoded = -1;
+    static char const* kwlist[] = {
+	"obj",
+	"not_encoded",
+	NULL
+    };
 
-    if (!PyArg_ParseTuple(args, "O", &jsonObject))
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|$p",
+				     (char**) kwlist,
+				     &jsonObject,
+				     &notEncoded))
         return NULL;
 
     NormalizerObject* v = (NormalizerObject*) self;
     Document d;
     bool isEmptyString = false;
+    bool forceObject = (notEncoded > 0);
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
 			 v->mappingMode, v->yggdrasilMode, v->expectsString,
-			 false, false, &isEmptyString))
+			 false, forceObject, &isEmptyString))
 	return NULL;
 
     SchemaValidator validator(*(v->schema));

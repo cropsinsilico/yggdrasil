@@ -4,4 +4,4 @@ model:
   args: ./src/server.py
   function: model_function
   is_server: True
-  copies: 10
+  copies: 5

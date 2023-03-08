@@ -3660,9 +3660,9 @@ extern "C" {
 
   int deserialize_dtype(const dtype_t *dtype, const char *buf, const size_t buf_siz,
 			const int allow_realloc, va_list_t ap) {
+    rapidjson::Document* d = NULL;
     try {
       size_t nargs_orig = ap.nargs[0];
-      rapidjson::Document* d = NULL;
       if (!deserialize_document(buf, buf_siz, (void**)(&d)))
 	return -1;
       if (d == NULL) {
@@ -3671,15 +3671,22 @@ extern "C" {
       }
       if (dtype->schema != NULL) {
 	if (!normalize_document((rapidjson::Document*)d,
-				(rapidjson::Document*)(dtype->schema)))
+				(rapidjson::Document*)(dtype->schema))) {
+	  delete d;
 	  return -1;
+	}
       }
       if (!document2args(d, (rapidjson::Document*)(dtype->schema),
-			 ap, allow_realloc))
+			 ap, allow_realloc)) {
+	delete d;
 	return -1;
+      }
+      delete d;
       return (int)(nargs_orig - ap.nargs[0]);
     } catch (...) {
       ygglog_error("deserialize_dtype: C++ exception thrown.");
+      if (d != NULL)
+	delete d;
       return -1;
     }
   }

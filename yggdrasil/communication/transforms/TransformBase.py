@@ -1,3 +1,4 @@
+import copy
 import collections
 from yggdrasil import rapidjson
 from yggdrasil.components import ComponentBase
@@ -21,9 +22,19 @@ class TransformBase(ComponentBase):
     def __init__(self, *args, **kwargs):
         self._state = {}
         super(TransformBase, self).__init__(*args, **kwargs)
-        self.transformed_datatype = None
+        self._transformed_datatype = None
         if self.original_datatype:
             self.set_original_datatype(self.original_datatype)
+
+    @property
+    def transformed_datatype(self):
+        r"""dict: The transformed datatype."""
+        if self._transformed_datatype is None:
+            out = None
+            if self.original_datatype:
+                out = self.transform_datatype(self.original_datatype)
+            return out
+        return self._transformed_datatype
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.
@@ -34,7 +45,6 @@ class TransformBase(ComponentBase):
         """
         self.validate_datatype(datatype)
         self.original_datatype = datatype
-        self.transformed_datatype = self.transform_datatype(self.original_datatype)
 
     def set_original_datatype_from_data(self, data):
         r"""Set datatype from data.
@@ -44,6 +54,35 @@ class TransformBase(ComponentBase):
 
         """
         self.set_original_datatype(rapidjson.encode_schema(data, minimal=True))
+
+    def set_transformed_datatype(self, datatype):
+        r"""Set datatype.
+
+        Args:
+            datatype (dict): Datatype.
+
+        """
+        self._transformed_datatype = datatype
+
+    def set_transformed_datatype_from_data(self, data):
+        r"""Set datatype from data.
+
+        Args:
+            data (object): Data object.
+
+        """
+        if isinstance(data, collections.abc.Iterator):
+            item_type = None
+            for x in copy.deepcopy(data):
+                x_type = rapidjson.encode_schema(x, minimal=True)
+                if item_type is None:
+                    item_type = x_type
+                elif item_type != x_type:
+                    item_type = {"type": "any"}
+                    break
+            return self.set_transformed_datatype(item_type)
+        self.set_transformed_datatype(
+            rapidjson.encode_schema(data, minimal=True))
         
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
@@ -97,16 +136,36 @@ class TransformBase(ComponentBase):
         """
         raise NotImplementedError  # pragma: debug
 
-    def __call__(self, x, no_copy=False, no_init=False):
+    def call_transform(self, x, no_init=False, **kwargs):
+        r"""Call transform, setting datatypes during the process.
+
+        Args:
+            x (object): Message object to transform.
+            no_init (bool, optional): If True, the datatype is not initialized
+                if it is not already set. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to
+                evaluate_transform.
+        
+        Returns:
+            object: The transformed message.
+
+        """
+        if (not self.original_datatype) and (not no_init):
+            self.set_original_datatype_from_data(x)
+        out = self.evaluate_transform(x, **kwargs)
+        if (not self._transformed_datatype) and (not no_init):
+            self.set_transformed_datatype_from_data(out)
+        return out
+
+    def __call__(self, x, no_init=False, **kwargs):
         r"""Call transform on the provided message.
 
         Args:
             x (object): Message object to transform.
-            no_copy (bool, optional): If True, the transformation occurs in
-                place. Otherwise a copy is created and transformed. Defaults
-                to False.
             no_init (bool, optional): If True, the datatype is not initialized
                 if it is not already set. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to
+                call_transform.
 
         Returns:
             object: The transformed message.
@@ -116,12 +175,10 @@ class TransformBase(ComponentBase):
             return b''
         if isinstance(x, collections.abc.Iterator):
             xlist = list(x)
-            if (not self.original_datatype) and (not no_init) and xlist:
-                self.set_original_datatype_from_data(xlist[0])
-            out = iter([self.evaluate_transform(xx, no_copy=no_copy)
-                        for xx in xlist])
+            out = iter([
+                self.call_transform(xx, no_init=no_init, **kwargs)
+                for xx in xlist
+            ])
         else:
-            if (not self.original_datatype) and (not no_init):
-                self.set_original_datatype_from_data(x)
-            out = self.evaluate_transform(x, no_copy=no_copy)
+            out = self.call_transform(x, no_init=no_init, **kwargs)
         return out

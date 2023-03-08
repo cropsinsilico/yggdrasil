@@ -998,8 +998,10 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
   }
   // Check for server signon and respond
   while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
-    ygglog_debug("zmq_comm_recv(%s): Received sign-on", x->name);
     char* client_address = (char*)zframe_data(out) + 23;
+    client_address[zframe_size(out) - 23] = '\0';
+    ygglog_debug("zmq_comm_recv(%s): Received sign-on: %s", x->name, client_address);
+    
     // create a DEALER socket and connect to address
     zsock_t *client_socket = create_zsock(ZMQ_DEALER);
     if (client_socket == NULL) {
