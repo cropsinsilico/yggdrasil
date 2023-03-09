@@ -37,7 +37,7 @@ jobs:
       os-versions: ${{ steps.set-os-versions.outputs.versions }}
     steps:
     - id: set-os-versions
-      run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"2019\"}"
+      run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}"
         >> $GITHUB_OUTPUT
   test_pip:
     needs: params
@@ -156,6 +156,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -481,6 +484,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -778,6 +784,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -1077,6 +1086,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -1375,6 +1387,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
