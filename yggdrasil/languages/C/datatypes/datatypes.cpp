@@ -1,7 +1,6 @@
 #include "../tools.h"
 #include "datatypes.h"
 #include "utils.h"
-#include "../python_wrapper.h"
 
 #define RAPIDJSON_YGGDRASIL
 #include "rapidjson/document.h"
@@ -2970,7 +2969,17 @@ extern "C" {
   void display_python(python_t x) {
     if (x.obj != NULL) {
 #ifndef YGGDRASIL_DISABLE_PYTHON_C_API
-      PyObject_Print_STDOUT(x.obj);
+#if defined(_WIN32) && !defined(_MSC_VER)
+      printf("This function was called from outside the MSVC CRT and will be"
+	     "skipped in order to avoid a segfault incurred due to the "
+	     "Python C API's use of the MSVC CRT (particularly the FILE* "
+	     "datatype). To fix this, please ensure "
+	     "that the MSVC compiler (cl.exe) is available and cleanup any "
+	     "remaining compilation products in order to trigger yggdrasil "
+	     "to recompile your model during the next run.\n");
+#else
+      PyObject_Print(x.obj, stdout, 0);
+#endif
 #endif // YGGDRASIL_DISABLE_PYTHON_C_API
     } else {
       printf("NULL");
