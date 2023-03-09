@@ -345,20 +345,21 @@
     },
     "julia": [
       {
-        "julia": [
-          {
-            "method": "apt"
-          },
-          {
-            "method": "brew"
-          },
-          {
-            "method": "choco"
-          },
-          {
-            "method": "conda"
-          }
-        ]
+        "julia": {
+          "executable": "julia",
+          "options": [
+            {
+              "method": "brew"
+            },
+            {
+              "method": "choco"
+            },
+            {
+              "method": "conda",
+              "host": true
+            }
+          ]
+        }
       }
     ],
     "mpi": [

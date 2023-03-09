@@ -156,6 +156,7 @@ outputs:
         - {{ pin_subpackage('yggdrasil.julia') }}
     requirements:
       host:
+        - julia
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}

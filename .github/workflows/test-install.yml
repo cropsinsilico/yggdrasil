@@ -157,6 +157,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
+      if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -482,6 +485,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
+      if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -779,6 +785,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
+      if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -1078,6 +1087,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
+      if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
@@ -1376,6 +1388,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
+      if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
