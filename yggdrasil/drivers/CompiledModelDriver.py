@@ -811,8 +811,6 @@ class CompilationToolBase(object):
             out = [out]
         if output_first is None:
             output_first = cls.output_first
-        if with_asan and cls.asan_flags:
-            out += cls.asan_flags
         # Add default & user defined flags
         if skip_defaults:
             # Include flags set by the environment (this is especially
@@ -834,6 +832,8 @@ class CompilationToolBase(object):
         if (outfile is not None) and (cls.output_key is not None):
             cls.append_flags(out, cls.output_key, outfile,
                              prepend=output_first, no_duplicates=True)
+        if with_asan and cls.asan_flags:
+            out += cls.asan_flags
         # Handle unused keyword argumetns
         if isinstance(unused_kwargs, dict):
             unused_kwargs.update(kwargs)
@@ -1856,7 +1856,8 @@ class CompilerBase(CompilationToolBase):
     @classmethod
     def asan_library(cls):
         r"""Return the address sanitizer library."""
-        assert cls.asan_flags and cls.object_tool
+        if not (cls.asan_flags and cls.object_tool):
+            return None
         if 'asan_library' in cls._language_cache:
             return cls._language_cache['asan_library']
         try:
@@ -2423,6 +2424,9 @@ class CompiledModelDriver(ModelDriver):
     allow_parallel_build = False
     locked_buildfile = None
     kwargs_in_suffix = ['with_asan', 'disable_python_c_api', 'commtype']
+    standard_libraries = []
+    external_libraries = {}
+    internal_libraries = {}
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
         self.buildfile_lock = None
@@ -3111,6 +3115,9 @@ class CompiledModelDriver(ModelDriver):
         elif dep in cls.external_libraries:
             libclass = 'external'
             libinfo = cls.external_libraries[dep]
+        elif dep in cls.standard_libraries:
+            libclass = 'standard'
+            libinfo = {'libtype': 'shared', 'language': cls.language}
         toolname = libinfo.get('toolname', toolname)
         # Get default libtype and return if header_only library
         if libtype is None:
@@ -3174,12 +3181,17 @@ class CompiledModelDriver(ModelDriver):
                                        working_dir=os.path.dirname(src))
             if import_lib:
                 out = os.path.splitext(out)[0] + '.lib'
+        elif libclass == 'standard':
+            tool = cls.get_tool('compiler', language=cls.language,
+                                toolname=toolname).linker()
+            out = f"{tool.library_prefix}{dep}{tool.library_ext}"
         elif isinstance(dep, str) and os.path.isfile(dep):
             out = dep
         if out is None:
             if default is None:
-                raise ValueError("Could not determine library path for "
-                                 "dependency '%s'" % dep)
+                raise ValueError(f"Could not determine library path for "
+                                 f"dependency '{dep}' "
+                                 f"(libclass = {libclass})")
             else:
                 out = default
         return out
@@ -3232,6 +3244,8 @@ class CompiledModelDriver(ModelDriver):
             out = cls.cfg.get(dep_lang, '%s_include' % dep, None)
             if (out is not None) and os.path.isfile(out):
                 out = os.path.dirname(out)
+        elif dep in cls.standard_libraries:
+            return []
         elif isinstance(dep, str) and os.path.isfile(dep):
             out = os.path.dirname(dep)
         if not out:
@@ -3548,7 +3562,8 @@ class CompiledModelDriver(ModelDriver):
                 dep, toolname=toolname, **suffix_kws)
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
-                     and (not os.path.isfile(dep_lib)))):
+                     and (not os.path.isfile(dep_lib))
+                     and dep not in cls.standard_libraries)):
                     if dep in internal_dependencies:
                         # If this is called recursively, verify that
                         # dep_lib is produced by compiling dep.
@@ -3698,6 +3713,8 @@ class CompiledModelDriver(ModelDriver):
         if lib in cls.internal_libraries:
             src = cls.get_dependency_source(lib)
             return os.path.isfile(src)
+        if lib in cls.standard_libraries:
+            return True
         dep_lang = cls.external_libraries[lib].get('language', cls.language)
         for lib_typ in cls.external_libraries[lib].keys():
             if lib_typ in ['libtype', 'language', 'for_python_api']:

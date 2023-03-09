@@ -569,6 +569,7 @@ class CModelDriver(CompiledModelDriver):
         'zmq': {'libraries': ['zmq', 'czmq']}}
     interface_dependencies = ['rapidjson']
     interface_directories = [_incl_interface]
+    standard_libraries = ['m']
     external_libraries = {
         'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
                                               'rapidjson', 'include',
@@ -840,6 +841,8 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'] = []
                 if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
+                if 'm' not in cls.internal_libraries[x]['external_dependencies']:
+                    cls.internal_libraries[x]['external_dependencies'].append('m')
         
     @classmethod
     def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None, **kwargs):

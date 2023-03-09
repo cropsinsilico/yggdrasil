@@ -1220,7 +1220,7 @@ int document_set_vargs(rapidjson::Value& document,
   if (use_generic) {
     rapidjson::Document* tmp_doc = new rapidjson::Document();
     tmp_doc->CopyFrom(document, tmp_doc->GetAllocator());
-    generic_t tmp;
+    generic_t tmp = init_generic();
     tmp.obj = (void*)(tmp_doc);
     if (!set_va_list(ap, tmp)) {
       return 0;
@@ -1393,7 +1393,7 @@ int document_set_vargs(rapidjson::Value& document,
       if (type == rapidjson::Document::GetSchemaString()) {
 	rapidjson::Document* tmp_doc = new rapidjson::Document();
 	tmp_doc->CopyFrom(document, tmp_doc->GetAllocator());
-	generic_t tmp;
+	generic_t tmp = init_generic();
 	tmp.obj = (void*)(tmp_doc);
 	if (!set_va_list(ap, tmp)) {
 	  return 0;

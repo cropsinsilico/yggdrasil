@@ -4,7 +4,7 @@ CFLAGS += -I$(IDIR)
 
 ODIR = .
 
-LIBS = -lm $(LDFLAGS)
+LIBS = $(LDFLAGS) -lm
 
 .PHONY: all
 all: model_error_with_io_modelA model_error_with_io_modelB
