@@ -1,7 +1,6 @@
 #include "../tools.h"
 #include "datatypes.h"
 #include "utils.h"
-#include "../python_wrapper.h"
 
 #define RAPIDJSON_YGGDRASIL
 #include "rapidjson/document.h"
@@ -1221,7 +1220,7 @@ int document_set_vargs(rapidjson::Value& document,
   if (use_generic) {
     rapidjson::Document* tmp_doc = new rapidjson::Document();
     tmp_doc->CopyFrom(document, tmp_doc->GetAllocator());
-    generic_t tmp;
+    generic_t tmp = init_generic();
     tmp.obj = (void*)(tmp_doc);
     if (!set_va_list(ap, tmp)) {
       return 0;
@@ -1394,7 +1393,7 @@ int document_set_vargs(rapidjson::Value& document,
       if (type == rapidjson::Document::GetSchemaString()) {
 	rapidjson::Document* tmp_doc = new rapidjson::Document();
 	tmp_doc->CopyFrom(document, tmp_doc->GetAllocator());
-	generic_t tmp;
+	generic_t tmp = init_generic();
 	tmp.obj = (void*)(tmp_doc);
 	if (!set_va_list(ap, tmp)) {
 	  return 0;
@@ -2970,7 +2969,17 @@ extern "C" {
   void display_python(python_t x) {
     if (x.obj != NULL) {
 #ifndef YGGDRASIL_DISABLE_PYTHON_C_API
-      PyObject_Print_STDOUT(x.obj);
+#if defined(_WIN32) && !defined(_MSC_VER)
+      printf("This function was called from outside the MSVC CRT and will be"
+	     "skipped in order to avoid a segfault incurred due to the "
+	     "Python C API's use of the MSVC CRT (particularly the FILE* "
+	     "datatype). To fix this, please ensure "
+	     "that the MSVC compiler (cl.exe) is available and cleanup any "
+	     "remaining compilation products in order to trigger yggdrasil "
+	     "to recompile your model during the next run.\n");
+#else
+      PyObject_Print(x.obj, stdout, 0);
+#endif
 #endif // YGGDRASIL_DISABLE_PYTHON_C_API
     } else {
       printf("NULL");

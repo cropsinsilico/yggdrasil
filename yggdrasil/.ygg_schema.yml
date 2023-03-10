@@ -2493,7 +2493,6 @@ definitions:
         $properties/outputs/items/anyOf/2:
         - working_dir
       required:
-      - args
       - inputs
       - name
       - outputs
@@ -2517,6 +2516,7 @@ definitions:
             - executable
             type: string
         required:
+        - args
         - language
         title: yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver
         type: object
@@ -2646,6 +2646,7 @@ definitions:
               sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver
         type: object
@@ -2711,6 +2712,7 @@ definitions:
               sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.CModelDriver.CModelDriver
         type: object
@@ -2778,6 +2780,7 @@ definitions:
               sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.CPPModelDriver.CPPModelDriver
         type: object
@@ -2819,6 +2822,7 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.DummyModelDriver.DummyModelDriver
         type: object
@@ -2890,6 +2894,7 @@ definitions:
               sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.FortranModelDriver.FortranModelDriver
         type: object
@@ -2970,6 +2975,7 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.LPyModelDriver.LPyModelDriver
         type: object
@@ -2990,6 +2996,7 @@ definitions:
             - mpi
             type: string
         required:
+        - args
         - language
         title: yggdrasil.drivers.MPIPartnerModel.MPIPartnerModel
         type: object
@@ -3117,6 +3124,7 @@ definitions:
               sanitizer enabled (if there is one available for the selected compiler).
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.MakeModelDriver.MakeModelDriver
         type: object
@@ -3162,6 +3170,7 @@ definitions:
               in Matlab using symunit. Defaults to False.
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver
         type: object
@@ -3216,6 +3225,7 @@ definitions:
           with_asan:
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.OSRModelDriver.OSRModelDriver
         type: object
@@ -3256,6 +3266,7 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.PythonModelDriver.PythonModelDriver
         type: object
@@ -3297,6 +3308,7 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.RModelDriver.RModelDriver
         type: object
@@ -3384,6 +3396,7 @@ definitions:
             description: Number of steps that should be output. Defaults to None.
             type: integer
         required:
+        - args
         - language
         title: yggdrasil.drivers.SBMLModelDriver.SBMLModelDriver
         type: object

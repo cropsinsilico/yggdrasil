@@ -160,6 +160,9 @@ def test_save_load_schema():
     s0.save(fname)
     assert s0 is not None
     assert os.path.isfile(fname)
+    old_contents = open(schema._schema_fname, 'r').read()
+    new_contents = open(fname, 'r').read()
+    assert new_contents == old_contents
     s1 = schema.get_schema(fname)
     assert s1.schema == s0.schema
     # assert s1 == s0
@@ -167,7 +170,9 @@ def test_save_load_schema():
     # Test getting schema
     s2 = schema.load_schema(fname)
     assert os.path.isfile(fname)
-    assert s2.schema == s0.schema
+    assert s2.schema == s0.schema  # Error HERE
+    # s2 has args required in model type schemas
+    # s0 has args default [] in model base schema and required
     assert s2 == s0
     os.remove(fname)
 

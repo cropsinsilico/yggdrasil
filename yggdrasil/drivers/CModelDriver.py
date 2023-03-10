@@ -9,8 +9,7 @@ import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
-    get_compilation_tool)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
 
@@ -570,6 +569,7 @@ class CModelDriver(CompiledModelDriver):
         'zmq': {'libraries': ['zmq', 'czmq']}}
     interface_dependencies = ['rapidjson']
     interface_directories = [_incl_interface]
+    standard_libraries = ['m']
     external_libraries = {
         'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
                                               'rapidjson', 'include',
@@ -594,8 +594,7 @@ class CModelDriver(CompiledModelDriver):
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'language': 'c',
                 'linker_language': 'c++',  # Some dependencies are C++
-                'internal_dependencies': ['regex', 'datatypes',
-                                          'python_wrapper'],
+                'internal_dependencies': ['regex', 'datatypes'],
                 'external_dependencies': ['rapidjson',
                                           'python', 'numpy'],
                 'include_dirs': [_incl_comm, _incl_seri],
@@ -618,15 +617,7 @@ class CModelDriver(CompiledModelDriver):
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson',
                                                 'python', 'numpy'],
-                      'include_dirs': []},
-        'python_wrapper': {'source': 'python_wrapper.c',
-                           'directory': _top_lang_dir,
-                           'language': 'c',
-                           'libtype': 'shared',
-                           'external_dependencies': ['python', 'numpy'],
-                           'linker_language': 'c',
-                           'for_python_api': True,
-                           'include_dirs': [_top_lang_dir]}}
+                      'include_dirs': []}}
     type_map = {
         'comm': 'comm_t*',
         'dtype': 'dtype_t*',
@@ -831,7 +822,6 @@ class CModelDriver(CompiledModelDriver):
             for x in ['zmq', 'czmq', 'python']:
                 if x in cls.external_libraries:
                     cls.external_libraries[x]['libtype'] = 'windows_import'
-            cls.internal_libraries['python_wrapper']['libtype'] = 'windows_import'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -846,11 +836,13 @@ class CModelDriver(CompiledModelDriver):
             shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
-            for x in ['ygg', 'datatypes', 'python_wrapper']:
+            for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
                 if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
+                if 'm' not in cls.internal_libraries[x]['external_dependencies']:
+                    cls.internal_libraries[x]['external_dependencies'].append('m')
         
     @classmethod
     def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None, **kwargs):
@@ -930,12 +922,6 @@ class CModelDriver(CompiledModelDriver):
 
         """
         replaced_toolname = False
-        if platform._is_win and (dep == 'python_wrapper'):
-            # The Python library is compiled against MSVC so a wrapper is requried
-            # to reconcile the differences in FILE* between gcc and MSVC.
-            if get_compilation_tool('compiler', 'cl').is_installed():
-                replaced_toolname = True
-                toolname = 'cl'
         out = super(CModelDriver, cls).get_dependency_info(
             dep, toolname=toolname, default=default)
         if replaced_toolname:

@@ -1,4 +1,7 @@
 {
+  "julia": [
+    "toml"
+  ],
   "mpi": [
     "mpi4py"
   ],

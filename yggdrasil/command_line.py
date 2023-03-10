@@ -870,6 +870,12 @@ class ygginfo(SubCommand):
                 for k, v in sysconfig.get_config_vars().items():
                     vardict.append((curr_prefix + k, v))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+                # ASAN library
+                asan_library = None
+                Cdrv = import_component("model", "c")
+                if Cdrv.is_installed():
+                    asan_library = Cdrv.get_tool("compiler").asan_library()
+                vardict.append(("Asan Library:", asan_library))
         finally:
             # Print things
             max_len = max(len(x[0]) for x in vardict)

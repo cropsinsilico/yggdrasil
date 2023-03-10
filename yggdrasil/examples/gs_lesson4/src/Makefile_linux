@@ -4,7 +4,7 @@ CFLAGS += -I$(IDIR)
 
 ODIR = .
 
-LIBS = -lm $(LDFLAGS)
+LIBS = $(LDFLAGS) -lm
 
 .PHONY: all
 all: gs_lesson4_modelA gs_lesson4_modelB

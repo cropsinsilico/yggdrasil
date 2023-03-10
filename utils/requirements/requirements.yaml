@@ -177,6 +177,7 @@ extras:
         # fails currently on Mac M1, but PR in progress to fix it
         - method: conda
           host: True
+    - toml
   mpi:
     - mpi4py
     - mpi:
