@@ -2636,8 +2636,6 @@ extern "C" {
       return deserialize_args(buf, buf_siz, *schema, *va);
     } catch (...) {
       ygglog_error("deserialize_dtype: C++ exception thrown.");
-      if (d != NULL)
-	delete d;
       return -1;
     }
   }

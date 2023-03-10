@@ -660,6 +660,10 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
   } else if (x->type == CLIENT_COMM) {
     if (!(is_eof(data))) {
       head = client_response_header(x, head);
+      if (!header_is_valid(head)) {
+	ygglog_error("comm_send_multipart_header(%s): Error adding response information to the header", x->name);
+	return head;
+      }
     }
     x0 = (comm_t*)(x->handle);
   } else {
