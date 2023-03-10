@@ -582,6 +582,27 @@ class ComponentSchema(object):
                              'class': self.base_subtype_class}]
         return out
 
+    def set_required_by_subtype(self, props):
+        r"""Update schema so that specified properties are required at
+        the subtype level instead of in the base schema to allow
+        subtypes to specify defaults.
+
+        Args:
+            props (list): List of properties to require by subtype.
+
+        """
+        if not props:
+            return
+        for x in self._storage.values():
+            x.setdefault('required', [])
+            x['required'] += [k for k in props if k not in x['required']]
+        if self._base_schema.get('required', []):
+            for k in props:
+                if k in self._base_schema['required']:
+                    self._base_schema['required'].remove(k)
+            if not self._base_schema['required']:
+                del self._base_schema['required']
+
     @classmethod
     def from_schema(cls, schema, schema_registry=None):
         r"""Construct a ComponentSchema from a schema.
@@ -619,11 +640,11 @@ class ComponentSchema(object):
                     subt_required_by_subtype.add(k)
         if 'driver' in subt_overlap:
             subt_overlap.remove('driver')
-        if schema_type == 'model':
-            print(f"from schema {schema_type}:"
-                  f"\n\tsubt_overlap = {subt_overlap}"
-                  f"\n\tsubt_props = {subt_props}"
-                  f"\n\tsubt_required_by_subtype = {subt_required_by_subtype}")
+        # if schema_type == 'model':
+        #     print(f"from schema {schema_type}:"
+        #           f"\n\tsubt_overlap = {subt_overlap}"
+        #           f"\n\tsubt_props = {subt_props}"
+        #           f"\n\tsubt_required_by_subtype = {subt_required_by_subtype}")
         # if 'driver' in subt_required_by_subtype:
         #     subt_props.add('driver')
         #     subt_required_by_subtype.remove('driver')
@@ -662,15 +683,7 @@ class ComponentSchema(object):
             x['additionalProperties'] = False
         # Handle properties that should be required at the subtype
         # level to allow for subtype specific defaults
-        if subt_required_by_subtype:
-            for x in out._storage.values():
-                x.setdefault('required', [])
-                for k in subt_required_by_subtype:
-                    if k not in x['required']:
-                        x['required'].append(k)
-            for k in subt_required_by_subtype:
-                if k in out._base_schema.get('required', []):
-                    out._base_schema['required'].remove(k)
+        out.set_required_by_subtype(subt_required_by_subtype)
         return out
 
     @property
@@ -710,13 +723,7 @@ class ComponentSchema(object):
         for x in registry['classes'].values():
             out.append(x, verify=True,
                        required_by_subtype=required_by_subtype)
-        if required_by_subtype:
-            for x in out._storage.values():
-                x.setdefault('required', [])
-                x['required'] = sorted(
-                    list(set(x['required'] + required_by_subtype)))
-            for x in required_by_subtype:
-                out._base_schema['required'].remove(x)
+        out.set_required_by_subtype(required_by_subtype)
         return out
 
     @property
@@ -955,6 +962,7 @@ class ComponentSchema(object):
                             f" definition of the same property.")
                     if ((k in self._base_schema.get('required', [])
                          and isinstance(required_by_subtype, list)
+                         and k not in required_by_subtype
                          and not self.compare_body(old, new,
                                                    only_keys=['default']))):
                         required_by_subtype.append(k)
