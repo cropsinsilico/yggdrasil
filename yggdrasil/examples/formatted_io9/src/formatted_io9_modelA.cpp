@@ -1,7 +1,6 @@
 #include <iostream>
 // Include methods for input/output channels
 #include "YggInterface.hpp"
-#include "datatypes/serialization.h"
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels

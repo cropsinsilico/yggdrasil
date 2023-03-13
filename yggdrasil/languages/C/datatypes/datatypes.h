@@ -28,8 +28,14 @@ typedef struct dtype_t {
 
 /*! @brief C-friendly wrapper for rapidjson::Document. */
 typedef struct generic_t {
-  void *obj; //!< Pointer to rapidjson::Document or rapidjson::Value.
+  void *obj; //!< Pointer to rapidjson::Document.
 } generic_t;
+
+/*! @brief C-friendly wrapper for rapidjson::Value. */
+typedef struct generic_ref_t {
+  void *obj; //!< Pointer to rapidjson::Value.
+  void *allocator; //!< Pointer to rapidjson Allocator used to allocated obj.
+} generic_ref_t;
 
 /*! @brief Structure used to wrap va_list and allow pointer passing.
 @param va va_list Wrapped variable argument list.
@@ -257,7 +263,7 @@ int set_generic_array(generic_t arr, const size_t i, generic_t x);
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
 int get_generic_array(generic_t arr, const size_t i, generic_t *x);
-int get_generic_array_ref(generic_t arr, const size_t i, generic_t *x);
+int get_generic_array_ref(generic_t arr, const size_t i, generic_ref_t *x);
 
 
 /*!
@@ -279,7 +285,7 @@ int set_generic_object(generic_t arr, const char* k, generic_t x);
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
 int get_generic_object(generic_t arr, const char* k, generic_t *x);
-int get_generic_object_ref(generic_t arr, const char* k, generic_t *x);
+int get_generic_object_ref(generic_t arr, const char* k, generic_ref_t *x);
 
 
 #define set_generic_map set_generic_object
@@ -319,6 +325,7 @@ size_t generic_map_get_keys(generic_t x, char*** keys);
 
 // TODO: Copy docs
 
+void* generic_ref_get_item(generic_ref_t x, const char *type);
 void* generic_get_item(generic_t x, const char *type);
 int generic_set_item(generic_t x, const char *type, void* value);
   
@@ -343,11 +350,13 @@ int generic_set_item(generic_t x, const char *type, void* value);
   int generic_array_set_ ## name(generic_t x, const size_t index, generic_t item); \
   int generic_map_set_ ## name(generic_t x, const char* key, generic_t item)
 #define STD_JSON_(name, type)						\
+  type generic_ref_get_ ## name(generic_ref_t x);			\
   type generic_get_ ## name(generic_t x);				\
   int generic_set_ ## name(generic_t x, type value);			\
   NESTED_GET_NOARGS_(name, type);					\
   NESTED_SET_(name, type value)
 #define STD_UNITS_(name, type)			\
+  type generic_ref_get_ ## name(generic_ref_t x);			\
   type generic_get_ ## name(generic_t x);				\
   int generic_set_ ## name(generic_t x, type value, const char* units); \
   NESTED_GET_NOARGS_(name, type);					\
@@ -356,7 +365,9 @@ int generic_set_item(generic_t x, const char *type, void* value);
   STD_JSON_(name, type)
 // TODO: Allow units when calling "get" methods?
 #define ARRAY_(name, type)						\
+  size_t generic_ref_get_1darray_ ## name(generic_ref_t x, type** data); \
   size_t generic_get_1darray_ ## name(generic_t x, type** data);	\
+  size_t generic_ref_get_ndarray_ ## name(generic_ref_t x, type** data, size_t** shape); \
   size_t generic_get_ndarray_ ## name(generic_t x, type** data, size_t** shape); \
   NESTED_GET_(1darray_ ## name, size_t, type** data);			\
   NESTED_GET_(ndarray_ ## name, size_t, type** data, size_t** shape);	\

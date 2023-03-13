@@ -439,7 +439,7 @@ int server_comm_recv(comm_t* x, char **data, const size_t len, const int allow_r
   }
   // Initialize new comm from received address
   comm_head_t head = create_recv_header(data, len, ret, allow_realloc, 1);
-  if (header_is_valid(head)) {
+  if (!header_is_valid(head)) {
     ygglog_error("server_comm_recv(%s): Error parsing header.", x->name);
     return -1;
   }

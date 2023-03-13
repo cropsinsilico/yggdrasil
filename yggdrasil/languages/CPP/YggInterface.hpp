@@ -4,6 +4,7 @@
 
 #define RAPIDJSON_YGGDRASIL
 #include "YggInterface.h"
+#include "datatypes/serialization.h"
 #include <string>
 
 

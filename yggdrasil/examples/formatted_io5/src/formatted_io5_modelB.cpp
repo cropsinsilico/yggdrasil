@@ -1,7 +1,6 @@
 #include <iostream>
 // Include methods for input/output channels
 #include "YggInterface.hpp"
-#include "rapidjson/ply.h"
 
 #define MYBUFSIZ 1000
 
