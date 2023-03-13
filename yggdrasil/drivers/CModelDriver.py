@@ -368,6 +368,14 @@ class LDLinker(LinkerBase):
             raise RuntimeError(f"Could not locate version in string: {out}")
         return match.group('version')
 
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of linker flags."""
+        out = super(LDLinker, cls).get_flags(*args, **kwargs)
+        if '-lstdc++' not in out:
+            out.append('-lstdc++')
+        return out
+
 
 class GCCLinker(LDLinker):
     r"""Interface class for gcc linker (calls to ld)."""
@@ -450,8 +458,6 @@ class ClangLinker(LDLinker):
                 # as existing installs still have this mismatch
                 kwargs['linker-version'] = ld_version
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
-        if '-lstdc++' not in out:
-            out.append('-lstdc++')
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
             if 'conda' not in cls.get_executable(full_path=True):

@@ -3317,6 +3317,29 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
+    def is_standard_library(cls, dep):
+        r"""Determine if a dependency is a standard library.
+
+        Args:
+            dep (str, tuple): Dependency name or tuple with language and
+                dependency name.
+
+        Returns:
+            bool: True if the dependency is a standard library, false
+                otherwise.
+
+        """
+        drv = cls
+        if isinstance(dep, tuple):
+            assert len(dep) == 2
+            dep_lang = dep[0]
+            dep = dep[1]
+            if dep_lang != cls.language:
+                drv = import_component('model', dep_lang)
+                return drv.is_standard_library(dep)
+        return (dep in drv.standard_libraries)
+
+    @classmethod
     def get_compiler_flags(cls, toolname=None, compiler=None, **kwargs):
         r"""Determine the flags required by the current compiler.
 
@@ -3563,7 +3586,7 @@ class CompiledModelDriver(ModelDriver):
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib))
-                     and dep not in cls.standard_libraries)):
+                     and not cls.is_standard_library(dep))):
                     if dep in internal_dependencies:
                         # If this is called recursively, verify that
                         # dep_lib is produced by compiling dep.
@@ -3579,7 +3602,7 @@ class CompiledModelDriver(ModelDriver):
                     if not os.path.isfile(dep_lib):  # pragma: debug
                         raise RuntimeError(
                             f"Library for {dep} dependency does not "
-                            f"exist: 'dep_lib'.")
+                            f"exist: '{dep_lib}'.")
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):

@@ -156,7 +156,6 @@ def test_save_load_schema():
     if os.path.isfile(fname):  # pragma: debug
         os.remove(fname)
     # Test saving/loading schema
-    print("BEGIN LOADING s0")
     s0 = schema.load_schema()
     s0.save(fname)
     assert s0 is not None
@@ -164,13 +163,11 @@ def test_save_load_schema():
     old_contents = open(schema._schema_fname, 'r').read()
     new_contents = open(fname, 'r').read()
     assert new_contents == old_contents
-    print("BEGIN LOADING s1")
     s1 = schema.get_schema(fname)
     assert s1.schema == s0.schema
     # assert s1 == s0
     os.remove(fname)
     # Test getting schema
-    print("BEGIN LOADING s2")
     s2 = schema.load_schema(fname)
     assert os.path.isfile(fname)
     assert s2.schema == s0.schema  # Error HERE
