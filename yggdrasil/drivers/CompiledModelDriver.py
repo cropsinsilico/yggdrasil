@@ -2126,7 +2126,7 @@ class LinkerBase(CompilationToolBase):
                     library_libs_nonstd.append(x_f)
                 if (((cls.tooltype == 'linker') and x_f.endswith(cls.library_ext)
                      and ('library_rpath' in cls.flag_options))):
-                    if x_d not in library_rpath:
+                    if x_d and x_d not in library_rpath:
                         library_rpath.append(x_d)
         # Add libraries to library_flags instead of flags so they can be
         # used elsewhere

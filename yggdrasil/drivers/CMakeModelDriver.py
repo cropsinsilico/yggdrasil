@@ -372,7 +372,7 @@ class CMakeConfigure(BuildToolBase):
         return x
         
     @classmethod
-    def create_include(cls, fname, target,
+    def create_include(cls, fname, target, driver=None,
                        compiler=None, compiler_flags=None,
                        linker=None, linker_flags=None,
                        library_flags=None, internal_library_flags=None,
@@ -383,28 +383,31 @@ class CMakeConfigure(BuildToolBase):
         Args:
             fname (str): File where the include file should be saved.
             target (str): Target that links should be added to.
-            compiler (CompilerBase): Compiler that should be used to generate the
-                list of compilation flags.
+            driver (CompiledModelDriver): Driver for the language being
+                compiled.
+            compiler (CompilerBase): Compiler that should be used to
+                generate the list of compilation flags.
             compile_flags (list, optional): Additional compile flags that
                 should be set. Defaults to [].
-            linker (LinkerBase): Linker that should be used to generate the
-                list of compilation flags.
+            linker (LinkerBase): Linker that should be used to generate
+                the list of compilation flags.
             linker_flags (list, optional): Additional linker flags that
                 should be set. Defaults to [].
             library_flags (list, optional): List of library flags to add.
                 Defaults to [].
             internal_library_flags (list, optional): List of library flags
                 associated with yggdrasil libraries. Defaults to [].
-            configuration (str, optional): Build type/configuration that should
-                be built. Defaults to 'Release'. Only used on Windows to
-                determin the standard library.
-            verbose (bool, optional): If True, the contents of the created file
-                are displayed. Defaults to False.
+            configuration (str, optional): Build type/configuration that
+                should be built. Defaults to 'Release'. Only used on
+                Windows to determine the standard library.
+            verbose (bool, optional): If True, the contents of the created
+                file are displayed. Defaults to False.
             **kwargs: Additional keyword arguments are ignored.
 
         Returns:
-            list: Lines that should be added before the executable is defined
-                in the CMakeLists.txt (e.g. LINK_DIRECTORIES commands).
+            list: Lines that should be added before the executable is
+                defined in the CMakeLists.txt (e.g. LINK_DIRECTORIES
+                commands).
 
         Raises:
             ValueError: If a linker or compiler flag cannot be interpreted.
@@ -524,7 +527,7 @@ class CMakeConfigure(BuildToolBase):
                 lines += ['        IMPORTED_LOCATION %s)' % x,
                           'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
-            else:
+            elif not driver.is_standard_library(xn):
                 # Version finding library
                 lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
                              % (xn.upper(), xf, xn, xd))
@@ -802,6 +805,7 @@ class CMakeModelDriver(BuildModelDriver):
             return out
         kws = dict(compiler=self.target_language_info['compiler'],
                    linker=self.target_language_info['linker'],
+                   driver=self.target_language_info['driver'],
                    configuration=self.configuration,
                    verbose=kwargs.get('verbose', False))
         if not self.use_env_vars:
