@@ -532,7 +532,8 @@ class ComponentBase(ComponentBaseUnregistered):
         state['_input_kwargs'] = {}
         self.__dict__.update(state)
 
-    def __init__(self, skip_component_schema_normalization=None, **kwargs):
+    def __init__(self, skip_component_schema_normalization=None,
+                 additional_component_properties=None, **kwargs):
         if skip_component_schema_normalization is None:
             skip_component_schema_normalization = (
                 not (os.environ.get('YGG_VALIDATE_COMPONENTS', 'None').lower()
@@ -572,6 +573,8 @@ class ComponentBase(ComponentBaseUnregistered):
             props = list(s['properties'].keys())
             if not skip_component_schema_normalization:
                 kwargs.setdefault(self._schema_subtype_key, subtype)
+                if additional_component_properties:
+                    kwargs.update(additional_component_properties)
                 # Remove properties that shouldn't ve validated in class
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
