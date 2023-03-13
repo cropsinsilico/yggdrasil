@@ -1222,6 +1222,17 @@ int document_set_vargs(rapidjson::Value& document,
     tmp_doc->CopyFrom(document, tmp_doc->GetAllocator());
     generic_t tmp = init_generic();
     tmp.obj = (void*)(tmp_doc);
+    generic_t* tmp2 = NULL;
+    generic_t** tmp2_ref = NULL;
+    if (!get_va_list_mem(ap, tmp2, tmp2_ref))
+      return 0;
+    if (tmp2 != NULL && is_generic_init(*tmp2)) {
+      if (tmp2->obj != NULL) {
+	rapidjson::Document* tmp_doc = (rapidjson::Document*)(tmp2->obj);
+	delete tmp_doc;
+	tmp2->obj = NULL;
+      }
+    }
     if (!set_va_list(ap, tmp)) {
       return 0;
     }
