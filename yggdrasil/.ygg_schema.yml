@@ -2935,6 +2935,7 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         required:
+        - args
         - language
         title: yggdrasil.drivers.JuliaModelDriver.JuliaModelDriver
         type: object

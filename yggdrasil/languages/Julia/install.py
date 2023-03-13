@@ -17,6 +17,8 @@ name_in_pragmas = 'Julia'
 lang_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 pkg_dir = os.path.join(os.path.dirname(__file__), 'Yggdrasil')
 proj_file = os.path.join(pkg_dir, 'Project.toml')
+if sys.platform in ['win32', 'cygwin']:
+    pkg_dir = pkg_dir.replace('\\', '\\\\')
 
 
 def update_argparser(parser=None):
@@ -99,8 +101,6 @@ def install_packages(package_list, update=False, into_pkg=None,
     if into_pkg:
         julia_cmd.append(f'Pkg.activate(\"{into_pkg}\")')
         julia_cmd += req_cmd
-    # if into_pkg:
-    #     julia_cmd.append(f'Pkg.develop(PackageSpec(path="{into_pkg}"))')
     if not call_julia(julia_cmd, **kwargs):
         logger.error("Error installing dependencies: %s" % ', '.join(package_list))
         return False
@@ -161,7 +161,7 @@ def make_call(julia_cmd, with_sudo=False, **kwargs):
         logger.info("Output:\n%s" % julia_proc)
         out = True
     except BaseException as e:
-        logger.error('Error installing Julia interface:\n%s' % e)
+        logger.error('Error running Julia command:\n%s' % e)
         out = False
     return out
 
@@ -233,6 +233,10 @@ def install(args=None, skip_requirements=None,
     if not call_julia(['using Pkg',
                        f'Pkg.develop(PackageSpec(path="{pkg_dir}"))']):
         logger.error("Error installing Julia interface.")
+        return False
+    # Check to see if Yggdrasil installed
+    if not call_julia(['using Yggdrasil']):
+        logger.error("Julia interface not installed.")
         return False
     logger.info("Installed Julia interface.")
     return True
