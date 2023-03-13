@@ -530,6 +530,7 @@ class ModelDriver(Driver):
         self._inv_mpi_tags = {v: k for k, v in self._mpi_tags.items()}
         self.model_outputs_in_inputs = outputs_in_inputs
         self.preparsed_function = preparsed_function
+        kwargs['additional_component_properties'] = {'args': args}
         super(ModelDriver, self).__init__(name, **kwargs)
         if self.overwrite is None:
             self.overwrite = (not self.preserve_cache)
