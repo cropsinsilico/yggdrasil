@@ -282,6 +282,20 @@ class OSRModelDriver(ExecutableModelDriver):
         return (cls.repository is not None)
 
     @classmethod
+    def language_version(cls, version_flags=None, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.run_executable.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        repo = git.Repo(cls.repository)
+        return str(repo.commit())
+        
+    @classmethod
     def clone_repository(cls, dest=None):
         r"""Clone the OpenSimRoot repository.
 
