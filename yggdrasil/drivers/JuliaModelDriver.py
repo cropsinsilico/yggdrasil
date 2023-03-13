@@ -11,7 +11,7 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
     base_languages = ['python']
     default_interpreter = 'julia'
     interface_library = 'Yggdrasil'
-    interface_dependencies = ['PyCall']
+    interface_dependencies = ['PyCall', 'Unitful']
     type_map = {
         'int': 'Int',
         'float': 'Float',
@@ -108,8 +108,7 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         """
         if lib not in cls._library_cache:
             try:
-                cls.run_executable(['-e', 'using %s' % lib])
-                # cls.run_executable(['-e', 'haskey(Pkg.installed(), "%s")'])
+                cls.run_executable(['-e', f'using {lib}'])
                 cls._library_cache[lib] = True
             except RuntimeError:
                 cls._library_cache[lib] = False

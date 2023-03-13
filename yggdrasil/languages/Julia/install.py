@@ -42,7 +42,8 @@ def update_argparser(parser=None):
     return parser
 
 
-def install_packages(package_list, update=False, **kwargs):
+def install_packages(package_list, update=False, into_pkg=None,
+                     **kwargs):
     r"""Install Julia packages from Pkg.
 
     Args:
@@ -51,19 +52,22 @@ def install_packages(package_list, update=False, **kwargs):
         update (bool, optional): If True, existing packages will be removed
             and then re-installed. If False, nothing will be done for existing
             packages. Defaults to False.
+        into_pkg (str, optional): Directory for package that Julia packages
+            should be added to.
         **kwargs: Additional keyword arguments are passed to call_julia.
 
     Returns:
         bool: True if call was successful, False otherwise.
 
     """
-    julia_cmd = ['using Pkg', 'Pkg.activate(\"%s\")' % pkg_dir]
+    julia_cmd = ['using Pkg']
     if not isinstance(package_list, list):
         package_list = [package_list]
     regex_ver = (r'(?P<name>.+?)\s*(?:\(\s*(?P<comparison>[=<>]+?)\s*'
                  r'(?P<ver>[^\s=<>]+?)\s*\))?')
     req_ver = []
     req_nover = []
+    req_cmd = []
     for x in package_list:
         out = re.fullmatch(regex_ver, x).groupdict()
         kws = {}
@@ -77,9 +81,9 @@ def install_packages(package_list, update=False, **kwargs):
     if req_nover:
         for x in req_nover:
             if update:
-                julia_cmd += [f'Pkg.update("{x}")']
+                req_cmd += [f'Pkg.update("{x}")']
             else:
-                julia_cmd += [f'Pkg.add("{x}")']
+                req_cmd += [f'Pkg.add("{x}")']
     if req_ver:
         for x in req_ver:
             name = "\"%s\"" % x['name']
@@ -89,8 +93,14 @@ def install_packages(package_list, update=False, **kwargs):
                     args += ', '
                 args += 'version=\"%s\"' % x['ver']
             if update:
-                julia_cmd += ['Pkg.rm(%s)' % name]
-            julia_cmd += ['Pkg.add(%s, %s)' % (name, args)]
+                req_cmd += ['Pkg.rm(%s)' % name]
+            req_cmd += ['Pkg.add(%s, %s)' % (name, args)]
+    julia_cmd += req_cmd
+    if into_pkg:
+        julia_cmd.append(f'Pkg.activate(\"{into_pkg}\")')
+        julia_cmd += req_cmd
+    # if into_pkg:
+    #     julia_cmd.append(f'Pkg.develop(PackageSpec(path="{into_pkg}"))')
     if not call_julia(julia_cmd, **kwargs):
         logger.error("Error installing dependencies: %s" % ', '.join(package_list))
         return False
@@ -205,27 +215,23 @@ def install(args=None, skip_requirements=None,
     kwargs = {'cwd': lang_dir}
     # Install requirements
     # TODO: Determine if develop calls install for deps
+    requirements = requirements_from_project_toml()
     if not skip_requirements:
-        # if update_requirements:
-        requirements = requirements_from_project_toml()
         if not install_packages(requirements, update=update_requirements,
-                                **kwargs):
+                                into_pkg=pkg_dir, **kwargs):
             logger.error("Failed to install dependencies")
             return False
         logger.info("Installed dependencies.")
     # Check to see if yggdrasil installed
     # Build packages
-    build_cmd = ['using Pkg', 'Pkg.build(\"PyCall\")']
-    # 'Pkg.activate(\"%s\")' % pkg_dir,
-    # 'Pkg.build()']
-    if not call_julia(build_cmd, **kwargs):
-        logger.error("Error building Julia interface.")
-        return False
-    logger.info("Built Julia interface.")
+    # build_cmd = ['using Pkg', 'Pkg.build(\"PyCall\")']
+    # if not call_julia(build_cmd, **kwargs):
+    #     logger.error("Error building Julia interface.")
+    #     return False
+    # logger.info("Built Julia interface.")
     # Install package
-    julia_cmd = ['using Pkg',
-                 f'Pkg.develop(PackageSpec(path="{pkg_dir}"))']
-    if not call_julia(julia_cmd, **kwargs):
+    if not call_julia(['using Pkg',
+                       f'Pkg.develop(PackageSpec(path="{pkg_dir}"))']):
         logger.error("Error installing Julia interface.")
         return False
     logger.info("Installed Julia interface.")
