@@ -83,7 +83,6 @@ class FileComm(CommBase.CommBase):
     _schema_excluded_from_inherit = (
         ['commtype', 'datatype', 'read_meth', 'serializer']
         + CommBase.CommBase._model_schema_prop)
-    _schema_excluded_from_class_validation = ['serializer']
     _schema_base_class = None
     _schema_additional_kwargs = {'allowSingular': 'name'}
     _schema_additional_kwargs_no_inherit = {
@@ -103,6 +102,9 @@ class FileComm(CommBase.CommBase):
 
     def _init_before_open(self, **kwargs):
         r"""Get absolute path and set attributes."""
+        if not hasattr(self, 'serializer'):
+            self.serializer = kwargs.pop(
+                'serializer', {'seritype', self._default_serializer})
         self.header_was_read = False
         self.header_was_written = False
         super(FileComm, self)._init_before_open(**kwargs)

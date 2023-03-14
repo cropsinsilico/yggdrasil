@@ -210,7 +210,7 @@ class ClientComm(CommBase.CommBase):
                                **self.response_kwargs)
             if comm_kwargs.get('use_async', False):
                 comm_kwargs['async_recv_method'] = 'recv_message'
-            self.icomm = new_comm(self.name + '.client_response_comm', **comm_kwargs)
+            self.icomm = new_comm(self.name + '-client_response_comm', **comm_kwargs)
         header['response_address'] = self.icomm.opp_address
         self.request_order.append(header['request_id'])
         return header

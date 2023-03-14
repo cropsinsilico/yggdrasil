@@ -234,7 +234,7 @@ class ServerComm(CommBase.CommBase):
         meta['response_id'] = response_id
         if meta['response_address'] not in self.ocomm:
             self.ocomm[meta['response_address']] = get_comm(
-                self.name + '.server_response_comm.' + response_id,
+                self.name + '-server_response_comm-' + response_id,
                 **comm_kwargs)
             client_model = meta.get('model', '')
             self.ocomm[meta['response_address']].client_model = client_model

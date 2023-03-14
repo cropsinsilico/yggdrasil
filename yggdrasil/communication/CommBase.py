@@ -16,6 +16,7 @@ from yggdrasil.components import (
 from yggdrasil.datatypes import DataTypeError, type2numpy
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
+from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
 logger = logging.getLogger(__name__)
@@ -603,7 +604,11 @@ class CommBase(tools.YggClass):
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
                  is_async=False, **kwargs):
+        kwargs['additional_component_properties'] = {'name': name}
+        tmp_seri = self._update_serializer_kwargs(kwargs)
         super(CommBase, self).__init__(name, **kwargs)
+        if tmp_seri:
+            self.serializer = tmp_seri
         if (((not is_interface)
              and (not self.__class__.is_installed(
                  language='python')))):  # pragma: debug
@@ -735,15 +740,24 @@ class CommBase(tools.YggClass):
         if self.is_interface:  # pragma: debug
             atexit.register(self.atexit)
 
-    def _init_before_open(self, **kwargs):
-        r"""Initialization steps that should be performed after base class, but
-        before the comm is opened."""
+    @classmethod
+    def _update_serializer_kwargs(cls, kwargs):
+        r"""Update serializer information in a set of keyword arguments.
+
+        Args:
+            kwargs (dict): Keyword arguments containing non-schema behaved
+                serializer information.
+
+        """
+        seri_instance = None
         seri_cls = kwargs.pop('serializer_class', None)
         seri_kws = kwargs.pop('serializer_kwargs', {})
-        if ('datatype' in self._schema_properties) and (self.datatype is not None):
-            seri_kws.setdefault('datatype', self.datatype)
+        datatype = kwargs.get('datatype', None)
+        serializer = kwargs.pop('serializer', None)
+        if ('datatype' in cls._schema_properties) and (datatype is not None):
+            seri_kws.setdefault('datatype', datatype)
             # TODO: Fix push/pull of schema properties
-            if self.datatype == constants.DEFAULT_DATATYPE:
+            if datatype == constants.DEFAULT_DATATYPE:
                 partial_datatype = {
                     k: kwargs[k] for k in list(
                         rapidjson.get_metaschema()['properties'].keys())
@@ -751,30 +765,47 @@ class CommBase(tools.YggClass):
                 if partial_datatype:
                     seri_kws.setdefault('partial_datatype',
                                         partial_datatype)
-        if ((('serializer' not in self._schema_properties)
-             and (not hasattr(self, 'serializer')))):
-            self.serializer = self._default_serializer
-        if isinstance(self.serializer, str):
-            seri_kws.setdefault('seritype', self.serializer)
-            self.serializer = None
-        elif isinstance(self.serializer, dict):
-            if len(self.serializer) == 0:
-                self.serializer['seritype'] = self._default_serializer
-            seri_kws.update(self.serializer)
-            self.serializer = None
+        if ((('serializer' not in cls._schema_properties)
+             and serializer is None)):
+            serializer = cls._default_serializer
+        if isinstance(serializer, str):
+            seri_kws.setdefault('seritype', serializer)
+            serializer = None
+        elif isinstance(serializer, dict):
+            seri_kws.update(serializer)
+            serializer = None
+        elif isinstance(serializer, type):
+            seri_cls = serializer
+        elif isinstance(serializer, SerializeBase):
+            seri_cls = type(serializer)
+            seri_instance = serializer
+            serializer = None
+        if seri_cls is not None:
+            seri_kws.setdefault('seritype', seri_cls._seritype)
+        if serializer is not None:
+            kwargs['serializer'] = serializer
+        else:
+            if len(seri_kws) == 0:
+                seri_kws['seritype'] = cls._default_serializer
+            kwargs['serializer'] = seri_kws
+        return seri_instance
+
+    def _init_before_open(self, **kwargs):
+        r"""Initialization steps that should be performed after base class, but
+        before the comm is opened."""
         # Only update serializer if not already set
-        if self.serializer is None:
+        seri_kws = getattr(self, 'serializer', {})
+        if isinstance(seri_kws, dict):
             # Get serializer class
-            if seri_cls is None:
-                seri_kws.setdefault('seritype', self._default_serializer)
-                seri_cls = import_component('serializer',
-                                            subtype=seri_kws['seritype'])
+            seri_kws.setdefault('seritype', self._default_serializer)
+            seri_cls = import_component('serializer',
+                                        subtype=seri_kws['seritype'])
             # Recover keyword arguments for serializer passed to comm class
             for k in seri_cls.seri_kws():
                 if k in kwargs:
                     seri_kws.setdefault(k, kwargs[k])
             # Create serializer instance
-            self.debug('seri_kws = %.100s', str(seri_kws))
+            logger.debug('seri_kws = %.100s', str(seri_kws))
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
         dir_conv = f'{self.direction}_converter'
@@ -1722,7 +1753,7 @@ class CommBase(tools.YggClass):
         kws.update(**kwargs)
         if work_comm_name is None:
             cls = kws.get('commtype', 'default')
-            work_comm_name = '%s_temp_%s_%s.%s' % (
+            work_comm_name = '%s_temp_%s_%s-%s' % (
                 self.name, cls, kws['direction'], kws['uuid'])
         c = new_comm(work_comm_name, **kws)
         self.add_work_comm(c)
@@ -1803,7 +1834,7 @@ class CommBase(tools.YggClass):
         kws['address'] = header['__meta__']['address']
         if work_comm_name is None:
             cls = kws.get('commtype', 'default')
-            work_comm_name = '%s_temp_%s_%s.%s' % (
+            work_comm_name = '%s_temp_%s_%s-%s' % (
                 self.name, cls, kws['direction'],
                 header['__meta__']['id'])
         c = get_comm(work_comm_name, **kws)
