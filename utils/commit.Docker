@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3
+FROM --platform=linux/amd64 condaforge/mambaforge
 SHELL ["/bin/bash", "--login", "-c"]
 ARG commit
 RUN apt-get --allow-releaseinfo-change update -y
@@ -11,17 +11,21 @@ RUN git clone --recurse-submodules https://github.com/cropsinsilico/yggdrasil.gi
     cd yggdrasil && \
     git checkout $commit
 WORKDIR /yggdrasil
+# RUN source /opt/conda/etc/profile.d/conda.sh && \
+#     conda install mamba -y
 RUN source /opt/conda/etc/profile.d/conda.sh && \
-    python utils/setup_test_env.py env --env-name=env conda 3.9
+    python utils/setup_test_env.py env --env-name=env mamba 3.9
 RUN source /opt/conda/etc/profile.d/conda.sh && \
     conda activate env && \
-    python utils/setup_test_env.py install conda-dev --always-yes --no-sudo --install-mpi --install-rmq --install-docs --install-sbml --install-omp --python-only
+    python utils/setup_test_env.py install mamba-dev --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp
 
-# Required so that gcc & g++ are available as paths in OpenSimRoot make
 RUN source /opt/conda/etc/profile.d/conda.sh && \
-    conda activate env && \
-    # cp $CC $(dirname $CC)/gcc && \
-    cp $CXX $(dirname $CXX)/g++
+    mamba install -y c-compiler cxx-compiler
+# Required so that gcc & g++ are available as paths in OpenSimRoot make
+# RUN source /opt/conda/etc/profile.d/conda.sh && \
+#     conda activate env && \
+#     # cp $CC $(dirname $CC)/gcc && \
+#     cp $CXX $(dirname $CXX)/g++
 RUN source /opt/conda/etc/profile.d/conda.sh && \
     conda activate env && \
     yggconfig && \

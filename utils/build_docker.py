@@ -25,7 +25,11 @@ def build(dockerfile, tag, flags=[], repo='cropsinsilico/yggdrasil',
             to False.
 
     """
-    args = ['docker', 'build', '-t', f'{repo}:{tag}', '-f', dockerfile] + flags
+    # TODO: Update so multiple targets are built
+    # https://docs.docker.com/build/building/multi-platform/
+    # TODO: Update sysv_ipc & czmq to have linux/aarch64 builds
+    args = ['docker', 'build', '-t', f'{repo}:{tag}', '-f', dockerfile,
+            '--platform', 'linux/amd64'] + flags
     args.append(context)
     subprocess.call(args)
     if not disable_latest:
@@ -66,6 +70,28 @@ def params_release(version):
     flags = ['--build-arg', f'commit=tags/v{version}']
     # dockerfile = os.path.join(_utils_dir, 'release.Docker')
     # flags = ['--build-arg', f'version={version}']
+    repo = 'cropsinsilico/yggdrasil'
+    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
+
+
+def params_conda_release(version):
+    r"""Get parameters to build a docker image containing an yggdrasil
+    release installed from conda.
+
+    Args:
+        version (str): Release version to install in the image.
+
+    Returns:
+        dict: Docker build parameters.
+
+    """
+    if version is None:
+        url = "https://api.github.com/repos/cropsinsilico/yggdrasil/tags"
+        tags = json.loads(urllib.request.urlopen(url).read())
+        version = max(tags, key=lambda x: x['name'])['name'].lstrip('v')
+    dockerfile = os.path.join(_utils_dir, 'release.Docker')
+    tag = f'v{version}'
+    flags = ['--build-arg', f'version={version}']
     repo = 'cropsinsilico/yggdrasil'
     return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
 
@@ -143,6 +169,9 @@ if __name__ == "__main__":
     group.add_argument(
         "--commit", type=str,
         help="Yggdrasil commit that should be installed in the image.")
+    group.add_argument(
+        "--conda-version", type=str,
+        help="Yggdrasil conda release that should be installed in the image.")
     parser.add_argument(
         "--push", action="store_true",
         help="After successfully building the image, push it to DockerHub.")
@@ -167,6 +196,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.commit:
         params = params_commit(args.commit)
+    elif args.conda_version:
+        params = params_conda_release(args.conda_version)
     else:
         params = params_release(args.version)
     if args.type == 'executable':
