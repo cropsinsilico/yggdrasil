@@ -527,7 +527,7 @@ class CMakeConfigure(BuildToolBase):
                 lines += ['        IMPORTED_LOCATION %s)' % x,
                           'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
-            elif not driver.is_standard_library(xn):
+            elif not (driver and driver.is_standard_library(xn)):
                 # Version finding library
                 lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
                              % (xn.upper(), xf, xn, xd))
