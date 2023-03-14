@@ -12,6 +12,7 @@ lang2print = {'python': 'Python',
               'r': 'R',
               'R': 'R',
               'c': 'C',
+              'julia': 'Julia',
               'cpp': 'C++',
               'all': 'Mixed',
               'all_nomatlab': 'Mixed w/o Matlab',
@@ -90,7 +91,7 @@ def get_default_lang(k):
 
 def write_src_ref(fd, k):
     default = get_default_lang(k)
-    assert(default)
+    assert default
     write_src(fd, k, default, upone=True)
     fd.write('\n')
     write_ref_link(fd, k)
@@ -98,7 +99,7 @@ def write_src_ref(fd, k):
     
 def write_yml_ref(fd, k):
     default = get_default_lang(k)
-    assert(default)
+    assert default
     write_yml(fd, k, default, upone=True)
     fd.write('\n')
     write_ref_link(fd, k)
