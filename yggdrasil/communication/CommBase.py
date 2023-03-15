@@ -16,7 +16,7 @@ from yggdrasil.components import (
 from yggdrasil.datatypes import DataTypeError, type2numpy
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
-from yggdrasil.serialize.SerializeBase import SerializeBase
+# from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
 logger = logging.getLogger(__name__)
@@ -776,10 +776,10 @@ class CommBase(tools.YggClass):
             serializer = None
         elif isinstance(serializer, type):
             seri_cls = serializer
-        elif isinstance(serializer, SerializeBase):
-            seri_cls = type(serializer)
-            seri_instance = serializer
-            serializer = None
+        # elif isinstance(serializer, SerializeBase):
+        #     seri_cls = type(serializer)
+        #     seri_instance = serializer
+        #     serializer = None
         if seri_cls is not None:
             seri_kws.setdefault('seritype', seri_cls._seritype)
         if serializer is not None:
@@ -811,9 +811,10 @@ class CommBase(tools.YggClass):
         dir_conv = f'{self.direction}_converter'
         if not getattr(self, 'transform', []):
             self.transform = getattr(self.serializer, dir_conv, [])
-        if self.transform:
             if not isinstance(self.transform, list):
                 self.transform = [self.transform]
+        if self.transform:
+            assert isinstance(self.transform, list)
             for i, iv in enumerate(self.transform):
                 if isinstance(iv, str):
                     cls_conv = getattr(self.language_driver, dir_conv + 's')

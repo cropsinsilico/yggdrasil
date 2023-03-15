@@ -214,8 +214,7 @@ def test_get_schema_subtype():
     with pytest.raises(rapidjson.ValidationError):
         s.validate_component(component, invalid, **kwargs)
     s.validate_component(component, doc, subtype=subtype)
-    with pytest.raises(rapidjson.ValidationError):
-        s.validate_component(component, valid, subtype=subtype)
+    s.validate_component(component, valid, subtype=subtype)
     # Test for base
     s.validate_component(component, valid, subtype='base',
                          allow_instance=True)

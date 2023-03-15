@@ -532,6 +532,20 @@ class ComponentBase(ComponentBaseUnregistered):
         state['_input_kwargs'] = {}
         self.__dict__.update(state)
 
+    def _ygg_rapidjson(self):
+        r"""Method for getting a rapidjson-friendly version of a class.
+
+        Returns:
+            dict: Dictionary of properties obeying the schema.
+
+        """
+        out = {self._schema_subtype_key:
+               getattr(self, f"_{self._schema_subtype_key}")}
+        for k in self._schema_properties.keys():
+            if getattr(self, k, None) is not None:
+                out[k] = getattr(self, k)
+        return out
+
     def __init__(self, skip_component_schema_normalization=None,
                  additional_component_properties=None, **kwargs):
         if skip_component_schema_normalization is None:
@@ -568,8 +582,8 @@ class ComponentBase(ComponentBaseUnregistered):
              and (not self._dont_register))):
             from yggdrasil.schema import get_schema
             s = get_schema().get_component_schema(
-                comptype, subtype, relaxed=True,
-                allow_instance_definitions=True)
+                # allow_instance_definitions=True,
+                comptype, subtype, relaxed=True)
             props = list(s['properties'].keys())
             if not skip_component_schema_normalization:
                 kwargs.setdefault(self._schema_subtype_key, subtype)
@@ -585,7 +599,7 @@ class ComponentBase(ComponentBaseUnregistered):
                 from yggdrasil import rapidjson
                 try:
                     kwargs.update(rapidjson.normalize(kwargs_cpy, s))
-                except rapidjson.NormalizationError:  # pragma: debug
+                except BaseException:  # pragma: debug
                     import pprint
                     pprint.pprint(kwargs)
                     raise
