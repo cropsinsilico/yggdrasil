@@ -5022,6 +5022,9 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
 	Py_END_ALLOW_THREADS
     }
 
+    if (!cleanup_python_globals(d, isPythonDoc))
+	return NULL;
+    
     if (!accept) {
 	if (isEmptyString) {
 	    PyErr_SetString(decode_error, "Invalid empty JSON document");
@@ -5034,9 +5037,6 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
     if (validator.GetInvalidSchemaCode() == kValidateWarnings)
 	set_validation_error(validator, validation_warning, true);
 
-    if (!cleanup_python_globals(d, isPythonDoc))
-	return NULL;
-    
     Py_RETURN_NONE;
 }
 
@@ -6245,12 +6245,12 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
         return NULL;
     }
 
-    if (validator.GetInvalidSchemaCode() == kValidateWarnings)
-	set_validation_error(validator, validation_warning, true);
-
     if (!cleanup_python_globals(d, isPythonDoc))
 	return NULL;
     
+    if (validator.GetInvalidSchemaCode() == kValidateWarnings)
+	set_validation_error(validator, validation_warning, true);
+
     Py_RETURN_NONE;
 }
 

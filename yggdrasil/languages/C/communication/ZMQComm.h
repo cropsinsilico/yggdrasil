@@ -993,7 +993,17 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
     return ret;
   }
   // Check for server signon and respond
-  while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
+  while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0 ||
+	 strncmp((char*)zframe_data(out), "ZMQ_CLIENT_SIGNED_ON::", 22) == 0) {
+    if (strncmp((char*)zframe_data(out), "ZMQ_CLIENT_SIGNED_ON::", 22) == 0) {
+      zframe_destroy(&out);
+      out = zmq_comm_recv_zframe(x);
+      if (out == NULL) {
+	ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
+	return ret;
+      }
+      continue;
+    }
     char* client_address = (char*)zframe_data(out) + 23;
     client_address[zframe_size(out) - 23] = '\0';
     ygglog_debug("zmq_comm_recv(%s): Received sign-on: %s", x->name, client_address);
