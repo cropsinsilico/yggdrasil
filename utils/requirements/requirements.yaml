@@ -72,6 +72,18 @@ extras:
         method: conda_recipe
     - "{{ compiler('cxx') }}":
         method: conda_recipe
+    # - c-compiler:
+    #   - name: "{{ compiler('c') }}"
+    #     method: conda_recipe
+    #   - name: c-compiler
+    #     method: conda
+    #     os: unix
+    # - cxx-compiler:
+    #   - name: "{{ compiler('cxx') }}"
+    #     method: conda_recipe
+    #   - name: cxx-compiler
+    #     method: conda
+    #     os: unix
     - compiler-rt:
         method: conda
         os: osx
