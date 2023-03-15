@@ -579,9 +579,16 @@ class ComponentBase(ComponentBaseUnregistered):
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
                         del s['properties'][k]
+                kwargs_cpy = {k: v for k, v in kwargs.items()
+                              if k in s['properties']}
                 # Validate and normalize
                 from yggdrasil import rapidjson
-                kwargs = rapidjson.normalize(kwargs, s)
+                try:
+                    kwargs.update(rapidjson.normalize(kwargs_cpy, s))
+                except rapidjson.NormalizationError:  # pragma: debug
+                    import pprint
+                    pprint.pprint(kwargs)
+                    raise
                 # TODO: Normalization performance needs improvement
                 # import pprint
                 # print('before')
