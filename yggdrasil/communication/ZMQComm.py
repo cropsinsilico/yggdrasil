@@ -229,6 +229,7 @@ class ZMQProxy(CommBase.CommServer):
 
     server_signon_msg = b'ZMQ_SERVER_SIGNING_ON::'
     # server_signoff_msg = b'ZMQ_SERVER_SIGNING_OFF::'
+    client_signon_msg = b'ZMQ_CLIENT_SIGNED_ON::'
     
     def __init__(self, srv_address, zmq_context=None, retry_timeout=-1,
                  nretry=1, **kwargs):
@@ -285,6 +286,8 @@ class ZMQProxy(CommBase.CommServer):
                 self.debug(f"A server has signed on after {self.nsignon} "
                            f"attempts, activating proxy.")
                 self.server_active = True
+                self.server_send(self.client_signon_msg
+                                 + str(self.nsignon).encode('utf-8'))
                 return None
             # if msg[1].startswith(self.server_signoff_msg):
             #     self.sleep(1.0)
@@ -314,7 +317,12 @@ class ZMQProxy(CommBase.CommServer):
                 return False
         if self.backlog and self.server_active:
             return True
-        out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
+        try:
+            out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
+        except zmq.ZMQError as e:
+            if e.errno in (zmq.ENOTSOCK, zmq.ENOTSUP):
+                return False
+            raise
         return (out == zmq.POLLIN)
 
     def run_loop(self):
@@ -327,7 +335,9 @@ class ZMQProxy(CommBase.CommServer):
                 self.server_send(message[1])
         if (not self.server_active):
             self.nsignon += 1
-            self.server_send(self.server_signon_msg + self.cli_address.encode('utf-8'))
+            msg = self.server_signon_msg + self.cli_address.encode('utf-8')
+            self.debug(f"Sending signon message #{self.nsignon}: {msg}")
+            self.server_send(msg)
             self.sleep()
 
     def after_loop(self):
@@ -508,6 +518,8 @@ class ZMQComm(CommBase.CommBase):
         self._server_class = ZMQProxy
         self._server_kwargs = dict(zmq_context=self.context,
                                    nretry=4, retry_timeout=2.0 * self.sleeptime)
+        self.cli_signon_sent = 0
+        self.cli_signon_recv = 0
         self.cli_address = None
         self.cli_socket = None
         super(ZMQComm, self)._init_before_open(**kwargs)
@@ -1247,12 +1259,19 @@ class ZMQComm(CommBase.CommBase):
                     raise  # pragma: debug
             # Check for server sign-on
             if total_msg.startswith(ZMQProxy.server_signon_msg):
+                self.cli_signon_recv += 1
                 if self.cli_address is None:
                     self.debug("Server received signon: %s, msg=%s",
                                self.address, total_msg)
                     self.cli_address = total_msg.split(
                         ZMQProxy.server_signon_msg)[-1].decode('utf-8')
+                else:
+                    self.debug("Server received extra signon: %s, msg=%s",
+                               self.address, total_msg)
                 self._send_client_msg(total_msg)
+            elif total_msg.startswith(ZMQProxy.client_signon_msg):
+                self.cli_signon_sent = int(total_msg.split(
+                    ZMQProxy.client_signon_msg)[-1].decode('utf-8'))
             else:
                 break
         # Interpret headers
@@ -1288,10 +1307,24 @@ class ZMQComm(CommBase.CommBase):
 
         # Drain signon messages
         def drain_signon():
+            # try:
             flag, msg = self.recv(timeout=0)
+            # except BaseException as e:
+            #     print("exception: ", e)
+            #     raise
             assert flag
             assert self.is_empty_recv(msg)
-            return (self.n_msg == 0)
+            # This version of check can let signon messages slip
+            # through if the messages are sent with a large interval
+            # or are delayed
+            # if self.cli_address is not None and self.n_msg == 0:
+            #     self.sleep()
+            # return (self.cli_address is not None and self.n_msg == 0)
+            # This version of check is guaranteed to find all messages
+            # but may sleep for the entire wait period if a message is
+            # sent before the server side connection is established
+            return (self.cli_signon_sent > 0
+                    and self.cli_signon_sent == self.cli_signon_recv)
 
         multitasking.wait_on_function(drain_signon, timeout=10.0)
         
