@@ -853,7 +853,6 @@ def wait_on_function(timeout, polling_interval):
 @pytest.fixture
 def run_once(request):
     r"""Fixture indicating that the test should only be run once."""
-    print("IN RUN ONCE")
     key = (request.cls, request.function.__name__)
     if key in _test_registry:
         pytest.skip(f"{request.cls.__name__}.{request.function.__name__} "

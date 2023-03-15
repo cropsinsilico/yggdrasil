@@ -3362,6 +3362,17 @@ PythonAccept(
 #undef ASSERT_VALID_SIZE
 }
 
+static bool cleanup_python_globals(Document& d, bool isPythonDoc) {
+    if (!isPythonDoc)
+	return true;
+    rapidjson::CleanupLocals<char> cleaner;
+    if (!d.Accept(cleaner)) {
+	PyErr_SetString(normalization_error, "Error cleaning up local functions/methods in globals");
+	return false;
+    }
+    return true;
+}
+
 static bool python2document(PyObject* jsonObject, Document& d,
 			    unsigned numberMode,
 			    unsigned datetimeMode,
@@ -3373,12 +3384,15 @@ static bool python2document(PyObject* jsonObject, Document& d,
 			    unsigned expectsString,
 			    bool forSchema = false,
 			    bool forceObject = false,
-			    bool* isEmptyString = NULL) {
+			    bool* isEmptyString = NULL,
+			    bool* isPythonDoc = NULL) {
     const char* jsonStr;
     Py_ssize_t jsonStrLen = 0;
 
     if (isEmptyString != NULL)
 	isEmptyString[0] = false;
+    if (isPythonDoc)
+	isPythonDoc[0] = false;
     if ((!forceObject) && PyBytes_Check(jsonObject)) {
         jsonStr = PyBytes_AsString(jsonObject);
         if (jsonStr == NULL)
@@ -3415,6 +3429,8 @@ static bool python2document(PyObject* jsonObject, Document& d,
 	d.FinalizeFromStack();
 	if (error)
 	    return false;
+	if (isPythonDoc)
+	    isPythonDoc[0] = true;
     } else {
         Py_BEGIN_ALLOW_THREADS
         error = d.Parse(jsonStr).HasParseError();
@@ -3426,6 +3442,8 @@ static bool python2document(PyObject* jsonObject, Document& d,
 	    d.FinalizeFromStack();
 	    if (error)
 		return false;
+	    if (isPythonDoc)
+		isPythonDoc[0] = true;
 	}
     }
 
@@ -4977,11 +4995,12 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
     ValidatorObject* v = (ValidatorObject*) self;
     Document d;
     bool isEmptyString = false;
+    bool isPythonDoc = false;
     bool forceObject = (notEncoded > 0);
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
 			 v->mappingMode, v->yggdrasilMode, v->expectsString,
-			 false, forceObject, &isEmptyString))
+			 false, forceObject, &isEmptyString, &isPythonDoc))
 	return NULL;
 
     SchemaValidator validator(*v->schema);
@@ -5014,6 +5033,9 @@ static PyObject* validator_call(PyObject* self, PyObject* args, PyObject* kwargs
 
     if (validator.GetInvalidSchemaCode() == kValidateWarnings)
 	set_validation_error(validator, validation_warning, true);
+
+    if (!cleanup_python_globals(d, isPythonDoc))
+	return NULL;
     
     Py_RETURN_NONE;
 }
@@ -5534,9 +5556,12 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
         return NULL;
 
     Document d;
+    bool isEmptyString = false;
+    bool isPythonDoc = false;
     if (!python2document(jsonObject, d, numberMode, datetimeMode,
 			 uuidMode, bytesMode, iterableMode,
-			 mappingMode, yggdrasilMode, 0, false, true))
+			 mappingMode, yggdrasilMode, 0, false, true,
+			 &isEmptyString, &isPythonDoc))
 	return NULL;
 
     bool accept = false;
@@ -5553,6 +5578,8 @@ encode_schema(PyObject* self, PyObject* args, PyObject* kwargs)
     if (!accept) {
 	return NULL;
     }
+
+    cleanup_python_globals(d, isPythonDoc);
     
     if (PyErr_Occurred()) {
         Py_XDECREF(handler.root);
@@ -5856,16 +5883,21 @@ as_pure_json(PyObject* self, PyObject* args, PyObject* kwargs)
 
     Document d;
     bool isEmptyString = false;
+    bool isPythonDoc = false;
     if (!python2document(jsonObject, d, numberMode, datetimeMode,
 			 uuidMode, bytesMode, iterableMode,
 			 mappingMode, yggdrasilMode, 0, false, false,
-			 &isEmptyString))
+			 &isEmptyString, &isPythonDoc))
 	return NULL;
 
     PyHandler handler(decoderObject, objectHook, datetimeMode, uuidMode,
 		      numberMode);
     JSONCoreWrapper<PyHandler> wrapped(handler);
     if (!d.Accept(wrapped)) {
+	return NULL;
+    }
+    if (!cleanup_python_globals(d, isPythonDoc)) {
+	Py_XDECREF(handler.root);
 	return NULL;
     }
     return handler.root;
@@ -5987,11 +6019,12 @@ static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwarg
     NormalizerObject* v = (NormalizerObject*) self;
     Document d;
     bool isEmptyString = false;
+    bool isPythonDoc = false;
     bool forceObject = (notEncoded > 0);
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
 			 v->mappingMode, v->yggdrasilMode, v->expectsString,
-			 false, forceObject, &isEmptyString))
+			 false, forceObject, &isEmptyString, &isPythonDoc))
 	return NULL;
     
     SchemaNormalizer normalizer(*((NormalizerObject*) self)->schema);
@@ -6032,12 +6065,14 @@ static PyObject* normalizer_call(PyObject* self, PyObject* args, PyObject* kwarg
 	PyErr_SetString(normalization_error, "Error converting the normalized JSON document to a Python object");
 	return NULL;
     }
+
+    cleanup_python_globals(d, isPythonDoc);
     
     if (PyErr_Occurred()) {
         Py_XDECREF(handler.root);
         return NULL;
     }
-    
+
     return handler.root;
 }
 
@@ -6182,11 +6217,12 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
     NormalizerObject* v = (NormalizerObject*) self;
     Document d;
     bool isEmptyString = false;
+    bool isPythonDoc = false;
     bool forceObject = (notEncoded > 0);
     if (!python2document(jsonObject, d, v->numberMode, v->datetimeMode,
 			 v->uuidMode, v->bytesMode, v->iterableMode,
 			 v->mappingMode, v->yggdrasilMode, v->expectsString,
-			 false, forceObject, &isEmptyString))
+			 false, forceObject, &isEmptyString, &isPythonDoc))
 	return NULL;
 
     SchemaValidator validator(*(v->schema));
@@ -6211,6 +6247,9 @@ static PyObject* normalizer_validate(PyObject* self, PyObject* args, PyObject* k
 
     if (validator.GetInvalidSchemaCode() == kValidateWarnings)
 	set_validation_error(validator, validation_warning, true);
+
+    if (!cleanup_python_globals(d, isPythonDoc))
+	return NULL;
     
     Py_RETURN_NONE;
 }
