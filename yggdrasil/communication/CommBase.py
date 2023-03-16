@@ -555,6 +555,7 @@ class CommBase(tools.YggClass):
                         'allowSingular': True},
         'as_array': {'type': 'boolean', 'default': False},
         'filter': {'$ref': '#/definitions/filter'},
+        'serializer': {'$ref': '#/definitions/serializer'},
         'transform': {
             'type': 'array',
             'items': {'anyOf': [
@@ -578,9 +579,10 @@ class CommBase(tools.YggClass):
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _schema_excluded_from_class_validation = ['datatype']
-    _schema_additional_kwargs = {'allowSingular': 'name',
-                                 'pushProperties': {
-                                     '$properties/datatype': True}}
+    _schema_additional_kwargs = {
+        'allowSingular': 'name',
+        'pushProperties': {'$properties/datatype': True,
+                           '$properties/serializer': True}}
     is_file = False
     _maxMsgSize = 0
     address_description = None
@@ -749,12 +751,13 @@ class CommBase(tools.YggClass):
                 serializer information.
 
         """
-        seri_instance = None
+        # TODO: Deprecate serializer_class & serializer_kwargs and
+        # remove this method
         seri_cls = kwargs.pop('serializer_class', None)
         seri_kws = kwargs.pop('serializer_kwargs', {})
         datatype = kwargs.get('datatype', None)
         serializer = kwargs.pop('serializer', None)
-        if ('datatype' in cls._schema_properties) and (datatype is not None):
+        if 'datatype' in cls._schema_properties and datatype is not None:
             seri_kws.setdefault('datatype', datatype)
             # TODO: Fix push/pull of schema properties
             if datatype == constants.DEFAULT_DATATYPE:
@@ -776,23 +779,21 @@ class CommBase(tools.YggClass):
             serializer = None
         elif isinstance(serializer, type):
             seri_cls = serializer
-        # elif isinstance(serializer, SerializeBase):
-        #     seri_cls = type(serializer)
-        #     seri_instance = serializer
-        #     serializer = None
+            serializer = None
         if seri_cls is not None:
             seri_kws.setdefault('seritype', seri_cls._seritype)
-        if serializer is not None:
-            kwargs['serializer'] = serializer
-        else:
+        if serializer is None:
             if len(seri_kws) == 0:
                 seri_kws['seritype'] = cls._default_serializer
-            kwargs['serializer'] = seri_kws
-        return seri_instance
+            serializer = seri_kws
+        if 'serializer' in cls._schema_properties:
+            kwargs['serializer'] = serializer
+        else:
+            return serializer
 
     def _init_before_open(self, **kwargs):
-        r"""Initialization steps that should be performed after base class, but
-        before the comm is opened."""
+        r"""Initialization steps that should be performed after base
+        class, but before the comm is opened."""
         # Only update serializer if not already set
         seri_kws = getattr(self, 'serializer', {})
         if isinstance(seri_kws, dict):
@@ -811,10 +812,9 @@ class CommBase(tools.YggClass):
         dir_conv = f'{self.direction}_converter'
         if not getattr(self, 'transform', []):
             self.transform = getattr(self.serializer, dir_conv, [])
+        if self.transform:
             if not isinstance(self.transform, list):
                 self.transform = [self.transform]
-        if self.transform:
-            assert isinstance(self.transform, list)
             for i, iv in enumerate(self.transform):
                 if isinstance(iv, str):
                     cls_conv = getattr(self.language_driver, dir_conv + 's')

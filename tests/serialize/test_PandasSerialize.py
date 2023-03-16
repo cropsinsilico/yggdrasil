@@ -36,13 +36,14 @@ class TestPandasSerialize(base_class):
             instance.func_serialize(None)
 
     def test_deserialize_no_header(self, instance, testing_options,
-                                   python_class, map_sent2recv, options):
+                                   python_class, map_sent2recv, options,
+                                   initialize_instance):
         r"""Test deserialization of frame output without a header."""
         if options.get('no_header', False):
             return
         kws = instance.get_testing_options(no_header=True)
         kws['kwargs'].pop('no_header', None)
-        no_head_inst = python_class(**kws['kwargs'])
+        no_head_inst = python_class(from_message=True, **kws['kwargs'])
         x = no_head_inst.serialize(kws['objects'][0])
         y = instance.deserialize(x)[0]
-        assert(y == map_sent2recv(testing_options['objects'][0]))
+        assert y == map_sent2recv(testing_options['objects'][0])

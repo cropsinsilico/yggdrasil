@@ -36,7 +36,9 @@ def normalize_objects(patch_equality, functions_equality):
                'seritype': 'ply',
                'working_dir': os.getcwd()},
               {'inputs': 'outputB',
-               'outputs': 'fileB.txt',
+               'outputs': {
+                   'name': 'fileB.txt',
+                   'filetype': 'table'},
                'working_dir': os.getcwd()}]},
          {'models': [{
              'name': 'modelA',
@@ -81,9 +83,8 @@ def normalize_objects(patch_equality, functions_equality):
                    'working_dir': os.getcwd()}],
                'outputs': [
                    {'name': 'fileB.txt',
-                    'filetype': 'binary',
-                    'working_dir': os.getcwd(),
-                    'serializer': {'seritype': 'default'}}],
+                    'filetype': 'table',
+                    'working_dir': os.getcwd()}],
                'working_dir': os.getcwd()}]})]
 
 

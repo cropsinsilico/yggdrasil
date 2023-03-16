@@ -8,7 +8,7 @@ from tests import TestComponentBase as base_class
 
 def test_demote_string():
     r"""Test format str creation of typedef."""
-    x = SerializeBase.SerializeBase(format_str='%s')
+    x = SerializeBase.SerializeBase(format_str='%s', from_message=True)
     assert x.datatype == {'type': 'array',
                           'items': [{'type': 'scalar',
                                      'subtype': 'string'}],
@@ -63,7 +63,13 @@ class TestSerializeBase(base_class):
             return nested_approx(obj)
         return wrapped_map_sent2recv
 
-    def test_field_specs(self, instance, testing_options, nested_approx):
+    @pytest.fixture
+    def initialize_instance(self, instance, testing_options):
+        if not instance.initialized:
+            instance.update_serializer(from_message=True)
+
+    def test_field_specs(self, instance, testing_options, nested_approx,
+                         initialize_instance):
         r"""Test field specifiers."""
         assert instance.numpy_dtype == testing_options['dtype']
         assert (instance.extra_kwargs
@@ -167,7 +173,8 @@ class TestSerializeBase(base_class):
         # assert ihead == empty_head(msg)
         
     def test_deserialize_empty(self, instance, empty_msg, empty_head,
-                               testing_options, map_sent2recv):
+                               testing_options, map_sent2recv,
+                               initialize_instance):
         r"""Test call for empty string."""
         out, head = instance.deserialize(empty_msg)
         assert map_sent2recv(testing_options['empty']) == out

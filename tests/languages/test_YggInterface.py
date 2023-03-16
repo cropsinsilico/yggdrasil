@@ -360,12 +360,9 @@ class TestYggClass(base_class):
             close_comm(out)
 
     @pytest.fixture(autouse=True)
-    def pandas_equality_patch(self, monkeypatch, pandas_equality):
+    def _pandas_equality_patch(self, pandas_equality_patch):
         r"""Patch pandas DataFrame so that equals is used instead of '=='"""
-        with monkeypatch.context() as m:
-            import pandas
-            m.setattr(pandas.DataFrame, '__eq__', pandas_equality)
-            yield
+        pass
 
     def test_msg(self, filecomm, testing_options, instance, timeout,
                  test_comm, iodriver, wait_on_function,

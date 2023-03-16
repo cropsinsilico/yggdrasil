@@ -54,7 +54,6 @@ class SerializeBase(tools.YggClass):
         'comment': {'type': 'string',
                     'default': constants.DEFAULT_COMMENT_STR},
         'datatype': {'type': 'schema'}}
-    _schema_additional_kwargs = {'default': {}}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
     default_datatype = constants.DEFAULT_DATATYPE
@@ -541,7 +540,7 @@ class SerializeBase(tools.YggClass):
             if datatype is None:
                 datatype = {}
             # Update datatype from oldstyle keywords in extra_kwargs
-            if from_message or datatype != self.default_datatype:
+            if from_message or (datatype and datatype != self.default_datatype):
                 datatype = self.update_typedef_from_oldstyle(datatype)
             if 'type' in datatype:
                 # TODO: Fix push/pull of schema properties
@@ -616,29 +615,34 @@ class SerializeBase(tools.YggClass):
                         cpy = copy.deepcopy(typedef)
                         typedef.clear()
                         typedef.update(type='array', items=[cpy])
-                    # This continue is covered, but the optimization
-                    # causes it to be skipped at runtime
-                    # https://bitbucket.org/ned/coveragepy/issues/198/
-                    # continue-marked-as-not-covered
-                    continue  # pragma: no cover
+                    else:  # pragma: debug
+                        continue
                 as_array = self.extra_kwargs.get('as_array',
                                                  getattr(self, 'as_array', False))
-                typedef.update(type='array', items=[])
+                typedef.setdefault('type', 'array')
+                typedef.setdefault('items', [])
                 for i, fmt in enumerate(fmts):
                     nptype = self.cformat2nptype(fmt)
-                    itype = rapidjson.encode_schema(np.ones(1, nptype),
-                                                    minimal=True)
-                    if (fmt == '%s') and ('precision' in itype):
-                        del itype['precision']
+                    itype_fmt = rapidjson.encode_schema(
+                        np.ones(1, nptype), minimal=True)
                     if as_array:
-                        itype['type'] = '1darray'
+                        itype_fmt['type'] = '1darray'
                     else:
-                        itype['type'] = 'scalar'
-                        if (((itype['subtype'] in constants.FLEXIBLE_TYPES)
-                             and ('precision' in itype))):
-                            del itype['precision']
-                        # itype['type'] = itype.pop('subtype')
-                    typedef['items'].append(itype)
+                        itype_fmt['type'] = 'scalar'
+                        if itype_fmt['subtype'] in constants.FLEXIBLE_TYPES:
+                            itype_fmt.pop('precision', None)
+                    if len(typedef['items']) < (i + 1):
+                        typedef['items'].append(itype_fmt)
+                        continue
+                    itype = typedef['items'][i]
+                    itype_fmt['type'] = itype['type']
+                    if ((itype_fmt['subtype'] in constants.FLEXIBLE_TYPES
+                         and (itype_fmt['type'] == 'scalar'
+                              or ('encoding' in itype
+                                  and 'encoding' not in itype_fmt
+                                  and 'precision' in itype)))):
+                        itype_fmt.pop('precision', None)
+                    typedef['items'][i].update(itype_fmt)
                 used.append('as_array')
                 updated.append('format_str')
             elif k == 'as_array':
@@ -791,8 +795,12 @@ class SerializeBase(tools.YggClass):
         if isinstance(args, bytes) and (args == constants.YGG_MSG_EOF):
             metadata['raw'] = True
         if not metadata.get('raw', False):
-            args = self.normalize(args)
+            was_init = self.initialized
+            if was_init:
+                args = self.normalize(args)
             self.initialize_from_message(args, **metadata)
+            if (not was_init) and self.initialized:
+                args = self.normalize(args)
         if add_serializer_info:
             self.verbose_debug("serializer_info = %.100s...",
                                str(self.serializer_info))
