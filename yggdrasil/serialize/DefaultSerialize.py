@@ -88,6 +88,8 @@ class DefaultSerialize(SerializeBase):
         if field_names is None:
             assert not as_array
             return super(DefaultSerialize, cls).object2dict(obj, **kwargs)
+        if isinstance(obj, np.ndarray):
+            return serialize.numpy2dict(obj)
         return serialize.list2dict(obj, names=field_names)
 
     @classmethod

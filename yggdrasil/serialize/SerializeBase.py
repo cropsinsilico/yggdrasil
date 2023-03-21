@@ -74,10 +74,9 @@ class SerializeBase(tools.YggClass):
         self._tmp = {}
         self._initialized = False
         # Update datatype from other keyword arguments
-        if self.datatype is None:
-            self.datatype = self.default_datatype
-        else:
+        if self.datatype is not None:
             kwargs['datatype'] = self.datatype
+        self.datatype = self.default_datatype
         self.update_serializer(**kwargs)
 
     @property
@@ -881,8 +880,12 @@ class SerializeBase(tools.YggClass):
             out = msg
         else:
             out = self.func_deserialize(msg)
-            out = self.normalize(out)
+            was_init = self.initialized
+            if was_init:
+                out = self.normalize(out)
             self.initialize_from_message(out, **metadata)
+            if (not was_init) and self.initialized:
+                out = self.normalize(out)
         return out, metadata
 
     def decode(self, msg, no_data=False, metadata=None):
