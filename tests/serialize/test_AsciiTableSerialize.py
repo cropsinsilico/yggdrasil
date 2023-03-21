@@ -23,10 +23,10 @@ def test_discover_header_no_header(tmpdir):
     inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
     inst.deserialize_file_header(fd)
     if platform._is_win:  # pragma: windows
-        assert(inst.format_str == b'%d %6s\n')
+        assert inst.format_str == b'%d %6s\n'
     else:
-        assert(inst.format_str == b'%ld %6s\n')
-    assert(inst.field_names == ('f0', 'f1'))
+        assert inst.format_str == b'%ld %6s\n'
+    assert inst.field_names == ('f0', 'f1')
 
 
 def test_discover_header_one_element(tmpdir):
@@ -36,8 +36,8 @@ def test_discover_header_one_element(tmpdir):
     fd = fd0.open('rb')
     inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
     inst.deserialize_file_header(fd)
-    assert(inst.format_str == b'%6s\n')
-    assert(inst.field_names == ('f0',))
+    assert inst.format_str == b'%6s\n'
+    assert inst.field_names == ('f0',)
 
 
 _options = [
@@ -71,21 +71,23 @@ class TestAsciiTableSerialize(base_class):
         r"""Arguments that should be provided when getting testing options."""
         return request.param
 
-    def test_field_specs(self, instance, testing_options, nested_approx):
+    def test_field_specs(self, instance, testing_options, nested_approx,
+                         initialize_instance):
         r"""Test field specifiers."""
         if not instance.initialized:
             instance.serialize(testing_options['objects'][0],
                                no_metadata=True)
         super(TestAsciiTableSerialize, self).test_field_specs(
-            instance, testing_options, nested_approx)
+            instance, testing_options, nested_approx,
+            initialize_instance)
         # Specific to this class
         if 'format_str' in testing_options:
-            assert(instance.format_str
-                   == testing_options['format_str'].encode("utf-8"))
+            assert (instance.format_str
+                    == testing_options['format_str'].encode("utf-8"))
         field_names = testing_options.get('field_names', None)
-        assert(instance.field_names == field_names)
+        assert instance.field_names == field_names
         field_units = testing_options.get('field_units', None)
-        assert(instance.field_units == field_units)
+        assert instance.field_units == field_units
 
 
 class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
