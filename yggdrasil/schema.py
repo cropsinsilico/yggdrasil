@@ -410,6 +410,23 @@ class ComponentSchema(object):
         raise ValueError("Could not determine subtype "
                          "for document: %s" % doc)  # pragma: debug
 
+    # def get_base_schema(self):
+    #     r"""Get a base schema containing properties that are the same
+    #     for all component subtypes."""
+    #     if self._base_schema is not None:
+    #         return copy.deepcopy(self._base_schema)
+    #     if self._base_name is None or self._base_name not in self._storage:
+    #         return None
+    #     self._base_schema = dict(
+    #         copy.deepcopy(self._storage[self._base_name],
+    #                       title=f"{self.schema_type}_base",
+    #                       description=(f"Base schema for all "
+    #                                    f"{self.schema_type} component "
+    #                                    f"subtypes."),
+    #                       additionalProperties=True,
+    #                       **self._base_kwargs)
+    #     return copy.deepcopy(self._base_schema)
+
     def get_subtype_schema(self, subtype, unique=False, relaxed=False,
                            allow_instance=False, for_form=False):
         r"""Get the schema for the specified subtype.
@@ -456,6 +473,11 @@ class ComponentSchema(object):
                                 out['properties'][k]['options']['dependencies'][
                                     self.subtype_key] += (
                                         x['properties'][self.subtype_key]['enum'])
+            elif not (relaxed or for_form):
+                # Add place holders
+                for x in self._storage.values():
+                    for k, v in x['properties'].items():
+                        self._add_placeholder(out['properties'], k, v)
         else:
             if subtype not in self._storage:
                 s2c = self.subtype2class
@@ -483,16 +505,18 @@ class ComponentSchema(object):
                 if isinstance(self._base_schema.get('allowSingular', False),
                               str):
                     skip_props.append(self._base_schema['allowSingular'])
-                for k in self._base_schema['properties'].keys():
-                    if (k not in skip_props) and (k in out['properties']):
+                for k, v in self._base_schema['properties'].items():
+                    if ((k not in skip_props and k in out['properties']
+                         and k not in out.get('required', []))):
                         del out['properties'][k]
+                    if not relaxed:
+                        self._add_placeholder(out['properties'], k, v)
                 if not out['properties']:  # pragma: no cover
                     del out['properties']
             else:
                 out['properties'][self.subtype_key]['default'] = out[
                     'properties'][self.subtype_key]['enum'][0]
-        if relaxed:
-            out['additionalProperties'] = True
+        out['additionalProperties'] = relaxed
         if allow_instance:
             if subtype == 'base':
                 comp_cls = self.base_subtype_class
@@ -523,64 +547,217 @@ class ComponentSchema(object):
                 order.insert(0, baseSchemaKey)
         return order
 
-    def get_schema(self, relaxed=False, allow_instance=False, for_form=False,
-                   full=False):
+    @classmethod
+    def _subtype_defkey(cls, schema_type, subtype):
+        return f"{schema_type}-subtype-{subtype}".replace('+', 'p')
+
+    @classmethod
+    def _is_placeholder(cls, x):
+        # return ((len(x) == 0) or (len(x) == 1 and 'aliases' in x))
+        return (x is True)
+
+    @classmethod
+    def _add_placeholder(cls, props, k, v):
+        if k not in props:
+            props[k] = {}
+            if 'aliases' in v:
+                for alias in v['aliases']:
+                    props[alias] = {}
+            # vnew = {}
+            # if 'aliases' in v:
+            #     vnew['aliases'] = copy.deepcopy(v['aliases'])
+            # props[k] = vnew
+
+    def get_subtype_definition_ref(self, subtype):
+        r"""Get the address for a subtype's schema definition that can
+        be used in references.
+
+        Args:
+            subtype (str): Component subtype.
+
+        Returns:
+            str: Definition address.
+
+        """
+        if subtype in self.class2subtype:
+            subtype = self.class2subtype[subtype][0]
+        key = self._subtype_defkey(self.schema_type, subtype)
+        return f"#/definitions/{key}"
+
+    def get_subtype_definitions(self, unique='both',
+                                relaxed=False, **kwargs):
+        r"""Get subtype definitions.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to
+                get_subtype_schema calls for each subtype.
+
+        Returns:
+            dict: Dictionary of subtype definitions.
+
+        """
+        order = self.get_subtype_order()
+        out = {}
+        unique_base = (unique in ['base', 'both'])
+        unique_subt = (unique in ['subtype', 'both'])
+        relaxed_base = True
+        relaxed_subt = True
+        if not relaxed:
+            if unique in ['base', 'both']:
+                relaxed_base = True
+                relaxed_subt = False
+            elif unique in ['subtype']:
+                relaxed_base = False
+                relaxed_subt = True
+            else:
+                relaxed_base = False
+                relaxed_subt = False
+        base = self.get_subtype_schema('base', unique=unique_base,
+                                       relaxed=relaxed_base, **kwargs)
+        out[self._subtype_defkey(self.schema_type, "base")] = base
+        for subC in order:
+            subT = self.class2subtype[subC][0]
+            x = self.get_subtype_schema(subC, unique=unique_subt,
+                                        relaxed=relaxed_subt, **kwargs)
+            out[self._subtype_defkey(self.schema_type, subT)] = x
+            # TODO: Unclear what this should be if properties added
+            # via relaxed
+            if not unique_subt:
+                for k in ['pushProperties', 'pullProperties']:
+                    if k in base:
+                        x.setdefault(k, {})
+                        x[k].update(base[k])
+            else:
+                # Only remove these if they will be in the base
+                for k in ['pushProperties', 'pullProperties']:
+                    if k in base:
+                        x.pop(k, None)
+        return out
+
+    def get_driver_definition(self, allow_driver=False):
+        r"""Get a definition for a driver schema.
+
+        Args:
+            allow_driver (bool, optional): If not True, the outputs will
+                be a null schema. Defaults to False.
+
+        Returns:
+            dict: Driver schema.
+
+        """
+        if allow_driver:
+            out = {"allOf": [
+                {"$ref": f"#/definitions/{self.schema_type}"},
+                {"required": ["driver", "args"],
+                 "properties": {
+                     'driver': {'type': 'string',
+                                'deprecated': True,
+                                'description': (
+                                    '[DEPRECATED] Name of driver '
+                                    'class that should be used.')},
+                     'args': {'type': 'string',
+                              'deprecated': True,
+                              'description': (
+                                  '[DEPRECATED] Arguments that should '
+                                  'be provided to the driver.')}}}
+            ]}
+            if self.schema_type == 'file':
+                out['allOf'][1]['required'].append('working_dir')
+                out['allOf'][1]['properties']['working_dir'] = {
+                    'type': 'string'}
+        else:
+            out = {'type': 'null'}
+        return out
+
+    def get_definitions(self, for_form=False, allow_instance=False,
+                        allow_driver=False, full=False, relaxed=False,
+                        **kwargs):
+        r"""Get the set of definitions defining this component type.
+
+        Args:
+            for_form (bool, optional): If True, the returned schema will
+                be formatted for easy parsing by form generation tools.
+                Defaults to False. Causes relaxed, allow_instance, and
+                full to be ignored.
+            allow_instance (bool, optional): If True, the returned schema
+                will validate instances of this component in addition to
+                documents describing a component. Defaults to False.
+            allow_driver (bool, optional): If True, the returned
+                definitions will include the deprecated driver based
+                schemas. Defaults to False.
+            full (bool, optional): If True, properties are made explicit
+                for each component subtype resulting in a larger schema
+                that has a simplified logic for parsing. If False, the
+                schema will be compressed such that properties occuring
+                across all component subtypes will only occur once in
+                the base schema. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to
+                get_subtype_definitions calls.
+
+        Returns:
+            dict: Set of component definitions.
+
+        """
+        combo = self.get_schema(for_form=for_form,
+                                allow_instance=allow_instance)
+        out = {self.schema_type: combo}
+        if full:
+            out.update(self.get_subtype_definitions(
+                unique='base', relaxed=relaxed, **kwargs))
+        else:
+            out.update(self.get_subtype_definitions(
+                unique='subtype', relaxed=relaxed, **kwargs))
+        if ((self.schema_type in ['connection', 'comm', 'file', 'model']
+             and not for_form)):
+            out[f"{self.schema_type}_driver"] = self.get_driver_definition(
+                allow_driver=allow_driver)
+        return out
+
+    def get_schema(self, for_form=False, allow_instance=False):
         r"""Get the schema defining this component.
 
         Args:
-            relaxed (bool, optional): If True, the returned schema (and any
-                definitions it includes) are relaxed to allow for objects with
-                objects with additional properties to pass validation. Defaults
-                to False.
-            allow_instance (bool, optional): If True, the returned schema will
-                validate instances of this component in addition to documents
-                describing a component. Defaults to False.
-            for_form (bool, optional): If True, the returned schema will be
-                formatted for easy parsing by form generation tools. Defaults
-                to False. Causes relaxed, allow_instance, and full to be ignored.
-            full (bool, optional): If True, properties are made explicit for
-                each component subtype resulting in a larger schema that has
-                a simplified logic for parsing. If False, the schema will be
-                compressed such that properties occuring across all component
-                subtypes will only occur once in the base schema. Defaults to
-                False.
+            for_form (bool, optional): If True, the returned schema will
+                be formatted for easy parsing by form generation tools.
+                Defaults to False. Causes relaxed, allow_instance, and
+                full to be ignored.
+            allow_instance (bool, optional): If True, the returned schema
+                will validate instances of this component in addition to
+                documents describing a component. Defaults to False.
 
         Returns:
             dict: Schema for this component.
 
         """
-        out = {'description': 'Schema for %s components.' % self.schema_type,
-               'title': self.schema_type}
+        combo = {
+            'description': f'Schema for {self.schema_type} components.',
+            'title': f"complete-{self.schema_type}-{self.subtype_key}"}
         if for_form:
-            out.update(self.get_subtype_schema('base', for_form=True))
-            return out
+            combo.update(self.get_subtype_schema('base', for_form=True))
+            return combo
         order = self.get_subtype_order()
-        if full:
-            out['allOf'] = [
-                self.get_subtype_schema('base', relaxed=relaxed,
-                                        unique=True),
-                {'anyOf': [self.get_subtype_schema(x, unique=False)
-                           for x in order]}]
-            for k in ['pushProperties', 'pullProperties']:
-                if k in out['allOf'][0]:
-                    for x in out['allOf'][1]['anyOf']:
-                        x.setdefault(k, {})
-                        x[k].update(out['allOf'][0][k])
-        else:
-            out['allOf'] = [
-                self.get_subtype_schema('base', relaxed=relaxed,
-                                        unique=False),
-                {'anyOf': [self.get_subtype_schema(x, unique=True)
-                           for x in order]}]
-            for k in ['pushProperties', 'pullProperties']:
-                if k in out['allOf'][0]:
-                    for x in out['allOf'][1]['anyOf']:
-                        x.pop(k, None)
+        combo['allOf'] = [
+            {'$ref': self.get_subtype_definition_ref("base")},
+            {'anyOf': [{'$ref': self.get_subtype_definition_ref(x)}
+                       for x in order]}]
+        # This does allow for properties to be removed via push/pull
+        # but is more elegant than duplicating properties in the base
+        # schema and so is preservered
+        # if not relaxed:
+        #     all_prop = set()
+        #     for x in self._storage.values():
+        #         all_prop.update(set(x['properties'].keys()))
+        #         for v in x['properties'].values():
+        #             all_prop.update(set(v.get('aliases', [])))
+        #     combo['allOf'].append(
+        #         {'type': 'object',
+        #          'additionalProperties': False,
+        #          'properties': {k: {} for k in all_prop}})
         if allow_instance:
-            out['oneOf'] = [{'allOf': out.pop('allOf')},
-                            {'type': 'instance',
-                             'class': self.base_subtype_class}]
-        return out
+            combo['oneOf'] = [{'allOf': combo.pop('allOf')},
+                              {'type': 'instance',
+                               'class': self.base_subtype_class}]
+        return combo
 
     def set_required_by_subtype(self, props):
         r"""Update schema so that specified properties are required at
@@ -595,7 +772,13 @@ class ComponentSchema(object):
             return
         for x in self._storage.values():
             x.setdefault('required', [])
-            x['required'] += [k for k in props if k not in x['required']]
+            x.setdefault('properties', {})
+            for k in props:
+                if k not in x['required']:
+                    x['required'].append(k)
+                if k not in x['properties']:
+                    x['properties'][k] = copy.deepcopy(
+                        self._base_schema['properties'][k])
         if self._base_schema.get('required', []):
             for k in props:
                 if k in self._base_schema['required']:
@@ -604,7 +787,7 @@ class ComponentSchema(object):
                 del self._base_schema['required']
 
     @classmethod
-    def from_schema(cls, schema, schema_registry=None):
+    def from_definitions(cls, schema, defs, schema_registry=None):
         r"""Construct a ComponentSchema from a schema.
 
         Args:
@@ -614,48 +797,31 @@ class ComponentSchema(object):
             ComponentSchema: Schema with information from schema.
 
         """
-        schema_type = schema['title']
-        subt_schema = schema['allOf'][1]['anyOf']
-        # Determine subtype key
-        subt_overlap = set(list(subt_schema[0]['properties'].keys()))
-        subt_singular = subt_schema[0].get('allowSingular', False)
-        subt_props = subt_overlap.copy()
+        _, schema_type, subtype_key = schema['title'].split('-')
+        subt_base = defs[cls._subtype_defkey(schema_type, "base")]
+        subt_schema = [defs[x['$ref'].split('#/definitions/')[-1]]
+                       for x in schema['allOf'][1]['anyOf']]
         subt_required_by_subtype = set()
-        for v in subt_schema[1:]:
-            ikeys = set(list(v['properties'].keys()))
-            subt_overlap &= ikeys
-            # subt_props |= ikeys
-            # Sub types that have overlapping properties should only
-            # differ in the default value and so should be required
-            # for all subtypes, but not the base so that the default
-            # can be set for subtypes or an error is raised if there
-            # is no default and the property is missing.
-            for k in ikeys:
-                if ((k == 'driver'
-                     or cls.compare_body(
-                         schema['allOf'][0]['properties'][k],
-                         v['properties'][k], ignore_keys=['description']))):
-                    subt_props.add(k)
-                elif k in schema['allOf'][0].get('required', []):
+        # Sub types that have overlapping properties should only
+        # differ in the default value and so should be required
+        # for all subtypes, but not the base so that the default
+        # can be set for subtypes or an error is raised if there
+        # is no default and the property is missing.
+        for v in subt_schema:
+            for k in v['properties'].keys():
+                if ((k != 'driver'
+                     and not cls._is_placeholder(v['properties'][k])
+                     and k in v.get('required', [])
+                     and not cls.compare_body(
+                         subt_base['properties'][k], v['properties'][k],
+                         ignore_keys=['description']))):
                     subt_required_by_subtype.add(k)
-        if 'driver' in subt_overlap:
-            subt_overlap.remove('driver')
-        # if schema_type == 'model':
-        #     print(f"from schema {schema_type}:"
-        #           f"\n\tsubt_overlap = {subt_overlap}"
-        #           f"\n\tsubt_props = {subt_props}"
-        #           f"\n\tsubt_required_by_subtype = {subt_required_by_subtype}")
-        # if 'driver' in subt_required_by_subtype:
-        #     subt_props.add('driver')
-        #     subt_required_by_subtype.remove('driver')
-        if len(subt_overlap) > 1 and subt_singular in subt_overlap:
-            subt_overlap.remove(subt_singular)
-        assert len(subt_overlap) == 1
-        subtype_key = list(subt_overlap)[0]
-        assert subtype_key in schema['allOf'][0]['properties']
         # Initialize schema
         out = cls(schema_type, subtype_key, schema_registry=schema_registry)
-        out._base_schema = schema['allOf'][0]
+        out._base_schema = subt_base
+        # for x in [subt_base, subt_schema[0]]:
+        #     if 'default' in x['properties'].get(subtype_key, {}):
+        #         out.default_subtype = x['properties'][subtype_key]['default']
         if 'default' in out._base_schema['properties'][subtype_key]:
             out.default_subtype = out._base_schema[
                 'properties'][subtype_key].pop('default')
@@ -669,15 +835,28 @@ class ComponentSchema(object):
                 out.module = v_module
             else:
                 assert v_module == out.module
-        # Remove subtype specific properties
+        # Remove placeholder properties in base and subtypes
+        for x in [out._base_schema] + list(out._storage.values()):
+            for k in list(x['properties'].keys()):
+                if cls._is_placeholder(x['properties'][k]):
+                    del x['properties'][k]
+        # Remove properties from base that are only specified in
+        # subtype schemas
+        subt_props = set()
+        for x in out._storage.values():
+            subt_props.update(set(x['properties'].keys()))
+        for k in ['driver', out.subtype_key]:
+            if k in subt_props:
+                subt_props.remove(k)
+        subt_props -= set(subt_required_by_subtype)
         for k in subt_props:
-            if k != out.subtype_key and k != 'driver':
+            if k in out._base_schema['properties']:
                 del out._base_schema['properties'][k]
         out._base_schema['additionalProperties'] = True
         # Update subtype properties with general properties
         for x in out._storage.values():
             for k, v in out._base_schema['properties'].items():
-                if ((k != out.subtype_key and k != 'driver'
+                if ((k not in [out.subtype_key, 'driver']
                      and k not in x['properties'])):
                     x['properties'][k] = copy.deepcopy(v)
             x['additionalProperties'] = False
@@ -685,17 +864,6 @@ class ComponentSchema(object):
         # level to allow for subtype specific defaults
         out.set_required_by_subtype(subt_required_by_subtype)
         return out
-
-    @property
-    def schema(self):
-        r"""dict: Schema for this component."""
-        return self.get_schema()
-    
-    @property
-    def full_schema(self):
-        r"""dict: Schema for evaluating YAML input file that fully specifies
-        the properties for each component."""
-        return self.get_schema(full=True)
 
     @classmethod
     def from_registry(cls, schema_type, registry, **kwargs):
@@ -1075,39 +1243,15 @@ class SchemaRegistry(object):
         if allow_driver:
             cache_key += '_driver'
         if cache_key not in self._cache:
-            out = {k: v.get_schema(relaxed=relaxed,
-                                   allow_instance=allow_instance,
-                                   for_form=for_form, full=full)
-                   for k, v in self._storage.items()}
+            out = {}
+            for k, v in self._storage.items():
+                out.update(v.get_definitions(for_form=for_form,
+                                             relaxed=relaxed,
+                                             allow_instance=allow_instance,
+                                             allow_driver=allow_driver,
+                                             full=full))
             for k in self.required_components:
                 out.setdefault(k, {'type': 'string'})
-            if allow_driver:
-                for k, v in self._storage.items():
-                    if k not in ['connection', 'comm', 'file', 'model']:
-                        continue
-                    out[k + '_driver'] = {"allOf": [
-                        {"$ref": f"#/definitions/{k}"},
-                        {"required": ["driver", "args"],
-                         "properties": {
-                             'driver': {'type': 'string',
-                                        'deprecated': True,
-                                        'description': (
-                                            '[DEPRECATED] Name of driver '
-                                            'class that should be used.')},
-                             'args': {'type': 'string',
-                                      'deprecated': True,
-                                      'description': (
-                                          '[DEPRECATED] Arguments that should '
-                                          'be provided to the driver.')}}}
-                    ]}
-                    if k == 'file':
-                        out[k + '_driver']['allOf'][1]['required'].append('working_dir')
-                        out[k + '_driver']['allOf'][1]['properties']['working_dir'] = {
-                            'type': 'string'}
-                for k in self.required_components:
-                    if k not in ['connection', 'comm', 'file', 'model']:
-                        continue
-                    out.setdefault(k + '_driver', {'type': 'null'})
             self._cache[cache_key] = out
         out = self._cache[cache_key]
         if not dont_copy:
@@ -1434,9 +1578,12 @@ class SchemaRegistry(object):
             raise Exception("Failed to load schema from %s" % fname)
         # Create components
         for k, v in schema.get('definitions', {}).items():
-            if k.endswith('_driver'):
+            # if k.endswith('_driver'):
+            #     continue
+            if not v.get('title', '').startswith('complete-'):
                 continue
-            icomp = ComponentSchema.from_schema(v, schema_registry=self)
+            icomp = ComponentSchema.from_definitions(
+                v, schema['definitions'], schema_registry=self)
             self.add(k, icomp)
 
     def save(self, fname, schema=None):
@@ -1461,7 +1608,7 @@ class SchemaRegistry(object):
 
         """
         if normalize:
-            return self.normalize(obj)
+            return self.normalize(obj, **kwargs)
         # TODO: Check schema?
         return rapidjson.validate(obj, self.get_schema(**kwargs))
 

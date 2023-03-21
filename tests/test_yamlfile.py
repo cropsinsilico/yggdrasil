@@ -923,6 +923,17 @@ class TestYamlMissingModelArgsError(YamlTestBaseError):
                   '      args: {{ %s }}' % _yaml_env],)
 
 
+class TestYamlMissingModelNameError(YamlTestBaseError):
+    r"""Test error when there is a missing arguments to a model."""
+    _error = rapidjson.NormalizationError
+    _contents = (['models:',
+                  '  - args: modelA',
+                  '    inputs:',
+                  '      name: inputA',
+                  '      driver: FileInputDriver',
+                  '      args: {{ %s }}' % _yaml_env],)
+
+
 class TestYamlMissingIOArgsError_input(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an input driver."""
     _error = rapidjson.NormalizationError

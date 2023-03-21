@@ -582,7 +582,6 @@ class ComponentBase(ComponentBaseUnregistered):
              and (not self._dont_register))):
             from yggdrasil.schema import get_schema
             s = get_schema().get_component_schema(
-                # allow_instance_definitions=True,
                 comptype, subtype, relaxed=True)
             props = list(s['properties'].keys())
             if not skip_component_schema_normalization:
@@ -593,24 +592,17 @@ class ComponentBase(ComponentBaseUnregistered):
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
                         del s['properties'][k]
-                kwargs_cpy = {k: v for k, v in kwargs.items()
-                              if k in s['properties']}
                 # Validate and normalize
                 from yggdrasil import rapidjson
+                # import pprint
+                # print(f'before: {self}\n{pprint.pformat(kwargs)}')
                 try:
-                    kwargs.update(rapidjson.normalize(kwargs_cpy, s))
+                    kwargs = rapidjson.normalize(kwargs, s)
                 except BaseException:  # pragma: debug
                     import pprint
                     pprint.pprint(kwargs)
                     raise
-                # TODO: Normalization performance needs improvement
-                # import pprint
-                # print('before')
-                # pprint.pprint(kwargs_comp)
-                # kwargs_comp = rapidjson.normalize(kwargs_comp, s)
-                # kwargs.update(kwargs_comp)
-                # print('normalized')
-                # pprint.pprint(kwargs_comp)
+                # print(f'after: {self}\n{pprint.pformat(kwargs)}')
         else:
             props = self._schema_properties.keys()
             for k in props:
