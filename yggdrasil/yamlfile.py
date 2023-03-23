@@ -528,7 +528,7 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     # Create connections to dummy model
     for io1, io2 in dir2opp.items():
         for i in miss[io1]:
-            dummy_channel = f"{name}:{i.split(':')[-1]}"
+            dummy_channel = f"{name}:dummy_{i.replace(':', '-')}"
             dummy_comm = copy.deepcopy(existing[io1][i])
             for k in ['address', 'for_service', 'commtype', 'host']:
                 dummy_comm.pop(k, None)
