@@ -525,6 +525,7 @@ definitions:
         description: '[DEPRECATED] Arguments that should be provided to the driver.'
         type: string
       connection_type:
+        description: Connection between one or more comms/files and one or more comms/files.
         enum:
         - connection
         - file_input
@@ -3657,7 +3658,7 @@ definitions:
           type: string
         type: array
       language:
-        description: Model is dedicated to synchronizingtimesteps between other models.
+        description: Model is dedicated to synchronizing timesteps between other models.
         enum:
         - timesync
         type: string
