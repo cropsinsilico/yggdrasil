@@ -2255,6 +2255,7 @@ extern "C" {
 	  if (!iSchema->Accept(*obj)) {
 	    ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
 	  }
+	  destroy_dtype(&(items[i]));
 	}
 	obj->EndArray(nitems);
       }
@@ -2291,6 +2292,7 @@ extern "C" {
 	  if (!iSchema->Accept(*obj)) {
 	    ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
 	  }
+	  destroy_dtype(&(values[i]));
 	}
 	obj->EndObject(nitems);
       }
