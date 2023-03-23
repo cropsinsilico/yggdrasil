@@ -301,12 +301,12 @@ rapidjson::Document* create_dtype_format_class(const char *format_str,
   out->EndObject(2);
   out->EndObject(1);
   out->FinalizeFromStack();
-  if (nOuter == 1) {
-    typename rapidjson::Document::ValueType tmp;
-    (*out)["serializer"]["datatype"].Swap(tmp);
-    (*out)["serializer"]["datatype"].Swap(tmp["items"][0]);
-    (*out)["serializer"].RemoveMember("format_str");
-  }
+  // if (nOuter == 1) {
+  //   typename rapidjson::Document::ValueType tmp;
+  //   (*out)["serializer"]["datatype"].Swap(tmp);
+  //   (*out)["serializer"]["datatype"].Swap(tmp["items"][0]);
+  //   (*out)["serializer"].RemoveMember("format_str");
+  // }
   return out;
 };
 

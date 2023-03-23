@@ -589,15 +589,19 @@ class ComponentBase(ComponentBaseUnregistered):
                 if additional_component_properties:
                     kwargs.update(additional_component_properties)
                 # Remove properties that shouldn't ve validated in class
+                extra_kwargs = {}
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
                         del s['properties'][k]
+                    if k in kwargs:
+                        extra_kwargs[k] = kwargs.pop(k)
                 # Validate and normalize
                 from yggdrasil import rapidjson
                 # import pprint
                 # print(f'before: {self}\n{pprint.pformat(kwargs)}')
                 try:
                     kwargs = rapidjson.normalize(kwargs, s)
+                    kwargs.update(extra_kwargs)
                 except BaseException:  # pragma: debug
                     import pprint
                     pprint.pprint(kwargs)
