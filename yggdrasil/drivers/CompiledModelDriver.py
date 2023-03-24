@@ -10,7 +10,7 @@ import contextlib
 import threading
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, tools, scanf, __version__
+from yggdrasil import platform, tools, scanf
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
 from yggdrasil.components import import_component
 
@@ -1586,17 +1586,16 @@ class CompilerBase(CompilationToolBase):
                 dont_link = True
             else:
                 dont_link = False
-        # Add yggdrasil version flag
-        yggver = __version__.split('+')[0].split('v')[-1].split('.')
-        if len(yggver) > 0:
-            kwargs.setdefault('definitions', [])
-            kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}']
-        # if len(yggver) > 1:
-        #     kwargs['definitions'] += [f'YGGVER_MINOR={yggver[1]}']
-        # Add flag that model is yggdrasil
+        # Add flag that model is yggdrasil and set yggdrasil version
         if not cls.is_build_tool:
+            from yggdrasil import __version__
             kwargs.setdefault('definitions', [])
             kwargs['definitions'].append('WITH_YGGDRASIL')
+            yggver = __version__.split('+')[0].split('v')[-1].split('.')
+            if len(yggver) > 0:
+                kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}']
+            # if len(yggver) > 1:
+            #     kwargs['definitions'] += [f'YGGVER_MINOR={yggver[1]}']
         # Add logging level as a definition
         if logging_level is not None:
             kwargs.setdefault('definitions', [])

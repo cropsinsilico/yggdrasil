@@ -555,8 +555,9 @@ class SerializeBase(tools.YggClass):
                      and isinstance(self.datatype.get('items', None), list)
                      and len(self.datatype['items']) == 1)):
                     self.datatype['allowSingular'] = True
+                    self.datatype['items'][0].pop('allowWrapped', False)
                 # elif self.datatype['type'] not in ['array', 'object']:
-                #     self.datatype['allowNested'] = True
+                #     self.datatype['allowWrapped'] = True
             # Check to see if new datatype is compatible with new one
             if old_datatype and datatype:
                 rapidjson.compare_schemas(self.datatype, old_datatype)
@@ -743,9 +744,10 @@ class SerializeBase(tools.YggClass):
                 args = rapidjson.normalize(args, self.datatype)
             except rapidjson.NormalizationError:
                 self.info(f"args = {args}, datatype = {self.datatype}")
-                # TODO: Replace this with allowWrapped
-                if isinstance(args, (list, tuple)) and len(args) == 1:
-                    return rapidjson.normalize(args[0], self.datatype)
+                if ((isinstance(args, (list, tuple)) and len(args) == 1
+                     and 'allowWrapped' not in self.datatype)):
+                    self.datatype['allowWrapped'] = True
+                    return rapidjson.normalize(args, self.datatype)
                 raise
         return args
 

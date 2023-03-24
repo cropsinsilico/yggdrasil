@@ -101,8 +101,6 @@ class AsciiTableSerialize(DefaultSerialize):
             for x, n in zip(old_typedef.get('items', []), field_names):
                 x['title'] = n
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
-        if len(self.datatype.get('items', [])) == 1:
-            self.datatype['allowSingular'] = True
         self.update_format_str()
         self.update_field_names()
         self.update_field_units()
