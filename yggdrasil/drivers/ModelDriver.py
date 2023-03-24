@@ -2479,6 +2479,7 @@ class ModelDriver(Driver):
                 elif any('datatype' in x for x in non_length):
                     if (len(non_length) == 1):
                         x['datatype'] = non_length[0]['datatype']
+                        x['datatype']['allowWrapped'] = True
                     else:
                         x['datatype'] = {
                             'type': 'array',
@@ -2915,6 +2916,25 @@ class ModelDriver(Driver):
             keys['use_generic'] = cls.function_param['true']
         else:
             keys['use_generic'] = cls.function_param['false']
+        if 'init_type_from_schema' in cls.function_param:
+            datatype_ = copy.deepcopy(datatype)
+            datatype_.pop('from_function', None)
+            for k in ['precision', 'length', 'ndim', 'shape']:
+                if k in datatype_ and not datatype_[k]:
+                    datatype_.pop(k)
+            if datatype_.get('type', None) == '1darray':
+                datatype_['type'] = 'ndarray'
+                if 'length' in datatype_:
+                    datatype_['shape'] = [datatype_.pop('length')]
+                if 'shape' not in datatype_:
+                    datatype_['ndim'] = 1
+            keys['schema'] = rapidjson.dumps(datatype_).replace(
+                '"', cls.function_param.get('escaped_double_quote', '\\"'))
+            fmt = cls.format_function_param(
+                'init_type_from_schema', **keys)
+            out.append(cls.format_function_param('assign', name=name,
+                                                 value=fmt))
+            return out
         typename = datatype['type']
         if name_base is None:
             name_base = name
@@ -3799,7 +3819,13 @@ class ModelDriver(Driver):
         if force_split:
             isplit = length_allow
         else:
-            isplit = line[:length_allow].rindex(' ') + 1
+            char_break = cls.function_param.get('continuation_break', ' ')
+            for c in char_break:
+                if c in line[:length_allow]:
+                    isplit = line[:length_allow].rindex(c) + 1
+                    break
+            else:
+                isplit = len(line)
         if (isplit < nindent + 1) or (isplit >= len(line)):
             out = [line]
         else:

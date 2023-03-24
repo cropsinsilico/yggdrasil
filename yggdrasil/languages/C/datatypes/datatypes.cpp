@@ -12,6 +12,9 @@
 #include "rapidjson/va_list.h"
 
 
+#define STRLEN_RJ(var)				\
+  static_cast<rapidjson::SizeType>(strlen(var))
+
 #define CSafe(x)  \
   try		  \
     {		  \
@@ -87,7 +90,7 @@ bool add_dtype(rapidjson::Document* d,
   // type
   if (!d->Key("type", 4, true))
     return false;
-  if (!d->String(type, strlen(type), true))
+  if (!d->String(type, STRLEN_RJ(type), true))
     return false;
   N++;
   // subtype
@@ -105,7 +108,7 @@ bool add_dtype(rapidjson::Document* d,
       return false;
     N++;
   } else {
-    if (!d->String(subtype, strlen(subtype), true))
+    if (!d->String(subtype, STRLEN_RJ(subtype), true))
       return false;
   }
   N++;
@@ -142,7 +145,7 @@ bool add_dtype(rapidjson::Document* d,
   if (units && strlen(units) > 0) {
     if (!d->Key("units", 5, true))
       return false;
-    if (!d->String(units, strlen(units), true))
+    if (!d->String(units, STRLEN_RJ(units), true))
       return false;
     N++;
   }
@@ -180,11 +183,14 @@ rapidjson::Document* create_dtype_format_class(const char *format_str,
   out->Key("serializer", 10, true);
   out->StartObject();
   out->Key("format_str", 10, true);
-  out->String(format_str, strlen(format_str), true);
+  out->String(format_str, STRLEN_RJ(format_str), true);
   out->Key("datatype", 8, true);
   out->StartObject();
+  int nDtype = 0;
+  nDtype++;
   out->Key("type", 4, true);
   out->String("array", 5, true);
+  nDtype++;
   out->Key("items", 5, true);
   out->StartArray();
   // Loop over string
@@ -290,14 +296,12 @@ rapidjson::Document* create_dtype_format_class(const char *format_str,
     beg = end;
   }
   out->EndArray(nOuter);
-  // if (nOuter == 1) {
-  //   out->Key("allowSingular", 13, true);
-  //   out->Bool(true);
-  //   out->EndObject(3);
-  // } else {
-  //   out->EndObject(2);
-  // }
-  out->EndObject(2);
+  if (nOuter == 1) {
+    nDtype++;
+    out->Key("allowSingular", 13, true);
+    out->Bool(true);
+  }
+  out->EndObject(nDtype);
   out->EndObject(2);
   out->EndObject(1);
   out->FinalizeFromStack();
@@ -386,7 +390,10 @@ dtype_t* create_dtype(rapidjson::Document* document=NULL,
       dtype_schema(s, s.GetAllocator(), is_metadata);
       rapidjson::StringBuffer sb;
       if (!document->Normalize(s, &sb)) {
-	ygglog_throw_error("create_dtype: Failed to normalize schema:\n%s", sb.GetString());
+	ygglog_throw_error("create_dtype: Failed to normalize schema:\n"
+			   "%s\nerror =\n%s",
+			   document2string(*document).c_str(),
+			   sb.GetString());
       }
       allocator = &(document->GetAllocator());
       if (is_metadata) {
@@ -958,7 +965,7 @@ extern "C" {
       else CASE_(boolean, SetBool(((bool*)value)[0]))
       else CASE_(number, SetDouble(((double*)value)[0]))
       else CASE_(integer, SetInt(((int*)value)[0]))
-      else CASE_(string, SetString(((char*)value), strlen((char*)value),
+      else CASE_(string, SetString(((char*)value), STRLEN_RJ((char*)value),
 				   generic_allocator(x))) // Shouuld this be cast to char**?
       else if (typeS == std::string("any") ||
 	       typeS == std::string("instance") ||
@@ -1088,7 +1095,7 @@ extern "C" {
 					schema.GetAllocator()).Move(),
 		       schema.GetAllocator());
       schema.AddMember(rapidjson::Document::GetSubTypeString(),
-		       rapidjson::Value(subtype, strlen(subtype),
+		       rapidjson::Value(subtype, STRLEN_RJ(subtype),
 					schema.GetAllocator()).Move(),
 		       schema.GetAllocator());
       schema.AddMember(rapidjson::Document::GetPrecisionString(),
@@ -1096,7 +1103,7 @@ extern "C" {
 		       schema.GetAllocator());
       if (units && strlen(units) > 0) {
 	schema.AddMember(rapidjson::Document::GetUnitsString(),
-			 rapidjson::Value(units, strlen(units),
+			 rapidjson::Value(units, STRLEN_RJ(units),
 					  schema.GetAllocator()).Move(),
 			 schema.GetAllocator());
       }
@@ -1128,7 +1135,7 @@ extern "C" {
 					schema.GetAllocator()).Move(),
 		       schema.GetAllocator());
       schema.AddMember(rapidjson::Document::GetSubTypeString(),
-		       rapidjson::Value(subtype, strlen(subtype),
+		       rapidjson::Value(subtype, STRLEN_RJ(subtype),
 					schema.GetAllocator()).Move(),
 		       schema.GetAllocator());
       schema.AddMember(rapidjson::Document::GetPrecisionString(),
@@ -1136,7 +1143,7 @@ extern "C" {
 		       schema.GetAllocator());
       if (units && strlen(units) > 0) {
 	schema.AddMember(rapidjson::Document::GetUnitsString(),
-			 rapidjson::Value(units, strlen(units),
+			 rapidjson::Value(units, STRLEN_RJ(units),
 					  schema.GetAllocator()).Move(),
 			 schema.GetAllocator());
       }
@@ -1173,7 +1180,7 @@ extern "C" {
 					schema.GetAllocator()).Move(),
 		       schema.GetAllocator());
       schema.AddMember(rapidjson::Document::GetSubTypeString(),
-		       rapidjson::Value(subtype, strlen(subtype),
+		       rapidjson::Value(subtype, STRLEN_RJ(subtype),
 					schema.GetAllocator()).Move(),
 		       schema.GetAllocator());
       schema.AddMember(rapidjson::Document::GetPrecisionString(),
@@ -1181,7 +1188,7 @@ extern "C" {
 		       schema.GetAllocator());
       if (units && strlen(units) > 0) {
 	schema.AddMember(rapidjson::Document::GetUnitsString(),
-			 rapidjson::Value(units, strlen(units),
+			 rapidjson::Value(units, STRLEN_RJ(units),
 					  schema.GetAllocator()).Move(),
 			 schema.GetAllocator());
       }
@@ -1483,7 +1490,7 @@ extern "C" {
 	(*arr_obj)[k].CopyFrom(*((rapidjson::Value*)x_obj),
 			       generic_allocator(arr), true);
       } else {
-	rapidjson::Value key(k, strlen(k), generic_allocator(arr));
+	rapidjson::Value key(k, STRLEN_RJ(k), generic_allocator(arr));
 	rapidjson::Value cpy(*((rapidjson::Value*)x_obj),
 			     generic_allocator(arr), true);
 	arr_obj->AddMember(key, cpy, generic_allocator(arr));
@@ -1786,7 +1793,7 @@ extern "C" {
   STD_JSON_(integer, int, Int, 0);
   STD_JSON_BASE_(null, void*, d->IsNull(), out = NULL, d->SetNull(), NULL);
   STD_JSON_(number, double, Double, 0.0);
-  STD_JSON_BASE_(string, const char*, d->IsString(), out = d->GetString(), d->SetString(value, strlen(value), generic_allocator(x)), 0);
+  STD_JSON_BASE_(string, const char*, d->IsString(), out = d->GetString(), d->SetString(value, STRLEN_RJ(value), generic_allocator(x)), 0);
   STD_JSON_NESTED_(object);
   STD_JSON_NESTED_(array);
   STD_JSON_NESTED_(any);
@@ -2048,9 +2055,9 @@ extern "C" {
     }
     rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
     if (s->IsObject() && s->HasMember("type")) {
-      (*s)["type"].SetString(name, strlen(name), dtype_allocator(*dtype));
+      (*s)["type"].SetString(name, STRLEN_RJ(name), dtype_allocator(*dtype));
     } else {
-      rapidjson::Value v(name, strlen(name), dtype_allocator(*dtype));
+      rapidjson::Value v(name, STRLEN_RJ(name), dtype_allocator(*dtype));
       s->AddMember(rapidjson::Document::GetTypeString(), v, dtype_allocator(*dtype));
     }
     return 0;
@@ -2104,6 +2111,31 @@ extern "C" {
     return ret;
   }
 
+  dtype_t* create_dtype_from_schema(const char* schema,
+				    const bool use_generic) {
+    rapidjson::Document* obj = NULL;
+    try {
+      obj = new rapidjson::Document();
+      obj->Parse(schema);
+      if (obj->HasParseError()) {
+	ygglog_throw_error("create_dtype_from_schema: Error parsing schema");
+      }
+      typename rapidjson::Value::MemberIterator it = obj->FindMember(rapidjson::Document::GetTypeString());
+      if (it != obj->MemberEnd() &&
+	  (it->value == rapidjson::Document::GetObjectString() ||
+	   it->value == rapidjson::Document::GetSchemaString() ||
+	   it->value == rapidjson::Document::GetPythonInstanceString() ||
+	   it->value == rapidjson::Document::GetAnyString() ||
+	   (it->value == rapidjson::Document::GetArrayString() &&
+	    !obj->HasMember(rapidjson::Document::GetItemsString()))))
+	return create_dtype(obj, true);
+      return create_dtype(obj, use_generic);
+    } catch(...) {
+      ygglog_error("create_dtype_from_schema: C++ exception thrown.");
+      return NULL;
+    }
+  }
+
   dtype_t* create_dtype_empty(const bool use_generic) {
     try {
       return create_dtype(NULL, use_generic);
@@ -2134,7 +2166,7 @@ extern "C" {
       obj = new rapidjson::Document();
       obj->StartObject();
       obj->Key("type", 4, true);
-      obj->String(type, strlen(type), true);
+      obj->String(type, STRLEN_RJ(type), true);
       obj->EndObject(1);
       obj->FinalizeFromStack();
       return create_dtype(obj, use_generic);
@@ -2287,7 +2319,7 @@ extern "C" {
 	obj->Key("properties", 10, true);
 	obj->StartObject();
 	for (i = 0; i < nitems; i++) {
-	  obj->Key(keys[i], strlen(keys[i]), true);
+	  obj->Key(keys[i], STRLEN_RJ(keys[i]), true);
 	  rapidjson::Document* iSchema = (rapidjson::Document*)(values[i]->schema);
 	  if (!iSchema->Accept(*obj)) {
 	    ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
@@ -2951,6 +2983,8 @@ extern "C" {
   
   
 }
+
+#undef STRLEN_RJ
 
 // Local Variables:
 // mode: c++

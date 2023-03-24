@@ -305,6 +305,15 @@
        integer(kind=c_int) :: out
      end function is_dtype_format_array_c
      
+     function create_dtype_from_schema_c(schema, use_generic) &
+          result(out) bind(c, name="create_dtype_from_schema_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: schema
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_from_schema_c
+
      function create_dtype_empty_c(use_generic) result(out) &
           bind(c, name="create_dtype_empty_f")
        use, intrinsic :: iso_c_binding, only: c_ptr, c_bool

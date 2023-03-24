@@ -251,6 +251,8 @@ class FortranModelDriver(CompiledModelDriver):
         'init_function': 'yggpyfunc(init_python())',
         'init_instance': 'yggpyinst(init_generic())',
         'init_any': 'init_generic()',
+        'init_type_from_schema': ('create_dtype_from_schema(\"{schema}\"'
+                                  ', {use_generic})'),
         'init_type_array': ('create_dtype_json_array({nitems}, '
                             '{items}, {use_generic})'),
         'init_type_object': ('create_dtype_json_object({nitems}, '
@@ -317,8 +319,10 @@ class FortranModelDriver(CompiledModelDriver):
         'or': '.or.',
         'indent': 3 * ' ',
         'quote': "'",
+        'escaped_double_quote': "\"\"",
         'error': ("write(*, \'(\"{error_msg}\")\')\n"
                   "stop 1"),
+        'continuation_break': (',', '{', ' '),
         'continuation_before': '&',
         'continuation_after': '     &',
         'block_end': 'END',

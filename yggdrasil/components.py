@@ -593,6 +593,8 @@ class ComponentBase(ComponentBaseUnregistered):
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
                         del s['properties'][k]
+                    if k in s['required']:
+                        s['required'].remove(k)
                     if k in kwargs:
                         extra_kwargs[k] = kwargs.pop(k)
                 # Validate and normalize

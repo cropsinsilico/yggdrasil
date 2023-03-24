@@ -158,6 +158,10 @@ int is_dtype_format_array_f(void* type_struct) {
   return is_dtype_format_array((dtype_t*)type_struct);
 }
 
+void *create_dtype_from_schema_f(const char* schema, const bool use_generic) {
+  return (void*)create_dtype_from_schema(schema, use_generic);
+}
+
 void *create_dtype_empty_f(const bool use_generic) {
   return (void*)create_dtype_empty(use_generic);
 }

@@ -742,7 +742,8 @@ class SerializeBase(tools.YggClass):
             try:
                 args = rapidjson.normalize(args, self.datatype)
             except rapidjson.NormalizationError:
-                # TODO: Replace this with allowNested
+                self.info(f"args = {args}, datatype = {self.datatype}")
+                # TODO: Replace this with allowWrapped
                 if isinstance(args, (list, tuple)) and len(args) == 1:
                     return rapidjson.normalize(args[0], self.datatype)
                 raise

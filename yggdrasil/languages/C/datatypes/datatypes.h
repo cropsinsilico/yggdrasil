@@ -512,7 +512,18 @@ const size_t dtype_precision(const dtype_t* type_class);
   @returns dtype_t* Initialized type structure/class.
 */
 dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic);
-  
+
+
+/*!
+  @brief Construct a type object from a JSON schema.
+  @param[in] schema Serialized JSON schema.
+  @param[in] use_generic If true, serialized/deserialized objects will
+    be expected to be generic_t instances.
+  @returns dtype_t* Type structure/class.
+ */
+dtype_t* create_dtype_from_schema(const char* schema,
+				  const bool use_generic);
+
 
 /*!
   @brief Construct and empty type object.

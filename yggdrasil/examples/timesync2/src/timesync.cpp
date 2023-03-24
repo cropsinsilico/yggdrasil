@@ -40,8 +40,6 @@ int main(int argc, char *argv[]) {
   rapidjson::units::Quantity<double> t_end(5.0, "days");
   
   std::string model(argv[3]);
-  size_t nkeys, ikey;
-  char** keys = NULL;
   int ret;
   rapidjson::Document state_send(rapidjson::kObjectType);
   rapidjson::Document state_recv(rapidjson::kObjectType);

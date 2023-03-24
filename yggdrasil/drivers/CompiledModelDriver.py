@@ -10,7 +10,7 @@ import contextlib
 import threading
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, tools, scanf
+from yggdrasil import platform, tools, scanf, __version__
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
 from yggdrasil.components import import_component
 
@@ -1586,6 +1586,11 @@ class CompilerBase(CompilationToolBase):
                 dont_link = True
             else:
                 dont_link = False
+        # Add yggdrasil version flag
+        yggver = __version__.split('+')[0].split('v')[-1].split('.')
+        kwargs.setdefault('definitions', [])
+        kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}',
+                                  f'YGGVER_MINOR={yggver[1]}']
         # Add flag that model is yggdrasil
         if not cls.is_build_tool:
             kwargs.setdefault('definitions', [])

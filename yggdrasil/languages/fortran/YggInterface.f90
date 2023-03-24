@@ -1933,6 +1933,22 @@ contains
   end function is_dtype_format_array
   ! END DOXYGEN_SHOULD_SKIP_THIS
 
+  !> @brief Create a data type from a serialized JSON schema.
+  !> @param[in] schema Serialized JSON schema.
+  !> @param[in] use_generic True if the data type should expect generic
+  !>   datatypes.
+  !> @returns A data type object.
+  function create_dtype_from_schema(schema, use_generic) result(out)
+    implicit none
+    character(len=*), intent(in) :: schema
+    logical, intent(in) :: use_generic
+    type(yggdtype) :: out
+    character(len=len_trim(schema)+1) :: c_schema
+    c_schema = trim(schema)//c_null_char
+    out%ptr = create_dtype_from_schema_c(c_schema, &
+         logical(use_generic, kind=1))
+  end function create_dtype_from_schema
+
   !> @brief Create an empty data type.
   !> @param[in] use_generic True if the data type should expect generic
   !>   datatypes.
@@ -2425,8 +2441,9 @@ contains
                 ! end if
              end if
           end if
-          if ((args(i)%type.eq."character").or. &
-               (args(i)%type.eq."unicode")) then
+          if (((args(i)%type.eq."character").or. &
+               (args(i)%type.eq."unicode")).and. &
+               args(i)%prec.ne.1) then
              nargs = nargs + 1  ! For the string length
           end if
        else if ((args(i)%type.eq."character").or. &
@@ -2486,8 +2503,9 @@ contains
                 j = j + 1
              end if
           end if
-          if ((args(i)%type.eq."character").or. &
-               (args(i)%type.eq."unicode")) then
+          if (((args(i)%type.eq."character").or. &
+               (args(i)%type.eq."unicode")).and. &
+               args(i)%prec.ne.1) then
              args(i)%prec_c = args(i)%prec
              args(i)%prec_ptr = c_loc(args(i)%prec_c)
              c_args(j) = args(i)%prec_ptr

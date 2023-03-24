@@ -54,6 +54,7 @@ void *yggRpcServerType_f(const char *name, void *inType, void *outType);
 void *yggTimesync_f(const char *name, const char *t_units);
 // Method for constructing data types
 int is_dtype_format_array_f(void* type_struct);
+void *create_dtype_from_schema_f(const char* schema, const bool use_generic);
 void *create_dtype_empty_f(const bool use_generic);
 void *create_dtype_python_f(void* pyobj, const bool use_generic);
 void *create_dtype_direct_f(const bool use_generic);

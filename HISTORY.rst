@@ -21,11 +21,12 @@ History
 TODO:
 ~~~~~
 
-* Fix bug where datatype parameters in communicators are not passed to the datatype during normalization (currently handle on python side)
+* Fix bug where datatype parameters in communicators are not passed to the datatype during normalization (currently handled on python side)
 * Update docs to indicate the use of extended rapidjson in installation and units sections (go through all docs to identify other places)
 * Update type tables
 * Allow obj_t/ply_t to be passed by pointer in types test
 * Add method to allow standard serialization of rapidjson::Value via << operator
+* Fix bug in timesync model driver when state variables have units and add units to OSR
 
 1.8.5 (2023-03-01) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
 ------------------

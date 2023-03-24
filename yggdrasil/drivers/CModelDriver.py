@@ -687,6 +687,8 @@ class CModelDriver(CompiledModelDriver):
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
         'init_any': 'init_generic()',
+        'init_type_from_schema': ('create_dtype_from_schema(\"{schema}\",'
+                                  ' {use_generic})'),
         'init_type_array': ('create_dtype_json_array({nitems}, '
                             '{items}, {use_generic})'),
         'init_type_object': ('create_dtype_json_object({nitems}, '

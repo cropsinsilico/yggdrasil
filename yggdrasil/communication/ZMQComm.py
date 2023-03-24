@@ -1296,25 +1296,13 @@ class ZMQComm(CommBase.CommBase):
         if not ((self.direction == 'recv')
                 and (self.is_server or self.allow_multiple_comms)):
             return
-        # Wait for messages to be drained by the async thread
-        if self.is_async:
-            multitasking.wait_on_function(
-                lambda: self.cli_address is not None, timeout=10.0)
-            multitasking.wait_on_function(
-                lambda: self.n_msg == 0, timeout=10.0)
-            return
-        # Wait for signon message
-        multitasking.wait_on_function(lambda: self.n_msg != 0, timeout=10.0)
-
+        
         # Drain signon messages
         def drain_signon():
-            # try:
-            flag, msg = self.recv(timeout=0)
-            # except BaseException as e:
-            #     print("exception: ", e)
-            #     raise
-            assert flag
-            assert self.is_empty_recv(msg)
+            if not self.is_async:  # only actively receive if not async
+                flag, msg = self.recv(timeout=0)
+                assert flag
+                assert self.is_empty_recv(msg)
             # This version of check can let signon messages slip
             # through if the messages are sent with a large interval
             # or are delayed
@@ -1326,6 +1314,15 @@ class ZMQComm(CommBase.CommBase):
             # sent before the server side connection is established
             return (self.cli_signon_sent > 0
                     and self.cli_signon_sent == self.cli_signon_recv)
+
+        if self.is_async:
+            # Wait for messages to be drained by the async thread
+            multitasking.wait_on_function(
+                lambda: self.cli_address is not None, timeout=10.0)
+        else:
+            # Wait for signon message, then actively drain
+            multitasking.wait_on_function(
+                lambda: self.n_msg != 0, timeout=10.0)
 
         multitasking.wait_on_function(drain_signon, timeout=10.0)
         
