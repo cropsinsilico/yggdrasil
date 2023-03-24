@@ -994,9 +994,7 @@ module fygg
   end type yggptr_map
   !> @brief Wrapper for a C generic object.
   type, bind(c) :: ygggeneric
-     character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to C generic object
-     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type ygggeneric
   !> @brief Wrapper for C NULL object.
   type :: yggnull
@@ -1007,27 +1005,19 @@ module fygg
   end type yggnull
   !> @brief Wrapper for an array of generic objects (stored in a generic object).
   type, bind(c) :: yggarr
-     character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped array.
-     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggarr
   !> @brief Wrapper for a mapping of generic objects (stored in a generic object).
   type, bind(c) :: yggmap
-     character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped mapping.
-     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggmap
   !> @brief Wrapper for a schema (stored in a generic object).
   type, bind(c) :: yggschema
-     character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped schema.
-     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggschema
   !> @brief  Wrapper for a Python instance (stored in a generic object).
   type, bind(c) :: yggpyinst
-     character(kind=c_char) :: prefix !< Character used to identify generic objects
      type(c_ptr) :: obj !< Pointer to wrapped Python instance.
-     type(c_ptr) :: allocator !< Pointer to allocator for generic object
   end type yggpyinst
   !> @brief Wrapper for a Python function.
   type, bind(c) :: yggpyfunc
@@ -1039,23 +1029,10 @@ module fygg
   end type yggpython
   !> @brief Ply structure.
   type, bind(c) :: yggply
-     integer(kind=c_int) :: nvert !< Number of vertices.
-     integer(kind=c_int) :: nface !< Number of faces.
-     integer(kind=c_int) :: nedge !< Number of edges.
      type(c_ptr) :: obj !< Pointer to wrapped rapidjson::Ply instance.
   end type yggply
   !> @brief Obj structure.
   type, bind(c) :: yggobj
-     integer(kind=c_int) :: nvert !< Material that should be used for faces.
-     integer(kind=c_int) :: ntexc !< Number of vertices.
-     integer(kind=c_int) :: nnorm !< Number of texture coordinates.
-     integer(kind=c_int) :: nparam !< Number of normals.
-     integer(kind=c_int) :: npoint !< Number of points.
-     integer(kind=c_int) :: nline !< Number of lines.
-     integer(kind=c_int) :: nface !< Number of faces.
-     integer(kind=c_int) :: ncurve !< Number of curves.
-     integer(kind=c_int) :: ncurve2 !< Number of curv2.
-     integer(kind=c_int) :: nsurf !< Number of surfaces.
      type(c_ptr) :: obj !< Pointer to wrapped rapidjson::ObjWavefront instance.
   end type yggobj
   !> @brief Wrapper for a 1 byte unsigned integer.
@@ -2434,18 +2411,23 @@ contains
                   is_next_size_t(args, i+1, req_array=.true.)) then
                 ! Do nothing, vars already exist
              else if (is_next_size_t(args, i, req_array=.true.)) then
-                if (args(i)%alloc) then
-                   nargs = nargs + 1  ! For ndim
-                end if
-             else if (args(i)%alloc) then
+                ! if (args(i)%alloc) then
+                nargs = nargs + 1  ! For ndim
+                ! end if
+             else
+                ! else if (args(i)%alloc) then
                 nargs = nargs + 2  ! For ndim and shape
              end if
           else
              if ((.not.is_format).and.(.not.is_next_size_t(args, i))) then
-                if (args(i)%alloc) then
-                   nargs = nargs + 1  ! For the array size
-                end if
+                ! if (args(i)%alloc) then
+                nargs = nargs + 1  ! For the array size
+                ! end if
              end if
+          end if
+          if ((args(i)%type.eq."character").or. &
+               (args(i)%type.eq."unicode")) then
+             nargs = nargs + 1  ! For the string length
           end if
        else if ((args(i)%type.eq."character").or. &
             (args(i)%type.eq."unicode")) then
@@ -2475,13 +2457,14 @@ contains
                 args(i)%shape_ptr = args(i+2)%ptr
              else if (is_next_size_t(args, i, req_array=.true.)) then
                 args(i)%shape_ptr = args(i+1)%ptr
-                if (args(i)%alloc) then
-                   args(i)%ndim_c = args(i)%ndim
-                   args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
-                   c_args(j) = args(i)%ndim_ptr
-                   j = j + 1
-                end if
-             else if (args(i)%alloc) then
+                ! if (args(i)%alloc) then
+                args(i)%ndim_c = args(i)%ndim
+                args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
+                c_args(j) = args(i)%ndim_ptr
+                j = j + 1
+                ! end if
+             else
+                ! else if (args(i)%alloc) then
                 args(i)%ndim_c = args(i)%ndim
                 args(i)%ndim_ptr = c_loc(args(i)%ndim_c)
                 c_args(j) = args(i)%ndim_ptr
@@ -2495,12 +2478,20 @@ contains
                 args(i)%len_ptr = c_args(1)
              else if (is_next_size_t(args, i)) then
                 args(i)%len_ptr = args(i+1)%ptr
-             else if (args(i)%alloc) then
+             else
+                ! else if (args(i)%alloc) then
                 args(i)%len_c = args(i)%len
                 args(i)%len_ptr = c_loc(args(i)%len_c)
                 c_args(j) = args(i)%len_ptr
                 j = j + 1
              end if
+          end if
+          if ((args(i)%type.eq."character").or. &
+               (args(i)%type.eq."unicode")) then
+             args(i)%prec_c = args(i)%prec
+             args(i)%prec_ptr = c_loc(args(i)%prec_c)
+             c_args(j) = args(i)%prec_ptr
+             j = j + 1
           end if
        else if ((args(i)%type.eq."character").or. &
             (args(i)%type.eq."unicode")) then
@@ -3014,6 +3005,19 @@ contains
     type(yggply), intent(in) :: p
     call display_ply_c(p)
   end subroutine display_ply
+  !> @brief Get the number of elements of a given time in an Ply structure
+  !> @param[in] p The Ply mesh.
+  !> @param[in] name The type of element to count.
+  !> @returns The number of elements of the provided type.
+  function nelements_ply(p, name) result(out)
+    implicit none
+    type(yggply), intent(in) :: p
+    character(len=*), intent(in) :: name
+    character(len=len(name)+1) :: c_name
+    integer(kind=c_int) :: out
+    c_name = name//c_null_char
+    out = nelements_ply_c(p, c_name)
+  end function nelements_ply
   
   ! Obj interface
   !> @brief Initialize an obj mesh instance.
@@ -3080,6 +3084,20 @@ contains
     type(yggobj), intent(in) :: p
     call display_obj_c(p)
   end subroutine display_obj
+  !> @brief Get the number of elements of a given time in an ObjWavefront
+  !>   structure.
+  !> @param[in] p The ObjWavefront mesh.
+  !> @param[in] name The type of element to count.
+  !> @returns The number of elements of the provided type.
+  function nelements_obj(p, name) result(out)
+    implicit none
+    type(yggobj), intent(in) :: p
+    character(len=*), intent(in) :: name
+    character(len=len(name)+1) :: c_name
+    integer(kind=c_int) :: out
+    c_name = name//c_null_char
+    out = nelements_obj_c(p, c_name)
+  end function nelements_obj
 
   ! Generic interface
   !> @brief Initialize a generic object.
@@ -3202,21 +3220,34 @@ contains
   !> @param[in] arr Array to get element from.
   !> @param[in] i Index of element to get.
   !> @param[out] x Pointer to address where element should be stored.
-  !> @param[in] copy If 1, the element will be copied. Otherwise the element
-  !>   reference will be used.
   !> @returns A flag that is 1 if there is an error and 0 otherwise.
-  function get_generic_array(arr, i, x, copy) result(out)
+  function get_generic_array(arr, i, x) result(out)
     implicit none
     type(ygggeneric), intent(in) :: arr
     integer(kind=c_size_t), intent(in) :: i
     type(ygggeneric), pointer :: x
-    integer(kind=c_int), intent(in) :: copy
     integer(kind=c_int) :: out
     type(c_ptr) :: c_x
     allocate(x);
     c_x = c_loc(x) ! Maybe use first element in type
-    out = get_generic_array_c(arr, i-1, c_x, copy)
+    out = get_generic_array_c(arr, i-1, c_x)
   end function get_generic_array
+  !> @brief Get a reference to an element from an array.
+  !> @param[in] arr Array to get element from.
+  !> @param[in] i Index of element to get.
+  !> @param[out] x Pointer to address where element should be stored.
+  !> @returns A flag that is 1 if there is an error and 0 otherwise.
+  function get_generic_array_ref(arr, i, x) result(out)
+    implicit none
+    type(ygggeneric), intent(in) :: arr
+    integer(kind=c_size_t), intent(in) :: i
+    type(ygggeneric), pointer :: x
+    integer(kind=c_int) :: out
+    type(c_ptr) :: c_x
+    allocate(x);
+    c_x = c_loc(x) ! Maybe use first element in type
+    out = get_generic_array_ref_c(arr, i-1, c_x)
+  end function get_generic_array_ref
   !> @brief Set an element in the object at for a given key to a new value.
   !> @param[in] arr Object to add element to.
   !> @param[in] k Key where element should be added.
@@ -3236,23 +3267,38 @@ contains
   !> @param[in] arr Object to get element from.
   !> @param[in] k Key of element to return.
   !> @param[out] x Pointer to address where element should be stored.
-  !> @param[in] copy If 1, the element will be copied. Otherwise the element
-  !>   reference will be used.
   !> @returns A flag that is 1 if there is an error and 0 otherwise.
-  function get_generic_object(arr, k, x, copy) result(out)
+  function get_generic_object(arr, k, x) result(out)
     implicit none
     type(ygggeneric), intent(in) :: arr
     character(len=*), intent(in) :: k
     type(ygggeneric), pointer, intent(out) :: x
-    integer(kind=c_int), intent(in) :: copy
     integer(kind=c_int) :: out
     character(len=len_trim(k)+1) :: c_k
     type(c_ptr) :: c_x
     allocate(x);
     c_k = trim(k)//c_null_char
     c_x = c_loc(x) ! Maybe use first element in type
-    out = get_generic_object_c(arr, c_k, c_x, copy)
+    out = get_generic_object_c(arr, c_k, c_x)
   end function get_generic_object
+  !> @brief Get a reference to an element from an object.
+  !> @param[in] arr Object to get element from.
+  !> @param[in] k Key of element to return.
+  !> @param[out] x Pointer to address where reference should be stored.
+  !> @returns A flag that is 1 if there is an error and 0 otherwise.
+  function get_generic_object_ref(arr, k, x) result(out)
+    implicit none
+    type(ygggeneric), intent(in) :: arr
+    character(len=*), intent(in) :: k
+    type(ygggeneric), pointer, intent(out) :: x
+    integer(kind=c_int) :: out
+    character(len=len_trim(k)+1) :: c_k
+    type(c_ptr) :: c_x
+    allocate(x);
+    c_k = trim(k)//c_null_char
+    c_x = c_loc(x) ! Maybe use first element in type
+    out = get_generic_object_ref_c(arr, c_k, c_x)
+  end function get_generic_object_ref
 
   ! Python interface
   !> @brief Initialize a Python object.

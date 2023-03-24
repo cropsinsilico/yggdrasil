@@ -16,6 +16,7 @@ History
 * Changed native string types in languages to be used for JSON string values
 * In C, C++, and Fortran, if Python objects will be sent/received the model must initialize Python via "init_python_API()" (a subroutine in Fortran). If a model is a wrapped function, this will be added automatically.
 * Change all JSON serialization to use rapidjson, removing JSONDecoder, JSONEncoder, & JSONEncoderReadable in the process.
+* C++ interface now expects C++ classes for generic, array, object, ply, & obj types. Send methods should pass pointers to these objects. Formatted_io examples for these types have been updated to reflect these changes.
 
 TODO:
 ~~~~~
@@ -23,6 +24,8 @@ TODO:
 * Fix bug where datatype parameters in communicators are not passed to the datatype during normalization (currently handle on python side)
 * Update docs to indicate the use of extended rapidjson in installation and units sections (go through all docs to identify other places)
 * Update type tables
+* Allow obj_t/ply_t to be passed by pointer in types test
+* Add method to allow standard serialization of rapidjson::Value via << operator
 
 1.8.5 (2023-03-01) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
 ------------------

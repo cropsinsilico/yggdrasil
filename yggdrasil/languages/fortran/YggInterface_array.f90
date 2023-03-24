@@ -6,7 +6,7 @@ subroutine generic_array_get_generic(x, index, out)
   integer, intent(in) :: index
   type(ygggeneric), pointer, intent(out) :: out
   integer(kind=c_int) :: flag
-  flag = get_generic_array(x, int(index, c_size_t), out, 0)
+  flag = get_generic_array(x, int(index, c_size_t), out)
   if (flag.ne.0) then
      stop "generic_array_get_generic: Error extracting generic object."
   end if

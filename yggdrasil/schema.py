@@ -378,7 +378,12 @@ class ComponentSchema(object):
     def __init__(self, schema_type, subtype_key, schema_registry=None,
                  module=None, schema_subtypes=None):
         self._storage = SchemaDict()
+        self._base_name = None
+        self._base_kwargs = None
+        self._base_subtype_description = None
         self._base_schema = None
+        self._no_inherit_kwargs = {}
+        self.required_by_subtype = []
         self.schema_type = schema_type
         self.subtype_key = subtype_key
         self.schema_registry = schema_registry
@@ -410,25 +415,91 @@ class ComponentSchema(object):
         raise ValueError("Could not determine subtype "
                          "for document: %s" % doc)  # pragma: debug
 
-    # def get_base_schema(self):
-    #     r"""Get a base schema containing properties that are the same
-    #     for all component subtypes."""
-    #     if self._base_schema is not None:
-    #         return copy.deepcopy(self._base_schema)
-    #     if self._base_name is None or self._base_name not in self._storage:
-    #         return None
-    #     self._base_schema = dict(
-    #         copy.deepcopy(self._storage[self._base_name],
-    #                       title=f"{self.schema_type}_base",
-    #                       description=(f"Base schema for all "
-    #                                    f"{self.schema_type} component "
-    #                                    f"subtypes."),
-    #                       additionalProperties=True,
-    #                       **self._base_kwargs)
-    #     return copy.deepcopy(self._base_schema)
+    def get_base_schema(self):
+        r"""Get a base schema containing properties that are the same
+        for all component subtypes."""
+        if self._base_schema is not None:
+            return copy.deepcopy(self._base_schema)
+        if self._base_name is None or self._base_name not in self._storage:
+            return None
+        self._base_schema = dict(
+            copy.deepcopy(self._storage[self._base_name]),
+            title=f"{self.schema_type}_base",
+            description=(f"Base schema for all subtypes of "
+                         f"{self.schema_type} components."),
+            additionalProperties=True)
+        if self._base_kwargs:
+            self._base_schema.update(self._base_kwargs)
+        if self.subtype_key in self._base_schema.get('required', []):
+            self._base_schema['required'].remove(self.subtype_key)
+            if not self._base_schema['required']:
+                self._base_schema.pop('required')
+        if self.default_subtype is None:
+            self._base_schema['properties'][self.subtype_key].pop(
+                'default', None)
+        else:
+            self._base_schema['properties'][
+                self.subtype_key]['default'] = self.default_subtype
+        if self._base_subtype_description:
+            self._base_schema['properties'][self.subtype_key][
+                'description'] = self._base_subtype_description
+        driver_list = []
+        for v in self._storage.values():
+            for k in v['properties'].get('driver', {}).get('enum', []):
+                if k and k not in driver_list:
+                    driver_list.append(k)
+        if driver_list:
+            self.add_legacy_properties(
+                self._base_schema, driver_list=driver_list, base=True)
+        if 'required' in self._base_schema:
+            self._base_schema['required'] = set(
+                self._base_schema['required'])
+            for v in self._storage.values():
+                self._base_schema['required'] &= set(v.get('required', []))
+            self._base_schema['required'] = sorted(
+                list(self._base_schema['required']))
+            if not self._base_schema['required']:  # pragma: no cover
+                del self._base_schema['required']
+        # Update base schema, checking for compatiblity
+        prop_overlap = set(self._base_schema['properties'].keys())
+        for v in self._storage.values():
+            prop_overlap &= set(v['properties'].keys())
+        # Force subtype keys to be included
+        prop_overlap.add(self.subtype_key)
+        new_base_prop = {k: self._base_schema['properties'][k]
+                         for k in prop_overlap}
+        for v in self._storage.values():
+            for k in prop_overlap:
+                old = new_base_prop[k]
+                new = v['properties'][k]
+                # Don't compare descriptions or properties defining the
+                # subtype (like the subtype key or driver)
+                if k not in [self.subtype_key, 'driver']:
+                    if not self.compare_body(old, new):
+                        raise ValueError(
+                            f"Schema for property '{k}' of class"
+                            f" '{v['title']}'"
+                            f" is {new}, which differs from the existing"
+                            f" base class value ({old}). Check that"
+                            f" another class dosn't have a conflicting"
+                            f" definition of the same property.")
+                    if ((k in self._base_schema.get('required', [])
+                         and not self.compare_body(old, new,
+                                                   only_keys=['default']))):
+                        self.required_by_subtype.append(k)
+                        old.pop('default', None)
+                # Assign original copy that includes description
+                if ((k in [self.subtype_key, 'driver']
+                     and ('enum' in old or 'enum' in new))):
+                    old['enum'] = sorted([
+                        x for x in (set(old.get('enum', []))
+                                    | set(new.get('enum', []))) if x])
+        self._base_schema['properties'] = new_base_prop
+        return copy.deepcopy(self._base_schema)
 
     def get_subtype_schema(self, subtype, unique=False, relaxed=False,
-                           allow_instance=False, for_form=False):
+                           allow_instance=False, for_form=False,
+                           partnered=False):
         r"""Get the schema for the specified subtype.
 
         Args:
@@ -454,8 +525,9 @@ class ComponentSchema(object):
         if for_form:
             relaxed = False
             allow_instance = False
+            partnered = False
         if subtype == 'base':
-            out = copy.deepcopy(self._base_schema)
+            out = self.get_base_schema()
             # Add additional properties that apply to specific subtypes
             if not unique:
                 if self.default_subtype:
@@ -473,6 +545,13 @@ class ComponentSchema(object):
                                 out['properties'][k]['options']['dependencies'][
                                     self.subtype_key] += (
                                         x['properties'][self.subtype_key]['enum'])
+                if ((partnered and self.required_by_subtype
+                     and out.get('required', []))):
+                    for k in self.required_by_subtype:
+                        if k in out['required']:
+                            out['required'].remove(k)
+                    if not out['required']:
+                        del out['required']
             elif not (relaxed or for_form):
                 # Add place holders
                 for x in self._storage.values():
@@ -484,28 +563,24 @@ class ComponentSchema(object):
                 if subtype in s2c:
                     subtype = s2c[subtype]
             out = copy.deepcopy(self._storage[subtype])
+            if subtype in self._no_inherit_kwargs:
+                out.update(self._no_inherit_kwargs[subtype])
+            base = self.get_base_schema()
             # Remove properties that apply to all subtypes
             if unique:
                 skip_props = [self.subtype_key, 'driver']
-                for k, v in self._base_schema['properties'].items():
-                    if k in skip_props or k not in out['properties']:
-                        continue
-                    if (('default' in out['properties'][k]
-                         and out['properties'][k]['default'] != v.get(
-                             'default', None))):
-                        skip_props.append(k)
+                skip_props += self.required_by_subtype
                 out['additionalProperties'] = True
                 if 'required' in out:
                     out['required'] = sorted(
                         list(set(out['required'])
-                             - (set(self._base_schema.get('required', []))
+                             - (set(base.get('required', []))
                                 - set(skip_props))))
                     if not out['required']:
                         del out['required']
-                if isinstance(self._base_schema.get('allowSingular', False),
-                              str):
-                    skip_props.append(self._base_schema['allowSingular'])
-                for k, v in self._base_schema['properties'].items():
+                if isinstance(base.get('allowSingular', False), str):
+                    skip_props.append(base['allowSingular'])
+                for k, v in base['properties'].items():
                     if ((k not in skip_props and k in out['properties']
                          and k not in out.get('required', []))):
                         del out['properties'][k]
@@ -513,9 +588,12 @@ class ComponentSchema(object):
                         self._add_placeholder(out['properties'], k, v)
                 if not out['properties']:  # pragma: no cover
                     del out['properties']
-            else:
-                out['properties'][self.subtype_key]['default'] = out[
-                    'properties'][self.subtype_key]['enum'][0]
+                # TODO: Remove pushProperties/pullProperties based on
+                # keys
+                if partnered and self._base_kwargs:
+                    for k in self._base_kwargs:
+                        if k in ['pushProperties', 'pullProperties']:
+                            out.pop(k, None)
         out['additionalProperties'] = relaxed
         if allow_instance:
             if subtype == 'base':
@@ -602,6 +680,8 @@ class ComponentSchema(object):
         unique_subt = (unique in ['subtype', 'both'])
         relaxed_base = True
         relaxed_subt = True
+        partnered_base = (unique in 'subtype')
+        partnered_subt = (unique in 'base')
         if not relaxed:
             if unique in ['base', 'both']:
                 relaxed_base = True
@@ -613,11 +693,13 @@ class ComponentSchema(object):
                 relaxed_base = False
                 relaxed_subt = False
         base = self.get_subtype_schema('base', unique=unique_base,
+                                       partnered=partnered_base,
                                        relaxed=relaxed_base, **kwargs)
         out[self._subtype_defkey(self.schema_type, "base")] = base
         for subC in order:
             subT = self.class2subtype[subC][0]
             x = self.get_subtype_schema(subC, unique=unique_subt,
+                                        partnered=partnered_subt,
                                         relaxed=relaxed_subt, **kwargs)
             out[self._subtype_defkey(self.schema_type, subT)] = x
             # TODO: Unclear what this should be if properties added
@@ -731,7 +813,8 @@ class ComponentSchema(object):
         """
         combo = {
             'description': f'Schema for {self.schema_type} components.',
-            'title': f"complete-{self.schema_type}-{self.subtype_key}"}
+            'title': (f"complete-{self.schema_type}-{self.subtype_key}")}
+        # f"-{self.default_subtype}")}
         if for_form:
             combo.update(self.get_subtype_schema('base', for_form=True))
             return combo
@@ -799,35 +882,44 @@ class ComponentSchema(object):
         """
         _, schema_type, subtype_key = schema['title'].split('-')
         subt_base = defs[cls._subtype_defkey(schema_type, "base")]
+        subt_default = subt_base['properties'][subtype_key].get('default', None)
+        subt_description = subt_base['properties'][subtype_key].get('description', '')
         subt_schema = [defs[x['$ref'].split('#/definitions/')[-1]]
                        for x in schema['allOf'][1]['anyOf']]
-        subt_required_by_subtype = set()
-        # Sub types that have overlapping properties should only
-        # differ in the default value and so should be required
-        # for all subtypes, but not the base so that the default
-        # can be set for subtypes or an error is raised if there
-        # is no default and the property is missing.
+        # Initialize schema
+        out = cls(schema_type, subtype_key,
+                  schema_registry=schema_registry)
+        out.default_subtype = subt_default
+        # out._base_schema = subt_base
+        prop_base = list(subt_base['properties'].keys())
         for v in subt_schema:
             for k in v['properties'].keys():
-                if ((k != 'driver'
-                     and not cls._is_placeholder(v['properties'][k])
-                     and k in v.get('required', [])
-                     and not cls.compare_body(
-                         subt_base['properties'][k], v['properties'][k],
-                         ignore_keys=['description']))):
-                    subt_required_by_subtype.add(k)
-        # Initialize schema
-        out = cls(schema_type, subtype_key, schema_registry=schema_registry)
-        out._base_schema = subt_base
-        # for x in [subt_base, subt_schema[0]]:
-        #     if 'default' in x['properties'].get(subtype_key, {}):
-        #         out.default_subtype = x['properties'][subtype_key]['default']
-        if 'default' in out._base_schema['properties'][subtype_key]:
-            out.default_subtype = out._base_schema[
-                'properties'][subtype_key].pop('default')
+                if k in prop_base:
+                    prop_base.remove(k)
+        prop_base += ['driver', subtype_key]
+        base_unique = {k: v for k, v in subt_base['properties'].items()
+                       if k in prop_base}
+        kwargs_base = {k: subt_base[k] for k in
+                       ['pushProperties', 'pullProperties']
+                       if k in subt_base}
         for v in subt_schema:
             v_class_name = v['title'].split('.')[-1]
-            out._storage[v_class_name] = v
+            v_new = copy.deepcopy(v)
+            v_new['required'] = sorted(list(
+                set(v.get('required', [])) | set(subt_base.get('required', []))))
+            if not v_new['required']:
+                del v_new['required']
+            v_new['properties'] = copy.deepcopy(base_unique)
+            v_new['properties'].update(v['properties'])
+            # TODO: Compare with base
+            kwargs_no_inherit = {k: v_new.pop(k) for k in
+                                 ['pushProperties', 'pullProperties']
+                                 if k in v_new and k not in subt_base}
+            out.append_schema(v_class_name, v_new,
+                              description=subt_description,
+                              default=subt_default,
+                              kwargs_base=kwargs_base,
+                              kwargs_no_inherit=kwargs_no_inherit)
             subtypes = v['properties'][out.subtype_key]['enum']
             out.schema_subtypes[v_class_name] = subtypes
             v_module = '.'.join(v['title'].split('.')[:-2])
@@ -836,33 +928,10 @@ class ComponentSchema(object):
             else:
                 assert v_module == out.module
         # Remove placeholder properties in base and subtypes
-        for x in [out._base_schema] + list(out._storage.values()):
-            for k in list(x['properties'].keys()):
-                if cls._is_placeholder(x['properties'][k]):
-                    del x['properties'][k]
-        # Remove properties from base that are only specified in
-        # subtype schemas
-        subt_props = set()
-        for x in out._storage.values():
-            subt_props.update(set(x['properties'].keys()))
-        for k in ['driver', out.subtype_key]:
-            if k in subt_props:
-                subt_props.remove(k)
-        subt_props -= set(subt_required_by_subtype)
-        for k in subt_props:
-            if k in out._base_schema['properties']:
-                del out._base_schema['properties'][k]
-        out._base_schema['additionalProperties'] = True
-        # Update subtype properties with general properties
-        for x in out._storage.values():
-            for k, v in out._base_schema['properties'].items():
-                if ((k not in [out.subtype_key, 'driver']
-                     and k not in x['properties'])):
-                    x['properties'][k] = copy.deepcopy(v)
-            x['additionalProperties'] = False
-        # Handle properties that should be required at the subtype
-        # level to allow for subtype specific defaults
-        out.set_required_by_subtype(subt_required_by_subtype)
+        # for x in list(out._storage.values()):
+        #     for k in list(x['properties'].keys()):
+        #         if cls._is_placeholder(x['properties'][k]):
+        #             del x['properties'][k]
         return out
 
     @classmethod
@@ -887,11 +956,8 @@ class ComponentSchema(object):
         kwargs.update(module=registry['module'],
                       schema_subtypes=schema_subtypes)
         out = cls(schema_type, registry['key'], **kwargs)
-        required_by_subtype = []
         for x in registry['classes'].values():
-            out.append(x, verify=True,
-                       required_by_subtype=required_by_subtype)
-        out.set_required_by_subtype(required_by_subtype)
+            out.append_class(x, verify=True)
         return out
 
     @property
@@ -995,7 +1061,8 @@ class ComponentSchema(object):
         return a_cpy == b_cpy
 
     @classmethod
-    def add_legacy_properties(cls, new_schema, driver_list=None):
+    def add_legacy_properties(cls, new_schema, driver_list=None,
+                              base=False):
         r"""Add driver/args legacy properties to the schema.
 
         Args:
@@ -1022,9 +1089,47 @@ class ComponentSchema(object):
         for k, v in legacy_properties.items():
             if k not in new_schema['properties']:
                 new_schema['properties'][k] = v
+        if 'dependencies' not in new_schema and base:
+            new_schema['dependencies'] = {'driver': ['args']}
 
-    def append(self, comp_cls, verify=False,
-               required_by_subtype=None):
+    def append_schema(self, name, new_schema, verify=False,
+                      description=None, default=None, kwargs_base=None,
+                      kwargs_no_inherit=None):
+        r"""Append component schema to the schema.
+
+        Args:
+            name (str): Name to store the schema under.
+            new_schema (dict): New schema to store.
+            verify (bool, optional): If True, verify the schema after
+                adding the schema. Defaults to False.
+            description (str, optional): Description of the base
+                subtype property.
+            default (str, optional): Default subtype for base.
+            kwargs_base (dict, optional): Keyword arguments added to the
+                base schema and removed from unique subtype schemas.
+            kwargs_no_inherit (dict, optional): Keyword arguments not
+                inherited by other subtypes or the base schema.
+
+        """
+        # Set properties for creating base schema or that would be
+        # present in base schema if not in every subschema
+        # if kwargs_base:
+        #     new_schema.update(kwargs_base)
+        if kwargs_no_inherit:  # TODO: Remove these from base?
+            self._no_inherit_kwargs[name] = kwargs_no_inherit
+            # new_schema.update(kwargs_no_inherit)
+        self._storage[name] = copy.deepcopy(new_schema)
+        if self._base_name is None:
+            self._base_name = name
+            self._base_kwargs = kwargs_base
+            self._base_subtype_description = description
+            self.default_subtype = default
+        # Verify that the schema is valid
+        if verify:
+            rapidjson.Normalizer.check_schema(self.get_schema())
+            self._base_schema = None  # Reset so that it will be regen
+
+    def append_class(self, comp_cls, verify=False):
         r"""Append component class to the schema.
 
         Args:
@@ -1064,89 +1169,34 @@ class ComponentSchema(object):
         new_schema['properties'].setdefault(self.subtype_key, {})
         new_schema['properties'][self.subtype_key]['enum'] = subtype_list
         # Add legacy properties
-        if driver_list or (isinstance(self._base_schema, dict)
-                           and 'driver' in self._base_schema['properties']):
+        prev_drivers = (
+            self._base_name
+            and 'driver' in self._storage[self._base_name]['properties'])
+        if driver_list or prev_drivers:
             self.add_legacy_properties(new_schema, driver_list)
-        # Create base schema
-        is_base = False
-        if self._base_schema is None:
-            is_base = True
-            self._base_schema = dict(
-                copy.deepcopy(new_schema),
-                title='%s_base' % self.schema_type,
-                description=('Base schema for all subtypes of %s components.'
-                             % self.schema_type),
-                additionalProperties=True,
-                **comp_cls._schema_additional_kwargs_base)
-            if self.subtype_key in self._base_schema.get('required', []):
-                self._base_schema['required'].remove(self.subtype_key)
-                if not self._base_schema['required']:
-                    self._base_schema.pop('required')
-        if ((self.default_subtype is None
-             and 'default' in new_schema['properties'][self.subtype_key])):
-            self._base_schema['properties'][self.subtype_key].pop('default')
-            self.default_subtype = new_schema['properties'][
-                self.subtype_key]['default']
-        if driver_list and 'dependencies' not in self._base_schema:
-            self._base_schema['dependencies'] = {'driver': ['args']}
+        if driver_list and not prev_drivers:
             for v in self._storage.values():
                 self.add_legacy_properties(v)
-            self.add_legacy_properties(self._base_schema, driver_list)
-        new_schema.update(comp_cls._schema_additional_kwargs_no_inherit)
+        # Add description/default for subtype to subtype property after
+        # recording base to prevent overwriting of the property rather
+        # than the property value.
+        base_description = new_schema['properties'][self.subtype_key].get(
+            'description', '')
+        base_default = new_schema['properties'][self.subtype_key].get(
+            'default', None)
+        
+        if comp_cls._schema_subtype_description is not None:
+            new_schema['properties'][self.subtype_key]['description'] = (
+                comp_cls._schema_subtype_description)
         if comp_cls._schema_no_default_subtype:
             new_schema['properties'][self.subtype_key].pop('default', None)
         elif subtype_list:
             new_schema['properties'][self.subtype_key]['default'] = subtype_list[0]
-        # Add description of subtype to subtype property after base to
-        # prevent overwriting description of the property rather than the
-        # property value.
-        if comp_cls._schema_subtype_description is not None:
-            new_schema['properties'][self.subtype_key]['description'] = (
-                comp_cls._schema_subtype_description)
-        # Update base schema, checking for compatiblity
-        if not is_base:
-            if 'required' in self._base_schema:
-                self._base_schema['required'] = sorted(list(
-                    set(self._base_schema['required'])
-                    & set(new_schema.get('required', []))))
-                if not self._base_schema['required']:  # pragma: no cover
-                    del self._base_schema['required']
-            prop_overlap = list(
-                set([self.subtype_key])  # Force subtype keys to be included
-                | (set(self._base_schema['properties'].keys())
-                   & set(new_schema['properties'].keys())))
-            new_base_prop = {}
-            for k in prop_overlap:
-                old = self._base_schema['properties'][k]
-                new = new_schema['properties'][k]
-                # Don't compare descriptions or properties defining subtype
-                if k != self.subtype_key and k != 'driver':
-                    if not self.compare_body(old, new):
-                        raise ValueError(
-                            f"Schema for property '{k}' of class '{comp_cls}'"
-                            f" is {new}, which differs from the existing"
-                            f" base class value ({old}). Check that"
-                            f" another class dosn't have a conflicting"
-                            f" definition of the same property.")
-                    if ((k in self._base_schema.get('required', [])
-                         and isinstance(required_by_subtype, list)
-                         and k not in required_by_subtype
-                         and not self.compare_body(old, new,
-                                                   only_keys=['default']))):
-                        required_by_subtype.append(k)
-                # Assign original copy that includes description
-                new_base_prop[k] = self._base_schema['properties'][k]
-                if ((k == self.subtype_key or k == 'driver'
-                     and ('enum' in new_base_prop[k] or 'enum' in new))):
-                    new_base_prop[k]['enum'] = sorted([
-                        x for x in list(
-                            set(new_base_prop[k].get('enum', []))
-                            | set(new.get('enum', []))) if x])
-            self._base_schema['properties'] = new_base_prop
-        self._storage[name] = copy.deepcopy(new_schema)
-        # Verify that the schema is valid
-        if verify:
-            rapidjson.Normalizer.check_schema(self.get_schema())
+        kws = dict(
+            kwargs_base=comp_cls._schema_additional_kwargs_base,
+            kwargs_no_inherit=comp_cls._schema_additional_kwargs_no_inherit,
+            description=base_description, default=base_default)
+        self.append_schema(name, new_schema, verify=verify, **kws)
 
 
 class SchemaRegistry(object):

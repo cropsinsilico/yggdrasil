@@ -25,7 +25,9 @@ program main
      end if
 
      ! Print received message
-     print *, "Model B: (", p%nvert, " verts, ", p%nface, " faces)"
+     print *, "Model B: (", &
+          nelements_ply(p, "vertex"), " verts, ", &
+          nelements_ply(p, "face"), " faces)"
      call display_ply_indent(p, "  ")
 
      ! Send output to output channel

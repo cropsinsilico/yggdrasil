@@ -20,12 +20,6 @@ static char prefix_char = '#';
 #pragma omp threadprivate(prefix_char)
 #endif
   
-/*! @brief Bit flags. */
-#define HEAD_FLAG_VALID      0x00000001  //!< Set if the header is valid.
-#define HEAD_FLAG_MULTIPART  0x00000002  //!< Set if the header is for a multipart message
-#define HEAD_META_IN_DATA    0x00000004  //!< Set if the type is stored with the data during serialization
-#define HEAD_AS_ARRAY        0x00000008  //!< Set if messages will be serialized arrays
-
 /*! @brief C-friendly definition of rapidjson::Document. */
 typedef struct dtype_t {
   void *schema; //!< Pointer to rapidjson::Value for validation.
@@ -34,10 +28,21 @@ typedef struct dtype_t {
 
 /*! @brief C-friendly wrapper for rapidjson::Document. */
 typedef struct generic_t {
-  char prefix; //!< Prefix character for limited verification.
-  void *obj; //!< Pointer to rapidjson::Document or rapidjson::Value.
-  void *allocator; //!< Allocator for rapidjson::Value stored in obj.
+  void *obj; //!< Pointer to rapidjson::Document.
 } generic_t;
+
+/*! @brief C-friendly wrapper for rapidjson::Value. */
+typedef struct generic_ref_t {
+  void *obj; //!< Pointer to rapidjson::Value.
+  void *allocator; //!< Pointer to rapidjson Allocator used to allocated obj.
+} generic_ref_t;
+
+/*! @brief Structure used to wrap va_list and allow pointer passing.
+@param va va_list Wrapped variable argument list.
+*/
+typedef struct va_list_t {
+  void* va;
+} va_list_t;
 
 /*! @brief C-friendly definition of vector object. */
 typedef generic_t json_array_t;
@@ -71,55 +76,28 @@ typedef char* bytes_t;
   
 /*! @brief Header information passed by comms for multipart messages. */
 typedef struct comm_head_t {
-  size_t bodysiz; //!< Size of body.
-  size_t bodybeg; //!< Start of body in header.
-  int flags; //!< Bit flags encoding the status of the header.
-  int nargs_populated; //!< Number of arguments populated during deserialization.
-  //
-  size_t size; //!< Size of incoming message.
-  char address[COMMBUFFSIZ]; //!< Address that message will comm in on.
-  char id[COMMBUFFSIZ]; //!< Unique ID associated with this message.
-  char response_address[COMMBUFFSIZ]; //!< Response address.
-  char request_id[COMMBUFFSIZ]; //!< Request id.
-  char zmq_reply[COMMBUFFSIZ]; //!< Reply address for ZMQ sockets.
-  char zmq_reply_worker[COMMBUFFSIZ]; //!< Reply address for worker socket.
-  char model[COMMBUFFSIZ]; //!< Name of model that sent the header.
-  //
-  void* dtype; //!< JSON schema for validating received data in rapidjson::Document.
+  size_t* size_data; //!< Size of incoming message.
+  size_t* size_buff; //!< Size of message buffer;
+  size_t* size_curr; //!< Size of current message.
+  size_t* size_head; //!< Size of header in incoming message.
+  uint16_t* flags; //!< Bit flags encoding the status of the header.
+  /* int nargs_populated; //!< Number of arguments populated during deserialization. */
+  void* head; //!< C++ header structure.
   void* metadata; //!< Additional user defined options in rapidjson::Value.
+  /* void* schema; //!< JSON schema for validating received data in rapidjson::Document. */
 } comm_head_t;
 
 
 /*! @brief Obj structure. */
 typedef struct obj_t {
-  int nvert; //!< Number of vertices.
-  int ntexc; //!< Number of texture coordinates.
-  int nnorm; //!< Number of normals.
-  int nparam; //!< Number of params.
-  int npoint; //!< Number of points.
-  int nline; //!< Number of lines.
-  int nface; //!< Number of faces.
-  int ncurve; //!< Number of curves.
-  int ncurve2; //!< Number of curv2.
-  int nsurf; //!< Number of surfaces.
   void* obj; //!< Pointer to rapidjson::ObjWavefront instance.
 } obj_t;
 
 /*! @brief Ply structure. */
 typedef struct ply_t {
-  int nvert; //!< Number of vertices.
-  int nface; //!< Number of faces.
-  int nedge; //!< Number of edges.
   void* obj; //!< Pointer to rapidjson::Ply instance.
 } ply_t;
   
-/*!
-  @brief C wrapper for the C++ type_from_doc function.
-  @param type_doc void* Pointer to const rapidjson::Value type doc.
-  @returns void* Pointer to rapidjson::Document.
- */
-void* type_from_doc_c(const void* type_doc);
-
 
 /*!
   @brief C wrapper for the C++ type_from_pyobj function.
@@ -174,13 +152,6 @@ generic_t init_generic_array();
   @returns generic_t New generic object structure contaiing an empty map (JSON object).
  */
 generic_t init_generic_map();
-
-/*!
-  @brief Determine if the provided character matches the required generic prefix char.
-  @param[in] x char Character to check.
-  @returns int 1 if the character is the correct prefix, 0 otherwise.
- */
-int is_generic_flag(char x);
 
 
 /*!
@@ -288,12 +259,11 @@ int set_generic_array(generic_t arr, const size_t i, generic_t x);
   @param[in] arr generic_t Array to get element from.
   @param[in] i size_t Index of element to get.
   @param[out] x generic_t* Pointer to address where element should be
-  stored.
-  @param[in] copy If 1, the element will be copied, otherwise a reference
-    will be returned.
+    stored.
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
-int get_generic_array(generic_t arr, const size_t i, generic_t *x, int copy);
+int get_generic_array(generic_t arr, const size_t i, generic_t *x);
+int get_generic_array_ref(generic_t arr, const size_t i, generic_ref_t *x);
 
 
 /*!
@@ -312,15 +282,15 @@ int set_generic_object(generic_t arr, const char* k, generic_t x);
   @param[in] k const char* Key of element to return.
   @param[out] x generic_t* Pointer to address where element should be
   stored.
-  @param[in] copy If 1, the element will be copied, otherwise a reference
-    will be returned.
   @returns int Flag that is 1 if there is an error and 0 otherwise.
  */
-int get_generic_object(generic_t arr, const char* k, generic_t *x, int copy);
+int get_generic_object(generic_t arr, const char* k, generic_t *x);
+int get_generic_object_ref(generic_t arr, const char* k, generic_ref_t *x);
 
 
 #define set_generic_map set_generic_object
 #define get_generic_map get_generic_object
+#define get_generic_map_ref get_generic_object_ref
 
 
 /*!
@@ -355,6 +325,7 @@ size_t generic_map_get_keys(generic_t x, char*** keys);
 
 // TODO: Copy docs
 
+void* generic_ref_get_item(generic_ref_t x, const char *type);
 void* generic_get_item(generic_t x, const char *type);
 int generic_set_item(generic_t x, const char *type, void* value);
   
@@ -379,11 +350,13 @@ int generic_set_item(generic_t x, const char *type, void* value);
   int generic_array_set_ ## name(generic_t x, const size_t index, generic_t item); \
   int generic_map_set_ ## name(generic_t x, const char* key, generic_t item)
 #define STD_JSON_(name, type)						\
+  type generic_ref_get_ ## name(generic_ref_t x);			\
   type generic_get_ ## name(generic_t x);				\
   int generic_set_ ## name(generic_t x, type value);			\
   NESTED_GET_NOARGS_(name, type);					\
   NESTED_SET_(name, type value)
 #define STD_UNITS_(name, type)			\
+  type generic_ref_get_ ## name(generic_ref_t x);			\
   type generic_get_ ## name(generic_t x);				\
   int generic_set_ ## name(generic_t x, type value, const char* units); \
   NESTED_GET_NOARGS_(name, type);					\
@@ -392,7 +365,9 @@ int generic_set_item(generic_t x, const char *type, void* value);
   STD_JSON_(name, type)
 // TODO: Allow units when calling "get" methods?
 #define ARRAY_(name, type)						\
+  size_t generic_ref_get_1darray_ ## name(generic_ref_t x, type** data); \
   size_t generic_get_1darray_ ## name(generic_t x, type** data);	\
+  size_t generic_ref_get_ndarray_ ## name(generic_ref_t x, type** data, size_t** shape); \
   size_t generic_get_ndarray_ ## name(generic_t x, type** data, size_t** shape); \
   NESTED_GET_(1darray_ ## name, size_t, type** data);			\
   NESTED_GET_(ndarray_ ## name, size_t, type** data, size_t** shape);	\
@@ -491,10 +466,11 @@ void destroy_python_function(python_function_t *x);
   @brief Skip datatype arguments.
   @param[in] dtype dtype_t* Type structure to skip arguments for.
   @param[in, out] ap va_list_t Variable argument list.
-  @param[in] pointers If true, the skipped arguments are assumed to be pointers.
+  @param[in] set If true, the skipped arguments are assumed to be
+    pointers for setting.
   @returns int 1 if there are no errors, 0 otherwise.
  */
-int skip_va_elements(const dtype_t* dtype, va_list_t *ap, bool pointers);
+int skip_va_elements(const dtype_t* dtype, va_list_t *ap, bool set);
 
 
 /*!
@@ -545,16 +521,6 @@ dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic);
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_empty(const bool use_generic);
-
-
-/*!
-  @brief Create a datatype based on a JSON document.
-  @param type_doc void* Pointer to const rapidjson::Value type doc.
-  @param[in] use_generic bool If true, serialized/deserialized
-  objects will be expected to be generic_t instances.
-  @returns dtype_t* Type structure/class.
- */
-dtype_t* create_dtype_doc(void* type_doc, const bool use_generic);
 
 
 /*!
@@ -787,189 +753,107 @@ int destroy_dtype(dtype_t** dtype);
 
 /*!
   @brief Initialize a header struct.
-  @param[in] size size_t Size of message to be sent.
-  @param[in] address char* Address that should be used for remainder of 
-  message following this header if it is a multipart message.
-  @param[in] id char* Message ID.
   @returns comm_head_t Structure with provided information, char arrays
   correctly initialized to empty strings if NULLs provided.
  */
-static inline
-comm_head_t init_header(const size_t size, const char *address, const char *id) {
-  comm_head_t out;
-  // Parameters set during read
-  out.bodysiz = 0;
-  out.bodybeg = 0;
-  out.flags = HEAD_FLAG_VALID;
-  out.nargs_populated = 0;
-  // Parameters sent in header
-  out.size = size;
-  if (address == NULL)
-    out.address[0] = '\0';
-  else
-    strncpy(out.address, address, COMMBUFFSIZ);
-  if (id == NULL)
-    out.id[0] = '\0';
-  else
-    strncpy(out.id, id, COMMBUFFSIZ);
-  out.response_address[0] = '\0';
-  out.request_id[0] = '\0';
-  out.zmq_reply[0] = '\0';
-  out.zmq_reply_worker[0] = '\0';
-  out.model[0] = '\0';
-  // Parameters used for type
-  out.dtype = NULL;
-  out.metadata = NULL;
-  return out;
-};
+comm_head_t init_header();
 
-static inline
-comm_head_t create_send_header(const char * data, const size_t len,
-			       dtype_t *datatype) {
-  /* printf("create_send_header: %d\n", len); */
-  comm_head_t head = init_header(len, NULL, NULL);
-  snprintf(head.id, COMMBUFFSIZ, "%d", rand());
-  char *model_name = getenv("YGG_MODEL_NAME");
-  if (model_name != NULL) {
-    strcpy(head.model, model_name);
-  }
-  char *model_copy = getenv("YGG_MODEL_COPY");
-  if (model_copy != NULL) {
-    strcat(head.model, "_copy");
-    strcat(head.model, model_copy);
-  }
-  head.flags = head.flags | HEAD_FLAG_VALID | HEAD_FLAG_MULTIPART;
-  // Add datatype information to header
-  head.dtype = datatype->schema;
-  head.metadata = datatype->metadata;
-  return head;
-};
+  
+/*!
+  @brief Create a header for sending messages.
+  @param[in] datatype Datatype for messages that will be sent.
+  @returns initialized header.
+*/
+comm_head_t create_send_header(dtype_t *datatype);
+			       
 
+/*!
+  @brief Create a header for receiving messages.
+  @param[in] data Pointer to string containing serialized header.
+  @param[in] len Length of buffer containing serialized message.
+  @param[in] msg_len Length of message in buffer.
+  @param[in] allow_realloc If true, data target can be reallocated.
+  @param[in] temp If true, the header is temporary.
+*/
+comm_head_t create_recv_header(char** data, const size_t len,
+			       size_t msg_len, int allow_realloc,
+			       int temp);
+			       
+
+#define HEADER_GET_SET_METHOD_(type, method)			\
+  int header_GetMeta ## method(comm_head_t head,		\
+			       const char* name, type* x);	\
+  int header_SetMeta ## method(comm_head_t* head,		\
+			       const char* name, type x)
+  HEADER_GET_SET_METHOD_(int, Int);
+  HEADER_GET_SET_METHOD_(bool, Bool);
+  HEADER_GET_SET_METHOD_(const char*, String);
+#undef HEADER_GET_SET_METHOD_
+int header_SetMetaID(comm_head_t* head, const char* name,
+		     const char** id);
+       
 /*!
   @brief Destroy a header object.
   @param[in] x comm_head_t* Pointer to the header that should be destroyed.
   @returns int 0 if successful, -1 otherwise.
 */
-static inline
-int destroy_header(comm_head_t* x) {
-  int ret = 0;
-  if (x->metadata != NULL) {
-    ret = destroy_document(&(x->metadata));
-    x->metadata = NULL;
-    x->dtype = NULL;
-  }
-  return ret;
-};
-
+int destroy_header(comm_head_t* x);
 
 /*!
-  @brief Split header and body of message.
-  @param[in] buf const char* Message that should be split.
-  @param[in] buf_siz size_t Size of buf.
-  @param[out] head const char** pointer to buffer where the extracted header
-  should be stored.
-  @param[out] headsiz size_t reference to memory where size of extracted header
-  should be stored.
-  @returns: int 0 if split is successful, -1 if there was an error.
+  @brief Set flags to mark header as invalid.
+  @param[in] x Header to modify.
 */
-static inline
-int split_head_body(const char *buf, const size_t buf_siz,
-		    char **head, size_t *headsiz) {
-  // Split buffer into head and body
-  int ret;
-  size_t sind, eind, sind_head, eind_head;
-  sind = 0;
-  eind = 0;
-#ifdef _WIN32
-  // Windows regex of newline is buggy
-  UNUSED(buf_siz);
-  size_t sind1, eind1, sind2, eind2;
-  char re_head_tag[COMMBUFFSIZ + 1];
-  snprintf(re_head_tag, COMMBUFFSIZ, "(%s)", MSG_HEAD_SEP);
-  ret = find_match(re_head_tag, buf, &sind1, &eind1);
-  if (ret > 0) {
-    sind = sind1;
-    ret = find_match(re_head_tag, buf + eind1, &sind2, &eind2);
-    if (ret > 0)
-      eind = eind1 + eind2;
-  }
-#else
-  // Extract just header
-  char re_head[COMMBUFFSIZ] = MSG_HEAD_SEP;
-  strcat(re_head, "(.*)");
-  strcat(re_head, MSG_HEAD_SEP);
-  // strcat(re_head, ".*");
-  ret = find_match(re_head, buf, &sind, &eind);
-#endif
-  if (ret < 0) {
-    ygglog_error("split_head_body: Could not find header in '%.1000s'", buf);
-    return -1;
-  } else if (ret == 0) {
-    ygglog_debug("split_head_body: No header in '%.1000s...'", buf);
-    sind_head = 0;
-    eind_head = 0;
-  } else {
-    sind_head = sind + strlen(MSG_HEAD_SEP);
-    eind_head = eind - strlen(MSG_HEAD_SEP);
-  }
-  headsiz[0] = (eind_head - sind_head);
-  char* temp = (char*)realloc(*head, *headsiz + 1);
-  if (temp == NULL) {
-    ygglog_error("split_head_body: Failed to reallocate header.");
-    return -1;
-  }
-  *head = temp;
-  memcpy(*head, buf + sind_head, *headsiz);
-  (*head)[*headsiz] = '\0';
-  return 0;
-};
-
-
-/*!
-  @brief Format header to a string.
-  @param[in] head comm_head_t* Pointer to header to be formatted.
-  @param[out] buf char ** Pointer to buffer where header should be written.
-  @param[in] buf_siz size_t Size of buf.
-  @param[in] max_header_size size_t Maximum size that header can occupy
-  before the type should be moved to the data portion of the message.
-  @param[in] no_type int If 1, type information will not be added to
-  the header. If 0, it will be.
-  @returns: int Size of header written.
-*/
-int format_comm_header(comm_head_t *head, char **buf, size_t buf_siz,
-		       const size_t max_header_size, const int no_type);
-
-
-/*!
-  @brief Extract type from data and updated header.
-  @param[in] buf char** Pointer to data containing type.
-  @param[in] buf_siz size_t Size of buf.
-  @param[in,out] head comm_head_t* Pointer to header structure that
-  should be updated.
-  @returns: int -1 if there is an error, size of adjusted data that
-  dosn't include type otherwise.
- */
-int parse_type_in_data(char **buf, const size_t buf_siz,
-		       comm_head_t* head);
-
+void invalidate_header(comm_head_t* x);
   
 /*!
-  @brief Extract header information from a string.
-  @param[in] buf const char* Message that header should be extracted from.
-  @param[in] buf_siz size_t Size of buf.
-  @returns: comm_head_t Header information structure.
+  @brief Check if a header is valid.
+  @param[in] head Header to check.
+  @returns 1 if valid, 0 otherwise.
 */
-comm_head_t parse_comm_header(const char *buf, const size_t buf_siz);
+int header_is_valid(const comm_head_t head);
+
+/*!
+  @brief Check if a header is for a multipart message.
+  @param[in] head Header to check.
+  @returns 1 if multipart, 0 otherwise.
+*/
+int header_is_multipart(const comm_head_t head);
+
+/*!
+  @brief Get schema from header.
+  @param[in] head Header to get schema from.
+  @returns Header schema.
+*/
+void* header_schema(comm_head_t head);
+  
+/*!
+  @brief Format header to a string.
+  @param[in] head Pointer to header to be formatted.
+  @param[out] headbuf Pointer to buffer where header should be written.
+  @param[in] buf Message being sent.
+  @param[in] buf_siz Size of buf.
+  @param[in] max_size Maximum size that header can occupy before the type
+    should be moved to the data portion of the message.
+  @param[in] no_type If 1, type information will not be added to the
+    header. If 0, it will be.
+  @returns: Size of header written.
+*/
+int format_comm_header(comm_head_t *head, char **headbuf,
+		       const char* buf, size_t buf_siz,
+		       const size_t max_size, const int no_type);
 
 
 /*!
-  @brief Get the ascii table data structure.
-  @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
-  @returns: void* Cast pointer to ascii table.
-*/
-/* void* dtype_ascii_table(const dtype_t* dtype); */
+  @brief Finalize header from complete data.
+  @param[in,out] head Header structure that should be finalized.
+  @param[in,out] dtype Datatype to update if type information is contained
+    in the data.
+  @returns: int -1 if there is an error, 0 otherwise.
+ */
+int finalize_header_recv(comm_head_t head, dtype_t* dtype);
+		       
 
-
+  
 /*!
   @brief Get a copy of a type structure.
   @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
@@ -1011,15 +895,11 @@ int update_precision_dtype(dtype_t* dtype,
   @param[in] dtype dtype_t* Wrapper struct for C++ rapidjson::Document.
   @param[in] buf character pointer to serialized message.
   @param[in] buf_siz size_t Size of buf.
-  @param[in] allow_realloc int If 1, variables being filled are assumed to be
-  pointers to pointers for heap memory. If 0, variables are assumed to be pointers
-  to stack memory. If allow_realloc is set to 1, but stack variables are passed,
-  a segfault can occur.
   @param[in] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
 */
-int deserialize_dtype(const dtype_t *dtype, const char *buf, const size_t buf_siz,
-		      const int allow_realloc, va_list_t ap);
+int deserialize_dtype(const dtype_t *dtype, const char *buf,
+		      const size_t buf_siz, va_list_t ap);
 
 
 /*!
@@ -1112,6 +992,12 @@ void display_obj_indent(obj_t p, const char* indent);
  */
 void display_obj(obj_t p);
 
+/*!
+  @brief Get the number of elements of a certain type in the structure.
+  @param[in] p obj_t ObjWavefront structure.
+  @param[in] name Name of element type to count.
+*/
+int nelements_obj(obj_t p, const char* name);
   
 // Ply wrapped methods
 
@@ -1158,11 +1044,82 @@ void display_ply_indent(ply_t p, const char* indent);
 void display_ply(ply_t p);
 
 /*!
+  @brief Get the number of elements of a certain type in the structure.
+  @param[in] p ply_t Ply structure.
+  @param[in] name Name of element type to count.
+*/
+int nelements_ply(ply_t p, const char* name);
+  
+/*!
   @brief Initialize Python if it is not initialized.
   @returns int 0 if successful, other values indicate errors.
  */
 int init_python_API();
 
+/*!
+  @brief Initialize a variable argument list from an existing va_list.
+  @param[in] nargs Pointer to argument count.
+  @param[in] allow_realloc If int, arguments in va will be reallocated
+    as necessary to receiving message contents.
+  @param[in] for_c If 1, the arguments are treated as coming from C with
+    C++ classes wrapped in structures.
+  @returns va_list_t New variable argument list structure.
+ */
+va_list_t init_va_list(size_t *nargs, int allow_realloc, int for_c);
+
+/*! Initialize a variable argument list from an array of pointers.
+  @param[in] nptrs Number of pointers.
+  @param[in] ptrs Array of pointers.
+  @param[in] allow_realloc If int, arguments in va will be reallocated
+    as necessary to receiving message contents.
+  @param[in] for_fortran If 1, it is assumed that the passed pointers are
+    passed from the fortran interface.
+  @returns va_list_t New variable argument list structure.
+*/
+va_list_t init_va_ptrs(const size_t nptrs, void** ptrs,
+		       int allow_realloc, int for_fortran);
+
+/*! Get pointer to va_list.
+  @param[in] ap Variable argument list.
+  @returns Pointer to variable argument list.
+ */
+va_list* get_va_list(va_list_t ap);
+  
+
+/*! Finalize a variable argument list.
+  @param[in] ap va_list_t Variable argument list.
+*/
+void end_va_list(va_list_t *ap);
+
+/*!
+  @brief Clear argument list.
+  @param[in, out] ap Variable argument list to clear.
+*/
+void clear_va_list(va_list_t *ap);
+
+/*! Get the number of arguments remaining in a variable argument list.
+  @param[in] ap Variable argument list.
+  @returns Number of arguments remaining.
+ */
+size_t size_va_list(va_list_t va);
+
+/*! Set the size of the variable argument list.
+  @param[in] ap Variable argument list.
+  @param[in] nargs Pointer to argument count.
+ */
+void set_va_list_size(va_list_t va, size_t* nargs);
+
+/*! Copy a variable argument list.
+  @param[in] ap va_list_t Variable argument list structure to copy.
+  @returns va_list_t New variable argument list structure.
+*/
+va_list_t copy_va_list(va_list_t ap);
+  
+/*! @brief Method for skipping a number of bytes in the argument list.
+  @param[in] ap va_list_t* Structure containing variable argument list.
+  @param[in] nbytes size_t Number of bytes that should be skipped.
+ */
+void va_list_t_skip(va_list_t *ap, const size_t nbytes);
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

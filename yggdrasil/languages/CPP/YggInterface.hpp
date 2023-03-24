@@ -2,7 +2,9 @@
 #ifndef YGGINTERFACE_HPP_
 #define YGGINTERFACE_HPP_
 
+#define RAPIDJSON_YGGDRASIL
 #include "YggInterface.h"
+#include "datatypes/serialization.h"
 #include <string>
 
 
@@ -128,10 +130,9 @@ public:
    */
   int recv(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 0, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -147,10 +148,9 @@ public:
    */
   int recvRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 1, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 1);
+    int ret = vcommRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   
@@ -179,10 +179,9 @@ public:
    */
   int recv_nolimit(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vyggRecv(_pi, 0, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   
@@ -308,10 +307,9 @@ public:
   */
   int send(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vyggSend(_pi, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommSend(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -336,10 +334,9 @@ public:
   */
   int send_nolimit(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vyggSend(_pi, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommSend(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -406,10 +403,9 @@ public:
   */
   int send(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcSend(_pi, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vrpcSend(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -425,10 +421,9 @@ public:
    */
   int recv(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcRecv(_pi, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vrpcRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -446,10 +441,9 @@ public:
    */
   int recvRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcRecvRealloc(_pi, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 1);
+    int ret = vrpcRecvRealloc(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 };
@@ -569,10 +563,9 @@ public:
   int call(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcCall(_cpi, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vrpcCall(_cpi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   
@@ -594,10 +587,9 @@ public:
   int callRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list(&nargs_copy);
-    va_start(va.va, nargs);
-    int ret = vrpcCallRealloc(_cpi, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 1);
+    int ret = vrpcCallRealloc(_cpi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   

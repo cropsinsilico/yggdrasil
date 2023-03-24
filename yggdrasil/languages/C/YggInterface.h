@@ -613,7 +613,6 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     list. If received message data will exceed the bounds of provided 
     variables, an error will be returned.
   @param[in] rpc RPC comm structure that message should be sent to.
-  @param[in] nargs Number of arguments contained in ap.
   @param[out] ap Variable list of arguments that should be assigned
     parameters extracted using the associated data type. Since these will 
     be assigned, they should be pointers to memory that has already been
@@ -621,7 +620,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecv(rpc, ap) vcommRecv(rpc, 0, ap)
+#define vrpcRecv(rpc, ap) vcommRecv(rpc, ap)
 
 /*!
   @brief Receive a message from a comm into variables in a variable argument
@@ -635,7 +634,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecvRealloc(rpc, ap) vcommRecv(rpc, 1, ap)
+#define vrpcRecvRealloc(rpc, ap) vcommRecv(rpc, ap)
 
 /*!
   @brief Format and send a message to an RPC output queue.
@@ -686,10 +685,6 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     and assign arguments from the message using the input queue format 
     string to parse it.
   @param[in] rpc yggRpc_t structure with RPC information.
-  @param[in] allow_realloc int If 1, output arguments are assumed to be 
-    pointers to pointers such that they can be reallocated as necessary to 
-    receive incoming data. If 0, output arguments are assumed to be 
-    preallocated.
   @param[in,out] ap va_list mixed arguments that include those that should be
     formatted using the output format string, followed by those that should 
     be assigned parameters extracted using the input format string. These 
@@ -699,7 +694,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     indicate success.
  */
 static inline
-int vrpcCallBase(yggRpc_t rpc, const int allow_realloc, va_list_t ap) {
+int vrpcCallBase(yggRpc_t rpc, va_list_t ap) {
   int sret, rret;
   rret = 0;
 
@@ -714,8 +709,8 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc, va_list_t ap) {
   } else {
     send_nargs = nargs_exp_dtype(send_comm->datatype, 0);
   }
-  size_t recv_nargs = ap.nargs[0] - send_nargs;
-  ap.nargs = &send_nargs;
+  size_t recv_nargs = size_va_list(ap) - send_nargs;
+  set_va_list_size(ap, &send_nargs);
   sret = vcommSend(rpc, ap);
   if (sret < 0) {
     ygglog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
@@ -728,23 +723,23 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc, va_list_t ap) {
     ygglog_error("vrpcCall: Error skipping vargs");
     return -1;
   }
-  if (op.nargs[0] != recv_nargs) {
-    ygglog_error("vrpcCall: Number of arguments after skip (%d) doesn't match the number expected (%d)", op.nargs[0], recv_nargs);
+  if (size_va_list(op) != recv_nargs) {
+    ygglog_error("vrpcCall: Number of arguments after skip (%d) doesn't match the number expected (%d)", size_va_list(op), recv_nargs);
     return -1;
   }
   // unpack the messages into the remaining variable arguments
-  rret = vcommRecv(rpc, allow_realloc, op);
+  rret = vcommRecv(rpc, op);
   if (rret < 0) {
     ygglog_error("vrpcCall: vcommRecv error: ret %d: %s", sret, strerror(errno));
   }
-  end_va_list(&op);
+  YGG_END_VAR_ARGS(op);
   
   return rret;
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#define vrpcCall(rpc, ap) vrpcCallBase(rpc, 0, ap)
-#define vrpcCallRealloc(rpc, ap) vrpcCallBase(rpc, 1, ap)
+#define vrpcCall(rpc, ap) vrpcCallBase(rpc, ap)
+#define vrpcCallRealloc(rpc, ap) vrpcCallBase(rpc, ap)
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /*!
@@ -773,10 +768,9 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc, va_list_t ap) {
 static inline
 int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
-  va_list_t ap = init_va_list(&nargs);
-  va_start(ap.va, nargs);
-  ret = vrpcCallBase(rpc, allow_realloc, ap);
-  end_va_list(&ap);
+  YGG_BEGIN_VAR_ARGS(ap, nargs, nargs, allow_realloc);
+  ret = vrpcCallBase(rpc, ap);
+  YGG_END_VAR_ARGS(ap);
   return ret;
 };
   

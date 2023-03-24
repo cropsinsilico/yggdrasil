@@ -220,7 +220,8 @@ class ServerComm(CommBase.CommBase):
             raise RuntimeError("No header received with last message.")
         meta = header.get('__meta__', {})
         if 'response_address' not in meta:  # pragma: debug
-            raise RuntimeError("Last header does not contain response address.")
+            raise RuntimeError(f"Last header does not contain response "
+                               f"address: {header}")
         comm_kwargs = dict(address=meta['response_address'],
                            direction='send',
                            **self.response_kwargs)
