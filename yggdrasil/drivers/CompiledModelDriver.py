@@ -1588,9 +1588,11 @@ class CompilerBase(CompilationToolBase):
                 dont_link = False
         # Add yggdrasil version flag
         yggver = __version__.split('+')[0].split('v')[-1].split('.')
-        kwargs.setdefault('definitions', [])
-        kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}',
-                                  f'YGGVER_MINOR={yggver[1]}']
+        if len(yggver) > 0:
+            kwargs.setdefault('definitions', [])
+            kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}']
+        # if len(yggver) > 1:
+        #     kwargs['definitions'] += [f'YGGVER_MINOR={yggver[1]}']
         # Add flag that model is yggdrasil
         if not cls.is_build_tool:
             kwargs.setdefault('definitions', [])
