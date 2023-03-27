@@ -108,7 +108,6 @@ def write_pyperf_script(script_file, nmsg, msg_size,
         'from yggdrasil import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
-        'warmups = %d' % _pyperf_warmups,
         'msg_size = %d' % msg_size,
         'max_errors = %d' % max_errors,
         'lang_src = "%s"' % lang_src,
@@ -127,7 +126,7 @@ def write_pyperf_script(script_file, nmsg, msg_size,
         'timer = timing.TimedRun(lang_src, lang_dst,'
         '                        comm_type=comm_type,'
         '                        matlab_running=matlab_running)',
-        'runner = pyperf.Runner(values=1, processes=nrep, warmups=warmups)',
+        'runner = pyperf.Runner(values=1, processes=nrep)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.pyperf_func,',
         '                             timer, nmsg, msg_size, max_errors)']
