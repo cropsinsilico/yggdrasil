@@ -2,9 +2,10 @@ model:
   name: feedback
   language: sbml
   args: ./src/sbml1.xml
+  selections: ["time", "S1", "S2", "S3", "S4", "X0", "X1", "[S1]", "[S2]", "[S3]", "[S4]", "[X0]", "[X1]", "compartment", "J0_VM1", "J0_Keq1", "J0_h", "J4_V4", "J4_KS4", "J0", "J1", "J2", "J3", "J4", "S1'", "S2'", "S3'", "S4'", "eigenReal(S1)", "eigenImag(S1)", "eigenReal(S2)", "eigenImag(S2)", "eigenReal(S3)", "eigenImag(S3)", "eigenReal(S4)", "eigenImag(S4)"]
   inputs:
     - name: input
-      vars: time,S1,S2
+      vars: [time,S1,S2]
       default_file:
         name: ./Input/input.txt
         filetype: table

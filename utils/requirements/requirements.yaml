@@ -212,7 +212,7 @@ extras:
   rmq:
     - pika>=1.0.0
   sbml:
-    - name: libroadrunner<2.0.7
+    - name: libroadrunner
       method: pip
       flags:
         install_flags: [--no-dependencies]

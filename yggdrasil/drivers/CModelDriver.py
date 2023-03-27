@@ -359,7 +359,7 @@ class LDLinker(LinkerBase):
         """
         out = super(LDLinker, cls).tool_version(**kwargs)
         for regex in [r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
-                      (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
+                      (r'GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
                        r'(?P<version>\d+(?:\.\d+){0,2})')]:
             match = re.search(regex, out)
             if match is not None:

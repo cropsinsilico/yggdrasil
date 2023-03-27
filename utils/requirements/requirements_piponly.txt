@@ -1,1 +1,1 @@
-libroadrunner<2.0.7  # [pip,sbml]
+libroadrunner    # [pip,sbml]

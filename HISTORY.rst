@@ -17,6 +17,7 @@ History
 * In C, C++, and Fortran, if Python objects will be sent/received the model must initialize Python via "init_python_API()" (a subroutine in Fortran). If a model is a wrapped function, this will be added automatically.
 * Change all JSON serialization to use rapidjson, removing JSONDecoder, JSONEncoder, & JSONEncoderReadable in the process.
 * C++ interface now expects C++ classes for generic, array, object, ply, & obj types. Send methods should pass pointers to these objects. Formatted_io examples for these types have been updated to reflect these changes.
+* Unpinned libroadrunner dependency for SBML
 
 TODO:
 ~~~~~
