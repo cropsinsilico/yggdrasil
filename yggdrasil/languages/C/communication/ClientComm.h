@@ -201,7 +201,7 @@ int client_pop_response(responses_t *x, const char* request_id, char **data,
   int idx = client_has_response(x, request_id);
   if (idx < 0) return -1;
   int ret = x->len[idx];
-  if ((ret + 1) > len) {
+  if ((ret + 1) > (int)len) {
     if (allow_realloc) {
       ygglog_debug("client_pop_response: reallocating buffer from %d to %d bytes.",
 		   len, ret + 1);

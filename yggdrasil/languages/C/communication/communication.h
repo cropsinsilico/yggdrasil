@@ -760,7 +760,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   // Send header
   size_t prev = 0, msgsiz = 0;
   msgsiz = headlen;
-  if (headlen > size_max) {
+  if (headlen > (int)size_max) {
     msgsiz = size_max;
     prev += size_max;
   }

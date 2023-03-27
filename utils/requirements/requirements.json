@@ -409,12 +409,7 @@
     "sbml": [
       {
         "name": "libroadrunner",
-        "method": "pip",
-        "flags": {
-          "install_flags": [
-            "--no-dependencies"
-          ]
-        }
+        "method": "pip"
       }
     ],
     "lpy": [

@@ -303,7 +303,7 @@ jobs:
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: |
         # ls .*
-        coverage xml
+        coverage xml -i
     - name: Upload coverage report
       uses: codecov/codecov-action@v3
       with:

@@ -214,8 +214,6 @@ extras:
   sbml:
     - name: libroadrunner
       method: pip
-      flags:
-        install_flags: [--no-dependencies]
   lpy:
     - name: lpy
       method: conda
