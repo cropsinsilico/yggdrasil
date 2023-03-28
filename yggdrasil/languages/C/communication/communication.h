@@ -211,8 +211,10 @@ int free_comm(comm_t *x) {
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((is_send(x->direction)) && (x->flags & COMM_FLAG_VALID)) {
     if (_ygg_error_flag == 0) {
-      ygglog_debug("free_comm(%s): Sending EOF", x->name);
-      comm_send_eof(x);
+      if (!(x->const_flags[0] & COMM_EOF_SENT)) {
+	ygglog_debug("free_comm(%s): Sending EOF", x->name);
+	comm_send_eof(x);
+      }
       while (comm_nmsg(x) > 0) {
         ygglog_debug("free_comm(%s): draining %d messages",
           x->name, comm_nmsg(x));

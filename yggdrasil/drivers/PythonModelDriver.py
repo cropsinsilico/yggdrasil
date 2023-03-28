@@ -1,8 +1,10 @@
 import os
 import sys
 import importlib
+import logging
 from yggdrasil import tools
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
+logger = logging.getLogger(__name__)
 
 
 class PythonModelDriver(InterpretedModelDriver):
@@ -151,7 +153,8 @@ class PythonModelDriver(InterpretedModelDriver):
         """
         try:
             importlib.import_module(lib)
-        except ImportError:
+        except ImportError as e:
+            logger.info(f"{cls}: {lib}, error = {e}")
             return False
         return True
 

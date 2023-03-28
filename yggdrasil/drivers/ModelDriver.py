@@ -2562,6 +2562,9 @@ class ModelDriver(Driver):
                 code to run it as part of an integration.
 
         """
+        if cls.language == 'fortran' and platform._is_win:
+            verbose = True
+            verbose_model = True
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
         # TODO: Determine how to encode dependencies on external variables in models
