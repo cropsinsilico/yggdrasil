@@ -215,7 +215,7 @@ extras:
     - name: libroadrunner
       method: pip
     - ncurses:
-        - name: ncurses
+        - name: ncurses==5.9
           method: conda
           os: linux
         - name: libncurses5-dev

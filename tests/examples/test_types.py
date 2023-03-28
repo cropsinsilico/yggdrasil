@@ -170,8 +170,10 @@ class TestExampleTypes(base_class):
         r"""dict: Environment variables set for the test."""
         with_asan = (language in ['c', 'c++', 'cpp'] and asan_installed)
         without_python = (
-            with_asan
-            and typename not in ['instance', 'class', 'function'])
+            typename not in ['instance', 'class', 'function'])
+        # without_python = (
+        #     with_asan
+        #     and typename not in ['instance', 'class', 'function'])
         # and typename not in ['instance', 'class', 'function'])
         kwargs = {}
         assign_kws = {}

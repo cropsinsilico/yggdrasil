@@ -371,8 +371,8 @@ class TestComm(BaseComm):
         monkeypatch.setattr(recv_comm, '_safe_recv',
                             magic_error_replacement)
         timeout = 5.0
-        if ((recv_comm._commtype == 'rest' and recv_comm.is_async
-             and platform._is_win)):
+        if ((getattr(recv_comm, '_commtype', None) == 'rest'
+             and recv_comm.is_async and platform._is_win)):
             # TODO: Debug why it takes so long for close to exit
             timeout = 100.0
         flag, msg_recv = recv_comm.recv(timeout=timeout)
@@ -480,8 +480,8 @@ class TestComm(BaseComm):
                                do_send_recv, timeout):
         r"""Test send/recv of a large message."""
         recv_timeout = timeout
-        if ((recv_comm._commtype == 'rest' and recv_comm.is_async
-             and platform._is_win)):
+        if ((getattr(recv_comm, '_commtype', None) == 'rest'
+             and recv_comm.is_async and platform._is_win)):
             # TODO: Debug why it takes so long for message to propagate
             recv_timeout = 100
         do_send_recv(send_comm, recv_comm, msg_long,

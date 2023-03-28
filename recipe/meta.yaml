@@ -184,7 +184,7 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - ncurses  # [linux]
+        - ncurses ==5.9  # [linux]
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

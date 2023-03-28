@@ -430,7 +430,7 @@ int get_generic_array_f(generic_t arr, const size_t i, void* x) {
 }
 
 int get_generic_array_ref_f(generic_t arr, const size_t i, void* x) {
-  return get_generic_array_ref(arr, i, (generic_t*)x);
+  return get_generic_array_ref(arr, i, (generic_ref_t*)x);
 }
 
 int set_generic_object_f(generic_t arr, const char* k, generic_t x) {
@@ -442,7 +442,7 @@ int get_generic_object_f(generic_t arr, const char* k, void* x) {
 }
 
 int get_generic_object_ref_f(generic_t arr, const char* k, void* x) {
-  return get_generic_object_ref(arr, k, (generic_t*)x);
+  return get_generic_object_ref(arr, k, (generic_ref_t*)x);
 }
 
 // Python interface

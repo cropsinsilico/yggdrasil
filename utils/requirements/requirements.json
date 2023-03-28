@@ -414,7 +414,7 @@
       {
         "ncurses": [
           {
-            "name": "ncurses",
+            "name": "ncurses==5.9",
             "method": "conda",
             "os": "linux"
           },
