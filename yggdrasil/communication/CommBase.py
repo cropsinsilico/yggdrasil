@@ -1197,7 +1197,7 @@ class CommBase(tools.YggClass):
                 method if linger is True.
 
         """
-        self.debug("Closing %s", self.address)
+        self.debug(f"Closing {self.address} (linger = {linger})")
         if linger and self.is_open:
             self.linger(**kwargs)
         else:

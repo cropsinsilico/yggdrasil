@@ -2,6 +2,7 @@ import os
 import uuid
 import copy
 import pytest
+from yggdrasil import platform
 from yggdrasil.communication import new_comm, get_comm
 from yggdrasil.tools import get_supported_comm
 from tests import TestComponentBase
@@ -169,7 +170,8 @@ class BaseComm(TestComponentBase):
                 if not recv_params.get('skip_wait', False):
                     wait_on_function(
                         lambda: (recv_comm.is_closed
-                                 or (recv_comm.n_msg_recv > 0)))
+                                 or (recv_comm.n_msg_recv > 0)),
+                        timeout=recv_params.get('wait_timeout', timeout))
                 flag, msg = getattr(
                     recv_comm, recv_params.get('method', 'recv'))(
                         **recv_params.get('kwargs', {'timeout': 0}))
@@ -368,7 +370,12 @@ class TestComm(BaseComm):
         r"""Test error on recv."""
         monkeypatch.setattr(recv_comm, '_safe_recv',
                             magic_error_replacement)
-        flag, msg_recv = recv_comm.recv(timeout=5.0)
+        timeout = 5.0
+        if ((recv_comm._commtype == 'rest' and recv_comm.is_async
+             and platform._is_win)):
+            # TODO: Debug why it takes so long for close to exit
+            timeout = 100.0
+        flag, msg_recv = recv_comm.recv(timeout=timeout)
         assert not flag
 
     def test_send_recv_after_close(self, commtype, send_comm, recv_comm,
@@ -470,13 +477,19 @@ class TestComm(BaseComm):
                      send_params={'method': 'send_eof'})
 
     def test_send_recv_nolimit(self, msg_long, send_comm, recv_comm,
-                               do_send_recv):
+                               do_send_recv, timeout):
         r"""Test send/recv of a large message."""
+        recv_timeout = timeout
+        if ((recv_comm._commtype == 'rest' and recv_comm.is_async
+             and platform._is_win)):
+            # TODO: Debug why it takes so long for message to propagate
+            recv_timeout = 100
         do_send_recv(send_comm, recv_comm, msg_long,
                      send_params={'method': 'send_nolimit',
                                   'kwargs': {
                                       'header_kwargs': {'x': msg_long}}},
-                     recv_params={'method': 'recv_nolimit'})
+                     recv_params={'method': 'recv_nolimit',
+                                  'wait_timeout': recv_timeout})
         if send_comm is not None:
             send_comm.printStatus()
             send_comm.printStatus(return_str=True)

@@ -410,6 +410,31 @@
       {
         "name": "libroadrunner",
         "method": "pip"
+      },
+      {
+        "ncurses": [
+          {
+            "name": "ncurses",
+            "method": "conda",
+            "os": "linux"
+          },
+          {
+            "name": "libncurses5-dev",
+            "method": "apt",
+            "os": "linux",
+            "add": [
+              "libncursesw5-dev"
+            ]
+          },
+          {
+            "method": "skip",
+            "os": "osx"
+          },
+          {
+            "method": "skip",
+            "os": "win"
+          }
+        ]
       }
     ],
     "lpy": [

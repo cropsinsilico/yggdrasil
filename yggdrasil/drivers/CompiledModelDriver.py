@@ -1334,7 +1334,7 @@ class CompilationToolBase(object):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))
             try:
-                logger.debug(' '.join(cmd) + '\n' + output)
+                logger.info(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(output)
         except (subprocess.CalledProcessError, OSError) as e:
@@ -1342,8 +1342,10 @@ class CompilationToolBase(object):
                 raise RuntimeError("Could not call command '%s': %s"
                                    % (' '.join(cmd), e))
         except BaseException as e:
-            print("Unexpected call error: %s" % e)
-            print(e, type(e))
+            try:
+                print(f"Unexpected call error {type(e)}: {e}")
+            except UnicodeDecodeError:  # pragma: debug
+                tools.print_encoded(e)
             raise
         # Check for output
         if (not skip_flags):
