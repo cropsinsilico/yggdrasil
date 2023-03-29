@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #endif
 
+#include <iostream>
 #include <string>
 #include <regex>
 #include <cstdint>
