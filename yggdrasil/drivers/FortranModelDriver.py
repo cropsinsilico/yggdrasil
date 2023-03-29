@@ -154,6 +154,7 @@ class FortranModelDriver(CompiledModelDriver):
         zmq={'libraries': [('c', x) for x in
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
+    standard_libraries = []
     external_libraries = {'cxx': {'include': 'stdlib.h',
                                   'libtype': 'shared',
                                   'language': 'c'}}
@@ -420,10 +421,14 @@ class FortranModelDriver(CompiledModelDriver):
                 else:
                     # GNU takes precedence when present
                     add_cxx_lib = 'stdc++'
-            if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
-                cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
+            if add_cxx_lib and (add_cxx_lib not in cls.standard_libraries):
+                cls.standard_libraries.append(add_cxx_lib)
                 cls.internal_libraries['fygg']['external_dependencies'].append(
                     add_cxx_lib)
+            # if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
+            #     cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
+            #     cls.internal_libraries['fygg']['external_dependencies'].append(
+            #         add_cxx_lib)
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
