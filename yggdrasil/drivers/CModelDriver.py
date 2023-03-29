@@ -839,9 +839,6 @@ class CModelDriver(CompiledModelDriver):
         # Platform specific internal library options
         cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows
-            stdint_win = os.path.join(_top_lang_dir, 'windows_stdint.h')
-            assert os.path.isfile(stdint_win)
-            shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
             for x in ['ygg', 'datatypes']:
