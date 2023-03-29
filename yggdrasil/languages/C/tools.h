@@ -145,7 +145,6 @@ typedef struct complex_long_double_t {
 #include "regex_posix.h"
 #endif
 #ifdef _MSC_VER
-#include "windows_stdint.h"  // Use local copy for MSVC support
 // Prevent windows.h from including winsock.h
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -156,7 +155,6 @@ typedef struct complex_long_double_t {
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
-#include <stdint.h>
 #include <unistd.h>
 #define ygg_getpid getpid
 #endif

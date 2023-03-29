@@ -174,17 +174,6 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - pika >=1.0.0
-  - name: yggdrasil.sbml
-    build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
-      run_exports:
-        - {{ pin_subpackage('yggdrasil.sbml') }}
-    requirements:
-      host:
-        - python
-      run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - ncurses ==5.9  # [linux]
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

@@ -1760,27 +1760,27 @@ contains
     character(len=*), intent(in) :: name
     character(len=*), intent(in), optional :: out_fmt_in
     character(len=*), intent(in), optional :: in_fmt_in
-    character(len=:), allocatable :: out_fmt
-    character(len=:), allocatable :: in_fmt
     character(len=len_trim(name)+1) :: c_name
     character(len=:), allocatable :: c_out_fmt
     character(len=:), allocatable :: c_in_fmt
     type(yggcomm) :: channel
     if (present(out_fmt_in)) then
-       out_fmt = out_fmt_in
+       allocate(character(len=len_trim(out_fmt_in)+1) :: c_out_fmt)
+       c_out_fmt = trim(out_fmt_in)//c_null_char
     else
-       out_fmt = "%s"
+       allocate(character(len=3) :: c_out_fmt)
+       c_out_fmt(1:2) = '%s'
+       c_out_fmt(3:3) = c_null_char
     end if
     if (present(in_fmt_in)) then
-       in_fmt = in_fmt_in
+       allocate(character(len=len_trim(in_fmt_in)+1) :: c_in_fmt)
+       c_in_fmt = trim(in_fmt_in)//c_null_char
     else
-       in_fmt = "%s"
+       allocate(character(len=3) :: c_in_fmt)
+       c_in_fmt(1:2) = '%s'
+       c_in_fmt(3:3) = c_null_char
     end if
-    allocate(character(len=len_trim(in_fmt)+1) :: c_in_fmt)
-    allocate(character(len=len_trim(out_fmt)+1) :: c_out_fmt)
     c_name = trim(name)//c_null_char
-    c_out_fmt = trim(out_fmt)//c_null_char
-    c_in_fmt = trim(in_fmt)//c_null_char
     call fix_format_str(c_out_fmt)
     call fix_format_str(c_in_fmt)
     channel%comm = ygg_rpc_client_c(c_name, c_out_fmt, c_in_fmt)
@@ -1802,27 +1802,27 @@ contains
     character(len=*), intent(in) :: name
     character(len=*), intent(in), optional :: in_fmt_in
     character(len=*), intent(in), optional :: out_fmt_in
-    character(len=:), allocatable :: in_fmt
-    character(len=:), allocatable :: out_fmt
     character(len=len_trim(name)+1) :: c_name
     character(len=:), allocatable :: c_in_fmt
     character(len=:), allocatable :: c_out_fmt
     type(yggcomm) :: channel
     if (present(in_fmt_in)) then
-       in_fmt = in_fmt_in
+       allocate(character(len=len_trim(in_fmt_in)+1) :: c_in_fmt)
+       c_in_fmt = trim(in_fmt_in)//c_null_char
     else
-       in_fmt = "%s"
+       allocate(character(len=3) :: c_in_fmt)
+       c_in_fmt(1:2) = '%s'
+       c_in_fmt(3:3) = c_null_char
     end if
     if (present(out_fmt_in)) then
-       out_fmt = out_fmt_in
+       allocate(character(len=len_trim(out_fmt_in)+1) :: c_out_fmt)
+       c_out_fmt = trim(out_fmt_in)//c_null_char
     else
-       out_fmt = "%s"
+       allocate(character(len=3) :: c_out_fmt)
+       c_out_fmt(1:2) = '%s'
+       c_out_fmt(3:3) = c_null_char
     end if
-    allocate(character(len=len_trim(in_fmt)+1) :: c_in_fmt)
-    allocate(character(len=len_trim(out_fmt)+1) :: c_out_fmt)
     c_name = trim(name)//c_null_char
-    c_in_fmt = trim(in_fmt)//c_null_char
-    c_out_fmt = trim(out_fmt)//c_null_char
     call fix_format_str(c_in_fmt)
     call fix_format_str(c_out_fmt)
     channel%comm = ygg_rpc_server_c(c_name, c_in_fmt, c_out_fmt)
@@ -3502,18 +3502,18 @@ contains
     type(c_ptr) :: val
     character(len=*), intent(in) :: subtype
     integer, intent(in) :: precision
-    character(len=*), intent(in), optional, target :: units_in
-    character(len=:), pointer :: units
+    character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
     character(len=len_trim(subtype)+1) :: c_subtype
     character(len=:), pointer :: c_units
     if (present(units_in)) then
-       units => units_in
+       allocate(character(len=len_trim(units_in)+1) :: c_units)
+       c_units = trim(units_in)//c_null_char
     else
-       units = ""
+       allocate(character(len=1)  :: c_units)
+       c_units(1:1) = c_null_char
     end if
     c_subtype = trim(subtype)//c_null_char
-    c_units = trim(units)//c_null_char
     c_out = generic_array_set_scalar_c(x, int(index-1, c_size_t), &
          val, c_subtype, int(precision, c_size_t), c_units)
     if (c_out.lt.0) then
@@ -3537,18 +3537,18 @@ contains
     character(len=*), intent(in) :: subtype
     integer, intent(in) :: precision
     integer, intent(in) :: length
-    character(len=*), intent(in), optional, target :: units_in
-    character(len=:), pointer :: units
+    character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
     character(len=len_trim(subtype)+1) :: c_subtype
     character(len=:), pointer :: c_units
     if (present(units_in)) then
-       units => units_in
+       allocate(character(len=len_trim(units_in)+1) :: c_units)
+       c_units = trim(units_in)//c_null_char
     else
-       units = ""
+       allocate(character(len=1)  :: c_units)
+       c_units(1:1) = c_null_char
     end if
     c_subtype = trim(subtype)//c_null_char
-    c_units = trim(units)//c_null_char
     c_out = generic_array_set_1darray_c(x, int(index-1, c_size_t), &
          val, c_subtype, int(precision, c_size_t), &
          int(length, c_size_t), c_units)
@@ -3574,18 +3574,18 @@ contains
     character(len=*), intent(in) :: subtype
     integer, intent(in) :: precision
     integer(kind=c_size_t), dimension(:), intent(in), target :: shape
-    character(len=*), intent(in), optional, target :: units_in
-    character(len=:), pointer :: units
+    character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
     character(len=len_trim(subtype)+1) :: c_subtype
     character(len=:), pointer :: c_units
     if (present(units_in)) then
-       units => units_in
+       allocate(character(len=len_trim(units_in)+1) :: c_units)
+       c_units = trim(units_in)//c_null_char
     else
-       units = ""
+       allocate(character(len=1)  :: c_units)
+       c_units(1:1) = c_null_char
     end if
     c_subtype = trim(subtype)//c_null_char
-    c_units = trim(units)//c_null_char
     c_out = generic_array_set_ndarray_c(x, int(index-1, c_size_t), &
          data, c_subtype, int(precision, c_size_t), &
          int(size(shape), c_size_t), c_loc(shape), c_units)
@@ -3830,20 +3830,20 @@ contains
     character(len=*) :: subtype
     integer, intent(in) :: precision
     integer, intent(in) :: length
-    character(len=*), intent(in), optional, target :: units_in
-    character(len=:), pointer :: units
+    character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
     character(len=len_trim(key)+1) :: c_key
     character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), pointer :: c_units
+    character(len=:), allocatable :: c_units
     if (present(units_in)) then
-       units => units_in
+       allocate(character(len=len_trim(units_in)+1) :: c_units)
+       c_units = trim(units_in)//c_null_char
     else
-       units = ""
+       allocate(character(len=1)  :: c_units)
+       c_units(1:1) = c_null_char
     end if
     c_key = trim(key)//c_null_char
     c_subtype = trim(subtype)//c_null_char
-    c_units = trim(units)//c_null_char
     c_out = generic_map_set_1darray_c(x, c_key, val, c_subtype, &
          int(precision, c_size_t), int(length, c_size_t), c_units)
     if (c_out.lt.0) then
@@ -3868,20 +3868,20 @@ contains
     character(len=*) :: subtype
     integer, intent(in) :: precision
     integer(kind=c_size_t), dimension(:), intent(in), target :: shape
-    character(len=*), intent(in), optional, target :: units_in
-    character(len=:), pointer :: units
+    character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
     character(len=len_trim(key)+1) :: c_key
     character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), pointer :: c_units
+    character(len=:), allocatable :: c_units
     if (present(units_in)) then
-       units => units_in
+       allocate(character(len=len_trim(units_in)+1) :: c_units)
+       c_units = trim(units_in)//c_null_char
     else
-       units = ""
+       allocate(character(len=1)  :: c_units)
+       c_units(1:1) = c_null_char
     end if
     c_key = trim(key)//c_null_char
     c_subtype = trim(subtype)//c_null_char
-    c_units = trim(units)//c_null_char
     c_out = generic_map_set_ndarray_c(x, c_key, data, c_subtype, &
          int(precision, c_size_t), int(size(shape), c_size_t), &
          c_loc(shape), c_units)

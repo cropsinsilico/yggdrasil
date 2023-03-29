@@ -214,18 +214,18 @@ extras:
   sbml:
     - name: libroadrunner
       method: pip
-    - ncurses:
-        - name: ncurses==5.9
-          method: conda
-          os: linux
-        - name: libncurses5-dev
-          method: apt
-          os: linux
-          add: [libncursesw5-dev]
-        - method: skip
-          os: osx
-        - method: skip
-          os: win
+    # - ncurses:
+    #     - name: ncurses==5.9
+    #       method: conda
+    #       os: linux
+    #     - name: libncurses5
+    #       method: apt
+    #       os: linux
+    #       add: [libncurses5-dev, libncursesw5-dev]
+    #     - method: skip
+    #       os: osx
+    #     - method: skip
+    #       os: win
   lpy:
     - name: lpy
       method: conda

@@ -224,10 +224,10 @@ public:
     }
   }
 
-  rapidjson::StringBuffer formatBuffer(bool metaOnly=true) {
-    rapidjson::StringBuffer buffer;
+  void formatBuffer(rapidjson::StringBuffer& buffer, bool metaOnly=true) {
+    buffer.Clear();
     if (!metadata.IsObject()) {
-      return buffer;
+      return;
     }
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     if (metaOnly) {
@@ -264,7 +264,6 @@ public:
       // 	  schema = &(metadata["serializer"]["datatype"]);
       // }
     }
-    return buffer;
   }
 
   size_t format(const char* buf, size_t buf_siz,
@@ -273,7 +272,8 @@ public:
     data = &data_;
     size_data = buf_siz;
     SetMetaInt("size", buf_siz);
-    rapidjson::StringBuffer buffer = formatBuffer(metaOnly);
+    rapidjson::StringBuffer buffer;
+    formatBuffer(buffer, metaOnly);
     rapidjson::StringBuffer buffer_body;
     if (buffer.GetLength() == 0) {
       return 0;
@@ -285,10 +285,10 @@ public:
 	ygglog_throw_error("Header::format: meta already excluded, cannot make header any smaller.");
       flags |= HEAD_META_IN_DATA;
       SetMetaBool("in_data", true);
-      buffer_body = formatBuffer();
+      formatBuffer(buffer_body);
       size_data += size_sep + static_cast<size_t>(buffer_body.GetLength());
       SetMetaInt("size", size_data);
-      buffer = formatBuffer(true);
+      formatBuffer(buffer, true);
       size_new = ((3 * size_sep) +
 		  static_cast<size_t>(buffer.GetLength()) +
 		  static_cast<size_t>(buffer_body.GetLength()));

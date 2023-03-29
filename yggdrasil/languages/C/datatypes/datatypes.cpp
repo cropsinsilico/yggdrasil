@@ -972,8 +972,8 @@ extern "C" {
 	       typeS == std::string("schema") ||
 	       typeS == std::string("array") ||
 	       typeS == std::string("object")) {
-	generic_t tmp = init_generic();
-	tmp.obj = copy_document((rapidjson::Value*)value);
+	x_obj->CopyFrom(((rapidjson::Value*)value)[0],
+			generic_allocator(x), true);
       }
       else if (typeS == std::string("class") ||
 	       typeS == std::string("function")) {

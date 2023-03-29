@@ -15,11 +15,6 @@
 extern "C" {
 #endif
 
-static char prefix_char = '#';
-#ifdef _OPENMP
-#pragma omp threadprivate(prefix_char)
-#endif
-  
 /*! @brief C-friendly definition of rapidjson::Document. */
 typedef struct dtype_t {
   void *schema; //!< Pointer to rapidjson::Value for validation.

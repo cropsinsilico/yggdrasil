@@ -33,7 +33,8 @@ void unset_global_comm_f() {
 
 // Methods for initializing channels
 int is_comm_format_array_type_f(const void *x) {
-  return is_comm_format_array_type((const comm_t*)x);
+  dtype_t *datatype = ((const comm_t*)x)->datatype;
+  return is_dtype_format_array(datatype);
 }
 
 void* ygg_output_f(const char *name) {

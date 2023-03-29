@@ -106,7 +106,6 @@ subroutine generic_map_get_python_class(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(c_ptr) :: c_out
   type(yggpython), pointer, intent(out) :: out
   allocate(out)
   out = yggpython(init_python())
@@ -816,7 +815,7 @@ subroutine generic_map_set_null(x, key, val)
   character(len=*) :: key
   type(yggnull), intent(in) :: val
   type(c_ptr) :: c_val
-  c_val = c_null_ptr
+  c_val = val%ptr
   call generic_map_set_item(x, key, "null", c_val)
 end subroutine generic_map_set_null
 subroutine generic_map_set_number(x, key, val)

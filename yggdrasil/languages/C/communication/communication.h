@@ -147,11 +147,11 @@ int comm_nmsg(const comm_t *x);
   @param[in] x comm_t * Pointer to communicator to check.
   @returns int 1 if format type, 0 otherwise.
  */
-static
-int is_comm_format_array_type(const comm_t *x) {
-  dtype_t *datatype = x->datatype;
-  return is_dtype_format_array(datatype);
-};
+/* static */
+/* int is_comm_format_array_type(const comm_t *x) { */
+/*   dtype_t *datatype = x->datatype; */
+/*   return is_dtype_format_array(datatype); */
+/* }; */
 
 
 /*!
@@ -1058,23 +1058,23 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
-static
-int comm_recv(comm_t *x, char *data, const size_t len) {
-  int ret = comm_recv_single(x, &data, len, 0);
-  if (ret > 0) {
-    if (is_eof(data)) {
-      ygglog_debug("comm_recv(%s): EOF received.", x->name);
-      x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV;
-      ret = -2;
-    } else {
-      ret = comm_recv_multipart(x, &data, len, ret, 0);
-    }
-  } else {
-    ygglog_error("comm_recv(%s): Failed to receive header or message.",
-      x->name);
-  }
-  return ret;
-};
+/* static */
+/* int comm_recv(comm_t *x, char *data, const size_t len) { */
+/*   int ret = comm_recv_single(x, &data, len, 0); */
+/*   if (ret > 0) { */
+/*     if (is_eof(data)) { */
+/*       ygglog_debug("comm_recv(%s): EOF received.", x->name); */
+/*       x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV; */
+/*       ret = -2; */
+/*     } else { */
+/*       ret = comm_recv_multipart(x, &data, len, ret, 0); */
+/*     } */
+/*   } else { */
+/*     ygglog_error("comm_recv(%s): Failed to receive header or message.", */
+/*       x->name); */
+/*   } */
+/*   return ret; */
+/* }; */
 
 /*!
   @brief Receive a message from an input comm, reallocating as necessary.
@@ -1149,10 +1149,10 @@ int comm_send_nolimit_eof(const comm_t *x) {
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
-static
-int comm_recv_nolimit(comm_t *x, char **data, const size_t len) {
-  return comm_recv_realloc(x, data, len);
-};
+/* static */
+/* int comm_recv_nolimit(comm_t *x, char **data, const size_t len) { */
+/*   return comm_recv_realloc(x, data, len); */
+/* }; */
 
 /*!
   @brief Send arguments as a small formatted message to an output comm.

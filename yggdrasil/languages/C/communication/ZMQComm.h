@@ -24,8 +24,8 @@ static char _purge_msg[100] = "YGG_PURGE";
 static int _zmq_sleeptime = 10000;
 #ifdef _OPENMP
 #pragma omp threadprivate(_reply_msg, _purge_msg, _zmq_sleeptime)
-#endif
 static void *ygg_s_process_ctx = NULL;
+#endif
 
 
 typedef struct ygg_zsock_t {
