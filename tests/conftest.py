@@ -139,12 +139,12 @@ def setup_ci(args):
                            % (src_ver, dst_ver))
     subprocess.check_call(
         ["flake8", "yggdrasil", "--append-config", "setup.cfg"])
-    if os.environ.get("YGG_CONDA", None):
-        subprocess.check_call(["python", "create_coveragerc.py"])
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
-        print(fd.read())
+        contents = fd.read()
+        print(f".coveragerc (cwd={os.getcwd()}):\n{contents}")
+        assert contents
     subprocess.check_call(["yggdrasil", "info", "--verbose"])
 
 

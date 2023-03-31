@@ -713,7 +713,7 @@ def rm_excl_rule(excl_list, new_rule):
     return excl_list
 
 
-def create_coveragerc(installed_languages, filename=None):
+def create_coveragerc(installed_languages, filename=None, setup_cfg=None):
     r"""Create the coveragerc to reflect the OS, Python version, and
     availability of matlab. Parameters from the setup.cfg file will be
     added. If the .coveragerc file already exists, it will be read first
@@ -725,6 +725,9 @@ def create_coveragerc(installed_languages, filename=None):
             of installation.
         filename (str, optional): File where coveragerc should be saved.
             Defaults to '.coveragerc' in the current directory.
+        setup_cfg (str, optional): setup.cfg file containing coverage
+            options. If not provided, the current directory will be
+            checked.
 
     Returns:
         bool: True if the file was created/updated successfully, False
@@ -738,12 +741,13 @@ def create_coveragerc(installed_languages, filename=None):
     if os.path.isfile(filename):
         cp.read(filename)
     # Read options from setup.cfg
-    setup_cfg = None
-    for x in ['setup.cfg',
-              os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                           'setup.cfg')]:
-        if os.path.isfile(x):
-            setup_cfg = x
+    if setup_cfg is None:
+        for x in ['setup.cfg',
+                  os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                               'setup.cfg')]:
+            if os.path.isfile(x):
+                setup_cfg = x
+                break
     if setup_cfg:
         cp_cfg = configparser.RawConfigParser("")
         cp_cfg.read(setup_cfg)
@@ -830,4 +834,6 @@ def create_coveragerc(installed_languages, filename=None):
     # Write
     with open(filename, 'w') as fd:
         cp.write(fd)
+    with open(filename, 'r') as fd:
+        logger.info(f"Created coverage rc @ '{filename}:\n{fd.read()}")
     return True

@@ -208,7 +208,6 @@ outputs:
         - breathe
         - doxygen
         - pypandoc
-        - r-rd2md
         - r-roxygen2
         - sphinx
         - sphinx-argparse

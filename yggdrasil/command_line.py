@@ -1568,6 +1568,9 @@ class coveragerc(SubCommand):
         (('--filename', ),
          {'type': str, 'default': None,
           'help': "File to save coveragerc to"}),
+        (('--setup-cfg', ),
+         {'type': str, 'default': None,
+          'help': "setup.cfg file containing coverage options"}),
     ]
 
     @classmethod
@@ -1591,7 +1594,8 @@ class coveragerc(SubCommand):
                 covered_languages[k] = False
         for k in LANGUAGES['all']:
             covered_languages.setdefault(k, True)
-        create_coveragerc(covered_languages, filename=args.filename)
+        create_coveragerc(covered_languages, filename=args.filename,
+                          setup_cfg=args.setup_cfg)
 
 
 class generate_gha_workflow(SubCommand):

@@ -523,11 +523,6 @@
       },
       "pypandoc",
       {
-        "r-rd2md": {
-          "method": "conda"
-        }
-      },
-      {
         "r-roxygen2": {
           "method": "conda"
         }
