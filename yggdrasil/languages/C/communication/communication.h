@@ -1271,7 +1271,7 @@ int vcommRecv(comm_t *x, va_list_t ap) {
     free(buf);
     return -1;
   }
-  ygglog_debug("vcommRecv(%s): deserialize_format returns %d", x->name, ret);
+  ygglog_debug("vcommRecv(%s): deserialize_dtype returns %d", x->name, ret);
   free(buf);
   return ret;
 };

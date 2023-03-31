@@ -703,7 +703,7 @@ int vrpcCallBase(yggRpc_t rpc, va_list_t ap) {
   
   // pack the args and call
   comm_t *send_comm = (comm_t*)(rpc->handle);
-  size_t send_nargs;
+  size_t send_nargs = 0;
   if (is_empty_dtype(send_comm->datatype)) {
     send_nargs = 1;
   } else {
@@ -723,6 +723,7 @@ int vrpcCallBase(yggRpc_t rpc, va_list_t ap) {
     ygglog_error("vrpcCall: Error skipping vargs");
     return -1;
   }
+  ygglog_debug("vrpcCall: %d remaining for receive", size_va_list(op));
   if (size_va_list(op) != recv_nargs) {
     ygglog_error("vrpcCall: Number of arguments after skip (%d) doesn't match the number expected (%d)", size_va_list(op), recv_nargs);
     return -1;
@@ -732,6 +733,7 @@ int vrpcCallBase(yggRpc_t rpc, va_list_t ap) {
   if (rret < 0) {
     ygglog_error("vrpcCall: vcommRecv error: ret %d: %s", sret, strerror(errno));
   }
+  ygglog_debug("vrpcCall: %d arguments after receive", size_va_list(op));
   YGG_END_VAR_ARGS(op);
   
   return rret;
@@ -769,6 +771,7 @@ static inline
 int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
   YGG_BEGIN_VAR_ARGS(ap, nargs, nargs, allow_realloc);
+  ygglog_debug("nrpcCallBase: nargs = %d", nargs);
   ret = vrpcCallBase(rpc, ap);
   YGG_END_VAR_ARGS(ap);
   return ret;

@@ -2947,13 +2947,15 @@ extern "C" {
   }
   
   void end_va_list(va_list_t *ap) {
+    if (!ap)
+      return;
     rapidjson::VarArgList* va = (rapidjson::VarArgList*)(ap->va);
     if (va) {
       size_t nargs = va->get_nargs();
       if (nargs != 0)
 	ygglog_error("%d arguments unused", (int)nargs);
       delete va;
-      ap->va = nullptr;
+      ap->va = NULL;
     }
   }
   void clear_va_list(va_list_t *ap) {
@@ -2963,21 +2965,38 @@ extern "C" {
     }
   }
   size_t size_va_list(va_list_t va) {
+    if (!va.va) {
+      ygglog_error("size_va_list: Argument list is NULL");
+      return 0;
+    }
     return ((rapidjson::VarArgList*)(va.va))->get_nargs();
   }
   
   void set_va_list_size(va_list_t va, size_t* nargs) {
+    if (!va.va) {
+      ygglog_error("set_va_list_size: Arugment list is NULL");
+      return;
+    }
     ((rapidjson::VarArgList*)(va.va))->nargs = nargs;
   }
 
   va_list_t copy_va_list(va_list_t ap) {
     va_list_t out;
-    rapidjson::VarArgList* va = new rapidjson::VarArgList(((rapidjson::VarArgList*)(ap.va))[0]);
-    out.va = (void*)va;
+    if (ap.va) {
+      rapidjson::VarArgList* va = new rapidjson::VarArgList(((rapidjson::VarArgList*)(ap.va))[0]);
+      out.va = (void*)va;
+    } else {
+      ygglog_error("copy_va_list: Source argument list is NULL");
+      out.va = NULL;
+    }
     return out;
   }
 
   void va_list_t_skip(va_list_t *ap, const size_t nbytes) {
+    if (!(ap && ap->va)) {
+      ygglog_error("va_list_t_skip: Argument list is NULL");
+      return;
+    }
     ((rapidjson::VarArgList*)(ap->va))->skip_nbytes(nbytes);
   }
   
