@@ -3,7 +3,7 @@ FROM $base
 
 RUN source /opt/conda/etc/profile.d/conda.sh && \
     conda activate env && \
-    conda install gunicorn
+    mamba install gunicorn
 
 COPY wsgi.py .
 COPY launch_local.sh .
