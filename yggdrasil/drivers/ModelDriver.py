@@ -2916,144 +2916,22 @@ class ModelDriver(Driver):
             keys['use_generic'] = cls.function_param['true']
         else:
             keys['use_generic'] = cls.function_param['false']
-        if 'init_type_from_schema' in cls.function_param:
-            datatype_ = copy.deepcopy(datatype)
-            datatype_.pop('from_function', None)
-            for k in ['precision', 'length', 'ndim', 'shape']:
-                if k in datatype_ and not datatype_[k]:
-                    datatype_.pop(k)
-            if datatype_.get('type', None) == '1darray':
-                datatype_['type'] = 'ndarray'
-                if 'length' in datatype_:
-                    datatype_['shape'] = [datatype_.pop('length')]
-                if 'shape' not in datatype_:
-                    datatype_['ndim'] = 1
-            keys['schema'] = rapidjson.dumps(datatype_).replace(
-                '"', cls.function_param.get('escaped_double_quote', '\\"'))
-            fmt = cls.format_function_param(
-                'init_type_from_schema', **keys)
-            out.append(cls.format_function_param('assign', name=name,
-                                                 value=fmt))
-            return out
-        typename = datatype['type']
-        if name_base is None:
-            name_base = name
-        if datatype['type'] == 'array':
-            if 'items' in datatype:
-                assert isinstance(datatype['items'], list)
-                keys['nitems'] = len(datatype['items'])
-                keys['items'] = '%s_items' % name_base
-                if cls.zero_based:
-                    idx_offset = 0
-                else:
-                    idx_offset = 1
-                for i, x in enumerate(datatype['items']):
-                    # Prevent recusion
-                    x_copy = copy.deepcopy(x)
-                    x_copy.pop('items', None)
-                    x_copy.pop('properties', None)
-                    out += cls.write_type_def(
-                        cls.format_function_param(
-                            'index', variable=keys['items'],
-                            index=(i + idx_offset)), x_copy,
-                        name_base=('%s_item%d' % (name_base, i)),
-                        use_generic=use_generic)
-            else:
-                keys['nitems'] = 0
-                keys['items'] = cls.function_param['null']
-                keys['use_generic'] = cls.function_param['true']
-        elif datatype['type'] == 'object':
-            keys['use_generic'] = cls.function_param['true']
-            if 'properties' in datatype:
-                assert isinstance(datatype['properties'], dict)
-                keys['nitems'] = len(datatype['properties'])
-                keys['keys'] = '%s_keys' % name_base
-                keys['values'] = '%s_vals' % name_base
-                if cls.zero_based:
-                    idx_offset = 0
-                else:
-                    idx_offset = 1
-                for i, (k, v) in enumerate(datatype['properties'].items()):
-                    # Prevent recusion
-                    v_copy = copy.deepcopy(v)
-                    v_copy.pop('items', None)
-                    v_copy.pop('properties', None)
-                    out.append(cls.format_function_param(
-                        'assign', value='\"%s\"' % k,
-                        name=cls.format_function_param(
-                            'index', variable=keys['keys'],
-                            index=(i + idx_offset))))
-                    out += cls.write_type_def(
-                        cls.format_function_param(
-                            'index', variable=keys['values'],
-                            index=(i + idx_offset)), v_copy,
-                        name_base=('%s_prop%d' % (name_base, i)),
-                        use_generic=use_generic)
-            else:
-                keys['nitems'] = 0
-                keys['keys'] = cls.function_param['null']
-                keys['values'] = cls.function_param['null']
-        elif datatype['type'] in ['ply', 'obj']:
-            pass
-        elif datatype['type'] == '1darray':
-            keys['subtype'] = datatype['subtype']
-            if keys['subtype'] in ['bytes', 'string', 'unicode']:
-                keys['precision'] = int(datatype.get('precision', 0))
-            else:
-                keys['precision'] = int(datatype['precision'])
-            keys['length'] = datatype.get('length', '0')
-            keys['units'] = datatype.get('units', '')
-        elif datatype['type'] == 'ndarray':
-            keys['subtype'] = datatype['subtype']
-            if keys['subtype'] in ['bytes', 'string', 'unicode']:
-                keys['precision'] = int(datatype.get('precision', 0))
-            else:
-                keys['precision'] = int(datatype['precision'])
-            if 'shape' in datatype:
-                shape_var = '%s_shape' % name_base
-                if cls.zero_based:
-                    idx_offset = 0
-                else:
-                    idx_offset = 1
-                for i, x in enumerate(datatype['shape']):
-                    out.append(cls.format_function_param(
-                        'assign', value=x,
-                        name=cls.format_function_param(
-                            'index', variable=shape_var,
-                            index=(i + idx_offset))))
-                keys['ndim'] = len(datatype['shape'])
-                keys['shape'] = shape_var
-                typename = 'ndarray_arr'
-            else:
-                keys['ndim'] = 0
-                keys['shape'] = cls.function_param['null']
-            keys['units'] = datatype.get('units', '')
-        elif (typename == 'scalar') or (typename in constants.SCALAR_TYPES):
-            keys['subtype'] = datatype.get('subtype', datatype['type'])
-            keys['units'] = datatype.get('units', '')
-            if keys['subtype'] in ['bytes', 'string', 'unicode']:
-                keys['precision'] = int(datatype.get('precision', 0))
-            elif 'precision' in datatype:
-                keys['precision'] = int(datatype['precision'])
-            else:  # pragma: debug
-                raise NotImplementedError(str(datatype))
-            typename = 'scalar'
-        elif datatype['type'] in ['boolean', 'null', 'number',
-                                  'integer', 'string']:
-            keys['type'] = datatype['type']
-            typename = 'default'
-        elif (typename in ['class', 'function']):
-            keys['type'] = typename
-            typename = 'pyobj'
-        elif typename in ['instance', 'any']:
-            keys['use_generic'] = cls.function_param['true']
-            typename = 'empty'
-        elif typename in ['schema']:
-            keys['use_generic'] = cls.function_param['true']
-        else:  # pragma: debug
-            raise ValueError(f"Cannot create {cls.language} version "
-                             f"of type '{typename}'")
-        fmt = cls.format_function_param(f'init_type_{typename}', **keys)
+        assert 'init_type_from_schema' in cls.function_param
+        datatype_ = copy.deepcopy(datatype)
+        datatype_.pop('from_function', None)
+        for k in ['precision', 'length', 'ndim', 'shape']:
+            if k in datatype_ and not datatype_[k]:
+                datatype_.pop(k)
+        if datatype_.get('type', None) == '1darray':
+            datatype_['type'] = 'ndarray'
+            if 'length' in datatype_:
+                datatype_['shape'] = [datatype_.pop('length')]
+            if 'shape' not in datatype_:
+                datatype_['ndim'] = 1
+        keys['schema'] = rapidjson.dumps(datatype_).replace(
+            '"', cls.function_param.get('escaped_double_quote', '\\"'))
+        fmt = cls.format_function_param(
+            'init_type_from_schema', **keys)
         out.append(cls.format_function_param('assign', name=name,
                                              value=fmt))
         return out
@@ -3888,9 +3766,10 @@ class ModelDriver(Driver):
 
         """
         if 'native_type' in kwargs:
+            out = kwargs['native_type']
             if return_json:
-                return kwargs['native_type'], kwargs.get('json_type', kwargs)
-            return kwargs['native_type']
+                out = (out, kwargs.get('json_type', kwargs))
+            return out
         assert 'json_type' not in kwargs
         json_type = copy.deepcopy(kwargs.get('datatype', kwargs))
         if isinstance(json_type, dict):
@@ -3901,10 +3780,9 @@ class ModelDriver(Driver):
         if type_name == 'scalar':
             type_name = json_type['subtype']
             if type_name == 'string':
+                type_name = 'unicode'
                 if json_type.get('encoding', 'ASCII') == 'ASCII':
                     type_name = 'bytes'
-                else:
-                    type_name = 'unicode'
         if (type_name == 'flag') and (type_name not in cls.type_map):
             type_name = 'boolean'
         if ((kwargs.get('is_length_var', False)

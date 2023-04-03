@@ -15,8 +15,6 @@ from yggdrasil.config import ygg_cfg
 
 
 _default_internal_libtype = 'object'
-# if platform._is_win:  # pragma: windows
-#     _default_internal_libtype = 'static'
 _top_lang_dir = get_language_dir('c')
 
 
@@ -905,33 +903,6 @@ class CModelDriver(CompiledModelDriver):
         if (nplib is not None) and os.path.isfile(nplib):
             cfg.set(cls._language, 'numpy_include',
                     os.path.dirname(os.path.dirname(nplib)))
-        return out
-
-    @classmethod
-    def get_dependency_info(cls, dep, toolname=None, default=None):
-        r"""Get the dictionary of information associated with a
-        dependency.
-
-        Args:
-            dep (str): Name of internal or external dependency or full path
-                to the library.
-            toolname (str, optional): Name of compiler tool that should be used.
-                Defaults to None and the default compiler for the language will
-                be used.
-            default (dict, optional): Information dictionary that should
-                be returned if dep cannot be located. Defaults to None
-                and an error will be raised if dep cannot be found.
-
-        Returns:
-            dict: Dependency info.
-
-        """
-        replaced_toolname = False
-        out = super(CModelDriver, cls).get_dependency_info(
-            dep, toolname=toolname, default=default)
-        if replaced_toolname:
-            out['remove_flags'] = ['/TP']
-            out['toolname'] = toolname
         return out
 
     @classmethod

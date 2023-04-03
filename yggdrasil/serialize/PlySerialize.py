@@ -2,79 +2,11 @@ import copy
 import numpy as np
 from yggdrasil import constants, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
-try:
-    import trimesh
-except ImportError:
-    trimesh = None
-
-
-def singular2plural(e_sing):
-    r"""Get the plural version of a singular element name. If the singular
-    version ends with the suffix 'ex' it is replaced with the plural suffix
-    'ices'. Otherwise, an 's' is appended to the singular name to make it
-    plural.
-
-    Args:
-        e_sing (str): Singular version of an element name.
-
-    Returns:
-        str: Plural version of the singular element name e_sing.
-
-    """
-    if e_sing.endswith('ex'):
-        e_plur = e_sing.rsplit('ex', 1)[0]
-        e_plur += 'ices'
-    else:
-        e_plur = e_sing + 's'
-    return e_plur
-
-
-def plural2singular(e_plur):
-    r"""Get the singular version of a plural element name. If the plural version
-    ends with the suffix 'ices', it is replaced with the singular suffix 'ex'.
-    If the plural version ends with an 's', it is removed.
-
-    Args:
-        e_plur (str): Plural version of an element name.
-
-    Returns:
-        str: Singular version of the plural element name e_plur.
-
-    Raises:
-        ValueError: If a singular version cannot be determined.
-
-    """
-    if e_plur.endswith('ices'):
-        e_sing = e_plur.rsplit('ices', 1)[0]
-        e_sing += 'ex'
-    elif e_plur.endswith('s'):
-        e_sing = e_plur[:-1]
-    else:
-        raise ValueError("Cannot determine singular version of '%s'." % e_plur)
-    return e_sing
 
 
 class GeometryBase:
     r"""Base class for extening rapidjson geometry classes."""
 
-    @classmethod
-    def from_trimesh(cls, in_mesh):
-        r"""Get a version of the object from a trimesh class."""
-        kws = dict(vertices=in_mesh.vertices,
-                   vertex_colors=in_mesh.visual.vertex_colors,
-                   faces=in_mesh.faces.astype('int32'))
-        kws['vertex_colors'] = kws['vertex_colors'][:, :3]
-        return cls.from_dict(kws, as_array=True)
-
-    def as_trimesh(self, **kwargs):
-        r"""Get a version of the object as a trimesh class."""
-        kws0 = self.as_dict(as_array=True)
-        kws = {'vertices': kws0.get('vertices', None),
-               'vertex_colors': kws0.get('vertex_colors', None),
-               'faces': kws0.get('faces', None)}
-        kws.update(kwargs, process=False)
-        return trimesh.base.Trimesh(**kws)
-    
     @classmethod
     def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
         r"""Create a geometry dictionary from a PlantGL shape and descritizer.
@@ -229,30 +161,6 @@ class GeometryBase:
         args = (points, indices)
         return smb_class, args, kwargs
 
-    def merge(self, geom_list, no_copy=False):
-        r"""Merge a list of geometry dictionaries.
-
-        Args:
-            geom_list (list): Geometry dictionaries.
-            no_copy (bool, optional): If True, the current dictionary will be
-                updated, otherwise a copy will be returned with the update.
-                Defaults to False.
-
-        Returns:
-            dict: Merged geometry dictionary.
-
-        """
-        if not isinstance(geom_list, list):
-            geom_list = [geom_list]
-        # Merge fields
-        if no_copy:
-            out = self
-        else:
-            out = copy.deepcopy(self)
-        for x in geom_list:
-            out.append(x)
-        return out
-
     def apply_scalar_map(self, scalar_arr, color_map=None,
                          vmin=None, vmax=None, scaling='linear',
                          scale_by_area=False, no_copy=False, _as_obj=False):
@@ -287,10 +195,7 @@ class GeometryBase:
         if scale_by_area:
             scalar_arr = copy.deepcopy(scalar_arr)
             for i, f in enumerate(self.get('faces', [])):
-                if _as_obj:
-                    fv = [_f['vertex_index'] for _f in f]
-                else:
-                    fv = f['vertex_index']
+                fv = f['vertex_index']
                 if len(fv) > 3:
                     raise NotImplementedError("Area calc not implemented "
                                               + "for faces above triangle.")
@@ -305,14 +210,9 @@ class GeometryBase:
                 scalar_arr[i] = area * scalar_arr[i]
         # Map vertices onto faces
         vertex_scalar = [[] for x in self['vertices']]
-        if _as_obj:
-            for i in range(len(self.get('faces', []))):
-                for v in self.get('faces', [])[i]:
-                    vertex_scalar[v['vertex_index']].append(scalar_arr[i])
-        else:
-            for i in range(len(self.get('faces', []))):
-                for v in self.get('faces', [])[i]['vertex_index']:
-                    vertex_scalar[v].append(scalar_arr[i])
+        for i in range(len(self.get('faces', []))):
+            for v in self.get('faces', [])[i]['vertex_index']:
+                vertex_scalar[v].append(scalar_arr[i])
         for i in range(len(vertex_scalar)):
             if len(vertex_scalar[i]) == 0:
                 vertex_scalar[i] = 0
@@ -398,8 +298,7 @@ class PlySerialize(SerializeBase):
             bytes: Serialized message.
 
         """
-        if not isinstance(args, PlyDict):
-            args = PlyDict(args)
+        assert isinstance(args, PlyDict)
         return str(args).encode("utf-8")
 
     def func_deserialize(self, msg):
@@ -443,8 +342,8 @@ class PlySerialize(SerializeBase):
         """
         if len(objects) == 0:
             return []
-        total = objects[0]
-        out = total.merge(objects[1:])
+        total = type(objects[0])(objects[0])
+        out = total.merge(objects[1:], no_copy=True)
         return [out]
         
     @classmethod
@@ -456,30 +355,39 @@ class PlySerialize(SerializeBase):
 
         """
         out = super(PlySerialize, cls).get_testing_options()
-        obj = PlyDict({'vertices': [{'x': float(0), 'y': float(0), 'z': float(0)},
-                                    {'x': float(0), 'y': float(0), 'z': float(1)},
-                                    {'x': float(0), 'y': float(1), 'z': float(1)}],
-                       'faces': [{'vertex_index': [int(0), int(1), int(2)]}],
-                       'comments': ["author ygg_auto", "File generated by yggdrasil"]})
+        obj = PlyDict(
+            {'vertices': [
+                {'x': float(0), 'y': float(0), 'z': float(0)},
+                {'x': float(0), 'y': float(0), 'z': float(1)},
+                {'x': float(0), 'y': float(1), 'z': float(1)},
+                {'x': float(1), 'y': float(1), 'z': float(1)}],
+             'faces': [
+                 {'vertex_index': [int(0), int(1), int(2)]},
+                 {'vertex_index': [int(0), int(1), int(2), int(3)]}],
+             'comments': ["author ygg_auto", "File generated by yggdrasil"]})
         out.update(objects=[obj, obj],
                    empty={},
                    contents=(b'ply\n'
                              + b'format ascii 1.0\n'
                              + b'comment author ygg_auto\n'
                              + b'comment File generated by yggdrasil\n'
-                             + b'element vertex 6\n'
+                             + b'element vertex 8\n'
                              + b'property double x\n'
                              + b'property double y\n'
                              + b'property double z\n'
-                             + b'element face 2\nproperty list uchar int vertex_index\n'
+                             + b'element face 4\nproperty list uchar int vertex_index\n'
                              + b'end_header\n'
                              + b'0 0 0\n'
                              + b'0 0 1\n'
                              + b'0 1 1\n'
+                             + b'1 1 1\n'
                              + b'0 0 0\n'
                              + b'0 0 1\n'
                              + b'0 1 1\n'
+                             + b'1 1 1\n'
                              + b'3 0 1 2\n'
-                             + b'3 3 4 5\n'))
+                             + b'4 0 1 2 3\n'
+                             + b'3 4 5 6\n'
+                             + b'4 4 5 6 7\n'))
         out['concatenate'] = [([], [])]
         return out

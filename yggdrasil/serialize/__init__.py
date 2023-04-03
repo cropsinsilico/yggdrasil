@@ -15,6 +15,11 @@ except ImportError:  # pragma: no cover
     _use_astropy = False
 
 
+class SerializationError(TypeError):
+    r"""Error during serialization due to unexpected type."""
+    pass
+
+
 def extract_formats(fmt_str):
     r"""Locate format codes within a format string.
 
@@ -1378,17 +1383,17 @@ def list2pandas(arrays, names=None):
     return out
 
 
-def pandas2list(frame):
-    r"""Convert a Pandas DataFrame to a list of arrays.
+# def pandas2list(frame):
+#     r"""Convert a Pandas DataFrame to a list of arrays.
 
-    Args:
-        frame (pandas.DataFrame): Frame to convert.
+#     Args:
+#         frame (pandas.DataFrame): Frame to convert.
 
-    Returns:
-        list: List with contents from the input frame.
+#     Returns:
+#         list: List with contents from the input frame.
 
-    """
-    return numpy2list(pandas2numpy(frame))
+#     """
+#     return numpy2list(pandas2numpy(frame))
 
 
 __all__ = []

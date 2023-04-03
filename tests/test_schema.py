@@ -250,3 +250,16 @@ def test_update_constants(project_dir, display_diff):
     finally:
         with open(filename, 'w') as fd:
             fd.write(old)
+
+
+def test_get_full_schema():
+    r"""Test full schema."""
+    s = schema.get_schema()
+    s.get_schema(full=True)
+
+
+def test_validate_component():
+    r"""Test validate_component."""
+    s = schema.get_schema()
+    x = {"seritype": "direct"}
+    s.validate_component('serializer', x)

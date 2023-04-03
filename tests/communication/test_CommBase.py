@@ -210,7 +210,7 @@ class BaseComm(TestComponentBase):
                                           global_send_comm,
                                           testing_options)
         if sleep_after_connect:
-            recv_comm.sleep()
+            recv_comm.sleep(sleep_after_connect)
         yield recv_comm
         close_comm(recv_comm)
 
@@ -237,7 +237,7 @@ class BaseComm(TestComponentBase):
         recv_comm = self.create_recv_comm(name, commtype, send_comm,
                                           testing_options)
         if sleep_after_connect:
-            recv_comm.sleep()
+            recv_comm.sleep(sleep_after_connect)
         yield recv_comm
         close_comm(recv_comm)
 

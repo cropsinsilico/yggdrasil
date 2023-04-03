@@ -2,7 +2,7 @@ import pytest
 import copy
 from yggdrasil import constants, schema
 from yggdrasil.components import import_component
-from yggdrasil.serialize import SerializeBase
+from yggdrasil.serialize import SerializeBase, SerializationError
 from tests import TestComponentBase as base_class
 
 
@@ -17,7 +17,8 @@ def test_demote_string():
 
 _seritypes = sorted([x for x in schema.get_schema()['serializer'].subtypes
                      if x not in ['default', 'table', 'pandas', 'map',
-                                  'functional', 'mat', 'pickle']])
+                                  'functional', 'mat', 'pickle', 'ply',
+                                  'obj']])
 
 
 class TestSerializeBase(base_class):
@@ -114,6 +115,12 @@ class TestSerializeBase(base_class):
         if ((('contents' in testing_options)
              and (class_name not in ['SerializeBase', 'DefaultSerialize']))):
             instance.deserialize(testing_options['contents'])
+
+    def test_serialize_error(self, instance, testing_options):
+        r"""Test error when serializing invalid message."""
+        for x in testing_options.get("invalid_objects", []):
+            with pytest.raises(SerializationError):
+                instance.serialize(x)
 
     def test_deserialize_error(self, instance):
         r"""Test error when deserializing message that is not bytes."""

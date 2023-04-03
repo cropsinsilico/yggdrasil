@@ -58,13 +58,6 @@ def ordered_dump(data, **kwargs):
     """
     from yggdrasil.serialize import YAMLSerialize
     kwargs['sorted_dict_type'] = [SchemaDict, OrderedDict]
-
-    class OrderedDecoder(rapidjson.Decoder):
-        def start_object(self):
-            return SchemaDict()
-
-    data = rapidjson.as_pure_json(data, decoder=OrderedDecoder(),
-                                  mapping_mode=rapidjson.MM_SORT_KEYS)
     return YAMLSerialize.encode_yaml(data, **kwargs)
 
 
@@ -420,8 +413,7 @@ class ComponentSchema(object):
         for all component subtypes."""
         if self._base_schema is not None:
             return copy.deepcopy(self._base_schema)
-        if self._base_name is None or self._base_name not in self._storage:
-            return None
+        assert self._base_name in self._storage
         self._base_schema = dict(
             copy.deepcopy(self._storage[self._base_name]),
             title=f"{self.schema_type}_base",
@@ -475,7 +467,7 @@ class ComponentSchema(object):
                 # Don't compare descriptions or properties defining the
                 # subtype (like the subtype key or driver)
                 if k not in [self.subtype_key, 'driver']:
-                    if not self.compare_body(old, new):
+                    if not self.compare_body(old, new):  # pragma: debug
                         raise ValueError(
                             f"Schema for property '{k}' of class"
                             f" '{v['title']}'"
@@ -550,13 +542,16 @@ class ComponentSchema(object):
                     for k in self.required_by_subtype:
                         if k in out['required']:
                             out['required'].remove(k)
-                    if not out['required']:
-                        del out['required']
-            elif not (relaxed or for_form):
-                # Add place holders
-                for x in self._storage.values():
-                    for k, v in x['properties'].items():
-                        self._add_placeholder(out['properties'], k, v)
+                    assert out['required']
+                    # if not out['required']:
+                    #     del out['required']
+            else:  # pragma: debug
+                assert (relaxed or for_form)
+            # elif not (relaxed or for_form):
+            #     # Add place holders
+            #     for x in self._storage.values():
+            #         for k, v in x['properties'].items():
+            #             self._add_placeholder(out['properties'], k, v)
         else:
             if subtype not in self._storage:
                 s2c = self.subtype2class
@@ -584,16 +579,18 @@ class ComponentSchema(object):
                     if ((k not in skip_props and k in out['properties']
                          and k not in out.get('required', []))):
                         del out['properties'][k]
-                    if not relaxed:
-                        self._add_placeholder(out['properties'], k, v)
+                    assert relaxed
+                    # if not relaxed:
+                    #     self._add_placeholder(out['properties'], k, v)
                 if not out['properties']:  # pragma: no cover
                     del out['properties']
                 # TODO: Remove pushProperties/pullProperties based on
                 # keys
-                if partnered and self._base_kwargs:
-                    for k in self._base_kwargs:
-                        if k in ['pushProperties', 'pullProperties']:
-                            out.pop(k, None)
+                assert not (partnered and self._base_kwargs)
+                # if partnered and self._base_kwargs:
+                #     for k in self._base_kwargs:
+                #         if k in ['pushProperties', 'pullProperties']:
+                #             out.pop(k, None)
         out['additionalProperties'] = relaxed
         if allow_instance:
             if subtype == 'base':
@@ -629,22 +626,17 @@ class ComponentSchema(object):
     def _subtype_defkey(cls, schema_type, subtype):
         return f"{schema_type}-subtype-{subtype}".replace('+', 'p')
 
-    @classmethod
-    def _is_placeholder(cls, x):
-        # return ((len(x) == 0) or (len(x) == 1 and 'aliases' in x))
-        return (x is True)
+    # @classmethod
+    # def _is_placeholder(cls, x):
+    #     return (x is True)
 
-    @classmethod
-    def _add_placeholder(cls, props, k, v):
-        if k not in props:
-            props[k] = {}
-            if 'aliases' in v:
-                for alias in v['aliases']:
-                    props[alias] = {}
-            # vnew = {}
-            # if 'aliases' in v:
-            #     vnew['aliases'] = copy.deepcopy(v['aliases'])
-            # props[k] = vnew
+    # @classmethod
+    # def _add_placeholder(cls, props, k, v):
+    #     if k not in props:
+    #         props[k] = {}
+    #         if 'aliases' in v:
+    #             for alias in v['aliases']:
+    #                 props[alias] = {}
 
     def get_subtype_definition_ref(self, subtype):
         r"""Get the address for a subtype's schema definition that can
@@ -683,13 +675,14 @@ class ComponentSchema(object):
         partnered_base = (unique in 'subtype')
         partnered_subt = (unique in 'base')
         if not relaxed:
+            assert unique in ['subtype', 'base', 'both']
             if unique in ['base', 'both']:
                 relaxed_base = True
                 relaxed_subt = False
             elif unique in ['subtype']:
                 relaxed_base = False
                 relaxed_subt = True
-            else:
+            else:  # pragma: completion
                 relaxed_base = False
                 relaxed_subt = False
         base = self.get_subtype_schema('base', unique=unique_base,
@@ -702,18 +695,18 @@ class ComponentSchema(object):
                                         partnered=partnered_subt,
                                         relaxed=relaxed_subt, **kwargs)
             out[self._subtype_defkey(self.schema_type, subT)] = x
-            # TODO: Unclear what this should be if properties added
-            # via relaxed
-            if not unique_subt:
-                for k in ['pushProperties', 'pullProperties']:
-                    if k in base:
-                        x.setdefault(k, {})
-                        x[k].update(base[k])
-            else:
+            if unique_subt:
                 # Only remove these if they will be in the base
                 for k in ['pushProperties', 'pullProperties']:
                     if k in base:
                         x.pop(k, None)
+            else:
+                # TODO: Unclear what this should be if properties added
+                # via relaxed
+                for k in ['pushProperties', 'pullProperties']:
+                    if k in base:
+                        x.setdefault(k, {})
+                        x[k].update(base[k])
         return out
 
     def get_driver_definition(self, allow_driver=False):
@@ -842,32 +835,32 @@ class ComponentSchema(object):
                                'class': self.base_subtype_class}]
         return combo
 
-    def set_required_by_subtype(self, props):
-        r"""Update schema so that specified properties are required at
-        the subtype level instead of in the base schema to allow
-        subtypes to specify defaults.
+    # def set_required_by_subtype(self, props):
+    #     r"""Update schema so that specified properties are required at
+    #     the subtype level instead of in the base schema to allow
+    #     subtypes to specify defaults.
 
-        Args:
-            props (list): List of properties to require by subtype.
+    #     Args:
+    #         props (list): List of properties to require by subtype.
 
-        """
-        if not props:
-            return
-        for x in self._storage.values():
-            x.setdefault('required', [])
-            x.setdefault('properties', {})
-            for k in props:
-                if k not in x['required']:
-                    x['required'].append(k)
-                if k not in x['properties']:
-                    x['properties'][k] = copy.deepcopy(
-                        self._base_schema['properties'][k])
-        if self._base_schema.get('required', []):
-            for k in props:
-                if k in self._base_schema['required']:
-                    self._base_schema['required'].remove(k)
-            if not self._base_schema['required']:
-                del self._base_schema['required']
+    #     """
+    #     if not props:
+    #         return
+    #     for x in self._storage.values():
+    #         x.setdefault('required', [])
+    #         x.setdefault('properties', {})
+    #         for k in props:
+    #             if k not in x['required']:
+    #                 x['required'].append(k)
+    #             if k not in x['properties']:
+    #                 x['properties'][k] = copy.deepcopy(
+    #                     self._base_schema['properties'][k])
+    #     if self._base_schema.get('required', []):
+    #         for k in props:
+    #             if k in self._base_schema['required']:
+    #                 self._base_schema['required'].remove(k)
+    #         if not self._base_schema['required']:
+    #             del self._base_schema['required']
 
     @classmethod
     def from_definitions(cls, schema, defs, schema_registry=None):
@@ -960,10 +953,10 @@ class ComponentSchema(object):
             out.append_class(x, verify=True)
         return out
 
-    @property
-    def properties(self):
-        r"""list: Valid properties for this component."""
-        return sorted(list(self.get_subtype_schema('base')['properties'].keys()))
+    # @property
+    # def properties(self):
+    #     r"""list: Valid properties for this component."""
+    #     return sorted(list(self.get_subtype_schema('base')['properties'].keys()))
 
     def get_subtype_properties(self, subtype):
         r"""Get the valid properties for a specific subtype.
@@ -1582,12 +1575,6 @@ class SchemaRegistry(object):
         out = convert_extended2base(out)
         return out
 
-    @property
-    def full_schema(self):
-        r"""dict: Schema for evaluating YAML input file that fully specifies
-        the properties for each component."""
-        return self.get_schema(full=True)
-
     def __getitem__(self, k):
         return self.get(k)
 
@@ -1649,18 +1636,18 @@ class SchemaRegistry(object):
         with open(fname, 'w') as f:
             ordered_dump(schema, stream=f, Dumper=yaml.SafeDumper)
 
-    def validate(self, obj, normalize=False, **kwargs):
-        r"""Validate an object against this schema.
+    # def validate(self, obj, normalize=False, **kwargs):
+    #     r"""Validate an object against this schema.
 
-        Args:
-            obj (object): Object to valdiate.
-            **kwargs: Additional keyword arguments are passed to get_schema.
+    #     Args:
+    #         obj (object): Object to valdiate.
+    #         **kwargs: Additional keyword arguments are passed to get_schema.
 
-        """
-        if normalize:
-            return self.normalize(obj, **kwargs)
-        # TODO: Check schema?
-        return rapidjson.validate(obj, self.get_schema(**kwargs))
+    #     """
+    #     if normalize:
+    #         return self.normalize(obj, **kwargs)
+    #     # TODO: Check schema?
+    #     return rapidjson.validate(obj, self.get_schema(**kwargs))
 
     def validate_model_submission(self, obj):
         r"""Validate an object against the schema for models submitted to
@@ -1721,22 +1708,22 @@ class SchemaRegistry(object):
     #         return False
     #     return True
 
-    def is_valid_component(self, comp_name, obj):
-        r"""Determine if an object is a valid represenation of a component.
+    # def is_valid_component(self, comp_name, obj):
+    #     r"""Determine if an object is a valid represenation of a component.
 
-        Args:
-            comp_name (str): Name of the component to validate against.
-            obj (object): Object to validate.
+    #     Args:
+    #         comp_name (str): Name of the component to validate against.
+    #         obj (object): Object to validate.
 
-        Returns:
-            bool: True if the object is valid, False otherwise.
+    #     Returns:
+    #         bool: True if the object is valid, False otherwise.
 
-        """
-        try:
-            self.validate_component(comp_name, obj)
-        except rapidjson.ValidationError:
-            return False
-        return True
+    #     """
+    #     try:
+    #         self.validate_component(comp_name, obj)
+    #     except rapidjson.ValidationError:
+    #         return False
+    #     return True
 
     def get_component_schema(self, comp_name, subtype=None, relaxed=False,
                              allow_instance=False, allow_instance_definitions=False,
@@ -1772,8 +1759,7 @@ class SchemaRegistry(object):
             raise ValueError("Unrecognized component: %s" % comp_name)
         if subtype is None:
             out = self._storage[comp_name].get_schema(
-                relaxed=relaxed, allow_instance=allow_instance,
-                for_form=for_form)
+                allow_instance=allow_instance, for_form=for_form)
         else:
             out = self._storage[comp_name].get_subtype_schema(
                 subtype, relaxed=relaxed, allow_instance=allow_instance,
@@ -1783,40 +1769,14 @@ class SchemaRegistry(object):
             for_form=for_form)
         return out
 
-    def get_component_keys(self, comp_name):
-        r"""Get the properties associated with a certain component.
+    # def get_component_keys(self, comp_name):
+    #     r"""Get the properties associated with a certain component.
 
-        Args:
-            comp_name (str): Name of the component to return keys for.
+    #     Args:
+    #         comp_name (str): Name of the component to return keys for.
 
-        Returns:
-            list: All of the valid properties for the specified component.
+    #     Returns:
+    #         list: All of the valid properties for the specified component.
 
-        """
-        return self._storage[comp_name].properties
-
-    @classmethod
-    def register_normalizer(cls, path):
-        r"""Register a normalizer that will be applied to elements in the
-        instance at the specified path.
-
-        Args:
-            path (tuple): Location in schema where normalizer will be applied.
-
-        Returns:
-            function: Decorator for registering the normalizer function.
-
-        """
-        if not isinstance(path, list):
-            path_list = [path]
-        else:
-            path_list = path
-
-        def _register_normalizer(func):
-            for p in path_list:
-                if p not in cls._normalizers:
-                    cls._normalizers[p] = []
-                cls._normalizers[p].append(func)
-            return func
-
-        return _register_normalizer
+    #     """
+    #     return self._storage[comp_name].properties

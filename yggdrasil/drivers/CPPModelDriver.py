@@ -46,9 +46,6 @@ class CPPCompilerBase(CCompilerBase):
 
         """
         std_flag_idx = cls.find_standard_flag(flags)
-        logger.info(f"cls = {cls},"
-                    f"std_flag_idx = {std_flag_idx}, "
-                    f"skip_standard_flag = {skip_standard_flag}")
         if skip_standard_flag and (std_flag_idx != -1):
             del flags[std_flag_idx]
         elif (not skip_standard_flag) and (std_flag_idx == -1):

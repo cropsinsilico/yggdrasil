@@ -1351,8 +1351,6 @@ class CompilationToolBase(object):
         if (not skip_flags):
             if (out != 'clean'):
                 expected_products = [out]
-                if kwargs.get('import_lib', False):
-                    expected_products.append(kwargs['import_lib'])
                 for x in expected_products:
                     if not (os.path.isfile(x)
                             or os.path.isdir(x)):  # pragma: debug
@@ -3177,18 +3175,10 @@ class CompiledModelDriver(ModelDriver):
             dep_lang = cls.get_dependency_info(dep, toolname=toolname).get(
                 'language', cls.language)
             tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
-            import_lib = False
-            if (((libinfo.get('libtype', None) == 'windows_import')
-                 and (libtype == 'static'))):
-                # Name import lib using dll
-                import_lib = (tool.toolname == 'cl')
-                libtype = 'shared'
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
                                        suffix=suffix,
                                        working_dir=os.path.dirname(src))
-            if import_lib:
-                out = os.path.splitext(out)[0] + '.lib'
         elif libclass == 'standard':
             tool = cls.get_tool('compiler', language=cls.language,
                                 toolname=toolname).linker()
@@ -3572,13 +3562,6 @@ class CompiledModelDriver(ModelDriver):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
-                for dep in cls.get_dependency_order(
-                        [cls.interface_library], toolname=toolname,
-                        disable_python_c_api=kwargs.get('disable_python_c_api', False)):
-                    if dep not in internal_dependencies:
-                        dep_info = cls.get_dependency_info(dep, toolname=toolname)
-                        if dep_info.get('libtype', None) in ['static', 'shared']:
-                            internal_dependencies.append(dep)
             for k in cls.get_external_libraries(no_comm_libs=True):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
@@ -4258,23 +4241,13 @@ class CompiledModelDriver(ModelDriver):
             for k, v in cls.get_dependency_info(dep, toolname=toolname).items():
                 if k == 'directory':
                     kwargs.setdefault('working_dir', v)
-                if k == 'toolname':
-                    toolname = v
-                elif k == 'for_python_api':
-                    if not kwargs.get('dry_run', False):
-                        assert not kwargs.get('disable_python_c_api', False)
-                else:
-                    kwargs[k] = copy.deepcopy(v)
+                kwargs[k] = copy.deepcopy(v)
             src = kwargs.pop('source', None)
             if (src is None) or (not os.path.isabs(src)):
                 src = cls.get_dependency_source(dep, toolname=toolname)
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)
             suffix_kws = cls.select_suffix_kwargs(kwargs)
-            windows_import = (kwargs['libtype'] == 'windows_import')
-            if windows_import:
-                # Compile dynamic library
-                kwargs['libtype'] = 'shared'
             if kwargs['libtype'] == 'header_only':
                 return src
             elif kwargs['libtype'] in ['static', 'shared']:
@@ -4284,10 +4257,6 @@ class CompiledModelDriver(ModelDriver):
                         toolname=toolname, **suffix_kws))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
-                if windows_import:
-                    kwargs.setdefault(
-                        'import_lib',
-                        os.path.splitext(kwargs['out'])[0] + '.lib')
             kwargs.setdefault('suffix', '')
             kwargs['suffix'] += cls.get_internal_suffix(**suffix_kws)
             return cls.call_compiler(src, toolname=toolname, **kwargs)

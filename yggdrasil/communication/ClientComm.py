@@ -230,8 +230,6 @@ class ClientComm(CommBase.CommBase):
         """
         def add_response_address(msg):
             if msg.flag == CommBase.FLAG_SUCCESS:
-                if msg.header is None:
-                    msg.header = {}
                 msg.header.setdefault('__meta__', {})
                 msg.header['__meta__'].update(self.create_response_comm())
             return msg

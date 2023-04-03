@@ -1,4 +1,3 @@
-import numpy as np
 from yggdrasil import serialize, tools, constants, datatypes
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
@@ -95,11 +94,6 @@ class AsciiTableSerialize(DefaultSerialize):
                 new_typedef = {'type': 'array', 'items': [old_typedef]}
             if new_typedef:
                 kwargs['datatype'] = new_typedef
-        elif 'field_names' in self._tmp:
-            field_names = self._tmp.pop('field_names')
-            assert len(field_names) == len(old_typedef.get('items', []))
-            for x, n in zip(old_typedef.get('items', []), field_names):
-                x['title'] = n
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
         self.update_format_str()
         self.update_field_names()
@@ -150,14 +144,8 @@ class AsciiTableSerialize(DefaultSerialize):
 
         """
         from yggdrasil.serialize import dict2list
-        if isinstance(args, np.ndarray):
-            if len(args.dtype) == 0 and len(args.shape) == 2:
-                args = [args[:, i] for i in range(args.shape[1])]
-        elif isinstance(args, dict):
+        if isinstance(args, dict):
             field_names = self.get_field_names()
-            if field_names is None:
-                field_names = sorted([k for k in args.keys()])
-                self._tmp['field_names'] = field_names
             args = dict2list(args, order=field_names)
         return super(AsciiTableSerialize, self).normalize(args)
         

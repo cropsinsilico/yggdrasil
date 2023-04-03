@@ -1060,6 +1060,7 @@ def get_runner(models, **kwargs):
 
 
 def run(*args, **kwargs):
+    run_kwargs = kwargs.pop('run_kwargs', {})
     yggRunner = get_runner(*args, **kwargs)
-    yggRunner.run()
+    yggRunner.run(**run_kwargs)
     yggRunner.debug("runner returns, exiting")

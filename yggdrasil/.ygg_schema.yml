@@ -171,8 +171,8 @@ definitions:
       serializer:
         $ref: '#/definitions/serializer'
         description: Class with serialize and deserialize methods that should be used
-          to process sent and received messages. Defaults to None and is constructed
-          using provided 'serializer_kwargs'.
+          to process sent and received messages or a dictionary describing a serializer
+          that obeys the serializer schema.
       transform:
         aliases:
         - recv_converter
@@ -1084,8 +1084,8 @@ definitions:
         - default: {}
         - $ref: '#/definitions/serializer'
         description: Class with serialize and deserialize methods that should be used
-          to process sent and received messages. Defaults to None and is constructed
-          using provided 'serializer_kwargs'.
+          to process sent and received messages or a dictionary describing a serializer
+          that obeys the serializer schema.
       sort_keys:
         default: true
         description: If True, the serialization of dictionaries will be in key sorted
@@ -1202,8 +1202,8 @@ definitions:
         - default: {}
         - $ref: '#/definitions/serializer'
         description: Class with serialize and deserialize methods that should be used
-          to process sent and received messages. Defaults to None and is constructed
-          using provided 'serializer_kwargs'.
+          to process sent and received messages or a dictionary describing a serializer
+          that obeys the serializer schema.
     pushProperties:
       $properties/serializer: true
     required:

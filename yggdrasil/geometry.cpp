@@ -353,6 +353,9 @@ static PyMethodDef ply_methods[] = {
     {"get_elements", (PyCFunction) ply_get_elements,
      METH_VARARGS | METH_KEYWORDS,
      "Get all elements of a given type."},
+    {"get", (PyCFunction) ply_get_elements,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get all elements of a given type."},
     {"add_elements", (PyCFunction) ply_add_elements,
      METH_VARARGS, "Add elements of a given type."},
     {"as_trimesh", (PyCFunction) ply_as_trimesh,
@@ -380,7 +383,7 @@ static PyMethodDef ply_methods[] = {
      METH_VARARGS,
      "Append another 3D structure."},
     {"merge", (PyCFunction) ply_merge,
-     METH_VARARGS,
+     METH_VARARGS | METH_KEYWORDS,
      "Merge this structure with one or more other 3D structures and return the result."},
     {"items", (PyCFunction) ply_items,
      METH_NOARGS,
@@ -489,6 +492,9 @@ PyDoc_STRVAR(objwavefront_doc,
 
 // Handle missing properties
 static PyMethodDef objwavefront_methods[] = {
+    {"get", (PyCFunction) objwavefront_get_elements,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get all elements of a given type."},
     {"get_elements", (PyCFunction) objwavefront_get_elements,
      METH_VARARGS | METH_KEYWORDS,
      "Get all elements of a given type."},
@@ -525,7 +531,7 @@ static PyMethodDef objwavefront_methods[] = {
      METH_VARARGS,
      "Append another 3D structure."},
     {"merge", (PyCFunction) objwavefront_merge,
-     METH_VARARGS,
+     METH_VARARGS | METH_KEYWORDS,
      "Merge this structure with one or more other 3D structures and return the result."},
     {"items", (PyCFunction) objwavefront_items,
      METH_NOARGS,
@@ -811,16 +817,17 @@ static PyObject* ply_richcompare(PyObject *self, PyObject *other, int op) {
 static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwargs) {
     const char* elementType0 = 0;
     int asArray = 0;
+    PyObject* defaultRet = NULL;
     
     static char const* kwlist[] = {
 	"name",
+	"default",
 	"as_array",
         NULL
     };
-    
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|p:", (char**) kwlist,
-				     &elementType0, &asArray))
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|Op:", (char**) kwlist,
+				     &elementType0, &defaultRet, &asArray))
 	return NULL;
 
     std::string elementType(elementType0);
@@ -850,8 +857,13 @@ static PyObject* ply_get_elements(PyObject* self, PyObject* args, PyObject* kwar
     }
     const PlyElementSet* elementSet = v->ply->get_element_set(elementType);
     if (elementSet == NULL) {
-	PyErr_SetString(PyExc_KeyError, elementType0);
-	return NULL;
+	if (defaultRet == NULL) {
+	    PyErr_SetString(PyExc_KeyError, elementType0);
+	    return NULL;
+	} else {
+	    Py_INCREF(defaultRet);
+	    return defaultRet;
+	}
     }
     
     if (asArray) {
@@ -1506,32 +1518,46 @@ static PyObject* ply_append(PyObject* self, PyObject* args, PyObject* kwargs) {
 }
 
 
-static PyObject* ply_merge(PyObject* self, PyObject* args, PyObject*) {
-    PyObject* tmp_args = PyTuple_New(0);
-    if (tmp_args == NULL)
-	return NULL;
-    PyObject* type = (PyObject*)self->ob_type;
-    PyObject* out = PyObject_Call(type, tmp_args, NULL);
-    Py_DECREF(tmp_args);
-    if (out == NULL)
-	return NULL;
+static PyObject* ply_merge(PyObject* self, PyObject* args, PyObject* kwargs) {
+    bool no_copy = false;
+    if (kwargs != NULL && PyDict_Check(kwargs)) {
+	PyObject* no_copy_py = PyDict_GetItemString(kwargs, "no_copy");
+	if (no_copy_py != NULL) {
+	    no_copy = PyObject_IsTrue(no_copy_py);
+	}
+    }
+    PyObject* out = NULL;
+    PyObject* result = NULL;
+    PyObject* item_args = NULL;
+    if (no_copy) {
+	out = self;
+	Py_INCREF(out);
+    } else {
+	PyObject* tmp_args = PyTuple_New(0);
+	if (tmp_args == NULL)
+	    return NULL;
+	PyObject* type = (PyObject*)self->ob_type;
+	out = PyObject_Call(type, tmp_args, NULL);
+	Py_DECREF(tmp_args);
+	if (out == NULL)
+	    return NULL;
+	item_args = PyTuple_Pack(1, self);
+	if (item_args == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	result = ply_append(out, item_args, NULL);
+	Py_DECREF(item_args);
+	if (result == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+    }
     PyObject* append_list = NULL;
     if (PyTuple_Size(args) == 1) {
 	append_list = PyTuple_GetItem(args, 0);
     } else {
 	append_list = args;
-    }
-    PyObject* result = NULL;
-    PyObject* item_args = PyTuple_Pack(1, self);
-    if (item_args == NULL) {
-	Py_DECREF(out);
-	return NULL;
-    }
-    result = ply_append(out, item_args, NULL);
-    Py_DECREF(item_args);
-    if (result == NULL) {
-	Py_DECREF(out);
-	return NULL;
     }
     if (PyTuple_Check(append_list) || PyList_Check(append_list)) {
 	for (Py_ssize_t i = 0; i < PySequence_Size(append_list); i++) {
@@ -2540,16 +2566,18 @@ static PyObject* objwavefront_richcompare(PyObject *self, PyObject *other, int o
 static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObject* kwargs) {
     const char* elementType0 = 0;
     int asArray = 0;
+    PyObject* defaultRet = NULL;
     
     static char const* kwlist[] = {
 	"name",
+	"default",
 	"as_array",
         NULL
     };
     
     
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|p:", (char**) kwlist,
-				     &elementType0, &asArray))
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|Op:", (char**) kwlist,
+				     &elementType0, &defaultRet, &asArray))
 	return NULL;
 
     std::string elementType = obj_alias2base(std::string(elementType0));
@@ -2557,8 +2585,13 @@ static PyObject* objwavefront_get_elements(PyObject* self, PyObject* args, PyObj
     ObjWavefrontObject* v = (ObjWavefrontObject*) self;
 
     if (v->obj->count_elements(elementType) == 0) {
-	PyErr_SetString(PyExc_KeyError, elementType0);
-	return NULL;
+	if (defaultRet == NULL) {
+	    PyErr_SetString(PyExc_KeyError, elementType0);
+	    return NULL;
+	} else {
+	    Py_INCREF(defaultRet);
+	    return defaultRet;
+	}
     }
     
     PyObject* out = NULL;
@@ -2930,31 +2963,45 @@ static PyObject* objwavefront_append(PyObject* self, PyObject* args, PyObject* k
 
 
 static PyObject* objwavefront_merge(PyObject* self, PyObject* args, PyObject* kwargs) {
-    PyObject* tmp_args = PyTuple_New(0);
-    if (tmp_args == NULL)
-	return NULL;
-    PyObject* type = (PyObject*)self->ob_type;
-    PyObject* out = PyObject_Call(type, tmp_args, NULL);
-    Py_DECREF(tmp_args);
-    if (out == NULL)
-	return NULL;
+    bool no_copy = false;
+    if (kwargs != NULL && PyDict_Check(kwargs)) {
+	PyObject* no_copy_py = PyDict_GetItemString(kwargs, "no_copy");
+	if (no_copy_py != NULL) {
+	    no_copy = PyObject_IsTrue(no_copy_py);
+	}
+    }
+    PyObject* out = NULL;
+    PyObject* result = NULL;
+    PyObject* item_args = NULL;
+    if (no_copy) {
+	out = self;
+	Py_INCREF(out);
+    } else {
+	PyObject* tmp_args = PyTuple_New(0);
+	if (tmp_args == NULL)
+	    return NULL;
+	PyObject* type = (PyObject*)self->ob_type;
+	out = PyObject_Call(type, tmp_args, NULL);
+	Py_DECREF(tmp_args);
+	if (out == NULL)
+	    return NULL;
+	item_args = PyTuple_Pack(1, self);
+	if (item_args == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	result = objwavefront_append(out, item_args, NULL);
+	Py_DECREF(item_args);
+	if (result == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+    }
     PyObject* append_list = NULL;
     if (PyTuple_Size(args) == 1) {
 	append_list = PyTuple_GetItem(args, 0);
     } else {
 	append_list = args;
-    }
-    PyObject* result = NULL;
-    PyObject* item_args = PyTuple_Pack(1, self);
-    if (item_args == NULL) {
-	Py_DECREF(out);
-	return NULL;
-    }
-    result = objwavefront_append(out, item_args, NULL);
-    Py_DECREF(item_args);
-    if (result == NULL) {
-	Py_DECREF(out);
-	return NULL;
     }
     if (PyTuple_Check(append_list) || PyList_Check(append_list)) {
 	for (Py_ssize_t i = 0; i < PySequence_Size(append_list); i++) {

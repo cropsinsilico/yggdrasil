@@ -322,7 +322,7 @@ class ZMQProxy(CommBase.CommServer):
         except zmq.ZMQError as e:
             if e.errno in (zmq.ENOTSOCK, zmq.ENOTSUP):
                 return False
-            raise
+            raise  # pragma: debug
         return (out == zmq.POLLIN)
 
     def run_loop(self):
@@ -756,7 +756,7 @@ class ZMQComm(CommBase.CommBase):
                     pass
                 self.unregister_comm(self.registry_key, dont_close=dont_close)
                 self._bound = False
-            self.debug('Unbound socket')
+                self.debug('Unbound socket')
 
     def disconnect_socket(self, dont_close=False):
         r"""Disconnect from address."""
@@ -796,6 +796,7 @@ class ZMQComm(CommBase.CommBase):
                 self._openned = True
             if (not self.is_async) and (not self.reply_thread.is_alive()):
                 self.reply_thread.start()
+        self.debug("Opened")
 
     def set_reply_socket_send(self):
         r"""Set the send reply socket if it dosn't exist."""
