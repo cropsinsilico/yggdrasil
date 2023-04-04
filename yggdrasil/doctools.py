@@ -430,7 +430,8 @@ def component2table(comp, table_type, include_required=None,
     elif table_type == 'subtype':
         kwargs.setdefault('key_column_name', subtype_key)
         for x, subtypes in s[comp].schema_subtypes.items():
-            s_comp = s[comp].get_subtype_schema(x, unique=True)
+            s_comp = s[comp].get_subtype_schema(x, unique=True,
+                                                relaxed=True)
             subt = subtypes[0]
             args[subt] = {
                 'description': s_comp['properties'][subtype_key].get(

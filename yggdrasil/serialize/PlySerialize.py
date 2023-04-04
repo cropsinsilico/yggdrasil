@@ -229,21 +229,26 @@ class GeometryBase:
             vmin = vertex_scalar.min()
         if vmax is None:
             vmax = vertex_scalar.max()
-        cmap = cm.get_cmap(color_map)
-        if scaling == 'log':
-            norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)
-        elif scaling == 'linear':
-            norm = mpl_colors.Normalize(vmin=vmin, vmax=vmax)
-        else:  # pragma: debug
-            raise Exception("Scaling must be 'linear' or 'log'.")
-        m = cm.ScalarMappable(norm=norm, cmap=cmap)
         # Scale colors
-        vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype('int')[:, :3].tolist()
+        if isinstance(vmin, np.ma.core.MaskedConstant):
+            assert isinstance(vmax, np.ma.core.MaskedConstant)
+            vertex_colors = np.zeros((len(vertex_scalar), 3), 'int')
+        else:
+            cmap = cm.get_cmap(color_map)
+            if scaling == 'log':
+                norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)
+            elif scaling == 'linear':
+                norm = mpl_colors.Normalize(vmin=vmin, vmax=vmax)
+            else:  # pragma: debug
+                raise Exception("Scaling must be 'linear' or 'log'.")
+            m = cm.ScalarMappable(norm=norm, cmap=cmap)
+            vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype(
+                'int')[:, :3]
         if no_copy:
             out = self
         else:
             out = copy.deepcopy(self)
-        out.add_colors("vertices", vertex_colors)
+        out.add_colors("vertices", vertex_colors.tolist())
         return out
 
 
