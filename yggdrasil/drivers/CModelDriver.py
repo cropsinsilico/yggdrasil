@@ -181,6 +181,18 @@ class GCCCompiler(CCompilerBase):
                 out = False
         return out
 
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of compiler flags."""
+        out = super(GCCCompiler, cls).get_flags(*args, **kwargs)
+        if platform._is_win:  # pragma: windows
+            ver = cls.tool_version()
+            if 'mingw' in ver:
+                out.append('-Wa,-mbig-obj')
+            else:
+                print("NOT MINGW?", ver)
+        return out
+        
     def dll2a(cls, dll, dst=None, overwrite=False):
         r"""Convert a window's .dll library into a static library.
 
@@ -265,6 +277,7 @@ class MSVCCompiler(CCompilerBase):
                      # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
                      # '/Z7',      # Symbolic debug in .obj (implies debug)
                      "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
+                     "/bigobj",  # Allow big files
                      '/TP',      # Treat all files as C++
                      "/nologo",  # Suppress startup banner
                      # Don't show errors from using scanf, strcpy, etc.

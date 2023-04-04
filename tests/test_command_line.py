@@ -14,9 +14,7 @@ def test_create_coveragerc():
     r"""Test the creation of coveragerc file."""
     covered_languages = {}
     for k in LANGUAGES['all']:
-        v = os.environ.get(f"INSTALL{k.upper()}", None)
-        if v is not None:
-            covered_languages[k] = (v == '1')
+        covered_languages[k] = True
     fname = os.path.join(os.getcwd(), '.coveragerc')
     fname_cpy = None
     if os.path.isfile(fname):
@@ -29,6 +27,12 @@ def test_create_coveragerc():
         create_coveragerc(covered_languages, filename=fname)
         contents2 = open(fname, 'r').read()
         assert contents2 == contents1
+        os.remove(fname)
+        create_coveragerc(covered_languages, filename=fname,
+                          setup_cfg=False)
+        covered_languages.pop('cpp', None)
+        covered_languages['c++'] = False
+        create_coveragerc(covered_languages, filename=fname)
     finally:
         if fname_cpy:
             shutil.copy2(fname_cpy, fname)

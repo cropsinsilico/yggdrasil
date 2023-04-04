@@ -786,7 +786,7 @@ def create_coveragerc(installed_languages, filename=None, setup_cfg=None):
     # CI Platform
     if os.environ.get('GITHUB_ACTIONS', False):
         excl_list = rm_excl_rule(excl_list, 'pragma: gha')
-    else:
+    else:  # pragma: no cover
         excl_list = add_excl_rule(excl_list, 'pragma: gha')
     if os.environ.get('TRAVIS_OS_NAME', False):
         excl_list = rm_excl_rule(excl_list, 'pragma: travis')

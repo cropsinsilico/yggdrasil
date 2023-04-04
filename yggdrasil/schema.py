@@ -524,6 +524,11 @@ class ComponentSchema(object):
             if not unique:
                 if self.default_subtype:
                     out['properties'][self.subtype_key]['default'] = self.default_subtype
+                if ((for_form
+                     and all(self.subtype_key in x.get('required', [])
+                             for x in self._storage.values()))):
+                    out.setdefault('required', [])
+                    out['required'].append(self.subtype_key)
                 out['additionalProperties'] = False
                 for x in self._storage.values():
                     for k, v in x['properties'].items():
@@ -1433,21 +1438,22 @@ class SchemaRegistry(object):
             'remove': {
                 'comm': ['is_default', 'length_map', 'serializer',
                          'address', 'dont_copy', 'for_service',
-                         'send_converter', 'recv_converter', 'client_id',
-                         'cookies', 'host', 'params', 'port', 'commtype'],
+                         'client_id', 'cookies', 'host', 'params',
+                         'port', 'commtype'],
                 'ocomm': ['default_value'],
                 'file': ['is_default', 'length_map',
                          'wait_for_creation', 'working_dir',
                          'read_meth', 'in_temp',
                          'serializer', 'datatype',
                          'address', 'dont_copy', 'for_service',
-                         'send_converter', 'recv_converter', 'client_id',
-                         'cookies', 'host', 'params', 'port'],
+                         'client_id', 'cookies', 'host', 'params',
+                         'port'],
                 'model': ['client_of', 'is_server', 'preserve_cache',
                           'products', 'source_products', 'working_dir',
                           'overwrite', 'skip_interpreter', 'copies',
                           'timesync', 'with_strace', 'with_valgrind',
-                          'valgrind_flags', 'additional_variables',
+                          'valgrind_flags', 'with_debugger', 'copies',
+                          'logging_level', 'additional_variables',
                           'aggregation', 'interpolation', 'synonyms',
                           'driver']},
             'order': {

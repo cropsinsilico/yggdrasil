@@ -142,11 +142,10 @@ def has_units(obj, check_dimensionless=False):
         bool: True if the object has units, False otherwise.
 
     """
-    out = isinstance(obj, (_unit_quantity, _unit_array))
+    out = (isinstance(obj, (_unit_quantity, _unit_array))
+           and not (obj.is_dimensionless()
+                    and (not check_dimensionless)))
     # out = hasattr(obj, 'units')
-    if ((out and (obj.units == as_unit('dimensionless'))
-         and (not check_dimensionless))):
-        out = False
     return out
 
 
