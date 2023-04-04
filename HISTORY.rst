@@ -5,7 +5,8 @@ History
 2.0.0 (2023-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson
 ------------------
 
-* Drop support for Python 3.5
+* Dropped support for Python 3.5
+* Addeds upport for Python 3.10
 * Changed rapidjson submodule to extended version
 * Vendor python-rapidjson extension
 * Removed jsonschema requirement

@@ -2969,8 +2969,6 @@ class ModelDriver(Driver):
         for k in try_keys:
             if k in kwargs:
                 v = kwargs[k]
-                if not isinstance(v, list):
-                    v = [v]
                 try_vals += v
         # This last transform is used because the others are assumed
         # to be applied by the connection driver
@@ -3702,7 +3700,7 @@ class ModelDriver(Driver):
                 if c in line[:length_allow]:
                     isplit = line[:length_allow].rindex(c) + 1
                     break
-            else:
+            else:  # pragma: debug
                 isplit = len(line)
         if (isplit < nindent + 1) or (isplit >= len(line)):
             out = [line]

@@ -399,9 +399,11 @@ def component2table(comp, table_type, include_required=None,
             kwargs['column_order'].remove('required')
         # Get list of component subtypes
         if table_type == 'general':
-            s_comp_list = [s[comp].get_subtype_schema('base', unique=True)]
+            s_comp_list = [s[comp].get_subtype_schema('base', unique=True,
+                                                      relaxed=True)]
         else:
-            s_comp_list = [s[comp].get_subtype_schema(x, unique=True)
+            s_comp_list = [s[comp].get_subtype_schema(x, unique=True,
+                                                      relaxed=True)
                            for x in s[comp].classes]
         # Loop over subtyeps
         out_apply = {}

@@ -465,7 +465,7 @@ class SerializeBase(tools.YggClass):
         return datatypes.type2numpy(self.datatype)
 
     @property
-    def typedef(self):
+    def typedef(self):  # pragma: deprecation
         r"""dict: Alias for datatype."""
         warnings.warn(message=("`typedef` attribute is deprecated`; use "
                                " `datatype` instead."),

@@ -1219,8 +1219,6 @@ def list2numpy(arrays, names=None):
         np.ndarray: Structured numpy array.
 
     """
-    if names is None:
-        names = list2names(arrays)
     return dict2numpy(list2dict(arrays, names=names), order=names)
 
 

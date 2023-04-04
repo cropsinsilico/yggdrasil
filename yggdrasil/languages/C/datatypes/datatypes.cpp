@@ -2638,6 +2638,10 @@ extern "C" {
 	rapidjson::SchemaDocument sd_old(*s_old);
 	rapidjson::SchemaNormalizer n(sd_old);
 	if (!n.Compare(*s_new)) {
+	  std::string s_old_str = document2string(*s_old);
+	  std::string s_new_str = document2string(*s_new);
+	  std::cerr << "old:" << std::endl << s_old_str << std::endl <<
+	    "new:" << std::endl << s_new_str << std::endl;
 	  throw_validator_error("update_dtype", n);
 	}
       }

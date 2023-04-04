@@ -583,7 +583,10 @@ class FortranModelDriver(CompiledModelDriver):
                     precision = json_type.get('precision', 1)
                 elif out.startswith('complex'):
                     precision = json_type['precision'] / 2
-                elif json_type.get('subtype', json_type['type']) == 'unicode':
+                elif (json_type.get('subtype', json_type['type']) == 'unicode'
+                      or (json_type.get('subtype', json_type['type'])
+                          in ['string', 'bytes']
+                          and json_type.get('encoding', 'ascii') != 'ascii')):
                     precision = json_type['precision'] / 4
                 else:
                     precision = json_type['precision']

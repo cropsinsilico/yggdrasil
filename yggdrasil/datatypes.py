@@ -72,7 +72,7 @@ def definition2dtype(props):
     if typename is None:  # pragma: debug
         raise KeyError('Could not find type in dictionary')
     if typename in constants.FLEXIBLE_TYPES:
-        nbytes = constants.ENCODING_SIZES.get(props.get('encoding', None), 1)
+        nbytes = constants.FIXED_ENCODING_SIZES.get(props.get('encoding', 'ASCII'), 4)
         if (typename == 'string' and 'subtype' not in props) or nbytes == 4:
             typename = 'unicode'
         if 'precision' in props:

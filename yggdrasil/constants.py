@@ -97,8 +97,8 @@ for k, v in PYTHON_SCALARS.items():
     ALL_PYTHON_SCALARS += list(v)
 ALL_PYTHON_SCALARS = tuple(set(ALL_PYTHON_SCALARS))
 ALL_PYTHON_ARRAYS = (np.ndarray,)
-ENCODING_SIZES = {
-    "UTF8": 4,
+FIXED_ENCODING_SIZES = {
+    "UTF32": 4,
     "UCS4": 4,
     "ASCII": 1
 }

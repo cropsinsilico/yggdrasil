@@ -566,7 +566,7 @@ def parse_component(yml, ctype, existing=None):
 
     """
     assert existing
-    if not isinstance(yml, dict):
+    if not isinstance(yml, dict):  # pragma: debug
         raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
     # Parse based on type
     if ctype == 'model':

@@ -781,7 +781,9 @@ def create_coveragerc(installed_languages, filename=None, setup_cfg=None):
     # Operating system
     if platform._is_win:
         excl_list = rm_excl_rule(excl_list, 'pragma: windows')
-    else:
+    else:  # pragma: no cover
+        # Unclear why this is not covered as it is run locally by
+        # test_create_coveragerc
         excl_list = add_excl_rule(excl_list, 'pragma: windows')
     # CI Platform
     if os.environ.get('GITHUB_ACTIONS', False):

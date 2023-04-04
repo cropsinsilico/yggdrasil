@@ -187,7 +187,7 @@ class GCCCompiler(CCompilerBase):
         out = super(GCCCompiler, cls).get_flags(*args, **kwargs)
         if platform._is_win:  # pragma: windows
             ver = cls.tool_version()
-            if 'mingw' in ver:
+            if 'mingw' in ver.lower() or 'msys' in ver.lower():
                 out.append('-Wa,-mbig-obj')
             else:
                 print("NOT MINGW?", ver)
@@ -1162,12 +1162,17 @@ class CModelDriver(CompiledModelDriver):
                         if 'iter_datatype' not in v:  # pragma: debug
                             raise RuntimeError("Length must be defined for "
                                                "arrays.")
-                    elif ((v['datatype'].get('subtype',
-                                             v['datatype']['type'])
-                           in ['bytes', 'string'])):
-                        v['length_var'] = 'strlen(%s)' % v['name']
                     else:
-                        v['length_var'] = 'strlen4(%s)' % v['name']
+                        subtype = v['datatype'].get('subtype', v['datatype']['type'])
+                        assert subtype in ['bytes', 'string', 'unicode']
+                        # if subtype == 'unicode':
+                        #     v['datatype'].setdefault('encoding', "UCS4")
+                        encoding_size = constants.FIXED_ENCODING_SIZES.get(
+                            v['datatype'].get('encoding', 'ASCII'), 4)
+                        if encoding_size == 1:
+                            v['length_var'] = 'strlen(%s)' % v['name']
+                        else:
+                            v['length_var'] = f"strlen{encoding_size}({v['name']})"
                 elif (cls.requires_shape_var(v)
                       and not (v.get('ndim_var', False)
                                and v.get('shape_var', False))):  # pragma: debug
@@ -1392,6 +1397,9 @@ class CModelDriver(CompiledModelDriver):
         if out['type'] in constants.SCALAR_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
+        if out.get('subtype', None) == 'unicode':
+            out['subtype'] = 'string'
+            out['encoding'] = 'UCS4'
         return out
         
     @classmethod
@@ -1862,11 +1870,19 @@ class CModelDriver(CompiledModelDriver):
                      in ['1darray', 'ndarray'])):  # pragma: debug
                     raise RuntimeError("Length must be set in order "
                                        "to write array assignments.")
-                elif (dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
-                      in ['bytes', 'string']):
-                    src_var_length = 'strlen(%s)' % src_var['name']
                 else:
-                    src_var_length = 'strlen4(%s)' % src_var['name']
+                    subtype = dst_var['datatype'].get(
+                        'subtype', dst_var['datatype']['type'])
+                    assert subtype in ['bytes', 'string', 'unicode']
+                    # if subtype == 'unicode':
+                    #     dst_var['datatype'].setdefault('encoding', "UCS4")
+                    encoding_size = constants.FIXED_ENCODING_SIZES.get(
+                        dst_var['datatype'].get('encoding', 'ASCII'), 4)
+                    if encoding_size == 1:
+                        src_var_length = 'strlen(%s)' % src_var['name']
+                    else:
+                        src_var_length = f"strlen{encoding_size}({src_var['name']})"
+                        
             if ((dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
                  in ['bytes', 'string', 'unicode'])):
                 src_var_length = f"({src_var_length}+1)"

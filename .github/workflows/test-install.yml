@@ -1,1627 +1,27 @@
 # DO NOT MODIFY THIS FILE, IT IS GENERATED.
 # To make changes, modify '.git/../utils/test-install-base.yml'
 # and run 'ygggha'
-name: Test of package installation & execution
-'on':
-  push:
-    branches-ignore:
-    - gh-pages
-    tags:
-    - '*'
-  schedule:
-  - cron: 0 10 * * 1
-  - cron: 0 10 1 * *
 env:
-  NUMPY: numpy
-  INSTALLR: 1
+  BUILDDOCS: 0
   INSTALLC: 1
   INSTALLFORTRAN: 1
-  INSTALLSBML: 0
   INSTALLLPY: 0
-  INSTALLZMQ: 1
-  INSTALLRMQ: 0
-  INSTALLTRIMESH: 1
-  INSTALLPYGMENTS: 1
-  INSTALLOMP: 1
-  INSTALLMPI: 1
   INSTALLMATLAB: 0
-  USEVIRTUALENV: 0
-  BUILDDOCS: 0
-  YGG_GHA_JOB_ID_SUFFIX: null
+  INSTALLMPI: 1
+  INSTALLOMP: 1
+  INSTALLPYGMENTS: 1
+  INSTALLR: 1
+  INSTALLRMQ: 0
+  INSTALLSBML: 0
+  INSTALLTRIMESH: 1
+  INSTALLZMQ: 1
+  NUMPY: numpy
   TMPDIR: /tmp/
+  USEVIRTUALENV: 0
+  YGG_GHA_JOB_ID_SUFFIX: null
 jobs:
-  params:
-    name: Prepare test parameters
-    runs-on: ubuntu-latest
-    outputs:
-      os-versions: ${{ steps.set-os-versions.outputs.versions }}
-    steps:
-    - id: set-os-versions
-      run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}"
-        >> $GITHUB_OUTPUT
-  test_pip:
-    needs: params
-    name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
-      }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
-      }}
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
-      }}
-    strategy:
-      max-parallel: 20
-      matrix:
-        os-base:
-        - ubuntu
-        - macos
-        - windows
-        python-version:
-        - 3.7
-        install-method:
-        - pip
-        test-flags1:
-        - --long-running --suites timing demos top
-        - --suite=examples --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3
-        - --suite=types --skip-languages c cpp
-        - --suite=types --languages c cpp
-        test-flags2:
-        - ''
-        install-c:
-        - true
-        install-mpi:
-        - true
-        install-sbml:
-        - false
-        include:
-        - os-base: windows
-          python-version: 3.7
-          install-method: pip
-          test-flags1: --long-running
-          test-flags2: ''
-          install-c: false
-          install-mpi: false
-          install-sbml: false
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true
-    - name: Set C installation based on matrix value
-      if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba'
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set MPI installation based on matrix value
-      if: matrix.install-mpi != true
-      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set SBML installation based on matrix value
-      if: matrix.install-sbml == true
-      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Store an ID string for the job
-      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
-        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      if: runner.os == 'Windows'
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,PIP) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      with:
-        toolset: 14.0
-    - name: (WINDOWS,PIP) Set up MSMPI
-      uses: mpi4py/setup-mpi@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
-        == 1
-    - name: Install R
-      uses: r-lib/actions/setup-r@v2
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-    - name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      with:
-        path: ~/Library/Caches/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (PIP) Set up Python
-      uses: actions/setup-python@v4
-      if: matrix.install-method == 'pip'
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Set up Matlab
-      uses: matlab-actions/setup-matlab@v1
-      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
-    - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
-
-        echo "source activate ygg" > ~/.bashrc
-
-        source test/bin/activate
-
-        echo "$VIRTUAL_ENV"
-
-        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-
-        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
-
-        '
-    - name: (PIP) Install dependencies & package
-      if: matrix.install-method == 'pip'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - name: (WINDOWS,PIP) Set the vcpkg root config value
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-    - name: (WINDOWS,PIP) Update R requirements
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-      run: ygginstall R --update-r-requirements
-    - name: (MACOS,PIP) Set C compiler to llvm clang
-      if: matrix.install-method == 'pip' && runner.os == 'macOS'
-      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
-    - name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      with:
-        auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        use-only-tar-bz2: true
-        channel-priority: strict
-        miniforge-variant: Mambaforge
-        use-mamba: true
-    - name: (WINDOWS,CONDA) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows' && env.INSTALLC == 1
-      with:
-        toolset: 14.0
-    - name: (CONDA) Build package in base environment
-      id: conda_build
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (CONDA) Build package in base environment (re-attempt)
-      if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      run: ./utils/setup_old_mac_sdk.sh
-    - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      if: runner.os == 'Linux' && matrix.install-sbml == true
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
-    - name: (CONDA) Install dependencies & package from existing build
-      id: conda_install
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (MACOS,CONDA) Set allow_multiple_omp config
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
-
-        yggconfig --allow-multiple-omp
-
-        '
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run cmake test in command prompt
-      timeout-minutes: 120
-      if: runner.os == 'Windows'
-      shell: cmd /C CALL {0}
-      run: 'cmake -h
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
-    - name: Run tests (1st)
-      timeout-minutes: 120
-      id: test1
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (1st)
-      timeout-minutes: 120
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
-      id: test1_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run tests (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' }}
-      id: test2
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
-        }}
-      id: test2_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Combine coverage reports
-      continue-on-error: true
-      run: '# ls .*
-
-        coverage combine --append
-
-        '
-    - name: (CONDA) Generate XML version of coverage report
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: '# ls .*
-
-        coverage xml -i
-
-        '
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v3
-      with:
-        name: ${{ env.YGG_GHA_JOB_ID }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Download the last successful workflow environment log
-      if: ${{ always() }}
-      continue-on-error: true
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        workflow: test-install.yml
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: .
-    - name: Create a log of Python package versions
-      if: ${{ always() }}
-      run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v3
-      if: ${{ success() }}
-      with:
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: new_environment_log.txt
-  test_conda:
-    needs: params
-    name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
-      }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
-      }}
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
-      }}
-    strategy:
-      max-parallel: 20
-      matrix:
-        os-base:
-        - ubuntu
-        - macos
-        - windows
-        python-version:
-        - 3.7
-        install-method:
-        - conda
-        test-flags1:
-        - --long-running --mpi-script=run_mpi.sh
-        test-flags2:
-        - --suite=examples --parametrize-example-name=backwards
-        install-c:
-        - true
-        install-mpi:
-        - true
-        install-sbml:
-        - false
-        include:
-        - os-base: ubuntu
-          python-version: 3.6
-          install-method: conda
-          test-flags1: --long-running
-          test-flags2: ''
-          install-c: true
-          install-mpi: false
-          install-sbml: false
-        - os-base: ubuntu
-          python-version: 3.8
-          install-method: conda
-          test-flags1: --long-running
-          test-flags2: ''
-          install-c: true
-          install-mpi: false
-          install-sbml: false
-        - os-base: ubuntu
-          python-version: 3.9
-          install-method: conda
-          test-flags1: --long-running --remote-service
-          test-flags2: --suites examples --parametrize-language=sbml
-          install-c: true
-          install-mpi: false
-          install-sbml: true
-        - os-base: macos
-          python-version: 3.8
-          install-method: conda
-          test-flags1: --suites examples top --parametrize-example-name=rpc_lesson3
-          test-flags2: tests/test_tools.py
-          install-c: true
-          install-mpi: false
-          install-sbml: false
-      fail-fast: false
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true
-    - name: Set C installation based on matrix value
-      if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba'
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set MPI installation based on matrix value
-      if: matrix.install-mpi != true
-      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set SBML installation based on matrix value
-      if: matrix.install-sbml == true
-      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Store an ID string for the job
-      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
-        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      if: runner.os == 'Windows'
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,PIP) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      with:
-        toolset: 14.0
-    - name: (WINDOWS,PIP) Set up MSMPI
-      uses: mpi4py/setup-mpi@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
-        == 1
-    - name: Install R
-      uses: r-lib/actions/setup-r@v2
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-    - name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      with:
-        path: ~/Library/Caches/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (PIP) Set up Python
-      uses: actions/setup-python@v4
-      if: matrix.install-method == 'pip'
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Set up Matlab
-      uses: matlab-actions/setup-matlab@v1
-      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
-    - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
-
-        echo "source activate ygg" > ~/.bashrc
-
-        source test/bin/activate
-
-        echo "$VIRTUAL_ENV"
-
-        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-
-        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
-
-        '
-    - name: (PIP) Install dependencies & package
-      if: matrix.install-method == 'pip'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - name: (WINDOWS,PIP) Set the vcpkg root config value
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-    - name: (WINDOWS,PIP) Update R requirements
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-      run: ygginstall R --update-r-requirements
-    - name: (MACOS,PIP) Set C compiler to llvm clang
-      if: matrix.install-method == 'pip' && runner.os == 'macOS'
-      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
-    - name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      with:
-        auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        use-only-tar-bz2: true
-        channel-priority: strict
-        miniforge-variant: Mambaforge
-        use-mamba: true
-    - name: (WINDOWS,CONDA) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows' && env.INSTALLC == 1
-      with:
-        toolset: 14.0
-    - name: (CONDA) Build package in base environment
-      id: conda_build
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (CONDA) Build package in base environment (re-attempt)
-      if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      run: ./utils/setup_old_mac_sdk.sh
-    - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      if: runner.os == 'Linux' && matrix.install-sbml == true
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
-    - name: (CONDA) Install dependencies & package from existing build
-      id: conda_install
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (MACOS,CONDA) Set allow_multiple_omp config
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
-
-        yggconfig --allow-multiple-omp
-
-        '
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run cmake test in command prompt
-      timeout-minutes: 120
-      if: runner.os == 'Windows'
-      shell: cmd /C CALL {0}
-      run: 'cmake -h
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
-    - name: Run tests (1st)
-      timeout-minutes: 120
-      id: test1
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (1st)
-      timeout-minutes: 120
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
-      id: test1_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run tests (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' }}
-      id: test2
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
-        }}
-      id: test2_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Combine coverage reports
-      continue-on-error: true
-      run: '# ls .*
-
-        coverage combine --append
-
-        '
-    - name: (CONDA) Generate XML version of coverage report
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: '# ls .*
-
-        coverage xml -i
-
-        '
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v3
-      with:
-        name: ${{ env.YGG_GHA_JOB_ID }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Download the last successful workflow environment log
-      if: ${{ always() }}
-      continue-on-error: true
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        workflow: test-install.yml
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: .
-    - name: Create a log of Python package versions
-      if: ${{ always() }}
-      run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v3
-      if: ${{ success() }}
-      with:
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: new_environment_log.txt
-  test_rmq_pip:
-    needs: params
-    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
-      }})
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
-      }}
-    env:
-      INSTALLRMQ: 1
-      INSTALLAPY: 1
-      USEVIRTUALENV: 1
-      YGG_DEFAULT_COMM: IPCComm
-    strategy:
-      matrix:
-        os-base:
-        - ubuntu
-        python-version:
-        - 3.7
-        install-method:
-        - pip
-        test-flags1:
-        - --long-running --languages python R matlab
-        test-flags2:
-        - ''
-        install-c:
-        - true
-        install-mpi:
-        - false
-        install-sbml:
-        - false
-      fail-fast: false
-    services:
-      rabbitmq:
-        image: rabbitmq:latest
-        ports:
-        - 5672:5672
-        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s
-          --health-timeout 5s --health-retries 5
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true
-    - name: Set C installation based on matrix value
-      if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba'
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set MPI installation based on matrix value
-      if: matrix.install-mpi != true
-      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set SBML installation based on matrix value
-      if: matrix.install-sbml == true
-      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Store an ID string for the job
-      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
-        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      if: runner.os == 'Windows'
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,PIP) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      with:
-        toolset: 14.0
-    - name: (WINDOWS,PIP) Set up MSMPI
-      uses: mpi4py/setup-mpi@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
-        == 1
-    - name: Install R
-      uses: r-lib/actions/setup-r@v2
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-    - name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      with:
-        path: ~/Library/Caches/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (PIP) Set up Python
-      uses: actions/setup-python@v4
-      if: matrix.install-method == 'pip'
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Set up Matlab
-      uses: matlab-actions/setup-matlab@v1
-      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
-    - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
-
-        echo "source activate ygg" > ~/.bashrc
-
-        source test/bin/activate
-
-        echo "$VIRTUAL_ENV"
-
-        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-
-        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
-
-        '
-    - name: (PIP) Install dependencies & package
-      if: matrix.install-method == 'pip'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - name: (WINDOWS,PIP) Set the vcpkg root config value
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-    - name: (WINDOWS,PIP) Update R requirements
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-      run: ygginstall R --update-r-requirements
-    - name: (MACOS,PIP) Set C compiler to llvm clang
-      if: matrix.install-method == 'pip' && runner.os == 'macOS'
-      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
-    - name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      with:
-        auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        use-only-tar-bz2: true
-        channel-priority: strict
-        miniforge-variant: Mambaforge
-        use-mamba: true
-    - name: (WINDOWS,CONDA) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows' && env.INSTALLC == 1
-      with:
-        toolset: 14.0
-    - name: (CONDA) Build package in base environment
-      id: conda_build
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (CONDA) Build package in base environment (re-attempt)
-      if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      run: ./utils/setup_old_mac_sdk.sh
-    - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      if: runner.os == 'Linux' && matrix.install-sbml == true
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
-    - name: (CONDA) Install dependencies & package from existing build
-      id: conda_install
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (MACOS,CONDA) Set allow_multiple_omp config
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
-
-        yggconfig --allow-multiple-omp
-
-        '
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run cmake test in command prompt
-      timeout-minutes: 120
-      if: runner.os == 'Windows'
-      shell: cmd /C CALL {0}
-      run: 'cmake -h
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
-    - name: Run tests (1st)
-      timeout-minutes: 120
-      id: test1
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (1st)
-      timeout-minutes: 120
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
-      id: test1_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run tests (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' }}
-      id: test2
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
-        }}
-      id: test2_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Combine coverage reports
-      continue-on-error: true
-      run: '# ls .*
-
-        coverage combine --append
-
-        '
-    - name: (CONDA) Generate XML version of coverage report
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: '# ls .*
-
-        coverage xml -i
-
-        '
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v3
-      with:
-        name: ${{ env.YGG_GHA_JOB_ID }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Download the last successful workflow environment log
-      if: ${{ always() }}
-      continue-on-error: true
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        workflow: test-install.yml
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: .
-    - name: Create a log of Python package versions
-      if: ${{ always() }}
-      run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v3
-      if: ${{ success() }}
-      with:
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: new_environment_log.txt
-  test_rmq_conda:
-    needs: params
-    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
-      }})
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
-      }}
-    env:
-      INSTALLRMQ: 1
-      INSTALLAPY: 1
-      USEVIRTUALENV: 1
-    strategy:
-      matrix:
-        os-base:
-        - ubuntu
-        python-version:
-        - 3.7
-        install-method:
-        - conda
-        test-flags1:
-        - --long-running --languages python R matlab
-        test-flags2:
-        - tests/test_services.py --nocapture
-        install-c:
-        - true
-        install-mpi:
-        - false
-        install-sbml:
-        - false
-      fail-fast: false
-    services:
-      rabbitmq:
-        image: rabbitmq:latest
-        ports:
-        - 5672:5672
-        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s
-          --health-timeout 5s --health-retries 5
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true
-    - name: Set C installation based on matrix value
-      if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba'
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set MPI installation based on matrix value
-      if: matrix.install-mpi != true
-      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set SBML installation based on matrix value
-      if: matrix.install-sbml == true
-      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Store an ID string for the job
-      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
-        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      if: runner.os == 'Windows'
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,PIP) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      with:
-        toolset: 14.0
-    - name: (WINDOWS,PIP) Set up MSMPI
-      uses: mpi4py/setup-mpi@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
-        == 1
-    - name: Install R
-      uses: r-lib/actions/setup-r@v2
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-    - name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      with:
-        path: ~/Library/Caches/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (PIP) Set up Python
-      uses: actions/setup-python@v4
-      if: matrix.install-method == 'pip'
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Set up Matlab
-      uses: matlab-actions/setup-matlab@v1
-      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
-    - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
-
-        echo "source activate ygg" > ~/.bashrc
-
-        source test/bin/activate
-
-        echo "$VIRTUAL_ENV"
-
-        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-
-        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
-
-        '
-    - name: (PIP) Install dependencies & package
-      if: matrix.install-method == 'pip'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - name: (WINDOWS,PIP) Set the vcpkg root config value
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-    - name: (WINDOWS,PIP) Update R requirements
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-      run: ygginstall R --update-r-requirements
-    - name: (MACOS,PIP) Set C compiler to llvm clang
-      if: matrix.install-method == 'pip' && runner.os == 'macOS'
-      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
-    - name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      with:
-        auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        use-only-tar-bz2: true
-        channel-priority: strict
-        miniforge-variant: Mambaforge
-        use-mamba: true
-    - name: (WINDOWS,CONDA) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows' && env.INSTALLC == 1
-      with:
-        toolset: 14.0
-    - name: (CONDA) Build package in base environment
-      id: conda_build
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (CONDA) Build package in base environment (re-attempt)
-      if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      run: ./utils/setup_old_mac_sdk.sh
-    - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      if: runner.os == 'Linux' && matrix.install-sbml == true
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
-    - name: (CONDA) Install dependencies & package from existing build
-      id: conda_install
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (MACOS,CONDA) Set allow_multiple_omp config
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
-
-        yggconfig --allow-multiple-omp
-
-        '
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run cmake test in command prompt
-      timeout-minutes: 120
-      if: runner.os == 'Windows'
-      shell: cmd /C CALL {0}
-      run: 'cmake -h
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
-    - name: Run tests (1st)
-      timeout-minutes: 120
-      id: test1
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (1st)
-      timeout-minutes: 120
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
-      id: test1_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run tests (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' }}
-      id: test2
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
-        }}
-      id: test2_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Combine coverage reports
-      continue-on-error: true
-      run: '# ls .*
-
-        coverage combine --append
-
-        '
-    - name: (CONDA) Generate XML version of coverage report
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: '# ls .*
-
-        coverage xml -i
-
-        '
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v3
-      with:
-        name: ${{ env.YGG_GHA_JOB_ID }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Download the last successful workflow environment log
-      if: ${{ always() }}
-      continue-on-error: true
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        workflow: test-install.yml
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: .
-    - name: Create a log of Python package versions
-      if: ${{ always() }}
-      run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v3
-      if: ${{ success() }}
-      with:
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: new_environment_log.txt
-  test_stripped:
-    needs: params
-    name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os-base
-      }}, ${{ matrix.install-method }})
-    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
-      }}
-    env:
-      INSTALLR: 0
-      INSTALLC: 0
-      INSTALLFORTRAN: 0
-      INSTALLLPY: 0
-      INSTALLZMQ: 0
-      INSTALLRMQ: 0
-      INSTALLTRIMESH: 0
-      INSTALLPYGMENTS: 0
-      INSTALLMPI: 0
-      YGG_GHA_JOB_ID_SUFFIX: -stripped
-    strategy:
-      matrix:
-        os-base:
-        - ubuntu
-        - macos
-        - windows
-        python-version:
-        - 3.7
-        install-method:
-        - pip
-        test-flags1:
-        - --long-running
-        test-flags2:
-        - ''
-        install-c:
-        - false
-        install-mpi:
-        - false
-        install-sbml:
-        - false
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true
-    - name: Set C installation based on matrix value
-      if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba'
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set MPI installation based on matrix value
-      if: matrix.install-mpi != true
-      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Set SBML installation based on matrix value
-      if: matrix.install-sbml == true
-      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: Store an ID string for the job
-      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
-        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      if: runner.os == 'Windows'
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - name: (WINDOWS,PIP) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      with:
-        toolset: 14.0
-    - name: (WINDOWS,PIP) Set up MSMPI
-      uses: mpi4py/setup-mpi@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
-        == 1
-    - name: Install R
-      uses: r-lib/actions/setup-r@v2
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-    - name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      with:
-        path: ~/Library/Caches/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
-      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - name: (PIP) Set up Python
-      uses: actions/setup-python@v4
-      if: matrix.install-method == 'pip'
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Set up Matlab
-      uses: matlab-actions/setup-matlab@v1
-      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
-    - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
-
-        echo "source activate ygg" > ~/.bashrc
-
-        source test/bin/activate
-
-        echo "$VIRTUAL_ENV"
-
-        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-
-        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
-
-        '
-    - name: (PIP) Install dependencies & package
-      if: matrix.install-method == 'pip'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - name: (WINDOWS,PIP) Set the vcpkg root config value
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-    - name: (WINDOWS,PIP) Update R requirements
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
-        == 1
-      run: ygginstall R --update-r-requirements
-    - name: (MACOS,PIP) Set C compiler to llvm clang
-      if: matrix.install-method == 'pip' && runner.os == 'macOS'
-      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
-    - name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      with:
-        auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        use-only-tar-bz2: true
-        channel-priority: strict
-        miniforge-variant: Mambaforge
-        use-mamba: true
-    - name: (WINDOWS,CONDA) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'Windows' && env.INSTALLC == 1
-      with:
-        toolset: 14.0
-    - name: (CONDA) Build package in base environment
-      id: conda_build
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (CONDA) Build package in base environment (re-attempt)
-      if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: 'conda activate base
-
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
-
-        '
-    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      run: ./utils/setup_old_mac_sdk.sh
-    - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      if: runner.os == 'Linux' && matrix.install-sbml == true
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
-    - name: (CONDA) Install dependencies & package from existing build
-      id: conda_install
-      continue-on-error: true
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
-        'conda' || matrix.install-method == 'mamba')}}
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-        --use-mamba
-    - name: (MACOS,CONDA) Set allow_multiple_omp config
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
-        runner.os == 'macOS'
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
-
-        yggconfig --allow-multiple-omp
-
-        '
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run cmake test in command prompt
-      timeout-minutes: 120
-      if: runner.os == 'Windows'
-      shell: cmd /C CALL {0}
-      run: 'cmake -h
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
-    - name: Run tests (1st)
-      timeout-minutes: 120
-      id: test1
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (1st)
-      timeout-minutes: 120
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
-      id: test1_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (1st)
-      timeout-minutes: 120
-      if: ${{ steps.test1_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run tests (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' }}
-      id: test2
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
-      continue-on-error: true
-    - name: Re-run test failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Run generated test script (2nd)
-      timeout-minutes: 120
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
-        }}
-      id: test2_script
-      run: ./run_mpi.sh
-      continue-on-error: true
-    - name: Re-run test script failures (2nd)
-      timeout-minutes: 120
-      if: ${{ steps.test2_script.outcome == 'failure' }}
-      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
-    - name: Combine coverage reports
-      continue-on-error: true
-      run: '# ls .*
-
-        coverage combine --append
-
-        '
-    - name: (CONDA) Generate XML version of coverage report
-      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: '# ls .*
-
-        coverage xml -i
-
-        '
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v3
-      with:
-        name: ${{ env.YGG_GHA_JOB_ID }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Download the last successful workflow environment log
-      if: ${{ always() }}
-      continue-on-error: true
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        workflow: test-install.yml
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: .
-    - name: Create a log of Python package versions
-      if: ${{ always() }}
-      run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v3
-      if: ${{ success() }}
-      with:
-        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: new_environment_log.txt
-  docs:
-    name: Build the Docs
-    runs-on: ubuntu-latest
-    env:
-      BUILDDOCS: 1
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: python utils/setup_test_env.py install pip
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Build the docs
-      run: 'cd docs
-
-        make autodoc
-
-        cd ../
-
-        '
-    - name: Publish docs to Github pages
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: docs/build/html/
   deploy:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Publish package
     needs:
     - test_pip
@@ -1630,7 +30,6 @@ jobs:
     - test_rmq_conda
     - test_stripped
     - docs
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -1653,10 +52,12 @@ jobs:
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        user: __token__
         password: ${{ secrets.pypi }}
         skip_existing: true
+        user: __token__
   docker:
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) || github.event.schedule
+      == '0 10 1 * *'
     name: Build and Publish Docker images
     needs:
     - test_pip
@@ -1665,8 +66,6 @@ jobs:
     - test_rmq_conda
     - test_stripped
     - docs
-    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) || github.event.schedule
-      == '0 10 1 * *'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -1679,13 +78,55 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
     - name: Build and push environment docker images for the new release
       run: python utils/build_docker.py --push
     - name: Build and push executable docker images for the new release
       run: python utils/build_docker.py --push executable
+  docs:
+    env:
+      BUILDDOCS: 1
+    name: Build the Docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: python utils/setup_test_env.py install pip
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Build the docs
+      run: 'cd docs
+
+        make autodoc
+
+        cd ../
+
+        '
+    - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      name: Publish docs to Github pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        BRANCH: gh-pages
+        FOLDER: docs/build/html/
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  params:
+    name: Prepare test parameters
+    outputs:
+      os-versions: ${{ steps.set-os-versions.outputs.versions }}
+    runs-on: ubuntu-latest
+    steps:
+    - id: set-os-versions
+      run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}"
+        >> $GITHUB_OUTPUT
   schema:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Update the schema used by the model submission form
     needs:
     - test_pip
@@ -1694,7 +135,6 @@ jobs:
     - test_rmq_conda
     - test_stripped
     - docs
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -1715,3 +155,1571 @@ jobs:
     - name: Update the form
       run: python utils/update_form_schema.py --token=${{ secrets.YGGDRASIL_UPDATE_TOKEN
         }}
+  test_conda:
+    defaults:
+      run:
+        shell: bash -l {0}
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
+      }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
+      }}
+    needs: params
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
+        != 'mamba'
+      name: Set C installation based on matrix value
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-mpi != true
+      name: Set MPI installation based on matrix value
+      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-sbml == true
+      name: Set SBML installation based on matrix value
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Store an ID string for the job
+      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
+        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
+        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: runner.os == 'Windows'
+      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
+      name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: Install R
+      uses: r-lib/actions/setup-r@v2
+    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/.cache/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/Library/Caches/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~\AppData\Local\pip\Cache
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
+      name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+    - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
+      name: (PIP) Set up Virtual Env
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Install dependencies & package
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set the vcpkg root config value
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: (WINDOWS,PIP) Update R requirements
+      run: ygginstall R --update-r-requirements
+    - if: matrix.install-method == 'pip' && runner.os == 'macOS'
+      name: (MACOS,PIP) Set C compiler to llvm clang
+      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
+      name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        channel-priority: strict
+        channels: conda-forge
+        miniforge-variant: Mambaforge
+        python-version: ${{ matrix.python-version }}
+        use-mamba: true
+        use-only-tar-bz2: true
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'Windows' && env.INSTALLC == 1
+      name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - continue-on-error: true
+      id: conda_build
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Build package in base environment
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Build package in base environment (re-attempt)
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
+        == 'mamba')
+      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      run: ./utils/setup_old_mac_sdk.sh
+    - if: runner.os == 'Linux' && matrix.install-sbml == true
+      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
+      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
+    - continue-on-error: true
+      id: conda_install
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Install dependencies & package from existing build
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'macOS'
+      name: (MACOS,CONDA) Set allow_multiple_omp config
+      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
+        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+
+        yggconfig --allow-multiple-omp
+
+        '
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - if: runner.os == 'Windows'
+      name: Run cmake test in command prompt
+      run: 'cmake -h
+
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+
+        '
+      shell: cmd /C CALL {0}
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1
+      name: Run tests (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test1.outcome == 'failure' }}
+      name: Re-run test failures (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1_script
+      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      name: Run generated test script (1st)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test1_script.outcome == 'failure' }}
+      name: Re-run test script failures (1st)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2
+      if: ${{ matrix.test-flags2 != '' }}
+      name: Run tests (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test2.outcome == 'failure' }}
+      name: Re-run test failures (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2_script
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+        }}
+      name: Run generated test script (2nd)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test2_script.outcome == 'failure' }}
+      name: Re-run test script failures (2nd)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      name: Combine coverage reports
+      run: '# ls .*
+
+        coverage combine --append
+
+        '
+    - if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Generate XML version of coverage report
+      run: '# ls .*
+
+        coverage xml -i
+
+        '
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+    - continue-on-error: true
+      if: ${{ always() }}
+      name: Download the last successful workflow environment log
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: .
+        workflow: test-install.yml
+    - if: ${{ always() }}
+      name: Create a log of Python package versions
+      run: python utils/setup_test_env.py log
+    - if: ${{ success() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: new_environment_log.txt
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - install-c: true
+          install-method: conda
+          install-mpi: false
+          install-sbml: false
+          os-base: ubuntu
+          python-version: 3.6
+          test-flags1: --long-running
+          test-flags2: ''
+        - install-c: true
+          install-method: conda
+          install-mpi: false
+          install-sbml: false
+          os-base: ubuntu
+          python-version: 3.8
+          test-flags1: --long-running
+          test-flags2: ''
+        - install-c: true
+          install-method: conda
+          install-mpi: false
+          install-sbml: true
+          os-base: ubuntu
+          python-version: 3.9
+          test-flags1: --long-running --remote-service
+          test-flags2: --suites examples --parametrize-language=sbml
+        - install-c: true
+          install-method: conda
+          install-mpi: false
+          install-sbml: false
+          os-base: ubuntu
+          python-version: 3.1
+          test-flags1: --long-running
+          test-flags2: ''
+        - install-c: true
+          install-method: conda
+          install-mpi: false
+          install-sbml: false
+          os-base: macos
+          python-version: 3.8
+          test-flags1: --suites examples top --parametrize-example-name=rpc_lesson3
+          test-flags2: tests/test_tools.py
+        install-c:
+        - true
+        install-method:
+        - conda
+        install-mpi:
+        - true
+        install-sbml:
+        - false
+        os-base:
+        - ubuntu
+        - macos
+        - windows
+        python-version:
+        - 3.7
+        test-flags1:
+        - --long-running --mpi-script=run_mpi.sh
+        test-flags2:
+        - --suite=examples --parametrize-example-name=backwards
+      max-parallel: 20
+  test_pip:
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
+      }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c
+      }}
+    needs: params
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
+        != 'mamba'
+      name: Set C installation based on matrix value
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-mpi != true
+      name: Set MPI installation based on matrix value
+      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-sbml == true
+      name: Set SBML installation based on matrix value
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Store an ID string for the job
+      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
+        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
+        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: runner.os == 'Windows'
+      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
+      name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: Install R
+      uses: r-lib/actions/setup-r@v2
+    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/.cache/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/Library/Caches/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~\AppData\Local\pip\Cache
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
+      name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+    - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
+      name: (PIP) Set up Virtual Env
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Install dependencies & package
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set the vcpkg root config value
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: (WINDOWS,PIP) Update R requirements
+      run: ygginstall R --update-r-requirements
+    - if: matrix.install-method == 'pip' && runner.os == 'macOS'
+      name: (MACOS,PIP) Set C compiler to llvm clang
+      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
+      name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        channel-priority: strict
+        channels: conda-forge
+        miniforge-variant: Mambaforge
+        python-version: ${{ matrix.python-version }}
+        use-mamba: true
+        use-only-tar-bz2: true
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'Windows' && env.INSTALLC == 1
+      name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - continue-on-error: true
+      id: conda_build
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Build package in base environment
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Build package in base environment (re-attempt)
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
+        == 'mamba')
+      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      run: ./utils/setup_old_mac_sdk.sh
+    - if: runner.os == 'Linux' && matrix.install-sbml == true
+      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
+      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
+    - continue-on-error: true
+      id: conda_install
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Install dependencies & package from existing build
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'macOS'
+      name: (MACOS,CONDA) Set allow_multiple_omp config
+      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
+        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+
+        yggconfig --allow-multiple-omp
+
+        '
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - if: runner.os == 'Windows'
+      name: Run cmake test in command prompt
+      run: 'cmake -h
+
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+
+        '
+      shell: cmd /C CALL {0}
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1
+      name: Run tests (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test1.outcome == 'failure' }}
+      name: Re-run test failures (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1_script
+      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      name: Run generated test script (1st)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test1_script.outcome == 'failure' }}
+      name: Re-run test script failures (1st)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2
+      if: ${{ matrix.test-flags2 != '' }}
+      name: Run tests (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test2.outcome == 'failure' }}
+      name: Re-run test failures (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2_script
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+        }}
+      name: Run generated test script (2nd)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test2_script.outcome == 'failure' }}
+      name: Re-run test script failures (2nd)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      name: Combine coverage reports
+      run: '# ls .*
+
+        coverage combine --append
+
+        '
+    - if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Generate XML version of coverage report
+      run: '# ls .*
+
+        coverage xml -i
+
+        '
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+    - continue-on-error: true
+      if: ${{ always() }}
+      name: Download the last successful workflow environment log
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: .
+        workflow: test-install.yml
+    - if: ${{ always() }}
+      name: Create a log of Python package versions
+      run: python utils/setup_test_env.py log
+    - if: ${{ success() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: new_environment_log.txt
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - install-c: false
+          install-method: pip
+          install-mpi: false
+          install-sbml: false
+          os-base: windows
+          python-version: 3.7
+          test-flags1: --long-running
+          test-flags2: ''
+        install-c:
+        - true
+        install-method:
+        - pip
+        install-mpi:
+        - true
+        install-sbml:
+        - false
+        os-base:
+        - ubuntu
+        - macos
+        - windows
+        python-version:
+        - 3.7
+        test-flags1:
+        - --long-running --suites timing demos top
+        - --suite=examples --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3
+        - --suite=types --skip-languages c cpp
+        - --suite=types --languages c cpp
+        test-flags2:
+        - ''
+      max-parallel: 20
+  test_rmq_conda:
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      INSTALLAPY: 1
+      INSTALLRMQ: 1
+      USEVIRTUALENV: 1
+    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
+      }})
+    needs: params
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+        ports:
+        - 5672:5672
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
+        != 'mamba'
+      name: Set C installation based on matrix value
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-mpi != true
+      name: Set MPI installation based on matrix value
+      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-sbml == true
+      name: Set SBML installation based on matrix value
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Store an ID string for the job
+      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
+        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
+        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: runner.os == 'Windows'
+      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
+      name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: Install R
+      uses: r-lib/actions/setup-r@v2
+    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/.cache/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/Library/Caches/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~\AppData\Local\pip\Cache
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
+      name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+    - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
+      name: (PIP) Set up Virtual Env
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Install dependencies & package
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set the vcpkg root config value
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: (WINDOWS,PIP) Update R requirements
+      run: ygginstall R --update-r-requirements
+    - if: matrix.install-method == 'pip' && runner.os == 'macOS'
+      name: (MACOS,PIP) Set C compiler to llvm clang
+      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
+      name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        channel-priority: strict
+        channels: conda-forge
+        miniforge-variant: Mambaforge
+        python-version: ${{ matrix.python-version }}
+        use-mamba: true
+        use-only-tar-bz2: true
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'Windows' && env.INSTALLC == 1
+      name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - continue-on-error: true
+      id: conda_build
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Build package in base environment
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Build package in base environment (re-attempt)
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
+        == 'mamba')
+      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      run: ./utils/setup_old_mac_sdk.sh
+    - if: runner.os == 'Linux' && matrix.install-sbml == true
+      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
+      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
+    - continue-on-error: true
+      id: conda_install
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Install dependencies & package from existing build
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'macOS'
+      name: (MACOS,CONDA) Set allow_multiple_omp config
+      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
+        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+
+        yggconfig --allow-multiple-omp
+
+        '
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - if: runner.os == 'Windows'
+      name: Run cmake test in command prompt
+      run: 'cmake -h
+
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+
+        '
+      shell: cmd /C CALL {0}
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1
+      name: Run tests (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test1.outcome == 'failure' }}
+      name: Re-run test failures (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1_script
+      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      name: Run generated test script (1st)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test1_script.outcome == 'failure' }}
+      name: Re-run test script failures (1st)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2
+      if: ${{ matrix.test-flags2 != '' }}
+      name: Run tests (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test2.outcome == 'failure' }}
+      name: Re-run test failures (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2_script
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+        }}
+      name: Run generated test script (2nd)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test2_script.outcome == 'failure' }}
+      name: Re-run test script failures (2nd)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      name: Combine coverage reports
+      run: '# ls .*
+
+        coverage combine --append
+
+        '
+    - if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Generate XML version of coverage report
+      run: '# ls .*
+
+        coverage xml -i
+
+        '
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+    - continue-on-error: true
+      if: ${{ always() }}
+      name: Download the last successful workflow environment log
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: .
+        workflow: test-install.yml
+    - if: ${{ always() }}
+      name: Create a log of Python package versions
+      run: python utils/setup_test_env.py log
+    - if: ${{ success() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: new_environment_log.txt
+    strategy:
+      fail-fast: false
+      matrix:
+        install-c:
+        - true
+        install-method:
+        - conda
+        install-mpi:
+        - false
+        install-sbml:
+        - false
+        os-base:
+        - ubuntu
+        python-version:
+        - 3.7
+        test-flags1:
+        - --long-running --languages python R matlab
+        test-flags2:
+        - tests/test_services.py --nocapture
+  test_rmq_pip:
+    env:
+      INSTALLAPY: 1
+      INSTALLRMQ: 1
+      USEVIRTUALENV: 1
+      YGG_DEFAULT_COMM: IPCComm
+    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
+      }})
+    needs: params
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+        ports:
+        - 5672:5672
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
+        != 'mamba'
+      name: Set C installation based on matrix value
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-mpi != true
+      name: Set MPI installation based on matrix value
+      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-sbml == true
+      name: Set SBML installation based on matrix value
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Store an ID string for the job
+      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
+        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
+        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: runner.os == 'Windows'
+      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
+      name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: Install R
+      uses: r-lib/actions/setup-r@v2
+    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/.cache/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/Library/Caches/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~\AppData\Local\pip\Cache
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
+      name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+    - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
+      name: (PIP) Set up Virtual Env
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Install dependencies & package
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set the vcpkg root config value
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: (WINDOWS,PIP) Update R requirements
+      run: ygginstall R --update-r-requirements
+    - if: matrix.install-method == 'pip' && runner.os == 'macOS'
+      name: (MACOS,PIP) Set C compiler to llvm clang
+      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
+      name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        channel-priority: strict
+        channels: conda-forge
+        miniforge-variant: Mambaforge
+        python-version: ${{ matrix.python-version }}
+        use-mamba: true
+        use-only-tar-bz2: true
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'Windows' && env.INSTALLC == 1
+      name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - continue-on-error: true
+      id: conda_build
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Build package in base environment
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Build package in base environment (re-attempt)
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
+        == 'mamba')
+      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      run: ./utils/setup_old_mac_sdk.sh
+    - if: runner.os == 'Linux' && matrix.install-sbml == true
+      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
+      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
+    - continue-on-error: true
+      id: conda_install
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Install dependencies & package from existing build
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'macOS'
+      name: (MACOS,CONDA) Set allow_multiple_omp config
+      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
+        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+
+        yggconfig --allow-multiple-omp
+
+        '
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - if: runner.os == 'Windows'
+      name: Run cmake test in command prompt
+      run: 'cmake -h
+
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+
+        '
+      shell: cmd /C CALL {0}
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1
+      name: Run tests (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test1.outcome == 'failure' }}
+      name: Re-run test failures (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1_script
+      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      name: Run generated test script (1st)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test1_script.outcome == 'failure' }}
+      name: Re-run test script failures (1st)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2
+      if: ${{ matrix.test-flags2 != '' }}
+      name: Run tests (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test2.outcome == 'failure' }}
+      name: Re-run test failures (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2_script
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+        }}
+      name: Run generated test script (2nd)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test2_script.outcome == 'failure' }}
+      name: Re-run test script failures (2nd)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      name: Combine coverage reports
+      run: '# ls .*
+
+        coverage combine --append
+
+        '
+    - if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Generate XML version of coverage report
+      run: '# ls .*
+
+        coverage xml -i
+
+        '
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+    - continue-on-error: true
+      if: ${{ always() }}
+      name: Download the last successful workflow environment log
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: .
+        workflow: test-install.yml
+    - if: ${{ always() }}
+      name: Create a log of Python package versions
+      run: python utils/setup_test_env.py log
+    - if: ${{ success() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: new_environment_log.txt
+    strategy:
+      fail-fast: false
+      matrix:
+        install-c:
+        - true
+        install-method:
+        - pip
+        install-mpi:
+        - false
+        install-sbml:
+        - false
+        os-base:
+        - ubuntu
+        python-version:
+        - 3.7
+        test-flags1:
+        - --long-running --languages python R matlab
+        test-flags2:
+        - ''
+  test_stripped:
+    env:
+      INSTALLC: 0
+      INSTALLFORTRAN: 0
+      INSTALLLPY: 0
+      INSTALLMPI: 0
+      INSTALLPYGMENTS: 0
+      INSTALLR: 0
+      INSTALLRMQ: 0
+      INSTALLTRIMESH: 0
+      INSTALLZMQ: 0
+      YGG_GHA_JOB_ID_SUFFIX: -stripped
+    name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os-base
+      }}, ${{ matrix.install-method }})
+    needs: params
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
+      }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
+        != 'mamba'
+      name: Set C installation based on matrix value
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-mpi != true
+      name: Set MPI installation based on matrix value
+      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.install-sbml == true
+      name: Set SBML installation based on matrix value
+      run: echo "INSTALLSBML=1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Store an ID string for the job
+      run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
+        matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
+        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: runner.os == 'Windows'
+      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
+      name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: Install R
+      uses: r-lib/actions/setup-r@v2
+    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/.cache/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~/Library/Caches/pip
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v3
+      with:
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        path: ~\AppData\Local\pip\Cache
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
+      name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+    - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
+      name: (PIP) Set up Virtual Env
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
+    - if: matrix.install-method == 'pip'
+      name: (PIP) Install dependencies & package
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set the vcpkg root config value
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      name: (WINDOWS,PIP) Update R requirements
+      run: ygginstall R --update-r-requirements
+    - if: matrix.install-method == 'pip' && runner.os == 'macOS'
+      name: (MACOS,PIP) Set C compiler to llvm clang
+      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
+      name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        channel-priority: strict
+        channels: conda-forge
+        miniforge-variant: Mambaforge
+        python-version: ${{ matrix.python-version }}
+        use-mamba: true
+        use-only-tar-bz2: true
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'Windows' && env.INSTALLC == 1
+      name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.0
+    - continue-on-error: true
+      id: conda_build
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Build package in base environment
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Build package in base environment (re-attempt)
+      run: 'conda activate base
+
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }} --use-mamba
+
+        '
+    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
+        == 'mamba')
+      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      run: ./utils/setup_old_mac_sdk.sh
+    - if: runner.os == 'Linux' && matrix.install-sbml == true
+      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
+      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
+    - continue-on-error: true
+      id: conda_install
+      if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Install dependencies & package from existing build
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method ==
+        'conda' || matrix.install-method == 'mamba')}}
+      name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+        --use-mamba
+    - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
+        runner.os == 'macOS'
+      name: (MACOS,CONDA) Set allow_multiple_omp config
+      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
+        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+
+        yggconfig --allow-multiple-omp
+
+        '
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - if: runner.os == 'Windows'
+      name: Run cmake test in command prompt
+      run: 'cmake -h
+
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+
+        '
+      shell: cmd /C CALL {0}
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1
+      name: Run tests (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test1.outcome == 'failure' }}
+      name: Re-run test failures (1st)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test1_script
+      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      name: Run generated test script (1st)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test1_script.outcome == 'failure' }}
+      name: Re-run test script failures (1st)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2
+      if: ${{ matrix.test-flags2 != '' }}
+      name: Run tests (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }}
+      timeout-minutes: 120
+    - if: ${{ steps.test2.outcome == 'failure' }}
+      name: Re-run test failures (2nd)
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
+        }} --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      id: test2_script
+      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+        }}
+      name: Run generated test script (2nd)
+      run: ./run_mpi.sh
+      timeout-minutes: 120
+    - if: ${{ steps.test2_script.outcome == 'failure' }}
+      name: Re-run test script failures (2nd)
+      run: ./run_mpi.sh --last-failed --last-failed-no-failures=all --second-attempt
+      timeout-minutes: 120
+    - continue-on-error: true
+      name: Combine coverage reports
+      run: '# ls .*
+
+        coverage combine --append
+
+        '
+    - if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
+      name: (CONDA) Generate XML version of coverage report
+      run: '# ls .*
+
+        coverage xml -i
+
+        '
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+    - continue-on-error: true
+      if: ${{ always() }}
+      name: Download the last successful workflow environment log
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: .
+        workflow: test-install.yml
+    - if: ${{ always() }}
+      name: Create a log of Python package versions
+      run: python utils/setup_test_env.py log
+    - if: ${{ success() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: new_environment_log.txt
+    strategy:
+      fail-fast: false
+      matrix:
+        install-c:
+        - false
+        install-method:
+        - pip
+        install-mpi:
+        - false
+        install-sbml:
+        - false
+        os-base:
+        - ubuntu
+        - macos
+        - windows
+        python-version:
+        - 3.7
+        test-flags1:
+        - --long-running
+        test-flags2:
+        - ''
+name: Test of package installation & execution
+'on':
+  push:
+    branches-ignore:
+    - gh-pages
+    tags:
+    - '*'
+  schedule:
+  - cron: 0 10 * * 1
+  - cron: 0 10 1 * *

@@ -771,7 +771,7 @@ class CompilationToolBase(object):
     @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
                   unused_kwargs=None, skip_defaults=False,
-                  dont_skip_env_defaults=False, remove_flags=None,
+                  dont_skip_env_defaults=False,  # remove_flags=None,
                   with_asan=False, **kwargs):
         r"""Get a list of flags for the tool.
 
@@ -837,10 +837,10 @@ class CompilationToolBase(object):
         # Handle unused keyword argumetns
         if isinstance(unused_kwargs, dict):
             unused_kwargs.update(kwargs)
-        if isinstance(remove_flags, list):
-            for x in remove_flags:
-                if x in out:
-                    out.remove(x)
+        # if isinstance(remove_flags, list):
+        #     for x in remove_flags:
+        #         if x in out:
+        #             out.remove(x)
         return out
 
     @classmethod

@@ -14,7 +14,7 @@ class TestPlySerialize(base_class):
     def test_apply_scalar_map(self, class_name, testing_options):
         r"""Test applying a scalar colormap."""
         for x in testing_options['objects']:
-            scalar_arr = np.arange(x.count_elements('faces')).astype(
+            scalar_arr = 10 * np.arange(x.count_elements('faces')).astype(
                 'float')
             with pytest.raises(NotImplementedError):
                 x.apply_scalar_map(scalar_arr, scale_by_area=True)
