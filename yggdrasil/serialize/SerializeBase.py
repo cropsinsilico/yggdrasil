@@ -465,7 +465,7 @@ class SerializeBase(tools.YggClass):
         return datatypes.type2numpy(self.datatype)
 
     @property
-    def typedef(self):  # pragma: deprecation
+    def typedef(self):  # pragma: deprecated
         r"""dict: Alias for datatype."""
         warnings.warn(message=("`typedef` attribute is deprecated`; use "
                                " `datatype` instead."),
@@ -679,13 +679,11 @@ class SerializeBase(tools.YggClass):
                         if units.is_null_unit(iv):
                             continue
                         iv = str(units.Units(iv))
-                        if itype['type'] == 'number':
+                        type_map = {'number': 'float',
+                                    'integer': 'int'}
+                        if itype['type'] in type_map:
                             itype.update(type='scalar',
-                                         subtype='float',
-                                         precision=8)
-                        elif itype['type'] == 'integer':
-                            itype.update(type='scalar',
-                                         subtype='int',
+                                         subtype=type_map[itype['type']],
                                          precision=8)
                     itype.setdefault(tk, iv)
                 if all_updated:

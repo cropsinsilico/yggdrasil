@@ -189,8 +189,6 @@ class GCCCompiler(CCompilerBase):
             ver = cls.tool_version()
             if 'mingw' in ver.lower() or 'msys' in ver.lower():
                 out.append('-Wa,-mbig-obj')
-            else:
-                print("NOT MINGW?", ver)
         return out
         
     def dll2a(cls, dll, dst=None, overwrite=False):
@@ -1390,8 +1388,6 @@ class CModelDriver(CompiledModelDriver):
             if grp['type'] in ['char', 'void']:
                 nptr -= 1
             if nptr > 0:
-                if out['type'] == 'number':
-                    out['type'] = 'float'
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
         if out['type'] in constants.SCALAR_TYPES:
@@ -1995,10 +1991,6 @@ class CModelDriver(CompiledModelDriver):
                     nele *= s
                 dst_var_type = cls.get_native_type(**dst_var)
                 kwargs.update(copy=True, N=nele,
-                              native_type=dst_var_type)
-            elif 'length' in dst_var.get('datatype', {}):
-                dst_var_type = cls.get_native_type(**dst_var)
-                kwargs.update(copy=True, N=dst_var['datatype']['length'],
                               native_type=dst_var_type)
         if outputs_in_inputs and (cls.language != 'c++'):
             if isinstance(dst_var, dict):

@@ -24,17 +24,6 @@ History
 * Removed 'typedef' attribute from serializer class, 'datatype' should be used instead
 * Removed use of 'header_kwargs' keyword argument from serializer 'serialize' method. Use 'metadata' instead.
 
-TODO:
-~~~~~
-
-* Fix bug where datatype parameters in communicators are not passed to the datatype during normalization (currently handled on python side)
-* Update docs to indicate the use of extended rapidjson in installation and units sections (go through all docs to identify other places)
-* Update type tables
-* Allow obj_t/ply_t to be passed by pointer in types test
-* Add method to allow standard serialization of rapidjson::Value via << operator
-* Fix bug in timesync model driver when state variables have units and add units to OSR
-* Add unicode test
-
 1.8.5 (2023-03-01) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
 ------------------
 * Fix bug where yggcompile was compiling some languages multiple times

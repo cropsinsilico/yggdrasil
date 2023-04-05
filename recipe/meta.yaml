@@ -195,6 +195,7 @@ outputs:
         - pytest-repeat
         - pytest-rerunfailures
         - pytest-timeout
+        - pytest-xdist
   - name: yggdrasil.docs
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

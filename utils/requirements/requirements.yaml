@@ -250,6 +250,7 @@ extras:
     - pytest-rerunfailures
     - pytest-repeat
     - pytest-timeout
+    - pytest-xdist
     # Split these into another section?
     - ccache:
         method: conda

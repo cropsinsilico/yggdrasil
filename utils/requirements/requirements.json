@@ -450,6 +450,7 @@
       "pytest-rerunfailures",
       "pytest-repeat",
       "pytest-timeout",
+      "pytest-xdist",
       {
         "ccache": {
           "method": "conda",

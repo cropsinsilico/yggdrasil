@@ -19,7 +19,8 @@
     "pytest-mpi",
     "pytest-repeat",
     "pytest-rerunfailures",
-    "pytest-timeout"
+    "pytest-timeout",
+    "pytest-xdist"
   ],
   "docs": [
     "breathe",

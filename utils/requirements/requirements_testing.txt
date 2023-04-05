@@ -11,3 +11,4 @@ pytest-mpi
 pytest-repeat
 pytest-rerunfailures
 pytest-timeout
+pytest-xdist

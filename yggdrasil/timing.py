@@ -515,7 +515,9 @@ class TimedRun(tools.YggClass):
 
         """
         out = {'models': [self.get_yaml_src(self.lang_src),
-                          self.get_yaml_dst(self.lang_dst)]}
+                          self.get_yaml_dst(self.lang_dst)],
+               'connections': [{'input': 'output_pipe',
+                                'output': 'input_pipe'}]}
         lines = yaml.dump(out, default_flow_style=False)
         with open(path, 'w') as fd:
             fd.write(lines)
@@ -531,9 +533,7 @@ class TimedRun(tools.YggClass):
                'language': lang,
                'args': [os.path.join('.', self.source_src),
                         "{{PIPE_MSG_COUNT}}", "{{PIPE_MSG_SIZE}}"],
-               'outputs': {'name': 'output_pipe',
-                           'driver': 'OutputDriver',
-                           'args': 'timed_pipe'}}
+               'outputs': {'name': 'output_pipe'}}
         return out
 
     def get_yaml_dst(self, lang):
@@ -546,13 +546,12 @@ class TimedRun(tools.YggClass):
         out = {'name': 'timed_pipe_dst',
                'language': lang,
                'args': os.path.join('.', self.source_dst),
-               'inputs': {'name': 'input_pipe',
-                          'driver': 'InputDriver',
-                          'args': 'timed_pipe'},
+               'inputs': {'name': 'input_pipe'},
                'outputs': {'name': 'output_file',
-                           'driver': 'AsciiFileOutputDriver',
-                           'args': "{{PIPE_OUT_FILE}}",
-                           'in_temp': True}}
+                           'default_file': {
+                               'name': "{{PIPE_OUT_FILE}}",
+                               'filetype': 'ascii',
+                               'in_temp': True}}}
         return out
 
     def before_run(self, nmsg, msg_size):

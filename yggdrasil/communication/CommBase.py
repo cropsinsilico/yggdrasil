@@ -1989,7 +1989,7 @@ class CommBase(tools.YggClass):
             header_kwargs = {}
         model_name = self.full_model_name
         if model_name:
-            if header_kwargs is None:
+            if header_kwargs is None:  # pragma: debug
                 header_kwargs = {}
             header_kwargs.setdefault('__meta__', {})
             header_kwargs['__meta__'].setdefault('model', model_name)
