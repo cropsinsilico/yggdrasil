@@ -178,7 +178,7 @@ jobs:
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')  #  && runner.os == 'Windows'
       with:
         auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
+        python-version: "${{ matrix.python-version }}"
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict

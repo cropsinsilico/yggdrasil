@@ -1251,7 +1251,7 @@ class FortranModelDriver(CompiledModelDriver):
                     vnew = vnew.replace('X', '1')
                 elif 'ISO_10646' in vnew:
                     knew = {'type': 'scalar', 'subtype': knew,
-                            'precision': 8}
+                            'encoding': 'UCS4', 'precision': 32}
                 else:
                     knew = {'type': 'scalar', 'subtype': knew,
                             'precision': 8}
