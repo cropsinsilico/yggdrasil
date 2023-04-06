@@ -23,6 +23,7 @@ class StatementFilter(FilterBase):
     _filtertype = 'statement'
     _schema_required = ['statement']
     _schema_properties = {'statement': {'type': 'string'}}
+    _schema_subtype_description = "Filter messages based on a statement"
 
     def __init__(self, *args, **kwargs):
         super(StatementFilter, self).__init__(*args, **kwargs)

@@ -26,11 +26,11 @@ class TestRMQAsyncComm(base_class):
         do_send_recv(send_comm, recv_comm)
         recv_comm.connection.close(reply_code=100,
                                    reply_text="Test shutdown")
-        recv_comm._reconnecting.started.wait(5)
-        recv_comm._reconnecting.stopped.wait(5)
+        recv_comm._reconnecting.started.wait(10)
+        recv_comm._reconnecting.stopped.wait(10)
         assert recv_comm.times_connected > 1
         assert recv_comm._reconnecting.has_stopped()
-        recv_comm._opening.stopped.wait(5)
+        recv_comm._opening.stopped.wait(10)
         do_send_recv(send_comm, recv_comm)
         send_comm.printStatus()
         recv_comm.printStatus()

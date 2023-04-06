@@ -16,6 +16,7 @@ class MapFieldsTransform(TransformBase):
     _schema_required = ['map']
     _schema_properties = {'map': {'type': 'object',
                                   'additionalProperties': {'type': 'string'}}}
+    _schema_subtype_description = "Change the names of fields in a message"
 
     def transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform

@@ -1166,6 +1166,7 @@ class ComponentSchema(object):
             del new_schema['required']
         new_schema['properties'].setdefault(self.subtype_key, {})
         new_schema['properties'][self.subtype_key]['enum'] = subtype_list
+        new_schema['properties'][self.subtype_key].setdefault('type', 'string')
         # Add legacy properties
         prev_drivers = (
             self._base_name

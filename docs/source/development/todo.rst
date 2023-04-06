@@ -13,15 +13,12 @@ Documentation
 -------------
 
 * Go through docs to strip out deprecated info
-* Update docs to reflect changes to YAML spec
 * Docs on datatypes w/ example of user defined data type
 * Docs on how nested data objects are represented in C/C++.
 * Regenerate metaschema with $schema entry
-* Refence metaschema on website in $id or $schema?
+* Refernce metaschema on website in $id or $schema?
 * Expand development section into contributing guide
 * Go through and update/prune interface documentation
-* Update docs to indicate the use of extended rapidjson in installation and units sections (go through all docs to identify other places)
-* Update type tables
   
 Refactor
 --------
@@ -30,7 +27,7 @@ Refactor
 * Change C client/server use of direction/serializer info to be more transparent
 * Split drivers into separate directories for model drivers and connection drivers
 * Change how CLI arguments are added to the arg parser for the language installer to use subparsers
-* Allow obj_t/ply_t to be passed by pointer in types test
+* Use doxygen linter/parser for parsing functions
 
 New feature/example
 -------------------
@@ -46,7 +43,6 @@ New feature/example
 * Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
 * Write C/C++ as extension to rapidjson and wrap in Python
 * Add 'shell' option for executable models on Windows to allow calling different shell types.
-* Add method to allow standard serialization of rapidjson::Value via << operator
 
 Testing
 -------

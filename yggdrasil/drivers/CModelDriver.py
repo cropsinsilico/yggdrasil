@@ -1298,14 +1298,16 @@ class CModelDriver(CompiledModelDriver):
         return False
               
     @classmethod
-    def get_native_type(cls, **kwargs):
+    def get_native_type(cls, const=False, **kwargs):
         r"""Get the native type.
 
         Args:
             type (str, optional): Name of |yggdrasil| extended JSON
                 type or JSONSchema dictionary defining a datatype.
-            **kwargs: Additional keyword arguments may be used in determining
-                the precise declaration that should be used.
+            const (bool, optional): If True, the native type will be
+                marked as constant. Defaults to False.
+            **kwargs: Additional keyword arguments may be used in
+                determining the precise declaration that should be used.
 
         Returns:
             str: The native type.
@@ -1313,8 +1315,11 @@ class CModelDriver(CompiledModelDriver):
         """
         out, json_type = super(CModelDriver, cls).get_native_type(
             return_json=True, **kwargs)
+        prefix = ''
+        if const:
+            prefix = 'const '
         if not ((out == '*') or ('X' in out) or (out == 'double')):
-            return out
+            return prefix + out
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
             json_subtype['type'] = 'scalar'
@@ -1337,7 +1342,7 @@ class CModelDriver(CompiledModelDriver):
         elif out == 'double':
             if json_type.get('precision', 8) == 4:
                 out = 'float'
-        return out.replace(' ', '')
+        return prefix + out.replace(' ', '')
         
     @classmethod
     def get_json_type(cls, native_type):

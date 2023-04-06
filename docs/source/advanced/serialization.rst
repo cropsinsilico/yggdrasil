@@ -11,10 +11,9 @@ of some type in the sending model's language into bytes and then reversing
 the process (deserialization) by turning the bytes into a variable of an
 analagous type in the language of the receiving model.
 
-For most types, |yggdrasil| uses an enhanced version of
+For most types, |yggdrasil| uses an `enhanced version <https://github.com/cropsinsilico/rapidjson>`_ of
 the `JSON data interchange format <https://www.json.org/>`_ to serialize
-data structures and uses `JSON Schema <https://json-schema.org/>`_ to describe
-and validate them. The use of JSON and JSON schema has the advantage that there
+data structures and uses `JSON Schema <https://json-schema.org/>`_ to describe, validate, and normalize them. The use of JSON and JSON schema has the advantage that there
 are many existing tools for reading, writing, and validating JSON serialized
 data that will make it easier to expand support to other languages in the future.
 For more complex data structures that are not easily or efficiently represented in
@@ -39,7 +38,7 @@ Message Header
 ==============
 
 Message headers are serialized JSON objects with properites that describe the message 
-and can be used to deserialize and validate the message on receipt. Although each 
+and can be used to ensure the message is complete on receipt. Although each 
 header can contain any information, at a minimum the header must include the
 following properties:
 
@@ -60,17 +59,9 @@ id          string    Unique message identifier.     Message tracking.
 ========    ======    ===========================    ===========================
 
 
-Depending on the datatype of the object encoded in the body, additional properties
-may be required in order to deserialize and/or validate the object. The properties
-required by each type are defined in the |yggdrasil|
-:ref:`JSON metaschema <metaschema_rst>`. On deserialization, the header is 
-validated against the metaschema, used to inform deserialization of the body, and
-then used as a JSON schema to validate the decoded data decoded from the body of the message.
-
-
-In addition to type information, the header is also used to pass information
+The header is also used to pass information
 between models reguarding communication. This information can include things
-like addresses of temporary communication resources, acknowledgement that a
+like the type of messages that should be expected, metadata about the messages that was not serialized, addresses of temporary communication resources, acknowledgement that a
 message was received, and notifications about new or broken connections. 
 
 
@@ -80,7 +71,7 @@ Message Body
 The message body is also a serialized JSON document, but during the encoding 
 process, data of some types undergo an additional pre-encoding step in order 
 to transform the data into a form that is more efficiently JSON encodable prior 
-to actually serializing the data via JSON encoding. For 
+to actually serializing the data via JSON encoding. This is handled in an `extended version <https://github.com/cropsinsilico/rapidjson>`_  of the rapidjson package with a corresponding `Python wrapper <https://github.com/cropsinsilico/python-rapidjson>`_. For 
 example, encoding one million 64bit floats would 1) produce a very large JSON 
 array and 2) require a large number of digits in order to preserve precision to 
 the level of round-off error as would be expected when passing floats between 
@@ -113,14 +104,8 @@ three different string related types. In addition to the core JSON ``string``
 type, which will be encoded and mapped to a datatype in
 the programming language of the receiving model according to the JSON
 implementation that is used (the JSON spec indicates UTF-8 should be used by
-default), |yggdrasil| also supports types of ``unicode`` and ``bytes``.
-Data identified with the ``bytes`` type will be pre-encoded as ASCII strings
-using the base64 encoding. Data identified with the ``unicode`` type will
-be pre-encoded by encoding them as bytes using UTF-32 and then encoding those
-bytes as ASCII strings using the base64 encoding. On receipt, messages
-of either type are decoded from base64. Messages containing data specified
-as ``unicode`` will be decoded and stored in a unicode data type if one
-is available in the receiving language. 
+default), |yggdrasil| also supports scalar strings that have explicit encodings. Support string scalar encodings currently include "ASCII", "UTF8", "UTF16", "UTF32", and "UCS4". If no encoding is specified for a string scalar, "ASCII" is assumed. In addition to ``string`` scalars, two additional strings are supported for backwards compatibility: ``unicode`` and ``bytes``. If not explicit encoding is provided with these types, ``bytes`` is treated as implying "ASCII" encoding and ``unicode`` is treated as implying "UCS4" encoding.
+Like other scalars, string scalars will also be encoded has ASCII via base64 on serialization and decoded when deserialized.
 If the receiving language dosn't have a built-in unicode type (e.g. C),
 the message will be preserved in the encoded UTF-32 bytes format.
 
