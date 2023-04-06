@@ -700,7 +700,7 @@ class FortranModelDriver(CompiledModelDriver):
                        if 'intent(out)' in x.get('native_type', '').lower()]
             if idx_out:
                 out.setdefault('outputs', [])
-                for i in idx_out:
+                for i in idx_out[::-1]:
                     out['outputs'].append(cls.input2output(out['inputs'].pop(i)))
         if 'flag_var' in out:
             outputs_in_inputs = out.get('outputs_in_inputs',

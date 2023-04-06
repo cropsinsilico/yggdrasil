@@ -106,6 +106,8 @@ def write_datatype_mapping_table(**kwargs):
                         'unicode.'),
              'string': 'User can specify an encoding for scalar strings.'}
     args = {k: {} for k in constants.ALL_TYPES}
+    for k in constants.PYTHON_SCALARS:
+        args.setdefault(k, {})
     for k, v in notes.items():
         if k in args:
             args[k]['notes'] = v
