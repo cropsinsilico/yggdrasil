@@ -75,6 +75,8 @@ class CommMessage(object):
         self.length = length
         self.flag = flag
         self.args = args
+        if header is None:
+            header = {}
         self.header = header
         self.additional_messages = []
         self.worker_messages = []
@@ -386,10 +388,8 @@ class CommBase(tools.YggClass):
             than row by row. Defaults to False.
         serializer (:class:.DefaultSerialize, optional): Class with serialize and
             deserialize methods that should be used to process sent and received
-            messages. Defaults to None and is constructed using provided
-            'serializer_kwargs'.
-        serializer_kwargs (dict, optional): Keyword arguments that should be
-            passed to :class:.DefaultSerialize to create serializer. Defaults to {}.
+            messages or a dictionary describing a serializer that obeys
+            the serializer schema.
         format_str (str, optional): String that should be used to format/parse
             messages. Default to None.
         dont_open (bool, optional): If True, the connection will not be opened.
@@ -751,10 +751,7 @@ class CommBase(tools.YggClass):
                 serializer information.
 
         """
-        # TODO: Deprecate serializer_class & serializer_kwargs and
-        # remove this method
-        seri_cls = kwargs.pop('serializer_class', None)
-        seri_kws = kwargs.pop('serializer_kwargs', {})
+        seri_kws = {}
         datatype = kwargs.get('datatype', None)
         serializer = kwargs.pop('serializer', None)
         if 'datatype' in cls._schema_properties and datatype is not None:
@@ -777,11 +774,6 @@ class CommBase(tools.YggClass):
         elif isinstance(serializer, dict):
             seri_kws.update(serializer)
             serializer = None
-        elif isinstance(serializer, type):
-            seri_cls = serializer
-            serializer = None
-        if seri_cls is not None:
-            seri_kws.setdefault('seritype', seri_cls._seritype)
         if serializer is None:
             if len(seri_kws) == 0:
                 seri_kws['seritype'] = cls._default_serializer
@@ -1180,7 +1172,7 @@ class CommBase(tools.YggClass):
 
     def open(self):
         r"""Open the connection."""
-        self.debug("Openning %s", self.address)
+        self.debug("Opening %s", self.address)
         self.bind()
 
     def _close(self, *args, **kwargs):
@@ -1197,7 +1189,7 @@ class CommBase(tools.YggClass):
                 method if linger is True.
 
         """
-        self.debug("Closing %s", self.address)
+        self.debug(f"Closing {self.address} (linger = {linger})")
         if linger and self.is_open:
             self.linger(**kwargs)
         else:
@@ -1993,11 +1985,11 @@ class CommBase(tools.YggClass):
 
     def prepare_header(self, header_kwargs):
         r"""Prepare header kwargs for the communicator."""
-        if header_kwargs is None:
+        if header_kwargs is None:  # pragma: debug
             header_kwargs = {}
         model_name = self.full_model_name
         if model_name:
-            if header_kwargs is None:
+            if header_kwargs is None:  # pragma: debug
                 header_kwargs = {}
             header_kwargs.setdefault('__meta__', {})
             header_kwargs['__meta__'].setdefault('model', model_name)
@@ -2042,11 +2034,8 @@ class CommBase(tools.YggClass):
         if (len(args) == 1) and isinstance(args[0], CommMessage):
             msg = args[0]
             if header_kwargs:
-                if msg.header is None:
-                    msg.header = header_kwargs
-                else:
-                    msg.header = copy.deepcopy(msg.header)
-                    msg.header.update(header_kwargs)
+                msg.header = copy.deepcopy(msg.header)
+                msg.header.update(header_kwargs)
             if flag is None:
                 flag = msg.flag
             msg.flag = flag
@@ -2128,8 +2117,6 @@ class CommBase(tools.YggClass):
                         raise NotImplementedError(("EOF message with header (%d) "
                                                    "exceeds max message size (%d).")
                                                   % (msg.length, self.maxMsgSize))
-                    if x.header is None:
-                        x.header = dict()
                     x.worker = self.create_work_comm()
                     # if 'address' not in x.header:
                     #     x.worker = self.create_work_comm()

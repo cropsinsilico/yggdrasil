@@ -9,10 +9,16 @@ from yggdrasil.serialize import (
 
 
 class ArrayTransform(TransformBase):
-    r"""Class for consolidating values into an array."""
+    r"""Class for consolidating values into an array.
+
+    Args:
+        field_names (list, optional): Names of fields in the array.
+
+    """
     _transformtype = 'array'
     _schema_properties = {'field_names': {'type': 'array',
                                           'items': {'type': 'string'}}}
+    _schema_subtype_description = "Consolidate values into an array"
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.

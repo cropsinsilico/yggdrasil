@@ -5,6 +5,7 @@ class DirectTransform(TransformBase):
     r"""Base class for message transforms."""
 
     _transformtype = 'direct'
+    _schema_subtype_description = "Pass the message through unchanged"
 
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.

@@ -24,7 +24,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Print received message
-    printf("Model A: (%d verts, %d faces)\n", p.nvert, p.nface);
+    printf("Model A: (%d verts, %d faces)\n",
+	   nelements_ply(p, "v"), nelements_ply(p, "f"));
     display_ply_indent(p, "  ");
 
     // Send output to output channel

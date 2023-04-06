@@ -33,7 +33,8 @@ void unset_global_comm_f() {
 
 // Methods for initializing channels
 int is_comm_format_array_type_f(const void *x) {
-  return is_comm_format_array_type((const comm_t*)x);
+  dtype_t *datatype = ((const comm_t*)x)->datatype;
+  return is_dtype_format_array(datatype);
 }
 
 void* ygg_output_f(const char *name) {
@@ -158,6 +159,10 @@ int is_dtype_format_array_f(void* type_struct) {
   return is_dtype_format_array((dtype_t*)type_struct);
 }
 
+void *create_dtype_from_schema_f(const char* schema, const bool use_generic) {
+  return (void*)create_dtype_from_schema(schema, use_generic);
+}
+
 void *create_dtype_empty_f(const bool use_generic) {
   return (void*)create_dtype_empty(use_generic);
 }
@@ -244,8 +249,10 @@ int ygg_send_var_f(const void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_send_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  return vcommSend((const comm_t*)yggQ, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vcommSend((const comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
@@ -253,9 +260,10 @@ int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 0, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vcommRecv((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
@@ -263,9 +271,10 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 1, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1, 1);
+  int out = vcommRecv((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int rpc_send_f(const void *yggQ, int nargs, void *args) {
@@ -285,9 +294,10 @@ int rpc_call_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 0, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
@@ -295,9 +305,10 @@ int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 1, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 // Ply interface
@@ -330,6 +341,11 @@ void display_ply_f(ply_t p) {
   display_ply(p);
 }
 
+int nelements_ply_f(ply_t p, const char* name) {
+  return nelements_ply(p, name);
+}
+
+
 // Obj interface
 obj_t init_obj_f() {
   return init_obj();
@@ -358,6 +374,10 @@ void display_obj_indent_f(obj_t p, const char *indent) {
 
 void display_obj_f(obj_t p) {
   display_obj(p);
+}
+
+int nelements_obj_f(obj_t p, const char* name) {
+  return nelements_obj(p, name);
 }
 
 
@@ -406,16 +426,24 @@ int set_generic_array_f(generic_t arr, const size_t i, generic_t x) {
   return set_generic_array(arr, i, x);
 }
 
-int get_generic_array_f(generic_t arr, const size_t i, void* x, int copy) {
-  return get_generic_array(arr, i, (generic_t*)x, copy);
+int get_generic_array_f(generic_t arr, const size_t i, void* x) {
+  return get_generic_array(arr, i, (generic_t*)x);
+}
+
+int get_generic_array_ref_f(generic_t arr, const size_t i, void* x) {
+  return get_generic_array_ref(arr, i, (generic_ref_t*)x);
 }
 
 int set_generic_object_f(generic_t arr, const char* k, generic_t x) {
   return set_generic_object(arr, k, x);
 }
 
-int get_generic_object_f(generic_t arr, const char* k, void* x, int copy) {
-  return get_generic_object(arr, k, (generic_t*)x, copy);
+int get_generic_object_f(generic_t arr, const char* k, void* x) {
+  return get_generic_object(arr, k, (generic_t*)x);
+}
+
+int get_generic_object_ref_f(generic_t arr, const char* k, void* x) {
+  return get_generic_object_ref(arr, k, (generic_ref_t*)x);
 }
 
 // Python interface

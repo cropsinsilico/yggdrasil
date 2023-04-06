@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.8.5" %}
+{% set version = "1.9.0" %}
 {% set PY_VER_MAJOR = PY_VER.split('.')[0] %}
 {% set PY_VER_MINOR = PY_VER.split('.')[1] %}
 
@@ -208,6 +208,7 @@ outputs:
         - pytest-repeat
         - pytest-rerunfailures
         - pytest-timeout
+        - pytest-xdist
   - name: yggdrasil.docs
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
@@ -221,7 +222,6 @@ outputs:
         - breathe
         - doxygen
         - pypandoc
-        - r-rd2md
         - r-roxygen2
         - sphinx
         - sphinx-argparse

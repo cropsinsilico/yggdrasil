@@ -24,8 +24,8 @@ static char _purge_msg[100] = "YGG_PURGE";
 static int _zmq_sleeptime = 10000;
 #ifdef _OPENMP
 #pragma omp threadprivate(_reply_msg, _purge_msg, _zmq_sleeptime)
-#endif
 static void *ygg_s_process_ctx = NULL;
+#endif
 
 
 typedef struct ygg_zsock_t {
@@ -609,29 +609,23 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   }
   zrep->n_msg++;
   // Extract address
-  comm_head_t head = parse_comm_header(data, len);
-  if (!(head.flags & HEAD_FLAG_VALID)) {
+  comm_head_t head = create_recv_header(&data, len, len, 0, 1);
+  if (!header_is_valid(head)) {
     ygglog_error("check_reply_recv(%s): Invalid header.", comm->name);
     return -1;
   }
-  char address[100];
-  size_t address_len;
+  const char* address;
   if ((comm->flags & COMM_FLAG_WORKER) && (zrep->nsockets == 1)) {
-    address_len = strlen(zrep->addresses[0]);
-    memcpy(address, zrep->addresses[0], address_len);
-  } else if (strlen(head.zmq_reply) > 0) {
-    address_len = strlen(head.zmq_reply);
-    memcpy(address, head.zmq_reply, address_len);
-  } else {
+    address = zrep->addresses[0];
+  } else if (!header_GetMetaString(head, "zmq_reply", &address)) {
     ygglog_error("check_reply_recv(%s): Error parsing reply header in '%s'",
 		 comm->name, data);
     destroy_header(&head);
     return -1;
   }
-  destroy_header(&head);
-  address[address_len] = '\0';
   // Match address and create if it dosn't exist
   int isock = set_reply_recv(comm, address);
+  destroy_header(&head); // After address has been set
   if (isock < 0) {
     ygglog_error("check_reply_recv(%s): Error setting reply socket.");
     return -1;
@@ -792,15 +786,17 @@ int free_zmq_comm(comm_t *x) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
       comm_head_t head;
-      bool is_eof_flag = false;
       while (zmq_comm_nmsg(x) > 0) {
         ret = zmq_comm_recv(x, &data, data_len, 1);
 	if (ret >= 0) {
-	  head = parse_comm_header(data, ret);
-	  if (strncmp(YGG_MSG_EOF, data + head.bodybeg, strlen(YGG_MSG_EOF)) == 0)
-	    is_eof_flag = true;
+	  head = create_recv_header(&data, data_len, ret, 0, 1);
+	  /* if (header_is_valid(head)) { */
+	  /*   ygglog_error("free_zmq_comm: Error parsing header"); */
+	  /*   return 1; */
+	  /* } */
+	  bool is_eof_recv = (head.flags[0] & HEAD_FLAG_EOF);
 	  destroy_header(&head);
-	  if ((head.flags & HEAD_FLAG_VALID) && is_eof_flag) {
+	  if (is_eof_recv) {
 	    x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV;
 	    break;
 	  }

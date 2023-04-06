@@ -528,7 +528,7 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     # Create connections to dummy model
     for io1, io2 in dir2opp.items():
         for i in miss[io1]:
-            dummy_channel = f"{name}:{i.split(':')[-1]}"
+            dummy_channel = f"{name}:dummy_{i.replace(':', '-')}"
             dummy_comm = copy.deepcopy(existing[io1][i])
             for k in ['address', 'for_service', 'commtype', 'host']:
                 dummy_comm.pop(k, None)
@@ -566,7 +566,7 @@ def parse_component(yml, ctype, existing=None):
 
     """
     assert existing
-    if not isinstance(yml, dict):
+    if not isinstance(yml, dict):  # pragma: debug
         raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
     # Parse based on type
     if ctype == 'model':
@@ -730,7 +730,8 @@ def parse_connection(yml, existing):
             if not os.path.isabs(fname):
                 fname = os.path.join(x['working_dir'], fname)
             fname = os.path.normpath(fname)
-            if (not os.path.isfile(fname)) and (not x.get('wait_for_creation', False)):
+            if (((not os.path.isfile(fname))
+                 and (not x.get('wait_for_creation', False)))):  # pragma: debug
                 raise YAMLSpecificationError(
                     f"Input file does not exist: \"{x['name']}\"")
             x['address'] = fname
@@ -782,7 +783,7 @@ def parse_connection(yml, existing):
     else:
         args = '%s_to_%s' % (iname, oname)
     name = args
-    if all(is_file['inputs']) and all(is_file['outputs']):
+    if all(is_file['inputs']) and all(is_file['outputs']):  # pragma: debug
         raise YAMLSpecificationError(
             f"Both the input and output fro this connection appear to be "
             f"files:\n{pprint.pformat(yml)}")
@@ -870,138 +871,45 @@ def rwmeth2filetype(rw_meth):
     return out
 
 
-def cdriver2commtype(driver):
-    r"""Convert a connection driver to a file type.
-
-    Args:
-        driver (str): The name of the connection driver.
-
-    Returns:
-        str: The corresponding file type for the driver.
-
-    """
-    _legacy = {'InputDriver': 'default',
-               'OutputDriver': 'default',
-               'ZMQInputDriver': 'zmq',
-               'ZMQOutputDriver': 'zmq',
-               'IPCInputDriver': 'ipc',
-               'IPCOutputDriver': 'ipc',
-               'RMQInputDriver': 'rmq',
-               'RMQOutputDriver': 'rmq',
-               'RMQAsyncInputDriver': 'rmq_async',
-               'RMQAsyncOutputDriver': 'rmq_async'}
-    if driver in _legacy:
-        return _legacy[driver]
-    raise ValueError("Unknown driver: '%s'" % driver)
-
-    
-def cdriver2filetype(driver):
-    r"""Convert a connection driver to a file type.
-
-    Args:
-        driver (str): The name of the connection driver.
-
-    Returns:
-        str: The corresponding file type for the driver.
-
-    """
-    _legacy = {'FileInputDriver': 'binary',
-               'FileOutputDriver': 'binary',
-               'AsciiMapInputDriver': 'map',
-               'AsciiMapOutputDriver': 'map',
-               'AsciiFileInputDriver': 'ascii',
-               'AsciiFileOutputDriver': 'ascii',
-               'AsciiTableInputDriver': 'table',
-               'AsciiTableOutputDriver': 'table',
-               'PandasFileInputDriver': 'pandas',
-               'PandasFileOutputDriver': 'pandas',
-               'PickleFileInputDriver': 'pickle',
-               'PickleFileOutputDriver': 'pickle',
-               'PlyFileInputDriver': 'ply',
-               'PlyFileOutputDriver': 'ply',
-               'ObjFileInputDriver': 'obj',
-               'ObjFileOutputDriver': 'obj',
-               'MatInputDriver': 'mat',
-               'MatOutputDriver': 'mat'}
-    if driver in _legacy:
-        return _legacy[driver]
-    raise ValueError("%s is not a registered connection driver." % driver)
-
-
-def migrate_keys(from_dict, to_dict, exclude_key_list=None, include_key_list=None):
-    r"""Migrate keys from one component to another that are not in a list
-    of predefined keys.
-
-    Args:
-         from_dict (dict): Component dictionary to migrate keys from.
-         to_dict (list): List of component dictionaries to migrate keys to. If
-             this is an empty list, keys will not be migrated.
-         exclude_key_list (list, optional): List of keys in from_dict that
-             should not be migrated to to_dict. All keys in include_key_list
-             that are not in this list are moved. Defaults to None and no keys
-             are excluded.
-         include_key_list (list, optional): List of keys that should be migrated
-             from from_dict to to_dict dictionaries. If not provided, all keys
-             in from_dict that are not in exclude_key_list are moved. Defaults
-             to None and all keys in from_dict are included.
-
-    """
-    assert isinstance(to_dict, list)
-    if len(to_dict) == 0:
-        return
-    if exclude_key_list is None:
-        exclude_key_list = []
-    if include_key_list is None:
-        include_key_list = list(from_dict.keys())
-    for k in include_key_list:
-        if (k not in from_dict) or (k in exclude_key_list):
-            continue
-        v = from_dict.pop(k)
-        for d in to_dict:
-            d.setdefault(k, v)
-
-
 def backward_compat_model_io(io, instance, iodict, model):
-    if not iodict['backward']:
-        return instance
-    # Match deprecated driver options
-    if ('driver' in instance) and ('args' in instance):
-        instance['working_dir'] = model['working_dir']
-        opp_map = {'input': 'output', 'output': 'input'}
-        for i, (opp_arg, opp_name) in enumerate(iodict[f'{opp_map[io]}_drivers']):
-            if instance['args'] == opp_arg:
-                if io == 'input':
-                    iodict['pairs'].append(
-                        (iodict[f'{opp_map[io]}_drivers'].pop(i)[1],
-                         instance['name']))
-                else:  # pragma: debug
-                    # This won't be called because inputs are processed first
-                    # but this code is here for symmetries sake
-                    iodict['pairs'].append(
-                        (instance['name'],
-                         iodict[f'{opp_map[io]}_drivers'].pop(i)[1]))
-                instance.pop('args')
-                instance.pop('driver')
-                break
-        else:
-            key = instance['args']
-            if 'filetype' in instance:
-                cpy = copy.deepcopy(instance)
-                instance.clear()
-                instance['name'] = cpy['name']
-                cpy['name'] = cpy['args']
-                key += f"_{instance['name']}"
-                iodict[opp_map[io]][key] = cpy
-                cpy.pop('args')
-                cpy.pop('driver')
-            iodict[f'{io}_drivers'].append((key, instance['name']))
+    if iodict['backward']:
+        # Match deprecated driver options
+        if ('driver' in instance) and ('args' in instance):
+            instance['working_dir'] = model['working_dir']
+            opp_map = {'input': 'output', 'output': 'input'}
+            for i, (opp_arg, opp_name) in enumerate(iodict[f'{opp_map[io]}_drivers']):
+                if instance['args'] == opp_arg:
+                    if io == 'input':
+                        iodict['pairs'].append(
+                            (iodict[f'{opp_map[io]}_drivers'].pop(i)[1],
+                             instance['name']))
+                    else:  # pragma: debug
+                        # This won't be called because inputs are processed first
+                        # but this code is here for symmetries sake
+                        iodict['pairs'].append(
+                            (instance['name'],
+                             iodict[f'{opp_map[io]}_drivers'].pop(i)[1]))
+                    instance.pop('args')
+                    instance.pop('driver')
+                    break
+            else:
+                key = instance['args']
+                if 'filetype' in instance:
+                    cpy = copy.deepcopy(instance)
+                    instance.clear()
+                    instance['name'] = cpy['name']
+                    cpy['name'] = cpy['args']
+                    key += f"_{instance['name']}"
+                    iodict[opp_map[io]][key] = cpy
+                    cpy.pop('args')
+                    cpy.pop('driver')
+                iodict[f'{io}_drivers'].append((key, instance['name']))
     return instance
 
 
 def backward_compat_models(instance, iodict):
-    if not iodict['backward']:
-        return instance
-    if instance.get('language', 'executable') == 'executable':
+    if ((iodict['backward']
+         and instance.get('language', 'executable') == 'executable')):
         args_ext = os.path.splitext(instance['args'][0])[-1]
         if args_ext in constants.EXT2LANG:
             instance['language'] = constants.EXT2LANG[args_ext]
@@ -1009,24 +917,24 @@ def backward_compat_models(instance, iodict):
     
 
 def backward_compat_connections(instance, iodict):
-    if not iodict['backward']:
-        return instance
-    files = [x for x in instance['inputs'] if 'filetype' in x]
-    files += [x for x in instance['outputs'] if 'filetype' in x]
-    # Replace old read/write methd with filetype
-    for k in ['read_meth', 'write_meth']:
-        val = instance.pop(k, None)
-        if val is None:
-            continue
-        ftype = rwmeth2filetype(val)
-        if files:
-            for x in files:
-                if x['filetype'] == 'binary':
-                    x.update(ftype)
-        else:
-            raise YAMLSpecificationError("Deprecated connection parameters "
-                                         "'write_meth' and 'read_meth' are "
-                                         "only valid for connections to files.")
+    if iodict['backward']:
+        files = [x for x in instance['inputs'] if 'filetype' in x]
+        files += [x for x in instance['outputs'] if 'filetype' in x]
+        # Replace old read/write methd with filetype
+        for k in ['read_meth', 'write_meth']:
+            val = instance.pop(k, None)
+            if val is None:
+                continue
+            ftype = rwmeth2filetype(val)
+            if files:
+                for x in files:
+                    if x['filetype'] == 'binary':
+                        x.update(ftype)
+            else:
+                raise YAMLSpecificationError(
+                    "Deprecated connection parameters "
+                    "'write_meth' and 'read_meth' are "
+                    "only valid for connections to files.")
     return instance
 
 
@@ -1042,35 +950,34 @@ def backward_compat(instance, iodict):
         dict: Backward compatible instance.
 
     """
-    if not iodict['backward']:
-        return instance
-    new_connections = []
-    # Create direct connections from output to input
-    for (oname, iname) in iodict['pairs']:
-        oyml = iodict['output'][oname]
-        iyml = iodict['input'][iname]
-        conn = dict(inputs=[{'name': oname}], outputs=[{'name': iname}])
-        oyml.pop('working_dir', None)
-        iyml.pop('working_dir', None)
-        new_connections.append(conn)
-    # File input
-    for k, v in iodict['input_drivers']:
-        iyml = iodict['input'][v]
-        fyml = iodict['output'].pop(k)
-        conn = dict(inputs=[fyml], outputs=[{'name': v}],
-                    working_dir=fyml['working_dir'])
-        new_connections.append(conn)
-    # File output
-    for k, v in iodict['output_drivers']:
-        oyml = iodict['output'][v]
-        fyml = iodict['input'].pop(k)
-        conn = dict(outputs=[fyml], inputs=[{'name': v}],
-                    working_dir=fyml['working_dir'])
-        new_connections.append(conn)
-    # Transfer keyword arguments from input/output to connection
-    for conn in new_connections:
-        instance['connections'].append(conn)
-    # Empty registry of orphan input/output drivers
-    for k in ['input_drivers', 'output_drivers', 'pairs']:
-        iodict[k] = []
+    if iodict['backward']:
+        new_connections = []
+        # Create direct connections from output to input
+        for (oname, iname) in iodict['pairs']:
+            oyml = iodict['output'][oname]
+            iyml = iodict['input'][iname]
+            conn = dict(inputs=[{'name': oname}], outputs=[{'name': iname}])
+            oyml.pop('working_dir', None)
+            iyml.pop('working_dir', None)
+            new_connections.append(conn)
+        # File input
+        for k, v in iodict['input_drivers']:
+            iyml = iodict['input'][v]
+            fyml = iodict['output'].pop(k)
+            conn = dict(inputs=[fyml], outputs=[{'name': v}],
+                        working_dir=fyml['working_dir'])
+            new_connections.append(conn)
+        # File output
+        for k, v in iodict['output_drivers']:
+            oyml = iodict['output'][v]
+            fyml = iodict['input'].pop(k)
+            conn = dict(outputs=[fyml], inputs=[{'name': v}],
+                        working_dir=fyml['working_dir'])
+            new_connections.append(conn)
+        # Transfer keyword arguments from input/output to connection
+        for conn in new_connections:
+            instance['connections'].append(conn)
+        # Empty registry of orphan input/output drivers
+        for k in ['input_drivers', 'output_drivers', 'pairs']:
+            iodict[k] = []
     return instance

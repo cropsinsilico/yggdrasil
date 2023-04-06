@@ -32,7 +32,9 @@ _markers = [
      "tests for superfluous examples", None),
     ("production_run", "--production-run", None),
     ("remote_service", "--remote-service",
-     "tests that must connect to a running remote service", None)
+     "tests that must connect to a running remote service", None),
+    ("serial", "--serial",
+     "tests that must be run in serial", None)
 ]
 _params = {
     "example_name": [],
@@ -139,12 +141,12 @@ def setup_ci(args):
                            % (src_ver, dst_ver))
     subprocess.check_call(
         ["flake8", "yggdrasil", "--append-config", "setup.cfg"])
-    if os.environ.get("YGG_CONDA", None):
-        subprocess.check_call(["python", "create_coveragerc.py"])
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
-        print(fd.read())
+        contents = fd.read()
+        print(f".coveragerc (cwd={os.getcwd()}):\n{contents}")
+        assert contents
     subprocess.check_call(["yggdrasil", "info", "--verbose"])
 
 
@@ -528,6 +530,13 @@ def write_pytest_script(fname, argv):
 
 
 # Session level constants
+@pytest.fixture(scope="session",
+                params=[pytest.param(0, marks=pytest.mark.serial)])
+def serial():
+    r"""Test must be run in serial."""
+    pass
+
+
 @pytest.fixture(scope="session")
 def project_dir():
     r"""Directory in which yggdrasil is installed."""

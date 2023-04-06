@@ -1519,6 +1519,8 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
                 coverage_flags += f" --dont-cover {' '.join(dont_cover)}"
         coverage_flags += (
             f" --filename={os.path.join(os.getcwd(), '.coveragerc')}")
+        coverage_flags += (
+            f" --setup-cfg={os.path.join(_pkg_dir, 'setup.cfg')}")
         cmds += [
             f"{param.python_cmd} -m yggdrasil coveragerc{coverage_flags}"]
     cmds += [f"cd {os.getcwd()}"]
@@ -1713,7 +1715,10 @@ def verify_pkg(install_opts=None):
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
-        print(fd.read())
+        contents = fd.read()
+        print(f"{os.path.join(os.getcwd(), '.coveragerc')}: \n"
+              f"{contents}")
+        assert contents
     subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
     if install_opts['c']:
         subprocess.check_call(["yggccflags"], cwd=src_dir)

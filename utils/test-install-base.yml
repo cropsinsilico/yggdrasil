@@ -224,6 +224,9 @@ jobs:
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: ./utils/setup_old_mac_sdk.sh
+    - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
+      if: runner.os == 'Linux' && matrix.install-sbml == true
+      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
     - name: (CONDA) Install dependencies & package from existing build
       id: conda_install
       continue-on-error: true
@@ -309,7 +312,7 @@ jobs:
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: |
         # ls .*
-        coverage xml
+        coverage xml -i
     - name: Upload coverage report
       uses: codecov/codecov-action@v3
       with:
@@ -373,6 +376,14 @@ jobs:
             install-c: true
             install-mpi: false
             install-sbml: true
+          # - os-base: ubuntu
+          #   python-version: "3.10"
+          #   install-method: conda
+          #   test-flags1: --long-running
+          #   test-flags2: ""
+          #   install-c: true
+          #   install-mpi: false
+          #   install-sbml: false
           - os-base: macos
             python-version: 3.8
             install-method: conda

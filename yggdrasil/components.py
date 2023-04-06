@@ -1,8 +1,6 @@
 import os
-import glob
 import copy
 import six
-import inspect
 import importlib
 import contextlib
 import weakref
@@ -19,62 +17,62 @@ class ComponentError(BaseException):
     pass
 
 
-class ClassRegistry(OrderedDict):
-    r"""Class for registering classes."""
+# class ClassRegistry(OrderedDict):
+#     r"""Class for registering classes."""
 
-    def __init__(self, *args, import_function=None, **kwargs):
-        module = inspect.getmodule(inspect.stack()[1][0])
-        self._module = module.__name__
-        self._directory = os.path.dirname(module.__file__)
-        self._import_function = import_function
-        self._imported = False
-        super(ClassRegistry, self).__init__(*args, **kwargs)
+#     def __init__(self, *args, import_function=None, **kwargs):
+#         module = inspect.getmodule(inspect.stack()[1][0])
+#         self._module = module.__name__
+#         self._directory = os.path.dirname(module.__file__)
+#         self._import_function = import_function
+#         self._imported = False
+#         super(ClassRegistry, self).__init__(*args, **kwargs)
 
-    def import_classes(self):
-        r"""Import all classes in the same directory."""
-        if self._imported:
-            return
-        self._imported = True
-        for x in sorted(glob.glob(os.path.join(self._directory, '*.py'))):
-            mod = os.path.basename(x)[:-3]
-            if not mod.startswith('__'):
-                importlib.import_module(self._module + '.%s' % mod)
-        if self._import_function is not None:
-            self._import_function()
+#     def import_classes(self):
+#         r"""Import all classes in the same directory."""
+#         if self._imported:
+#             return
+#         self._imported = True
+#         for x in sorted(glob.glob(os.path.join(self._directory, '*.py'))):
+#             mod = os.path.basename(x)[:-3]
+#             if not mod.startswith('__'):
+#                 importlib.import_module(self._module + '.%s' % mod)
+#         if self._import_function is not None:
+#             self._import_function()
 
-    def keys(self, *args, **kwargs):
-        self.import_classes()
-        return super(ClassRegistry, self).keys(*args, **kwargs)
+#     def keys(self, *args, **kwargs):
+#         self.import_classes()
+#         return super(ClassRegistry, self).keys(*args, **kwargs)
 
-    def values(self, *args, **kwargs):
-        self.import_classes()
-        return super(ClassRegistry, self).values(*args, **kwargs)
+#     def values(self, *args, **kwargs):
+#         self.import_classes()
+#         return super(ClassRegistry, self).values(*args, **kwargs)
 
-    def items(self, *args, **kwargs):
-        self.import_classes()
-        return super(ClassRegistry, self).items(*args, **kwargs)
+#     def items(self, *args, **kwargs):
+#         self.import_classes()
+#         return super(ClassRegistry, self).items(*args, **kwargs)
 
-    def __contains__(self, key):
-        self.import_classes()
-        return super(ClassRegistry, self).__contains__(key)
+#     def __contains__(self, key):
+#         self.import_classes()
+#         return super(ClassRegistry, self).__contains__(key)
 
-    def get(self, key, default=None):
-        if (not self.has_entry(key)):
-            self.import_classes()
-        return super(ClassRegistry, self).get(key, default)
+#     def get(self, key, default=None):
+#         if (not self.has_entry(key)):
+#             self.import_classes()
+#         return super(ClassRegistry, self).get(key, default)
 
-    def __getitem__(self, *args, **kwargs):
-        try:
-            return super(ClassRegistry, self).__getitem__(*args, **kwargs)
-        except KeyError:  # pragma: no cover
-            # This will only be called during import
-            if self._imported:
-                raise
-            self.import_classes()
-            return super(ClassRegistry, self).__getitem__(*args, **kwargs)
+#     def __getitem__(self, *args, **kwargs):
+#         try:
+#             return super(ClassRegistry, self).__getitem__(*args, **kwargs)
+#         except KeyError:  # pragma: no cover
+#             # This will only be called during import
+#             if self._imported:
+#                 raise
+#             self.import_classes()
+#             return super(ClassRegistry, self).__getitem__(*args, **kwargs)
 
-    def has_entry(self, key):
-        return super(ClassRegistry, self).__contains__(key)
+#     def has_entry(self, key):
+#         return super(ClassRegistry, self).__contains__(key)
 
 
 def registration_in_progress():
@@ -589,15 +587,21 @@ class ComponentBase(ComponentBaseUnregistered):
                 if additional_component_properties:
                     kwargs.update(additional_component_properties)
                 # Remove properties that shouldn't ve validated in class
+                extra_kwargs = {}
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
                         del s['properties'][k]
+                    if k in s['required']:
+                        s['required'].remove(k)
+                    if k in kwargs:
+                        extra_kwargs[k] = kwargs.pop(k)
                 # Validate and normalize
                 from yggdrasil import rapidjson
                 # import pprint
                 # print(f'before: {self}\n{pprint.pformat(kwargs)}')
                 try:
                     kwargs = rapidjson.normalize(kwargs, s)
+                    kwargs.update(extra_kwargs)
                 except BaseException:  # pragma: debug
                     import pprint
                     pprint.pprint(kwargs)

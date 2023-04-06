@@ -102,22 +102,7 @@ containing the YAML file) or a mapping with fields descripting the
 file. In particular, the ``filetype`` keyword specifies the format of
 the file being read/written. Supported values include:
 
-===========    =================================================================
-Value          Description
-===========    =================================================================
-binary         The entire file is read/written all at once as bytes.
-ascii          The file is read/written one line at a time.
-table          The file is an ASCII table that will be read/written one row
-               at a time. If ``as_array: True`` is also specified, the table
-               will be read/written all at once.
-pandas         The file is a Pandas frame output as a table.
-pickle         The file contains one or more pickled Python objects.
-ply            The file is in `Ply <http://paulbourke.net/dataformats/ply/>`_
-               data format for 3D structures.
-obj            The file is in `Obj <http://paulbourke.net/dataformats/obj/>`_
-               data format for 3D structures.
-===========    =================================================================
-
+.. include:: tables/schema_table_file_subtype.rst
 
 The above example shows the basic case of receiving raw messages from a channel,
 but there are also interface functions which can process these raw messages to

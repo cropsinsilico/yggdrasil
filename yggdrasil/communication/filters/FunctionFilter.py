@@ -19,6 +19,7 @@ class FunctionFilter(FilterBase):
     _filtertype = 'function'
     _schema_required = ['function']
     _schema_properties = {'function': {'type': 'function'}}
+    _schema_subtype_description = "Filter messages based on a function"
 
     def evaluate_filter(self, x):
         r"""Call filter on the provided message.

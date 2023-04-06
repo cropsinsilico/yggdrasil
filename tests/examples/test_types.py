@@ -170,8 +170,10 @@ class TestExampleTypes(base_class):
         r"""dict: Environment variables set for the test."""
         with_asan = (language in ['c', 'c++', 'cpp'] and asan_installed)
         without_python = (
-            with_asan
-            and typename not in ['instance', 'class', 'function'])
+            typename not in ['instance', 'class', 'function'])
+        # without_python = (
+        #     with_asan
+        #     and typename not in ['instance', 'class', 'function'])
         # and typename not in ['instance', 'class', 'function'])
         kwargs = {}
         assign_kws = {}
@@ -187,7 +189,7 @@ class TestExampleTypes(base_class):
         modelfile = os.path.join(os.path.dirname(__file__), example_name,
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
-        if with_asan or without_python:
+        if with_asan or without_python and hasattr(drv, 'compile_dependencies'):
             drv.compile_dependencies(with_asan=with_asan,
                                      disable_python_c_api=without_python)
         if using_generics and drv.is_typed:

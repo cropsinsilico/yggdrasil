@@ -16,6 +16,7 @@ class FunctionTransform(TransformBase):
     _transformtype = 'function'
     _schema_required = ['function']
     _schema_properties = {'function': {'type': 'function'}}
+    _schema_subtype_description = "Transform messages using a function."
 
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.

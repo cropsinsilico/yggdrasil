@@ -18,6 +18,7 @@ class SelectScalarTransform(SelectFieldsTransform):
     _schema_properties = {'index': {'type': ['integer', 'string'],
                                     'default': 0}}
     _schema_excluded_from_inherit = ['selected', 'single_as_scalar']
+    _schema_subtype_description = "Select a single field from a message"
 
     def __init__(self, *args, **kwargs):
         self.single_as_scalar = True

@@ -194,8 +194,11 @@ class TestDummyCompiler(TestCompilationTool):
         
     def test_get_flags(self, python_class):
         r"""Test get_flags."""
+        from yggdrasil import __version__ as yggver
+        yggver = yggver.split('+')[0].split('v')[-1].split('.')
         assert (python_class.get_flags(flags='hello', libtype='object')
-                == ['hello', '-DWITH_YGGDRASIL'])
+                == ['hello', '-DWITH_YGGDRASIL',
+                    f'-DYGGVER_MAJOR={yggver[0]}'])
         
     def test_get_executable_command(self, python_class):
         r"""Test get_executable_command."""

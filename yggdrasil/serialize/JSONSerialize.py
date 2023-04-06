@@ -1,4 +1,3 @@
-import importlib
 from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil import tools, rapidjson
 
@@ -17,28 +16,6 @@ def indent_char2int(indent):
     if isinstance(indent, str):
         indent = len(indent.replace('\t', '    '))
     return indent
-
-
-def string2import(s):
-    r"""Import a function/class based on its representation as a string.
-
-    Args:
-        s (str): String that may or may not contain a represetnation of an
-            importable class or function.
-
-    Returns:
-        str, class, function: Imported class/function if one exists, original
-            string if not.
-
-    """
-    pkg_mod = s.split(u':')
-    if (len(pkg_mod) == 2) and (not s.startswith('http')) and (' ' not in s):
-        try:
-            mod = importlib.import_module(pkg_mod[0])
-            s = getattr(mod, pkg_mod[1])
-        except (ImportError, AttributeError):  # pragma: debug
-            pass
-    return s
 
 
 def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):

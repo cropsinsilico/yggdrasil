@@ -513,7 +513,9 @@ class CMakeConfigure(BuildToolBase):
             if cls.add_libraries or (xorig in internal_library_flags):
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
-                if xe.lower() in ['.so', '.dll', '.dylib']:
+                if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
+                    # Not covered atm due to internal libraries being
+                    # compiled as static libraries, but this may change
                     lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
                 else:
                     lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)

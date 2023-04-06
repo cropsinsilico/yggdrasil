@@ -71,7 +71,6 @@ class SerializeBase(tools.YggClass):
         super(SerializeBase, self).__init__(**kwargs)
         kwargs = self.extra_kwargs
         self.extra_kwargs = {}
-        self._tmp = {}
         self._initialized = False
         # Update datatype from other keyword arguments
         if self.datatype is not None:
@@ -466,7 +465,7 @@ class SerializeBase(tools.YggClass):
         return datatypes.type2numpy(self.datatype)
 
     @property
-    def typedef(self):
+    def typedef(self):  # pragma: deprecated
         r"""dict: Alias for datatype."""
         warnings.warn(message=("`typedef` attribute is deprecated`; use "
                                " `datatype` instead."),
@@ -488,7 +487,10 @@ class SerializeBase(tools.YggClass):
         if serializer is None:
             serializer = {}
         if 'datatype' not in serializer:
-            serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
+            try:
+                serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
+            except TypeError as e:
+                raise serialize.SerializationError(e)
         self.update_serializer(from_message=True, **serializer)
 
     def initialize_from_metadata(self, metadata):
@@ -547,6 +549,7 @@ class SerializeBase(tools.YggClass):
                      and (from_message
                           or datatype != self.default_datatype))):
                     datatype.update(self.partial_datatype)
+                    self.partial_datatype = None
                 self.datatype = rapidjson.normalize(datatype,
                                                     {'type': 'schema'})
                 if from_message:
@@ -555,12 +558,12 @@ class SerializeBase(tools.YggClass):
                      and isinstance(self.datatype.get('items', None), list)
                      and len(self.datatype['items']) == 1)):
                     self.datatype['allowSingular'] = True
+                    self.datatype['items'][0].pop('allowWrapped', False)
                 # elif self.datatype['type'] not in ['array', 'object']:
-                #     self.datatype['allowNested'] = True
+                #     self.datatype['allowWrapped'] = True
             # Check to see if new datatype is compatible with new one
             if old_datatype and datatype:
                 rapidjson.compare_schemas(self.datatype, old_datatype)
-                self.partial_datatype = None
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
@@ -653,8 +656,6 @@ class SerializeBase(tools.YggClass):
                     tk = 'title'
                 else:
                     tk = 'units'
-                if 'items' not in typedef:
-                    continue
                 if isinstance(typedef.get('items', []), dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
@@ -678,13 +679,11 @@ class SerializeBase(tools.YggClass):
                         if units.is_null_unit(iv):
                             continue
                         iv = str(units.Units(iv))
-                        if itype['type'] == 'number':
+                        type_map = {'number': 'float',
+                                    'integer': 'int'}
+                        if itype['type'] in type_map:
                             itype.update(type='scalar',
-                                         subtype='float',
-                                         precision=8)
-                        elif itype['type'] == 'integer':
-                            itype.update(type='scalar',
-                                         subtype='int',
+                                         subtype=type_map[itype['type']],
                                          precision=8)
                     itype.setdefault(tk, iv)
                 if all_updated:
@@ -739,22 +738,19 @@ class SerializeBase(tools.YggClass):
 
         """
         if self.initialized:
-            try:
-                args = rapidjson.normalize(args, self.datatype)
-            except rapidjson.NormalizationError:
-                # TODO: Replace this with allowNested
-                if isinstance(args, (list, tuple)) and len(args) == 1:
-                    return rapidjson.normalize(args[0], self.datatype)
-                raise
+            # try:
+            args = rapidjson.normalize(args, self.datatype)
+            # except rapidjson.NormalizationError:
+            #     self.info(f"args = {args}, datatype = {self.datatype}")
+            #     if ((isinstance(args, (list, tuple)) and len(args) == 1
+            #          and 'allowWrapped' not in self.datatype)):
+            #         self.datatype['allowWrapped'] = True
+            #         return rapidjson.normalize(args, self.datatype)
+            #     raise
         return args
 
-    def encode_schema(self, msg, minimal=False, normalize=False):
-        if normalize and self.initialized:
-            msg = self.normalize(msg, self.datatype)
-        return rapidjson.encode_schema(msg, minimal=minimal)
-    
     def serialize(self, args, metadata=None, add_serializer_info=False,
-                  no_metadata=False, max_header_size=0, header_kwargs=None):
+                  no_metadata=False, max_header_size=0):
         r"""Serialize a message.
 
         Args:
@@ -778,17 +774,6 @@ class SerializeBase(tools.YggClass):
 
 
         """
-        if header_kwargs is not None:
-            if metadata is None:
-                metadata = header_kwargs
-                warnings.warn(message=("`header_kwargs` is deprecated as an"
-                                       " argument to `serialize`; use"
-                                       " `metadata` instead."),
-                              category=DeprecationWarning)
-            else:
-                raise TypeError("`serialize` received both `metadata` and"
-                                " `header_kwargs` as arguments. `header_kwargs`"
-                                " is deprecated, use `metadata` instead.")
         if metadata is None:
             metadata = {}
         if isinstance(args, bytes) and (args == constants.YGG_MSG_EOF):
@@ -911,13 +896,10 @@ class SerializeBase(tools.YggClass):
         if not isinstance(msg, bytes):
             raise TypeError("Messages are expected to be bytes.")
         if msg.startswith(constants.YGG_MSG_HEAD):
-            if metadata is not None:
+            if metadata is not None:  # pragma: debug
                 raise ValueError("Metadata in header and provided by keyword.")
             _, metadata, data = msg.split(constants.YGG_MSG_HEAD, 2)
-            if len(metadata) == 0:
-                metadata = dict(size=len(data))
-            else:
-                metadata = rapidjson.loads(metadata)
+            metadata = rapidjson.loads(metadata)
         elif isinstance(metadata, dict) and metadata['__meta__'].get('in_data', False):
             assert msg.count(constants.YGG_MSG_HEAD) == 1
             metadata_remainder, data = msg.split(constants.YGG_MSG_HEAD, 1)

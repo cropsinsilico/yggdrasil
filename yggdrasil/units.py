@@ -118,7 +118,7 @@ def convert_matlab_unit_string(m_str):  # pragma: matlab
                         current_version=__version__,
                         details=("This method is no longer necessary and "
                                  "units can be parsed directly"))
-def convert_R_unit_string(r_str):
+def convert_R_unit_string(r_str):  # pragma: deprecated
     r"""Convert R unit string to string that the Python package can
     understand.
 
@@ -136,7 +136,7 @@ def convert_R_unit_string(r_str):
                         current_version=__version__,
                         details=("This method is no longer necessary and "
                                  "units can be parsed directly"))
-def convert_unit_string(orig_str, replacements=None):
+def convert_unit_string(orig_str, replacements=None):  # pragma: deprecated
     r"""Convert unit string to string that the Python package can
     understand.
 
@@ -164,11 +164,10 @@ def has_units(obj, check_dimensionless=False):
         bool: True if the object has units, False otherwise.
 
     """
-    out = isinstance(obj, (_unit_quantity, _unit_array))
+    out = (isinstance(obj, (_unit_quantity, _unit_array))
+           and not (obj.is_dimensionless()
+                    and (not check_dimensionless)))
     # out = hasattr(obj, 'units')
-    if ((out and (obj.units == as_unit('dimensionless'))
-         and (not check_dimensionless))):
-        out = False
     return out
 
 
@@ -187,7 +186,7 @@ def get_units(obj, for_language=None):
         out = str(obj.units)
     else:
         out = ''
-    if for_language == "R":
+    if for_language == "R":  # pragma: extern
         # udunits dosn't support Δ
         out = out.replace('Δ', '')
     return out

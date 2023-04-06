@@ -24,6 +24,7 @@ class SelectFieldsTransform(TransformBase):
                           'original_order': {'type': 'array',
                                              'items': {'type': 'string'}},
                           'single_as_scalar': {'type': 'boolean'}}
+    _schema_subtype_description = "Select a subset of fields from a message"
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.

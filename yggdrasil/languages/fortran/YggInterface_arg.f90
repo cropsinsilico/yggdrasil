@@ -223,7 +223,7 @@ function yggarg_scalar_ply(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "ply"
-  y%ptr = c_loc(xp%nvert)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_ply
 function yggarg_scalar_obj(x) result(y)
@@ -233,7 +233,7 @@ function yggarg_scalar_obj(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "obj"
-  y%ptr = c_loc(xp%nvert)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_obj
 function yggarg_scalar_null(x) result(y)
@@ -253,7 +253,7 @@ function yggarg_scalar_generic(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "generic"
-  y%ptr = c_loc(xp%prefix)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_generic
 function yggarg_scalar_yggarr(x) result(y)
@@ -263,7 +263,7 @@ function yggarg_scalar_yggarr(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "array"
-  y%ptr = c_loc(xp%prefix)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggarr
 function yggarg_scalar_yggmap(x) result(y)
@@ -273,7 +273,7 @@ function yggarg_scalar_yggmap(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "object"
-  y%ptr = c_loc(xp%prefix)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggmap
 function yggarg_scalar_yggschema(x) result(y)
@@ -283,7 +283,7 @@ function yggarg_scalar_yggschema(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "schema"
-  y%ptr = c_loc(xp%prefix)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggschema
 function yggarg_scalar_yggpyinst(x) result(y)
@@ -293,7 +293,7 @@ function yggarg_scalar_yggpyinst(x) result(y)
   y = yggarg_scalar_init(x)
   xp => x
   y%type = "instance"
-  y%ptr = c_loc(xp%prefix)
+  y%ptr = c_loc(xp%obj)
   y%nbytes = -1  ! sizeof(x)
 end function yggarg_scalar_yggpyinst
 function yggarg_scalar_yggpython(x) result(y)

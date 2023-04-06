@@ -15,8 +15,6 @@ from yggdrasil.config import ygg_cfg
 
 
 _default_internal_libtype = 'object'
-# if platform._is_win:  # pragma: windows
-#     _default_internal_libtype = 'static'
 _top_lang_dir = get_language_dir('c')
 
 
@@ -183,6 +181,16 @@ class GCCCompiler(CCompilerBase):
                 out = False
         return out
 
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of compiler flags."""
+        out = super(GCCCompiler, cls).get_flags(*args, **kwargs)
+        if platform._is_win:  # pragma: windows
+            ver = cls.tool_version()
+            if 'mingw' in ver.lower() or 'msys' in ver.lower():
+                out.append('-Wa,-mbig-obj')
+        return out
+        
     def dll2a(cls, dll, dst=None, overwrite=False):
         r"""Convert a window's .dll library into a static library.
 
@@ -267,6 +275,7 @@ class MSVCCompiler(CCompilerBase):
                      # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
                      # '/Z7',      # Symbolic debug in .obj (implies debug)
                      "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
+                     "/bigobj",  # Allow big files
                      '/TP',      # Treat all files as C++
                      "/nologo",  # Suppress startup banner
                      # Don't show errors from using scanf, strcpy, etc.
@@ -359,7 +368,7 @@ class LDLinker(LinkerBase):
         """
         out = super(LDLinker, cls).tool_version(**kwargs)
         for regex in [r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
-                      (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
+                      (r'GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
                        r'(?P<version>\d+(?:\.\d+){0,2})')]:
             match = re.search(regex, out)
             if match is not None:
@@ -687,6 +696,8 @@ class CModelDriver(CompiledModelDriver):
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
         'init_any': 'init_generic()',
+        'init_type_from_schema': ('create_dtype_from_schema(\"{schema}\",'
+                                  ' {use_generic})'),
         'init_type_array': ('create_dtype_json_array({nitems}, '
                             '{items}, {use_generic})'),
         'init_type_object': ('create_dtype_json_object({nitems}, '
@@ -837,9 +848,6 @@ class CModelDriver(CompiledModelDriver):
         # Platform specific internal library options
         cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows
-            stdint_win = os.path.join(_top_lang_dir, 'windows_stdint.h')
-            assert os.path.isfile(stdint_win)
-            shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
             for x in ['ygg', 'datatypes']:
@@ -906,33 +914,6 @@ class CModelDriver(CompiledModelDriver):
         if (nplib is not None) and os.path.isfile(nplib):
             cfg.set(cls._language, 'numpy_include',
                     os.path.dirname(os.path.dirname(nplib)))
-        return out
-
-    @classmethod
-    def get_dependency_info(cls, dep, toolname=None, default=None):
-        r"""Get the dictionary of information associated with a
-        dependency.
-
-        Args:
-            dep (str): Name of internal or external dependency or full path
-                to the library.
-            toolname (str, optional): Name of compiler tool that should be used.
-                Defaults to None and the default compiler for the language will
-                be used.
-            default (dict, optional): Information dictionary that should
-                be returned if dep cannot be located. Defaults to None
-                and an error will be raised if dep cannot be found.
-
-        Returns:
-            dict: Dependency info.
-
-        """
-        replaced_toolname = False
-        out = super(CModelDriver, cls).get_dependency_info(
-            dep, toolname=toolname, default=default)
-        if replaced_toolname:
-            out['remove_flags'] = ['/TP']
-            out['toolname'] = toolname
         return out
 
     @classmethod
@@ -1165,7 +1146,9 @@ class CModelDriver(CompiledModelDriver):
                          and (not v.get('is_length_var', False))
                          and (v['datatype']['type'] not in
                               ['any', 'object', 'array', 'schema',
-                               'instance', '1darray', 'ndarray'])
+                               'instance', '1darray', 'ndarray',
+                               'ply', 'obj'])
+                         # TODO: allow ply_t/obj_t to be passed by pointer
                          and (cls.function_param['recv_function']
                               == cls.function_param['recv_heap']))):
                         v['allow_realloc'] = True
@@ -1177,12 +1160,17 @@ class CModelDriver(CompiledModelDriver):
                         if 'iter_datatype' not in v:  # pragma: debug
                             raise RuntimeError("Length must be defined for "
                                                "arrays.")
-                    elif ((v['datatype'].get('subtype',
-                                             v['datatype']['type'])
-                           in ['bytes', 'string'])):
-                        v['length_var'] = 'strlen(%s)' % v['name']
                     else:
-                        v['length_var'] = 'strlen4(%s)' % v['name']
+                        subtype = v['datatype'].get('subtype', v['datatype']['type'])
+                        assert subtype in ['bytes', 'string', 'unicode']
+                        # if subtype == 'unicode':
+                        #     v['datatype'].setdefault('encoding', "UCS4")
+                        encoding_size = constants.FIXED_ENCODING_SIZES.get(
+                            v['datatype'].get('encoding', 'ASCII'), 4)
+                        if encoding_size == 1:
+                            v['length_var'] = 'strlen(%s)' % v['name']
+                        else:
+                            v['length_var'] = f"strlen{encoding_size}({v['name']})"
                 elif (cls.requires_shape_var(v)
                       and not (v.get('ndim_var', False)
                                and v.get('shape_var', False))):  # pragma: debug
@@ -1310,14 +1298,16 @@ class CModelDriver(CompiledModelDriver):
         return False
               
     @classmethod
-    def get_native_type(cls, **kwargs):
+    def get_native_type(cls, const=False, **kwargs):
         r"""Get the native type.
 
         Args:
             type (str, optional): Name of |yggdrasil| extended JSON
                 type or JSONSchema dictionary defining a datatype.
-            **kwargs: Additional keyword arguments may be used in determining
-                the precise declaration that should be used.
+            const (bool, optional): If True, the native type will be
+                marked as constant. Defaults to False.
+            **kwargs: Additional keyword arguments may be used in
+                determining the precise declaration that should be used.
 
         Returns:
             str: The native type.
@@ -1325,8 +1315,11 @@ class CModelDriver(CompiledModelDriver):
         """
         out, json_type = super(CModelDriver, cls).get_native_type(
             return_json=True, **kwargs)
+        prefix = ''
+        if const:
+            prefix = 'const '
         if not ((out == '*') or ('X' in out) or (out == 'double')):
-            return out
+            return prefix + out
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
             json_subtype['type'] = 'scalar'
@@ -1349,7 +1342,7 @@ class CModelDriver(CompiledModelDriver):
         elif out == 'double':
             if json_type.get('precision', 8) == 4:
                 out = 'float'
-        return out.replace(' ', '')
+        return prefix + out.replace(' ', '')
         
     @classmethod
     def get_json_type(cls, native_type):
@@ -1400,13 +1393,14 @@ class CModelDriver(CompiledModelDriver):
             if grp['type'] in ['char', 'void']:
                 nptr -= 1
             if nptr > 0:
-                if out['type'] == 'number':
-                    out['type'] = 'float'
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
         if out['type'] in constants.SCALAR_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
+        if out.get('subtype', None) == 'unicode':
+            out['subtype'] = 'string'
+            out['encoding'] = 'UCS4'
         return out
         
     @classmethod
@@ -1877,11 +1871,19 @@ class CModelDriver(CompiledModelDriver):
                      in ['1darray', 'ndarray'])):  # pragma: debug
                     raise RuntimeError("Length must be set in order "
                                        "to write array assignments.")
-                elif (dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
-                      in ['bytes', 'string']):
-                    src_var_length = 'strlen(%s)' % src_var['name']
                 else:
-                    src_var_length = 'strlen4(%s)' % src_var['name']
+                    subtype = dst_var['datatype'].get(
+                        'subtype', dst_var['datatype']['type'])
+                    assert subtype in ['bytes', 'string', 'unicode']
+                    # if subtype == 'unicode':
+                    #     dst_var['datatype'].setdefault('encoding', "UCS4")
+                    encoding_size = constants.FIXED_ENCODING_SIZES.get(
+                        dst_var['datatype'].get('encoding', 'ASCII'), 4)
+                    if encoding_size == 1:
+                        src_var_length = 'strlen(%s)' % src_var['name']
+                    else:
+                        src_var_length = f"strlen{encoding_size}({src_var['name']})"
+                        
             if ((dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
                  in ['bytes', 'string', 'unicode'])):
                 src_var_length = f"({src_var_length}+1)"
@@ -1994,10 +1996,6 @@ class CModelDriver(CompiledModelDriver):
                     nele *= s
                 dst_var_type = cls.get_native_type(**dst_var)
                 kwargs.update(copy=True, N=nele,
-                              native_type=dst_var_type)
-            elif 'length' in dst_var.get('datatype', {}):
-                dst_var_type = cls.get_native_type(**dst_var)
-                kwargs.update(copy=True, N=dst_var['datatype']['length'],
                               native_type=dst_var_type)
         if outputs_in_inputs and (cls.language != 'c++'):
             if isinstance(dst_var, dict):

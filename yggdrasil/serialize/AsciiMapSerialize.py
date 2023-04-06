@@ -38,8 +38,6 @@ class AsciiMapSerialize(SerializeBase):
         newline_str = tools.bytes2str(self.newline)
         for k in order:
             v = args[k]
-            if not isinstance(k, (str, bytes)):
-                raise ValueError("Serialization of non-string keys not supported.")
             out += tools.bytes2str(k)
             out += self.delimiter
             out += rapidjson.dumps(v, yggdrasil_mode=rapidjson.YM_READABLE)
@@ -109,4 +107,5 @@ class AsciiMapSerialize(SerializeBase):
                            + b'args2\t"this"\n'
                            + b'args3\t1.0\n'
                            + b'args4\t[1,2]\n')
+        out['invalid_objects'] = [{'args1': int(1), 1: 'this'}]
         return out

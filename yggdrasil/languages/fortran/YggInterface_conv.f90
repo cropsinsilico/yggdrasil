@@ -2,65 +2,49 @@
 function yggarr2ygggeneric(input) result(out)
   type(yggarr) :: input
   type(ygggeneric) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function yggarr2ygggeneric
   
 function yggmap2ygggeneric(input) result(out)
   type(yggmap) :: input
   type(ygggeneric) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function yggmap2ygggeneric
   
 function yggschema2ygggeneric(input) result(out)
   type(yggschema) :: input
   type(ygggeneric) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function yggschema2ygggeneric
   
 function yggpyinst2ygggeneric(input) result(out)
   type(yggpyinst) :: input
   type(ygggeneric) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function yggpyinst2ygggeneric
 
 function ygggeneric2yggarr(input) result(out)
   type(ygggeneric) :: input
   type(yggarr) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function ygggeneric2yggarr
 
 function ygggeneric2yggmap(input) result(out)
   type(ygggeneric) :: input
   type(yggmap) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function ygggeneric2yggmap
 
 function ygggeneric2yggschema(input) result(out)
   type(ygggeneric) :: input
   type(yggschema) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function ygggeneric2yggschema
 
 function ygggeneric2yggpyinst(input) result(out)
   type(ygggeneric) :: input
   type(yggpyinst) :: out
-  out%prefix = input%prefix
   out%obj = input%obj
-  out%allocator = input%allocator
 end function ygggeneric2yggpyinst
 
 function yggpython2yggpython(input) result(out)

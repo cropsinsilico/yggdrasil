@@ -201,7 +201,7 @@ int client_pop_response(responses_t *x, const char* request_id, char **data,
   int idx = client_has_response(x, request_id);
   if (idx < 0) return -1;
   int ret = x->len[idx];
-  if ((ret + 1) > len) {
+  if ((ret + 1) > (int)len) {
     if (allow_realloc) {
       ygglog_debug("client_pop_response: reallocating buffer from %d to %d bytes.",
 		   len, ret + 1);
@@ -355,7 +355,7 @@ comm_head_t client_response_header(const comm_t* x, comm_head_t head) {
     int ret = new_default_address(resp->comm);
     if (ret < 0) {
       ygglog_error("client_response_header(%s): could not create response comm", x->name);
-      head.flags = head.flags & ~HEAD_FLAG_VALID;
+      invalidate_header(&head);
       return head;
     }
     resp->comm->const_flags[0] = resp->comm->const_flags[0] | COMM_EOF_SENT | COMM_EOF_RECV;
@@ -363,22 +363,31 @@ comm_head_t client_response_header(const comm_t* x, comm_head_t head) {
 		 x->name);
   }
   // Add address & request ID to header
-  strcpy(head.response_address, resp->comm->address);
-  snprintf(head.request_id, COMMBUFFSIZ, "%d", rand());
-  if (client_add_request(resp, head.request_id) < 0) {
-    ygglog_error("client_response_header(%s): Failed to add request",
-		 x->name);
-    head.flags = head.flags & ~HEAD_FLAG_VALID;
+  if (!header_SetMetaString(&head, "response_address", resp->comm->address)) {
+    ygglog_error("client_response_header(%s): Error setting response_address", x->name);
+    invalidate_header(&head);
     return head;
   }
-  if (client_has_request(resp, head.request_id) < 0) {
+  const char* request_id;
+  if (!header_SetMetaID(&head, "request_id", &request_id)) {
+    ygglog_error("client_response_header(%s): Error setting request_id", x->name);
+    invalidate_header(&head);
+    return head;
+  }
+  if (client_add_request(resp, request_id) < 0) {
     ygglog_error("client_response_header(%s): Failed to add request",
 		 x->name);
-    head.flags = head.flags & ~HEAD_FLAG_VALID;
+    invalidate_header(&head);
+    return head;
+  }
+  if (client_has_request(resp, request_id) < 0) {
+    ygglog_error("client_response_header(%s): Failed to add request",
+		 x->name);
+    invalidate_header(&head);
     return head;
   }
   ygglog_debug("client_response_header(%s): response_address = %s, request_id = %s",
-	       x->name, head.response_address, head.request_id);
+	       x->name, resp->comm->address, request_id);
   return head;
 };
 
@@ -437,12 +446,18 @@ int client_comm_recv(const comm_t* x, char **data, const size_t len, const int a
 		   x->name, ret);
       return ret;
     }
-    comm_head_t head = parse_comm_header(*data, len);
-    if (!(head.flags & HEAD_FLAG_VALID)) {
+    comm_head_t head = create_recv_header(data, len, ret, allow_realloc, 1);
+    if (!header_is_valid(head)) {
       ygglog_error("client_comm_recv(%s): Invalid header.", x->name);
       return -1;
     }
-    if (strcmp(head.request_id, request_id) == 0) {
+    const char* head_request_id;
+    if (!header_GetMetaString(head, "request_id", &head_request_id)) {
+      ygglog_error("client_comm_recv(%s): Error getting request_id",
+		   x->name);
+      return -1;
+    }
+    if (strcmp(head_request_id, request_id) == 0) {
       ygglog_debug("client_comm_recv(%s): default_comm_recv returned %d",
 		   x->name, ret);
       if (client_remove_request(resp, request_id) < 0) {
@@ -452,11 +467,12 @@ int client_comm_recv(const comm_t* x, char **data, const size_t len, const int a
       }
       return ret;
     }
-    if (client_add_response(resp, head.request_id, *data, ret) < 0) {
+    if (client_add_response(resp, head_request_id, *data, ret) < 0) {
       ygglog_error("client_comm_recv(%s): Failed to add response %s",
-		   x->name, head.request_id);
+		   x->name, head_request_id);
       return -1;
     }
+    destroy_header(&head);
   }
   ret = client_pop_response(resp, request_id, data, len, allow_realloc);
   // Close response comm and decrement count of response comms

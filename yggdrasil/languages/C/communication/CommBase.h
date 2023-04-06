@@ -138,7 +138,7 @@ comm_t empty_comm_base() {
   @returns comm_t* Address of comm structure.
 */
 static inline
-comm_t* new_comm_base(char *address, const char *direction,
+comm_t* new_comm_base(const char *address, const char *direction,
 		      const comm_type t, dtype_t* datatype) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
   if (ret == NULL) {

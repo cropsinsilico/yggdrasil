@@ -245,6 +245,18 @@ class yggrun(SubCommand):
         (('--with-asan', ),
          {'action': 'store_true',
           'help': 'Compile models with the address sanitizer enabled.'}),
+        (('--as-service', ),
+         {'action': 'store_true',
+          'help': 'Run the provided YAMLs as a service.'}),
+        (('--partial-commtype', ),
+         {'type': str, 'default': 'rest',
+          'help': ('Type of communicator to use for partial comms when '
+                   '--as-service is passed')}),
+        (('--client-id', ),
+         {'type': str,
+          'help': ('ID associated with the client requesting a service. '
+                   '(This should only be passed when running with '
+                   '--as-service)')}),
     ]
 
     @classmethod
@@ -270,13 +282,26 @@ class yggrun(SubCommand):
         from yggdrasil import runner, config
         prog = sys.argv[0].split(os.path.sep)[-1]
         with config.parser_config(args):
-            runner.run(args.yamlfile, ygg_debug_prefix=prog,
-                       production_run=args.production_run,
-                       mpi_tag_start=args.mpi_tag_start,
-                       validate=args.validate,
-                       with_debugger=args.with_debugger,
-                       disable_python_c_api=args.disable_python_c_api,
-                       with_asan=args.with_asan)
+            kwargs = dict(
+                ygg_debug_prefix=prog,
+                production_run=args.production_run,
+                mpi_tag_start=args.mpi_tag_start,
+                validate=args.validate,
+                with_debugger=args.with_debugger,
+                disable_python_c_api=args.disable_python_c_api,
+                with_asan=args.with_asan,
+                as_service=args.as_service)
+            if args.as_service:
+                kwargs['complete_partial'] = True
+                if not args.partial_commtype:
+                    args.partial_commtype = 'rest'
+            if args.partial_commtype:
+                kwargs['partial_commtype'] = {
+                    'commtype': args.partial_commtype}
+                if args.as_service and args.partial_commtype == 'rest':
+                    assert args.client_id
+                    kwargs['partial_commtype']['client_id'] = args.client_id
+            runner.run(args.yamlfile, **kwargs)
 
 
 class integration_service_manager(SubCommand):
@@ -1568,6 +1593,9 @@ class coveragerc(SubCommand):
         (('--filename', ),
          {'type': str, 'default': None,
           'help': "File to save coveragerc to"}),
+        (('--setup-cfg', ),
+         {'type': str, 'default': None,
+          'help': "setup.cfg file containing coverage options"}),
     ]
 
     @classmethod
@@ -1591,7 +1619,8 @@ class coveragerc(SubCommand):
                 covered_languages[k] = False
         for k in LANGUAGES['all']:
             covered_languages.setdefault(k, True)
-        create_coveragerc(covered_languages, filename=args.filename)
+        create_coveragerc(covered_languages, filename=args.filename,
+                          setup_cfg=args.setup_cfg)
 
 
 class generate_gha_workflow(SubCommand):

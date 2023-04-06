@@ -2790,7 +2790,7 @@ PythonAccept(
             }
         }
 	handler->Double(d);
-    } else if (PyUnicode_Check(object)) {
+    } else if (CHECK_UNICODE_NO_NUMPY(object)) {
         Py_ssize_t l;
         const char* s = PyUnicode_AsUTF8AndSize(object, &l);
         if (s == NULL)
@@ -3301,7 +3301,7 @@ PythonAccept(
 		 PyObject_IsInstance(object, decimal_type) ||
 		 PyLong_Check(object) ||
 		 PyFloat_Check(object) ||
-		 PyUnicode_Check(object) ||
+		 (CHECK_UNICODE_NO_NUMPY(object)) ||
 		 ((bytesMode == BM_UTF8 || bytesMode == BM_NONE) &&
 		  (PyBytes_Check(object) || PyByteArray_Check(object))) ||
 		 PyList_Check(object) ||
@@ -3611,7 +3611,7 @@ dumps_internal(
             writer->RawValue(rs, l, kNumberType);
             Py_DECREF(dr);
         }
-    } else if (PyUnicode_Check(object)) {
+    } else if (CHECK_UNICODE_NO_NUMPY(object)) {
         Py_ssize_t l;
         const char* s = PyUnicode_AsUTF8AndSize(object, &l);
         if (s == NULL)
@@ -5374,7 +5374,11 @@ static PyObject* validator_generate_data(PyObject* self, PyObject*, PyObject*)
 		      v->numberMode);
     accept = d.Accept(handler);
     if (!accept) {
-	PyErr_SetString(generate_error, "Error converting the generated JSON document to a Python object");
+	GenericStringBuffer<UTF8<> > buf;
+	PrettyWriter<GenericStringBuffer<UTF8<> >, UTF8<>, UTF8<> > writer(buf);
+	d.Accept(writer);
+	PyErr_Format(generate_error,
+		     "Error converting the generated JSON document to a Python object:\n%s", buf.GetString());
 	return NULL;
     }
     

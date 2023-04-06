@@ -154,6 +154,7 @@ class FortranModelDriver(CompiledModelDriver):
         zmq={'libraries': [('c', x) for x in
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
+    standard_libraries = []
     external_libraries = {'cxx': {'include': 'stdlib.h',
                                   'libtype': 'shared',
                                   'language': 'c'}}
@@ -251,6 +252,8 @@ class FortranModelDriver(CompiledModelDriver):
         'init_function': 'yggpyfunc(init_python())',
         'init_instance': 'yggpyinst(init_generic())',
         'init_any': 'init_generic()',
+        'init_type_from_schema': ('create_dtype_from_schema(\"{schema}\"'
+                                  ', {use_generic})'),
         'init_type_array': ('create_dtype_json_array({nitems}, '
                             '{items}, {use_generic})'),
         'init_type_object': ('create_dtype_json_object({nitems}, '
@@ -317,8 +320,10 @@ class FortranModelDriver(CompiledModelDriver):
         'or': '.or.',
         'indent': 3 * ' ',
         'quote': "'",
+        'escaped_double_quote': "\"\"",
         'error': ("write(*, \'(\"{error_msg}\")\')\n"
                   "stop 1"),
+        'continuation_break': (',', '{', ' '),
         'continuation_before': '&',
         'continuation_after': '     &',
         'block_end': 'END',
@@ -416,10 +421,14 @@ class FortranModelDriver(CompiledModelDriver):
                 else:
                     # GNU takes precedence when present
                     add_cxx_lib = 'stdc++'
-            if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
-                cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
+            if add_cxx_lib and (add_cxx_lib not in cls.standard_libraries):
+                cls.standard_libraries.append(add_cxx_lib)
                 cls.internal_libraries['fygg']['external_dependencies'].append(
                     add_cxx_lib)
+            # if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
+            #     cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
+            #     cls.internal_libraries['fygg']['external_dependencies'].append(
+            #         add_cxx_lib)
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
@@ -574,7 +583,10 @@ class FortranModelDriver(CompiledModelDriver):
                     precision = json_type.get('precision', 1)
                 elif out.startswith('complex'):
                     precision = json_type['precision'] / 2
-                elif json_type.get('subtype', json_type['type']) == 'unicode':
+                elif (json_type.get('subtype', json_type['type']) == 'unicode'
+                      or (json_type.get('subtype', json_type['type'])
+                          in ['string', 'bytes']
+                          and json_type.get('encoding', 'ascii') != 'ascii')):
                     precision = json_type['precision'] / 4
                 else:
                     precision = json_type['precision']
@@ -1239,7 +1251,7 @@ class FortranModelDriver(CompiledModelDriver):
                     vnew = vnew.replace('X', '1')
                 elif 'ISO_10646' in vnew:
                     knew = {'type': 'scalar', 'subtype': knew,
-                            'precision': 8}
+                            'encoding': 'UCS4', 'precision': 32}
                 else:
                     knew = {'type': 'scalar', 'subtype': knew,
                             'precision': 8}

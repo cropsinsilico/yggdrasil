@@ -322,7 +322,7 @@ class ZMQProxy(CommBase.CommServer):
         except zmq.ZMQError as e:
             if e.errno in (zmq.ENOTSOCK, zmq.ENOTSUP):
                 return False
-            raise
+            raise  # pragma: debug
         return (out == zmq.POLLIN)
 
     def run_loop(self):
@@ -427,6 +427,7 @@ class ZMQComm(CommBase.CommBase):
                         + ['reply_socket_lock', 'socket_lock',
                            '_reply_thread'])
     _deprecated_drivers = ['ZMQInputDriver', 'ZMQOutputDriver']
+    _schema_excluded_from_class_validation = ['context']
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
@@ -755,7 +756,7 @@ class ZMQComm(CommBase.CommBase):
                     pass
                 self.unregister_comm(self.registry_key, dont_close=dont_close)
                 self._bound = False
-            self.debug('Unbound socket')
+                self.debug('Unbound socket')
 
     def disconnect_socket(self, dont_close=False):
         r"""Disconnect from address."""
@@ -795,6 +796,7 @@ class ZMQComm(CommBase.CommBase):
                 self._openned = True
             if (not self.is_async) and (not self.reply_thread.is_alive()):
                 self.reply_thread.start()
+        self.debug("Opened")
 
     def set_reply_socket_send(self):
         r"""Set the send reply socket if it dosn't exist."""
@@ -1295,25 +1297,13 @@ class ZMQComm(CommBase.CommBase):
         if not ((self.direction == 'recv')
                 and (self.is_server or self.allow_multiple_comms)):
             return
-        # Wait for messages to be drained by the async thread
-        if self.is_async:
-            multitasking.wait_on_function(
-                lambda: self.cli_address is not None, timeout=10.0)
-            multitasking.wait_on_function(
-                lambda: self.n_msg == 0, timeout=10.0)
-            return
-        # Wait for signon message
-        multitasking.wait_on_function(lambda: self.n_msg != 0, timeout=10.0)
-
+        
         # Drain signon messages
         def drain_signon():
-            # try:
-            flag, msg = self.recv(timeout=0)
-            # except BaseException as e:
-            #     print("exception: ", e)
-            #     raise
-            assert flag
-            assert self.is_empty_recv(msg)
+            if not self.is_async:  # only actively receive if not async
+                flag, msg = self.recv(timeout=0)
+                assert flag
+                assert self.is_empty_recv(msg)
             # This version of check can let signon messages slip
             # through if the messages are sent with a large interval
             # or are delayed
@@ -1325,6 +1315,15 @@ class ZMQComm(CommBase.CommBase):
             # sent before the server side connection is established
             return (self.cli_signon_sent > 0
                     and self.cli_signon_sent == self.cli_signon_recv)
+
+        if self.is_async:
+            # Wait for messages to be drained by the async thread
+            multitasking.wait_on_function(
+                lambda: self.cli_address is not None, timeout=10.0)
+        else:
+            # Wait for signon message, then actively drain
+            multitasking.wait_on_function(
+                lambda: self.n_msg != 0, timeout=10.0)
 
         multitasking.wait_on_function(drain_signon, timeout=10.0)
         

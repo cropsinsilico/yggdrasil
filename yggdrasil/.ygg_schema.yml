@@ -171,8 +171,8 @@ definitions:
       serializer:
         $ref: '#/definitions/serializer'
         description: Class with serialize and deserialize methods that should be used
-          to process sent and received messages. Defaults to None and is constructed
-          using provided 'serializer_kwargs'.
+          to process sent and received messages or a dictionary describing a serializer
+          that obeys the serializer schema.
       transform:
         aliases:
         - recv_converter
@@ -525,6 +525,7 @@ definitions:
         description: '[DEPRECATED] Arguments that should be provided to the driver.'
         type: string
       connection_type:
+        description: Connection between one or more comms/files and one or more comms/files.
         enum:
         - connection
         - file_input
@@ -1083,8 +1084,8 @@ definitions:
         - default: {}
         - $ref: '#/definitions/serializer'
         description: Class with serialize and deserialize methods that should be used
-          to process sent and received messages. Defaults to None and is constructed
-          using provided 'serializer_kwargs'.
+          to process sent and received messages or a dictionary describing a serializer
+          that obeys the serializer schema.
       sort_keys:
         default: true
         description: If True, the serialization of dictionaries will be in key sorted
@@ -1201,8 +1202,8 @@ definitions:
         - default: {}
         - $ref: '#/definitions/serializer'
         description: Class with serialize and deserialize methods that should be used
-          to process sent and received messages. Defaults to None and is constructed
-          using provided 'serializer_kwargs'.
+          to process sent and received messages or a dictionary describing a serializer
+          that obeys the serializer schema.
     pushProperties:
       $properties/serializer: true
     required:
@@ -1804,10 +1805,12 @@ definitions:
     description: Base schema for all subtypes of filter components.
     properties:
       filtertype:
+        description: Pass every message
         enum:
         - direct
         - function
         - statement
+        type: string
       function:
         description: The handle for a callable Python object (e.g. function) that
           should be used to determine if a message should be filtered or a string
@@ -1832,8 +1835,10 @@ definitions:
     properties:
       filtertype:
         default: direct
+        description: Pass every message
         enum:
         - direct
+        type: string
     title: yggdrasil.communication.filters.DirectFilter.DirectFilter
     type: object
   filter-subtype-function:
@@ -1842,8 +1847,10 @@ definitions:
     properties:
       filtertype:
         default: function
+        description: Filter messages based on a function
         enum:
         - function
+        type: string
       function:
         description: The handle for a callable Python object (e.g. function) that
           should be used to determine if a message should be filtered or a string
@@ -1863,8 +1870,10 @@ definitions:
     properties:
       filtertype:
         default: statement
+        description: Filter messages based on a statement
         enum:
         - statement
+        type: string
       statement:
         description: Python statement in terms of the message as represented by the
           string "%x%" that should evaluate to a boolean, True if the message should
@@ -3713,7 +3722,7 @@ definitions:
           type: string
         type: array
       language:
-        description: Model is dedicated to synchronizingtimesteps between other models.
+        description: Model is dedicated to synchronizing timesteps between other models.
         enum:
         - timesync
         type: string
@@ -4265,13 +4274,16 @@ definitions:
     description: Schema for transform component ['array'] subtype.
     properties:
       field_names:
+        description: Names of fields in the array.
         items:
           type: string
         type: array
       transformtype:
         default: array
+        description: Consolidate values into an array
         enum:
         - array
+        type: string
     title: yggdrasil.communication.transforms.ArrayTransform.ArrayTransform
     type: object
   transform-subtype-base:
@@ -4280,11 +4292,13 @@ definitions:
     description: Base schema for all subtypes of transform components.
     properties:
       field_names:
+        description: Names of fields in the array.
         items:
           type: string
         type: array
       filter:
         $ref: '#/definitions/filter'
+        description: Filter used to exclude some messages based on their contents.
       function:
         description: The handle for a callable Python object (e.g. function) that
           should be used to transform messages or a string of the form "<function
@@ -4331,6 +4345,7 @@ definitions:
           If more complex relationships are required, use the FunctionTransform class.
         type: string
       transformtype:
+        description: Consolidate values into an array
         enum:
         - array
         - direct
@@ -4342,6 +4357,7 @@ definitions:
         - select_fields
         - select_scalar
         - statement
+        type: string
     title: transform_base
     type: object
   transform-subtype-direct:
@@ -4351,8 +4367,10 @@ definitions:
     properties:
       transformtype:
         default: direct
+        description: Pass the message through unchanged
         enum:
         - direct
+        type: string
     title: yggdrasil.communication.transforms.DirectTransform.DirectTransform
     type: object
   transform-subtype-filter:
@@ -4362,10 +4380,13 @@ definitions:
     properties:
       filter:
         $ref: '#/definitions/filter'
+        description: Filter used to exclude some messages based on their contents.
       transformtype:
         default: filter
+        description: Pass only some messages based on a filter
         enum:
         - filter
+        type: string
     required:
     - filter
     title: yggdrasil.communication.transforms.FilterTransform.FilterTransform
@@ -4385,8 +4406,10 @@ definitions:
         type: function
       transformtype:
         default: function
+        description: Transform messages using a function.
         enum:
         - function
+        type: string
     required:
     - function
     title: yggdrasil.communication.transforms.FunctionTransform.FunctionTransform
@@ -4398,8 +4421,10 @@ definitions:
     properties:
       transformtype:
         default: iterate
+        description: Split messages up into their iterable components
         enum:
         - iterate
+        type: string
     title: yggdrasil.communication.transforms.IterateTransform.IterateTransform
     type: object
   transform-subtype-map_fields:
@@ -4414,8 +4439,10 @@ definitions:
         type: object
       transformtype:
         default: map_fields
+        description: Change the names of fields in a message
         enum:
         - map_fields
+        type: string
     required:
     - map
     title: yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform
@@ -4426,13 +4453,16 @@ definitions:
     description: Schema for transform component ['pandas'] subtype.
     properties:
       field_names:
+        description: Names of fields in the array.
         items:
           type: string
         type: array
       transformtype:
         default: pandas
+        description: Convert messages into Pandas data frames
         enum:
         - pandas
+        type: string
     title: yggdrasil.communication.transforms.PandasTransform.PandasTransform
     type: object
   transform-subtype-select_fields:
@@ -4458,8 +4488,10 @@ definitions:
         type: boolean
       transformtype:
         default: select_fields
+        description: Select a subset of fields from a message
         enum:
         - select_fields
+        type: string
     required:
     - selected
     title: yggdrasil.communication.transforms.SelectFieldsTransform.SelectFieldsTransform
@@ -4484,8 +4516,10 @@ definitions:
         type: array
       transformtype:
         default: select_scalar
+        description: Select a single field from a message
         enum:
         - select_scalar
+        type: string
     title: yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform
     type: object
   transform-subtype-statement:
@@ -4501,8 +4535,10 @@ definitions:
         type: string
       transformtype:
         default: statement
+        description: Transform messages according to a statement
         enum:
         - statement
+        type: string
     required:
     - statement
     title: yggdrasil.communication.transforms.StatementTransform.StatementTransform

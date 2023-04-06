@@ -7,6 +7,7 @@ from yggdrasil.serialize import numpy2pandas
 class PandasTransform(ArrayTransform):
     r"""Class for consolidating values into a Pandas data frame."""
     _transformtype = 'pandas'
+    _schema_subtype_description = "Convert messages into Pandas data frames"
 
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.

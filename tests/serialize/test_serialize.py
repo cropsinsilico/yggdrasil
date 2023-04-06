@@ -65,9 +65,9 @@ def test_extract_formats():
     test_str = ['%10s\t%5.2f\t%4d\t%g%+gj']
     test_fmt = [['%10s', '%5.2f', '%4d', '%g%+gj']]
     for s, f in zip(test_str, test_fmt):
-        assert(serialize.extract_formats(s) == f)
-        assert(serialize.extract_formats(s.encode("utf-8"))
-               == [i.encode("utf-8") for i in f])
+        assert serialize.extract_formats(s) == f
+        assert (serialize.extract_formats(s.encode("utf-8"))
+                == [i.encode("utf-8") for i in f])
 
 
 def test_nptype2cformat():
@@ -76,7 +76,7 @@ def test_nptype2cformat():
         if isinstance(a, str):
             a = [a]
         for ia in a:
-            assert(serialize.nptype2cformat(ia) == b)
+            assert serialize.nptype2cformat(ia) == b
     with pytest.raises(TypeError):
         serialize.nptype2cformat(0)
     for a in unsupported_nptype:
@@ -98,9 +98,9 @@ def test_nptype2cformat_structured():
     alist = [dtype0, dtype1]
     blist = [fmts, fmts]
     for a, b in zip(alist, blist):
-        assert(serialize.nptype2cformat(a) == b)
-        assert(serialize.nptype2cformat(a, asbytes=True)
-               == [ib.encode("utf-8") for ib in b])
+        assert serialize.nptype2cformat(a) == b
+        assert (serialize.nptype2cformat(a, asbytes=True)
+                == [ib.encode("utf-8") for ib in b])
 
 
 def test_cformat2nptype():
@@ -113,8 +113,8 @@ def test_cformat2nptype():
                 ia = _ia.encode("utf-8")
             else:
                 ia = constants.FMT_CHAR + _ia.encode("utf-8")
-            assert(serialize.cformat2nptype(ia) == np.dtype(b))  # .str)
-            # assert(serialize.cformat2nptype(ia) == np.dtype(b).str)
+            assert serialize.cformat2nptype(ia) == np.dtype(b)  # .str)
+            # assert serialize.cformat2nptype(ia) == np.dtype(b).str
     with pytest.raises(TypeError):
         serialize.cformat2nptype(0)
     with pytest.raises(ValueError):
@@ -143,9 +143,9 @@ def test_cformat2nptype_structured():
     alist = ["\t".join(fmts) + "\n", ''.join(fmts), fmts]
     for a in alist:
         b0 = serialize.cformat2nptype(a)
-        assert(b0 == dtype0)
+        assert b0 == dtype0
         b1 = serialize.cformat2nptype(a, names=names1)
-        assert(b1 == dtype1)
+        assert b1 == dtype1
 
 
 def test_cformat2pyscanf():
@@ -160,7 +160,7 @@ def test_cformat2pyscanf():
             ib = b.encode("utf-8")
             all_a.append(ia)
             all_b.append(ib)
-            assert(serialize.cformat2pyscanf(ia) == ib)
+            assert serialize.cformat2pyscanf(ia) == ib
     with pytest.raises(TypeError):
         serialize.cformat2pyscanf(0)
     with pytest.raises(ValueError):
@@ -169,8 +169,8 @@ def test_cformat2pyscanf():
         serialize.cformat2pyscanf(b'%')
     fmt_a = b'\t'.join(all_a)
     fmt_b = b'\t'.join(all_b)
-    assert(serialize.cformat2pyscanf(all_a) == all_b)
-    assert(serialize.cformat2pyscanf(fmt_a) == fmt_b)
+    assert serialize.cformat2pyscanf(all_a) == all_b
+    assert serialize.cformat2pyscanf(fmt_a) == fmt_b
 
 
 def test_format_message():
@@ -185,12 +185,12 @@ def test_format_message():
         msg = serialize.format_message(a, f)
         b = serialize.process_message(msg, f)
         if not isinstance(a, tuple):
-            assert(b == (a, ))
+            assert b == (a, )
         else:
-            assert(b == a)
+            assert b == a
     # Formats with mixed types
-    assert(serialize.format_message(b'hello', '%s') == 'hello')
-    assert(serialize.format_message('hello', b'%s') == b'hello')
+    assert serialize.format_message(b'hello', '%s') == 'hello'
+    assert serialize.format_message('hello', b'%s') == b'hello'
     # Errors
     with pytest.raises(RuntimeError):
         serialize.format_message((0, ), "%d %d")
@@ -365,6 +365,13 @@ def test_consolidate_array():
     # Error on dtypes with differing numbers of fields
     with pytest.raises(ValueError):
         serialize.consolidate_array(np.zeros(3, dtype0), dtype=dtype3)
+    # Consolidation with single field
+    dtype_single = np.dtype([('f0', 'f8')])
+    arr_single = np.zeros(3, 'f8')
+    res_single = np.zeros(3, dtype_single)
+    np.testing.assert_array_equal(
+        serialize.consolidate_array(arr_single, dtype=dtype_single),
+        res_single)
                      
 
 def test_format2table():
@@ -380,12 +387,12 @@ def test_format2table():
     del sout['newline'], sout['comment']
     fmt = b'# %5s\t%ld\t%lf\t%g%+gj\n'
     fmt2 = b'# %5s\t\t%ld\t%lf\t%g%+gj\n'
-    assert(dict(fmts=[]) == serialize.format2table('hello'))
-    assert(sout == serialize.format2table(sfmt))
-    assert(fmt == serialize.table2format(**out))
-    assert(out == serialize.format2table(fmt))
-    assert(fmt == serialize.table2format(fmts=out['fmts']))
-    assert(out == serialize.format2table(fmt2))
+    assert dict(fmts=[]) == serialize.format2table('hello')
+    assert sout == serialize.format2table(sfmt)
+    assert fmt == serialize.table2format(**out)
+    assert out == serialize.format2table(fmt)
+    assert fmt == serialize.table2format(fmts=out['fmts'])
+    assert out == serialize.format2table(fmt2)
     with pytest.raises(RuntimeError):
         serialize.format2table("%5s,%ld\t%g\n")
 
@@ -431,7 +438,7 @@ def test_array_to_bytes():
         b0 = serialize.array_to_bytes(np.zeros(nrow, dtype2), order=order)
         b1 = serialize.array_to_bytes(np.zeros((nrow, ncol)), dtype=dtype2,
                                       order=order)
-        assert(b1 == b0)
+        assert b1 == b0
         # Error on incomplete serial array
         with pytest.raises(RuntimeError):
             serialize.bytes_to_array(b0[:-1], dtype2, order=order)
@@ -470,7 +477,7 @@ def test_format_header():
     for kws_keys, res_keys in test_list:
         kws = {k: kws_all[k] for k in kws_keys}
         res = b''.join([res_all[k] for k in res_keys])
-        assert(serialize.format_header(**kws) == res)
+        assert serialize.format_header(**kws) == res
     with pytest.raises(ValueError):
         serialize.format_header()
 
@@ -485,19 +492,19 @@ def test_parse_header():
                fmts=[b'%5s', b'%ld', b'%lf', b'%g%+gj'],
                field_names=[b'name', b'number', b'value', b'complex'],
                field_units=[b'n/a', b'g', b'cm', b'n/a'])
-    assert(serialize.parse_header(header) == res)
-    assert(serialize.parse_header(header[::-1]) == res)
+    assert serialize.parse_header(header) == res
+    assert serialize.parse_header(header[::-1]) == res
     _empty = b''
-    assert(serialize.parse_header(_empty.join(header)) == res)
+    assert serialize.parse_header(_empty.join(header)) == res
     # Test without formats
     header2 = header[:2]
     res2 = dict(**res)
     del res2['format_str']
     res2['fmts'] = []
-    assert(serialize.parse_header(header2) == res2)
+    assert serialize.parse_header(header2) == res2
     # Test with explicit line numbers
-    assert(serialize.parse_header(header, lineno_names=0, lineno_units=1)
-           == res)
+    assert (serialize.parse_header(header, lineno_names=0, lineno_units=1)
+            == res)
     # Test errors
     header3 = [header[0], header[0]]
     with pytest.raises(RuntimeError):
@@ -515,7 +522,7 @@ def test_dict2list():
         serialize.list2dict(None)
     x = {'c': 0, 'b': 1, 'a': 2}
     y = [2, 1, 0]
-    assert(serialize.dict2list(x) == y)
+    assert serialize.dict2list(x) == y
 
 
 def test_numpy2pandas():

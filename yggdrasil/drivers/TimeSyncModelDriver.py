@@ -53,7 +53,7 @@ class TimeSyncModelDriver(DSLModelDriver):
 
     """
 
-    _schema_subtype_description = ('Model is dedicated to synchronizing'
+    _schema_subtype_description = ('Model is dedicated to synchronizing '
                                    'timesteps between other models.')
     _schema_properties = {
         'synonyms': {'type': 'object',

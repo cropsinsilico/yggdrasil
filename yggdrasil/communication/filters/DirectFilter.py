@@ -5,6 +5,7 @@ class DirectFilter(FilterBase):
     r"""Class that always passes messages."""
 
     _filtertype = 'direct'
+    _schema_subtype_description = "Pass every message"
 
     def evaluate_filter(self, x):
         r"""Call filter on the provided message.

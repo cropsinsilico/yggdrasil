@@ -6,7 +6,7 @@ subroutine generic_array_get_generic(x, index, out)
   integer, intent(in) :: index
   type(ygggeneric), pointer, intent(out) :: out
   integer(kind=c_int) :: flag
-  flag = get_generic_array(x, int(index, c_size_t), out, 0)
+  flag = get_generic_array(x, int(index, c_size_t), out)
   if (flag.ne.0) then
      stop "generic_array_get_generic: Error extracting generic object."
   end if
@@ -36,6 +36,7 @@ subroutine generic_array_get_null(x, index, out)
   type(yggnull) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_item(x, index, "null")
+  out%ptr = c_null_ptr
   ! call c_f_pointer(c_out%ptr, out)
 end subroutine generic_array_get_null
 subroutine generic_array_get_number(x, index, out)
@@ -53,7 +54,6 @@ subroutine generic_array_get_string(x, index, out)
   integer, intent(in) :: index
   character(len=:, kind=c_char), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  integer :: nbytes
   c_out = generic_array_get_item(x, index, "string")
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_string
@@ -117,7 +117,6 @@ subroutine generic_array_get_python_function(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(c_ptr) :: c_out
   type(yggpython), pointer, intent(out) :: out
   allocate(out)
   out = yggpython(init_python())
@@ -817,7 +816,7 @@ subroutine generic_array_set_null(x, index, val)
   integer, intent(in) :: index
   type(yggnull), intent(in) :: val
   type(c_ptr) :: c_val
-  c_val = c_null_ptr
+  c_val = val%ptr
   call generic_array_set_item(x, index, "null", c_val)
 end subroutine generic_array_set_null
 subroutine generic_array_set_number(x, index, val)

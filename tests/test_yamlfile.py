@@ -53,18 +53,6 @@ def test_load_yaml_error():
         yamlfile.load_yaml('invalid')
 
 
-def test_cdriver2filetype_error():
-    r"""Test errors in cdriver2filetype."""
-    with pytest.raises(ValueError):
-        yamlfile.cdriver2filetype('invalid')
-
-
-def test_cdriver2commtype_error():
-    r"""Test error when invalid driver supplied."""
-    with pytest.raises(ValueError):
-        yamlfile.cdriver2commtype('invalid')
-
-
 @pytest.mark.flaky_optin(max_runs=3)
 def test_load_yaml_git():
     r"""Test loading a yaml from a remote git repository."""
@@ -216,6 +204,16 @@ class TestYamlModelOnly(YamlTestBase):
                   '  args: ./src/modelD.c',
                   '  env:',
                   '    TEST_VAR: 1'], )
+
+
+class TestYamlBackwardsCompat(YamlTestBase):
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.cpp'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    args: ./src/modelB.c'])
 
 
 class TestYamlServerClient(YamlTestBase):

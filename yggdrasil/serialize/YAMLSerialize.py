@@ -1,11 +1,11 @@
 import yaml
 from yggdrasil import rapidjson
 from yggdrasil.serialize.JSONSerialize import (
-    JSONSerialize, indent_char2int, string2import)
+    JSONSerialize, indent_char2int)
 
 
 def encode_yaml(obj, fd=None, indent=None,
-                sorted_dict_type=None, **kwargs):
+                sorted_dict_type=None, sort_keys=True, **kwargs):
     r"""Encode a Python object in YAML format.
 
     Args:
@@ -14,6 +14,8 @@ def encode_yaml(obj, fd=None, indent=None,
             should be written to. Defaults to None and string is returned.
         indent (int, str, optional): Indentation for new lines in encoded
             string. Defaults to None.
+        sort_keys (bool, optional): If True, dictionaries will be sorted
+            alphabetically by key. Defaults to True.
         **kwargs: Additional keyword arguments are passed to yaml.dump.
 
     Returns:
@@ -47,10 +49,11 @@ def encode_yaml(obj, fd=None, indent=None,
             def start_object(self):
                 return sorted_dict_type[0]()
         json_kws['decoder'] = OrderedDecoder()
-        # json_kws['mapping_mode'] = rapidjson.MM_SORT_KEYS
+        if sort_keys:
+            json_kws['mapping_mode'] = rapidjson.MM_SORT_KEYS
     
     obj = rapidjson.as_pure_json(obj, **json_kws)
-    return yaml.dump(obj, **kwargs)
+    return yaml.dump(obj, sort_keys=sort_keys, **kwargs)
 
 
 def decode_yaml(msg, sorted_dict_type=None, **kwargs):
@@ -79,14 +82,15 @@ def decode_yaml(msg, sorted_dict_type=None, **kwargs):
             yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
             construct_mapping)
 
-    def construct_scalar(loader, node):
-        out = loader.construct_scalar(node)
-        out = string2import(out)
-        return out
+    # If this is required, add a method to rapidjson python wrapper
+    # def construct_scalar(loader, node):
+    #     out = loader.construct_scalar(node)
+    #     out = string2import(out)
+    #     return out
 
-    OrderedLoader.add_constructor(
-        yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG,
-        construct_scalar)
+    # OrderedLoader.add_constructor(
+    #     yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG,
+    #     construct_scalar)
     kwargs['Loader'] = OrderedLoader
     out = yaml.load(msg, **kwargs)
     return out

@@ -222,10 +222,20 @@ extras:
   rmq:
     - pika>=1.0.0
   sbml:
-    - name: libroadrunner<2.0.7
+    - name: libroadrunner
       method: pip
-      flags:
-        install_flags: [--no-dependencies]
+    # - ncurses:
+    #     - name: ncurses==5.9
+    #       method: conda
+    #       os: linux
+    #     - name: libncurses5
+    #       method: apt
+    #       os: linux
+    #       add: [libncurses5-dev, libncursesw5-dev]
+    #     - method: skip
+    #       os: osx
+    #     - method: skip
+    #       os: win
   lpy:
     - name: lpy
       method: conda
@@ -250,6 +260,7 @@ extras:
     - pytest-rerunfailures
     - pytest-repeat
     - pytest-timeout
+    - pytest-xdist
     # Split these into another section?
     - ccache:
         method: conda
@@ -284,8 +295,8 @@ extras:
           os: win
         - method: conda_skip
     - pypandoc
-    - r-rd2md:
-        method: conda
+    # - r-rd2md:
+    #     method: conda
     - r-roxygen2:
         method: conda
     - sphinx
