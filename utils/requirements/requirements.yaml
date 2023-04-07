@@ -188,7 +188,7 @@ extras:
         - method: choco
         # fails currently on Mac M1, but PR in progress to fix it
         # fails on windows, unclear if it will be added
-        - name: julia>=1.8.3
+        - name: julia>=1.1.1
           method: conda
           host: True
           os: unix

@@ -112,7 +112,17 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
                 cls.run_executable(['-e', f'using {lib}'])
                 cls._library_cache[lib] = True
             except RuntimeError:
-                print(cls.run_executable(['-e', '"using Pkg; Pkg.status()"']))
+                try:
+                    import uuid
+                    import os
+                    fname = f'wrapper{uuid.uuid4()}.jl'
+                    assert not os.path.isfile(fname)
+                    with open(fname, 'w') as fd:
+                        fd.write('using Pkg\nPkg.status()\n')
+                    print(cls.run_executable([fname]))
+                finally:
+                    if os.path.isfile(fname):
+                        os.remove(fname)
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
 
