@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.9.0" %}
+{% set version = "1.9.1" %}
 {% set PY_VER_MAJOR = PY_VER.split('.')[0] %}
 {% set PY_VER_MINOR = PY_VER.split('.')[1] %}
 
