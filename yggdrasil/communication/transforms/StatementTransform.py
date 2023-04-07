@@ -22,6 +22,7 @@ class StatementTransform(TransformBase):
     _transformtype = 'statement'
     _schema_required = ['statement']
     _schema_properties = {'statement': {'type': 'string'}}
+    _schema_subtype_description = "Transform messages according to a statement"
 
     def __init__(self, *args, **kwargs):
         super(StatementTransform, self).__init__(*args, **kwargs)

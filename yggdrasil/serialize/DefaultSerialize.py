@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import units, serialize
+from yggdrasil import serialize, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -17,9 +17,55 @@ class DefaultSerialize(SerializeBase):
                                    'extended JSON serialization based on a '
                                    'provided type definition (See discussion '
                                    ':ref:`here <serialization_rst>`).')
-    func_serialize = None
-    func_deserialize = None
     
+    def func_serialize(self, args):
+        r"""Serialize a message.
+
+        Args:
+            args: List of arguments to be formatted or numpy array to be
+                serialized.
+
+        Returns:
+            bytes, str: Serialized message.
+
+        """
+        return rapidjson.dumps(args).encode('utf8')
+
+    def func_deserialize(self, msg):
+        r"""Deserialize a message.
+
+        Args:
+            msg: Message to be deserialized.
+
+        Returns:
+            obj: Deserialized message.
+
+        """
+        return rapidjson.loads(msg.decode('utf8'))
+    
+    @classmethod
+    def dict2object(cls, obj, as_array=False, field_names=None, **kwargs):
+        r"""Conver a dictionary to a message object.
+
+        Args:
+            obj (dict): Dictionary to convert to serializable object.
+            as_array (bool, optional): If True, the objects in the list
+                are complete columns in a table and as_format is set to True.
+                Defaults to False.
+            field_names (list, optional): The field names associated with a
+                table-like data type. Defaults to None. This keyword must be
+                provided if as_array is True.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            object: Serializable object.
+
+        """
+        if field_names is None and len(obj) == 1:
+            assert not as_array
+            return super(DefaultSerialize, cls).dict2object(obj, **kwargs)
+        return serialize.dict2list(obj, order=field_names)
+
     @classmethod
     def object2dict(cls, obj, as_array=False, field_names=None, **kwargs):
         r"""Convert a message object into a dictionary.
@@ -42,9 +88,7 @@ class DefaultSerialize(SerializeBase):
         if field_names is None:
             assert not as_array
             return super(DefaultSerialize, cls).object2dict(obj, **kwargs)
-        else:
-            out = serialize.list2dict(obj, names=field_names)
-        return out
+        return serialize.list2dict(obj, names=field_names)
 
     @classmethod
     def object2array(cls, obj, as_array=False, field_names=None, **kwargs):
@@ -67,10 +111,8 @@ class DefaultSerialize(SerializeBase):
         """
         if as_array:
             assert field_names is not None
-            out = serialize.list2numpy(obj, names=field_names)
-        else:
-            out = super(DefaultSerialize, cls).object2array(obj, **kwargs)
-        return out
+            return serialize.list2numpy(obj, names=field_names)
+        return super(DefaultSerialize, cls).object2array(obj, **kwargs)
 
     @classmethod
     def concatenate(cls, objects, as_array=False, **kwargs):
@@ -91,9 +133,8 @@ class DefaultSerialize(SerializeBase):
         if len(objects) == 0:
             return []
         if as_array:
-            units_list = [units.get_units(ix) for ix in objects[0]]
-            out = [[units.add_units(np.hstack([x[i] for x in objects]), u)
-                    for i, u in enumerate(units_list)]]
+            out = [[np.hstack([x[i] for x in objects])
+                    for i in range(len(objects[0]))]]
         elif isinstance(objects[0], bytes):
             out = [b''.join(objects)]
         else:
@@ -107,18 +148,4 @@ class DefaultSerialize(SerializeBase):
         if cls._seritype == 'default':
             out['concatenate'] = [([], []),
                                   ([b'a', b'b'], [b'ab'])]
-        return out
-        
-    def update_serializer(self, *args, **kwargs):
-        r"""Update serializer with provided information.
-
-        Args:
-            *args: All arguments are passed to the parent class's method.
-            **kwargs: All keyword arguments are passed to the parent class's
-                method.
-
-        """
-        out = super(DefaultSerialize, self).update_serializer(*args, **kwargs)
-        if (self.func_serialize is None) or (self.func_deserialize is None):
-            self.encoded_datatype = self.datatype
         return out

@@ -33,7 +33,8 @@ void unset_global_comm_f() {
 
 // Methods for initializing channels
 int is_comm_format_array_type_f(const void *x) {
-  return is_comm_format_array_type((const comm_t*)x);
+  dtype_t *datatype = ((const comm_t*)x)->datatype;
+  return is_dtype_format_array(datatype);
 }
 
 void* ygg_output_f(const char *name) {
@@ -158,6 +159,10 @@ int is_dtype_format_array_f(void* type_struct) {
   return is_dtype_format_array((dtype_t*)type_struct);
 }
 
+void *create_dtype_from_schema_f(const char* schema, const bool use_generic) {
+  return (void*)create_dtype_from_schema(schema, use_generic);
+}
+
 void *create_dtype_empty_f(const bool use_generic) {
   return (void*)create_dtype_empty(use_generic);
 }
@@ -244,8 +249,10 @@ int ygg_send_var_f(const void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_send_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  return vcommSend((const comm_t*)yggQ, (size_t)nargs, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vcommSend((const comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
@@ -253,9 +260,10 @@ int ygg_recv_var_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 0, (size_t)nargs, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vcommRecv((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
@@ -263,9 +271,10 @@ int ygg_recv_var_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("ygg_recv_var_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vcommRecv((comm_t*)yggQ, 1, (size_t)nargs, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1, 1);
+  int out = vcommRecv((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int rpc_send_f(const void *yggQ, int nargs, void *args) {
@@ -285,9 +294,10 @@ int rpc_call_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 0, (size_t)nargs, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 0, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
@@ -295,14 +305,21 @@ int rpc_call_realloc_f(void *yggQ, int nargs, void *args) {
     ygglog_error("rpc_call_realloc_f: args pointer is NULL.");
     return -1;
   }
-  va_list_t ap = init_va_ptrs(nargs, (void**)args);
-  ap.for_fortran = 1;
-  return vrpcCallBase((comm_t*)yggQ, 1, (size_t)nargs, ap);
+  va_list_t ap = init_va_ptrs(nargs, (void**)args, 1, 1);
+  int out = vrpcCallBase((comm_t*)yggQ, ap);
+  end_va_list(&ap);
+  return out;
 }
 
 // Ply interface
 ply_t init_ply_f() {
   return init_ply();
+}
+
+void set_ply_f(void* x, void* obj, int copy) {
+  ply_t* c_x = (ply_t*)x;
+  if (c_x != NULL)
+    set_ply(c_x, obj, copy);
 }
 
 void free_ply_f(void* p) {
@@ -324,9 +341,20 @@ void display_ply_f(ply_t p) {
   display_ply(p);
 }
 
+int nelements_ply_f(ply_t p, const char* name) {
+  return nelements_ply(p, name);
+}
+
+
 // Obj interface
 obj_t init_obj_f() {
   return init_obj();
+}
+
+void set_obj_f(void* x, void* obj, int copy) {
+  obj_t* c_x = (obj_t*)x;
+  if (c_x != NULL)
+    set_obj(c_x, obj, copy);
 }
 
 void free_obj_f(void* p) {
@@ -348,6 +376,10 @@ void display_obj_f(obj_t p) {
   display_obj(p);
 }
 
+int nelements_obj_f(obj_t p, const char* name) {
+  return nelements_obj(p, name);
+}
+
 
 // Generic interface
 generic_t init_generic_f() {
@@ -362,12 +394,16 @@ generic_t init_generic_map_f() {
   return init_generic_map();
 }
 
-generic_t create_generic_f(void* type_class, void* data, size_t nbytes) {
-  return create_generic((dtype_t*)type_class, data, nbytes);
-}
+/* generic_t create_generic_f(void* type_class, void* data, size_t nbytes) { */
+/*   return create_generic((dtype_t*)type_class, data, nbytes); */
+/* } */
 
 int free_generic_f(void* x) {
   return destroy_generic((generic_t*)x);
+}
+
+int copy_generic_into_f(void* dst, generic_t src) {
+  return copy_generic_into((generic_t*)dst, src);
 }
 
 generic_t copy_generic_f(generic_t src) {
@@ -386,12 +422,16 @@ int add_generic_array_f(generic_t arr, generic_t x) {
   return add_generic_array(arr, x);
 }
 
-int set_generic_array_f(generic_t arr, size_t i, generic_t x) {
+int set_generic_array_f(generic_t arr, const size_t i, generic_t x) {
   return set_generic_array(arr, i, x);
 }
 
-int get_generic_array_f(generic_t arr, size_t i, void* x) {
+int get_generic_array_f(generic_t arr, const size_t i, void* x) {
   return get_generic_array(arr, i, (generic_t*)x);
+}
+
+int get_generic_array_ref_f(generic_t arr, const size_t i, void* x) {
+  return get_generic_array_ref(arr, i, (generic_ref_t*)x);
 }
 
 int set_generic_object_f(generic_t arr, const char* k, generic_t x) {
@@ -400,6 +440,10 @@ int set_generic_object_f(generic_t arr, const char* k, generic_t x) {
 
 int get_generic_object_f(generic_t arr, const char* k, void* x) {
   return get_generic_object(arr, k, (generic_t*)x);
+}
+
+int get_generic_object_ref_f(generic_t arr, const char* k, void* x) {
+  return get_generic_object_ref(arr, k, (generic_ref_t*)x);
 }
 
 // Python interface
@@ -430,8 +474,8 @@ void* generic_array_get_item_f(generic_t x, const size_t index, const char *type
   return generic_array_get_item(x, index, type);
 }
 
-int generic_array_get_item_nbytes_f(generic_t x, const size_t index) {
-  return generic_array_get_item_nbytes(x, index);
+int generic_array_get_item_nbytes_f(generic_t x, const size_t index, const char* type) {
+  return generic_array_get_item_nbytes(x, index, type);
 }
 
 void* generic_array_get_scalar_f(generic_t x, const size_t index,
@@ -504,9 +548,7 @@ void* generic_map_get_keys_f(generic_t x, void* n_keys_f, void* key_size_f) {
   }
   for (i = 0; i < n_keys; i++) {
     memcpy(keys_f + (i * max_key_size), keys_c[i], strlen(keys_c[i]));
-    free(keys_c[i]);
   }
-  free(keys_c);
   ((size_t*)n_keys_f)[0] = n_keys;
   ((size_t*)key_size_f)[0] = max_key_size;
   return (void*)keys_f;
@@ -517,8 +559,8 @@ void* generic_map_get_item_f(generic_t x, const char* key,
   return generic_map_get_item(x, key, type);
 }
 
-int generic_map_get_item_nbytes_f(generic_t x, const char* key) {
-  return generic_map_get_item_nbytes(x, key);
+int generic_map_get_item_nbytes_f(generic_t x, const char* key, const char* type) {
+  return generic_map_get_item_nbytes(x, key, type);
 }
 
 void* generic_map_get_scalar_f(generic_t x, const char* key,
@@ -567,4 +609,9 @@ int generic_map_set_ndarray_f(generic_t x, const char* key,
   return generic_map_set_ndarray(x, key, data, subtype, precision,
 				 ndim, (const size_t*)shape, units);
 }
+
+int init_python_API_f() {
+  return init_python_API();
+}
+
 #endif // DOXYGEN_SHOULD_SKIP_THIS

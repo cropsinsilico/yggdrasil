@@ -9,8 +9,8 @@ try:
     import sysv_ipc
     _ipc_installed = (platform._is_linux or platform._is_mac)
 except ImportError:  # pragma: windows
-    logger.debug("Could not import sysv_ipc. "
-                 + "IPC support will be disabled.")
+    logger.debug("Could not import sysv_ipc."
+                 " IPC support will be disabled.")
     sysv_ipc = None
     _ipc_installed = False
 
@@ -33,7 +33,7 @@ def get_queue(qid=None):
         try:
             mq = sysv_ipc.MessageQueue(qid, **kwargs)
         except sysv_ipc.ExistentialError as e:  # pragma: debug
-            raise sysv_ipc.ExistentialError("%s: %s" % (e, qid))
+            raise sysv_ipc.ExistentialError(f"{e}: {qid}")
         key = str(mq.key)
         IPCComm.register_comm(key, mq)
         return mq
@@ -191,6 +191,7 @@ class IPCComm(CommBase.CommBase):
     _schema_subtype_description = ('Interprocess communication (IPC) queue.')
     _maxMsgSize = 2048  # Based on IPC limit on MacOS
     address_description = ("An IPC message queue key.")
+    _deprecated_drivers = ['IPCInputDriver', 'IPCOutputDriver']
 
     def _init_before_open(self, **kwargs):
         r"""Initialize empty queue and server class."""

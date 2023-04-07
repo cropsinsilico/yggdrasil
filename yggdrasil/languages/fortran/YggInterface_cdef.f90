@@ -305,6 +305,15 @@
        integer(kind=c_int) :: out
      end function is_dtype_format_array_c
      
+     function create_dtype_from_schema_c(schema, use_generic) &
+          result(out) bind(c, name="create_dtype_from_schema_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_bool, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: schema
+       logical(kind=c_bool), value, intent(in) :: use_generic
+       type(c_ptr) :: out
+     end function create_dtype_from_schema_c
+
      function create_dtype_empty_c(use_generic) result(out) &
           bind(c, name="create_dtype_empty_f")
        use, intrinsic :: iso_c_binding, only: c_ptr, c_bool
@@ -530,6 +539,13 @@
        implicit none
        type(yggply) :: out
      end function init_ply_c
+     subroutine set_ply_c(x, obj, copy) bind(c, name="set_ply_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_int
+       implicit none
+       type(c_ptr), value :: x
+       type(c_ptr), value :: obj
+       integer(kind=c_int), value :: copy
+     end subroutine set_ply_c
      subroutine free_ply_c(p) bind(c, name="free_ply_f")
        use, intrinsic :: iso_c_binding, only: c_ptr
        implicit none
@@ -553,6 +569,14 @@
        implicit none
        type(yggply), value, intent(in) :: p
      end subroutine display_ply_c
+     function nelements_ply_c(p, name) result(out) bind(c, name="nelements_ply_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_int
+       import :: yggply
+       implicit none
+       type(yggply), value, intent(in) :: p
+       character(kind=c_char), dimension(*), intent(in) :: name
+       integer(kind=c_int) :: out
+     end function nelements_ply_c
 
      ! Obj interface
      function init_obj_c() result(out) bind(c, name="init_obj_f")
@@ -560,6 +584,13 @@
        implicit none
        type(yggobj) :: out
      end function init_obj_c
+     subroutine set_obj_c(x, obj, copy) bind(c, name="set_obj_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_int
+       implicit none
+       type(c_ptr), value :: x
+       type(c_ptr), value :: obj
+       integer(kind=c_int), value :: copy
+     end subroutine set_obj_c
      subroutine free_obj_c(p) bind(c, name="free_obj_f")
        use, intrinsic :: iso_c_binding, only: c_ptr
        implicit none
@@ -583,6 +614,14 @@
        implicit none
        type(yggobj), value, intent(in) :: p
      end subroutine display_obj_c
+     function nelements_obj_c(p, name) result(out) bind(c, name="nelements_obj_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_int
+       import :: yggobj
+       implicit none
+       type(yggobj), value, intent(in) :: p
+       character(kind=c_char), dimension(*), intent(in) :: name
+       integer(kind=c_int) :: out
+     end function nelements_obj_c
 
      ! Generic interface
      function init_generic_c() result(out) &
@@ -603,16 +642,16 @@
        implicit none
        type(ygggeneric) :: out
      end function init_generic_map_c
-     function create_generic_c(type_class, data, nbytes) result(out) &
-          bind(c, name="create_generic_f")
-       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr
-       import :: ygggeneric
-       implicit none
-       type(c_ptr), value, intent(in) :: type_class
-       type(c_ptr), value, intent(in) :: data
-       integer(kind=c_size_t), value, intent(in) :: nbytes
-       type(ygggeneric) :: out
-     end function create_generic_c
+     ! function create_generic_c(type_class, data, nbytes) result(out) &
+     !      bind(c, name="create_generic_f")
+     !   use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr
+     !   import :: ygggeneric
+     !   implicit none
+     !   type(c_ptr), value, intent(in) :: type_class
+     !   type(c_ptr), value, intent(in) :: data
+     !   integer(kind=c_size_t), value, intent(in) :: nbytes
+     !   type(ygggeneric) :: out
+     ! end function create_generic_c
      function free_generic_c(x) result(out) &
           bind(c, name="free_generic_f")
        use, intrinsic :: iso_c_binding, only: c_int, c_ptr
@@ -629,6 +668,15 @@
        type(ygggeneric), value, intent(in) :: x
        integer(kind=c_int) :: out
      end function is_generic_init_c
+     function copy_generic_into_c(dst, src) result(out) &
+          bind(c, name="copy_generic_into_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(c_ptr), value :: dst
+       type(ygggeneric), value, intent(in) :: src
+       integer(kind=c_int) :: out
+     end function copy_generic_into_c
      function copy_generic_c(src) result(out) &
           bind(c, name="copy_generic_f")
        import :: ygggeneric
@@ -670,6 +718,16 @@
        type(c_ptr), value :: x
        integer(kind=c_int) :: out
      end function get_generic_array_c
+     function get_generic_array_ref_c(arr, i, x) result(out) &
+          bind(c, name="get_generic_array_ref_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_size_t, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value, intent(in) :: arr
+       integer(kind=c_size_t), value, intent(in) :: i
+       type(c_ptr), value :: x
+       integer(kind=c_int) :: out
+     end function get_generic_array_ref_c
      function set_generic_object_c(arr, k, x) result(out) &
           bind(c, name="set_generic_object_f")
        use, intrinsic :: iso_c_binding, only: c_int, c_char
@@ -690,6 +748,16 @@
        type(c_ptr), value :: x
        integer(kind=c_int) :: out
      end function get_generic_object_c
+     function get_generic_object_ref_c(arr, k, x) result(out) &
+          bind(c, name="get_generic_object_ref_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: arr
+       character(kind=c_char), dimension(*), intent(in) :: k
+       type(c_ptr), value :: x
+       integer(kind=c_int) :: out
+     end function get_generic_object_ref_c
 
      ! Python interface
      function init_python_c() result(out) &
@@ -736,13 +804,14 @@
        character(kind=c_char), dimension(*), intent(in) :: type
        type(c_ptr) :: out
      end function generic_array_get_item_c
-     function generic_array_get_item_nbytes_c(x, index) result(out) &
+     function generic_array_get_item_nbytes_c(x, index, type) result(out) &
           bind(c, name="generic_array_get_item_nbytes_f")
-       use, intrinsic :: iso_c_binding, only: c_size_t, c_int
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_int, c_char
        import :: ygggeneric
        implicit none
        type(ygggeneric), value :: x
        integer(kind=c_size_t), value, intent(in) :: index
+       character(kind=c_char), dimension(*), intent(in) :: type
        integer(kind=c_int) :: out
      end function generic_array_get_item_nbytes_c
      function generic_array_get_scalar_c(x, index, subtype, precision) &
@@ -875,13 +944,14 @@
        character(kind=c_char), dimension(*), intent(in) :: type
        type(c_ptr) :: out
      end function generic_map_get_item_c
-     function generic_map_get_item_nbytes_c(x, key) result(out) &
+     function generic_map_get_item_nbytes_c(x, key, type) result(out) &
           bind(c, name="generic_map_get_item_nbytes_f")
        use, intrinsic :: iso_c_binding, only: c_char, c_int
        import :: ygggeneric
        implicit none
        type(ygggeneric), value :: x
        character(kind=c_char), dimension(*), intent(in) :: key
+       character(kind=c_char), dimension(*), intent(in) :: type
        integer(kind=c_int) :: out
      end function generic_map_get_item_nbytes_c
      function generic_map_get_scalar_c(x, key, subtype, precision) &
@@ -980,6 +1050,12 @@
        character(kind=c_char), dimension(*), intent(in) :: units
        integer(kind=c_int) :: out
      end function generic_map_set_ndarray_c
+     function init_python_API_c() result(out) &
+          bind(c, name="init_python_API_f")
+       use, intrinsic :: iso_c_binding, only: c_int
+       implicit none
+       integer(kind=c_int) :: out
+     end function init_python_API_c
 
   end interface
 #endif ! DOXYGEN_SHOULD_SKIP_THIS

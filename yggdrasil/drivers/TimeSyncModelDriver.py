@@ -53,7 +53,7 @@ class TimeSyncModelDriver(DSLModelDriver):
 
     """
 
-    _schema_subtype_description = ('Model is dedicated to synchronizing'
+    _schema_subtype_description = ('Model is dedicated to synchronizing '
                                    'timesteps between other models.')
     _schema_properties = {
         'synonyms': {'type': 'object',
@@ -97,7 +97,11 @@ class TimeSyncModelDriver(DSLModelDriver):
             'type': 'object',
             'additionalProperties': {'type': 'array',
                                      'items': {'type': 'string'}},
-            'default': {}}}
+            'default': {}},
+        'args': {'type': 'array', 'default': [],
+                 'items': {'type': ['string', 'number']},
+                 'allowSingular': True}}
+    _schema_no_default_subtype = True
     language = 'timesync'
     executable_type = 'other'
 

@@ -1492,23 +1492,36 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
             install_flags += f" --r-interpreter={R_exe}"
         elif _on_gha and _is_unix and not param.install_opts['no_sudo']:
             install_flags += ' --sudoR'
-    install_called = False
+    src_dir = os.path.dirname(os.path.dirname(__file__))
+    if not os.path.isabs(src_dir):
+        src_dir = os.path.abspath(src_dir)
+    cmds += [
+        f"cd {os.path.dirname(src_dir)}",  # avoid accidentally calling local
+        f"{param.python_cmd} -m yggdrasil install all{install_flags}"]
+    # TODO: Call configure?
     if _on_ci or param.for_development:
         coverage_flags = ''
         if _on_ci:
-            coverage_flags += " --from-env"
+            coverage_flags += " --method=env"
         else:
-            install_called = True
-            coverage_flags += install_flags
-        src_dir = os.path.dirname(os.path.dirname(__file__))
-        if not os.path.isabs(src_dir):
-            src_dir = os.path.abspath(src_dir)
+            cover = []
+            dont_cover = []
+            for k in ['c', 'lpy', 'R', 'fortran', 'sbml']:
+                if param.install_opts[k.lower()]:
+                    cover.append(k)
+                else:
+                    dont_cover.append(k)
+            if cover:
+                coverage_flags += f" --cover {' '.join(cover)}"
+            if dont_cover:
+                coverage_flags += f" --dont-cover {' '.join(dont_cover)}"
+        coverage_flags += (
+            f" --filename={os.path.join(os.getcwd(), '.coveragerc')}")
+        coverage_flags += (
+            f" --setup-cfg={os.path.join(_pkg_dir, 'setup.cfg')}")
         cmds += [
-            f"cd {src_dir}",
-            f"{param.python_cmd} create_coveragerc.py {coverage_flags}",
-            f"cd {os.getcwd()}"]
-    if not install_called:
-        cmds += [f"{param.python_cmd} -m yggdrasil install all{install_flags}"]
+            f"{param.python_cmd} -m yggdrasil coveragerc{coverage_flags}"]
+    cmds += [f"cd {os.getcwd()}"]
     if return_commands:
         return cmds
     call_script(cmds, param=param)
@@ -1700,7 +1713,10 @@ def verify_pkg(install_opts=None):
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
-        print(fd.read())
+        contents = fd.read()
+        print(f"{os.path.join(os.getcwd(), '.coveragerc')}: \n"
+              f"{contents}")
+        assert contents
     subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
     if install_opts['c']:
         subprocess.check_call(["yggccflags"], cwd=src_dir)

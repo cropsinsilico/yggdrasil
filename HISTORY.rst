@@ -2,6 +2,27 @@
 History
 =======
 
+1.9.0 (2023-04-07) Migrate to using extended version of rapidjson/python-rapidjson for serialization
+------------------
+
+* Dropped support for Python 3.5
+* Changed rapidjson submodule to extended version
+* Vendor python-rapidjson extension
+* Removed jsonschema requirement
+* Updated yggdrasil to use the vendored rapidjson for serialization, validation, normalization, and units
+* Removed majority of datatypes submodule. rapidjson should be used for type validation, normalization, and serialization
+* Removed C and C++ API for AsciiFile and AsciiTable
+* Changed how tables are parsed such that rows in single column tables will be read as arrays unless otherwise specified via the YAML option 'transform: select_scalar'
+* Updated utility scripts and package parameters to build extension
+* Changed native string types in languages to be used for JSON string values
+* In C, C++, and Fortran, if Python objects will be sent/received the model must initialize Python via "init_python_API()" (a subroutine in Fortran). If a model is a wrapped function, this will be added automatically.
+* Change all JSON serialization to use rapidjson, removing JSONDecoder, JSONEncoder, & JSONEncoderReadable in the process.
+* C++ interface now expects C++ classes for generic, array, object, ply, & obj types. Send methods should pass pointers to these objects. Formatted_io examples for these types have been updated to reflect these changes.
+* Unpinned libroadrunner dependency for SBML
+* Removed the 'serializer_class' and 'serializer_kwargs' from accepted communication keyword arguments. Serializer classes can be accessed via the seritype string associated with them in the schema and keyword arguments for serializer construction can be passed in a dictionary via 'serializer'.
+* Removed 'typedef' attribute from serializer class, 'datatype' should be used instead
+* Removed use of 'header_kwargs' keyword argument from serializer 'serialize' method. Use 'metadata' instead.
+
 1.8.5 (2023-03-01) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
 ------------------
 * Fix bug where yggcompile was compiling some languages multiple times

@@ -813,8 +813,8 @@ def get_supported_type():
         list: The names of data types supported by yggdrasil.
 
     """
-    from yggdrasil.metaschema.datatypes import get_registered_types
-    return list(get_registered_types().keys())
+    from yggdrasil import rapidjson
+    return rapidjson.get_metaschema()['definitions']['simpleTypes']['enum']
 
 
 def get_supported_comm(dont_include_value=False):
@@ -1048,18 +1048,24 @@ def safe_eval(statement, **kwargs):
 
     """
     safe_dict = {}
-    _safe_lists = {'math': ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
-                            'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
-                            'frexp', 'hypot', 'ldexp', 'log', 'log10', 'modf', 'pi',
-                            'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'],
-                   'builtins': ['abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
-                                'list', 'map', 'max', 'min', 'repr', 'set', 'str',
-                                'sum', 'tuple', 'type'],
-                   'numpy': ['array', 'int8', 'int16', 'int32', 'int64',
-                             'uint8', 'uint16', 'uint32', 'uint64',
-                             'float16', 'float32', 'float64'],
-                   'yggdrasil.units': ['get_data', 'add_units'],
-                   'unyt.array': ['unyt_quantity', 'unyt_array']}
+    _safe_lists = {
+        'math': [
+            'acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
+            'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
+            'frexp', 'hypot', 'ldexp', 'log', 'log10', 'modf', 'pi',
+            'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'],
+        'builtins': [
+            'abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
+            'list', 'map', 'max', 'min', 'repr', 'set', 'str',
+            'sum', 'tuple', 'type'],
+        'numpy': [
+            'array', 'int8', 'int16', 'int32', 'int64',
+            'uint8', 'uint16', 'uint32', 'uint64',
+            'float16', 'float32', 'float64'],
+        'yggdrasil.units': [
+            'get_data', 'add_units'],
+        'yggdrasil.rapidjson.units': [
+            'Quantity', 'QuantityArray']}
     for mod_name, func_list in _safe_lists.items():
         mod = importlib.import_module(mod_name)
         for func in func_list:

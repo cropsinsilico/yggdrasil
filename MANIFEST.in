@@ -45,6 +45,7 @@ graft docs
 include versioneer.py
 include yggdrasil/_version.py
 include create_coveragerc.py
+graft _vendor/python_rapidjson
 include utils/*.py
 include utils/requirements/*.txt
 include utils/requirements/*.yaml

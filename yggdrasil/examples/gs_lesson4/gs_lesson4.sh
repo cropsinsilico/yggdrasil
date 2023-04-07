@@ -36,6 +36,10 @@ case $1 in
 	echo "Running CMake"
 	yaml='gs_lesson4_cmake.yml'
 	;;
+    -f | --fortran)
+	echo "Running Fortran"
+	yaml='gs_lesson4_fortran.yml'
+	;;
 esac
 
 yggrun $yaml

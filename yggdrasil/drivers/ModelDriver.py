@@ -11,10 +11,10 @@ import tempfile
 import asyncio
 from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, languages, multitasking, constants
+from yggdrasil import (
+    platform, tools, languages, multitasking, constants, rapidjson)
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
-from yggdrasil.metaschema.datatypes import is_default_typedef
 from queue import Empty
 logger = logging.getLogger(__name__)
 
@@ -333,7 +333,8 @@ class ModelDriver(Driver):
 
     _schema_type = 'model'
     _schema_subtype_key = 'language'
-    _schema_required = ['name', 'language', 'args', 'working_dir']
+    _schema_required = ['name', 'language', 'args', 'working_dir',
+                        'inputs', 'outputs']
     _schema_properties = {
         'name': {'type': 'string'},
         'language': {'type': 'string', 'default': 'executable',
@@ -343,16 +344,33 @@ class ModelDriver(Driver):
                          'languages can be found :ref:`here <'
                          'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
-                 'items': {'type': 'string', 'minLength': 1}},
-        'inputs': {'type': 'array', 'default': [],
-                   'items': {'$ref': '#/definitions/comm'},
+                 'items': {'type': ['string', 'number']},
+                 'allowSingular': True},
+        'inputs': {'type': 'array',
+                   'default': [{'name': 'input',
+                                'commtype': 'default',
+                                'datatype': constants.DEFAULT_DATATYPE,
+                                'is_default': True}],
+                   'items': {'anyOf': [{'$ref': '#/definitions/comm'},
+                                       {'$ref': '#/definitions/comm_driver'},
+                                       {'$ref': '#/definitions/file_driver'}]},
+                   'allowSingular': True,
+                   'aliases': ['input', 'input_file', 'input_files'],
                    'description': (
                        'Zero or more channels carrying input to the model. '
                        'A full description of channel entries and the '
                        'options available for channels can be found '
                        ':ref:`here<yaml_comm_options>`.')},
-        'outputs': {'type': 'array', 'default': [],
-                    'items': {'$ref': '#/definitions/comm'},
+        'outputs': {'type': 'array',
+                    'default': [{'name': 'output',
+                                 'commtype': 'default',
+                                 'datatype': constants.DEFAULT_DATATYPE,
+                                 'is_default': True}],
+                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
+                                        {'$ref': '#/definitions/comm_driver'},
+                                        {'$ref': '#/definitions/file_driver'}]},
+                    'allowSingular': True,
+                    'aliases': ['output', 'output_file', 'output_files'],
                     'description': (
                         'Zero or more channels carrying output from the '
                         'model. A full description of channel entries and '
@@ -377,40 +395,28 @@ class ModelDriver(Driver):
                                  'additionalProperties': False}],
                       'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
-                      'default': []},
+                      'default': [], 'allowSingular': True},
         'timesync': {
-            'anyOf': [
-                {'type': 'boolean'}, {'type': 'string'},
-                {'type': 'object',
-                 'required': ['name'],
-                 'properties': {
-                     'name': {'type': 'string', 'default': 'timesync'},
-                     'inputs': {'anyOf': [
-                         {'type': 'string'},
-                         {'type': 'array',
-                          'items': {'type': 'string'}}]},
-                     'outputs': {'anyOf': [
-                         {'type': 'string'},
-                         {'type': 'array',
-                          'items': {'type': 'string'}}]}}},
-                {'type': 'array',
-                 'items': {
-                     'anyOf': [
-                         {'type': 'string'},
-                         {'type': 'object',
-                          'required': ['name'],
-                          'properties': {
-                              'name': {'type': 'string',
-                                       'default': 'timesync'},
-                              'inputs': {'anyOf': [
-                                  {'type': 'string'},
-                                  {'type': 'array',
-                                   'items': {'type': 'string'}}]},
-                              'outputs': {'anyOf': [
-                                  {'type': 'string'},
-                                  {'type': 'array',
-                                   'items': {'type': 'string'}}]}}}]}}],
-            'default': False},
+            'type': 'array',
+            'allowSingular': True,
+            'items': {
+                'anyOf': [
+                    {'type': 'string'},
+                    {'type': 'boolean'},
+                    {'type': 'object',
+                     'required': ['name'],
+                     'properties': {
+                         'name': {'type': 'string',
+                                  'default': 'timesync'},
+                         'inputs': {'type': 'array',
+                                    'allowSingular': True,
+                                    'aliases': ['input'],
+                                    'items': {'type': 'string'}},
+                         'outputs': {'type': 'array',
+                                     'allowSingular': True,
+                                     'aliases': ['output'],
+                                     'items': {'type': 'string'}}}}]},
+            'default': [False]},
         'with_debugger': {'type': 'string'},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
@@ -456,7 +462,15 @@ class ModelDriver(Driver):
                      'additionalProperties': False}]}}}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
-    
+    _schema_additional_kwargs_base = {
+        'pushProperties': {
+            ('$properties/inputs/items/anyOf/0/allOf/0/properties/'
+             'default_file'): ['working_dir'],
+            ('$properties/outputs/items/anyOf/0/allOf/0/properties/'
+             'default_file'): ['working_dir'],
+            '$properties/inputs/items/anyOf/2': ['working_dir'],
+            '$properties/outputs/items/anyOf/2': ['working_dir']}}
+
     language = None
     language_ext = None
     language_aliases = []
@@ -516,6 +530,7 @@ class ModelDriver(Driver):
         self._inv_mpi_tags = {v: k for k, v in self._mpi_tags.items()}
         self.model_outputs_in_inputs = outputs_in_inputs
         self.preparsed_function = preparsed_function
+        kwargs['additional_component_properties'] = {'args': args}
         super(ModelDriver, self).__init__(name, **kwargs)
         if self.overwrite is None:
             self.overwrite = (not self.preserve_cache)
@@ -2043,10 +2058,10 @@ class ModelDriver(Driver):
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
         assert io in ['inputs', 'outputs']
-        if ('%s_def_regex' % io) not in cls.function_param:  # pragma: debug
+        if f'{io}_def_regex' not in cls.function_param:  # pragma: debug
             raise NotImplementedError(
-                ("'%s_def_regex' not defined for "
-                 "language %s.") % (io, cls.language))
+                f"'{io}_def_regex' not defined for "
+                f"language {cls.language}.")
         if 'multiple_outputs' in cls.function_param:
             multi_re = cls.function_param['multiple_outputs']
             for x in '[]()':
@@ -2056,7 +2071,7 @@ class ModelDriver(Driver):
             if match is not None:
                 value = match.group(1)
         new_val = []
-        io_re = cls.format_function_param('%s_def_regex' % io)
+        io_re = cls.format_function_param(f'{io}_def_regex')
         for i, ivar in enumerate(cls.split_variables(value)):
             igrp = {'name': ivar}
             x = re.search(io_re, ivar)
@@ -2356,6 +2371,7 @@ class ModelDriver(Driver):
                 model does not use a flag variable.
 
         """
+        from yggdrasil.datatypes import is_default_typedef
         # Read info from the source code
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
              or (contents is not None))):  # pragma: debug
@@ -2392,34 +2408,34 @@ class ModelDriver(Driver):
                     continue
                 var_name = x['name'].split(':')[-1]
                 if var_name in io_map:
-                    x['vars'] = [var_name]
+                    x['vars'] = [{'name': var_name}]
                     for k in ['length', 'shape', 'ndim']:
                         kvar = '%s_var' % k
                         if kvar in io_map[var_name]:
-                            x['vars'].append(io_map[var_name][kvar])
+                            x['vars'].append({"name": io_map[var_name][kvar]})
         # Move variables if outputs in inputs
         if outputs_in_inputs:
             if ((((len(inputs) + len(outputs)) == len(info.get('inputs', [])))
                  and (len(info.get('outputs', [])) == 0))):
                 for i, vdict in enumerate(info['inputs'][:len(inputs)]):
-                    inputs[i].setdefault('vars', [vdict['name']])
-                    assert inputs[i]['vars'] == [vdict['name']]
+                    inputs[i].setdefault('vars', [{'name': vdict['name']}])
+                    assert len(inputs[i]['vars']) == 1
+                    assert inputs[i]['vars'][0]['name'] == vdict['name']
                 for i, vdict in enumerate(info['inputs'][len(inputs):]):
-                    outputs[i].setdefault('vars', [vdict['name']])
-                    assert outputs[i]['vars'] == [vdict['name']]
+                    outputs[i].setdefault('vars', [{'name': vdict['name']}])
+                    assert len(outputs[i]['vars']) == 1
+                    assert outputs[i]['vars'][0]['name'] == vdict['name']
             for x in outputs:
                 for i, v in enumerate(x.get('vars', [])):
-                    if v in info_map['inputs']:
-                        info_map['outputs'][v] = cls.input2output(
-                            info_map['inputs'].pop(v))
+                    if v['name'] in info_map['inputs']:
+                        info_map['outputs'][v['name']] = cls.input2output(
+                            info_map['inputs'].pop(v['name']))
         for io, io_var in zip(['inputs', 'outputs'], [inputs, outputs]):
             for x in io_var:
                 x['channel_name'] = x['name']
                 x['channel'] = (x['name'].split(':', 1)[-1]
                                 + '_%s_channel' % io[:-1])
                 for i, v in enumerate(x.get('vars', [])):
-                    if isinstance(v, str):
-                        v = {'name': v}
                     if v['name'] in info_map[io]:
                         info_map[io][v['name']].update(v)
                         x['vars'][i] = info_map[io][v['name']]
@@ -2441,7 +2457,6 @@ class ModelDriver(Driver):
                     for v in x['vars']:
                         if k + '_var' in v:
                             v[k + '_var'] = info_map[io][v[k + '_var']]
-                            # v[k + '_var']['is_' + k + '_var'] = True
                             v[k + '_var']['is_length_var'] = True
                         else:
                             v[k + '_var'] = False
@@ -2464,6 +2479,7 @@ class ModelDriver(Driver):
                 elif any('datatype' in x for x in non_length):
                     if (len(non_length) == 1):
                         x['datatype'] = non_length[0]['datatype']
+                        x['datatype']['allowWrapped'] = True
                     else:
                         x['datatype'] = {
                             'type': 'array',
@@ -2567,7 +2583,7 @@ class ModelDriver(Driver):
         iter_ovars = []
         if iter_function_over:
             iter_function_idx = {'name': 'idx_func_iter',
-                                 'datatype': {'type': 'int'}}
+                                 'datatype': {'type': 'integer'}}
             if cls.zero_based:
                 iter_function_idx['begin'] = int(0)
             else:
@@ -2627,6 +2643,9 @@ class ModelDriver(Driver):
                         v, definitions=definitions,
                         requires_freeing=free_vars)
             lines += definitions
+        if 'python_init' in cls.function_param:
+            # TODO: Check if python is used?
+            lines += [cls.function_param['python_init'], '']
         nline_preamble = len(lines)
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
@@ -2735,9 +2754,11 @@ class ModelDriver(Driver):
                                    imports={'filename': model_file,
                                             'function': model_function})
         if verbose:  # pragma: debug
-            logger.info('\n' + '\n'.join(out))
+            logger.info('\n' + '\n'.join(
+                [f"{i + 1:3}: {x}" for i, x in enumerate(out)]))
         else:
-            logger.debug('\n' + '\n'.join(out))
+            logger.debug('\n' + '\n'.join(
+                [f"{i + 1:3}: {x}" for i, x in enumerate(out)]))
         return out
 
     @classmethod
@@ -2825,7 +2846,7 @@ class ModelDriver(Driver):
                 out += cls.write_declaration(
                     {'name': '%s_keys' % name_base,
                      'datatype': {
-                         'type': '1darray', 'subtype': 'bytes',
+                         'type': '1darray', 'subtype': 'string',
                          'length': len(datatype['properties']),
                          'precision': precision}},
                     definitions=definitions,
@@ -2854,7 +2875,8 @@ class ModelDriver(Driver):
                     {'name': '%s_shape' % name_base,
                      'datatype': {
                          'type': '1darray', 'subtype': 'int',
-                         'precision': 64, 'length': len(datatype['shape'])}},
+                         'precision': rapidjson.SIZE_OF_SIZE_T,
+                         'length': len(datatype['shape'])}},
                     definitions=definitions,
                     requires_freeing=requires_freeing)
         elif datatype['type'] in (['ply', 'obj', '1darray', 'scalar',
@@ -2894,119 +2916,22 @@ class ModelDriver(Driver):
             keys['use_generic'] = cls.function_param['true']
         else:
             keys['use_generic'] = cls.function_param['false']
-        typename = datatype['type']
-        if name_base is None:
-            name_base = name
-        if datatype['type'] == 'array':
-            if 'items' in datatype:
-                assert isinstance(datatype['items'], list)
-                keys['nitems'] = len(datatype['items'])
-                keys['items'] = '%s_items' % name_base
-                if cls.zero_based:
-                    idx_offset = 0
-                else:
-                    idx_offset = 1
-                for i, x in enumerate(datatype['items']):
-                    # Prevent recusion
-                    x_copy = copy.deepcopy(x)
-                    x_copy.pop('items', None)
-                    x_copy.pop('properties', None)
-                    out += cls.write_type_def(
-                        cls.format_function_param(
-                            'index', variable=keys['items'],
-                            index=(i + idx_offset)), x_copy,
-                        name_base=('%s_item%d' % (name_base, i)),
-                        use_generic=use_generic)
-            else:
-                keys['nitems'] = 0
-                keys['items'] = cls.function_param['null']
-                keys['use_generic'] = cls.function_param['true']
-        elif datatype['type'] == 'object':
-            keys['use_generic'] = cls.function_param['true']
-            if 'properties' in datatype:
-                assert isinstance(datatype['properties'], dict)
-                keys['nitems'] = len(datatype['properties'])
-                keys['keys'] = '%s_keys' % name_base
-                keys['values'] = '%s_vals' % name_base
-                if cls.zero_based:
-                    idx_offset = 0
-                else:
-                    idx_offset = 1
-                for i, (k, v) in enumerate(datatype['properties'].items()):
-                    # Prevent recusion
-                    v_copy = copy.deepcopy(v)
-                    v_copy.pop('items', None)
-                    v_copy.pop('properties', None)
-                    out.append(cls.format_function_param(
-                        'assign', value='\"%s\"' % k,
-                        name=cls.format_function_param(
-                            'index', variable=keys['keys'],
-                            index=(i + idx_offset))))
-                    out += cls.write_type_def(
-                        cls.format_function_param(
-                            'index', variable=keys['values'],
-                            index=(i + idx_offset)), v_copy,
-                        name_base=('%s_prop%d' % (name_base, i)),
-                        use_generic=use_generic)
-            else:
-                keys['nitems'] = 0
-                keys['keys'] = cls.function_param['null']
-                keys['values'] = cls.function_param['null']
-        elif datatype['type'] in ['ply', 'obj']:
-            pass
-        elif datatype['type'] == '1darray':
-            for k in ['subtype', 'precision']:
-                keys[k] = datatype[k]
-            keys['precision'] = int(keys['precision'])
-            keys['length'] = datatype.get('length', '0')
-            keys['units'] = datatype.get('units', '')
-        elif datatype['type'] == 'ndarray':
-            for k in ['subtype', 'precision']:
-                keys[k] = datatype[k]
-            keys['precision'] = int(keys['precision'])
-            if 'shape' in datatype:
-                shape_var = '%s_shape' % name_base
-                if cls.zero_based:
-                    idx_offset = 0
-                else:
-                    idx_offset = 1
-                for i, x in enumerate(datatype['shape']):
-                    out.append(cls.format_function_param(
-                        'assign', value=x,
-                        name=cls.format_function_param(
-                            'index', variable=shape_var,
-                            index=(i + idx_offset))))
-                keys['ndim'] = len(datatype['shape'])
-                keys['shape'] = shape_var
-                typename = 'ndarray_arr'
-            else:
-                keys['ndim'] = 0
-                keys['shape'] = cls.function_param['null']
-            keys['units'] = datatype.get('units', '')
-        elif (typename == 'scalar') or (typename in constants.VALID_TYPES):
-            keys['subtype'] = datatype.get('subtype', datatype['type'])
-            keys['units'] = datatype.get('units', '')
-            if keys['subtype'] in ['bytes', 'string', 'unicode']:
-                keys['precision'] = int(datatype.get('precision', 0))
-            else:
-                keys['precision'] = int(datatype['precision'])
-            typename = 'scalar'
-        elif datatype['type'] in ['boolean', 'null', 'number',
-                                  'integer', 'string']:
-            keys['type'] = datatype['type']
-            typename = 'default'
-        elif (typename in ['class', 'function']):
-            keys['type'] = typename
-            typename = 'pyobj'
-        elif typename in ['instance', 'any']:
-            keys['use_generic'] = cls.function_param['true']
-            typename = 'empty'
-        elif typename in ['schema']:
-            keys['use_generic'] = cls.function_param['true']
-        else:  # pragma: debug
-            raise ValueError("Cannot create %s version of type '%s'"
-                             % (cls.language, typename))
-        fmt = cls.format_function_param('init_type_%s' % typename, **keys)
+        assert 'init_type_from_schema' in cls.function_param
+        datatype_ = copy.deepcopy(datatype)
+        datatype_.pop('from_function', None)
+        for k in ['precision', 'length', 'ndim', 'shape']:
+            if k in datatype_ and not datatype_[k]:
+                datatype_.pop(k)
+        if datatype_.get('type', None) == '1darray':
+            datatype_['type'] = 'ndarray'
+            if 'length' in datatype_:
+                datatype_['shape'] = [datatype_.pop('length')]
+            if 'shape' not in datatype_:
+                datatype_['ndim'] = 1
+        keys['schema'] = rapidjson.dumps(datatype_).replace(
+            '"', cls.function_param.get('escaped_double_quote', '\\"'))
+        fmt = cls.format_function_param(
+            'init_type_from_schema', **keys)
         out.append(cls.format_function_param('assign', name=name,
                                              value=fmt))
         return out
@@ -3044,15 +2969,17 @@ class ModelDriver(Driver):
         for k in try_keys:
             if k in kwargs:
                 v = kwargs[k]
-                if not isinstance(v, list):
-                    v = [v]
                 try_vals += v
         # This last transform is used because the others are assumed
         # to be applied by the connection driver
-        if try_vals and isinstance(try_vals[-1], str):
-            try_key = '%s_%s' % (try_vals[-1], key)
-            if ((('python_interface' in cls.function_param)
-                 and (try_key in cls.python_interface))):
+        if try_vals:
+            transform_type = try_vals[-1]
+            if isinstance(transform_type, dict):
+                transform_type = transform_type.get('transformtype', None)
+            try_key = f"{transform_type}_{key}"
+            if ((isinstance(transform_type, str)
+                 and 'python_interface' in cls.function_param
+                 and try_key in cls.python_interface)):
                 kwargs['python_interface'] = cls.python_interface[try_key]
                 if ((('format_str' in kwargs)
                      and ('python_interface_format' in cls.function_param))):
@@ -3768,7 +3695,13 @@ class ModelDriver(Driver):
         if force_split:
             isplit = length_allow
         else:
-            isplit = line[:length_allow].rindex(' ') + 1
+            char_break = cls.function_param.get('continuation_break', ' ')
+            for c in char_break:
+                if c in line[:length_allow]:
+                    isplit = line[:length_allow].rindex(c) + 1
+                    break
+            else:  # pragma: debug
+                isplit = len(line)
         if (isplit < nindent + 1) or (isplit >= len(line)):
             out = [line]
         else:
@@ -3815,12 +3748,14 @@ class ModelDriver(Driver):
         return var
 
     @classmethod
-    def get_native_type(cls, **kwargs):
+    def get_native_type(cls, return_json=False, **kwargs):
         r"""Get the native type.
 
         Args:
             type (str, optional): Name of |yggdrasil| extended JSON
                 type or JSONSchema dictionary defining a datatype.
+            return_json (bool, optional): If True, the returned value will
+                also include the JSON datatype.
             **kwargs: Additional keyword arguments may be used in determining
                 the precise declaration that should be used.
 
@@ -3829,9 +3764,12 @@ class ModelDriver(Driver):
 
         """
         if 'native_type' in kwargs:
-            return kwargs['native_type']
+            out = kwargs['native_type']
+            if return_json:
+                out = (out, kwargs.get('json_type', kwargs))
+            return out
         assert 'json_type' not in kwargs
-        json_type = kwargs.get('datatype', kwargs)
+        json_type = copy.deepcopy(kwargs.get('datatype', kwargs))
         if isinstance(json_type, dict):
             type_name = json_type.get('type', 'bytes')
         else:
@@ -3839,8 +3777,33 @@ class ModelDriver(Driver):
             json_type = kwargs
         if type_name == 'scalar':
             type_name = json_type['subtype']
+            if type_name == 'string':
+                type_name = 'unicode'
+                if json_type.get('encoding', 'ASCII') == 'ASCII':
+                    type_name = 'bytes'
         if (type_name == 'flag') and (type_name not in cls.type_map):
             type_name = 'boolean'
+        if ((kwargs.get('is_length_var', False)
+             and 'length' in cls.type_map
+             and type_name != '1darray')):
+            type_name = 'length'
+        if return_json:
+            json_type.setdefault('type', type_name)
+            if not (any(x in ['comm', 'dtype', '1darray_pointer',
+                              'ndarray_pointer', 'flag']
+                        for x in [json_type.get('subtype', None),
+                                  json_type['type']])):
+                length = json_type.pop('length', None)
+                if json_type.get('type', None) != 'length':
+                    try:
+                        json_type = rapidjson.normalize(
+                            json_type, {'type': 'schema'})
+                    except rapidjson.NormalizationError:  # pragma: debug
+                        print(f"Invalid schema: {json_type}")
+                        raise
+                    if length is not None:
+                        json_type['length'] = length
+            return cls.type_map[type_name], json_type
         return cls.type_map[type_name]
 
     @classmethod
@@ -4411,11 +4374,11 @@ class ModelDriver(Driver):
             write_function_def_params=[
                 {'inputs': [{'name': 'x', 'value': 1.0,
                              'datatype': {'type': 'float',
-                                          'precision': 32,
+                                          'precision': 4,
                                           'units': 'cm'}}],
                  'outputs': [{'name': 'y',
                               'datatype': {'type': 'float',
-                                           'precision': 32,
+                                           'precision': 4,
                                            'units': 'cm'}}]}],
             split_lines=[('abcdef', {'length': 3, 'force_split': True},
                           ['abc', 'def']),

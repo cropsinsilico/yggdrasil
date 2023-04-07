@@ -1506,7 +1506,7 @@ class YggTask(YggClass):
         if self._ygg_target:
             self._ygg_target(*self._ygg_args, **self._ygg_kwargs)
 
-    def run_error(self):
+    def run_error(self):  # pragma: debug
         r"""Actions to perform on error in try/except wrapping run."""
         self.exception("%s ERROR", self.context.task_method.upper())
         self.set_flag_attr('error_flag')
@@ -1789,7 +1789,7 @@ class YggTaskLoop(YggTask):
         with self.lock:
             self._loop_count += 1
 
-    def run_error(self):
+    def run_error(self):  # pragma: debug
         r"""Actions to perform on error in try/except wrapping run."""
         super(YggTaskLoop, self).run_error()
         self.debug("run_error")

@@ -43,6 +43,8 @@ def register_example(example_dir):
     if example_base in ['rpcFib', 'maxMsg']:
         lang_search = example_base + 'Cli_%s.yml'
         lang_avail += ['all', 'all_nomatlab']
+    elif example_base == 'rpc_lesson3b':
+        lang_search = 'server_%s.yml'
     elif example_base.startswith('rpc_'):
         lang_search = 'client_%s.yml'
     elif example_base == 'root_to_shoot':
@@ -99,6 +101,11 @@ def register_example(example_dir):
                          '%sSrv_%s.yml' % (example_base, lang_set[1])]
             src_names = ['%sCli%s' % (example_base, ext_map[lang_set[0]]),
                          '%sSrv%s' % (example_base, ext_map[lang_set[1]])]
+        elif example_base == 'rpc_lesson3b':
+            yml_names = ['server_%s.yml' % lang,
+                         'client_%s.yml' % 'c']
+            src_names = ['server%s' % ext_map[lang],
+                         'client%s' % ext_map['c']]
         elif example_base.startswith('rpc_'):
             yml_names = ['server_%s.yml' % lang,
                          'client_%s.yml' % lang]

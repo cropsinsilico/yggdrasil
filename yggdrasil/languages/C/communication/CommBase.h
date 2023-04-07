@@ -13,7 +13,6 @@ extern "C" {
 /*! @brief Bit flags. */
 #define COMM_FLAG_VALID   0x00000001  //!< Set if the comm is initialized
 #define COMM_FLAG_GLOBAL  0x00000002  //!< Set if the comm is global
-#define COMM_FLAG_FILE    0x00000004  //!< Set if the comm connects to a file
 #define COMM_FLAG_WORKER  0x00000008  //!< Set if the comm is a work comm
 #define COMM_FLAG_CLIENT  0x00000010  //!< Set if the comm is a client
 #define COMM_FLAG_SERVER  0x00000020  //!< Set if the comm is a server
@@ -139,7 +138,7 @@ comm_t empty_comm_base() {
   @returns comm_t* Address of comm structure.
 */
 static inline
-comm_t* new_comm_base(char *address, const char *direction,
+comm_t* new_comm_base(const char *address, const char *direction,
 		      const comm_type t, dtype_t* datatype) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
   if (ret == NULL) {

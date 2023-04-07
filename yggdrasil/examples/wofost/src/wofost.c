@@ -70,9 +70,6 @@ int main(int argc, char *argv[]) {
 
   // Free dynamically allocated obj structure
   free_generic(&obj);
-  free(amaxtb_x);
-  free(amaxtb_y);
-  free(keys);
   
   return 0;
 }

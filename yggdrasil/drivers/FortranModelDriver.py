@@ -3,7 +3,7 @@ import re
 import copy
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, tools, constants
+from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -154,6 +154,7 @@ class FortranModelDriver(CompiledModelDriver):
         zmq={'libraries': [('c', x) for x in
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
+    standard_libraries = []
     external_libraries = {'cxx': {'include': 'stdlib.h',
                                   'libtype': 'shared',
                                   'language': 'c'}}
@@ -188,6 +189,7 @@ class FortranModelDriver(CompiledModelDriver):
         'array': 'yggarr',
         'object': 'yggmap',
         'integer': 'integer',
+        'number': 'real(kind = 8)',
         'boolean': 'logical(kind = X)',
         'null': 'yggnull',
         'uint': 'ygguintX',  # Fortran has no unsigned int
@@ -250,6 +252,8 @@ class FortranModelDriver(CompiledModelDriver):
         'init_function': 'yggpyfunc(init_python())',
         'init_instance': 'yggpyinst(init_generic())',
         'init_any': 'init_generic()',
+        'init_type_from_schema': ('create_dtype_from_schema(\"{schema}\"'
+                                  ', {use_generic})'),
         'init_type_array': ('create_dtype_json_array({nitems}, '
                             '{items}, {use_generic})'),
         'init_type_object': ('create_dtype_json_object({nitems}, '
@@ -282,8 +286,8 @@ class FortranModelDriver(CompiledModelDriver):
         'copy_class': '{name} = copy_python({value})',
         'copy_function': '{name} = yggpyfunc(copy_python(yggpython({value})))',
         'copy_instance': '{name} = yggpyinst(copy_generic(ygggeneric({value})))',
-        'copy_generic': '{name} = copy_generic({value})',
-        'copy_any': '{name} = copy_generic({value})',
+        'copy_generic': 'call copy_generic_into({name}, {value})',
+        'copy_any': 'call copy_generic_into({name}, {value})',
         'free_array': 'call free_generic(ygggeneric({variable}))',
         'free_object': 'call free_generic(ygggeneric({variable}))',
         'free_schema': 'call free_generic(ygggeneric({variable}))',
@@ -316,8 +320,10 @@ class FortranModelDriver(CompiledModelDriver):
         'or': '.or.',
         'indent': 3 * ' ',
         'quote': "'",
+        'escaped_double_quote': "\"\"",
         'error': ("write(*, \'(\"{error_msg}\")\')\n"
                   "stop 1"),
+        'continuation_break': (',', '{', ' '),
         'continuation_before': '&',
         'continuation_after': '     &',
         'block_end': 'END',
@@ -332,6 +338,7 @@ class FortranModelDriver(CompiledModelDriver):
         'break': 'EXIT',
         'exec_begin': 'PROGRAM main\n   use iso_c_binding\n   use fygg',
         'exec_end': '   stop\nEND PROGRAM main',
+        'python_init': 'call init_python_API()',
         'free': 'DEALLOCATE({variable})',
         'function_def_begin': (
             'FUNCTION {function_name}({input_var}) '
@@ -373,6 +380,10 @@ class FortranModelDriver(CompiledModelDriver):
             r'(?:\s*,\s*(?P<parameter>parameter))?'
             r'(?:\s*,\s*intent\((?P<intent>.*?)\))?')
     }
+    default_type_precision = {
+        'real': 4,
+        'integer': 4
+    }
     outputs_in_inputs = True
     include_channel_obj = True
     is_typed = True
@@ -410,10 +421,14 @@ class FortranModelDriver(CompiledModelDriver):
                 else:
                     # GNU takes precedence when present
                     add_cxx_lib = 'stdc++'
-            if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
-                cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
+            if add_cxx_lib and (add_cxx_lib not in cls.standard_libraries):
+                cls.standard_libraries.append(add_cxx_lib)
                 cls.internal_libraries['fygg']['external_dependencies'].append(
                     add_cxx_lib)
+            # if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
+            #     cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
+            #     cls.internal_libraries['fygg']['external_dependencies'].append(
+            #         add_cxx_lib)
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
@@ -494,7 +509,7 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = super(FortranModelDriver, cls).get_inverse_type_map()
-        out['yggchar_r'] = 'bytes'
+        out['yggchar_r'] = 'string'
         return out
         
     @classmethod
@@ -511,7 +526,8 @@ class FortranModelDriver(CompiledModelDriver):
             str: The native type.
 
         """
-        out = super(FortranModelDriver, cls).get_native_type(**kwargs)
+        out, json_type = super(FortranModelDriver, cls).get_native_type(
+            return_json=True, **kwargs)
         intent_regex = r'(,\s*intent\(.+?\))'
         for x in re.finditer(intent_regex, out):
             out = out.replace(x.group(0), '')
@@ -534,15 +550,6 @@ class FortranModelDriver(CompiledModelDriver):
             if out.startswith('ygg'):
                 out = 'type(%s)' % out
             return out
-        from yggdrasil.metaschema.datatypes import get_type_class
-        json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
-        if isinstance(json_type, str):  # pragma: no cover
-            json_type = {'type': json_type}
-        if 'type' in kwargs:  # pragma: no cover
-            json_type.update(kwargs)
-        assert isinstance(json_type, dict)
-        json_type = get_type_class(json_type['type']).normalize_definition(
-            json_type)
         if out == '*':
             dim_str = ''
             if json_type['type'] == '1darray':
@@ -553,7 +560,7 @@ class FortranModelDriver(CompiledModelDriver):
                     dim_str = ', dimension(%s)' % ','.join(
                         [str(x) for x in json_type['shape']])
             json_subtype = copy.deepcopy(json_type)
-            json_subtype['type'] = json_subtype.pop('subtype')
+            json_subtype['type'] = 'scalar'
             out = cls.get_native_type(datatype=json_subtype) + dim_str
             if not dim_str:
                 json_subtype['type'] = out.split('(')[0]
@@ -561,7 +568,7 @@ class FortranModelDriver(CompiledModelDriver):
                     json_subtype['precision'] = ''
                     raise RuntimeError("Character array requires precision.")
                 else:
-                    json_subtype['precision'] = int(json_subtype['precision'] / 8)
+                    json_subtype['precision'] = int(json_subtype['precision'])
                 json_subtype.setdefault('ndim', 'n')
                 out = 'type(%s)' % cls.get_native_type(
                     type=('%s_pointer' % json_type['type'])).format(
@@ -573,14 +580,17 @@ class FortranModelDriver(CompiledModelDriver):
                 if out.startswith('ygguint'):
                     out = 'type(%s)' % out
                 if out.startswith('logical'):
-                    precision = json_type.get('precision', 8)
+                    precision = json_type.get('precision', 1)
                 elif out.startswith('complex'):
                     precision = json_type['precision'] / 2
-                elif json_type.get('subtype', json_type['type']) == 'unicode':
+                elif (json_type.get('subtype', json_type['type']) == 'unicode'
+                      or (json_type.get('subtype', json_type['type'])
+                          in ['string', 'bytes']
+                          and json_type.get('encoding', 'ascii') != 'ascii')):
                     precision = json_type['precision'] / 4
                 else:
                     precision = json_type['precision']
-                out = out.replace('X', str(int(precision / 8)))
+                out = out.replace('X', str(int(precision)))
         return out
         
     @classmethod
@@ -608,15 +618,17 @@ class FortranModelDriver(CompiledModelDriver):
             grp = {'type': 'ygguintX',
                    'precision': grp['type'].split('ygguint')[-1]}
         if grp.get('precision', False):
-            out['precision'] = 8 * int(grp['precision'])
+            out['precision'] = int(grp['precision'])
             if grp['type'] == 'complex':
                 out['precision'] *= 2
+        elif grp['type'] in cls.default_type_precision:
+            out['precision'] = cls.default_type_precision[grp['type']]
         if (((grp.get('precision', False) or (grp['type'] == 'logical'))
              and (grp['type'] != 'ygguintX'))):
             grp['type'] += '(kind = X)'
         if grp['type'] == 'character':
             if grp.get('length', None):
-                out['precision'] = int(grp.get('length', 0)) * 8
+                out['precision'] = int(grp.get('length', 0))
             if grp.get('precision_var', None) == 'selected_char_kind(\'ISO_10646\')':
                 grp['type'] += '(kind = selected_char_kind(\'ISO_10646\'), len = X)'
                 if grp.get('length', None):
@@ -646,7 +658,7 @@ class FortranModelDriver(CompiledModelDriver):
                 out['type'] = 'ndarray'
                 if shape[0] not in '*:':
                     out['shape'] = [int(i) for i in shape]
-        if out['type'] in constants.VALID_TYPES:
+        if out['type'] in constants.SCALAR_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
         return out
@@ -944,14 +956,16 @@ class FortranModelDriver(CompiledModelDriver):
                 if isinstance(datatype, str):
                     datatype = {'type': datatype}
                 if (((datatype.get('subtype', datatype.get('type', None))
-                      in ['bytes', 'unicode'])
+                      in constants.FLEXIBLE_TYPES)
                      and ('precision' not in datatype))):
                     return True
                 elif (((datatype.get('type', None) == '1darray')
-                       and ('length' not in datatype))):
+                       and ('length' not in datatype)
+                       and ('shape' not in datatype))):
                     return True
                 elif (((datatype.get('type', None) == 'ndarray')
-                       and ('shape' not in datatype))):
+                       and ('shape' not in datatype)
+                       and ('length' not in datatype))):
                     return True
         return False
         
@@ -1099,12 +1113,8 @@ class FortranModelDriver(CompiledModelDriver):
             list: Lines printing the specified variable.
 
         """
-        if isinstance(var, dict):
-            datatype = var.get('datatype', var)
-            typename = datatype.get('type', None)
-            if ((((typename == '1darray') and ('length' not in datatype))
-                 or ((typename == 'ndarray') and ('shape' not in datatype)))):
-                return []
+        if cls.allows_realloc(var):
+            return []
         return super(FortranModelDriver, cls).write_print_var(
             var, **kwargs)
 
@@ -1131,11 +1141,11 @@ class FortranModelDriver(CompiledModelDriver):
                 datatype = dict(datatype, shape=[])
             if 'ndim' not in datatype:
                 datatype = dict(datatype, ndim=len(datatype['shape']))
-        if datatype.get('subtype', datatype['type']) in ['bytes', 'unicode']:
+        if datatype.get('subtype', datatype['type']) in constants.FLEXIBLE_TYPES:
             if 'precision' not in datatype:
                 datatype = dict(datatype, precision=0)
-        elif datatype.get('subtype', datatype['type']) in constants.VALID_TYPES:
-            datatype.setdefault('precision', 32)
+        elif datatype.get('subtype', datatype['type']) in constants.SCALAR_TYPES:
+            datatype.setdefault('precision', 4)
         out = super(FortranModelDriver, cls).write_type_def(
             name, datatype, **kwargs)
         return out
@@ -1224,8 +1234,7 @@ class FortranModelDriver(CompiledModelDriver):
             knew = k
             vnew = v
             if v == '*':
-                knew = {'type': k, 'subtype': 'float',
-                        'precision': 32}
+                knew = {'type': k, 'subtype': 'float', 'precision': 4}
                 vnew = 'real(kind = 4)'
                 if k == '1darray':
                     knew['length'] = 3
@@ -1235,11 +1244,17 @@ class FortranModelDriver(CompiledModelDriver):
                     vnew += ', dimension(3,4)'
             elif 'X' in v:
                 if vnew.startswith('complex'):
-                    knew = {'type': knew, 'precision': 128}
+                    knew = {'type': 'scalar', 'subtype': knew,
+                            'precision': 16}
+                elif k == 'boolean':
+                    knew = {'type': knew}
+                    vnew = vnew.replace('X', '1')
                 elif 'ISO_10646' in vnew:
-                    knew = {'type': knew, 'precision': 4 * 64}
+                    knew = {'type': 'scalar', 'subtype': knew,
+                            'encoding': 'UCS4', 'precision': 32}
                 else:
-                    knew = {'type': knew, 'precision': 64}
+                    knew = {'type': 'scalar', 'subtype': knew,
+                            'precision': 8}
                 vnew = vnew.replace('X', '8')
             if vnew.startswith('ygg'):
                 vnew = 'type(%s)' % vnew
@@ -1251,18 +1266,18 @@ class FortranModelDriver(CompiledModelDriver):
             # Single output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'outputs_in_inputs': False,
              'dont_add_lengths': True},
             # No output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [],
              'outputs_in_inputs': False},
@@ -1274,7 +1289,7 @@ class FortranModelDriver(CompiledModelDriver):
                                       'units': ''}},
                         {'name': 'length_x', 'value': 5,
                          'datatype': {'type': 'uint',
-                                      'precision': 64},
+                                      'precision': rapidjson.SIZE_OF_SIZE_T},
                          'is_length_var': True}],
              'outputs': [{'name': 'y',
                           'length_var': 'length_y',
@@ -1283,28 +1298,28 @@ class FortranModelDriver(CompiledModelDriver):
                                        'units': ''}},
                          {'name': 'length_y',
                           'datatype': {'type': 'uint',
-                                       'precision': 64},
+                                       'precision': rapidjson.SIZE_OF_SIZE_T},
                           'is_length_var': True}],
              'dont_add_lengths': True},
             # Returns output instead of parameter
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'outputs_in_inputs': False,
              'guess_at_outputs_in_inputs': True},
             # Guess at outputs in inputs
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'guess_at_outputs_in_inputs': True},
         ]

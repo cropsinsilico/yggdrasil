@@ -17,3 +17,4 @@ class ObjFileComm(PlyFileComm):
         'data format for 3D structures.')
     _default_serializer = 'obj'
     _default_extension = '.obj'
+    _deprecated_drivers = ['ObjFileInputDriver', 'ObjFileOutputDriver']

@@ -66,7 +66,7 @@ class TestFileInputDriver(base_class):
 
     @pytest.fixture
     def assert_before_stop(self, instance, recv_message_list,
-                           recv_comm, testing_options, unyts_equality_patch,
+                           recv_comm, testing_options,
                            pandas_equality_patch):
         r"""Assertions to make before stopping the driver instance."""
         def assert_before_stop_w():

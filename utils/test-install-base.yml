@@ -37,7 +37,7 @@ jobs:
       os-versions: ${{ steps.set-os-versions.outputs.versions }}
     steps:
       - id: set-os-versions
-        run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"2019\"}" >> $GITHUB_OUTPUT
+        run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}" >> $GITHUB_OUTPUT
   test_pip:
     needs: params
     name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c }}
@@ -133,6 +133,9 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up Matlab
+      uses: matlab-actions/setup-matlab@v1
+      if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: |
@@ -215,6 +218,9 @@ jobs:
     - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       run: ./utils/setup_old_mac_sdk.sh
+    - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
+      if: runner.os == 'Linux' && matrix.install-sbml == true
+      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
     - name: (CONDA) Install dependencies & package from existing build
       id: conda_install
       continue-on-error: true
@@ -240,17 +246,17 @@ jobs:
       shell: cmd /C CALL {0}
       run: |
         cmake -h
-        pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
     - name: Run tests (1st)
       timeout-minutes: 120
       id: test1
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all --second-attempt
 
     - name: Run generated test script (1st)
       timeout-minutes: 120
@@ -267,12 +273,12 @@ jobs:
       timeout-minutes: 120
       if: ${{ matrix.test-flags2 != '' }}
       id: test2
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
     - name: Re-run test failures (2nd)
       timeout-minutes: 120
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all --second-attempt
 
     - name: Run generated test script (2nd)
       timeout-minutes: 120
@@ -300,7 +306,7 @@ jobs:
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       run: |
         # ls .*
-        coverage xml
+        coverage xml -i
     - name: Upload coverage report
       uses: codecov/codecov-action@v3
       with:
@@ -364,6 +370,14 @@ jobs:
             install-c: true
             install-mpi: false
             install-sbml: true
+          # - os-base: ubuntu
+          #   python-version: "3.10"
+          #   install-method: conda
+          #   test-flags1: --long-running
+          #   test-flags2: ""
+          #   install-c: true
+          #   install-mpi: false
+          #   install-sbml: false
           - os-base: macos
             python-version: 3.8
             install-method: conda

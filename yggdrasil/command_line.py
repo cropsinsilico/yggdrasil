@@ -20,14 +20,16 @@ package_dir = os.path.dirname(os.path.abspath(__file__))
 def githook():
     r"""Git hook to determine if the Github workflow need to be
     re-generated."""
-    try:
-        files = subprocess.check_output(
-            ["git", "diff-index", "--cached", "--name-only",
-             "--diff-filter=ACMRTUXB", "HEAD"],
-            stderr=subprocess.PIPE).decode('utf-8').splitlines()
-    except subprocess.CalledProcessError:
-        return 1
-    regen = (os.path.join('utils', 'test-install-base.yml') in files)
+    # This check is not required when using pre-commit package
+    # try:
+    #     files = subprocess.check_output(
+    #         ["git", "diff-index", "--cached", "--name-only",
+    #          "--diff-filter=ACMRTUXB", "HEAD"],
+    #         stderr=subprocess.PIPE).decode('utf-8').splitlines()
+    # except subprocess.CalledProcessError:
+    #     return 1
+    # regen = (os.path.join('utils', 'test-install-base.yml') in files)
+    regen = True
     if regen:
         try:
             gitdir = subprocess.check_output(
@@ -243,6 +245,18 @@ class yggrun(SubCommand):
         (('--with-asan', ),
          {'action': 'store_true',
           'help': 'Compile models with the address sanitizer enabled.'}),
+        (('--as-service', ),
+         {'action': 'store_true',
+          'help': 'Run the provided YAMLs as a service.'}),
+        (('--partial-commtype', ),
+         {'type': str, 'default': 'rest',
+          'help': ('Type of communicator to use for partial comms when '
+                   '--as-service is passed')}),
+        (('--client-id', ),
+         {'type': str,
+          'help': ('ID associated with the client requesting a service. '
+                   '(This should only be passed when running with '
+                   '--as-service)')}),
     ]
 
     @classmethod
@@ -268,13 +282,26 @@ class yggrun(SubCommand):
         from yggdrasil import runner, config
         prog = sys.argv[0].split(os.path.sep)[-1]
         with config.parser_config(args):
-            runner.run(args.yamlfile, ygg_debug_prefix=prog,
-                       production_run=args.production_run,
-                       mpi_tag_start=args.mpi_tag_start,
-                       validate=args.validate,
-                       with_debugger=args.with_debugger,
-                       disable_python_c_api=args.disable_python_c_api,
-                       with_asan=args.with_asan)
+            kwargs = dict(
+                ygg_debug_prefix=prog,
+                production_run=args.production_run,
+                mpi_tag_start=args.mpi_tag_start,
+                validate=args.validate,
+                with_debugger=args.with_debugger,
+                disable_python_c_api=args.disable_python_c_api,
+                with_asan=args.with_asan,
+                as_service=args.as_service)
+            if args.as_service:
+                kwargs['complete_partial'] = True
+                if not args.partial_commtype:
+                    args.partial_commtype = 'rest'
+            if args.partial_commtype:
+                kwargs['partial_commtype'] = {
+                    'commtype': args.partial_commtype}
+                if args.as_service and args.partial_commtype == 'rest':
+                    assert args.client_id
+                    kwargs['partial_commtype']['client_id'] = args.client_id
+            runner.run(args.yamlfile, **kwargs)
 
 
 class integration_service_manager(SubCommand):
@@ -868,6 +895,12 @@ class ygginfo(SubCommand):
                 for k, v in sysconfig.get_config_vars().items():
                     vardict.append((curr_prefix + k, v))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+                # ASAN library
+                asan_library = None
+                Cdrv = import_component("model", "c")
+                if Cdrv.is_installed():
+                    asan_library = Cdrv.get_tool("compiler").asan_library()
+                vardict.append(("Asan Library:", asan_library))
         finally:
             # Print things
             max_len = max(len(x[0]) for x in vardict)
@@ -1209,7 +1242,7 @@ class ygginstall(SubCommand):
           {'nargs': '*',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
            'default': [],
-           'help': 'One or more languages that should be configured.'}),
+           'help': 'One or more languages that should be installed.'}),
          (('--no-import', ),
           {'action': 'store_true',
            'help': ('Don\'t import the yggdrasil package in '
@@ -1229,6 +1262,7 @@ class ygginstall(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.languages import install_languages
+        from yggdrasil import config
         languages = args.languages
         if (((isinstance(languages, str) and (languages == 'all'))
              or (isinstance(languages, list) and ('all' in languages)))):
@@ -1240,6 +1274,8 @@ class ygginstall(SubCommand):
             CModelDriver.set_asan_env(os.environ)
         for x in languages:
             install_languages.install_language(x, args=args)
+        if not os.path.isfile(config.usr_config_file):
+            config.update_language_config(verbose=True)
 
 
 class update_config(SubCommand):
@@ -1408,22 +1444,6 @@ class update_config(SubCommand):
             lang_kwargs=lang_kwargs)
 
 
-class regen_metaschema(SubCommand):
-    r"""Regenerate the yggdrasil metaschema."""
-
-    name = "metaschema"
-    help = "Regenerate the yggdrasil metaschema."
-
-    @classmethod
-    def func(cls, args):
-        from yggdrasil import metaschema
-        if os.path.isfile(metaschema._metaschema_fname):
-            os.remove(metaschema._metaschema_fname)
-        metaschema._metaschema = None
-        metaschema._validator = None
-        metaschema.get_metaschema()
-
-
 class regen_schema(SubCommand):
     r"""Regenerate the yggdrasil schema."""
 
@@ -1433,16 +1453,21 @@ class regen_schema(SubCommand):
         (('--only-constants', ),
          {'action': 'store_true',
           'help': ('Only update the constants.py file without updating '
-                   'the schema.')})]
+                   'the schema.')}),
+        (('--filename', ),
+         {'type': str,
+          'help': 'Name where schema should be saved.'})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil import schema
         if not args.only_constants:
-            if os.path.isfile(schema._schema_fname):
-                os.remove(schema._schema_fname)
+            if args.filename is None:
+                args.filename = schema._schema_fname
+            if os.path.isfile(args.filename):
+                os.remove(args.filename)
             schema.clear_schema()
-            schema.init_schema()
+            schema.init_schema(fname=args.filename)
         else:
             schema.update_constants()
 
@@ -1540,6 +1565,64 @@ class timing_plots(SubCommand):
             timing.plot_scalings(compare=args.comparison)
 
 
+class coveragerc(SubCommand):
+    r"""Create a .coveragerc file."""
+
+    name = "coveragerc"
+    help = (
+        "Generate a coveragerc file that covers/ignores lines based on "
+        "installed languages or options.")
+    arguments = [
+        (('--method', ),
+         {'choices': ['installed', 'env', None],
+          'default': None,
+          'help': ("Method that should be used to select languages that "
+                   "should be covered. 'env' covers languages based on "
+                   "the value of environment variables of the form "
+                   "'INSTALL{language}'. 'installed' covers languages "
+                   "that yggdrasil considers installed.")}),
+        (('--cover-languages', '--cover-language', '--cover'),
+         {'nargs': '*',
+          'choices': LANGUAGES.get('all', []),
+          'help': "Language(s) to cover."}),
+        (('--dont-cover-languages', '--dont-cover-language',
+          '--dont-cover'),
+         {'nargs': '*',
+          'choices': LANGUAGES.get('all', []),
+          'help': "Language(s) to ignore in coverage."}),
+        (('--filename', ),
+         {'type': str, 'default': None,
+          'help': "File to save coveragerc to"}),
+        (('--setup-cfg', ),
+         {'type': str, 'default': None,
+          'help': "setup.cfg file containing coverage options"}),
+    ]
+
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.tools import is_lang_installed
+        from yggdrasil.config import create_coveragerc
+        covered_languages = {}
+        if args.method == 'env':
+            for k in LANGUAGES['all']:
+                v = os.environ.get(f"INSTALL{k.upper()}", None)
+                if v is not None:
+                    covered_languages[k] = (v == '1')
+        elif args.method == 'installed':
+            for k in LANGUAGES['all']:
+                covered_languages[k] = is_lang_installed(k)
+        if args.cover_languages:
+            for k in args.cover_languages:
+                covered_languages[k] = True
+        if args.dont_cover_languages:
+            for k in args.dont_cover_languages:
+                covered_languages[k] = False
+        for k in LANGUAGES['all']:
+            covered_languages.setdefault(k, True)
+        create_coveragerc(covered_languages, filename=args.filename,
+                          setup_cfg=args.setup_cfg)
+
+
 class generate_gha_workflow(SubCommand):
     r"""Re-generate the Github actions workflow yaml."""
 
@@ -1561,7 +1644,7 @@ class generate_gha_workflow(SubCommand):
     @classmethod
     def func(cls, args, gitdir=None):
         import yaml
-        from yggdrasil.metaschema.encoder import decode_yaml, encode_yaml
+        from yggdrasil.serialize.YAMLSerialize import decode_yaml, encode_yaml
         from collections import OrderedDict
 
         class NoAliasDumper(yaml.SafeDumper):
@@ -1640,11 +1723,10 @@ class main(SubCommand):
     arguments = []
     subcommands = [yggrun, ygginfo, validate_yaml,
                    yggcc, yggcompile, yggclean,
-                   ygginstall, update_config,
-                   regen_metaschema, regen_schema,
+                   ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,
                    timing_plots, generate_gha_workflow,
-                   integration_service_manager]
+                   integration_service_manager, coveragerc]
 
     @classmethod
     def get_parser(cls, **kwargs):

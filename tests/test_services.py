@@ -255,8 +255,8 @@ def test_validate_model_repo():
             repo = git.Repo.clone_from(x, dest)
             model_dir = os.path.join(dest, "models")
             if os.path.isdir(model_dir):
-                # This condition can be removed once there are models in the
-                # non-dev repository
+                # This condition can be removed once there are models
+                # in the non-dev repository
                 validate_model_submission(model_dir)
             repo.close()
         finally:

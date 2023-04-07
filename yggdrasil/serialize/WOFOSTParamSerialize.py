@@ -1,9 +1,7 @@
 import re
-import json
 import numpy as np
-from yggdrasil import tools, units
+from yggdrasil import tools, units, rapidjson
 from yggdrasil.serialize.AsciiMapSerialize import AsciiMapSerialize
-from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
 
 class WOFOSTParamSerialize(AsciiMapSerialize):
@@ -49,10 +47,13 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                 iline += (',\n' + indent).join(arr_lines)
             elif isinstance(v, str):
                 iline += "\'%s\'" % v
+            elif hasattr(v, 'units'):
+                iline += rapidjson.dumps(
+                    float(v), yggdrasil_mode=rapidjson.YM_READABLE)
+                iline += f'\t! [{v.units}]'
             else:
-                iline += json.dumps(v, cls=JSONReadableEncoder)
-                if hasattr(v, 'units'):
-                    iline += f'\t! [{v.units}]'
+                iline += rapidjson.dumps(
+                    v, yggdrasil_mode=rapidjson.YM_READABLE)
             lines.append(iline)
         return tools.str2bytes('\n'.join(lines))
 
@@ -71,14 +72,13 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                         "kg P": "kg",
                         "kg-1 dry biomass": "kg-1",
                         "kg CH2O": "kg",
-                        "days": "d",
-                        "cel": "degC"}
+                        "cel": "degC",
+                        "degC d": "ΔdegC d"}
         for k, v in replacements.items():
             x = x.replace(k, v)
         if x == '-':
             x = ""
-        out = units.convert_R_unit_string(x)
-        return out
+        return x
             
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -121,7 +121,7 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                 else:
                     out[k] = units.add_units(
                         out[k], self.parse_units(k_units))
-        
+
         for line in lines:
             if (not line.strip()) or line.startswith('**'):
                 continue
@@ -150,14 +150,14 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                     v1 = match['value1'].strip('\'')
                 else:
                     try:
-                        v1 = json.loads(match['value1'])
-                    except json.decoder.JSONDecodeError:
+                        v1 = rapidjson.loads(match['value1'])
+                    except rapidjson.JSONDecodeError:
                         if match['value1'].endswith('.'):
-                            v1 = json.loads(match['value1'] + '0')
+                            v1 = rapidjson.loads(match['value1'] + '0')
                         else:  # pragma: debug
                             raise
                 if is_arr:
-                    v2 = json.loads(match['value2'])
+                    v2 = rapidjson.loads(match['value2'])
                     out[k][0].append(v1)
                     out[k][1].append(v2)
                 else:
@@ -197,17 +197,17 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
         out['objects'] = [{'CRPNAM': 'Grain maize CSA practicals',
                            'TBASEM': units.add_units(4.0, 'degC'),
                            'TEFFMX': units.add_units(30.0, 'degC'),
-                           'TSUMEM': units.add_units(110.0, 'degC*d'),
+                           'TSUMEM': units.add_units(110.0, 'ΔdegC*d'),
                            'IDSL': 0,
                            'DLO': units.add_units(-99.0, 'hr'),
                            'DLC': units.add_units(-99.0, 'hr'),
-                           'TSUM1': units.add_units(900.0, 'degC*d'),
-                           'TSUM2': units.add_units(800.0, 'degC*d'),
+                           'TSUM1': units.add_units(900.0, 'ΔdegC*d'),
+                           'TSUM2': units.add_units(800.0, 'ΔdegC*d'),
                            'DTSMTB': [
                                units.add_units(
                                    np.array([0.0, 10.0, 30.0, 35.0]), 'degC'),
                                units.add_units(
-                                   np.array([0.0, 0.0, 24.0, 24.0]), 'degC*d')],
+                                   np.array([0.0, 0.0, 24.0, 24.0]), 'ΔdegC*d')],
                            'DVSI': 0.0,
                            'DVSEND': 2.0,
                            'SSATB': [

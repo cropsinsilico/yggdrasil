@@ -33,10 +33,10 @@ class ForkedCommMessage(CommBase.CommMessage):
             msg_list = [copy.deepcopy(msg.args[i])
                         for i in range(len(comm_list))]
             kwargs.setdefault('flag', msg.flag)
-            if msg.header:
-                kwargs.setdefault('header_kwargs', msg.header)
         else:  # pragma: debug
             raise ValueError("Unsupported pattern: '%s'" % pattern)
+        if msg.header:
+            kwargs.setdefault('header_kwargs', msg.header)
         args = {i: x.prepare_message(msg_list[i], **kwargs)
                 for i, x in enumerate(comm_list)}
         self.orig = msg.args
@@ -414,7 +414,7 @@ class ForkComm(CommBase.CommBase):
                                        "scattered.")
                 for i, x in enumerate(self.comm_list):
                     imsg = copy.deepcopy(msg)
-                    imsg.header = {}
+                    imsg.header = {'__meta__': {}}
                     imsg.stype = msg.stype['items'][i]
                     imsg.args = msg.args[i]
                     x.update_serializer_from_message(imsg)

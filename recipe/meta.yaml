@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.8.5" %}
+{% set version = "1.9.0" %}
 {% set PY_VER_MAJOR = PY_VER.split('.')[0] %}
 {% set PY_VER_MINOR = PY_VER.split('.')[1] %}
 
@@ -28,7 +28,6 @@ build:
     - yggldtool = yggdrasil.command_line:ld_toolname
     - yggccflags = yggdrasil.command_line:cc_flags
     - yggldflags = yggdrasil.command_line:ld_flags
-    - yggmetaschema = yggdrasil.command_line:regen_metaschema
     - yggschema = yggdrasil.command_line:regen_schema
     - yggbuildapi_c = yggdrasil.command_line:rebuild_c_api
     - yggconfig = yggdrasil.command_line:update_config
@@ -47,8 +46,10 @@ build:
 requirements:
   build:
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - numpy >=1.13.0                         # [build_platform != target_platform]
+    - numpy >=1.13.0
     - python                                 # [build_platform != target_platform]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   host:
     - numpy >=1.13.0
     - pip
@@ -57,16 +58,15 @@ requirements:
   run:
     - GitPython
     - chevron
+    - deprecation
     - flask
     - git
-    - jsonschema ==3.2.0
     - matplotlib-base
     - numpy >=1.13.0
     - pandas
     - psutil
     - pyperf
     - python
-    - python-rapidjson
     - pyyaml
     - pyzmq
     - requests
@@ -195,6 +195,7 @@ outputs:
         - pytest-repeat
         - pytest-rerunfailures
         - pytest-timeout
+        - pytest-xdist
   - name: yggdrasil.docs
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

@@ -4,40 +4,36 @@
 #include "YggInterface.hpp"
 
 
-int timestep_calc(double t, const char* t_units, generic_t state) {
-  int ret = 0;
-  if (ret >= 0) {
-    ret = generic_map_set_double(state, "carbonAllocation2Roots", 10.0, "g");
+void timestep_calc(rapidjson::units::Quantity<double>& t,
+		   rapidjson::Document& state) {
+#define SET_(key, val)							\
+  if (!state.HasMember(key)) {						\
+    state.AddMember(key,						\
+		    rapidjson::Value(val),				\
+		    state.GetAllocator());				\
+  } else {								\
+    state[key].SetScalar(val);						\
   }
-  if (ret >= 0) {
-    ret = generic_map_set_double(state, "saturatedConductivity", 10.0, "cm/day");
-  }
-  return ret;
+  // TODO: Update timesync/OSR to convert units
+  // rapidjson::units::Quantity<double> x(10.0, "g");
+  // rapidjson::units::Quantity<double> y(10.0, "cm/day");
+  SET_("carbonAllocation2Roots", 10.0)
+  SET_("saturatedConductivity", 10.0)
 }
 
 
 int main(int argc, char *argv[]) {
 
-  double t_step = atof(argv[1]);
   char* t_units = argv[2];
-  int exit_code = 0;
-  printf("Hello from C++ other_model: timestep %f %s\n", t_step, t_units);
-  double t_start = 0.0;
-  double t_end = 1.0;
-  size_t nkeys, ikey;
-  char** keys = NULL;
-  if (strcmp(t_units, "hr") == 0) {
-    t_end = 24.0 * t_end;
-  }
-  int ret;
-  generic_t state_send = init_generic_map();
-  generic_t state_recv = init_generic_map();
-  ret = timestep_calc(t_start, t_units, state_send);
-  if (ret < 0) {
-    printf("other_model(C++): Error in initial timestep calculation.");
-    return -1;
-  }
-
+  rapidjson::units::Quantity<double> t_step(atof(argv[1]), t_units);
+  std::cout << "Hello from C++ other_model: timestep " << t_step << std::endl;
+  rapidjson::units::Quantity<double> t_start(0.0, t_units);
+  rapidjson::units::Quantity<double> t_end(1.0, "days");
+  rapidjson::Document state_send(rapidjson::kObjectType);
+  rapidjson::Document state_recv(rapidjson::kObjectType);
+  timestep_calc(t_start, state_send);
+  int ret = 0;
+  
   // Set up connections matching yaml
   // Timestep synchronization connection will default to 'timesync'
   YggTimesync timesync("timesync", t_units);
@@ -45,77 +41,61 @@ int main(int argc, char *argv[]) {
   YggOutput out("output", out_dtype);
 
   // Initialize state and synchronize with other models
-  double t = t_start;
-  ret = timesync.call(3, t, state_send, &state_recv);
+  rapidjson::units::Quantity<double> t = t_start;
+  ret = timesync.call(3, t.value(), &state_send, &state_recv);
   if (ret < 0) {
-    printf("other_model(C++): Initial sync failed.\n");
+    std::cerr << "other_model(C++): Initial sync failed." << std::endl;
     return -1;
   }
-  nkeys = generic_map_get_keys(state_recv, &keys);
-  printf("other_model(C++): t = %5.1f %-3s", t, t_units);
-  for (ikey = 0; ikey < nkeys; ikey++) {
-    printf(", %s = %+ 5.2f", keys[ikey],
-	   generic_map_get_double(state_recv, keys[ikey]));
-  }
-  printf("\n");
+  std::cout << "other_model(C++): t = " << t;
+  for (rapidjson::Value::MemberIterator it = state_recv.MemberBegin();
+       it != state_recv.MemberEnd(); it++)
+    std::cout << ", " << it->name.GetString() <<
+      " = " << it->value.GetDouble();
+  std::cout << std::endl;
 
   // Send initial state to output
-  generic_t msg = copy_generic(state_recv);
-  ret = generic_map_set_double(msg, "time", t, t_units);
+  rapidjson::Document msg;
+  msg.CopyFrom(state_recv, msg.GetAllocator());
+  msg.AddMember("time", rapidjson::Value(t).Move(), msg.GetAllocator());
+  ret = out.send(1, &msg);
   if (ret < 0) {
-    printf("other_model(C++): Failed to set time in initial output map.\n");
+    std::cerr << "other_model(C++): Failed to send initial output for t=" <<
+      t << std::endl;
     return -1;
   }
-  ret = out.send(1, msg);
-  if (ret < 0) {
-    printf("other_model(C++): Failed to send initial output for t=%f.\n", t);
-    return -1;
-  }
-  destroy_generic(&msg);
 
   // Iterate until end
   while (t < t_end) {
 
     // Perform calculations to update the state
     t = t + t_step;
-    ret = timestep_calc(t, t_units, state_send);
-    if (ret < 0) {
-      printf("other_model(C++): Error in timestep calculation for t = %f.\n", t);
-      return -1;
-    }
+    timestep_calc(t, state_send);
 
     // Synchronize the state
-    ret = timesync.call(3, t, state_send, &state_recv);
+    ret = timesync.call(3, t.value(), &state_send, &state_recv);
     if (ret < 0) {
-      printf("other_model(C++): sync for t=%f failed.\n", t);
+      std::cerr << "other_model(C++): sync for t=" << t << " failed" << std::endl;
       return -1;
     }
-    nkeys = generic_map_get_keys(state_recv, &keys);
-    printf("other_model(C++): t = %5.1f %-3s", t, t_units);
-    for (ikey = 0; ikey < nkeys; ikey++) {
-      printf(", %s = %+ 5.2f", keys[ikey],
-	     generic_map_get_double(state_recv, keys[ikey]));
-    }
-    printf("\n");
+    std::cout << "other_model(C++): t = " << t;
+    for (rapidjson::Value::MemberIterator it = state_recv.MemberBegin();
+	 it != state_recv.MemberEnd(); it++)
+      std::cout << ", " << it->name.GetString() <<
+	" = " << it->value.GetDouble();
+    std::cout << std::endl;
 
     // Send output
-    generic_t msg = copy_generic(state_recv);
-    ret = generic_map_set_double(msg, "time", t, t_units);
+    msg.CopyFrom(state_recv, msg.GetAllocator());
+    msg.AddMember("time", rapidjson::Value(t).Move(), msg.GetAllocator());
+    ret = out.send(1, &msg);
     if (ret < 0) {
-      printf("other_model(C++): Failed to set time in output map.\n");
+      std::cerr << "other_model(C++): Failed to send output for t=" << t << std::endl;
       return -1;
     }
-    ret = out.send(1, msg);
-    if (ret < 0) {
-      printf("other_model(C++): Failed to send output for t=%f.\n", t);
-      return -1;
-    }
-    destroy_generic(&msg);
   }
 
-  printf("Goodbye from C++ other_model\n");
-  destroy_generic(&state_send);
-  destroy_generic(&state_recv);
+  std::cout << "Goodbye from C++ other_model" << std::endl;
   return 0;
     
 }

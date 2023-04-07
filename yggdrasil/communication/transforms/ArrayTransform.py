@@ -3,16 +3,22 @@ import copy
 import pandas
 from yggdrasil import constants
 from yggdrasil.communication.transforms.TransformBase import TransformBase
-from yggdrasil.metaschema import type2numpy
+from yggdrasil.datatypes import type2numpy
 from yggdrasil.serialize import (
     consolidate_array, pandas2numpy, numpy2pandas, dict2list)
 
 
 class ArrayTransform(TransformBase):
-    r"""Class for consolidating values into an array."""
+    r"""Class for consolidating values into an array.
+
+    Args:
+        field_names (list, optional): Names of fields in the array.
+
+    """
     _transformtype = 'array'
     _schema_properties = {'field_names': {'type': 'array',
                                           'items': {'type': 'string'}}}
+    _schema_subtype_description = "Consolidate values into an array"
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.
@@ -353,24 +359,24 @@ class ArrayTransform(TransformBase):
         t = {'type': 'array',
              'items': [
                  {'type': '1darray', 'subtype': 'bytes',
-                  'precision': 40, 'length': length},
+                  'precision': 5, 'length': length},
                  {'type': '1darray', 'subtype': 'int',
-                  'precision': 64, 'length': length},
+                  'precision': 8, 'length': length},
                  {'type': '1darray', 'subtype': 'float',
-                  'precision': 64, 'length': length},
+                  'precision': 8, 'length': length},
                  {'type': '1darray', 'subtype': 'complex',
-                  'precision': 128, 'length': length}]}
+                  'precision': 16, 'length': length}]}
         t_prec = {
             'type': 'array',
             'items': [
                 {'type': '1darray', 'subtype': 'bytes',
                  'length': length},
                 {'type': '1darray', 'subtype': 'int',
-                 'precision': 64, 'length': length},
+                 'precision': 8, 'length': length},
                 {'type': '1darray', 'subtype': 'float',
-                 'precision': 64, 'length': length},
+                 'precision': 8, 'length': length},
                 {'type': '1darray', 'subtype': 'complex',
-                 'precision': 128, 'length': length}]}
+                 'precision': 16, 'length': length}]}
         t_arr = {'type': 'array',
                  'items': [{'type': 'array',
                             'items': [dict(i, type='scalar') for

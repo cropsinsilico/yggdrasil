@@ -24,6 +24,7 @@ class SelectFieldsTransform(TransformBase):
                           'original_order': {'type': 'array',
                                              'items': {'type': 'string'}},
                           'single_as_scalar': {'type': 'boolean'}}
+    _schema_subtype_description = "Select a subset of fields from a message"
 
     def set_original_datatype(self, datatype):
         r"""Set datatype.
@@ -41,7 +42,8 @@ class SelectFieldsTransform(TransformBase):
                 self.original_order = [x.get('title', 'f%d' % i) for i, x in
                                        enumerate(self.original_datatype['items'])]
             elif datatype['type'] == 'object':
-                self.original_order = list(datatype['properties'].keys())
+                self.original_order = sorted(
+                    list(datatype['properties'].keys()))
 
     @property
     def as_single(self):
@@ -100,6 +102,7 @@ class SelectFieldsTransform(TransformBase):
         elif datatype.get('type', None) == 'object':
             if self.as_single:
                 datatype = copy.deepcopy(datatype['properties'][self.selected[0]])
+                datatype.setdefault('title', self.selected[0])
             else:
                 datatype = copy.deepcopy(datatype)
                 datatype['properties'] = {k: datatype['properties'][k]
@@ -177,7 +180,7 @@ class SelectFieldsTransform(TransformBase):
                  'in/out_t': [({'type': 'object',
                                 'properties': {x: {'type': 'int'}
                                                for x in 'abc'}},
-                               {'type': 'int'})]},
+                               {'type': 'int', 'title': 'a'})]},
                 {'kwargs': {'selected': ['a', 'c'],
                             'original_datatype': {
                                 'type': 'array',

@@ -18,6 +18,7 @@ NUMPY_STRING_TYPES = [
     'str',
 ]
 NUMPY_TYPES = NUMPY_NUMERIC_TYPES + NUMPY_STRING_TYPES
+SCALAR_TYPES = [x for x in NUMPY_TYPES if x != 'str']
 FLEXIBLE_TYPES = [
     'string',
     'bytes',
@@ -28,13 +29,19 @@ PYTHON_SCALARS = OrderedDict([
     ('int', [int]),
     ('uint', []),
     ('complex', [complex]),
+    ('string', [bytes]),
     ('bytes', [bytes]),
     ('unicode', [str]),
+    ('number', [float]),
+    ('integer', [int]),
 ])
 VALID_TYPES = OrderedDict([(k, k) for k in NUMPY_NUMERIC_TYPES])
 VALID_TYPES.update([
+    ('string', 'bytes'),
     ('bytes', 'bytes'),
     ('unicode', 'str'),
+    ('number', 'float'),
+    ('integer', 'int'),
 ])
 NUMPY_PRECISIONS = {
     'float': [16, 32, 64],
@@ -42,6 +49,33 @@ NUMPY_PRECISIONS = {
     'uint': [8, 16, 32, 64],
     'complex': [64, 128],
 }
+JSON_SIMPLE_TYPES = OrderedDict([
+    ("null", ""),
+    ("boolean", "true or false"),
+    ("string", "Arrays of characters"),
+    ("integer", "Integer numbers"),
+    ("number", "Integer or decimal numbers"),
+])
+JSON_CONTAINER_TYPES = OrderedDict([
+    ("array", "Container for sequences of values"),
+    ("object", "Container for mappings of key and value pairs"),
+])
+
+YGGDRASIL_TYPES = OrderedDict([
+    ("scalar", ("Scalar quantities that can have units, variables "
+                "precision, or an encoding (for unicode scalars)")),
+    ("ndarray", ("N-dimensional arrays of memory contiguous arrays of "
+                 "scalars")),
+    ("instance", "Python class instance"),
+    ("class", "Python class"),
+    ("function", "Python function"),
+    ("obj", "ObjWavefront 3D structure"),
+    ("ply", "Ply 3D structure"),
+    ("schema", "JSON schema"),
+])
+ALL_TYPES = OrderedDict()
+for x in [JSON_SIMPLE_TYPES, JSON_CONTAINER_TYPES, YGGDRASIL_TYPES]:
+    ALL_TYPES.update(x)
 try:
     # Not available on windows
     np.dtype('float128')
@@ -63,6 +97,11 @@ for k, v in PYTHON_SCALARS.items():
     ALL_PYTHON_SCALARS += list(v)
 ALL_PYTHON_SCALARS = tuple(set(ALL_PYTHON_SCALARS))
 ALL_PYTHON_ARRAYS = (np.ndarray,)
+FIXED_ENCODING_SIZES = {
+    "UTF32": 4,
+    "UCS4": 4,
+    "ASCII": 1
+}
 
 
 # Serialization constants
@@ -75,6 +114,7 @@ FMT_CHAR_STR = FMT_CHAR.decode("utf-8")
 DEFAULT_COMMENT_STR = DEFAULT_COMMENT.decode("utf-8")
 DEFAULT_DELIMITER_STR = DEFAULT_DELIMITER.decode("utf-8")
 DEFAULT_NEWLINE_STR = DEFAULT_NEWLINE.decode("utf-8")
+DEFAULT_DATATYPE = {'type': 'scalar', 'subtype': 'string'}
 
 
 # Communication constants
@@ -217,6 +257,7 @@ COMPONENT_REGISTRY = {
             'map_fields': 'MapFieldsTransform',
             'pandas': 'PandasTransform',
             'select_fields': 'SelectFieldsTransform',
+            'select_scalar': 'SelectScalarTransform',
             'statement': 'StatementTransform',
         },
     },

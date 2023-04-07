@@ -10,7 +10,9 @@ import logging
 import argparse
 import subprocess
 import contextlib
-from yggdrasil import platform, constants
+from yggdrasil import platform, constants, rapidjson
+from yggdrasil.serialize.ObjSerialize import ObjDict
+from yggdrasil.serialize.PlySerialize import PlyDict
 from yggdrasil.tools import (
     get_supported_lang, get_supported_comm, get_supported_type,
     resolve_language_aliases)
@@ -30,7 +32,9 @@ _markers = [
      "tests for superfluous examples", None),
     ("production_run", "--production-run", None),
     ("remote_service", "--remote-service",
-     "tests that must connect to a running remote service", None)
+     "tests that must connect to a running remote service", None),
+    ("serial", "--serial",
+     "tests that must be run in serial", None)
 ]
 _params = {
     "example_name": [],
@@ -137,12 +141,12 @@ def setup_ci(args):
                            % (src_ver, dst_ver))
     subprocess.check_call(
         ["flake8", "yggdrasil", "--append-config", "setup.cfg"])
-    if os.environ.get("YGG_CONDA", None):
-        subprocess.check_call(["python", "create_coveragerc.py"])
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
-        print(fd.read())
+        contents = fd.read()
+        print(f".coveragerc (cwd={os.getcwd()}):\n{contents}")
+        assert contents
     subprocess.check_call(["yggdrasil", "info", "--verbose"])
 
 
@@ -526,6 +530,13 @@ def write_pytest_script(fname, argv):
 
 
 # Session level constants
+@pytest.fixture(scope="session",
+                params=[pytest.param(0, marks=pytest.mark.serial)])
+def serial():
+    r"""Test must be run in serial."""
+    pass
+
+
 @pytest.fixture(scope="session")
 def project_dir():
     r"""Directory in which yggdrasil is installed."""
@@ -850,7 +861,6 @@ def wait_on_function(timeout, polling_interval):
 @pytest.fixture
 def run_once(request):
     r"""Fixture indicating that the test should only be run once."""
-    print("IN RUN ONCE")
     key = (request.cls, request.function.__name__)
     if key in _test_registry:
         pytest.skip(f"{request.cls.__name__}.{request.function.__name__} "
@@ -952,7 +962,7 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
             return (not flag)
         wait_on_function(recv_element, timeout=timeout)
         if expected_result is not None:
-            assert msg_list == nested_approx(expected_result)
+            assert nested_approx(expected_result) == msg_list
         return msg_list
     return wrapped_recv_message_list
 
@@ -1074,29 +1084,6 @@ def pandas_equality_patch(monkeypatch, pandas_equality):
 
 
 @pytest.fixture(scope="session")
-def unyts_equality(nested_approx):
-    r"""Comparison operation for unyt quantities and arrays."""
-    import unyt
-
-    def unyts_equality_w(a, b):
-        if not isinstance(b, unyt.array.unyt_array):
-            return False
-        if a.units != b.units:
-            return False
-        return a.to_ndarray() == nested_approx(b.to_ndarray())
-    return unyts_equality_w
-
-
-@pytest.fixture
-def unyts_equality_patch(monkeypatch, unyts_equality):
-    r"""Patch unyt array so that data and units considered."""
-    import unyt
-    with monkeypatch.context() as m:
-        m.setattr(unyt.array.unyt_array, '__eq__', unyts_equality)
-        yield
-        
-
-@pytest.fixture(scope="session")
 def functions_equality():
     def functions_equality_w(a, b):
         a_str = f"{a.__module__}.{a.__name__}"
@@ -1112,7 +1099,6 @@ def nested_approx(patch_equality, pandas_equality):
     r"""Nest pytest.approx for assertion."""
     from collections import OrderedDict
     import pandas
-    import unyt
 
     def nested_approx_(x, **kwargs):
         if isinstance(x, dict):
@@ -1124,15 +1110,17 @@ def nested_approx(patch_equality, pandas_equality):
             return [nested_approx_(xx, **kwargs) for xx in x]
         elif isinstance(x, tuple):
             return tuple([nested_approx_(xx, **kwargs) for xx in x])
-        elif isinstance(x, pandas.DataFrame):
+        elif isinstance(x, (pandas.DataFrame, ObjDict, PlyDict)):
             return x
-        elif isinstance(x, (unyt.array.unyt_quantity, unyt.array.unyt_array)):
-            # from yggdrasil.units import get_ureg
-            # units = str(x.units)
-            # y = pytest.approx(x, **kwargs)
-            # dtype = x.to_ndarray().dtype
-            # return x.__class__(y, units, dtype=dtype, registry=get_ureg())
-            return x
+        elif isinstance(x, (rapidjson.units.Quantity,
+                            rapidjson.units.QuantityArray)):
+            
+            def units_equality(a, b):
+                if a.units != b.units:
+                    return False
+                return pytest.approx(a.value, **kwargs) == b.value
+            
+            return patch_equality(x, units_equality)
         return pytest.approx(x, **kwargs)
     return nested_approx_
 
@@ -1151,9 +1139,13 @@ def patch_equality():
                 return f"EqualityWrapper({self.x!r})"
             
             def __eq__(self, other):
-                if not isinstance(other, self.x.__class__):
+                if isinstance(other, EqualityWrapper):
+                    y = other.x
+                else:
+                    y = other
+                if not isinstance(y, self.x.__class__):
                     return False
-                return method(self.x, other)
+                return method(self.x, y)
         return EqualityWrapper(obj)
     return patch_equality_w
 
@@ -1569,3 +1561,18 @@ def finalize_mpi(request, on_mpi, mpi_comm, mpi_rank, mpi_size):
             return True
 
         plugin._is_worker = new_is_worker
+
+
+@pytest.fixture
+def display_diff():
+
+    def wrapped(a, b):
+        import pprint
+        import difflib
+        a_str = pprint.pformat(a)
+        b_str = pprint.pformat(b)
+        diff = difflib.ndiff(a_str.splitlines(),
+                             b_str.splitlines())
+        print('\n'.join(diff))
+
+    return wrapped

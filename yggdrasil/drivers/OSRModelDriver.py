@@ -53,7 +53,7 @@ class OSRModelDriver(ExecutableModelDriver):
     executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
-    base_languages = ['cpp']
+    base_languages = ['c++']
     interface_dependencies = ['make']
     repository = None
     executable_path = None
@@ -191,6 +191,7 @@ class OSRModelDriver(ExecutableModelDriver):
             elif not os.path.isfile(cls.executable_path):
                 return
             cmd = ['make', target] + flags
+            logger.debug(f"Calling {cmd} from {cwd}")
             subprocess.check_call(cmd, cwd=cwd, env=env)
 
     def write_wrappers(self, **kwargs):
@@ -281,6 +282,20 @@ class OSRModelDriver(ExecutableModelDriver):
         """
         return (cls.repository is not None)
 
+    @classmethod
+    def language_version(cls, version_flags=None, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.run_executable.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        repo = git.Repo(cls.repository)
+        return str(repo.commit())
+        
     @classmethod
     def clone_repository(cls, dest=None):
         r"""Clone the OpenSimRoot repository.

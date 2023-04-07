@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from tests.serialize import TestSerializeBase as base_class
+from yggdrasil import constants
 from yggdrasil.serialize import DefaultSerialize
 
 
@@ -27,7 +28,7 @@ class TestFunctionalSerialize(base_class):
                'objects': [['one', np.int32(1), 1.0],
                            ['two', np.int32(2), 1.0]],
                'extra_kwargs': {},
-               'typedef': {'type': 'bytes'},
+               'datatype': constants.DEFAULT_DATATYPE,
                'dtype': None,
                'is_user_defined': True}
         return out
@@ -81,16 +82,16 @@ class TestFunctionalSerialize_class(TestFunctionalSerialize):
     def testing_options(self, func_serialize, func_deserialize):
         r"""Testing options."""
         temp_seri = FakeSerializer()
-        assert(issubclass(temp_seri.__class__,
-                          DefaultSerialize.DefaultSerialize))
+        assert issubclass(temp_seri.__class__,
+                          DefaultSerialize.DefaultSerialize)
         out = {'kwargs': {'func_serialize': temp_seri,
                           'func_deserialize': temp_seri,
-                          'encoded_datatype': {'type': 'bytes'}},
+                          'encoded_datatype': constants.DEFAULT_DATATYPE},
                'empty': b'',
                'objects': [['one', np.int32(1), 1.0],
                            ['two', np.int32(2), 1.0]],
                'extra_kwargs': {},
-               'typedef': {'type': 'bytes'},
+               'datatype': constants.DEFAULT_DATATYPE,
                'dtype': None,
                'is_user_defined': True}
         return out

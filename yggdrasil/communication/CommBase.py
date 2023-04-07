@@ -7,16 +7,16 @@ import types
 import time
 import collections
 import numpy as np
-from yggdrasil import tools, multitasking, constants
+from yggdrasil import tools, multitasking, constants, rapidjson
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
     import_comm, check_env_for_address)
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
-from yggdrasil.metaschema import MetaschemaTypeError, type2numpy
-from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
+from yggdrasil.datatypes import DataTypeError, type2numpy
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
+# from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
 logger = logging.getLogger(__name__)
@@ -75,6 +75,8 @@ class CommMessage(object):
         self.length = length
         self.flag = flag
         self.args = args
+        if header is None:
+            header = {}
         self.header = header
         self.additional_messages = []
         self.worker_messages = []
@@ -386,10 +388,8 @@ class CommBase(tools.YggClass):
             than row by row. Defaults to False.
         serializer (:class:.DefaultSerialize, optional): Class with serialize and
             deserialize methods that should be used to process sent and received
-            messages. Defaults to None and is constructed using provided
-            'serializer_kwargs'.
-        serializer_kwargs (dict, optional): Keyword arguments that should be
-            passed to :class:.DefaultSerialize to create serializer. Defaults to {}.
+            messages or a dictionary describing a serializer that obeys
+            the serializer schema.
         format_str (str, optional): String that should be used to format/parse
             messages. Default to None.
         dont_open (bool, optional): If True, the connection will not be opened.
@@ -523,63 +523,66 @@ class CommBase(tools.YggClass):
     _schema_subtype_key = 'commtype'
     _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {
-        'name': {'type': 'string'},
+        'name': {'type': 'string',
+                 'pattern': ('^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+'
+                             '(::[A-Za-z0-9-_]+)?$')},
         'address': {'type': 'string'},
         'commtype': {'type': 'string', 'default': 'default',
                      'description': ('Communication mechanism '
                                      'that should be used.')},
         'datatype': {'type': 'schema',
-                     'default': {'type': 'bytes'}},
-        'recv_converter': {'anyOf': [
-            {'$ref': '#/definitions/transform'},
-            {'type': ['function', 'string']},
-            {'type': 'array',
-             'items': {'anyOf': [
-                 {'$ref': '#/definitions/transform'},
-                 {'type': ['function', 'string']}]}}]},
-        'send_converter': {'anyOf': [
-            {'$ref': '#/definitions/transform'},
-            {'type': ['function', 'string']},
-            {'type': 'array',
-             'items': {'anyOf': [
-                 {'$ref': '#/definitions/transform'},
-                 {'type': ['function', 'string']}]}}]},
+                     'default': constants.DEFAULT_DATATYPE},
         'vars': {
             'type': 'array',
-            'items': {'anyOf': [
-                {'type': 'string'},
-                {'type': 'object',
-                 'properties': {
-                     'name': {'type': 'string'},
-                     'datatype': {'type': 'schema',
-                                  'default': {'type': 'bytes'}}}}]}},
+            'items': {'type': 'object',
+                      'properties': {
+                          'name': {'type': 'string'},
+                          'datatype': {'type': 'schema',
+                                       'default': constants.DEFAULT_DATATYPE}},
+                      'allowSingular': 'name'},
+            'allowSingular': True},
         'length_map': {
             'type': 'object',
             'additionalProperties': {'type': 'string'}},
         'format_str': {'type': 'string'},
         'field_names': {'type': 'array',
-                        'items': {'type': 'string'}},
+                        'items': {'type': 'string'},
+                        'aliases': ['column_names'],
+                        'allowSingular': True},
         'field_units': {'type': 'array',
-                        'items': {'type': 'string'}},
+                        'items': {'type': 'string'},
+                        'aliases': ['column_units'],
+                        'allowSingular': True},
         'as_array': {'type': 'boolean', 'default': False},
         'filter': {'$ref': '#/definitions/filter'},
-        'transform': {'anyOf': [
-            {'$ref': '#/definitions/transform'},
-            {'type': ['function', 'string']},
-            {'type': 'array',
-             'items': {'anyOf': [
-                 {'$ref': '#/definitions/transform'},
-                 {'type': ['function', 'string']}]}}]},
+        'serializer': {'$ref': '#/definitions/serializer'},
+        'transform': {
+            'type': 'array',
+            'items': {'anyOf': [
+                {'$ref': '#/definitions/transform'},
+                {'type': ['function', 'string']}]},
+            'allowSingular': True,
+            'aliases': ['recv_converter', 'send_converter', 'transforms',
+                        'translator', 'translators']},
         'is_default': {'type': 'boolean', 'default': False},
         'outside_loop': {'type': 'boolean',
                          'default': False},
         'dont_copy': {'type': 'boolean', 'default': False},
         'default_file': {'$ref': '#/definitions/file'},
         'default_value': {'type': 'any'},
-        'for_service': {'type': 'boolean', 'default': False}}
+        'for_service': {'type': 'boolean', 'default': False},
+        'working_dir': {'type': 'string'},
+        'onexit': {'type': 'string', 'deprecated': True,
+                   'description': ('[DEPRECATED] Method of input/output '
+                                   'driver to call when the connection '
+                                   'closes')}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _schema_excluded_from_class_validation = ['datatype']
+    _schema_additional_kwargs = {
+        'allowSingular': 'name',
+        'pushProperties': {'$properties/datatype': True,
+                           '$properties/serializer': True}}
     is_file = False
     _maxMsgSize = 0
     address_description = None
@@ -603,9 +606,11 @@ class CommBase(tools.YggClass):
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
                  is_async=False, **kwargs):
-        if isinstance(kwargs.get('datatype', None), MetaschemaType):
-            self.datatype = kwargs.pop('datatype')
+        kwargs['additional_component_properties'] = {'name': name}
+        tmp_seri = self._update_serializer_kwargs(kwargs)
         super(CommBase, self).__init__(name, **kwargs)
+        if tmp_seri:
+            self.serializer = tmp_seri
         if (((not is_interface)
              and (not self.__class__.is_installed(
                  language='python')))):  # pragma: debug
@@ -737,43 +742,67 @@ class CommBase(tools.YggClass):
         if self.is_interface:  # pragma: debug
             atexit.register(self.atexit)
 
+    @classmethod
+    def _update_serializer_kwargs(cls, kwargs):
+        r"""Update serializer information in a set of keyword arguments.
+
+        Args:
+            kwargs (dict): Keyword arguments containing non-schema behaved
+                serializer information.
+
+        """
+        seri_kws = {}
+        datatype = kwargs.get('datatype', None)
+        serializer = kwargs.pop('serializer', None)
+        if 'datatype' in cls._schema_properties and datatype is not None:
+            seri_kws.setdefault('datatype', datatype)
+            # TODO: Fix push/pull of schema properties
+            if datatype == constants.DEFAULT_DATATYPE:
+                partial_datatype = {
+                    k: kwargs[k] for k in list(
+                        rapidjson.get_metaschema()['properties'].keys())
+                    if k in kwargs and k not in ['pattern', 'args']}
+                if partial_datatype:
+                    seri_kws.setdefault('partial_datatype',
+                                        partial_datatype)
+        if ((('serializer' not in cls._schema_properties)
+             and serializer is None)):
+            serializer = cls._default_serializer
+        if isinstance(serializer, str):
+            seri_kws.setdefault('seritype', serializer)
+            serializer = None
+        elif isinstance(serializer, dict):
+            seri_kws.update(serializer)
+            serializer = None
+        if serializer is None:
+            if len(seri_kws) == 0:
+                seri_kws['seritype'] = cls._default_serializer
+            serializer = seri_kws
+        if 'serializer' in cls._schema_properties:
+            kwargs['serializer'] = serializer
+        else:
+            return serializer
+
     def _init_before_open(self, **kwargs):
-        r"""Initialization steps that should be performed after base class, but
-        before the comm is opened."""
-        seri_cls = kwargs.pop('serializer_class', None)
-        seri_kws = kwargs.pop('serializer_kwargs', {})
-        if ('datatype' in self._schema_properties) and (self.datatype is not None):
-            seri_kws.setdefault('datatype', self.datatype)
-        if ((('serializer' not in self._schema_properties)
-             and (not hasattr(self, 'serializer')))):
-            self.serializer = self._default_serializer
-        if isinstance(self.serializer, str):
-            seri_kws.setdefault('seritype', self.serializer)
-            self.serializer = None
-        elif isinstance(self.serializer, dict):
-            seri_kws.update(self.serializer)
-            self.serializer = None
+        r"""Initialization steps that should be performed after base
+        class, but before the comm is opened."""
         # Only update serializer if not already set
-        if self.serializer is None:
+        seri_kws = getattr(self, 'serializer', {})
+        if isinstance(seri_kws, dict):
             # Get serializer class
-            if seri_cls is None:
-                seri_cls = import_component('serializer',
-                                            subtype=seri_kws['seritype'])
+            seri_kws.setdefault('seritype', self._default_serializer)
+            seri_cls = import_component('serializer',
+                                        subtype=seri_kws['seritype'])
             # Recover keyword arguments for serializer passed to comm class
             for k in seri_cls.seri_kws():
                 if k in kwargs:
                     seri_kws.setdefault(k, kwargs[k])
             # Create serializer instance
-            self.debug('seri_kws = %.100s', str(seri_kws))
+            logger.debug('seri_kws = %.100s', str(seri_kws))
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
-        dir_conv = '%s_converter' % self.direction
-        if getattr(self, 'transform', []):
-            assert not getattr(self, dir_conv, [])
-            # setattr(self, dir_conv, self.transform)
-        elif getattr(self, dir_conv, []):
-            self.transform = getattr(self, dir_conv)
-        else:
+        dir_conv = f'{self.direction}_converter'
+        if not getattr(self, 'transform', []):
             self.transform = getattr(self.serializer, dir_conv, [])
         if self.transform:
             if not isinstance(self.transform, list):
@@ -1129,7 +1158,6 @@ class CommBase(tools.YggClass):
         else:
             kwargs['direction'] = 'send'
         if for_yaml:
-            kwargs['datatype'] = kwargs['datatype']._typedef
             for k in ['use_async', 'allow_multiple_comms', 'direction',
                       'comment', 'newline', 'seritype']:
                 kwargs.pop(k, None)
@@ -1144,7 +1172,7 @@ class CommBase(tools.YggClass):
 
     def open(self):
         r"""Open the connection."""
-        self.debug("Openning %s", self.address)
+        self.debug("Opening %s", self.address)
         self.bind()
 
     def _close(self, *args, **kwargs):
@@ -1161,7 +1189,7 @@ class CommBase(tools.YggClass):
                 method if linger is True.
 
         """
-        self.debug("Closing %s", self.address)
+        self.debug(f"Closing {self.address} (linger = {linger})")
         if linger and self.is_open:
             self.linger(**kwargs)
         else:
@@ -1396,8 +1424,8 @@ class CommBase(tools.YggClass):
 
         """
         if self.serializer.initialized:
-            msg.stype = self.serializer.typedef
             msg.sinfo = self.serializer.serializer_info
+            msg.stype = msg.sinfo['datatype']
             for k in ['format_str', 'field_names', 'field_units']:
                 if k in msg.sinfo:
                     msg.stype[k] = msg.sinfo[k]
@@ -1417,8 +1445,8 @@ class CommBase(tools.YggClass):
             if k in msg.stype:
                 msg.sinfo[k] = msg.stype.pop(k)
         msg.sinfo['datatype'] = msg.stype
-        self.serializer.initialize_serializer(msg.sinfo)
-        self.serializer.update_serializer(skip_type=True, **msg.header)
+        if not self.serializer.initialized:
+            self.serializer.update_serializer(from_message=True, **msg.sinfo)
 
     def apply_transform_to_type(self, typedef):
         r"""Evaluate the transform to alter the type definition.
@@ -1455,8 +1483,7 @@ class CommBase(tools.YggClass):
         """
         if not self.transform:
             return msg_in
-        self.debug("Applying transformations to message being %s."
-                   % self.direction)
+        self.debug(f"Applying transformations to message being {self.direction}.")
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
         if (((self.direction == 'recv') and self.serializer.initialized
@@ -1465,7 +1492,7 @@ class CommBase(tools.YggClass):
         # if (((self.direction == 'recv')
         #      and self.serializer.initialized
         #      and (not self.transform[0].original_datatype))):
-        #     typedef = self.serializer.typedef
+        #     typedef = self.serializer.datatype
         #     for iconv in self.transform:
         #         if not iconv.original_datatype:
         #             iconv.set_original_datatype(typedef)
@@ -1484,11 +1511,13 @@ class CommBase(tools.YggClass):
         if (((self.direction == 'send') and (header is not False)
              and iconv and iconv.transformed_datatype
              and (not self.serializer.initialized))):
-            if not header:
-                header = {}
-            metadata = dict(header,
-                            datatype=iconv.transformed_datatype)
-            self.serializer.initialize_serializer(metadata, extract=True)
+            if header:
+                metadata = dict(header)
+            else:
+                metadata = {}
+            metadata.setdefault('serializer', {})
+            metadata['serializer']['datatype'] = iconv.transformed_datatype
+            self.serializer.initialize_from_metadata(metadata)
         return msg_out
 
     def evaluate_filter(self, *msg_in):
@@ -1534,7 +1563,7 @@ class CommBase(tools.YggClass):
                 pandas.testing.assert_frame_equal(msg, emsg)
             else:
                 assert msg == emsg
-        except BaseException:  # AssertionError:
+        except BaseException:
             return False
         return True
 
@@ -1673,8 +1702,8 @@ class CommBase(tools.YggClass):
         r"""dict: Keyword arguments for a new work comm."""
         if self._commtype is None:  # pragma: debug
             raise IncompleteBaseComm(
-                "Base comm class '%s' cannot create work comm."
-                % self.__class__.__name__)
+                f"Base comm class '{self.__class__.__name__}'"
+                f" cannot create work comm.")
         return dict(commtype=self._commtype, direction='send',
                     recv_timeout=self.recv_timeout,
                     is_interface=self.is_interface,
@@ -1693,7 +1722,7 @@ class CommBase(tools.YggClass):
             :class:.CommBase: Work comm.
 
         """
-        c = self._work_comms.get(header['id'], None)
+        c = self._work_comms.get(header['__meta__']['id'], None)
         if c is None:
             c = self.header2workcomm(header, **kwargs)
             self.add_work_comm(c)
@@ -1717,7 +1746,7 @@ class CommBase(tools.YggClass):
         kws.update(**kwargs)
         if work_comm_name is None:
             cls = kws.get('commtype', 'default')
-            work_comm_name = '%s_temp_%s_%s.%s' % (
+            work_comm_name = '%s_temp_%s_%s-%s' % (
                 self.name, cls, kws['direction'], kws['uuid'])
         c = new_comm(work_comm_name, **kws)
         self.add_work_comm(c)
@@ -1771,8 +1800,9 @@ class CommBase(tools.YggClass):
 
         """
         header = kwargs
-        header['address'] = work_comm.opp_address
-        header['id'] = work_comm.uuid
+        header.setdefault('__meta__', {})
+        header['__meta__']['address'] = work_comm.opp_address
+        header['__meta__']['id'] = work_comm.uuid
         return header
 
     def header2workcomm(self, header, work_comm_name=None, **kwargs):
@@ -1793,20 +1823,19 @@ class CommBase(tools.YggClass):
         """
         kws = self.get_work_comm_kwargs
         kws.update(**kwargs)
-        kws['uuid'] = header['id']
-        kws['address'] = header['address']
+        kws['uuid'] = header['__meta__']['id']
+        kws['address'] = header['__meta__']['address']
         if work_comm_name is None:
             cls = kws.get('commtype', 'default')
-            work_comm_name = '%s_temp_%s_%s.%s' % (
-                self.name, cls, kws['direction'], header['id'])
+            work_comm_name = '%s_temp_%s_%s-%s' % (
+                self.name, cls, kws['direction'],
+                header['__meta__']['id'])
         c = get_comm(work_comm_name, **kws)
         return c
 
     # SERIALIZATION/DESERIALIZATION METHODS
     def serialize(self, *args, **kwargs):
         r"""Serialize a message using the associated serializer."""
-        # Don't send metadata for files
-        # kwargs.setdefault('dont_encode', self.is_file)
         kwargs.setdefault('add_serializer_info',
                           (self._send_serializer and (not self.is_file)))
         kwargs.setdefault('no_metadata', self.is_file)
@@ -1815,8 +1844,6 @@ class CommBase(tools.YggClass):
 
     def deserialize(self, *args, **kwargs):
         r"""Deserialize a message using the associated deserializer."""
-        # Don't serialize files using JSON
-        # kwargs.setdefault('dont_decode', self.is_file)
         return self.serializer.deserialize(*args, **kwargs)
 
     # SEND METHODS
@@ -1929,7 +1956,7 @@ class CommBase(tools.YggClass):
                 self.linger_close()
                 # self.close_in_thread(no_wait=True, timeout=False)
             return True
-        except MetaschemaTypeError as e:  # pragma: debug
+        except DataTypeError as e:  # pragma: debug
             self._type_errors.append(e)
             try:
                 self.exception('Failed to send: %.100s.', str(msg.args))
@@ -1955,6 +1982,18 @@ class CommBase(tools.YggClass):
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
         return False
+
+    def prepare_header(self, header_kwargs):
+        r"""Prepare header kwargs for the communicator."""
+        if header_kwargs is None:  # pragma: debug
+            header_kwargs = {}
+        model_name = self.full_model_name
+        if model_name:
+            if header_kwargs is None:  # pragma: debug
+                header_kwargs = {}
+            header_kwargs.setdefault('__meta__', {})
+            header_kwargs['__meta__'].setdefault('model', model_name)
+        return header_kwargs
 
     def prepare_message(self, *args, header_kwargs=None, skip_serialization=False,
                         skip_processing=False, skip_language2python=False,
@@ -1991,23 +2030,16 @@ class CommBase(tools.YggClass):
             CommMessage: Serialized and annotated message.
 
         """
+        header_kwargs = self.prepare_header(header_kwargs)
         if (len(args) == 1) and isinstance(args[0], CommMessage):
             msg = args[0]
             if header_kwargs:
-                if msg.header is None:
-                    msg.header = header_kwargs
-                else:
-                    msg.header = copy.deepcopy(msg.header)
-                    msg.header.update(header_kwargs)
+                msg.header = copy.deepcopy(msg.header)
+                msg.header.update(header_kwargs)
             if flag is None:
                 flag = msg.flag
             msg.flag = flag
         else:
-            model_name = self.full_model_name
-            if model_name:
-                if header_kwargs is None:
-                    header_kwargs = {}
-                header_kwargs.setdefault('model', model_name)
             if flag is None:
                 flag = FLAG_SUCCESS
             msg = CommMessage(args=args, header=header_kwargs, flag=flag)
@@ -2070,12 +2102,12 @@ class CommBase(tools.YggClass):
                 else:
                     if x.flag == FLAG_EOF:
                         if x.header:
-                            x.msg = self.serialize(x.args, header_kwargs=x.header,
+                            x.msg = self.serialize(x.args, metadata=x.header,
                                                    add_serializer_info=True)
                         else:
                             x.msg = x.args
                     else:
-                        x.msg = self.serialize(x.args, header_kwargs=x.header)
+                        x.msg = self.serialize(x.args, metadata=x.header)
                         x.flag = FLAG_SUCCESS
                     x.length = len(x.msg)
                 # 8. Create a work comm if the message is too large to be sent all
@@ -2085,15 +2117,13 @@ class CommBase(tools.YggClass):
                         raise NotImplementedError(("EOF message with header (%d) "
                                                    "exceeds max message size (%d).")
                                                   % (msg.length, self.maxMsgSize))
-                    if x.header is None:
-                        x.header = dict()
                     x.worker = self.create_work_comm()
                     # if 'address' not in x.header:
                     #     x.worker = self.create_work_comm()
                     # else:
                     #     x.worker = self.get_work_comm(x.header)
                     x.header = self.workcomm2header(x.worker, **x.header)
-                    total = self.serialize(x.args, header_kwargs=x.header)
+                    total = self.serialize(x.args, metadata=x.header)
                     x.msg = total[:self.maxMsgSize]
                     x.length = len(x.msg)
                     for imsg in self.chunk_message(total[self.maxMsgSize:]):
@@ -2221,7 +2251,7 @@ class CommBase(tools.YggClass):
             return CommMessage(flag=FLAG_FAILURE)
         try:
             self.periodic_debug("recv_message", period=1000)(
-                "Receiving message from %s" % self.address)
+                f"Receiving message from {self.address}")
             flag, s_msg = self._safe_recv(*args, **kwargs)
             msg = CommMessage(msg=s_msg)
             if not flag:
@@ -2229,9 +2259,9 @@ class CommBase(tools.YggClass):
                 return msg
             if no_serialization:
                 msg.args = msg.msg
-                msg.header = {}
+                msg.header = {'__meta__': {}}
                 if isinstance(msg.msg, bytes):
-                    msg.header['size'] = len(msg.msg)
+                    msg.header['__meta__']['size'] = len(msg.msg)
             else:
                 msg.args, msg.header = self.deserialize(msg.msg)
             msg.flag = FLAG_SUCCESS
@@ -2239,16 +2269,17 @@ class CommBase(tools.YggClass):
                 msg.msg = msg.args
                 msg.worker = self.get_work_comm(msg.header)
                 msg.flag = FLAG_INCOMPLETE
-                while len(msg.msg) < msg.header['size']:
+                while len(msg.msg) < msg.header['__meta__']['size']:
                     imsg = msg.worker.recv_message(skip_deserialization=True, **kwargs)
                     if imsg.flag in [FLAG_EOF, FLAG_FAILURE]:  # pragma: debug
                         self.error("Receive interupted at %d of %d bytes.",
-                                   len(msg.msg), msg.header['size'])
+                                   len(msg.msg), msg.header['__meta__']['size'])
                         msg.flag = FLAG_FAILURE
                         break
                     if imsg.flag == FLAG_SUCCESS:
                         msg.msg += imsg.msg
-                self.debug("Received %d/%d bytes", len(msg.msg), msg.header['size'])
+                self.debug("Received %d/%d bytes", len(msg.msg),
+                           msg.header['__meta__']['size'])
                 if msg.flag in [FLAG_INCOMPLETE, FLAG_SUCCESS]:
                     msg.args = msg.msg
                     if not (no_serialization or msg.header.get('raw', False)):
@@ -2271,7 +2302,7 @@ class CommBase(tools.YggClass):
         if msg.length == 0:
             msg.flag = FLAG_EMPTY
         if msg.flag == FLAG_SUCCESS:
-            self.debug('%d bytes received from %s', msg.length, self.address)
+            self.debug(f'{msg.length} bytes received from {self.address}')
         if self.is_eof(msg.args):
             msg.flag = FLAG_EOF
         msg.header['commtype'] = self._commtype
@@ -2358,19 +2389,18 @@ class CommBase(tools.YggClass):
         if direction is None:
             direction = self.direction
         if variable is None:
-            variable = 'n_msg_%s_drain' % direction
+            variable = f'n_msg_{direction}_drain'
         if timeout is None:
             timeout = self._timeout_drain
         if not hasattr(self, variable):
-            raise ValueError("No attribute named '%s'" % variable)
+            raise ValueError(f"No attribute named '{variable}'")
         Tout = self.start_timeout(timeout, key_suffix='.drain_messages')
         while (not Tout.is_out) and self.is_open:
             n_msg = getattr(self, variable)
             if n_msg == 0:
                 break
             else:  # pragma: debug
-                self.verbose_debug("Draining %d %s messages.",
-                                   n_msg, variable)
+                self.verbose_debug(f"Draining {n_msg} {variable} messages.")
                 self.sleep()
         self.stop_timeout(key_suffix='.drain_messages')
         self.debug('Done draining')
@@ -2413,26 +2443,14 @@ class CommBase(tools.YggClass):
             dict: Converted message.
 
         """
-        if self.direction == 'send':
-            from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
-                JSONArrayMetaschemaType)
-            TypeClass = JSONArrayMetaschemaType
-        else:
-            from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
-                JSONObjectMetaschemaType)
-            TypeClass = JSONObjectMetaschemaType
-            if self.serializer.typedef['type'] != 'array':
-                return {'f0': msg}
         if key_order is None:
             key_order = metadata.pop('key_order', self.serializer.get_field_names())
-        if (key_order is None) and isinstance(msg, dict) and (len(msg) <= 1):
-            key_order = [k for k in msg.keys()]
         if key_order:
-            if not self.serializer.initialized:
-                metadata['field_names'] = key_order
-            metadata['key_order'] = key_order
-        out = TypeClass.coerce_type(msg, **metadata)
-        return out
+            metadata['field_names'] = key_order
+        if self.direction == 'send':
+            return self.serializer.dict2object(msg, **metadata)
+        else:
+            return self.serializer.object2dict(msg, **metadata)
     
     def send_dict(self, args_dict, **kwargs):
         r"""Send a message with fields specified in the input dictionary.
@@ -2452,7 +2470,7 @@ class CommBase(tools.YggClass):
         kwargs.setdefault('header_kwargs', {})
         args = self.coerce_to_dict(args_dict, key_order,
                                    kwargs['header_kwargs'])
-        return self.send(*args, **kwargs)
+        return self.send(args, **kwargs)
 
     def recv_dict(self, *args, **kwargs):
         r"""Return a received message as a dictionary of fields. If there are

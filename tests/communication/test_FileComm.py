@@ -1,7 +1,6 @@
 import pytest
 import os
-import jsonschema
-from yggdrasil import schema
+from yggdrasil import schema, rapidjson
 from yggdrasil.communication import new_comm
 from tests.communication.test_CommBase import TestComm as base_class
 
@@ -30,10 +29,10 @@ def test_wait_for_creation():
     while (not T.is_out) and (send_instance.sched_out is None):  # pragma: debug
         recv_instance.sleep()
     recv_instance.stop_timeout()
-    assert(send_instance.sched_out)
+    assert send_instance.sched_out
     flag, msg_recv = recv_instance.recv()
-    assert(flag)
-    assert(msg_recv == msg_send)
+    assert flag
+    assert msg_recv == msg_send
     send_instance.close()
     recv_instance.close()
     recv_instance.remove_file()
@@ -43,7 +42,6 @@ _filetypes = sorted([x for x in schema.get_schema()['file'].subtypes
                      if x not in ['ascii', 'table', 'pandas']])
 
 
-@pytest.mark.usefixtures("unyts_equality_patch")
 @pytest.mark.suite("files", ignore="comms")
 class TestFileComm(base_class):
     r"""Test for FileComm communication class."""
@@ -132,7 +130,7 @@ class TestFileComm(base_class):
                      recv_params={'flag': False,
                                   'skip_wait': True,
                                   'kwargs': {'timeout': timeout}})
-        assert(recv_comm.is_closed)
+        assert recv_comm.is_closed
 
     def test_send_recv_filter_send_filter(self, filtered_comms,
                                           msg_filter_send, send_comm,
@@ -165,7 +163,7 @@ class TestFileComm(base_class):
         kws = self.get_send_comm_kwargs(
             commtype, use_async, testing_options, read_meth='invalid',
             skip_component_schema_normalization=False)
-        with pytest.raises(jsonschema.ValidationError):
+        with pytest.raises(rapidjson.NormalizationError):
             new_comm(name, **kws)
 
     def test_append(self, uuid, commtype, use_async, testing_options,
@@ -176,7 +174,7 @@ class TestFileComm(base_class):
         recv_objects_partial = testing_options['recv_partial']
         # Write to file
         flag = send_comm.send(send_objects[0])
-        assert(flag)
+        assert flag
         # Create temp file comms in append mode
         recv_kwargs = self.get_recv_comm_kwargs(
             commtype, send_comm, testing_options, append=True)
@@ -189,7 +187,7 @@ class TestFileComm(base_class):
                               break_on_empty=True)
             for i in range(1, len(send_objects)):
                 flag = new_inst_send.send(send_objects[i])
-                assert(flag)
+                assert flag
                 recv_message_list(new_inst_recv, recv_objects_partial[i],
                                   break_on_empty=True)
             # Read entire contents
@@ -201,7 +199,7 @@ class TestFileComm(base_class):
         if testing_options.get('exact_contents', True):
             with open(send_comm.address, 'rb') as fd:
                 contents = fd.read()
-            assert(contents == testing_options['contents'])
+            assert contents == testing_options['contents']
 
     def test_series(self, send_comm, recv_comm, do_send_recv):
         r"""Test sending/receiving to/from a series of files."""
@@ -222,16 +220,16 @@ class TestFileComm(base_class):
         
     def test_remaining_bytes(self, send_comm, recv_comm):
         r"""Test remaining_bytes."""
-        assert(send_comm.remaining_bytes == 0)
+        assert send_comm.remaining_bytes == 0
         recv_comm.close()
-        assert(recv_comm.is_closed)
-        assert(recv_comm.remaining_bytes == 0)
+        assert recv_comm.is_closed
+        assert recv_comm.remaining_bytes == 0
 
     def test_recv_nomsg(self, recv_comm, polling_interval):
         r"""Test recieve when there is no waiting message."""
         flag, msg_recv = recv_comm.recv(timeout=polling_interval)
-        assert(not flag)
-        assert(msg_recv == recv_comm.eof_msg)
+        assert not flag
+        assert msg_recv == recv_comm.eof_msg
 
 
 class TestFileComm_readline(TestFileComm):

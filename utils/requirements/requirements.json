@@ -6,17 +6,36 @@
         "method": "conda_recipe",
         "flags": {
           "build": true,
+          "build_only": true,
+          "cross_build": true
+        }
+      }
+    },
+    {
+      "{{ compiler('c') }}": {
+        "method": "conda_recipe",
+        "flags": {
+          "build": true,
           "build_only": true
         }
       }
     },
+    {
+      "{{ compiler('cxx') }}": {
+        "method": "conda_recipe",
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
+    "deprecation",
     "flask",
     {
       "git": {
         "method": "conda"
       }
     },
-    "jsonschema==3.2.0",
     {
       "matplotlib": {
         "flags": {
@@ -59,11 +78,11 @@
         "method": "conda_recipe",
         "host": true,
         "flags": {
-          "build": true
+          "build": true,
+          "cross_build": true
         }
       }
     },
-    "python-rapidjson",
     "pyyaml",
     "pyzmq",
     "requests",
@@ -389,13 +408,8 @@
     ],
     "sbml": [
       {
-        "name": "libroadrunner<2.0.7",
-        "method": "pip",
-        "flags": {
-          "install_flags": [
-            "--no-dependencies"
-          ]
-        }
+        "name": "libroadrunner",
+        "method": "pip"
       }
     ],
     "lpy": [
@@ -436,6 +450,7 @@
       "pytest-rerunfailures",
       "pytest-repeat",
       "pytest-timeout",
+      "pytest-xdist",
       {
         "ccache": {
           "method": "conda",

@@ -628,8 +628,7 @@ class YggRequirementsList(UserList):
             req = out
             out = OrderedDict()
             host_req = [
-                x.format(**kwargs) for x in selected
-                if x.host]
+                x.format(**kwargs) for x in selected if x.host]
             build_req = [
                 x.format(for_build=True, padding=39, **kwargs)
                 for x in selected
@@ -658,6 +657,8 @@ class YggRequirementsList(UserList):
                 out['requirements']['build'] = sorted(build_req)
             if host_req:
                 out['requirements']['host'] = sorted(host_req)
+            if build_req:
+                out['requirements']['build'] = sorted(build_req)
             out['requirements']['run'] = req
             if fname is not None:
                 with open(fname, 'w') as fd:
@@ -1053,7 +1054,7 @@ class YggRequirement(object):
 
         """
         varients = []
-        if self.flags.get("build", False) and for_build:
+        if self.flags.get("cross_build", False) and for_build:
             varients.append("build_platform != target_platform")
         if self.os is not None:
             if self.os == 'unix':
@@ -1266,7 +1267,7 @@ class YggRequirement(object):
 
         """
         # print(self.name, not self.os_matches(param),
-        #       not self.method_selected(param)
+        #       not self.method_selected(param),
         #       not self.flags_selected(select_flags=select_flags,
         #                               deselect_flags=deselect_flags,
         #                               required_flags=required_flags),

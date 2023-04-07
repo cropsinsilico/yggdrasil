@@ -11,5 +11,4 @@ Development
    general
    release
    new_language
-   new_datatype
    todo

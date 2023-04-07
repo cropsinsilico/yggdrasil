@@ -6,7 +6,7 @@
     "pika>=1.0.0"
   ],
   "sbml": [
-    "libroadrunner<2.0.7"
+    "libroadrunner"
   ],
   "testing": [
     "codecov",
@@ -19,7 +19,8 @@
     "pytest-mpi",
     "pytest-repeat",
     "pytest-rerunfailures",
-    "pytest-timeout"
+    "pytest-timeout",
+    "pytest-xdist"
   ],
   "docs": [
     "breathe",

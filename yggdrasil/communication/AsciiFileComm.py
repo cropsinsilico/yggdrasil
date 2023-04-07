@@ -17,6 +17,7 @@ class AsciiFileComm(FileComm):
     _filetype = 'ascii'
     _schema_subtype_description = ('This file is read/written as encoded text '
                                    'one line at a time.')
+    _deprecated_drivers = ['AsciiFileInputDriver', 'AsciiFileOutputDriver']
 
     def _init_before_open(self, **kwargs):
         r"""Get absolute path and set attributes."""

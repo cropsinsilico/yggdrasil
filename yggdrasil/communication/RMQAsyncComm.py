@@ -47,6 +47,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                         + ['rmq_thread', '_consuming', '_reconnecting',
                            '_buffered_messages', '_deliveries',
                            '_external_close'])
+    _deprecated_drivers = ['RMQAsyncInputDriver', 'RMQAsyncOutputDriver']
 
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""

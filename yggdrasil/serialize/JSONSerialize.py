@@ -1,7 +1,74 @@
-from yggdrasil.metaschema.encoder import (
-    indent_char2int, encode_json, decode_json,
-    JSONReadableEncoder)
 from yggdrasil.serialize.SerializeBase import SerializeBase
+from yggdrasil import tools, rapidjson
+
+
+def indent_char2int(indent):
+    r"""Convert a character indent into a number of spaces that should be used.
+    Tabs are set to be equivalent to 4 spaces.
+
+    Args:
+        indent (str): String indent.
+
+    Returns:
+        int: Number of whitespaces that is equivalent to the provided string.
+
+    """
+    if isinstance(indent, str):
+        indent = len(indent.replace('\t', '    '))
+    return indent
+
+
+def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
+    r"""Encode a Python object in JSON format.
+
+    Args:
+        obj (object): Python object to encode.
+        fd (file, optional): File descriptor for file that encoded object
+            should be written to. Defaults to None and string is returned.
+        indent (int, str, optional): Indentation for new lines in encoded
+            string. Defaults to None.
+        sort_keys (bool, optional): If True, the keys will be output in sorted
+            order. Defaults to True.
+        **kwargs: Additional keyword arguments are passed to
+            rapidjson.dumps.
+
+    Returns:
+        str, bytes: Encoded object.
+
+    """
+    if (indent is None) and (fd is not None):
+        indent = '\t'
+    # Character indents not allowed in Python 2 json
+    indent = indent_char2int(indent)
+    kwargs['indent'] = indent
+    kwargs['sort_keys'] = sort_keys
+    if 'cls' in kwargs:
+        kwargs.setdefault('default', kwargs.pop('cls')().default)
+    if fd is None:
+        return tools.str2bytes(rapidjson.dumps(obj, **kwargs))
+    else:
+        return rapidjson.dump(obj, fd, **kwargs)
+
+
+def decode_json(msg, **kwargs):
+    r"""Decode a Python object from a JSON serialization.
+
+    Args:
+        msg (str): JSON serialization to decode.
+        **kwargs: Additional keyword arguments are passed to
+            rapidjson.loads.
+
+    Returns:
+        object: Deserialized Python object.
+
+    """
+    if isinstance(msg, (str, bytes)):
+        msg_decode = tools.bytes2str(msg)
+        func_decode = rapidjson.loads
+    else:
+        msg_decode = msg
+        func_decode = rapidjson.load
+    return func_decode(msg_decode, **kwargs)
 
 
 class JSONSerialize(SerializeBase):
@@ -35,7 +102,8 @@ class JSONSerialize(SerializeBase):
             bytes, str: Serialized message.
 
         """
-        return encode_json(args, indent=self.indent, cls=JSONReadableEncoder)
+        return encode_json(args, indent=self.indent,
+                           yggdrasil_mode=rapidjson.YM_READABLE)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -95,7 +163,7 @@ class JSONSerialize(SerializeBase):
                'empty': {}, 'dtype': None,
                'extra_kwargs': {},
                'objects': [iobj1, iobj2],  # , iobj3, iobj4],
-               'typedef': {'type': 'object'}}
+               'datatype': {'type': 'object'}}
         out['contents'] = (b'{\n\t"a": [\n\t\t"b",\n\t\t1,\n\t\t1.0\n\t],'
                            b'\n\t"c": {\n\t\t"z": "hello"\n\t},'
                            b'\n\t"d": "new field"\n}')

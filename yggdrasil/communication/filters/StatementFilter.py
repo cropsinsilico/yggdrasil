@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import units
+from yggdrasil import units, rapidjson
 from yggdrasil.tools import safe_eval
 from yggdrasil.communication.filters.FilterBase import FilterBase
 
@@ -23,6 +23,7 @@ class StatementFilter(FilterBase):
     _filtertype = 'statement'
     _schema_required = ['statement']
     _schema_properties = {'statement': {'type': 'string'}}
+    _schema_subtype_description = "Filter messages based on a statement"
 
     def __init__(self, *args, **kwargs):
         super(StatementFilter, self).__init__(*args, **kwargs)
@@ -38,7 +39,10 @@ class StatementFilter(FilterBase):
             bool: True if the message will pass through the filter, False otherwise.
 
         """
-        return safe_eval(self.statement, x=x)
+        try:
+            return safe_eval(self.statement, x=x)
+        except rapidjson.units.UnitsError:
+            return safe_eval(self.statement, x=x.value)
 
     @classmethod
     def get_testing_options(cls):

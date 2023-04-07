@@ -90,16 +90,25 @@ def write_datatype_mapping_table(**kwargs):
         str, list: Name of file or files created.
 
     """
-    from yggdrasil import tools, components
-    from yggdrasil.metaschema.datatypes import _type_registry
+    from yggdrasil import tools, components, constants
     kwargs.setdefault('fname_base', 'datatype_mapping_table.rst')
-    args = {}
-    for k, v in _type_registry.items():
-        if v.cross_language_support:
-            args[k] = {'notes': get_docs_section(v.__doc__,
-                                                 keys=['Developer Notes:',
-                                                       'Development Notes:'],
-                                                 join_lines=True)}
+    notes = {'bytes': 'Precision X is preserved.',
+             'complex': 'Precision X is preserved.',
+             'float': 'Precision X is preserved.',
+             'int': 'Precision X is preserved.',
+             'uint': 'Precision X is preserved.',
+             'unicode': 'Precision X is preserved.',
+             'number': (
+                 'This covers the JSON default for floating point or '
+                 'integer values.'),
+             'scalar': ('yggdrasil defines scalars as an umbrella type '
+                        'encompassing int, uint, float, bytes, and '
+                        'unicode.'),
+             'string': 'User can specify an encoding for scalar strings.'}
+    args = {k: {} for k in constants.ALL_TYPES}
+    for k, v in notes.items():
+        if k in args:
+            args[k]['notes'] = v
     for lang in tools.get_supported_lang():
         if lang in ['lpy', 'make', 'cmake', 'executable']:
             continue
@@ -202,7 +211,7 @@ def write_datatype_table(table_type='all', **kwargs):
         ValueError: If table_type is not one of the supported values.
 
     """
-    from yggdrasil.metaschema.datatypes import _type_registry
+    from yggdrasil import constants
     table_type_list = ['simple', 'container', 'yggdrasil']
     if table_type == 'all':
         fname = kwargs.get("fname", None)
@@ -219,21 +228,14 @@ def write_datatype_table(table_type='all', **kwargs):
     target_types = []
     args = {}
     if table_type == 'simple':
-        for k, v in _type_registry.items():
-            if v._replaces_existing and (not hasattr(v, '_container_type')):
-                target_types.append(k)
+        target_types += constants.JSON_SIMPLE_TYPES
     elif table_type == 'container':
-        for k, v in _type_registry.items():
-            if v._replaces_existing and hasattr(v, '_container_type'):
-                target_types.append(k)
+        target_types += constants.JSON_CONTAINER_TYPES
     elif table_type == 'yggdrasil':
-        for k, v in _type_registry.items():
-            if not v._replaces_existing:
-                target_types.append(k)
+        target_types += constants.YGGDRASIL_TYPES
     for k in target_types:
-        v = _type_registry[k]
-        args[k] = {'description': v.description,
-                   'required properties': v.definition_properties}
+        args[k] = {'description': constants.ALL_TYPES[k]}
+        # 'required properties'?
     kwargs.setdefault('key_column_name', 'type')
     kwargs.setdefault('list_columns', 'required properties')
     lines = dict2table(args, **kwargs)
@@ -399,17 +401,28 @@ def component2table(comp, table_type, include_required=None,
         # Set defaults
         kwargs.setdefault('key_column_name', 'option')
         kwargs.setdefault('val_column_name', 'description')
-        kwargs.setdefault('column_order', [kwargs['key_column_name'],
-                                           'type', 'required',
-                                           kwargs['val_column_name']])
+        default_order = [kwargs['key_column_name'],
+                         'type', 'required',
+                         kwargs['val_column_name']]
+        if table_type == 'specific':
+            default_order.insert(2, 'Valid for \'%s\' of' % subtype_key)
+        kwargs.setdefault('column_order', default_order)
+        kwargs.setdefault('wrapped_columns', {'description': 80})
         if (not include_required) and ('required' in kwargs['column_order']):
             kwargs['column_order'].remove('required')
         # Get list of component subtypes
+        defs = s.get_definitions(relaxed=True)
         if table_type == 'general':
-            s_comp_list = [s[comp].get_subtype_schema('base', unique=True)]
+            s_comp_list = [s[comp].get_subtype_schema('base', unique=True,
+                                                      relaxed=True)]
         else:
-            s_comp_list = [s[comp].get_subtype_schema(x, unique=True)
-                           for x in s[comp].classes]
+            s_comp_list = [
+                defs[s[comp]._subtype_defkey(
+                    comp, s[comp].class2subtype[x][0])]
+                for x in s[comp].classes]
+            # s_comp_list = [s[comp].get_subtype_schema(x, unique=True,
+            #                                           relaxed=True)
+            #                for x in s[comp].classes]
         # Loop over subtyeps
         out_apply = {}
         for s_comp in s_comp_list:
@@ -417,7 +430,11 @@ def component2table(comp, table_type, include_required=None,
                 if (k == subtype_key) and (table_type == 'specific'):
                     continue
                 if k not in args:
-                    args[k] = {'type': v.get('type', ''),
+                    def_type = ''
+                    if '$ref' in v:
+                        v = defs[v['$ref'].split('#/definitions/')[-1]]
+                        def_type = 'object'
+                    args[k] = {'type': v.get('type', def_type),
                                'description': v.get('description', '')}
                     if include_required:
                         if k in s_comp.get('required', []):
@@ -436,15 +453,18 @@ def component2table(comp, table_type, include_required=None,
                 v['Valid for \'%s\' of' % subtype_key] = list(set(out_apply[k]))
     elif table_type == 'subtype':
         kwargs.setdefault('key_column_name', subtype_key)
+        s_base = s[comp].get_subtype_schema('base', unique=True,
+                                            relaxed=True)
         for x, subtypes in s[comp].schema_subtypes.items():
-            s_comp = s[comp].get_subtype_schema(x, unique=True)
+            s_comp = s[comp].get_subtype_schema(x, unique=True,
+                                                relaxed=True)
             subt = subtypes[0]
             args[subt] = {
                 'description': s_comp['properties'][subtype_key].get(
                     'description', '')}
             if len(subtypes) > 1:
                 args[subt]['aliases'] = subtypes[1:]
-            if s_comp['properties'][subtype_key].get('default', None) in subtypes:
+            if s_base['properties'][subtype_key].get('default', None) in subtypes:
                 args[subt]['description'] = ('[DEFAULT] '
                                              + args[subt]['description'])
     else:

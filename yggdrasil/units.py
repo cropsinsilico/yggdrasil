@@ -1,12 +1,23 @@
 import re
 import numpy as np
 import pandas as pd
-import unyt
+import deprecation
 from collections import OrderedDict
+from ._version import get_versions
 from yggdrasil import tools, constants
-_unit_quantity = unyt.array.unyt_quantity
-_unit_array = unyt.array.unyt_array
-_ureg_unyt = None
+from yggdrasil.rapidjson import units as units_
+# Use get_versions to prevent circular import from importing it
+#   from yggdrasil's __init__
+__version__ = get_versions()['version']
+# TODO: This import fails saying yggdrasil.rapidjson is not a package so
+# we need to find a work around
+# from yggdrasil.rapidjson.units import Quantity, QuantityArray, Units, UnitsError
+Quantity = units_.Quantity
+QuantityArray = units_.QuantityArray
+Units = units_.Units
+UnitsError = units_.UnitsError
+_unit_quantity = Quantity
+_unit_array = QuantityArray
 
 
 PYTHON_SCALARS_WITH_UNITS = OrderedDict([
@@ -16,30 +27,6 @@ ALL_PYTHON_ARRAYS_WITH_UNITS = tuple(
     list(constants.ALL_PYTHON_ARRAYS) + [_unit_array])
 ALL_PYTHON_SCALARS_WITH_UNITS = tuple(
     list(constants.ALL_PYTHON_SCALARS) + [_unit_quantity])
-
-
-def get_ureg():
-    r"""Get the unit registry."""
-    global _ureg_unyt
-    if _ureg_unyt is None:
-        _ureg_unyt = unyt.UnitRegistry('mks')
-        _ureg_unyt.add("ac", 4046.86, dimensions=unyt.dimensions.area,
-                       tex_repr=r"\rm{ac}", offset=0.0, prefixable=False)
-        _ureg_unyt.add("a", 100.0, dimensions=unyt.dimensions.area,
-                       tex_repr=r"\rm{a}", offset=0.0, prefixable=True)
-        _ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.energy,
-                       tex_repr=r"\rm{J}", offset=0.0, prefixable=True)
-        # _ureg_unyt.add("cel", 1.0, dimensions=unyt.dimensions.temperature,
-        #                tex_repr=r"^\circ\rm{C}", offset=-273.15, prefixable=True)
-        # _ureg_unyt.add("j", 1.0, dimensions=unyt.dimensions.specific_flux,
-        #                tex_repr=r"\rm{Jy}", prefixable=True)
-        # _ureg_unyt.add("CH2O", 1.0, dimensions=unyt.dimensions.dimensionless,
-        #                tex_repr=r"\rm{CH2O}", offset=0.0, prefixable=False)
-        unyt._unit_lookup_table.inv_name_alternatives["acre"] = "ac"
-        unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
-        unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
-        unyt._unit_lookup_table.inv_name_alternatives["days"] = "day"
-    return _ureg_unyt
 
 
 def convert_to_pandas_timedelta(x):
@@ -105,7 +92,11 @@ def convert_matlab_unit_string(m_str):  # pragma: matlab
     return out
 
 
-def convert_R_unit_string(r_str):
+@deprecation.deprecated(deprecated_in="2.0", removed_in="3.0",
+                        current_version=__version__,
+                        details=("This method is no longer necessary and "
+                                 "units can be parsed directly"))
+def convert_R_unit_string(r_str):  # pragma: deprecated
     r"""Convert R unit string to string that the Python package can
     understand.
 
@@ -119,7 +110,11 @@ def convert_R_unit_string(r_str):
     return convert_unit_string(r_str)
 
 
-def convert_unit_string(orig_str, replacements=None):
+@deprecation.deprecated(deprecated_in="2.0", removed_in="3.0",
+                        current_version=__version__,
+                        details=("This method is no longer necessary and "
+                                 "units can be parsed directly"))
+def convert_unit_string(orig_str, replacements=None):  # pragma: deprecated
     r"""Convert unit string to string that the Python package can
     understand.
 
@@ -132,47 +127,7 @@ def convert_unit_string(orig_str, replacements=None):
         str: Converted string.
 
     """
-    if not orig_str.strip():
-        return ''
-    out = []
-    if replacements is None:
-        replacements = {'h': 'hr',
-                        'hrs': 'hr',
-                        'days': 'day',
-                        '100%': 'percent'}
-    regex_mu = [tools.bytes2str(b'\xc2\xb5'),
-                tools.bytes2str(b'\xce\xbcs'),
-                tools.bytes2str(b'\xc2\xb0'),
-                r'(?:100\%)']
-    regex = (r'(?P<paren>\()?(?P<name>[A-Za-z%s]+)'
-             r'(?:(?:(?:\^)|(?:\*\*))?(?P<exp_paren>\()?(?P<exp>-?[0-9]+)'
-             r'(?(exp_paren)\)))?'
-             r'(?(paren)\)|)(?P<op> |(?:\*)|(?:\/))?' % ''.join(regex_mu))
-    out = ''
-    if re.fullmatch(r'(?:%s)+' % regex, orig_str.strip()):
-        for x in re.finditer(regex, orig_str.strip()):
-            xdict = x.groupdict()
-            if xdict['name'] in replacements:
-                xdict['name'] = replacements[xdict['name']]
-            if xdict['exp']:
-                out += '({name}**{exp})'.format(**xdict)
-            else:
-                out += xdict['name']
-            if xdict['op']:
-                if xdict['op'].isspace():
-                    xdict['op'] = '*'
-                out += xdict['op']
-    else:  # pragma: debug
-        print(repr(orig_str), type(orig_str))
-        m = re.search(r'(?:%s)+' % regex, orig_str.strip())
-        if m:
-            print(repr(m.group(0)), m.groupdict())
-        else:
-            print('no match')
-        for m in re.finditer(regex, orig_str.strip()):
-            print(m.group(0), m.groupdict())
-        raise Exception("Could not standardize units: %s" % repr(orig_str))
-    return out
+    return orig_str
 
 
 def has_units(obj, check_dimensionless=False):
@@ -187,19 +142,19 @@ def has_units(obj, check_dimensionless=False):
         bool: True if the object has units, False otherwise.
 
     """
-    out = isinstance(obj, (_unit_quantity, _unit_array))
+    out = (isinstance(obj, (_unit_quantity, _unit_array))
+           and not (obj.is_dimensionless()
+                    and (not check_dimensionless)))
     # out = hasattr(obj, 'units')
-    if ((out and (obj.units == as_unit('dimensionless'))
-         and (not check_dimensionless))):
-        out = False
     return out
 
 
-def get_units(obj):
+def get_units(obj, for_language=None):
     r"""Get the string representation of the units.
 
     Args:
         obj (object): Object to get units for.
+        for_language (str, optional): Language requesting units.
 
     Returns:
         str: Units, empty if input object has none.
@@ -209,6 +164,9 @@ def get_units(obj):
         out = str(obj.units)
     else:
         out = ''
+    if for_language == "R":  # pragma: extern
+        # udunits dosn't support Δ
+        out = out.replace('Δ', '')
     return out
 
 
@@ -223,50 +181,32 @@ def get_data(obj):
 
     """
     if has_units(obj, check_dimensionless=True):
-        out = obj.to_ndarray()
-        if out.ndim == 0:
-            out = out.reshape((1, ))[0]
+        out = obj.value
     else:
         out = obj
     return out
 
 
-def add_units(arr, unit_str, dtype=None):
+def add_units(arr, unit_str, **kwargs):
     r"""Add units to an array or scalar.
 
     Args:
         arr (np.ndarray, float, int): Scalar or array of data to add units to.
         unit_str (str): Unit string.
-        dtype (np.dtype, optional): Numpy data type that should be maintained for
-            array/qunatity with units. If not provided, this is determined from the
-            array.
+        **kwargs: Additional keyword arguments are passed to the unit constructor.
 
     Returns:
-        unyt.unyt_array: Array with units.
+        Quantity ro QuantityArray: Scalar or array with units.
 
     """
-    ureg = get_ureg()
-    unit_str = tools.bytes2str(unit_str)
     if is_null_unit(unit_str):
         return arr
-    unit_str = convert_unit_string(unit_str)
     if has_units(arr):
-        return convert_to(arr, unit_str)
-    if dtype is None:
-        if isinstance(arr, np.ndarray):
-            dtype = arr.dtype
-        else:
-            dtype = np.array([arr]).dtype
-    try:
-        if isinstance(arr, np.ndarray) and (arr.ndim > 0):
-            out = unyt.unyt_array(arr, unit_str, dtype=dtype,
-                                  registry=ureg)
-        else:
-            out = unyt.unyt_quantity(arr, unit_str, dtype=dtype,
-                                     registry=ureg)
-    except BaseException:
-        raise ValueError("Error parsing unit: %s, type(%s)."
-                         % (repr(unit_str), type(unit_str)))
+        out = convert_to(arr, unit_str)
+    elif isinstance(arr, np.ndarray) and (arr.ndim > 0):
+        out = QuantityArray(arr, unit_str, **kwargs)
+    else:
+        out = Quantity(arr, unit_str, **kwargs)
     return out
 
 
@@ -282,16 +222,14 @@ def are_compatible(units1, units2):
 
     """
     # Empty units always compatible
-    if is_null_unit(units1) or is_null_unit(units2):
-        return True
-    if (not is_unit(units1)) or (not is_unit(units2)):
-        return False
-    x = add_units(1, units1)
     try:
-        convert_to(x, units2)
-    except ValueError:
+        u1 = Units(units1)
+        u2 = Units(units2)
+    except UnitsError:
         return False
-    return True
+    if u1.is_dimensionless() or u2.is_dimensionless():
+        return True
+    return u1.is_compatible(u2)
 
 
 def is_null_unit(ustr):
@@ -304,9 +242,7 @@ def is_null_unit(ustr):
         bool: True if the string is '' or 'n/a', False otherwise.
 
     """
-    if (len(ustr) == 0) or (ustr == 'n/a'):
-        return True
-    return False
+    return Units(ustr).is_dimensionless()
 
 
 def as_unit(ustr):
@@ -316,17 +252,13 @@ def as_unit(ustr):
         ustr (str): Unit string.
 
     Returns:
-        unyt.Unit: Unit object.
+        Units: Unit object.
 
     Raises:
         ValueError: If the string is not a recognized unit.
 
     """
-    try:
-        out = unyt.Unit(ustr, registry=get_ureg())
-    except unyt.exceptions.UnitParseError as e:
-        raise ValueError(str(e))
-    return out
+    return Units(ustr)
 
 
 def is_unit(ustr):
@@ -339,14 +271,11 @@ def is_unit(ustr):
         bool: True if the string is a valid unit. False otherwise.
 
     """
-    ustr = tools.bytes2str(ustr)
-    if is_null_unit(ustr):
-        return True
     try:
         as_unit(ustr)
-    except ValueError:
+        return True
+    except UnitsError:
         return False
-    return True
 
 
 def convert_to(arr, new_units):
@@ -354,30 +283,17 @@ def convert_to(arr, new_units):
     will be returned with the new units.
 
     Args:
-        arr (np.ndarray, float, int, unyt.unyt_array): Quantity with or
-            without units.
+        arr (np.ndarray, float, int, Quantity, QuantityArray): Quantity with
+            or without units.
         new_units (str): New units that should be applied.
 
     Returns:
-        unyt.unyt_array: Array with new units.
+        Quantity, QuantityArray: Scalar or array with new units.
 
     """
-    if is_null_unit(new_units):
-        return arr
     if not has_units(arr):
         return add_units(arr, new_units)
-    new_units = convert_unit_string(new_units)
-    try:
-        arr1 = get_data(arr)
-        dtype = get_data(arr1).dtype
-        out = arr.to(new_units)
-        arr2 = get_data(out)
-        equal = (arr2.dtype == dtype)
-        if not equal:
-            out = add_units(arr2, new_units, dtype=dtype)
-    except unyt.exceptions.UnitConversionError as e:
-        raise ValueError(str(e))
-    return out
+    return arr.to(new_units)
 
 
 def get_conversion_function(old_units, new_units):

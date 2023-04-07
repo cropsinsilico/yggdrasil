@@ -2,7 +2,6 @@ import os
 import copy
 import tempfile
 from yggdrasil import platform, tools
-from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.communication import CommBase
 from yggdrasil.components import import_component
 
@@ -66,37 +65,59 @@ class FileComm(CommBase.CommBase):
                                    'once as bytes.')
     _schema_required = ['name', 'filetype', 'working_dir', 'serializer']
     _schema_properties = {
+        'name': {'type': 'string',
+                 'pattern': (r'^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+'
+                             r'\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$')},
         'working_dir': {'type': 'string'},
         'filetype': {'type': 'string', 'default': _filetype,
                      'description': ('The type of file that will be read from '
                                      'or written to.')},
         'read_meth': {'type': 'string', 'default': 'read',
-                      'enum': ['read', 'readline']},
+                      'enum': ['read', 'readline'],
+                      'deprecated': True},
         'append': {'type': 'boolean', 'default': False},
         'in_temp': {'type': 'boolean', 'default': False},
         'is_series': {'type': 'boolean', 'default': False},
-        'wait_for_creation': {'type': 'float', 'default': 0.0},
-        'serializer': {'oneOf': [{'$ref': '#/definitions/serializer'},
-                                 {'type': 'instance',
-                                  'class': SerializeBase}],
-                       'default': {'seritype': 'direct'}}}
+        'wait_for_creation': {'type': 'number', 'default': 0.0},
+        'serializer': {'allOf': [
+            {'default': {}},
+            {'$ref': '#/definitions/serializer'}]}}
     _schema_excluded_from_inherit = (
         ['commtype', 'datatype', 'read_meth', 'serializer']
         + CommBase.CommBase._model_schema_prop)
-    _schema_excluded_from_class_validation = ['serializer']
     _schema_base_class = None
+    _schema_additional_kwargs = {'allowSingular': 'name'}
+    _schema_additional_kwargs_no_inherit = {
+        'pushProperties': {'$properties/serializer': True}}
     _default_serializer = 'direct'
     _default_extension = '.txt'
     is_file = True
     _maxMsgSize = 0
     _mode_as_bytes = True
     _synchronous_read = False
+    _deprecated_drivers = ['FileInputDriver', 'FileOutputDriver']
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
         kwargs['partner_language'] = None  # Files don't have partner comms
         return super(FileComm, self).__init__(*args, **kwargs)
 
+    @classmethod
+    def _update_serializer_kwargs(cls, kwargs):
+        r"""Update serializer information in a set of keyword arguments.
+
+        Args:
+            kwargs (dict): Keyword arguments containing non-schema behaved
+                serializer information.
+
+        """
+        out = super(FileComm, cls)._update_serializer_kwargs(kwargs)
+        if ((cls._default_serializer != 'direct'
+             and isinstance(out, dict)
+             and out.get('seritype', 'direct') in ['default', 'direct'])):
+            out['seritype'] = cls._default_serializer
+        return out
+        
     def _init_before_open(self, **kwargs):
         r"""Get absolute path and set attributes."""
         self.header_was_read = False
@@ -139,6 +160,17 @@ class FileComm(CommBase.CommBase):
         CommBase.CommBase.before_registration(cls)
         # Add serializer properties to schema
         if cls._filetype != 'binary':
+            # from yggdrasil.schema import ComponentSchema
+            # if cls._default_serializer != 'direct':
+            #     seri_key = ComponentSchema._subtype_defkey(
+            #         'serializer', cls._default_serializer)
+            #     base_key = ComponentSchema._subtype_defkey(
+            #         'serializer', 'base')
+            #     cls._schema_properties['serializer'] = {
+            #         'allOf': [
+            #             {"$ref": f"#/definitions/{seri_key}"},
+            #             {"$ref": f"#/definitions/{base_key}"}
+            #         ]}
             assert 'serializer' not in cls._schema_properties
             # if registration_in_progress():
             seri = import_component('serializer', cls._default_serializer)

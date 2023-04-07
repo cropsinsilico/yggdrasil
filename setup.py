@@ -3,15 +3,38 @@ import sys
 import logging
 import warnings
 import json
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages, Extension
 from distutils.sysconfig import get_python_lib
-import versioneer
+ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
+PYRJ_PATH = os.path.join(ROOT_PATH, '_vendor', 'python_rapidjson')
+sys.path.insert(0, ROOT_PATH)
+import versioneer  # noqa: E402
 ygg_ver = versioneer.get_version()
 
 
-print("In setup.py", sys.argv)
-logging.critical("In setup.py: %s" % sys.argv)
-        
+print(f"In setup.py: sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
+logging.critical(
+    f"In setup.py: sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
+
+
+# Get extension options for the vendored python-rapidjson
+sys.path.insert(0, PYRJ_PATH)
+if not any(x.startswith("--rj-include-dir") for x in sys.argv):
+    rj_include_dir = os.path.join('yggdrasil', 'rapidjson', 'include')
+    sys.argv.append(f"--rj-include-dir={rj_include_dir}")
+pwd = os.getcwd()
+os.chdir(PYRJ_PATH)
+try:
+    import pyrj_setup
+    pyrj_ext = pyrj_setup.extension_options
+    pyrj_ext.update(
+        sources=[os.path.join('yggdrasil', 'rapidjson.cpp')])
+finally:
+    sys.path.pop(0)
+    os.chdir(pwd)
+print(f"pyrj_ext = {pyrj_ext}")
+logging.critical(f"pyrj_ext = {pyrj_ext}")
+
 
 # Create .rst README from .md and get long description
 if os.path.isfile('README.rst'):
@@ -54,7 +77,8 @@ if '--user' in sys.argv:
     
 setup(
     name="yggdrasil-framework",
-    packages=find_packages(),
+    packages=find_namespace_packages(
+        exclude=["_vendor", "_vendor.*"]),
     include_package_data=True,
     version=ygg_ver,
     cmdclass=versioneer.get_cmdclass(),
@@ -67,6 +91,8 @@ setup(
     download_url=(
         "https://github.com/cropsinsilico/yggdrasil/archive/%s.tar.gz" % ygg_ver),
     keywords=["plants", "simulation", "models", "framework"],
+    ext_modules=[Extension('yggdrasil.rapidjson', **pyrj_ext)],
+    setup_requires=['numpy'],
     install_requires=requirements,
     tests_require=test_requirements,
     extras_require=extras_requirements,
@@ -76,10 +102,11 @@ setup(
         "Programming Language :: ML",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
@@ -91,5 +118,5 @@ setup(
         'console_scripts': console_scripts,
     },
     license="BSD",
-    python_requires='>=3.5',
+    python_requires='>=3.6',
 )

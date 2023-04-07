@@ -33,6 +33,7 @@ class NetCDFFileComm(FileComm):
     _default_extension = '.nc'
     _mode_as_bytes = False
     _synchronous_read = True
+    _deprecated_drivers = []
 
     def __init__(self, *args, **kwargs):
         self._fd_netcdf = None

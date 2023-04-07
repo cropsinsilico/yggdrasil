@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from yggdrasil import units
+from yggdrasil import units, rapidjson
 from tests.serialize import TestSerializeBase as base_class
 
 
@@ -14,21 +14,21 @@ _options = [
                    {'type': 'array',
                     'items': {'type': '1darray',
                               'subtype': 'float',
-                              'precision': 64}}},
+                              'precision': 8}}},
         'empty': [],
         'objects': [[np.zeros(3, 'float'), np.zeros(3, 'float')],
                     [np.ones(3, 'float'), np.ones(3, 'float')]],
         'extra_kwargs': {},
-        'typedef': {'type': 'array', 'items': {'type': '1darray',
-                                               'subtype': 'float',
-                                               'precision': 64}},
+        'datatype': {'type': 'array', 'items': {'type': '1darray',
+                                                'subtype': 'float',
+                                                'precision': 8}},
         'dtype': np.dtype("float64")}},
     {'explicit_testing_options': {
         'kwargs': {'datatype':
                    {'type': 'array',
                     'items': {'type': '1darray',
                               'subtype': 'float',
-                              'precision': 64}},
+                              'precision': 8}},
                    'field_names': [b'a', b'b'],
                    'field_units': [b'cm', b'g']},
         'empty': [],
@@ -37,17 +37,17 @@ _options = [
                     [units.add_units(np.ones(3, 'float'), 'cm'),
                      units.add_units(np.ones(3, 'float'), 'g')]],
         'extra_kwargs': {},
-        'typedef': {'type': 'array',
-                    'items': [{'type': '1darray',
-                               'subtype': 'float',
-                               'precision': 64,
-                               'title': 'a',
-                               'units': 'cm'},
-                              {'type': '1darray',
-                               'subtype': 'float',
-                               'precision': 64,
-                               'title': 'b',
-                               'units': 'g'}]},
+        'datatype': {'type': 'array',
+                     'items': [{'type': '1darray',
+                                'subtype': 'float',
+                                'precision': 8,
+                                'title': 'a',
+                                'units': 'cm'},
+                               {'type': '1darray',
+                                'subtype': 'float',
+                                'precision': 8,
+                                'title': 'b',
+                                'units': 'g'}]},
         'dtype': np.dtype([('a', '<f8'), ('b', '<f8')]),
         'field_names': ['a', 'b'],
         'field_units': ['cm', 'g']}},
@@ -56,7 +56,8 @@ _options = [
         'empty': b'',
         'objects': [float(x) for x in range(5)],
         'extra_kwargs': {},
-        'typedef': {'type': 'float', 'precision': 64},
+        'datatype': {'type': 'scalar', 'subtype': 'float',
+                     'precision': 8},
         'dtype': None}}]
 
 
@@ -79,10 +80,10 @@ class TestDefaultSerialize(base_class):
         r"""Test serialize/deserialize without format string."""
         if (len(instance_kwargs) == 0) and (class_name == 'DefaultSerialize'):
             for iobj in testing_options['objects']:
-                msg = instance.serialize(iobj, header_kwargs=header_info)
+                msg = instance.serialize(iobj, metadata=header_info)
                 iout, ihead = instance.deserialize(msg)
-                assert(iout == map_sent2recv(iobj))
-                # assert(ihead == header_info)
+                assert iout == map_sent2recv(iobj)
+                # assert ihead == header_info
             # with pytest.raises(Exception):
             #     instance.serialize(['msg', 0])
 
@@ -92,5 +93,5 @@ class TestDefaultSerialize(base_class):
         compatible."""
         if (len(instance_kwargs) == 0) and (class_name == 'DefaultSerialize'):
             instance.initialize_from_message(np.int64(1))
-            with pytest.raises(RuntimeError):
+            with pytest.raises(rapidjson.ComparisonError):
                 instance.update_serializer(datatype={'type': 'ply'})

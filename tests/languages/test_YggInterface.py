@@ -201,6 +201,8 @@ class TestYggClass(base_class):
             return {'format_str': format_str}
         elif class_name == 'YggAsciiTableOutput':
             return {}
+        elif class_name.endswith('Input'):
+            return {}
         return dict(testing_options.get('kwargs', {}))
 
     @pytest.fixture(scope="class")
@@ -358,23 +360,20 @@ class TestYggClass(base_class):
             close_comm(out)
 
     @pytest.fixture(autouse=True)
-    def pandas_equality_patch(self, monkeypatch, pandas_equality):
+    def _pandas_equality_patch(self, pandas_equality_patch):
         r"""Patch pandas DataFrame so that equals is used instead of '=='"""
-        with monkeypatch.context() as m:
-            import pandas
-            m.setattr(pandas.DataFrame, '__eq__', pandas_equality)
-            yield
+        pass
 
     def test_msg(self, filecomm, testing_options, instance, timeout,
                  test_comm, iodriver, wait_on_function,
-                 filename, direction, nested_approx, unyts_equality_patch):
+                 filename, direction, nested_approx):
         r"""Test sending/receiving message."""
         if direction == 'input':
             if filecomm:
                 for msg_recv in testing_options['recv']:
                     msg_flag, msg_recv0 = instance.recv(timeout)
                     assert msg_flag
-                    assert msg_recv0 == nested_approx(msg_recv)
+                    assert nested_approx(msg_recv) == msg_recv0
                 msg_flag, msg_recv0 = instance.recv(timeout)
                 assert not msg_flag
             else:
@@ -384,7 +383,7 @@ class TestYggClass(base_class):
                     assert msg_flag
                     msg_flag, msg_recv0 = instance.recv(timeout)
                     assert msg_flag
-                    assert msg_recv0 == nested_approx(msg_recv)
+                    assert nested_approx(msg_recv) == msg_recv0
         else:
             if filecomm:
                 for msg in testing_options['send']:
@@ -490,12 +489,12 @@ class TestYggRpcClient(TestYggClass):
 
     def test_msg(self, filecomm, testing_options, instance, timeout,
                  test_comm, iodriver, wait_on_function,
-                 filename, direction, nested_approx, unyts_equality_patch):
+                 filename, direction, nested_approx):
         r"""Test sending/receiving message."""
         super(TestYggRpcClient, self).test_msg(
             filecomm, testing_options, instance, timeout,
             test_comm, iodriver, wait_on_function, filename, direction,
-            nested_approx, unyts_equality_patch)
+            nested_approx)
         if direction == 'output':
             send_comm = test_comm
             recv_comm = instance

@@ -771,7 +771,7 @@ class CompilationToolBase(object):
     @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
                   unused_kwargs=None, skip_defaults=False,
-                  dont_skip_env_defaults=False, remove_flags=None,
+                  dont_skip_env_defaults=False,  # remove_flags=None,
                   with_asan=False, **kwargs):
         r"""Get a list of flags for the tool.
 
@@ -811,8 +811,6 @@ class CompilationToolBase(object):
             out = [out]
         if output_first is None:
             output_first = cls.output_first
-        if with_asan and cls.asan_flags:
-            out += cls.asan_flags
         # Add default & user defined flags
         if skip_defaults:
             # Include flags set by the environment (this is especially
@@ -834,13 +832,15 @@ class CompilationToolBase(object):
         if (outfile is not None) and (cls.output_key is not None):
             cls.append_flags(out, cls.output_key, outfile,
                              prepend=output_first, no_duplicates=True)
+        if with_asan and cls.asan_flags:
+            out += cls.asan_flags
         # Handle unused keyword argumetns
         if isinstance(unused_kwargs, dict):
             unused_kwargs.update(kwargs)
-        if isinstance(remove_flags, list):
-            for x in remove_flags:
-                if x in out:
-                    out.remove(x)
+        # if isinstance(remove_flags, list):
+        #     for x in remove_flags:
+        #         if x in out:
+        #             out.remove(x)
         return out
 
     @classmethod
@@ -1342,15 +1342,15 @@ class CompilationToolBase(object):
                 raise RuntimeError("Could not call command '%s': %s"
                                    % (' '.join(cmd), e))
         except BaseException as e:
-            print("Unexpected call error: %s" % e)
-            print(e, type(e))
+            try:
+                print(f"Unexpected call error {type(e)}: {e}")
+            except UnicodeDecodeError:  # pragma: debug
+                tools.print_encoded(e)
             raise
         # Check for output
         if (not skip_flags):
             if (out != 'clean'):
                 expected_products = [out]
-                if kwargs.get('import_lib', False):
-                    expected_products.append(kwargs['import_lib'])
                 for x in expected_products:
                     if not (os.path.isfile(x)
                             or os.path.isdir(x)):  # pragma: debug
@@ -1586,10 +1586,16 @@ class CompilerBase(CompilationToolBase):
                 dont_link = True
             else:
                 dont_link = False
-        # Add flag that model is yggdrasil
+        # Add flag that model is yggdrasil and set yggdrasil version
         if not cls.is_build_tool:
+            from yggdrasil import __version__
             kwargs.setdefault('definitions', [])
             kwargs['definitions'].append('WITH_YGGDRASIL')
+            yggver = __version__.split('+')[0].split('v')[-1].split('.')
+            if len(yggver) > 0:
+                kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}']
+            # if len(yggver) > 1:
+            #     kwargs['definitions'] += [f'YGGVER_MINOR={yggver[1]}']
         # Add logging level as a definition
         if logging_level is not None:
             kwargs.setdefault('definitions', [])
@@ -1856,7 +1862,8 @@ class CompilerBase(CompilationToolBase):
     @classmethod
     def asan_library(cls):
         r"""Return the address sanitizer library."""
-        assert cls.asan_flags and cls.object_tool
+        if not (cls.asan_flags and cls.object_tool):
+            return None
         if 'asan_library' in cls._language_cache:
             return cls._language_cache['asan_library']
         try:
@@ -2125,7 +2132,7 @@ class LinkerBase(CompilationToolBase):
                     library_libs_nonstd.append(x_f)
                 if (((cls.tooltype == 'linker') and x_f.endswith(cls.library_ext)
                      and ('library_rpath' in cls.flag_options))):
-                    if x_d not in library_rpath:
+                    if x_d and x_d not in library_rpath:
                         library_rpath.append(x_d)
         # Add libraries to library_flags instead of flags so they can be
         # used elsewhere
@@ -2423,6 +2430,9 @@ class CompiledModelDriver(ModelDriver):
     allow_parallel_build = False
     locked_buildfile = None
     kwargs_in_suffix = ['with_asan', 'disable_python_c_api', 'commtype']
+    standard_libraries = []
+    external_libraries = {}
+    internal_libraries = {}
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
         self.buildfile_lock = None
@@ -3111,6 +3121,9 @@ class CompiledModelDriver(ModelDriver):
         elif dep in cls.external_libraries:
             libclass = 'external'
             libinfo = cls.external_libraries[dep]
+        elif dep in cls.standard_libraries:
+            libclass = 'standard'
+            libinfo = {'libtype': 'shared', 'language': cls.language}
         toolname = libinfo.get('toolname', toolname)
         # Get default libtype and return if header_only library
         if libtype is None:
@@ -3162,24 +3175,21 @@ class CompiledModelDriver(ModelDriver):
             dep_lang = cls.get_dependency_info(dep, toolname=toolname).get(
                 'language', cls.language)
             tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
-            import_lib = False
-            if (((libinfo.get('libtype', None) == 'windows_import')
-                 and (libtype == 'static'))):
-                # Name import lib using dll
-                import_lib = (tool.toolname == 'cl')
-                libtype = 'shared'
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
                                        suffix=suffix,
                                        working_dir=os.path.dirname(src))
-            if import_lib:
-                out = os.path.splitext(out)[0] + '.lib'
+        elif libclass == 'standard':
+            tool = cls.get_tool('compiler', language=cls.language,
+                                toolname=toolname).linker()
+            out = f"{tool.library_prefix}{dep}{tool.library_ext}"
         elif isinstance(dep, str) and os.path.isfile(dep):
             out = dep
         if out is None:
             if default is None:
-                raise ValueError("Could not determine library path for "
-                                 "dependency '%s'" % dep)
+                raise ValueError(f"Could not determine library path for "
+                                 f"dependency '{dep}' "
+                                 f"(libclass = {libclass})")
             else:
                 out = default
         return out
@@ -3232,6 +3242,8 @@ class CompiledModelDriver(ModelDriver):
             out = cls.cfg.get(dep_lang, '%s_include' % dep, None)
             if (out is not None) and os.path.isfile(out):
                 out = os.path.dirname(out)
+        elif dep in cls.standard_libraries:
+            return []
         elif isinstance(dep, str) and os.path.isfile(dep):
             out = os.path.dirname(dep)
         if not out:
@@ -3301,6 +3313,29 @@ class CompiledModelDriver(ModelDriver):
                 new_deps.insert(0, d)
             out = out[:min_dep] + new_deps + out[min_dep:]
         return out
+
+    @classmethod
+    def is_standard_library(cls, dep):
+        r"""Determine if a dependency is a standard library.
+
+        Args:
+            dep (str, tuple): Dependency name or tuple with language and
+                dependency name.
+
+        Returns:
+            bool: True if the dependency is a standard library, false
+                otherwise.
+
+        """
+        drv = cls
+        if isinstance(dep, tuple):
+            assert len(dep) == 2
+            dep_lang = dep[0]
+            dep = dep[1]
+            if dep_lang != cls.language:
+                drv = import_component('model', dep_lang)
+                return drv.is_standard_library(dep)
+        return (dep in drv.standard_libraries)
 
     @classmethod
     def get_compiler_flags(cls, toolname=None, compiler=None, **kwargs):
@@ -3527,13 +3562,6 @@ class CompiledModelDriver(ModelDriver):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
-                for dep in cls.get_dependency_order(
-                        [cls.interface_library], toolname=toolname,
-                        disable_python_c_api=kwargs.get('disable_python_c_api', False)):
-                    if dep not in internal_dependencies:
-                        dep_info = cls.get_dependency_info(dep, toolname=toolname)
-                        if dep_info.get('libtype', None) in ['static', 'shared']:
-                            internal_dependencies.append(dep)
             for k in cls.get_external_libraries(no_comm_libs=True):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
@@ -3548,7 +3576,8 @@ class CompiledModelDriver(ModelDriver):
                 dep, toolname=toolname, **suffix_kws)
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
-                     and (not os.path.isfile(dep_lib)))):
+                     and (not os.path.isfile(dep_lib))
+                     and not cls.is_standard_library(dep))):
                     if dep in internal_dependencies:
                         # If this is called recursively, verify that
                         # dep_lib is produced by compiling dep.
@@ -3564,7 +3593,7 @@ class CompiledModelDriver(ModelDriver):
                     if not os.path.isfile(dep_lib):  # pragma: debug
                         raise RuntimeError(
                             f"Library for {dep} dependency does not "
-                            f"exist: 'dep_lib'.")
+                            f"exist: '{dep_lib}'.")
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):
@@ -3698,6 +3727,8 @@ class CompiledModelDriver(ModelDriver):
         if lib in cls.internal_libraries:
             src = cls.get_dependency_source(lib)
             return os.path.isfile(src)
+        if lib in cls.standard_libraries:
+            return True
         dep_lang = cls.external_libraries[lib].get('language', cls.language)
         for lib_typ in cls.external_libraries[lib].keys():
             if lib_typ in ['libtype', 'language', 'for_python_api']:
@@ -4210,23 +4241,13 @@ class CompiledModelDriver(ModelDriver):
             for k, v in cls.get_dependency_info(dep, toolname=toolname).items():
                 if k == 'directory':
                     kwargs.setdefault('working_dir', v)
-                if k == 'toolname':
-                    toolname = v
-                elif k == 'for_python_api':
-                    if not kwargs.get('dry_run', False):
-                        assert not kwargs.get('disable_python_c_api', False)
-                else:
-                    kwargs[k] = copy.deepcopy(v)
+                kwargs[k] = copy.deepcopy(v)
             src = kwargs.pop('source', None)
             if (src is None) or (not os.path.isabs(src)):
                 src = cls.get_dependency_source(dep, toolname=toolname)
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)
             suffix_kws = cls.select_suffix_kwargs(kwargs)
-            windows_import = (kwargs['libtype'] == 'windows_import')
-            if windows_import:
-                # Compile dynamic library
-                kwargs['libtype'] = 'shared'
             if kwargs['libtype'] == 'header_only':
                 return src
             elif kwargs['libtype'] in ['static', 'shared']:
@@ -4236,10 +4257,6 @@ class CompiledModelDriver(ModelDriver):
                         toolname=toolname, **suffix_kws))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
-                if windows_import:
-                    kwargs.setdefault(
-                        'import_lib',
-                        os.path.splitext(kwargs['out'])[0] + '.lib')
             kwargs.setdefault('suffix', '')
             kwargs['suffix'] += cls.get_internal_suffix(**suffix_kws)
             return cls.call_compiler(src, toolname=toolname, **kwargs)

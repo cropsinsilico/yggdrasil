@@ -7,3 +7,4 @@ class WOFOSTParamFileComm(FileComm.FileComm):
     _filetype = 'wofost'
     _schema_subtype_description = 'The file is a WOFOST parameter file.'
     _default_serializer = 'wofost'
+    _deprecated_drivers = []

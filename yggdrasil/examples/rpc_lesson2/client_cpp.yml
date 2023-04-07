@@ -21,7 +21,7 @@ models:
 connections:
   - input: output_log1
     output: client_output1.txt
-    in_temp: True
+    in_temp: true
   - input: output_log2
     output: client_output2.txt
-    in_temp: True
+    in_temp: true

@@ -23,12 +23,12 @@ class RPCResponseDriver(ConnectionDriver):
     def __init__(self, model_response_address, msg_id, **kwargs):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
-        inputs[0]['name'] = 'server_model_response.' + msg_id
+        inputs[0]['name'] = 'server_model_response-' + msg_id
         inputs[0]['is_response_server'] = True
         kwargs['inputs'] = inputs
         # Output communicator
         outputs = kwargs.get('outputs', [{}])
-        outputs[0]['name'] = 'client_model_response.' + msg_id
+        outputs[0]['name'] = 'client_model_response-' + msg_id
         outputs[0]['is_response_client'] = True
         if model_response_address is not None:
             outputs[0]['address'] = model_response_address
@@ -64,8 +64,9 @@ class RPCResponseDriver(ConnectionDriver):
             bool: Success or failure of send.
 
         """
-        if msg.header and ('request_id' in msg.header):
+        if msg.header and ('request_id' in msg.header['__meta__']):
             kwargs.setdefault('header_kwargs', {})
-            kwargs['header_kwargs'].setdefault(
-                'request_id', msg.header['request_id'])
+            kwargs['header_kwargs'].setdefault('__meta__', {})
+            kwargs['header_kwargs']['__meta__'].setdefault(
+                'request_id', msg.header['__meta__']['request_id'])
         return super(RPCResponseDriver, self).send_message(msg, **kwargs)

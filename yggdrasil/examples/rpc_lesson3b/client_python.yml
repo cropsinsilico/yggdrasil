@@ -6,7 +6,7 @@ model:
   client_of: server
   allow_threading: true
   env:
-    NTHREAD: 10
+    NTHREAD: 5
   inputs:
     name: in_buf
     default_file:

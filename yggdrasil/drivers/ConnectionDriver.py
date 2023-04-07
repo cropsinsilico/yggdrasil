@@ -11,12 +11,6 @@ from yggdrasil.components import create_component, isinstance_component
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 
 
-def _translate_list2element(arr):
-    if isinstance(arr, (list, tuple)):
-        arr = arr[0]
-    return arr
-
-
 class TaskThreadError(RuntimeError):
     pass
 
@@ -151,7 +145,7 @@ class ConnectionDriver(Driver):
                   each.
               'broadcast': Send the same message to each comm.
               'scatter': Send part of message (must be a list) to each comm.
-        translator (str, func, optional): Function or string specifying function
+        transform (str, func, optional): Function or string specifying function
             that should be used to translate messages from the input communicator
             before passing them to the output communicator. If a string, the
             format should be "<package.module>:<function>" so that <function>
@@ -176,7 +170,7 @@ class ConnectionDriver(Driver):
         nproc (int): Number of messages processed.
         nsent (int): Number of messages sent.
         state (str): Descriptor of last action taken.
-        translator (func): Function that will be used to translate messages from
+        transform (func): Function that will be used to translate messages from
             the input communicator before passing them to the output communicator.
         timeout_send_1st (float): Time in seconds that should be waited before
             giving up on the first send.
@@ -203,7 +197,8 @@ class ConnectionDriver(Driver):
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
-                   'default': [{}],
+                   'allowSingular': True,
+                   'aliases': ['input', 'from', 'input_file', 'input_files'],
                    'description': (
                        'One or more name(s) of model output channel(s) '
                        'and/or new channel/file objects that the '
@@ -214,7 +209,8 @@ class ConnectionDriver(Driver):
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                         {'$ref': '#/definitions/file'}]},
-                    'default': [{}],
+                    'allowSingular': True,
+                    'aliases': ['output', 'to', 'output_file', 'output_files'],
                     'description': (
                         'One or more name(s) of model input channel(s) '
                         'and/or new channel/file objects that the '
@@ -228,17 +224,41 @@ class ConnectionDriver(Driver):
         'output_pattern': {'type': 'string',
                            'enum': ['cycle', 'broadcast', 'scatter'],
                            'default': 'broadcast'},
-        'translator': {'type': 'array',
-                       'items': {'oneOf': [
-                           {'type': 'function'},
-                           {'$ref': '#/definitions/transform'}]}},
-        'onexit': {'type': 'string'}}
+        'transform': {'type': 'array',
+                      'items': {'anyOf': [
+                          {'$ref': '#/definitions/transform'},
+                          {'type': ['function', 'string']}]},
+                      'allowSingular': True,
+                      'aliases': ['transforms', 'translator',
+                                  'translators']},
+        'read_meth': {'type': 'string', 'deprecated': True,
+                      'enum': ['all', 'line', 'table_array', 'ascii',
+                               'binary', 'json', 'map', 'mat', 'netcdf',
+                               'obj', 'pandas', 'pickle', 'ply', 'table',
+                               'wofost', 'yaml']},
+        'write_meth': {'type': 'string', 'deprecated': True,
+                       'enum': ['all', 'line', 'table_array', 'ascii',
+                                'binary', 'json', 'map', 'mat', 'netcdf',
+                                'obj', 'pandas', 'pickle', 'ply', 'table',
+                                'wofost', 'yaml']},
+        'onexit': {'type': 'string'},
+        'working_dir': {'type': 'string'}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
+    _schema_additional_kwargs_base = {
+        'pushProperties': {
+            '!$properties/inputs/items': ['transform', 'onexit',
+                                          'read_meth', 'write_meth'],
+            '!$properties/outputs/items/anyOf/1': ['transform', 'onexit',
+                                                   'read_meth', 'write_meth'],
+            ('$properties/inputs/items/anyOf/1/allOf/1/anyOf/0/'
+             'properties/serializer'): True,
+            ('$properties/outputs/items/anyOf/1/allOf/1/anyOf/0/'
+             'properties/serializer'): True}}
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread',
         'icomm', 'ocomm']
 
-    def __init__(self, name, translator=None, single_use=False, onexit=None,
+    def __init__(self, name, single_use=False, onexit=None,
                  models=None, **kwargs):
         # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
@@ -259,17 +279,15 @@ class ConnectionDriver(Driver):
             self.task_thread = RemoteTaskLoop(
                 self, name=('%s.TaskThread' % self.name))
         # Translator
-        if translator is None:
-            translator = []
-        elif not isinstance(translator, list):
-            translator = [translator]
-        self.translator = []
-        for t in translator:
+        if self.transform is None:
+            self.transform = []
+        elif not isinstance(self.transform, list):
+            self.transform = [self.transform]
+        for i, t in enumerate(self.transform):
             if isinstance(t, dict):
-                t = create_component('transform', **t)
-            if not hasattr(t, '__call__'):
-                raise ValueError("Translator %s not callable." % t)
-            self.translator.append(t)
+                self.transform[i] = create_component('transform', **t)
+            if not hasattr(self.transform[i], '__call__'):
+                raise ValueError(f"Transform {self.transform[i]} not callable.")
         if (onexit is not None) and (not hasattr(self, onexit)):
             raise ValueError("onexit '%s' is not a class method." % onexit)
         self.onexit = onexit
@@ -339,7 +357,7 @@ class ConnectionDriver(Driver):
                 if ((x.get('datatype', {}).get('from_function', False)
                      and (x.get('datatype', {}).get('type', None)
                           in ['any', 'instance']))):
-                    x['datatype'] = {'type': 'bytes'}
+                    x['datatype'] = {'type': 'scalar', 'subtype': 'string'}
                 x.get('datatype', {}).pop('from_function', False)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
@@ -840,12 +858,12 @@ class ConnectionDriver(Driver):
                 return False
             msg = self.icomm.recv(return_message_object=True, **kwargs)
             self.errors += self.icomm.errors
-        if msg.header and ('model' in msg.header):
-            self.models_recvd.setdefault(msg.header['model'], 0)
-            self.models_recvd[msg.header['model']] += 1
-            if ((self.models_recvd[msg.header['model']] == 1
-                 and msg.header['model'] not in self.models['input'])):
-                self.models['input'].append(msg.header['model'])
+        if msg.header and ('model' in msg.header.get('__meta__', {})):
+            self.models_recvd.setdefault(msg.header['__meta__']['model'], 0)
+            self.models_recvd[msg.header['__meta__']['model']] += 1
+            if ((self.models_recvd[msg.header['__meta__']['model']] == 1
+                 and msg.header['__meta__']['model'] not in self.models['input'])):
+                self.models['input'].append(msg.header['__meta__']['model'])
         if msg.flag == CommBase.FLAG_EOF:
             return self.on_eof(msg)
         if msg.flag == CommBase.FLAG_SUCCESS:
@@ -883,7 +901,7 @@ class ConnectionDriver(Driver):
         """
         if (self.ocomm._send_serializer) and self.icomm.serializer.initialized:
             self.update_serializer(msg)
-        for t in self.translator:
+        for t in self.transform:
             msg.args = t(msg.args)
         return msg
 
@@ -892,20 +910,15 @@ class ConnectionDriver(Driver):
         self.debug('Before update:\n  icomm:%s\n  ocomm:%s\n'
                    % ("\n".join(self.icomm.get_status_message(nindent=1)[0][1:]),
                       "\n".join(self.ocomm.get_status_message(nindent=1)[0][1:])))
-        for t in self.translator:
+        for t in self.transform:
             if isinstance_component(t, 'transform'):
                 t.set_original_datatype(msg.stype)
                 msg.stype = t.transformed_datatype
+        if self.transform:
+            msg.sinfo = {}
         # This can be removed if send_message is set up to update and send the
         # received message rather than create a new one by sending msg.args
         self.ocomm.update_serializer_from_message(msg)
-        if (((msg.stype['type'] == 'array')
-             and (self.ocomm.serializer.typedef['type'] != 'array')
-             and (len(msg.stype['items']) == 1))):
-            # if (((self.icomm.serializer.typedef['type'] == 'array')
-            #      and (self.ocomm.serializer.typedef['type'] != 'array')
-            #      and (len(self.icomm.serializer.typedef['items']) == 1))):
-            self.translator.insert(0, _translate_list2element)
         self.debug('After update:\n  icomm:\n%s\n  ocomm:\n%s\n'
                    % ("\n".join(self.icomm.get_status_message(nindent=1)[0][1:]),
                       "\n".join(self.ocomm.get_status_message(nindent=1)[0][1:])))
@@ -991,9 +1004,11 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             self._used = True
-        if (msg.header is not None) and ('model' in msg.header):
+        if (msg.header is not None) and ('model' in msg.header.get('__meta__', {})):
             kwargs.setdefault('header_kwargs', {})
-            kwargs['header_kwargs'].setdefault('model', msg.header['model'])
+            kwargs['header_kwargs'].setdefault('__meta__', {})
+            kwargs['header_kwargs']['__meta__'].setdefault(
+                'model', msg.header['__meta__']['model'])
         kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
                        if k in kwargs}
         msg_out = self.ocomm.prepare_message(msg.args, **kws_prepare)

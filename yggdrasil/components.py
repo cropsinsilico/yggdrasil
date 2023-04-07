@@ -1,8 +1,6 @@
 import os
-import glob
 import copy
 import six
-import inspect
 import importlib
 import contextlib
 import weakref
@@ -19,62 +17,62 @@ class ComponentError(BaseException):
     pass
 
 
-class ClassRegistry(OrderedDict):
-    r"""Class for registering classes."""
+# class ClassRegistry(OrderedDict):
+#     r"""Class for registering classes."""
 
-    def __init__(self, *args, import_function=None, **kwargs):
-        module = inspect.getmodule(inspect.stack()[1][0])
-        self._module = module.__name__
-        self._directory = os.path.dirname(module.__file__)
-        self._import_function = import_function
-        self._imported = False
-        super(ClassRegistry, self).__init__(*args, **kwargs)
+#     def __init__(self, *args, import_function=None, **kwargs):
+#         module = inspect.getmodule(inspect.stack()[1][0])
+#         self._module = module.__name__
+#         self._directory = os.path.dirname(module.__file__)
+#         self._import_function = import_function
+#         self._imported = False
+#         super(ClassRegistry, self).__init__(*args, **kwargs)
 
-    def import_classes(self):
-        r"""Import all classes in the same directory."""
-        if self._imported:
-            return
-        self._imported = True
-        for x in sorted(glob.glob(os.path.join(self._directory, '*.py'))):
-            mod = os.path.basename(x)[:-3]
-            if not mod.startswith('__'):
-                importlib.import_module(self._module + '.%s' % mod)
-        if self._import_function is not None:
-            self._import_function()
+#     def import_classes(self):
+#         r"""Import all classes in the same directory."""
+#         if self._imported:
+#             return
+#         self._imported = True
+#         for x in sorted(glob.glob(os.path.join(self._directory, '*.py'))):
+#             mod = os.path.basename(x)[:-3]
+#             if not mod.startswith('__'):
+#                 importlib.import_module(self._module + '.%s' % mod)
+#         if self._import_function is not None:
+#             self._import_function()
 
-    def keys(self, *args, **kwargs):
-        self.import_classes()
-        return super(ClassRegistry, self).keys(*args, **kwargs)
+#     def keys(self, *args, **kwargs):
+#         self.import_classes()
+#         return super(ClassRegistry, self).keys(*args, **kwargs)
 
-    def values(self, *args, **kwargs):
-        self.import_classes()
-        return super(ClassRegistry, self).values(*args, **kwargs)
+#     def values(self, *args, **kwargs):
+#         self.import_classes()
+#         return super(ClassRegistry, self).values(*args, **kwargs)
 
-    def items(self, *args, **kwargs):
-        self.import_classes()
-        return super(ClassRegistry, self).items(*args, **kwargs)
+#     def items(self, *args, **kwargs):
+#         self.import_classes()
+#         return super(ClassRegistry, self).items(*args, **kwargs)
 
-    def __contains__(self, key):
-        self.import_classes()
-        return super(ClassRegistry, self).__contains__(key)
+#     def __contains__(self, key):
+#         self.import_classes()
+#         return super(ClassRegistry, self).__contains__(key)
 
-    def get(self, key, default=None):
-        if (not self.has_entry(key)):
-            self.import_classes()
-        return super(ClassRegistry, self).get(key, default)
+#     def get(self, key, default=None):
+#         if (not self.has_entry(key)):
+#             self.import_classes()
+#         return super(ClassRegistry, self).get(key, default)
 
-    def __getitem__(self, *args, **kwargs):
-        try:
-            return super(ClassRegistry, self).__getitem__(*args, **kwargs)
-        except KeyError:  # pragma: no cover
-            # This will only be called during import
-            if self._imported:
-                raise
-            self.import_classes()
-            return super(ClassRegistry, self).__getitem__(*args, **kwargs)
+#     def __getitem__(self, *args, **kwargs):
+#         try:
+#             return super(ClassRegistry, self).__getitem__(*args, **kwargs)
+#         except KeyError:  # pragma: no cover
+#             # This will only be called during import
+#             if self._imported:
+#                 raise
+#             self.import_classes()
+#             return super(ClassRegistry, self).__getitem__(*args, **kwargs)
 
-    def has_entry(self, key):
-        return super(ClassRegistry, self).__contains__(key)
+#     def has_entry(self, key):
+#         return super(ClassRegistry, self).__contains__(key)
 
 
 def registration_in_progress():
@@ -347,6 +345,7 @@ class ComponentMeta(type):
     r"""Meta class for registering schema components."""
     
     def __new__(meta, name, bases, class_dict):
+        class_dict.setdefault('_schema_additional_kwargs_no_inherit', {})
         cls = type.__new__(meta, name, bases, class_dict)
         # Determine subtype
         subtype = None
@@ -482,6 +481,8 @@ class ComponentBase(ComponentBaseUnregistered):
         _dont_register (bool): If True, the component class will be be registered
             and the before_registration class method will not be called. Defaults
             to False.
+        _schema_no_default_subtype (bool): If True, the subtype schema
+            will not have a default subtype set. Defaults to False.
         
 
     """
@@ -497,6 +498,10 @@ class ComponentBase(ComponentBaseUnregistered):
     _schema_excluded_from_inherit = []
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
+    _schema_additional_kwargs = {}
+    _schema_additional_kwargs_base = {}
+    _schema_additional_kwargs_no_inherit = {}
+    _schema_no_default_subtype = False
     _dont_register = False
 
     def __new__(cls, *args, **kwargs):
@@ -525,7 +530,22 @@ class ComponentBase(ComponentBaseUnregistered):
         state['_input_kwargs'] = {}
         self.__dict__.update(state)
 
-    def __init__(self, skip_component_schema_normalization=None, **kwargs):
+    def _ygg_rapidjson(self):
+        r"""Method for getting a rapidjson-friendly version of a class.
+
+        Returns:
+            dict: Dictionary of properties obeying the schema.
+
+        """
+        out = {self._schema_subtype_key:
+               getattr(self, f"_{self._schema_subtype_key}")}
+        for k in self._schema_properties.keys():
+            if getattr(self, k, None) is not None:
+                out[k] = getattr(self, k)
+        return out
+
+    def __init__(self, skip_component_schema_normalization=None,
+                 additional_component_properties=None, **kwargs):
         if skip_component_schema_normalization is None:
             skip_component_schema_normalization = (
                 not (os.environ.get('YGG_VALIDATE_COMPONENTS', 'None').lower()
@@ -539,7 +559,7 @@ class ComponentBase(ComponentBaseUnregistered):
             subtype = getattr(self, self._schema_subtype_key,
                               getattr(self, '_%s' % self._schema_subtype_key, None))
         # Fall back to some simple parsing/normalization to save time on
-        # full jsonschema normalization
+        # full rapidjson normalization
         self._defaults_set = []
         for k, v in self._schema_properties.items():
             if k in self._schema_excluded_from_class:
@@ -560,29 +580,39 @@ class ComponentBase(ComponentBaseUnregistered):
              and (not self._dont_register))):
             from yggdrasil.schema import get_schema
             s = get_schema().get_component_schema(
-                comptype, subtype, relaxed=True,
-                allow_instance_definitions=True)
+                comptype, subtype, relaxed=True)
             props = list(s['properties'].keys())
             if not skip_component_schema_normalization:
-                from yggdrasil import metaschema
                 kwargs.setdefault(self._schema_subtype_key, subtype)
+                if additional_component_properties:
+                    kwargs.update(additional_component_properties)
                 # Remove properties that shouldn't ve validated in class
+                extra_kwargs = {}
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
                         del s['properties'][k]
+                    if k in s['required']:
+                        s['required'].remove(k)
+                    if k in kwargs:
+                        extra_kwargs[k] = kwargs.pop(k)
                 # Validate and normalize
-                metaschema.validate_instance(kwargs, s, normalize=False)
-                # TODO: Normalization performance needs improvement
+                from yggdrasil import rapidjson
                 # import pprint
-                # print('before')
-                # pprint.pprint(kwargs_comp)
-                # kwargs_comp = metaschema.validate_instance(kwargs_comp, s,
-                #                                            normalize=True)
-                # kwargs.update(kwargs_comp)
-                # print('normalized')
-                # pprint.pprint(kwargs_comp)
+                # print(f'before: {self}\n{pprint.pformat(kwargs)}')
+                try:
+                    kwargs = rapidjson.normalize(kwargs, s)
+                    kwargs.update(extra_kwargs)
+                except BaseException:  # pragma: debug
+                    import pprint
+                    pprint.pprint(kwargs)
+                    raise
+                # print(f'after: {self}\n{pprint.pformat(kwargs)}')
         else:
             props = self._schema_properties.keys()
+            for k in props:
+                for x in self._schema_properties[k].get('aliases', []):
+                    if x in kwargs:
+                        kwargs.setdefault(k, kwargs.pop(x))
         # Set attributes based on properties
         for k in props:
             if k in self._schema_excluded_from_class:
