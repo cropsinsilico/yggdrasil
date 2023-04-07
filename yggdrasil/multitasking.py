@@ -86,8 +86,12 @@ def check_sockets():  # pragma: debug
 
 def ygg_atexit():  # pragma: debug
     r"""Things to do at exit."""
-    check_locks()
-    check_threads()
+    try:
+        check_locks()
+        check_threads()
+    except ValueError:
+        # Allow for logger to have disconnected
+        pass
     # # This causes a segfault in a C dependency
     # if not is_subprocess():
     #     check_sockets()

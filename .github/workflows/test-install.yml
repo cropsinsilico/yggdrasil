@@ -242,7 +242,8 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+    - if: (matrix.install-method == 'pip' || runner.os == 'Windows') && env.INSTALLJULIA
+        == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
@@ -573,7 +574,8 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+    - if: (matrix.install-method == 'pip' || runner.os == 'Windows') && env.INSTALLJULIA
+        == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
@@ -896,7 +898,8 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+    - if: (matrix.install-method == 'pip' || runner.os == 'Windows') && env.INSTALLJULIA
+        == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
@@ -1202,7 +1205,8 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+    - if: (matrix.install-method == 'pip' || runner.os == 'Windows') && env.INSTALLJULIA
+        == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
@@ -1507,7 +1511,8 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+    - if: (matrix.install-method == 'pip' || runner.os == 'Windows') && env.INSTALLJULIA
+        == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'

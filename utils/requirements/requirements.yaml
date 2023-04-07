@@ -187,8 +187,13 @@ extras:
         - method: brew
         - method: choco
         # fails currently on Mac M1, but PR in progress to fix it
-        - method: conda
+        # fails on windows, unclear if it will be added
+        - name: julia>=1.8.3
+          method: conda
           host: True
+          os: unix
+        - method: conda_skip
+          os: win
     - toml
   mpi:
     - mpi4py

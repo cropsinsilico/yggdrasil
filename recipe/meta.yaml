@@ -156,11 +156,11 @@ outputs:
         - {{ pin_subpackage('yggdrasil.julia') }}
     requirements:
       host:
-        - julia
+        - julia >=1.8.3  # [not win]
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - julia
+        - julia >=1.8.3  # [not win]
         - toml
   - name: yggdrasil.mpi
     build:

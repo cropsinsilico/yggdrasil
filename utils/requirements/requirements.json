@@ -355,8 +355,14 @@
               "method": "choco"
             },
             {
+              "name": "julia>=1.8.3",
               "method": "conda",
-              "host": true
+              "host": true,
+              "os": "unix"
+            },
+            {
+              "method": "conda_skip",
+              "os": "win"
             }
           ]
         }
