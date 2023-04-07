@@ -483,8 +483,6 @@ class CPPModelDriver(CModelDriver):
 
         """
         if in_definition:
-            if not isinstance(vars_list, list):
-                vars_list = [vars_list]
             new_vars_list = []
             for x in vars_list:
                 if isinstance(x, dict) and cls.is_cpp_class(x):
