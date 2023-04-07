@@ -1,3 +1,4 @@
+from yggdrasil import platform
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 
@@ -111,6 +112,7 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
                 cls.run_executable(['-e', f'using {lib}'])
                 cls._library_cache[lib] = True
             except RuntimeError:
+                cls.run_executable(['-e', '"using Pkg; Pkg.status()"'])
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
 
@@ -163,6 +165,21 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         out += [f"{var['name']}_type = typeof({var['name']}[1])",
                 f"global {var['name']} = Array{{{var['name']}_type}}({var['name']})"]
         return out
+
+    @classmethod
+    def write_executable_import(cls, **kwargs):
+        r"""Add import statements to executable lines.
+       
+        Args:
+            **kwargs: Keyword arguments for import statement.
+
+        Returns:
+            list: Lines required to complete the import.
+ 
+        """
+        if platform._is_win:  # pragma: windows
+            kwargs['filename'] = kwargs['filename'].replace('\\', '\\\\')
+        return super(JuliaModelDriver, cls).write_executable_import(**kwargs)
     
     @classmethod
     def get_testing_options(cls, **kwargs):

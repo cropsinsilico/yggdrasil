@@ -45,5 +45,6 @@ def test_display_example():
 
 def test_examples_for_all_languages():
     r"""Test that there examples are replicated across languages."""
+    assert find_missing(ignore_examples=[])
     assert not find_missing(languages='c')['c']
     assert not find_missing()

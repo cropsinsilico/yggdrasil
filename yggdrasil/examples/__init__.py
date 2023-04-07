@@ -1,7 +1,6 @@
 """Tools for accessing examples from python."""
 import os
 import glob
-import logging
 from yggdrasil import tools, languages, serialize, constants
 
 
@@ -33,8 +32,6 @@ def register_example(example_dir):
     example_base = os.path.basename(example_dir)
     srcdir = os.path.join(example_dir, 'src')
     if not os.path.isdir(srcdir):  # pragma: no cover
-        if not tools.is_subprocess():
-            logging.error("Missing source directory: %s" % srcdir)
         return {}
     # Determine which languages are present in the example
     lang_base = []
