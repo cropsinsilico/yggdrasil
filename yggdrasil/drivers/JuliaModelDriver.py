@@ -109,7 +109,8 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         """
         if lib not in cls._library_cache:
             try:
-                cls.run_executable(['-e', f'using {lib}'])
+                cls.run_executable(['-e', f'using {lib}'],
+                                   env=cls.set_env_class())
                 cls._library_cache[lib] = True
             except RuntimeError:
                 try:
@@ -120,20 +121,23 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
                     with open(fname, 'w') as fd:
                         fd.write('using Pkg\nPkg.status()\n')
                     print(cls.run_executable([fname]))
+                    print(cls.run_executable([fname],
+                                             env=cls.set_env_class()))
                 finally:
                     if os.path.isfile(fname):
                         os.remove(fname)
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
 
-    def set_env(self, **kwargs):
+    @classmethod
+    def set_env_class(cls, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(JuliaModelDriver, self).set_env(**kwargs)
+        out = super(JuliaModelDriver, cls).set_env_class(**kwargs)
         out['PYTHON'] = PythonModelDriver.get_interpreter()
         return out
 

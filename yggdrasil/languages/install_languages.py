@@ -106,6 +106,7 @@ def import_language_install(language, no_import=False):
             yield install
         except BaseException:  # pragma: debug
             install = None
+            raise
         finally:
             sys.path.pop(0)
             if install is not None:
