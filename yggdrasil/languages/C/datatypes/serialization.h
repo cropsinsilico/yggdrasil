@@ -282,7 +282,7 @@ public:
     size_t size_new = static_cast<size_t>(buffer.GetLength()) + 2 * size_sep;
     if (size_new > size_max) {
       if (metaOnly)
-	ygglog_throw_error("Header::format: meta already excluded, cannot make header any smaller.");
+	ygglog_throw_error("Header::format: Extra data already excluded, cannot make header any smaller.");
       flags |= HEAD_META_IN_DATA;
       SetMetaBool("in_data", true);
       formatBuffer(buffer_body);

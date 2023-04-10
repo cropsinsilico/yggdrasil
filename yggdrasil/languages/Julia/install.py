@@ -185,8 +185,7 @@ def requirements_from_project_toml(fname=None):
     return list(contents['deps'].keys())
 
 
-def install(args=None, skip_requirements=None,
-            update_requirements=None):
+def install(args=None, skip_requirements=None, update_requirements=None):
     r"""Attempt to install the Julia interface.
 
     Args:

@@ -2,14 +2,14 @@
 History
 =======
 
-1.9.1 (2023-4-10) Add support for models written in Julia
+1.9.1 (2023-4-11) Add support for models written in Julia
 ------------------
 
 * Added Julia interface with units implemented via Unitful
 * Added Julia versions of examples
 
 
-1.9.0 (2023-04-07) Migrate to using extended version of rapidjson/python-rapidjson for serialization
+1.9.0 (2023-04-10) Migrate to using extended version of rapidjson/python-rapidjson for serialization
 ------------------
 
 * Dropped support for Python 3.5

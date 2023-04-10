@@ -1486,12 +1486,17 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
         param = SetupParam(method, **kwargs)
     cmds = []
     install_flags = ''
+    install_prefix = ''
+    if param.fallback_to_conda:
+        install_prefix = f"conda run -n {param.conda_env} "
     if param.install_opts['r']:
         if param.fallback_to_conda:
-            R_exe = locate_conda_exe(param.conda_env, 'R',
-                                     use_mamba=param.use_mamba,
-                                     allow_missing=True)
-            install_flags += f" --r-interpreter={R_exe}"
+            # TODO: This may not be necessary with conda run
+            # R_exe = locate_conda_exe(param.conda_env, 'R',
+            #                          use_mamba=param.use_mamba,
+            #                          allow_missing=True)
+            # install_flags += f" --r-interpreter={R_exe}"
+            pass
         elif _on_gha and _is_unix and not param.install_opts['no_sudo']:
             install_flags += ' --sudoR'
     src_dir = os.path.dirname(os.path.dirname(__file__))
@@ -1499,7 +1504,7 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
         src_dir = os.path.abspath(src_dir)
     cmds += [
         f"cd {os.path.dirname(src_dir)}",  # avoid accidentally calling local
-        f"{param.python_cmd} -m yggdrasil install all{install_flags}"]
+        f"{install_prefix}{param.python_cmd} -m yggdrasil install all{install_flags}"]
     # TODO: Call configure?
     if _on_ci or param.for_development:
         coverage_flags = ''
