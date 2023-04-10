@@ -122,6 +122,19 @@ def call_julia(julia_cmd, **kwargs):
     if 'env' not in kwargs:
         kwargs['env'] = os.environ.copy()
     kwargs['env']['PYTHON'] = sys.executable
+    if ((kwargs['env'].get('CONDA_PREFIX', None)
+         and not kwargs['env'].get('JULIA_DEPOT_PATH', None))):
+        kwargs['env']['JULIA_DEPOT_PATH'] = os.pathsep.join(
+            os.path.join(kwargs['env']['CONDA_PREFIX'], 'share', 'julia'),
+            '')
+        kwargs['env']['JULIA_PROJECT'] = (
+            f"@{os.path.basename(kwargs['env']['CONDA_PREFIX'])}")
+        kwargs['env']['JULIA_LOAD_PATH'] = os.pathsep.join(
+            "@", kwargs['env']['JULIA_PROJECT'], "@stdlib")
+        kwargs['env']['CONDA_JL_HOME'] = kwargs['env']['CONDA_PREFIX']
+        kwargs['env']['CONDA_JL_CONDA_EXE'] = kwargs['env']['CONDA_EXE']
+        kwargs['env']['JULIA_SSL_CA_ROOTS_PATH'] = os.path.join(
+            kwargs['env']['CONDA_PREFIX'], 'ssl', 'cacert.pem')
     julia_script = os.path.join(tempfile.gettempdir(),
                                 'wrapper_%s.jl' % (
                                     str(uuid.uuid4()).replace('-', '_')))
@@ -212,6 +225,10 @@ def install(args=None, skip_requirements=None, update_requirements=None):
     if update_requirements:
         skip_requirements = False
     kwargs = {'cwd': lang_dir}
+    for k in ['CONDA_PREFIX', 'CONDA_JL_HOME', 'CONDA_JL_CONDA_EXE',
+              'JULIA_DEPOT_PATH', 'JULIA_LOAD_PATH', 'JULIA_PROJECT',
+              'JULIA_SSL_CA_ROOTS_PATH']:
+        print(f"Julia install: {k} = {os.environ.get(k, None)}")
     # Install requirements
     # TODO: Determine if develop calls install for deps
     requirements = requirements_from_project_toml()

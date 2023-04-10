@@ -280,7 +280,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -612,7 +612,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -936,7 +936,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -1243,7 +1243,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -1549,7 +1549,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true

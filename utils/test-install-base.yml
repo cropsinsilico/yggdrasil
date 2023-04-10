@@ -179,9 +179,9 @@ jobs:
     #     key:
     #       ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
     #       hashFiles('recipe/meta.yaml') }}
-    - name: (WINDOWS,CONDA) Set up miniconda base environment
+    - name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')  #  && runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
