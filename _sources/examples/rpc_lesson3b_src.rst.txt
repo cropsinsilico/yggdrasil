@@ -4,8 +4,8 @@ Model Code:
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/src/client.cpp
-   :language: c++
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/src/client.c
+   :language: c
    :linenos:
 
 

@@ -68,6 +68,14 @@ yggdrasil.communication.transforms.SelectFieldsTransform module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.transforms.SelectScalarTransform module
+---------------------------------------------------------------
+
+.. automodule:: yggdrasil.communication.transforms.SelectScalarTransform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.transforms.StatementTransform module
 ------------------------------------------------------------
 

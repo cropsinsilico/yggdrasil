@@ -1,11 +1,9 @@
 .. _schema_table_filter_subtype_rst:
 
-+------------+
-| Filtertype |
-+============+
-| direct     |
-+------------+
-| function   |
-+------------+
-| statement  |
-+------------+
+==========   ================================================================================
+Filtertype   Description                                                                     
+==========   ================================================================================
+direct       Pass every message                                                              
+function     Filter messages based on a function                                             
+statement    Filter messages based on a statement                                            
+==========   ================================================================================

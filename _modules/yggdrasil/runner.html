@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.runner &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.runner &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1158,8 +1158,9 @@
 
 
 <div class="viewcode-block" id="run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">run_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;run_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
     <span class="n">yggRunner</span> <span class="o">=</span> <span class="n">get_runner</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">yggRunner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="n">yggRunner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">**</span><span class="n">run_kwargs</span><span class="p">)</span>
     <span class="n">yggRunner</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;runner returns, exiting&quot;</span><span class="p">)</span></div>
 </pre></div>
 

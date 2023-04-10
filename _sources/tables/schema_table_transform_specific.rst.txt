@@ -1,23 +1,25 @@
 .. _schema_table_transform_specific_rst:
 
-================   ========   ================================================================================   ============================
-Option             Type       Description                                                                        Valid For 'Transformtype' Of
-================   ========   ================================================================================   ============================
-field_names        array                                                                                         ['pandas', 'array']         
-filter                                                                                                           ['filter']                  
-function           function   The handle for a callable Python object (e.g. function) that should be used to     ['function']                
-                              transform messages or a string of the form "<function file>:<function name>"                                   
-                              identifying a function where "<function file>" is the module or Python file                                    
-                              containing the function and "<function name>" is the name of the function. The                                 
-                              function should take the message as input and return the transformed message.                                  
-map                object     A mapping from original field name to new field names.                             ['map_fields']              
-original_order     array      The original order of fields that should be used for selecting from                ['select_fields']           
-                              lists/tuples.                                                                                                  
-selected           array      A list of fields that should be selected.                                          ['select_fields']           
-single_as_scalar   boolean    If True and only a single field is selected, the transformed messages will be      ['select_fields']           
-                              scalars rather than arrays with single elements. Defaults to False.                                            
-statement          string     Python statement in terms of the message as represented by the string "%x%" that   ['statement']               
-                              should evaluate to the transformed message. The statement should only use a                                    
-                              limited set of builtins and the math library (See yggdrasil.tools.safe_eval). If                               
-                              more complex relationships are required, use the FunctionTransform class.                                      
-================   ========   ================================================================================   ============================
+================   =====================   ==================================   ================================================================================
+Option             Type                    Valid For 'Transformtype' Of         Description                                                                     
+================   =====================   ==================================   ================================================================================
+field_names        array                   ['pandas', 'array']                  Names of fields in the array.                                                   
+filter             object                  ['filter']                           Schema for filter components.                                                   
+function           function                ['function']                         The handle for a callable Python object (e.g. function) that should be used to  
+                                                                                transform messages or a string of the form "<function file>:<function name>"    
+                                                                                identifying a function where "<function file>" is the module or Python file     
+                                                                                containing the function and "<function name>" is the name of the function. The  
+                                                                                function should take the message as input and return the transformed message.   
+index              ['integer', 'string']   ['select_scalar']                    Array index or dictionary key to select. Defaults to selecting the first element
+                                                                                in an array or the first key alphabetically.                                    
+map                object                  ['map_fields']                       A mapping from original field name to new field names.                          
+original_order     array                   ['select_scalar', 'select_fields']   The original order of fields that should be used for selecting from             
+                                                                                lists/tuples.                                                                   
+selected           array                   ['select_fields']                    A list of fields that should be selected.                                       
+single_as_scalar   boolean                 ['select_fields']                    If True and only a single field is selected, the transformed messages will be   
+                                                                                scalars rather than arrays with single elements. Defaults to False.             
+statement          string                  ['statement']                        Python statement in terms of the message as represented by the string "%x%" that
+                                                                                should evaluate to the transformed message. The statement should only use a     
+                                                                                limited set of builtins and the math library (See yggdrasil.tools.safe_eval). If
+                                                                                more complex relationships are required, use the FunctionTransform class.       
+================   =====================   ==================================   ================================================================================

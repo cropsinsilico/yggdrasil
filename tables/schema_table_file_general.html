@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -105,39 +105,28 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>filetype</p></td>
-<td><p>string</p></td>
-<td><p>X</p></td>
-<td><p>The type of file that will be read from or written to. (Options described
-<a class="reference internal" href="../yaml.html#schema-table-file-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
-</tr>
-<tr class="row-odd"><td><p>name</p></td>
+<tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
 <td><p>X</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
-<tr class="row-even"><td><p>working_dir</p></td>
+<tr class="row-odd"><td><p>working_dir</p></td>
 <td><p>string</p></td>
 <td><p>X</p></td>
 <td><p>Working directory. If not provided, the current working directory is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p>address</p></td>
+<tr class="row-even"><td><p>address</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>Communication info. Default to None and address is taken from the environment
 variable.</p></td>
 </tr>
-<tr class="row-even"><td><p>append</p></td>
+<tr class="row-odd"><td><p>append</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True and writing, file is openned in append mode. If True and reading, file
 is kept open even if the end of the file is reached to allow for another process
 to write to the file in append mode. Defaults to False.</p></td>
-</tr>
-<tr class="row-odd"><td><p>args</p></td>
-<td><p>string</p></td>
-<td></td>
-<td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
 <tr class="row-even"><td><p>as_array</p></td>
 <td><p>boolean</p></td>
@@ -164,30 +153,35 @@ field names are created based on the field order.</p></td>
 tables. This keyword is only valid for table-like datatypes. If not provided,
 all fields are assumed to be unitless.</p></td>
 </tr>
-<tr class="row-even"><td><p>filter</p></td>
+<tr class="row-even"><td><p>filetype</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td><p>Filter that will be used to determine when messages should be sent/received.
-Ignored if not provided.</p></td>
+<td><p>The type of file that will be read from or written to. (Options described
+<a class="reference internal" href="../yaml.html#schema-table-file-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
 </tr>
-<tr class="row-odd"><td><p>for_service</p></td>
+<tr class="row-odd"><td><p>filter</p></td>
+<td><p>object</p></td>
+<td></td>
+<td><p>Schema for filter components.</p></td>
+</tr>
+<tr class="row-even"><td><p>for_service</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, this comm bridges the gap to an integration running as a service,
 possibly on a remote machine. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>format_str</p></td>
+<tr class="row-odd"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>String that should be used to format/parse messages. Default to None.</p></td>
 </tr>
-<tr class="row-odd"><td><p>in_temp</p></td>
+<tr class="row-even"><td><p>in_temp</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, the path will be considered relative to the platform temporary
 directory. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>is_series</p></td>
+<tr class="row-odd"><td><p>is_series</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, input/output will be done to a series of files. If reading, each file
@@ -195,24 +189,19 @@ will be processed until the end is reached. If writing, each output will be to a
 new file in the series. The addressed is assumed to contain a format for the
 index of the file. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>length_map</p></td>
+<tr class="row-even"><td><p>length_map</p></td>
 <td><p>object</p></td>
 <td></td>
 <td><p>Map from pointer variable names to the names of variables where their length
 will be stored. Defaults to {}.</p></td>
 </tr>
-<tr class="row-even"><td><p>recv_converter</p></td>
+<tr class="row-odd"><td><p>onexit</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td><p>Converter that should be used on received objects. Defaults to None.</p></td>
-</tr>
-<tr class="row-odd"><td><p>send_converter</p></td>
-<td></td>
-<td></td>
-<td><p>Converter that should be used on sent objects. Defaults to None.</p></td>
+<td><p>[DEPRECATED] Method of input/output driver to call when the connection closes</p></td>
 </tr>
 <tr class="row-even"><td><p>transform</p></td>
-<td></td>
+<td><p>array</p></td>
 <td></td>
 <td><p>One or more transformations that will be applied to messages that are
 sent/received. Ignored if not provided.</p></td>
@@ -223,7 +212,7 @@ sent/received. Ignored if not provided.</p></td>
 <td><p>Names of variables to be sent/received by this comm. Defaults to [].</p></td>
 </tr>
 <tr class="row-even"><td><p>wait_for_creation</p></td>
-<td><p>float</p></td>
+<td><p>number</p></td>
 <td></td>
 <td><p>Time (in seconds) that should be waited before opening for the file to be
 created if it dosn’t exist. Defaults to 0 s and file will attempt to be opened

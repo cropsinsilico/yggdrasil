@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Command Line Interface (CLI) &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -70,13 +70,13 @@
 <li class="toctree-l4"><a class="reference internal" href="#clean">clean</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#install">install</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#config">config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#metaschema">metaschema</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schema">schema</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#model-form-schema">model-form-schema</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dev-update">dev-update</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#timing">timing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gha">gha</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#integration-service-manager">integration-service-manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#coveragerc">coveragerc</a></li>
 </ul>
 </li>
 </ul>
@@ -105,7 +105,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#yggmetaschema-command"><code class="docutils literal notranslate"><span class="pre">yggmetaschema</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggmodelform-command"><code class="docutils literal notranslate"><span class="pre">yggmodelform</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggrun-command"><code class="docutils literal notranslate"><span class="pre">yggrun</span></code> Command</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#yggschema-command"><code class="docutils literal notranslate"><span class="pre">yggschema</span></code> Command</a></li>
@@ -157,7 +156,7 @@
 <section id="yggdrasil-command">
 <span id="cli-yggdrasil-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> Command<a class="headerlink" href="#yggdrasil-command" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">yggdrasil</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
-                 <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">model</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">metaschema</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">}</span>
+                 <span class="p">{</span><span class="n">run</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">validate</span><span class="p">,</span><span class="nb">compile</span><span class="o">-</span><span class="n">model</span><span class="p">,</span><span class="nb">compile</span><span class="p">,</span><span class="n">clean</span><span class="p">,</span><span class="n">install</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">schema</span><span class="p">,</span><span class="n">model</span><span class="o">-</span><span class="n">form</span><span class="o">-</span><span class="n">schema</span><span class="p">,</span><span class="n">dev</span><span class="o">-</span><span class="n">update</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span><span class="n">gha</span><span class="p">,</span><span class="n">integration</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">manager</span><span class="p">,</span><span class="n">coveragerc</span><span class="p">}</span>
                  <span class="o">...</span>
 </pre></div>
 </div>
@@ -173,7 +172,7 @@
 <h3>subcommands<a class="headerlink" href="#subcommands" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>subcommand</kbd></dt>
-<dd><p>Possible choices: run, info, validate, compile-model, compile, clean, install, config, metaschema, schema, model-form-schema, dev-update, timing, gha, integration-service-manager</p>
+<dd><p>Possible choices: run, info, validate, compile-model, compile, clean, install, config, schema, model-form-schema, dev-update, timing, gha, integration-service-manager, coveragerc</p>
 </dd>
 </dl>
 </section>
@@ -184,8 +183,9 @@
 <p>Run an integration.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mpi</span> <span class="n">WITH_MPI</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mpi</span><span class="o">-</span><span class="n">tag</span><span class="o">-</span><span class="n">start</span> <span class="n">MPI_TAG_START</span><span class="p">]</span>
               <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">debugger</span> <span class="n">WITH_DEBUGGER</span><span class="p">]</span>
-              <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span>
-              <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">python</span><span class="o">-</span><span class="n">c</span><span class="o">-</span><span class="n">api</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">asan</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="k">as</span><span class="o">-</span><span class="n">service</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">partial</span><span class="o">-</span><span class="n">commtype</span> <span class="n">PARTIAL_COMMTYPE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="nb">id</span> <span class="n">CLIENT_ID</span><span class="p">]</span>
+              <span class="p">[</span><span class="o">--</span><span class="n">loglevel</span> <span class="n">LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">rmq</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">RMQ_LOGLEVEL</span><span class="p">]</span>
               <span class="p">[</span><span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="n">loglevel</span> <span class="n">CLIENT_LOGLEVEL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">components</span><span class="p">]</span>
               <span class="p">[</span><span class="o">--</span><span class="n">validate</span><span class="o">-</span><span class="n">messages</span> <span class="p">{</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">,</span><span class="n">First</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">namespace</span> <span class="n">NAMESPACE</span><span class="p">]</span>
               <span class="p">[</span><span class="o">--</span><span class="n">host</span> <span class="n">HOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vhost</span> <span class="n">VHOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">user</span> <span class="n">USER</span><span class="p">]</span>
@@ -227,6 +227,17 @@
 <dt><kbd>--with-asan</kbd></dt>
 <dd><p>Compile models with the address sanitizer enabled.</p>
 <p>Default: False</p>
+</dd>
+<dt><kbd>--as-service</kbd></dt>
+<dd><p>Run the provided YAMLs as a service.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--partial-commtype</kbd></dt>
+<dd><p>Type of communicator to use for partial comms when –as-service is passed</p>
+<p>Default: “rest”</p>
+</dd>
+<dt><kbd>--client-id</kbd></dt>
+<dd><p>ID associated with the client requesting a service. (This should only be passed when running with –as-service)</p>
 </dd>
 <dt><kbd>--loglevel</kbd></dt>
 <dd><p>Logging level for yggdrasil operations.</p>
@@ -602,7 +613,7 @@
 <h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat8" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>languages</kbd></dt>
-<dd><p>One or more languages that should be configured.</p>
+<dd><p>One or more languages that should be installed.</p>
 <p>Default: []</p>
 </dd>
 </dl>
@@ -733,17 +744,10 @@
 </dl>
 </section>
 </section>
-<section id="metaschema">
-<h4>metaschema<a class="headerlink" href="#metaschema" title="Permalink to this heading">¶</a></h4>
-<p>Regenerate the yggdrasil metaschema.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">metaschema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span>
-</pre></div>
-</div>
-</section>
 <section id="schema">
 <h4>schema<a class="headerlink" href="#schema" title="Permalink to this heading">¶</a></h4>
 <p>Regenerate the yggdrasil schema.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">constants</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">schema</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">constants</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">filename</span> <span class="n">FILENAME</span><span class="p">]</span>
 </pre></div>
 </div>
 <section id="named-arguments_repeat11">
@@ -752,6 +756,9 @@
 <dt><kbd>--only-constants</kbd></dt>
 <dd><p>Only update the constants.py file without updating the schema.</p>
 <p>Default: False</p>
+</dd>
+<dt><kbd>--filename</kbd></dt>
+<dd><p>Name where schema should be saved.</p>
 </dd>
 </dl>
 </section>
@@ -998,6 +1005,39 @@
 </section>
 </section>
 </section>
+<section id="coveragerc">
+<h4>coveragerc<a class="headerlink" href="#coveragerc" title="Permalink to this heading">¶</a></h4>
+<p>Generate a coveragerc file that covers/ignores lines based on installed languages or options.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggdrasil</span> <span class="n">coveragerc</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">method</span> <span class="p">{</span><span class="n">installed</span><span class="p">,</span><span class="n">env</span><span class="p">,</span><span class="kc">None</span><span class="p">}]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">cover</span><span class="o">-</span><span class="n">languages</span> <span class="p">[{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="p">[{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="o">...</span><span class="p">]]]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">dont</span><span class="o">-</span><span class="n">cover</span><span class="o">-</span><span class="n">languages</span> <span class="p">[{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="p">[{</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">++</span><span class="p">,</span><span class="n">fortran</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">matlab</span><span class="p">,</span><span class="n">python</span><span class="p">,</span><span class="n">cmake</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">lpy</span><span class="p">,</span><span class="n">osr</span><span class="p">,</span><span class="n">sbml</span><span class="p">,</span><span class="n">dummy</span><span class="p">,</span><span class="n">executable</span><span class="p">,</span><span class="n">mpi</span><span class="p">,</span><span class="n">timesync</span><span class="p">}</span> <span class="o">...</span><span class="p">]]]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">filename</span> <span class="n">FILENAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">setup</span><span class="o">-</span><span class="n">cfg</span> <span class="n">SETUP_CFG</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="named-arguments_repeat17">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat17" title="Permalink to this heading">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--method</kbd></dt>
+<dd><p>Possible choices: installed, env, None</p>
+<p>Method that should be used to select languages that should be covered. ‘env’ covers languages based on the value of environment variables of the form ‘INSTALL{language}’. ‘installed’ covers languages that yggdrasil considers installed.</p>
+</dd>
+<dt><kbd>--cover-languages, --cover-language, --cover</kbd></dt>
+<dd><p>Possible choices: c, c++, fortran, R, matlab, python, cmake, make, lpy, osr, sbml, dummy, executable, mpi, timesync</p>
+<p>Language(s) to cover.</p>
+</dd>
+<dt><kbd>--dont-cover-languages, --dont-cover-language, --dont-cover</kbd></dt>
+<dd><p>Possible choices: c, c++, fortran, R, matlab, python, cmake, make, lpy, osr, sbml, dummy, executable, mpi, timesync</p>
+<p>Language(s) to ignore in coverage.</p>
+</dd>
+<dt><kbd>--filename</kbd></dt>
+<dd><p>File to save coveragerc to</p>
+</dd>
+<dt><kbd>--setup-cfg</kbd></dt>
+<dd><p>setup.cfg file containing coverage options</p>
+</dd>
+</dl>
+</section>
+</section>
 </section>
 </section>
 <section id="yggcc-command">
@@ -1123,10 +1163,6 @@
 </dd>
 </dl>
 </section>
-</section>
-<section id="yggmetaschema-command">
-<span id="cli-yggmetaschema-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggmetaschema</span></code> Command<a class="headerlink" href="#yggmetaschema-command" title="Permalink to this heading">¶</a></h2>
-<p>Alias for <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">metaschema</span></code></p>
 </section>
 <section id="yggmodelform-command">
 <span id="cli-yggmodelform-rst"></span><h2><code class="docutils literal notranslate"><span class="pre">yggmodelform</span></code> Command<a class="headerlink" href="#yggmodelform-command" title="Permalink to this heading">¶</a></h2>

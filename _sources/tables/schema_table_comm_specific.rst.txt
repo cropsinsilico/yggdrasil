@@ -1,12 +1,15 @@
 .. _schema_table_comm_specific_rst:
 
-=========   =======   ================================================================================   =======================
-Option      Type      Description                                                                        Valid For 'Commtype' Of
-=========   =======   ================================================================================   =======================
-client_id   string                                                                                       ['rest']               
-cookies     object    Cookies to send to the server. Defaults to None and is ignored.                    ['rest']               
-count       integer                                                                                      ['value']              
-host        string                                                                                       ['rest']               
-params      object    Parameters that should be passed via URL. Defaults to None and is ignored.         ['rest']               
-port        int                                                                                          ['rest']               
-=========   =======   ================================================================================   =======================
+=========   =======   ===============================================================================   ================================================================================
+Option      Type      Valid For 'Commtype' Of                                                           Description                                                                     
+=========   =======   ===============================================================================   ================================================================================
+args        string    ['zmq', 'rmq', 'default', 'rmq_async', 'ipc']                                     [DEPRECATED] Arguments that should be provided to the driver.                   
+client_id   string    ['rest']                                                                                                                                                          
+cookies     object    ['rest']                                                                          Cookies to send to the server. Defaults to None and is ignored.                 
+count       integer   ['value']                                                                                                                                                         
+driver      string    ['zmq', 'rmq', 'default', 'rmq_async', 'mpi', 'ipc', 'buffer', 'rest', 'value']   [DEPRECATED] Name of driver class that should be used.                          
+host        string    ['rest']                                                                                                                                                          
+name        string    ['zmq', 'rmq', 'default', 'rmq_async', 'mpi', 'ipc', 'buffer', 'rest', 'value']   Name used for component in log messages.                                        
+params      object    ['rest']                                                                          Parameters that should be passed via URL. Defaults to None and is ignored.      
+port        int       ['rest']                                                                                                                                                          
+=========   =======   ===============================================================================   ================================================================================

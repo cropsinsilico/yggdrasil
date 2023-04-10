@@ -122,14 +122,6 @@ Alias for ``yggdrasil install``
    :prog: yggldtool
 
 
-.. _cli_yggmetaschema_rst:
-
-``yggmetaschema`` Command
-*************************
-
-Alias for ``yggdrasil metaschema``
-
-
 .. _cli_yggmodelform_rst:
 
 ``yggmodelform`` Command

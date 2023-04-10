@@ -1,18 +1,18 @@
 .. _schema_table_filter_specific_rst:
 
-=========   ========   ================================================================================   =========================
-Option      Type       Description                                                                        Valid For 'Filtertype' Of
-=========   ========   ================================================================================   =========================
-function    function   The handle for a callable Python object (e.g. function) that should be used to     ['function']             
-                       determine if a message should be filtered or a string of the form "<function                                
-                       file>:<function name>" identifying a function where "<function file>" is the                                
-                       module or Python file containing the function and "<function name>" is the name                             
-                       of the function. The function should take the message as input and return a                                 
-                       boolean, True if the message should pass through the filter, False if it should                             
-                       not.                                                                                                        
-statement   string     Python statement in terms of the message as represented by the string "%x%" that   ['statement']            
-                       should evaluate to a boolean, True if the message should pass through the                                   
-                       filter, False if it should not. The statement should only use a limited set of                              
-                       builtins and the math library (See yggdrasil.tools.safe_eval). If more complex                              
-                       relationships are required, use the FunctionFilter class.                                                   
-=========   ========   ================================================================================   =========================
+=========   ========   =========================   ================================================================================
+Option      Type       Valid For 'Filtertype' Of   Description                                                                     
+=========   ========   =========================   ================================================================================
+function    function   ['function']                The handle for a callable Python object (e.g. function) that should be used to  
+                                                   determine if a message should be filtered or a string of the form "<function    
+                                                   file>:<function name>" identifying a function where "<function file>" is the    
+                                                   module or Python file containing the function and "<function name>" is the name 
+                                                   of the function. The function should take the message as input and return a     
+                                                   boolean, True if the message should pass through the filter, False if it should 
+                                                   not.                                                                            
+statement   string     ['statement']               Python statement in terms of the message as represented by the string "%x%" that
+                                                   should evaluate to a boolean, True if the message should pass through the       
+                                                   filter, False if it should not. The statement should only use a limited set of  
+                                                   builtins and the math library (See yggdrasil.tools.safe_eval). If more complex  
+                                                   relationships are required, use the FunctionFilter class.                       
+=========   ========   =========================   ================================================================================

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.YAMLSerialize &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.serialize.YAMLSerialize &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -96,8 +96,102 @@
            <div itemprop="articleBody">
              
   <h1>Source code for yggdrasil.serialize.YAMLSerialize</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">encode_yaml</span><span class="p">,</span> <span class="n">decode_yaml</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.JSONSerialize</span> <span class="kn">import</span> <span class="n">JSONSerialize</span>
+<span></span><span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">rapidjson</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.JSONSerialize</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JSONSerialize</span><span class="p">,</span> <span class="n">indent_char2int</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="encode_yaml"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.YAMLSerialize.encode_yaml">[docs]</a><span class="k">def</span> <span class="nf">encode_yaml</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">sorted_dict_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode a Python object in YAML format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        obj (object): Python object to encode.</span>
+<span class="sd">        fd (file, optional): File descriptor for file that encoded object</span>
+<span class="sd">            should be written to. Defaults to None and string is returned.</span>
+<span class="sd">        indent (int, str, optional): Indentation for new lines in encoded</span>
+<span class="sd">            string. Defaults to None.</span>
+<span class="sd">        sort_keys (bool, optional): If True, dictionaries will be sorted</span>
+<span class="sd">            alphabetically by key. Defaults to True.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to yaml.dump.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, bytes: Encoded object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">indent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="n">indent_char2int</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indent</span>
+    <span class="k">if</span> <span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="s1">&#39;stream&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;stream&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fd</span>
+    <span class="n">json_kws</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">sorted_dict_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">class</span> <span class="nc">OrderedDumper</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Dumper&#39;</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">)):</span>
+            <span class="k">pass</span>
+        
+        <span class="k">def</span> <span class="nf">_dict_representer</span><span class="p">(</span><span class="n">dumper</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">dumper</span><span class="o">.</span><span class="n">represent_mapping</span><span class="p">(</span>
+                <span class="n">yaml</span><span class="o">.</span><span class="n">resolver</span><span class="o">.</span><span class="n">BaseResolver</span><span class="o">.</span><span class="n">DEFAULT_MAPPING_TAG</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sorted_dict_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">sorted_dict_type</span> <span class="o">=</span> <span class="p">[</span><span class="n">sorted_dict_type</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sorted_dict_type</span><span class="p">:</span>
+            <span class="n">OrderedDumper</span><span class="o">.</span><span class="n">add_representer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_dict_representer</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Dumper&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDumper</span>
+        
+        <span class="k">class</span> <span class="nc">OrderedDecoder</span><span class="p">(</span><span class="n">rapidjson</span><span class="o">.</span><span class="n">Decoder</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">start_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">sorted_dict_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]()</span>
+        <span class="n">json_kws</span><span class="p">[</span><span class="s1">&#39;decoder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDecoder</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sort_keys</span><span class="p">:</span>
+            <span class="n">json_kws</span><span class="p">[</span><span class="s1">&#39;mapping_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">MM_SORT_KEYS</span>
+    
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">as_pure_json</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">json_kws</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="n">sort_keys</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="decode_yaml"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.YAMLSerialize.decode_yaml">[docs]</a><span class="k">def</span> <span class="nf">decode_yaml</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">sorted_dict_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode a Python object from a YAML serialization.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        msg (str): YAML serialization to decode.</span>
+<span class="sd">        sorted_dict_type (type, optional): Class that should be used to</span>
+<span class="sd">            contain mapping objects while preserving order. Defaults to</span>
+<span class="sd">            None and is ignored.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to yaml.load.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        object: Deserialized Python object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">class</span> <span class="nc">OrderedLoader</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Loader&#39;</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">Loader</span><span class="p">)):</span>
+        <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">sorted_dict_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">construct_mapping</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+            <span class="n">loader</span><span class="o">.</span><span class="n">flatten_mapping</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sorted_dict_type</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_pairs</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+
+        <span class="n">OrderedLoader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">resolver</span><span class="o">.</span><span class="n">BaseResolver</span><span class="o">.</span><span class="n">DEFAULT_MAPPING_TAG</span><span class="p">,</span>
+            <span class="n">construct_mapping</span><span class="p">)</span>
+
+    <span class="c1"># If this is required, add a method to rapidjson python wrapper</span>
+    <span class="c1"># def construct_scalar(loader, node):</span>
+    <span class="c1">#     out = loader.construct_scalar(node)</span>
+    <span class="c1">#     out = string2import(out)</span>
+    <span class="c1">#     return out</span>
+
+    <span class="c1"># OrderedLoader.add_constructor(</span>
+    <span class="c1">#     yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG,</span>
+    <span class="c1">#     construct_scalar)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Loader&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedLoader</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="YAMLSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.YAMLSerialize.YAMLSerialize">[docs]</a><span class="k">class</span> <span class="nc">YAMLSerialize</span><span class="p">(</span><span class="n">JSONSerialize</span><span class="p">):</span>
@@ -167,7 +261,7 @@
                <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
                <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">iobj1</span><span class="p">,</span> <span class="n">iobj2</span><span class="p">],</span>  <span class="c1"># , iobj3, iobj4],</span>
-               <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">}}</span>
+               <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">}}</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;a:</span><span class="se">\n</span><span class="s1">- b</span><span class="se">\n</span><span class="s1">- 1</span><span class="se">\n</span><span class="s1">- 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
                            <span class="sa">b</span><span class="s1">&#39;c:</span><span class="se">\n</span><span class="s1">    z: hello</span><span class="se">\n</span><span class="s1">&#39;</span>
                            <span class="sa">b</span><span class="s1">&#39;d: new field</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>

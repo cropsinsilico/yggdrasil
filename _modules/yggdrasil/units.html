@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.units &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.units &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -99,12 +99,23 @@
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">unyt</span>
+<span class="kn">import</span> <span class="nn">deprecation</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">._version</span> <span class="kn">import</span> <span class="n">get_versions</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">constants</span>
-<span class="n">_unit_quantity</span> <span class="o">=</span> <span class="n">unyt</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">unyt_quantity</span>
-<span class="n">_unit_array</span> <span class="o">=</span> <span class="n">unyt</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">unyt_array</span>
-<span class="n">_ureg_unyt</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.rapidjson</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">units_</span>
+<span class="c1"># Use get_versions to prevent circular import from importing it</span>
+<span class="c1">#   from yggdrasil&#39;s __init__</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="n">get_versions</span><span class="p">()[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span>
+<span class="c1"># TODO: This import fails saying yggdrasil.rapidjson is not a package so</span>
+<span class="c1"># we need to find a work around</span>
+<span class="c1"># from yggdrasil.rapidjson.units import Quantity, QuantityArray, Units, UnitsError</span>
+<span class="n">Quantity</span> <span class="o">=</span> <span class="n">units_</span><span class="o">.</span><span class="n">Quantity</span>
+<span class="n">QuantityArray</span> <span class="o">=</span> <span class="n">units_</span><span class="o">.</span><span class="n">QuantityArray</span>
+<span class="n">Units</span> <span class="o">=</span> <span class="n">units_</span><span class="o">.</span><span class="n">Units</span>
+<span class="n">UnitsError</span> <span class="o">=</span> <span class="n">units_</span><span class="o">.</span><span class="n">UnitsError</span>
+<span class="n">_unit_quantity</span> <span class="o">=</span> <span class="n">Quantity</span>
+<span class="n">_unit_array</span> <span class="o">=</span> <span class="n">QuantityArray</span>
 
 
 <span class="n">PYTHON_SCALARS_WITH_UNITS</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
@@ -114,30 +125,6 @@
     <span class="nb">list</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">ALL_PYTHON_ARRAYS</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">_unit_array</span><span class="p">])</span>
 <span class="n">ALL_PYTHON_SCALARS_WITH_UNITS</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
     <span class="nb">list</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">ALL_PYTHON_SCALARS</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">_unit_quantity</span><span class="p">])</span>
-
-
-<div class="viewcode-block" id="get_ureg"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_ureg">[docs]</a><span class="k">def</span> <span class="nf">get_ureg</span><span class="p">():</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the unit registry.&quot;&quot;&quot;</span>
-    <span class="k">global</span> <span class="n">_ureg_unyt</span>
-    <span class="k">if</span> <span class="n">_ureg_unyt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_ureg_unyt</span> <span class="o">=</span> <span class="n">unyt</span><span class="o">.</span><span class="n">UnitRegistry</span><span class="p">(</span><span class="s1">&#39;mks&#39;</span><span class="p">)</span>
-        <span class="n">_ureg_unyt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;ac&quot;</span><span class="p">,</span> <span class="mf">4046.86</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="n">unyt</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">area</span><span class="p">,</span>
-                       <span class="n">tex_repr</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\rm</span><span class="si">{ac}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">prefixable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">_ureg_unyt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="n">unyt</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">area</span><span class="p">,</span>
-                       <span class="n">tex_repr</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\rm</span><span class="si">{a}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">prefixable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">_ureg_unyt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;j&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="n">unyt</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
-                       <span class="n">tex_repr</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\rm</span><span class="si">{J}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">prefixable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="c1"># _ureg_unyt.add(&quot;cel&quot;, 1.0, dimensions=unyt.dimensions.temperature,</span>
-        <span class="c1">#                tex_repr=r&quot;^\circ\rm{C}&quot;, offset=-273.15, prefixable=True)</span>
-        <span class="c1"># _ureg_unyt.add(&quot;j&quot;, 1.0, dimensions=unyt.dimensions.specific_flux,</span>
-        <span class="c1">#                tex_repr=r&quot;\rm{Jy}&quot;, prefixable=True)</span>
-        <span class="c1"># _ureg_unyt.add(&quot;CH2O&quot;, 1.0, dimensions=unyt.dimensions.dimensionless,</span>
-        <span class="c1">#                tex_repr=r&quot;\rm{CH2O}&quot;, offset=0.0, prefixable=False)</span>
-        <span class="n">unyt</span><span class="o">.</span><span class="n">_unit_lookup_table</span><span class="o">.</span><span class="n">inv_name_alternatives</span><span class="p">[</span><span class="s2">&quot;acre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ac&quot;</span>
-        <span class="n">unyt</span><span class="o">.</span><span class="n">_unit_lookup_table</span><span class="o">.</span><span class="n">inv_name_alternatives</span><span class="p">[</span><span class="s2">&quot;are&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span>
-        <span class="n">unyt</span><span class="o">.</span><span class="n">_unit_lookup_table</span><span class="o">.</span><span class="n">inv_name_alternatives</span><span class="p">[</span><span class="s2">&quot;hectare&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ha&quot;</span>
-        <span class="n">unyt</span><span class="o">.</span><span class="n">_unit_lookup_table</span><span class="o">.</span><span class="n">inv_name_alternatives</span><span class="p">[</span><span class="s2">&quot;days&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;day&quot;</span>
-    <span class="k">return</span> <span class="n">_ureg_unyt</span></div>
 
 
 <div class="viewcode-block" id="convert_to_pandas_timedelta"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_to_pandas_timedelta">[docs]</a><span class="k">def</span> <span class="nf">convert_to_pandas_timedelta</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -203,7 +190,11 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="convert_R_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_R_unit_string">[docs]</a><span class="k">def</span> <span class="nf">convert_R_unit_string</span><span class="p">(</span><span class="n">r_str</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_R_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_R_unit_string">[docs]</a><span class="nd">@deprecation</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="n">deprecated_in</span><span class="o">=</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">removed_in</span><span class="o">=</span><span class="s2">&quot;3.0&quot;</span><span class="p">,</span>
+                        <span class="n">current_version</span><span class="o">=</span><span class="n">__version__</span><span class="p">,</span>
+                        <span class="n">details</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;This method is no longer necessary and &quot;</span>
+                                 <span class="s2">&quot;units can be parsed directly&quot;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">convert_R_unit_string</span><span class="p">(</span><span class="n">r_str</span><span class="p">):</span>  <span class="c1"># pragma: deprecated</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert R unit string to string that the Python package can</span>
 <span class="sd">    understand.</span>
 
@@ -217,7 +208,11 @@
     <span class="k">return</span> <span class="n">convert_unit_string</span><span class="p">(</span><span class="n">r_str</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="convert_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_unit_string">[docs]</a><span class="k">def</span> <span class="nf">convert_unit_string</span><span class="p">(</span><span class="n">orig_str</span><span class="p">,</span> <span class="n">replacements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_unit_string">[docs]</a><span class="nd">@deprecation</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="n">deprecated_in</span><span class="o">=</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">removed_in</span><span class="o">=</span><span class="s2">&quot;3.0&quot;</span><span class="p">,</span>
+                        <span class="n">current_version</span><span class="o">=</span><span class="n">__version__</span><span class="p">,</span>
+                        <span class="n">details</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;This method is no longer necessary and &quot;</span>
+                                 <span class="s2">&quot;units can be parsed directly&quot;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">convert_unit_string</span><span class="p">(</span><span class="n">orig_str</span><span class="p">,</span> <span class="n">replacements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: deprecated</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert unit string to string that the Python package can</span>
 <span class="sd">    understand.</span>
 
@@ -230,47 +225,7 @@
 <span class="sd">        str: Converted string.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">orig_str</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">replacements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">replacements</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="s1">&#39;hr&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;hrs&#39;</span><span class="p">:</span> <span class="s1">&#39;hr&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="s1">&#39;day&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;100%&#39;</span><span class="p">:</span> <span class="s1">&#39;percent&#39;</span><span class="p">}</span>
-    <span class="n">regex_mu</span> <span class="o">=</span> <span class="p">[</span><span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xc2\xb5</span><span class="s1">&#39;</span><span class="p">),</span>
-                <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xce\xbc</span><span class="s1">s&#39;</span><span class="p">),</span>
-                <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xc2\xb0</span><span class="s1">&#39;</span><span class="p">),</span>
-                <span class="sa">r</span><span class="s1">&#39;(?:100\%)&#39;</span><span class="p">]</span>
-    <span class="n">regex</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;paren&gt;\()?(?P&lt;name&gt;[A-Za-z</span><span class="si">%s</span><span class="s1">]+)&#39;</span>
-             <span class="sa">r</span><span class="s1">&#39;(?:(?:(?:\^)|(?:\*\*))?(?P&lt;exp_paren&gt;\()?(?P&lt;exp&gt;-?[0-9]+)&#39;</span>
-             <span class="sa">r</span><span class="s1">&#39;(?(exp_paren)\)))?&#39;</span>
-             <span class="sa">r</span><span class="s1">&#39;(?(paren)\)|)(?P&lt;op&gt; |(?:\*)|(?:\/))?&#39;</span> <span class="o">%</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">regex_mu</span><span class="p">))</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?:</span><span class="si">%s</span><span class="s1">)+&#39;</span> <span class="o">%</span> <span class="n">regex</span><span class="p">,</span> <span class="n">orig_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">orig_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
-            <span class="n">xdict</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
-                <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">replacements</span><span class="p">[</span><span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
-            <span class="k">if</span> <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;exp&#39;</span><span class="p">]:</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;(</span><span class="si">{name}</span><span class="s1">**</span><span class="si">{exp}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">xdict</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
-                    <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="n">xdict</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">orig_str</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">orig_str</span><span class="p">))</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?:</span><span class="si">%s</span><span class="s1">)+&#39;</span> <span class="o">%</span> <span class="n">regex</span><span class="p">,</span> <span class="n">orig_str</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;no match&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">orig_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not standardize units: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">orig_str</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">orig_str</span></div>
 
 
 <div class="viewcode-block" id="has_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.has_units">[docs]</a><span class="k">def</span> <span class="nf">has_units</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">check_dimensionless</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -285,19 +240,19 @@
 <span class="sd">        bool: True if the object has units, False otherwise.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">_unit_quantity</span><span class="p">,</span> <span class="n">_unit_array</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">_unit_quantity</span><span class="p">,</span> <span class="n">_unit_array</span><span class="p">))</span>
+           <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">()</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">check_dimensionless</span><span class="p">)))</span>
     <span class="c1"># out = hasattr(obj, &#39;units&#39;)</span>
-    <span class="k">if</span> <span class="p">((</span><span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="n">as_unit</span><span class="p">(</span><span class="s1">&#39;dimensionless&#39;</span><span class="p">))</span>
-         <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">check_dimensionless</span><span class="p">))):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="get_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_units">[docs]</a><span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<div class="viewcode-block" id="get_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_units">[docs]</a><span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">for_language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the string representation of the units.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Object to get units for.</span>
+<span class="sd">        for_language (str, optional): Language requesting units.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Units, empty if input object has none.</span>
@@ -307,6 +262,9 @@
         <span class="n">out</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">for_language</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>  <span class="c1"># pragma: extern</span>
+        <span class="c1"># udunits dosn&#39;t support Δ</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Δ&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
@@ -321,50 +279,32 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">has_units</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">check_dimensionless</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">value</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">obj</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="add_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.add_units">[docs]</a><span class="k">def</span> <span class="nf">add_units</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="add_units"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.add_units">[docs]</a><span class="k">def</span> <span class="nf">add_units</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add units to an array or scalar.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        arr (np.ndarray, float, int): Scalar or array of data to add units to.</span>
 <span class="sd">        unit_str (str): Unit string.</span>
-<span class="sd">        dtype (np.dtype, optional): Numpy data type that should be maintained for</span>
-<span class="sd">            array/qunatity with units. If not provided, this is determined from the</span>
-<span class="sd">            array.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the unit constructor.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        unyt.unyt_array: Array with units.</span>
+<span class="sd">        Quantity ro QuantityArray: Scalar or array with units.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ureg</span> <span class="o">=</span> <span class="n">get_ureg</span><span class="p">()</span>
-    <span class="n">unit_str</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">unit_str</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">is_null_unit</span><span class="p">(</span><span class="n">unit_str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">arr</span>
-    <span class="n">unit_str</span> <span class="o">=</span> <span class="n">convert_unit_string</span><span class="p">(</span><span class="n">unit_str</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">has_units</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">convert_to</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">arr</span><span class="p">])</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">unyt</span><span class="o">.</span><span class="n">unyt_array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-                                  <span class="n">registry</span><span class="o">=</span><span class="n">ureg</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">unyt</span><span class="o">.</span><span class="n">unyt_quantity</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-                                     <span class="n">registry</span><span class="o">=</span><span class="n">ureg</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error parsing unit: </span><span class="si">%s</span><span class="s2">, type(</span><span class="si">%s</span><span class="s2">).&quot;</span>
-                         <span class="o">%</span> <span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">unit_str</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">unit_str</span><span class="p">)))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">convert_to</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">QuantityArray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">unit_str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
@@ -380,16 +320,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Empty units always compatible</span>
-    <span class="k">if</span> <span class="n">is_null_unit</span><span class="p">(</span><span class="n">units1</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_null_unit</span><span class="p">(</span><span class="n">units2</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">units1</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">units2</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">add_units</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">units1</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">convert_to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">units2</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">u1</span> <span class="o">=</span> <span class="n">Units</span><span class="p">(</span><span class="n">units1</span><span class="p">)</span>
+        <span class="n">u2</span> <span class="o">=</span> <span class="n">Units</span><span class="p">(</span><span class="n">units2</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">UnitsError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">return</span> <span class="kc">True</span></div>
+    <span class="k">if</span> <span class="n">u1</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">()</span> <span class="ow">or</span> <span class="n">u2</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">u1</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">u2</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="is_null_unit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.is_null_unit">[docs]</a><span class="k">def</span> <span class="nf">is_null_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">):</span>
@@ -402,9 +340,7 @@
 <span class="sd">        bool: True if the string is &#39;&#39; or &#39;n/a&#39;, False otherwise.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ustr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ustr</span> <span class="o">==</span> <span class="s1">&#39;n/a&#39;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="kc">False</span></div>
+    <span class="k">return</span> <span class="n">Units</span><span class="p">(</span><span class="n">ustr</span><span class="p">)</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="as_unit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.as_unit">[docs]</a><span class="k">def</span> <span class="nf">as_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">):</span>
@@ -414,17 +350,13 @@
 <span class="sd">        ustr (str): Unit string.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        unyt.Unit: Unit object.</span>
+<span class="sd">        Units: Unit object.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the string is not a recognized unit.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">unyt</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">get_ureg</span><span class="p">())</span>
-    <span class="k">except</span> <span class="n">unyt</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">UnitParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">Units</span><span class="p">(</span><span class="n">ustr</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="is_unit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.is_unit">[docs]</a><span class="k">def</span> <span class="nf">is_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">):</span>
@@ -437,14 +369,11 @@
 <span class="sd">        bool: True if the string is a valid unit. False otherwise.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ustr</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">ustr</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">is_null_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">as_unit</span><span class="p">(</span><span class="n">ustr</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="n">UnitsError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="convert_to"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_to">[docs]</a><span class="k">def</span> <span class="nf">convert_to</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">new_units</span><span class="p">):</span>
@@ -452,30 +381,17 @@
 <span class="sd">    will be returned with the new units.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        arr (np.ndarray, float, int, unyt.unyt_array): Quantity with or</span>
-<span class="sd">            without units.</span>
+<span class="sd">        arr (np.ndarray, float, int, Quantity, QuantityArray): Quantity with</span>
+<span class="sd">            or without units.</span>
 <span class="sd">        new_units (str): New units that should be applied.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        unyt.unyt_array: Array with new units.</span>
+<span class="sd">        Quantity, QuantityArray: Scalar or array with new units.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">is_null_unit</span><span class="p">(</span><span class="n">new_units</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">arr</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">has_units</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">add_units</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">new_units</span><span class="p">)</span>
-    <span class="n">new_units</span> <span class="o">=</span> <span class="n">convert_unit_string</span><span class="p">(</span><span class="n">new_units</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">arr1</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
-        <span class="n">dtype</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">arr1</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">new_units</span><span class="p">)</span>
-        <span class="n">arr2</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="n">equal</span> <span class="o">=</span> <span class="p">(</span><span class="n">arr2</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">dtype</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">equal</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">add_units</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span> <span class="n">new_units</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">unyt</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">UnitConversionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">new_units</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_conversion_function"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.get_conversion_function">[docs]</a><span class="k">def</span> <span class="nf">get_conversion_function</span><span class="p">(</span><span class="n">old_units</span><span class="p">,</span> <span class="n">new_units</span><span class="p">):</span>

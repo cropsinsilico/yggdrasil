@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -101,7 +101,6 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 
@@ -165,37 +164,59 @@
                                    <span class="s1">&#39;once as bytes.&#39;</span><span class="p">)</span>
     <span class="n">_schema_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;filetype&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">]</span>
     <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;pattern&#39;</span><span class="p">:</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_</span><span class="se">\\</span><span class="s1">\/]+&#39;</span>
+                             <span class="sa">r</span><span class="s1">&#39;\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$&#39;</span><span class="p">)},</span>
         <span class="s1">&#39;working_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
         <span class="s1">&#39;filetype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">_filetype</span><span class="p">,</span>
                      <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;The type of file that will be read from &#39;</span>
                                      <span class="s1">&#39;or written to.&#39;</span><span class="p">)},</span>
         <span class="s1">&#39;read_meth&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;read&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;read&#39;</span><span class="p">,</span> <span class="s1">&#39;readline&#39;</span><span class="p">]},</span>
+                      <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;read&#39;</span><span class="p">,</span> <span class="s1">&#39;readline&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
         <span class="s1">&#39;append&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;in_temp&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;is_series&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
-        <span class="s1">&#39;wait_for_creation&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
-        <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/serializer&#39;</span><span class="p">},</span>
-                                 <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;instance&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">SerializeBase</span><span class="p">}],</span>
-                       <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">}}}</span>
+        <span class="s1">&#39;wait_for_creation&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+        <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;allOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{}},</span>
+            <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/serializer&#39;</span><span class="p">}]}}</span>
     <span class="n">_schema_excluded_from_inherit</span> <span class="o">=</span> <span class="p">(</span>
         <span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">]</span>
         <span class="o">+</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">_model_schema_prop</span><span class="p">)</span>
-    <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;serializer&#39;</span><span class="p">]</span>
     <span class="n">_schema_base_class</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_schema_additional_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;allowSingular&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">}</span>
+    <span class="n">_schema_additional_kwargs_no_inherit</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;pushProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$properties/serializer&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}</span>
     <span class="n">_default_serializer</span> <span class="o">=</span> <span class="s1">&#39;direct&#39;</span>
     <span class="n">_default_extension</span> <span class="o">=</span> <span class="s1">&#39;.txt&#39;</span>
     <span class="n">is_file</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_maxMsgSize</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">_mode_as_bytes</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_synchronous_read</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_deprecated_drivers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;FileInputDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;FileOutputDriver&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;close_on_eof_send&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;partner_language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Files don&#39;t have partner comms</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_update_serializer_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update serializer information in a set of keyword arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kwargs (dict): Keyword arguments containing non-schema behaved</span>
+<span class="sd">                serializer information.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">_update_serializer_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span> <span class="o">!=</span> <span class="s1">&#39;direct&#39;</span>
+             <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="s1">&#39;direct&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;direct&#39;</span><span class="p">])):</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span>
+        <span class="k">return</span> <span class="n">out</span>
+        
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get absolute path and set attributes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="kc">False</span>
@@ -238,6 +259,17 @@
         <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="c1"># Add serializer properties to schema</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span> <span class="o">!=</span> <span class="s1">&#39;binary&#39;</span><span class="p">:</span>
+            <span class="c1"># from yggdrasil.schema import ComponentSchema</span>
+            <span class="c1"># if cls._default_serializer != &#39;direct&#39;:</span>
+            <span class="c1">#     seri_key = ComponentSchema._subtype_defkey(</span>
+            <span class="c1">#         &#39;serializer&#39;, cls._default_serializer)</span>
+            <span class="c1">#     base_key = ComponentSchema._subtype_defkey(</span>
+            <span class="c1">#         &#39;serializer&#39;, &#39;base&#39;)</span>
+            <span class="c1">#     cls._schema_properties[&#39;serializer&#39;] = {</span>
+            <span class="c1">#         &#39;allOf&#39;: [</span>
+            <span class="c1">#             {&quot;$ref&quot;: f&quot;#/definitions/{seri_key}&quot;},</span>
+            <span class="c1">#             {&quot;$ref&quot;: f&quot;#/definitions/{base_key}&quot;}</span>
+            <span class="c1">#         ]}</span>
             <span class="k">assert</span> <span class="s1">&#39;serializer&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span>
             <span class="c1"># if registration_in_progress():</span>
             <span class="n">seri</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">)</span>

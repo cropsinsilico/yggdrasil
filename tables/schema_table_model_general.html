@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -113,36 +113,43 @@ for the model’s language and/or a list of arguments that should be passed as
 input to the model program or language executable (e.g. source code or
 configuration file for a domain specific language).</p></td>
 </tr>
-<tr class="row-odd"><td><p>language</p></td>
-<td><p>string</p></td>
+<tr class="row-odd"><td><p>inputs</p></td>
+<td><p>array</p></td>
 <td><p>X</p></td>
-<td><p>The programming language that the model is written in. A list of available
-languages can be found <a class="reference internal" href="../yaml.html#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>. (Options
-described <a class="reference internal" href="../yaml.html#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+<td><p>Zero or more channels carrying input to the model. A full description of channel
+entries and the options available for channels can be found
+<a class="reference internal" href="../yaml.html#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
 <td><p>X</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
-<tr class="row-odd"><td><p>working_dir</p></td>
+<tr class="row-odd"><td><p>outputs</p></td>
+<td><p>array</p></td>
+<td><p>X</p></td>
+<td><p>Zero or more channels carrying output from the model. A full description of
+channel entries and the options available for channels can be found
+<a class="reference internal" href="../yaml.html#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p>working_dir</p></td>
 <td><p>string</p></td>
 <td><p>X</p></td>
 <td><p>Working directory. If not provided, the current working directory is used.</p></td>
 </tr>
-<tr class="row-even"><td><p>additional_dependencies</p></td>
+<tr class="row-odd"><td><p>additional_dependencies</p></td>
 <td><p>object</p></td>
 <td></td>
 <td><p>A mapping between languages and lists of packages in those languages that are
 required by the model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>allow_threading</p></td>
+<tr class="row-even"><td><p>allow_threading</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, comm connections will be set up so that the model-side comms can be
 used by more than one thread. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>client_of</p></td>
+<tr class="row-odd"><td><p>client_of</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>The names of one or more models that this model will call as a server. If there
@@ -153,18 +160,18 @@ underscore <cite>&lt;server_model&gt;_&lt;client_model&gt;</cite>. There will be
 for each server the model is a client of. Defaults to empty list. Use of
 <cite>client_of</cite> with <cite>function</cite> is not currently supported.</p></td>
 </tr>
-<tr class="row-odd"><td><p>contact_email</p></td>
+<tr class="row-even"><td><p>contact_email</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>Email address that should be used to contact the maintainer of the model. This
 parameter is only used in the model repository.</p></td>
 </tr>
-<tr class="row-even"><td><p>copies</p></td>
+<tr class="row-odd"><td><p>copies</p></td>
 <td><p>integer</p></td>
 <td></td>
 <td><p>The number of copies of the model that should be created. Defaults to 1.</p></td>
 </tr>
-<tr class="row-odd"><td><p>dependencies</p></td>
+<tr class="row-even"><td><p>dependencies</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>A list of packages required by the model that are written in the same language
@@ -174,37 +181,30 @@ version of the package from a specific package manager, a mapping with ‘packag
 and ‘package_manager’ fields can be provided instead of just the name of the
 package.</p></td>
 </tr>
-<tr class="row-even"><td><p>description</p></td>
+<tr class="row-odd"><td><p>description</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>Description of the model. This parameter is only used in the model repository or
 when providing the model as a service.</p></td>
 </tr>
-<tr class="row-odd"><td><p>driver</p></td>
+<tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>env</p></td>
+<tr class="row-odd"><td><p>env</p></td>
 <td><p>object</p></td>
 <td></td>
 <td><p>Dictionary of environment variables that should be set when the driver starts.
 Defaults to {}.</p></td>
 </tr>
-<tr class="row-odd"><td><p>function</p></td>
+<tr class="row-even"><td><p>function</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>If provided, an integrated model is created by wrapping the function named here.
 The function must be located within the file specified by the source file listed
 in the first argument. If not provided, the model must contain it’s own calls to
 the yggdrasil interface.</p></td>
-</tr>
-<tr class="row-even"><td><p>inputs</p></td>
-<td><p>array</p></td>
-<td></td>
-<td><p>Zero or more channels carrying input to the model. A full description of channel
-entries and the options available for channels can be found
-<a class="reference internal" href="../yaml.html#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>is_server</p></td>
 <td></td>
@@ -225,19 +225,19 @@ each time the co-opted input channel’s recv method is called. If used with the
 <td><p>Variable(s) that should be received or sent as an array, but iterated over.
 Defaults to an empty array and is ignored.</p></td>
 </tr>
-<tr class="row-odd"><td><p>logging_level</p></td>
+<tr class="row-odd"><td><p>language</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The programming language that the model is written in. A list of available
+languages can be found <a class="reference internal" href="../yaml.html#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>. (Options
+described <a class="reference internal" href="../yaml.html#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+</tr>
+<tr class="row-even"><td><p>logging_level</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>The level of logging messages that should be displayed by the model. Defaults to
 the logging level as determined by the configuration file and environment
 variables.</p></td>
-</tr>
-<tr class="row-even"><td><p>outputs</p></td>
-<td><p>array</p></td>
-<td></td>
-<td><p>Zero or more channels carrying output from the model. A full description of
-channel entries and the options available for channels can be found
-<a class="reference internal" href="../yaml.html#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>outputs_in_inputs</p></td>
 <td><p>boolean</p></td>
@@ -298,7 +298,7 @@ this list unless they are sure they should be deleted. Defaults to [].</p></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 </tr>
 <tr class="row-odd"><td><p>timesync</p></td>
-<td></td>
+<td><p>array</p></td>
 <td></td>
 <td><p>If set, the model is assumed to call a send then receive of the state at each
 timestep for syncronization with other models that are also integrating in time.

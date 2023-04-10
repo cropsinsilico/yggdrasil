@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Units &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Units &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -58,7 +58,30 @@
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Units</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#schema-datatypes">Schema Datatypes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#python-objects">Python Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#language-specific-support">Language Specific Support</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#python">Python</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scalar-creation">Scalar Creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#array-creation">Array Creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#additional-methods">Additional Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#c">C++</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Scalar Creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Array Creation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#c-language">C Language</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Scalar Creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Array Creation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#r-language">R Language</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#matlab">MATLAB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#julia">Julia</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface (CLI)</a></li>
@@ -104,9 +127,9 @@
              
   <section id="units">
 <span id="units-rst"></span><h1>Units<a class="headerlink" href="#units" title="Permalink to this heading">¶</a></h1>
-<p>Units are handled via the <a class="reference external" href="https://unyt.readthedocs.io/en/stable/">unyt</a>
-package in Python &gt;=3 and via <a class="reference external" href="https://pint.readthedocs.io/en/0.9/">pint</a>
-in Python 2. In both cases, units are specified via strings
+<p>Units are handled via language-specific libraries described blow with every
+effort made to ensure that the same units are available in each by updating
+the unit registries where needed. Units are specified via strings
 associated with the units (usually the abbreviation; e.g.
 <code class="docutils literal notranslate"><span class="pre">'cm'</span></code> for centimeters or <code class="docutils literal notranslate"><span class="pre">'umol'</span></code> for micromoles). In addition, units can be
 expressed as composites via symbolic arithmetic (e.g. <code class="docutils literal notranslate"><span class="pre">'km/s'</span></code> for kilometers
@@ -121,32 +144,166 @@ units of the sending model to the units of the receiving model. If the units
 are not compatible, an error will be raised.</p>
 <p>Units can be added to numeric scalars and arrays.</p>
 </section>
-<section id="python-objects">
-<h2>Python Objects<a class="headerlink" href="#python-objects" title="Permalink to this heading">¶</a></h2>
-<p>In Python, units can be added to numeric types (or retrieved) using the
-yggdrasil units submodule which wraps the particular behavior of the
-underlying packages. Using unyt:</p>
+<section id="language-specific-support">
+<h2>Language Specific Support<a class="headerlink" href="#language-specific-support" title="Permalink to this heading">¶</a></h2>
+<section id="python">
+<h3>Python<a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h3>
+<section id="backwards-compatibility">
+<h4>Backwards Compatibility<a class="headerlink" href="#backwards-compatibility" title="Permalink to this heading">¶</a></h4>
+<p>Prior to version 2.0, yggdrasil used <a class="reference external" href="https://unyt.readthedocs.io/en/stable/">unyt</a> for unit support in Python.
+After 2.0, yggdrasil migrating to using a Python wrapped C++ units system based on unyt that is now used in C++ as well. yggdrasil still supports the use of unyt classes for backwards compatibility, but unyt class instances will be normalized to the analagous new classes during serialization by rapidjson.</p>
+</section>
+<section id="scalar-creation">
+<h4>Scalar Creation<a class="headerlink" href="#scalar-creation" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">yggdrasil.units</span> <span class="kn">import</span> <span class="n">Quantity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">Quantity(1., &#39;cm&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">&#39;1.0 cm&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+<span class="go">&#39;cm&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">value</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+</section>
+<section id="array-creation">
+<h4>Array Creation<a class="headerlink" href="#array-creation" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">yggdrasil.units</span> <span class="kn">import</span> <span class="n">QuantityArray</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">QuantityArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="s1">&#39;km/s&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
+<span class="go">QuantityArray([1., 1., 1., 1., 1.], &#39;km*(s**-1)&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="go">&#39;[1. 1. 1. 1. 1.] km*(s**-1)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+<span class="go">&#39;km*(s**-1)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">value</span>
+<span class="go">array([1., 1., 1., 1., 1.])</span>
+</pre></div>
+</div>
+</section>
+<section id="arithmetic">
+<h4>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this heading">¶</a></h4>
+<p>Any operations possible in Python with scalars or numpy arrays will also be possible with Quantity or QuantityArray objects.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">*=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">Quantity(5., &#39;cm&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span>
+<span class="go">Quantity([20000., 20000., 20000., 20000., 20000.], &#39;s**-1&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="go">UnitsError: Incompatible units: &#39;&#39; and &#39;cm&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">+</span> <span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
+<span class="go">Quantity(105., &#39;cm&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="go">Quantity(25., &#39;cm**2&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span>
+<span class="go">Quantity(1., &#39;cm&#39;)</span>
+</pre></div>
+</div>
+</section>
+<section id="additional-methods">
+<h4>Additional Methods<a class="headerlink" href="#additional-methods" title="Permalink to this heading">¶</a></h4>
+<p>For backwards compat, units in python can also be added to numeric types (or retrieved) using several methods from
+the yggdrasil units submodule:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
-<span class="go">unyt_quantity(1., &#39;cm&#39;)</span>
+<span class="go">Quantity(1., &#39;cm&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="go">&#39;cm&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="s1">&#39;km/s&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
+<span class="go">QuantityArray([1., 1., 1., 1., 1.], &#39;km*(s**-1)&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="go">&#39;km*(s**-1)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="go">array([1., 1., 1., 1., 1.])</span>
 </pre></div>
 </div>
-<p>or using pint:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
-<span class="go">1.0 &lt;Unit(&#39;centimeter&#39;)&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="go">&#39;centimeter&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="go">1.0</span>
+</section>
+</section>
+<section id="c">
+<h3>C++<a class="headerlink" href="#c" title="Permalink to this heading">¶</a></h3>
+<section id="id1">
+<h4>Scalar Creation<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;iostream&gt;</span>
+<span class="c1">#include &quot;YggInterface.hpp&quot;</span>
+<span class="n">rapidjson</span><span class="p">::</span><span class="n">units</span><span class="p">::</span><span class="n">Quantity</span><span class="o">&lt;</span><span class="n">double</span><span class="o">&gt;</span> <span class="n">x</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;cm&quot;</span><span class="p">);</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;x = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
 </pre></div>
 </div>
+<p>Output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="n">cm</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h4>Array Creation<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;iostream&gt;</span>
+<span class="c1">#include &quot;YggInterface.hpp&quot;</span>
+<span class="n">double</span> <span class="n">arr</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">};</span>
+<span class="n">rapidjson</span><span class="p">::</span><span class="n">units</span><span class="p">::</span><span class="n">QuantityArray</span><span class="o">&lt;</span><span class="n">double</span><span class="o">&gt;</span> <span class="n">y</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="s2">&quot;km/s&quot;</span><span class="p">);</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;y = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span> <span class="n">cm</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="c-language">
+<h3>C Language<a class="headerlink" href="#c-language" title="Permalink to this heading">¶</a></h3>
+<p>Units in C are inplmeented by wrapping the C++ unit classes as generic objects.</p>
+<section id="id3">
+<h4>Scalar Creation<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &quot;YggInterface.h&quot;</span>
+<span class="n">generic_t</span> <span class="n">x</span><span class="p">;</span>
+<span class="n">generic_set_double</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;cm&quot;</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s2">&quot;x = &quot;</span><span class="p">);</span>
+<span class="n">display_generic</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="n">cm</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h4>Array Creation<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &quot;YggInterface.h&quot;</span>
+<span class="n">generic_t</span> <span class="n">y</span><span class="p">;</span>
+<span class="n">printf</span><span class="p">(</span><span class="s2">&quot;x = &quot;</span><span class="p">);</span>
+<span class="n">double</span> <span class="n">arr</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">};</span>
+<span class="n">generic_set_1darray_double</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;cm&quot;</span><span class="p">);</span>
+<span class="n">display_generic</span><span class="p">(</span><span class="n">y</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span> <span class="n">cm</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="r-language">
+<h3>R Language<a class="headerlink" href="#r-language" title="Permalink to this heading">¶</a></h3>
+<p>In R, units are represented via the <a class="reference external" href="https://cran.r-project.org/web/packages/units/index.html">units</a> package. Details on adding units to quantites in R can be found <a class="reference external" href="https://cran.r-project.org/web/packages/units/vignettes/units.html">here</a>.</p>
+</section>
+<section id="matlab">
+<h3>MATLAB<a class="headerlink" href="#matlab" title="Permalink to this heading">¶</a></h3>
+<p>In MATLAB, units are represented via <a class="reference external" href="https://www.mathworks.com/help/symbolic/units-of-measurement.html?s_tid=CRUX_lftnav">symbolic units</a> if the <code class="docutils literal notranslate"><span class="pre">YGG_MATLAB_SYMUNIT</span></code> environment variables is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, othwerise the value is passed to MATLAB without the units. Details on adding units to quantaties in MATALB can be found <a class="reference external" href="https://www.mathworks.com/help/symbolic/units-conversion.html">here</a>.</p>
+</section>
+<section id="julia">
+<h3>Julia<a class="headerlink" href="#julia" title="Permalink to this heading">¶</a></h3>
+<p>In Julia, units are represented via the <a class="reference external" href="https://painterqubits.github.io/Unitful.jl/stable/">Unitful</a> package. Details on adding units to quantaties in Julia can be found <a class="reference external" href="https://painterqubits.github.io/Unitful.jl/stable/newunits/">here</a>.</p>
+</section>
 </section>
 </section>
 

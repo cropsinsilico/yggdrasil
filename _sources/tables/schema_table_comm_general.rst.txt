@@ -1,52 +1,49 @@
 .. _schema_table_comm_general_rst:
 
-==============   =======   ========   ================================================================================
-Option           Type      Required   Description                                                                     
-==============   =======   ========   ================================================================================
-commtype         string    X          Communication mechanism that should be used. (Options described :ref:`here      
-                                      <schema_table_comm_subtype_rst>`)                                               
-datatype         schema    X          JSON schema (with expanded core types defined by |yggdrasil|) that constrains   
-                                      the type of data that should be sent/received by this object. Defaults to       
-                                      {'type': 'bytes'}. Additional information on specifying datatypes can be found  
-                                      :ref:`here <datatypes_rst>`.                                                    
-name             string    X          Name used for component in log messages.                                        
-address          string               Communication info. Default to None and address is taken from the environment   
-                                      variable.                                                                       
-args             string               [DEPRECATED] Arguments that should be provided to the driver.                   
-as_array         boolean              [DEPRECATED] If True and the datatype is table-like, tables are sent/recieved   
-                                      with either columns rather than row by row. Defaults to False.                  
-default_file                          Comm information for a file that input should be drawn from (for input comms) or
-                                      that output should be sent to (for output comms) in the event that a yaml does  
-                                      not pair the comm with another model comm or a file.                            
-default_value    any                  Value that should be returned in the event that a yaml does not pair the comm   
-                                      with another model comm or a file.                                              
-dont_copy        boolean              If True, the comm will not be duplicated in the even a model is duplicated via  
-                                      the 'copies' parameter. Defaults to False except for in the case that a model is
-                                      wrapped and the comm is inside the loop or that a model is a RPC input to a     
-                                      model server.                                                                   
-driver           string               [DEPRECATED] Name of driver class that should be used.                          
-field_names      array                [DEPRECATED] Field names that should be used to label fields in sent/received   
-                                      tables. This keyword is only valid for table-like datatypes. If not provided,   
-                                      field names are created based on the field order.                               
-field_units      array                [DEPRECATED] Field units that should be used to convert fields in sent/received 
-                                      tables. This keyword is only valid for table-like datatypes. If not provided,   
-                                      all fields are assumed to be unitless.                                          
-filter                                Filter that will be used to determine when messages should be sent/received.    
-                                      Ignored if not provided.                                                        
-for_service      boolean              If True, this comm bridges the gap to an integration running as a service,      
-                                      possibly on a remote machine. Defaults to False.                                
-format_str       string               String that should be used to format/parse messages. Default to None.           
-is_default       boolean              If True, this comm was created to handle all input/output variables to/from a   
-                                      model. Defaults to False. This variable is used internally and should not be set
-                                      explicitly in the YAML.                                                         
-length_map       object               Map from pointer variable names to the names of variables where their length    
-                                      will be stored. Defaults to {}.                                                 
-outside_loop     boolean              If True, and the comm is an input/outputs to/from a model being wrapped. The    
-                                      receive/send calls for this comm will be outside the loop for the model.        
-                                      Defaults to False.                                                              
-recv_converter                        Converter that should be used on received objects. Defaults to None.            
-send_converter                        Converter that should be used on sent objects. Defaults to None.                
-transform                             One or more transformations that will be applied to messages that are           
-                                      sent/received. Ignored if not provided.                                         
-vars             array                Names of variables to be sent/received by this comm. Defaults to [].            
-==============   =======   ========   ================================================================================
+=============   =======   ========   ================================================================================
+Option          Type      Required   Description                                                                     
+=============   =======   ========   ================================================================================
+datatype        schema    X          JSON schema (with expanded core types defined by |yggdrasil|) that constrains   
+                                     the type of data that should be sent/received by this object. Defaults to       
+                                     {'type': 'bytes'}. Additional information on specifying datatypes can be found  
+                                     :ref:`here <datatypes_rst>`.                                                    
+name            string    X          Name used for component in log messages.                                        
+address         string               Communication info. Default to None and address is taken from the environment   
+                                     variable.                                                                       
+as_array        boolean              [DEPRECATED] If True and the datatype is table-like, tables are sent/recieved   
+                                     with either columns rather than row by row. Defaults to False.                  
+commtype        string               Communication mechanism that should be used. (Options described :ref:`here      
+                                     <schema_table_comm_subtype_rst>`)                                               
+default_file    object               Schema for file components.                                                     
+default_value   any                  Value that should be returned in the event that a yaml does not pair the comm   
+                                     with another model comm or a file.                                              
+dont_copy       boolean              If True, the comm will not be duplicated in the even a model is duplicated via  
+                                     the 'copies' parameter. Defaults to False except for in the case that a model is
+                                     wrapped and the comm is inside the loop or that a model is a RPC input to a     
+                                     model server.                                                                   
+driver          string               [DEPRECATED] Name of driver class that should be used.                          
+field_names     array                [DEPRECATED] Field names that should be used to label fields in sent/received   
+                                     tables. This keyword is only valid for table-like datatypes. If not provided,   
+                                     field names are created based on the field order.                               
+field_units     array                [DEPRECATED] Field units that should be used to convert fields in sent/received 
+                                     tables. This keyword is only valid for table-like datatypes. If not provided,   
+                                     all fields are assumed to be unitless.                                          
+filter          object               Schema for filter components.                                                   
+for_service     boolean              If True, this comm bridges the gap to an integration running as a service,      
+                                     possibly on a remote machine. Defaults to False.                                
+format_str      string               String that should be used to format/parse messages. Default to None.           
+is_default      boolean              If True, this comm was created to handle all input/output variables to/from a   
+                                     model. Defaults to False. This variable is used internally and should not be set
+                                     explicitly in the YAML.                                                         
+length_map      object               Map from pointer variable names to the names of variables where their length    
+                                     will be stored. Defaults to {}.                                                 
+onexit          string               [DEPRECATED] Method of input/output driver to call when the connection closes   
+outside_loop    boolean              If True, and the comm is an input/outputs to/from a model being wrapped. The    
+                                     receive/send calls for this comm will be outside the loop for the model.        
+                                     Defaults to False.                                                              
+serializer      object               Schema for serializer components.                                               
+transform       array                One or more transformations that will be applied to messages that are           
+                                     sent/received. Ignored if not provided.                                         
+vars            array                Names of variables to be sent/received by this comm. Defaults to [].            
+working_dir     string               Working directory. If not provided, the current working directory is used.      
+=============   =======   ========   ================================================================================

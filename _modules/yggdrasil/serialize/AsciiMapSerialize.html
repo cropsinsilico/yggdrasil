@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.AsciiMapSerialize &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.serialize.AsciiMapSerialize &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -96,10 +96,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for yggdrasil.serialize.AsciiMapSerialize</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">constants</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">rapidjson</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">JSONReadableEncoder</span>
 
 
 <div class="viewcode-block" id="AsciiMapSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize">[docs]</a><span class="k">class</span> <span class="nc">AsciiMapSerialize</span><span class="p">(</span><span class="n">SerializeBase</span><span class="p">):</span>
@@ -138,11 +136,9 @@
         <span class="n">newline_str</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">order</span><span class="p">:</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Serialization of non-string keys not supported.&quot;</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">JSONReadableEncoder</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">yggdrasil_mode</span><span class="o">=</span><span class="n">rapidjson</span><span class="o">.</span><span class="n">YM_READABLE</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="n">newline_str</span>
         <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
@@ -168,7 +164,7 @@
                     <span class="n">out</span><span class="p">[</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="n">out</span><span class="p">[</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
                         <span class="n">out</span><span class="p">[</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -208,7 +204,8 @@
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;args1</span><span class="se">\t</span><span class="s1">1</span><span class="se">\n</span><span class="s1">&#39;</span>
                            <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;args2</span><span class="se">\t</span><span class="s1">&quot;this&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
                            <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;args3</span><span class="se">\t</span><span class="s1">1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;args4</span><span class="se">\t</span><span class="s1">[1, 2]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;args4</span><span class="se">\t</span><span class="s1">[1,2]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;invalid_objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;args1&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;this&#39;</span><span class="p">}]</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

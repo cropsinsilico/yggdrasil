@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -100,104 +100,104 @@
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
 <th class="head"><p>Type</p></th>
-<th class="head"><p>Description</p></th>
 <th class="head"><p>Valid For ‘Seritype’ Of</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>as_array</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘table’]</p></td>
 <td><p>If True, each of the arguments being serialized/deserialized will be arrays that
 are converted to/from bytes in column major (‘F’) order. Otherwise, each
 argument should be a scalar. Defaults to False.</p></td>
-<td><p>[‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘yaml’]</p></td>
 <td><p>If True, nested collections will be serialized in the block style. If False,
 they will always be serialized in the flow style. See <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a>.</p></td>
-<td><p>[‘yaml’]</p></td>
 </tr>
 <tr class="row-even"><td><p>delimiter</p></td>
 <td><p>string</p></td>
+<td><p>[‘table’, ‘wofost’, ‘pandas’, ‘map’]</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘pandas’, ‘wofost’, ‘map’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>encoded_datatype</p></td>
 <td><p>schema</p></td>
+<td><p>[‘functional’]</p></td>
 <td><p>JSON schema describing the type that serialized objects should conform to.
 Defaults to the class attribute default_encoded_datatype. If either
 func_serialize or func_deserialize are not provided, this needs to be specified
 in order to serialize non-bytes objects.</p></td>
-<td><p>[‘functional’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
-<td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
 <td><p>[‘yaml’]</p></td>
+<td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
 </tr>
 <tr class="row-odd"><td><p>field_names</p></td>
 <td><p>array</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>The names of fields in the format string. If not provided, names are set based
 on the order of the fields in the format string.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>The units of fields in the format string. If not provided, all fields are
 assumed to be dimensionless.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>format_str</p></td>
 <td><p>string</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>If provided, this string will be used to format messages from a list of
 arguments and parse messages to get a list of arguments in C printf/scanf style.
 Defaults to None and messages are assumed to already be bytes.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>func_deserialize</p></td>
 <td><p>function</p></td>
+<td><p>[‘functional’]</p></td>
 <td><p>Callable object that takes objects of a type that conforms to encoded_datatype
 and returns a deserialized Python object. Defaults to None and the default
 deserialization for encoded_datatype will be used.</p></td>
-<td><p>[‘functional’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>func_serialize</p></td>
 <td><p>function</p></td>
+<td><p>[‘functional’]</p></td>
 <td><p>Callable object that takes Python objects as input and returns a representation
 that conforms to encoded_datatype. Defaults to None and the default
 serialization for encoded_datatype will be used.</p></td>
-<td><p>[‘functional’]</p></td>
 </tr>
 <tr class="row-even"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
+<td><p>[‘json’, ‘yaml’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘pandas’]</p></td>
 <td><p>If True, headers will not be read or serialized from/to tables. Defaults to
 False.</p></td>
-<td><p>[‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘json’]</p></td>
 <td><p>If True, the serialization of dictionaries will be in key sorted order. Defaults
 to True.</p></td>
-<td><p>[‘json’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>str_as_bytes</p></td>
 <td><p>boolean</p></td>
-<td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
 <td><p>[‘pandas’]</p></td>
+<td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
 </tr>
 <tr class="row-even"><td><p>use_astropy</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 </tbody>
 </table>

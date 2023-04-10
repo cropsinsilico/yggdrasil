@@ -4,5 +4,6 @@
 Option              Type     Required   Description                                                                     
 =================   ======   ========   ================================================================================
 original_datatype   schema              Datatype associated with expected messages. Defaults to None.                   
-transformtype                            (Options described :ref:`here <schema_table_transform_subtype_rst>`)           
+transformtype       string              Consolidate values into an array (Options described :ref:`here                  
+                                        <schema_table_transform_subtype_rst>`)                                          
 =================   ======   ========   ================================================================================

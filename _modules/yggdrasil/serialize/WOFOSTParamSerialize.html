@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.WOFOSTParamSerialize &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.serialize.WOFOSTParamSerialize &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -97,11 +97,9 @@
              
   <h1>Source code for yggdrasil.serialize.WOFOSTParamSerialize</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">rapidjson</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize.AsciiMapSerialize</span> <span class="kn">import</span> <span class="n">AsciiMapSerialize</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">JSONReadableEncoder</span>
 
 
 <div class="viewcode-block" id="WOFOSTParamSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize">[docs]</a><span class="k">class</span> <span class="nc">WOFOSTParamSerialize</span><span class="p">(</span><span class="n">AsciiMapSerialize</span><span class="p">):</span>
@@ -147,10 +145,13 @@
                 <span class="n">iline</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;,</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">indent</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">arr_lines</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">iline</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">):</span>
+                <span class="n">iline</span> <span class="o">+=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">yggdrasil_mode</span><span class="o">=</span><span class="n">rapidjson</span><span class="o">.</span><span class="n">YM_READABLE</span><span class="p">)</span>
+                <span class="n">iline</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">! [</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s1">]&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">iline</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">JSONReadableEncoder</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">):</span>
-                    <span class="n">iline</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">! [</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s1">]&#39;</span>
+                <span class="n">iline</span> <span class="o">+=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                    <span class="n">v</span><span class="p">,</span> <span class="n">yggdrasil_mode</span><span class="o">=</span><span class="n">rapidjson</span><span class="o">.</span><span class="n">YM_READABLE</span><span class="p">)</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iline</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
 
@@ -169,14 +170,13 @@
                         <span class="s2">&quot;kg P&quot;</span><span class="p">:</span> <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
                         <span class="s2">&quot;kg-1 dry biomass&quot;</span><span class="p">:</span> <span class="s2">&quot;kg-1&quot;</span><span class="p">,</span>
                         <span class="s2">&quot;kg CH2O&quot;</span><span class="p">:</span> <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;days&quot;</span><span class="p">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;cel&quot;</span><span class="p">:</span> <span class="s2">&quot;degC&quot;</span><span class="p">}</span>
+                        <span class="s2">&quot;cel&quot;</span><span class="p">:</span> <span class="s2">&quot;degC&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;degC d&quot;</span><span class="p">:</span> <span class="s2">&quot;ΔdegC d&quot;</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">replacements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_R_unit_string</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="n">x</span></div>
             
 <div class="viewcode-block" id="WOFOSTParamSerialize.func_deserialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
@@ -219,7 +219,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
                         <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_units</span><span class="p">(</span><span class="n">k_units</span><span class="p">))</span>
-        
+
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;**&#39;</span><span class="p">):</span>
                 <span class="k">continue</span>
@@ -248,14 +248,14 @@
                     <span class="n">v1</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="n">v1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">])</span>
-                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                        <span class="n">v1</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
-                            <span class="n">v1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
+                            <span class="n">v1</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                             <span class="k">raise</span>
                 <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
-                    <span class="n">v2</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value2&#39;</span><span class="p">])</span>
+                    <span class="n">v2</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value2&#39;</span><span class="p">])</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -295,17 +295,17 @@
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;CRPNAM&#39;</span><span class="p">:</span> <span class="s1">&#39;Grain maize CSA practicals&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;TBASEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="s1">&#39;degC&#39;</span><span class="p">),</span>
                            <span class="s1">&#39;TEFFMX&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="s1">&#39;degC&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;TSUMEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">110.0</span><span class="p">,</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUMEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">110.0</span><span class="p">,</span> <span class="s1">&#39;ΔdegC*d&#39;</span><span class="p">),</span>
                            <span class="s1">&#39;IDSL&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                            <span class="s1">&#39;DLO&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">),</span>
                            <span class="s1">&#39;DLC&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;TSUM1&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">900.0</span><span class="p">,</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;TSUM2&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUM1&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">900.0</span><span class="p">,</span> <span class="s1">&#39;ΔdegC*d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUM2&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="s1">&#39;ΔdegC*d&#39;</span><span class="p">),</span>
                            <span class="s1">&#39;DTSMTB&#39;</span><span class="p">:</span> <span class="p">[</span>
                                <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
                                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">]),</span> <span class="s1">&#39;degC&#39;</span><span class="p">),</span>
                                <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
-                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">]),</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">)],</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">]),</span> <span class="s1">&#39;ΔdegC*d&#39;</span><span class="p">)],</span>
                            <span class="s1">&#39;DVSI&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
                            <span class="s1">&#39;DVSEND&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
                            <span class="s1">&#39;SSATB&#39;</span><span class="p">:</span> <span class="p">[</span>

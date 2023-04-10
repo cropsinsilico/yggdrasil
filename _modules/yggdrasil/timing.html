@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.timing &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.timing &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -206,7 +206,6 @@
         <span class="s1">&#39;from yggdrasil import timing&#39;</span><span class="p">,</span>
         <span class="s1">&#39;nrep = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">nrep</span><span class="p">,</span>
         <span class="s1">&#39;nmsg = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">nmsg</span><span class="p">,</span>
-        <span class="s1">&#39;warmups = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">_pyperf_warmups</span><span class="p">,</span>
         <span class="s1">&#39;msg_size = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg_size</span><span class="p">,</span>
         <span class="s1">&#39;max_errors = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">max_errors</span><span class="p">,</span>
         <span class="s1">&#39;lang_src = &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">lang_src</span><span class="p">,</span>
@@ -225,7 +224,7 @@
         <span class="s1">&#39;timer = timing.TimedRun(lang_src, lang_dst,&#39;</span>
         <span class="s1">&#39;                        comm_type=comm_type,&#39;</span>
         <span class="s1">&#39;                        matlab_running=matlab_running)&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;runner = pyperf.Runner(values=1, processes=nrep, warmups=warmups)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;runner = pyperf.Runner(values=1, processes=nrep)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),&#39;</span><span class="p">,</span>
         <span class="s1">&#39;                             timing.pyperf_func,&#39;</span><span class="p">,</span>
         <span class="s1">&#39;                             timer, nmsg, msg_size, max_errors)&#39;</span><span class="p">]</span>
@@ -614,7 +613,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_yaml_src</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang_src</span><span class="p">),</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">get_yaml_dst</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang_dst</span><span class="p">)]}</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">get_yaml_dst</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lang_dst</span><span class="p">)],</span>
+               <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;output_pipe&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;input_pipe&#39;</span><span class="p">}]}</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
             <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
@@ -630,9 +631,7 @@
                <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="n">lang</span><span class="p">,</span>
                <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_src</span><span class="p">),</span>
                         <span class="s2">&quot;{{PIPE_MSG_COUNT}}&quot;</span><span class="p">,</span> <span class="s2">&quot;{{PIPE_MSG_SIZE}}&quot;</span><span class="p">],</span>
-               <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output_pipe&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;OutputDriver&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;timed_pipe&#39;</span><span class="p">}}</span>
+               <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output_pipe&#39;</span><span class="p">}}</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.get_yaml_dst"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.get_yaml_dst">[docs]</a>    <span class="k">def</span> <span class="nf">get_yaml_dst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
@@ -645,13 +644,12 @@
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;timed_pipe_dst&#39;</span><span class="p">,</span>
                <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="n">lang</span><span class="p">,</span>
                <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_dst</span><span class="p">),</span>
-               <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;input_pipe&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;InputDriver&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;timed_pipe&#39;</span><span class="p">},</span>
+               <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;input_pipe&#39;</span><span class="p">},</span>
                <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output_file&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;AsciiFileOutputDriver&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s2">&quot;{{PIPE_OUT_FILE}}&quot;</span><span class="p">,</span>
-                           <span class="s1">&#39;in_temp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}</span>
+                           <span class="s1">&#39;default_file&#39;</span><span class="p">:</span> <span class="p">{</span>
+                               <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;{{PIPE_OUT_FILE}}&quot;</span><span class="p">,</span>
+                               <span class="s1">&#39;filetype&#39;</span><span class="p">:</span> <span class="s1">&#39;ascii&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;in_temp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}}</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TimedRun.before_run"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.before_run">[docs]</a>    <span class="k">def</span> <span class="nf">before_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmsg</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">):</span>

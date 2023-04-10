@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.RMQAsyncComm &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.communication.RMQAsyncComm &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -146,6 +146,7 @@
                         <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;rmq_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;_consuming&#39;</span><span class="p">,</span> <span class="s1">&#39;_reconnecting&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;_buffered_messages&#39;</span><span class="p">,</span> <span class="s1">&#39;_deliveries&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;_external_close&#39;</span><span class="p">])</span>
+    <span class="n">_deprecated_drivers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RMQAsyncInputDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQAsyncOutputDriver&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize null variables and RMQ async thread.&quot;&quot;&quot;</span>

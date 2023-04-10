@@ -10,7 +10,8 @@ outputs           array    X          One or more name(s) of model input channel
                                       that the connection should send messages to. A full description of file entries 
                                       and the available options can be found :ref:`here<yaml_file_options>`.          
 args              string              [DEPRECATED] Arguments that should be provided to the driver.                   
-connection_type   string               (Options described :ref:`here <schema_table_connection_subtype_rst>`)          
+connection_type   string              Connection between one or more comms/files and one or more comms/files. (Options
+                                      described :ref:`here <schema_table_connection_subtype_rst>`)                    
 driver            string              [DEPRECATED] Name of driver class that should be used.                          
 input_pattern     string              The communication pattern that should be used to handle incoming messages when  
                                       there is more than one input communicators present. Defaults to 'cycle'. Options
@@ -24,10 +25,13 @@ output_pattern    string              The communication pattern that should be u
                                       Options include: 'cycle': Rotate through output comms, sending one message to   
                                       each. 'broadcast': Send the same message to each comm. 'scatter': Send part of  
                                       message (must be a list) to each comm.                                          
-translator        array               Function or string specifying function that should be used to translate messages
+read_meth         string                                                                                              
+transform         array               Function or string specifying function that should be used to translate messages
                                       from the input communicator before passing them to the output communicator. If a
                                       string, the format should be "<package.module>:<function>" so that <function>   
                                       can be imported from <package>. Defaults to None and messages are passed        
                                       directly. This can also be a list of functions/strings that will be called on   
                                       the messages in the order they are provided.                                    
+working_dir       string              Working directory. If not provided, the current working directory is used.      
+write_meth        string                                                                                              
 ===============   ======   ========   ================================================================================

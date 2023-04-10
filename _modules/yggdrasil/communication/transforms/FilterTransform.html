@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.transforms.FilterTransform &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.communication.transforms.FilterTransform &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -101,10 +101,17 @@
 
 
 <div class="viewcode-block" id="FilterTransform"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.FilterTransform.FilterTransform">[docs]</a><span class="k">class</span> <span class="nc">FilterTransform</span><span class="p">(</span><span class="n">TransformBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for applying a filter.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for applying a filter.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filter (FilterBase): Filter used to exclude some messages based</span>
+<span class="sd">            on their contents.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_transformtype</span> <span class="o">=</span> <span class="s1">&#39;filter&#39;</span>
     <span class="n">_schema_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span>
     <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/filter&#39;</span><span class="p">}}</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="s2">&quot;Pass only some messages based on a filter&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FilterTransform</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

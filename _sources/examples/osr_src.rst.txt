@@ -4,6 +4,10 @@ Model Code:
    :language: python
    :linenos:
 
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/osr/src/old_osr_model.xml
+   :language: python
+   :linenos:
+
 .. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/osr/src/osr_model.xml
    :language: python
    :linenos:

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.multitasking &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.multitasking &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1604,7 +1604,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_ygg_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_ygg_kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="YggTask.run_error"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.run_error">[docs]</a>    <span class="k">def</span> <span class="nf">run_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="YggTask.run_error"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTask.run_error">[docs]</a>    <span class="k">def</span> <span class="nf">run_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on error in try/except wrapping run.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> ERROR&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">task_method</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;error_flag&#39;</span><span class="p">)</span></div>
@@ -1887,7 +1887,7 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_loop_count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="YggTaskLoop.run_error"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.run_error">[docs]</a>    <span class="k">def</span> <span class="nf">run_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="YggTaskLoop.run_error"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop.run_error">[docs]</a>    <span class="k">def</span> <span class="nf">run_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on error in try/except wrapping run.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_error</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;run_error&quot;</span><span class="p">)</span>

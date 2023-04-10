@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>formatted_io8 &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>formatted_io8 &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -254,7 +254,7 @@
 <span class="linenos"> 9</span>
 <span class="linenos">10</span><span class="w">  </span><span class="c1">// Declare resulting variables and create buffer for received message</span>
 <span class="linenos">11</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-<span class="linenos">12</span><span class="w">  </span><span class="n">generic_t</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">init_generic</span><span class="p">();</span>
+<span class="linenos">12</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">vec</span><span class="p">;</span>
 <span class="linenos">13</span>
 <span class="linenos">14</span><span class="w">  </span><span class="c1">// Loop until there is no longer input or the queues are closed</span>
 <span class="linenos">15</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -269,12 +269,12 @@
 <span class="linenos">24</span><span class="w">    </span><span class="p">}</span>
 <span class="linenos">25</span>
 <span class="linenos">26</span><span class="w">    </span><span class="c1">// Print received message</span>
-<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">28</span><span class="w">    </span><span class="n">display_generic</span><span class="p">(</span><span class="n">vec</span><span class="p">);</span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Model A:&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="w"> </span><span class="o">&lt;&lt;</span>
+<span class="linenos">28</span><span class="w">      </span><span class="n">document2string</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="linenos">29</span>
 <span class="linenos">30</span><span class="w">    </span><span class="c1">// Send output to output channel</span>
 <span class="linenos">31</span><span class="w">    </span><span class="c1">// If there is an error, the flag will be negative</span>
-<span class="linenos">32</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">vec</span><span class="p">);</span>
 <span class="linenos">33</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos">34</span><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Model A: Error sending output.&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="linenos">35</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
@@ -282,11 +282,8 @@
 <span class="linenos">37</span>
 <span class="linenos">38</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">39</span>
-<span class="linenos">40</span><span class="w">  </span><span class="c1">// Free dynamically allocated generic structure</span>
-<span class="linenos">41</span><span class="w">  </span><span class="n">free_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vec</span><span class="p">);</span>
-<span class="linenos">42</span><span class="w">  </span>
-<span class="linenos">43</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos">44</span><span class="p">}</span>
+<span class="linenos">40</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">41</span><span class="p">}</span>
 </pre></div>
 </div>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
@@ -300,7 +297,7 @@
 <span class="linenos"> 9</span>
 <span class="linenos">10</span><span class="w">  </span><span class="c1">// Declare resulting variables and create buffer for received message</span>
 <span class="linenos">11</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-<span class="linenos">12</span><span class="w">  </span><span class="n">generic_t</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">init_generic</span><span class="p">();</span>
+<span class="linenos">12</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">vec</span><span class="p">;</span>
 <span class="linenos">13</span>
 <span class="linenos">14</span><span class="w">  </span><span class="c1">// Loop until there is no longer input or the queues are closed</span>
 <span class="linenos">15</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -315,12 +312,12 @@
 <span class="linenos">24</span><span class="w">    </span><span class="p">}</span>
 <span class="linenos">25</span>
 <span class="linenos">26</span><span class="w">    </span><span class="c1">// Print received message</span>
-<span class="linenos">27</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">28</span><span class="w">    </span><span class="n">display_generic</span><span class="p">(</span><span class="n">vec</span><span class="p">);</span>
+<span class="linenos">27</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Model B:&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="w"> </span><span class="o">&lt;&lt;</span>
+<span class="linenos">28</span><span class="w">      </span><span class="n">document2string</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="linenos">29</span>
 <span class="linenos">30</span><span class="w">    </span><span class="c1">// Send output to output channel</span>
 <span class="linenos">31</span><span class="w">    </span><span class="c1">// If there is an error, the flag will be negative</span>
-<span class="linenos">32</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">);</span>
+<span class="linenos">32</span><span class="w">    </span><span class="n">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">vec</span><span class="p">);</span>
 <span class="linenos">33</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">flag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos">34</span><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Model B: Error sending output.&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="linenos">35</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
@@ -328,11 +325,8 @@
 <span class="linenos">37</span>
 <span class="linenos">38</span><span class="w">  </span><span class="p">}</span>
 <span class="linenos">39</span>
-<span class="linenos">40</span><span class="w">  </span><span class="c1">// Free dynamically allocated generic structure</span>
-<span class="linenos">41</span><span class="w">  </span><span class="n">free_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vec</span><span class="p">);</span>
-<span class="linenos">42</span><span class="w">  </span>
-<span class="linenos">43</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos">44</span><span class="p">}</span>
+<span class="linenos">40</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">41</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Model YAML:</p>

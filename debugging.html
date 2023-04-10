@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Debugging &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Debugging &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -172,11 +172,17 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ld</span><span class="p">:</span> <span class="n">warning</span><span class="p">:</span> <span class="n">ignoring</span> <span class="n">file</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="mf">.14</span><span class="o">.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span><span class="p">,</span> <span class="n">file</span> <span class="n">was</span> <span class="n">built</span> <span class="k">for</span> <span class="n">unsupported</span> <span class="n">file</span> <span class="nb">format</span> <span class="p">(</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x20</span> <span class="mh">0x21</span> <span class="mh">0x74</span> <span class="mh">0x61</span> <span class="mh">0x70</span> <span class="mh">0x69</span> <span class="mh">0x2D</span> <span class="mh">0x74</span> <span class="mh">0x62</span> <span class="mh">0x64</span> <span class="mh">0x2D</span> <span class="mh">0x76</span> <span class="mh">0x33</span> <span class="p">)</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">architecture</span> <span class="n">being</span> <span class="n">linked</span> <span class="p">(</span><span class="n">x86_64</span><span class="p">):</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="mf">.14</span><span class="o">.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span>
 </pre></div>
 </div>
+<p>or you get an error about a missing <code class="docutils literal notranslate"><span class="pre">locale.h</span></code> header like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">langmm</span><span class="o">/</span><span class="n">miniconda3</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">pyrj</span><span class="o">/</span><span class="nb">bin</span><span class="o">/../</span><span class="n">include</span><span class="o">/</span><span class="n">c</span><span class="o">++/</span><span class="n">v1</span><span class="o">/</span><span class="n">locale</span><span class="o">.</span><span class="n">h</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span> <span class="n">fatal</span> <span class="n">error</span><span class="p">:</span> <span class="s1">&#39;locale.h&#39;</span> <span class="n">file</span> <span class="ow">not</span> <span class="n">found</span>
+<span class="c1">#include_next &lt;locale.h&gt;</span>
+</pre></div>
+</div>
 <blockquote>
-<div><p><strong>Possible Cause:</strong> You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion <a class="reference external" href="https://github.com/conda-forge/compilers-feedstock/issues/6">here</a>). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors.</p>
+<div><p><strong>Possible Cause:</strong> You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion <a class="reference external" href="https://github.com/conda-forge/compilers-feedstock/issues/6">here</a>). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> or missing header errors.</p>
 <p><strong>Solution:</strong> Download an older SDK (10.9 works well for pre-Apple silicon Macs, but 11.0 should be used for Macs with the M1/M2 chips and arm64 architechture) and point the conda compilers to it using the steps below. If you use a version other than 11.0, check the location of that release’s download directly at <a class="reference external" href="https://github.com/phracker/MacOSX-SDKs/releases">https://github.com/phracker/MacOSX-SDKs/releases</a> to verify what the directory containing it is as it will be version dependent (step 3).:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-11.0}
 $ export CONDA_BUILD_SYSROOT=&quot;$(xcode-select -p)/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk&quot;
+$ export SDKROOT=$CONDA_BUILD_SYSROOT
 $ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/11.0-11.1/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
 $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;$CONDA_BUILD_SYSROOT&quot;)&quot;  # This may require sudo
 </pre></div>

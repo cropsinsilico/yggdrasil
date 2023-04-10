@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Datatypes &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Datatypes &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -132,35 +132,23 @@ passed (dynamic arrays/objects are not yet supported).</p>
 <div><p>Description</p>
 </div></blockquote>
 <dl class="simple">
-<dt>-================================================================================-</dt><dd><p>JSON boolean type.</p>
-</dd>
-</dl>
-</td>
-<td rowspan="2"><blockquote>
-<div><p>Required Properties</p>
-</div></blockquote>
-<dl class="simple">
-<dt>-====================</dt><dd><p>type</p>
+<dt>-=================================================================================</dt><dd><p>true or false</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="row-even"></tr>
 <tr class="row-odd"><td><p>integer</p></td>
-<td><p>JSON integer type.</p></td>
-<td><p>type</p></td>
+<td><p>Integer numbers</p></td>
 </tr>
 <tr class="row-even"><td><p>null</p></td>
-<td><p>JSON null type.</p></td>
-<td><p>type</p></td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><p>number</p></td>
-<td><p>JSON number type.</p></td>
-<td><p>type</p></td>
+<td><p>Integer or decimal numbers</p></td>
 </tr>
 <tr class="row-even"><td><p>string</p></td>
-<td><p>JSON string type.</p></td>
-<td><p>type</p></td>
+<td><p>Arrays of characters</p></td>
 </tr>
 </tbody>
 </table>
@@ -181,23 +169,14 @@ passed (dynamic arrays/objects are not yet supported).</p>
 <div><p>Description</p>
 </div></blockquote>
 <dl class="simple">
-<dt>-================================================================================-</dt><dd><p>A container of ordered values.</p>
-</dd>
-</dl>
-</td>
-<td rowspan="2"><blockquote>
-<div><p>Required Properties</p>
-</div></blockquote>
-<dl class="simple">
-<dt>-====================</dt><dd><p>type</p>
+<dt>-=================================================================================</dt><dd><p>Container for sequences of values</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="row-even"></tr>
 <tr class="row-odd"><td><p>object</p></td>
-<td><p>A container mapping between keys and values.</p></td>
-<td><p>type</p></td>
+<td><p>Container for mappings of key and value pairs</p></td>
 </tr>
 </tbody>
 </table>
@@ -210,7 +189,7 @@ passed (dynamic arrays/objects are not yet supported).</p>
 <div><p>Type</p>
 </div></blockquote>
 <dl class="simple">
-<dt>=========-</dt><dd><p>1darray</p>
+<dt>=========-</dt><dd><p>class</p>
 </dd>
 </dl>
 </td>
@@ -218,83 +197,33 @@ passed (dynamic arrays/objects are not yet supported).</p>
 <div><p>Description</p>
 </div></blockquote>
 <dl class="simple">
-<dt>-================================================================================-</dt><dd><p>A 1D array with or without units.</p>
-</dd>
-</dl>
-</td>
-<td rowspan="2"><blockquote>
-<div><p>Required Properties</p>
-</div></blockquote>
-<dl class="simple">
-<dt>-====================</dt><dd><p>type
-subtype</p>
+<dt>-=================================================================================</dt><dd><p>Python class</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="row-even"></tr>
-<tr class="row-odd"><td><p>any</p></td>
-<td><p>A type allowing any value that is expresible in some type.</p></td>
-<td><p>type</p></td>
+<tr class="row-odd"><td><p>function</p></td>
+<td><p>Python function</p></td>
 </tr>
-<tr class="row-even"><td><p>bytes</p></td>
-<td><p>A bytes value with or without units.</p></td>
-<td><p>type</p></td>
-</tr>
-<tr class="row-odd"><td><p>class</p></td>
-<td><p>Type for Python classes.</p></td>
-<td><p>type</p></td>
-</tr>
-<tr class="row-even"><td><p>complex</p></td>
-<td><p>A complex value with or without units.</p></td>
-<td><p>type</p></td>
-</tr>
-<tr class="row-odd"><td><p>float</p></td>
-<td><p>A float value with or without units.</p></td>
-<td><p>type</p></td>
-</tr>
-<tr class="row-even"><td><p>function</p></td>
-<td><p>Type for callable Python functions.</p></td>
-<td><p>type</p></td>
-</tr>
-<tr class="row-odd"><td><p>instance</p></td>
-<td><p>Type for Python class instances.</p></td>
-<td><p>type
-class</p></td>
-</tr>
-<tr class="row-even"><td><p>int</p></td>
-<td><p>A int value with or without units.</p></td>
-<td><p>type</p></td>
+<tr class="row-even"><td><p>instance</p></td>
+<td><p>Python class instance</p></td>
 </tr>
 <tr class="row-odd"><td><p>ndarray</p></td>
-<td><p>An ND array with or without units.</p></td>
-<td><p>type
-subtype</p></td>
+<td><p>N-dimensional arrays of memory contiguous arrays of scalars</p></td>
 </tr>
 <tr class="row-even"><td><p>obj</p></td>
-<td><p>A mapping container for Obj 3D data.</p></td>
-<td><p>type</p></td>
+<td><p>ObjWavefront 3D structure</p></td>
 </tr>
 <tr class="row-odd"><td><p>ply</p></td>
-<td><p>A mapping container for Ply 3D data.</p></td>
-<td><p>type</p></td>
+<td><p>Ply 3D structure</p></td>
 </tr>
 <tr class="row-even"><td><p>scalar</p></td>
-<td><p>A scalar value with or without units.</p></td>
-<td><p>type
-subtype</p></td>
+<td><p>Scalar quantities that can have units, variables precision, or an encoding (for
+unicode scalars)</p></td>
 </tr>
 <tr class="row-odd"><td><p>schema</p></td>
-<td><p>A schema type for evaluating subschema.</p></td>
-<td><p>type</p></td>
-</tr>
-<tr class="row-even"><td><p>uint</p></td>
-<td><p>A uint value with or without units.</p></td>
-<td><p>type</p></td>
-</tr>
-<tr class="row-odd"><td><p>unicode</p></td>
-<td><p>A unicode value with or without units.</p></td>
-<td><p>type</p></td>
+<td><p>JSON schema</p></td>
 </tr>
 </tbody>
 </table>

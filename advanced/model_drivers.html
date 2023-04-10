@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Model Drivers &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Model Drivers &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -222,6 +222,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.identify_source_files"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver.identify_source_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_language_installed"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver.is_language_installed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_library_installed"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver.is_library_installed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_standard_library"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver.is_standard_library()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_tool_installed"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver.is_tool_installed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.language_executable"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver.language_executable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.language_version"><code class="docutils literal notranslate"><span class="pre">CompiledModelDriver.language_version()</span></code></a></li>
@@ -2797,6 +2798,28 @@ Defaults to yggdrasil.config.ygg_cfg if not provided.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the library is installed, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_standard_library">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_standard_library</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/CompiledModelDriver.html#CompiledModelDriver.is_standard_library"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_standard_library" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a dependency is a standard library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a>) – Dependency name or tuple with language and
+dependency name.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>True if the dependency is a standard library, false</dt><dd><p>otherwise.</p>
+</dd>
+</dl>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>

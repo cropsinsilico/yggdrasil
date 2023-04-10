@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.config &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.config &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -114,7 +114,7 @@
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
 <span class="n">env_prefixes</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_env_prefixes</span><span class="p">()</span>
 <span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;.yggdrasil.cfg&#39;</span>
 <span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
@@ -777,6 +777,166 @@
         <span class="k">yield</span> <span class="n">cfg_env</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">cfg_env</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="add_excl_rule"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.add_excl_rule">[docs]</a><span class="k">def</span> <span class="nf">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="n">new_rule</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add an exclusion rule to the list if its not in there.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        excl_list (list): List of exclusion rules to update.</span>
+<span class="sd">        new_rule (str): New rule to add to the list if it already exists.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Updated exclustion rules.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">new_rule</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excl_list</span><span class="p">:</span>
+        <span class="n">excl_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_rule</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">excl_list</span></div>
+
+
+<div class="viewcode-block" id="rm_excl_rule"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.rm_excl_rule">[docs]</a><span class="k">def</span> <span class="nf">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="n">new_rule</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove an exclusion rule from the list if its in there.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        excl_list (list): List of exclusion rules to update.</span>
+<span class="sd">        new_rule (str): New rule to remove from the list if it exists.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Updated exclustion rules.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">new_rule</span> <span class="ow">in</span> <span class="n">excl_list</span><span class="p">:</span>
+        <span class="n">excl_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">new_rule</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">excl_list</span></div>
+
+
+<div class="viewcode-block" id="create_coveragerc"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.create_coveragerc">[docs]</a><span class="k">def</span> <span class="nf">create_coveragerc</span><span class="p">(</span><span class="n">installed_languages</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">setup_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create the coveragerc to reflect the OS, Python version, and</span>
+<span class="sd">    availability of matlab. Parameters from the setup.cfg file will be</span>
+<span class="sd">    added. If the .coveragerc file already exists, it will be read first</span>
+<span class="sd">    before adding setup.cfg options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        installed_languages (dict): Dictionary of language/boolean</span>
+<span class="sd">            key/value pairs indicating optional languages and their state</span>
+<span class="sd">            of installation.</span>
+<span class="sd">        filename (str, optional): File where coveragerc should be saved.</span>
+<span class="sd">            Defaults to &#39;.coveragerc&#39; in the current directory.</span>
+<span class="sd">        setup_cfg (str, optional): setup.cfg file containing coverage</span>
+<span class="sd">            options. If not provided, the current directory will be</span>
+<span class="sd">            checked.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the file was created/updated successfully, False</span>
+<span class="sd">            otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;.coveragerc&#39;</span><span class="p">)</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="c1"># Read from existing .coveragerc</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="c1"># Read options from setup.cfg</span>
+    <span class="k">if</span> <span class="n">setup_cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;setup.cfg&#39;</span><span class="p">,</span>
+                  <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                               <span class="s1">&#39;setup.cfg&#39;</span><span class="p">)]:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="n">setup_cfg</span> <span class="o">=</span> <span class="n">x</span>
+                <span class="k">break</span>
+    <span class="k">if</span> <span class="n">setup_cfg</span><span class="p">:</span>
+        <span class="n">cp_cfg</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">cp_cfg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">setup_cfg</span><span class="p">)</span>
+        <span class="c1"># Transfer options</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cp_cfg</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;coverage:&#39;</span><span class="p">):</span>
+                <span class="n">sect_cp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;coverage:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">cp</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">sect_cp</span><span class="p">):</span>
+                    <span class="n">cp</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">sect_cp</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">cp_cfg</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">sect_cp</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+                        <span class="n">val_old</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span>
+                                   <span class="n">cp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sect_cp</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)]</span>
+                        <span class="n">val_new</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span>
+                                   <span class="n">cp_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)]</span>
+                        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val_new</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val_old</span><span class="p">:</span>
+                                <span class="n">val_old</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="n">opt_new</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val_old</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">opt_new</span> <span class="o">=</span> <span class="n">cp_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
+                    <span class="n">cp</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">sect_cp</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">opt_new</span><span class="p">)</span>
+    <span class="c1"># Exclude rules for all files</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cp</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">):</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_lines&#39;</span><span class="p">):</span>
+        <span class="n">excl_str</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_lines&#39;</span><span class="p">)</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">excl_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Operating system</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: windows&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># Unclear why this is not covered as it is run locally by</span>
+        <span class="c1"># test_create_coveragerc</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: windows&#39;</span><span class="p">)</span>
+    <span class="c1"># CI Platform</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;GITHUB_ACTIONS&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: gha&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: gha&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TRAVIS_OS_NAME&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: travis&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: travis&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;APPVEYOR_BUILD_FOLDER&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: appveyor&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">excl_list</span> <span class="o">=</span> <span class="n">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: appveyor&#39;</span><span class="p">)</span>
+    <span class="c1"># Python version</span>
+    <span class="n">verlist</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">verlist</span><span class="p">:</span>
+        <span class="n">vincl</span> <span class="o">=</span> <span class="s1">&#39;pragma: Python </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">v</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">excl_list</span> <span class="o">=</span> <span class="n">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="n">vincl</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">excl_list</span> <span class="o">=</span> <span class="n">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="n">vincl</span><span class="p">)</span>
+    <span class="c1"># Language specific</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">installed_languages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;c++&#39;</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="s1">&#39;cpp&#39;</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">excl_list</span> <span class="o">=</span> <span class="n">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: no </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="n">excl_list</span> <span class="o">=</span> <span class="n">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">excl_list</span> <span class="o">=</span> <span class="n">add_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="n">excl_list</span> <span class="o">=</span> <span class="n">rm_excl_rule</span><span class="p">(</span><span class="n">excl_list</span><span class="p">,</span> <span class="s1">&#39;pragma: no </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+    <span class="c1"># Add new rules</span>
+    <span class="n">cp</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude_lines&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">excl_list</span><span class="p">))</span>
+    <span class="c1"># Set include path so that filenames in the report are absolute</span>
+    <span class="n">PACKAGE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;source&#39;</span>
+    <span class="c1"># if section == &#39;include&#39;:</span>
+    <span class="c1">#     section_path = os.path.join(PACKAGE_DIR, &#39;*&#39;)</span>
+    <span class="c1"># else:</span>
+    <span class="n">section_path</span> <span class="o">=</span> <span class="n">PACKAGE_DIR</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cp</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">):</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">)</span>
+    <span class="n">incl_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="n">incl_list</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">section_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">incl_list</span><span class="p">:</span>
+        <span class="n">incl_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_path</span><span class="p">)</span>
+    <span class="n">cp</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">incl_list</span><span class="p">))</span>
+    <span class="c1"># Write</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created coverage rc @ &#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
 </pre></div>
 
            </div>

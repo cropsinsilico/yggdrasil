@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TODO &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>TODO &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Publications" href="../publications.html" />
-    <link rel="prev" title="Defining New Datatypes" href="new_datatype.html" /> 
+    <link rel="prev" title="Adding Support for a New Language" href="new_language.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -70,13 +70,11 @@
 <li class="toctree-l2"><a class="reference internal" href="general.html">General Development Notes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="new_language.html">Adding Support for a New Language</a></li>
-<li class="toctree-l2"><a class="reference internal" href="new_datatype.html">Defining New Datatypes</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">TODO</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bugs">Bugs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#performance">Performance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#refactor">Refactor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#new-feature-example">New feature/example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#deprecation">Deprecation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
@@ -116,25 +114,23 @@
              
   <section id="todo">
 <h1>TODO<a class="headerlink" href="#todo" title="Permalink to this heading">¶</a></h1>
+<section id="bugs">
+<h2>Bugs<a class="headerlink" href="#bugs" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fix bug where datatype parameters in communicators are not passed to the datatype during normalization (currently handled on python side)</p></li>
+<li><p>Fix bug in timesync model driver when state variables have units and add units to OSR</p></li>
+</ul>
+</section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Go through docs to strip out deprecated info</p></li>
-<li><p>Update docs to reflect changes to YAML spec</p></li>
 <li><p>Docs on datatypes w/ example of user defined data type</p></li>
 <li><p>Docs on how nested data objects are represented in C/C++.</p></li>
 <li><p>Regenerate metaschema with $schema entry</p></li>
-<li><p>Refence metaschema on website in $id or $schema?</p></li>
+<li><p>Refernce metaschema on website in $id or $schema?</p></li>
 <li><p>Expand development section into contributing guide</p></li>
 <li><p>Go through and update/prune interface documentation</p></li>
-</ul>
-</section>
-<section id="performance">
-<h2>Performance<a class="headerlink" href="#performance" title="Permalink to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Streamline normalization to speed it up</p></li>
-<li><p>improve speed of validation</p></li>
-<li><p>Wrap C API for serializing/deserializing obj/ply</p></li>
 </ul>
 </section>
 <section id="refactor">
@@ -144,46 +140,30 @@
 <li><p>Change C client/server use of direction/serializer info to be more transparent</p></li>
 <li><p>Split drivers into separate directories for model drivers and connection drivers</p></li>
 <li><p>Change how CLI arguments are added to the arg parser for the language installer to use subparsers</p></li>
+<li><p>Use doxygen linter/parser for parsing functions</p></li>
 </ul>
 </section>
 <section id="new-feature-example">
 <h2>New feature/example<a class="headerlink" href="#new-feature-example" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Change “args” in drivers to more transparent wording (source_code, etc.)</p></li>
-<li><p>Alias input/output keyword arguments for connections to from/to for clarity</p></li>
 <li><p>Add example of each supported language (missing LPy, cmake, make)</p></li>
 <li><p>change gs_lesson/formatted_io series to have more descriptive names</p></li>
 <li><p>Consider passing input/output to/from Matlab function models directly through the matlab engine</p></li>
-<li><p>Add deprecation warnings to handling of old syntax</p></li>
-<li><p>Add datatypes as components?</p></li>
-<li><p>Improve support for different string encodings (i.e. add datatype property to string)</p></li>
 <li><p>Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.</p></li>
-<li><p>Changes ‘bytes’ type to ‘ascii’ since that is really what it means</p></li>
-<li><p>Change name of C MetaschemaType to schema?</p></li>
 <li><p>Allow use of different ‘default’ communication mechanisms on different connections based on the languages involved</p></li>
-<li><p>Add automated deprecation marker for schema options</p></li>
-<li><p>Split ld off as its own linker</p></li>
 <li><p>Add comm for using files as temporary storage in passing information between models</p></li>
 <li><p>Assign meanings to error codes and implement across languages (e.g. missing comm class)</p></li>
 <li><p>Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters</p></li>
 <li><p>Allow users to select from list of multiple possiblities when locating libraries to avoid conflict</p></li>
 <li><p>Write C/C++ as extension to rapidjson and wrap in Python</p></li>
-<li><p>Add alias key to schema that is then translated into valid JSON schema</p></li>
 <li><p>Add ‘shell’ option for executable models on Windows to allow calling different shell types.</p></li>
-</ul>
-</section>
-<section id="deprecation">
-<h2>Deprecation<a class="headerlink" href="#deprecation" title="Permalink to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Remove IOInfo test class as no longer used</p></li>
 </ul>
 </section>
 <section id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Try to setup comm/connection testing at class level so that comms only created once</p></li>
-<li><p>Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors</p></li>
 <li><p>testing for R native functions</p></li>
+<li><p>Identify tests that can only run in serial and update GHA jobs to run tests in parallel</p></li>
 </ul>
 </section>
 </section>
@@ -192,7 +172,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="new_datatype.html" class="btn btn-neutral float-left" title="Defining New Datatypes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="new_language.html" class="btn btn-neutral float-left" title="Adding Support for a New Language" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../publications.html" class="btn btn-neutral float-right" title="Publications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

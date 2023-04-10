@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -108,8 +108,8 @@
     <span class="kn">import</span> <span class="nn">sysv_ipc</span>
     <span class="n">_ipc_installed</span> <span class="o">=</span> <span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span> <span class="ow">or</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not import sysv_ipc. &quot;</span>
-                 <span class="o">+</span> <span class="s2">&quot;IPC support will be disabled.&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not import sysv_ipc.&quot;</span>
+                 <span class="s2">&quot; IPC support will be disabled.&quot;</span><span class="p">)</span>
     <span class="n">sysv_ipc</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_ipc_installed</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -132,7 +132,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">mq</span> <span class="o">=</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">MessageQueue</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">qid</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">qid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">mq</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
         <span class="n">IPCComm</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mq</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mq</span>
@@ -290,6 +290,7 @@
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Interprocess communication (IPC) queue.&#39;</span><span class="p">)</span>
     <span class="n">_maxMsgSize</span> <span class="o">=</span> <span class="mi">2048</span>  <span class="c1"># Based on IPC limit on MacOS</span>
     <span class="n">address_description</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;An IPC message queue key.&quot;</span><span class="p">)</span>
+    <span class="n">_deprecated_drivers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IPCInputDriver&#39;</span><span class="p">,</span> <span class="s1">&#39;IPCOutputDriver&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize empty queue and server class.&quot;&quot;&quot;</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.doctools &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.doctools &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -188,16 +188,25 @@
 <span class="sd">        str, list: Name of file or files created.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">components</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">_type_registry</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">constants</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype_mapping_table.rst&#39;</span><span class="p">)</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">cross_language_support</span><span class="p">:</span>
-            <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;notes&#39;</span><span class="p">:</span> <span class="n">get_docs_section</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
-                                                 <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Developer Notes:&#39;</span><span class="p">,</span>
-                                                       <span class="s1">&#39;Development Notes:&#39;</span><span class="p">],</span>
-                                                 <span class="n">join_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bytes&#39;</span><span class="p">:</span> <span class="s1">&#39;Precision X is preserved.&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;complex&#39;</span><span class="p">:</span> <span class="s1">&#39;Precision X is preserved.&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="s1">&#39;Precision X is preserved.&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="s1">&#39;Precision X is preserved.&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;uint&#39;</span><span class="p">:</span> <span class="s1">&#39;Precision X is preserved.&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;unicode&#39;</span><span class="p">:</span> <span class="s1">&#39;Precision X is preserved.&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="p">(</span>
+                 <span class="s1">&#39;This covers the JSON default for floating point or &#39;</span>
+                 <span class="s1">&#39;integer values.&#39;</span><span class="p">),</span>
+             <span class="s1">&#39;scalar&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;yggdrasil defines scalars as an umbrella type &#39;</span>
+                        <span class="s1">&#39;encompassing int, uint, float, bytes, and &#39;</span>
+                        <span class="s1">&#39;unicode.&#39;</span><span class="p">),</span>
+             <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="s1">&#39;User can specify an encoding for scalar strings.&#39;</span><span class="p">}</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALL_TYPES</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">notes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;notes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
     <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;executable&#39;</span><span class="p">]:</span>
             <span class="k">continue</span>
@@ -300,7 +309,7 @@
 <span class="sd">        ValueError: If table_type is not one of the supported values.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">_type_registry</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span>
     <span class="n">table_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;yggdrasil&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -317,21 +326,14 @@
     <span class="n">target_types</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;_container_type&#39;</span><span class="p">)):</span>
-                <span class="n">target_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">target_types</span> <span class="o">+=</span> <span class="n">constants</span><span class="o">.</span><span class="n">JSON_SIMPLE_TYPES</span>
     <span class="k">elif</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;container&#39;</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;_container_type&#39;</span><span class="p">):</span>
-                <span class="n">target_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">target_types</span> <span class="o">+=</span> <span class="n">constants</span><span class="o">.</span><span class="n">JSON_CONTAINER_TYPES</span>
     <span class="k">elif</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;yggdrasil&#39;</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span><span class="p">:</span>
-                <span class="n">target_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">target_types</span> <span class="o">+=</span> <span class="n">constants</span><span class="o">.</span><span class="n">YGGDRASIL_TYPES</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">target_types</span><span class="p">:</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">_type_registry</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-        <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                   <span class="s1">&#39;required properties&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">definition_properties</span><span class="p">}</span>
+        <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALL_TYPES</span><span class="p">[</span><span class="n">k</span><span class="p">]}</span>
+        <span class="c1"># &#39;required properties&#39;?</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">)</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;list_columns&#39;</span><span class="p">,</span> <span class="s1">&#39;required properties&#39;</span><span class="p">)</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -497,17 +499,28 @@
         <span class="c1"># Set defaults</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;option&#39;</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">)</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;column_order&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">],</span>
-                                           <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">,</span>
-                                           <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">]])</span>
+        <span class="n">default_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">],</span>
+                         <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">,</span>
+                         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;specific&#39;</span><span class="p">:</span>
+            <span class="n">default_order</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Valid for </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1"> of&#39;</span> <span class="o">%</span> <span class="n">subtype_key</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;column_order&#39;</span><span class="p">,</span> <span class="n">default_order</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wrapped_columns&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">})</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">include_required</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;required&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;column_order&#39;</span><span class="p">]):</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;column_order&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span>
         <span class="c1"># Get list of component subtypes</span>
+        <span class="n">defs</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_definitions</span><span class="p">(</span><span class="n">relaxed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;general&#39;</span><span class="p">:</span>
-            <span class="n">s_comp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+            <span class="n">s_comp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                      <span class="n">relaxed</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">s_comp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                           <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="p">]</span>
+            <span class="n">s_comp_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">defs</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">_subtype_defkey</span><span class="p">(</span>
+                    <span class="n">comp</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">class2subtype</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])]</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="p">]</span>
+            <span class="c1"># s_comp_list = [s[comp].get_subtype_schema(x, unique=True,</span>
+            <span class="c1">#                                           relaxed=True)</span>
+            <span class="c1">#                for x in s[comp].classes]</span>
         <span class="c1"># Loop over subtyeps</span>
         <span class="n">out_apply</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">s_comp</span> <span class="ow">in</span> <span class="n">s_comp_list</span><span class="p">:</span>
@@ -515,7 +528,11 @@
                 <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">subtype_key</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;specific&#39;</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-                    <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                    <span class="n">def_type</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">if</span> <span class="s1">&#39;$ref&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="n">defs</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;$ref&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;#/definitions/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+                        <span class="n">def_type</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
+                    <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">def_type</span><span class="p">),</span>
                                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)}</span>
                     <span class="k">if</span> <span class="n">include_required</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">s_comp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[]):</span>
@@ -534,15 +551,18 @@
                 <span class="n">v</span><span class="p">[</span><span class="s1">&#39;Valid for </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1"> of&#39;</span> <span class="o">%</span> <span class="n">subtype_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out_apply</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
     <span class="k">elif</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="n">subtype_key</span><span class="p">)</span>
+        <span class="n">s_base</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">relaxed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">subtypes</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">s_comp</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">s_comp</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                <span class="n">relaxed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">subt</span> <span class="o">=</span> <span class="n">subtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">s_comp</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">subtype_key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                     <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)}</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subtypes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">][</span><span class="s1">&#39;aliases&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-            <span class="k">if</span> <span class="n">s_comp</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">subtype_key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subtypes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">s_base</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">subtype_key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subtypes</span><span class="p">:</span>
                 <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;[DEFAULT] &#39;</span>
                                              <span class="o">+</span> <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>

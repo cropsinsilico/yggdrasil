@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C Interface &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>C Interface &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -295,13 +295,12 @@
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.vrpcRecv">
-<span class="target" id="_ygg_interface_8h_1afeac902932aa1cfa08d07504d93247f0"></span><span class="sig-name descname"><span class="n"><span class="pre">vrpcRecv</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rpc</span></span>, <span class="n"><span class="pre">nargs</span></span>, <span class="n"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcRecv" title="Permalink to this definition">¶</a><br /></dt>
+<span class="target" id="_ygg_interface_8h_1ad129d153de13824426b4cf2241b62c6f"></span><span class="sig-name descname"><span class="n"><span class="pre">vrpcRecv</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rpc</span></span>, <span class="n"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcRecv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message from a comm into variables in a variable argument list. If received message data will exceed the bounds of provided variables, an error will be returned. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rpc</strong> – <strong>[in]</strong> RPC comm structure that message should be sent to. </p></li>
-<li><p><strong>nargs</strong> – <strong>[in]</strong> Number of arguments contained in ap. </p></li>
 <li><p><strong>ap</strong> – <strong>[out]</strong> Variable list of arguments that should be assigned parameters extracted using the associated data type. Since these will be assigned, they should be pointers to memory that has already been allocated (heap or stack). </p></li>
 </ul>
 </dd>
@@ -313,13 +312,12 @@
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.vrpcRecvRealloc">
-<span class="target" id="_ygg_interface_8h_1a80b8fe73f32501f9995c66f2305485fa"></span><span class="sig-name descname"><span class="n"><span class="pre">vrpcRecvRealloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rpc</span></span>, <span class="n"><span class="pre">nargs</span></span>, <span class="n"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcRecvRealloc" title="Permalink to this definition">¶</a><br /></dt>
+<span class="target" id="_ygg_interface_8h_1a86abe4f650ee010fcafe1875f34534b9"></span><span class="sig-name descname"><span class="n"><span class="pre">vrpcRecvRealloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rpc</span></span>, <span class="n"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcRecvRealloc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message from a comm into variables in a variable argument list. If received message data will exceed the bounds of provided variables, the variables will be reallocated. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rpc</strong> – <strong>[in]</strong> RPC comm structure that message should be sent to. </p></li>
-<li><p><strong>nargs</strong> – <strong>[in]</strong> Number of arguments contained in ap. </p></li>
 <li><p><strong>ap</strong> – <strong>[out]</strong> Variable list of arguments that should be assigned parameters extracted using the associated data type. Since these will be assigned and possibly reallocated, they should be pointers to memory addresses that can be reallocated (heap). </p></li>
 </ul>
 </dd>
@@ -1002,15 +1000,13 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv412vrpcCallBase8yggRpc_tKi6size_t9va_list_t">
-<span id="_CPPv312vrpcCallBase8yggRpc_tKi6size_t9va_list_t"></span><span id="_CPPv212vrpcCallBase8yggRpc_tKi6size_t9va_list_t"></span><span id="vrpcCallBase__yggRpc_t.iC.s.va_list_t"></span><span class="target" id="_ygg_interface_8h_1ab3284d57ee7265c52975eb2d4304b485"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vrpcCallBase</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggRpc_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rpc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">allow_realloc</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="n"><span class="pre">va_list_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412vrpcCallBase8yggRpc_tKi6size_t9va_list_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv412vrpcCallBase8yggRpc_t9va_list_t">
+<span id="_CPPv312vrpcCallBase8yggRpc_t9va_list_t"></span><span id="_CPPv212vrpcCallBase8yggRpc_t9va_list_t"></span><span id="vrpcCallBase__yggRpc_t.va_list_t"></span><span class="target" id="_ygg_interface_8h_1a3483888d0da6712bd6debcdaf5784b7b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vrpcCallBase</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">yggRpc_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rpc</span></span>, <a class="reference internal" href="datatypes_cpp.html#_CPPv49va_list_t" title="va_list_t"><span class="n"><span class="pre">va_list_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">ap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412vrpcCallBase8yggRpc_t9va_list_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response. Format arguments using the output queue format string, send the message to the output queue, receive a response from the input queue, and assign arguments from the message using the input queue format string to parse it. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rpc</strong> – <strong>[in]</strong> yggRpc_t structure with RPC information. </p></li>
-<li><p><strong>allow_realloc</strong> – <strong>[in]</strong> int If 1, output arguments are assumed to be pointers to pointers such that they can be reallocated as necessary to receive incoming data. If 0, output arguments are assumed to be preallocated. </p></li>
-<li><p><strong>nargs</strong> – <strong>[in]</strong> size_t Number of arguments contained in ap including both input and output arguments. </p></li>
 <li><p><strong>ap</strong> – <strong>[inout]</strong> va_list mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </p></li>
 </ul>
 </dd>

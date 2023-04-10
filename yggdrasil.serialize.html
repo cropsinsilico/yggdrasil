@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize package &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.serialize package &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -377,6 +377,23 @@ serialized.</p>
 <span class="sig-name descname"><span class="pre">has_header</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize.has_header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/AsciiTableSerialize.html#AsciiTableSerialize.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize a message to conform to the expected datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message arguments.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize.read_meth">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_meth</span></span><a class="headerlink" href="#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize.read_meth" title="Permalink to this definition">¶</a></dt>
@@ -428,10 +445,15 @@ to files serialized using this class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>*args</strong> – All arguments are passed to the parent class’s method.</p></li>
-<li><p><strong>**kwargs</strong> – All keyword arguments are passed to the parent class’s
-method.</p></li>
+<li><p><strong>skip_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, everything is updated except
+the data type. Defaults to False.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are processed as part of
+they type definition and are parsed for old-style keywords.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – If there are keywords that are not valid datatype
+    keywords (currect or old-style).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -476,15 +498,66 @@ Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_deserialize">
-<span class="sig-name descname"><span class="pre">func_deserialize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize.dict2object">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dict2object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DefaultSerialize.html#DefaultSerialize.dict2object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.dict2object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conver a dictionary to a message object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Dictionary to convert to serializable object.</p></li>
+<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the objects in the list
+are complete columns in a table and as_format is set to True.
+Defaults to False.</p></li>
+<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – The field names associated with a
+table-like data type. Defaults to None. This keyword must be
+provided if as_array is True.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Serializable object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_deserialize">
+<span class="sig-name descname"><span class="pre">func_deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DefaultSerialize.html#DefaultSerialize.func_deserialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> – Message to be deserialized.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Deserialized message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>obj</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_serialize">
-<span class="sig-name descname"><span class="pre">func_serialize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">func_serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DefaultSerialize.html#DefaultSerialize.func_serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> – List of arguments to be formatted or numpy array to be
+serialized.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Serialized message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize.get_testing_options">
@@ -542,21 +615,6 @@ provided if as_array is True.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize.update_serializer">
-<span class="sig-name descname"><span class="pre">update_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DefaultSerialize.html#DefaultSerialize.update_serializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.update_serializer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update serializer with provided information.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>*args</strong> – All arguments are passed to the parent class’s method.</p></li>
-<li><p><strong>**kwargs</strong> – All keyword arguments are passed to the parent class’s
-method.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -698,17 +756,6 @@ constructor.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize.empty_msg">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">empty_msg</span></span><a class="headerlink" href="#yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize.empty_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Object indicating empty message.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>obj</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize.func_deserialize">
 <span class="sig-name descname"><span class="pre">func_deserialize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
@@ -832,6 +879,72 @@ the concatenated serialization were deserialized.</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.serialize.JSONSerialize.decode_json">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.JSONSerialize.</span></span><span class="sig-name descname"><span class="pre">decode_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/JSONSerialize.html#decode_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.JSONSerialize.decode_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode a Python object from a JSON serialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – JSON serialization to decode.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to
+rapidjson.loads.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Deserialized Python object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.serialize.JSONSerialize.encode_json">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.JSONSerialize.</span></span><span class="sig-name descname"><span class="pre">encode_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/JSONSerialize.html#encode_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.JSONSerialize.encode_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode a Python object in JSON format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Python object to encode.</p></li>
+<li><p><strong>fd</strong> (<em>file</em><em>, </em><em>optional</em>) – File descriptor for file that encoded object
+should be written to. Defaults to None and string is returned.</p></li>
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Indentation for new lines in encoded
+string. Defaults to None.</p></li>
+<li><p><strong>sort_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the keys will be output in sorted
+order. Defaults to True.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to
+rapidjson.dumps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Encoded object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.serialize.JSONSerialize.indent_char2int">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.JSONSerialize.</span></span><span class="sig-name descname"><span class="pre">indent_char2int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/JSONSerialize.html#indent_char2int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.JSONSerialize.indent_char2int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a character indent into a number of spaces that should be used.
+Tabs are set to be equivalent to 4 spaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – String indent.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of whitespaces that is equivalent to the provided string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-yggdrasil.serialize.MatSerialize">
 <span id="yggdrasil-serialize-matserialize-module"></span><h2>yggdrasil.serialize.MatSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.MatSerialize" title="Permalink to this heading">¶</a></h2>
@@ -929,6 +1042,86 @@ the concatenated serialization were deserialized.</p>
 <section id="module-yggdrasil.serialize.ObjSerialize">
 <span id="yggdrasil-serialize-objserialize-module"></span><h2>yggdrasil.serialize.ObjSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.ObjSerialize" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.ObjSerialize.</span></span><span class="sig-name descname"><span class="pre">ObjDict</span></span><a class="reference internal" href="_modules/yggdrasil/serialize/ObjSerialize.html#ObjDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.ObjSerialize.ObjDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.PlySerialize.GeometryBase" title="yggdrasil.serialize.PlySerialize.GeometryBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryBase</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjWavefront</span></code></p>
+<p>Enhanced dictionary class for storing Obj information.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjDict.apply_scalar_map">
+<span class="sig-name descname"><span class="pre">apply_scalar_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/ObjSerialize.html#ObjDict.apply_scalar_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.ObjSerialize.ObjDict.apply_scalar_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the color of faces in a 3D object based on a scalar map.
+This creates a copy unless no_copy is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scalar_arr</strong> (<em>arr</em>) – Scalar values that should be mapped to colors
+for each face.</p></li>
+<li><p><strong>color_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the color map that should
+be used. Defaults to ‘plasma’.</p></li>
+<li><p><strong>vmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Value that should map to the minimum of the
+colormap. Defaults to min(scalar_arr).</p></li>
+<li><p><strong>vmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Value that should map to the maximum of the
+colormap. Defaults to max(scalar_arr).</p></li>
+<li><p><strong>scaling</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Scaling that should be used to map the scalar
+array onto the colormap. Defaults to ‘linear’.</p></li>
+<li><p><strong>scale_by_area</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the elements of the scalar
+array will be multiplied by the area of the corresponding face.
+If True, vmin and vmax should be in terms of the scaled array.
+Defaults to False.</p></li>
+<li><p><strong>no_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned object will not be a
+copy. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Obj with updated vertex colors.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjDict.from_shape">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/ObjSerialize.html#ObjDict.from_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.ObjSerialize.ObjDict.from_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ply dictionary from a PlantGL shape and descritizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> (<em>openalea.plantgl.scene</em>) – Scene that should be descritized.</p></li>
+<li><p><strong>d</strong> (<em>openalea.plantgl.descritizer</em>) – Descritizer.</p></li>
+<li><p><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertex positions. Defaults to 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjDict.to_geom_args">
+<span class="sig-name descname"><span class="pre">to_geom_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/ObjSerialize.html#ObjDict.to_geom_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.ObjSerialize.ObjDict.to_geom_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get arguments for creating a PlantGL geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertices. Defaults to 1.0.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Name that should be given to the created
+PlantGL symbol. Defaults to None and is ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Class, arguments and keyword arguments for PlantGL geometry.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjSerialize">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.ObjSerialize.</span></span><span class="sig-name descname"><span class="pre">ObjSerialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/ObjSerialize.html#ObjSerialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.ObjSerialize.ObjSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.PlySerialize.PlySerialize" title="yggdrasil.serialize.PlySerialize.PlySerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlySerialize</span></code></a></p>
@@ -984,6 +1177,23 @@ serialized.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.ObjSerialize.ObjSerialize.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/ObjSerialize.html#ObjSerialize.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.ObjSerialize.ObjSerialize.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize a message to conform to the expected datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message arguments.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1127,6 +1337,26 @@ serializer.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PandasSerialize.PandasSerialize.dict2object">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dict2object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PandasSerialize.html#PandasSerialize.dict2object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PandasSerialize.PandasSerialize.dict2object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conver a dictionary to a message object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Dictionary to convert to serializable object.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Serializable object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PandasSerialize.PandasSerialize.disable_file_header">
 <span class="sig-name descname"><span class="pre">disable_file_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PandasSerialize.html#PandasSerialize.disable_file_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PandasSerialize.PandasSerialize.disable_file_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set serializer attributes to disable file headers from being
@@ -1227,6 +1457,38 @@ names are not provided to the deserializer. Defaults to False.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PandasSerialize.PandasSerialize.initialize_from_message">
+<span class="sig-name descname"><span class="pre">initialize_from_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PandasSerialize.html#PandasSerialize.initialize_from_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PandasSerialize.PandasSerialize.initialize_from_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the serializer based on recieved message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message that serializer should be initialized from.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are treated as metadata that
+may contain additional information for initializing the serializer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PandasSerialize.PandasSerialize.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PandasSerialize.html#PandasSerialize.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PandasSerialize.PandasSerialize.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize a message to conform to the expected datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message arguments.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1405,6 +1667,127 @@ or more frames.</p>
 <section id="module-yggdrasil.serialize.PlySerialize">
 <span id="yggdrasil-serialize-plyserialize-module"></span><h2>yggdrasil.serialize.PlySerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PlySerialize" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.GeometryBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.PlySerialize.</span></span><span class="sig-name descname"><span class="pre">GeometryBase</span></span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#GeometryBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.GeometryBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for extening rapidjson geometry classes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.GeometryBase.apply_scalar_map">
+<span class="sig-name descname"><span class="pre">apply_scalar_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_by_area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_as_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#GeometryBase.apply_scalar_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.GeometryBase.apply_scalar_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the color of faces in a 3D object based on a scalar map.
+This creates a copy unless no_copy is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scalar_arr</strong> (<em>arr</em>) – Scalar values that should be mapped to colors
+for each face.</p></li>
+<li><p><strong>color_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the color map that should
+be used. Defaults to ‘plasma’.</p></li>
+<li><p><strong>vmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Value that should map to the minimum of the
+colormap. Defaults to min(scalar_arr).</p></li>
+<li><p><strong>vmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Value that should map to the maximum of the
+colormap. Defaults to max(scalar_arr).</p></li>
+<li><p><strong>scaling</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Scaling that should be used to map the scalar
+array onto the colormap. Defaults to ‘linear’.</p></li>
+<li><p><strong>scale_by_area</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the elements of the scalar
+array will be multiplied by the area of the corresponding face.
+If True, vmin and vmax should be in terms of the scaled array.
+Defaults to False.</p></li>
+<li><p><strong>no_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned object will not be a
+copy. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Geometry with updated vertex colors.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.GeometryBase.from_scene">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#GeometryBase.from_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.GeometryBase.from_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a geometry dictionary from a PlantGL scene and descritizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> (<em>openalea.plantgl.scene</em>) – Scene that should be descritized.</p></li>
+<li><p><strong>d</strong> (<em>openalea.plantgl.descritizer</em><em>, </em><em>optional</em>) – Descritizer. Defaults
+to openalea.plantgl.all.Tesselator.</p></li>
+<li><p><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertex positions. Defaults to 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.GeometryBase.from_shape">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_as_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#GeometryBase.from_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.GeometryBase.from_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a geometry dictionary from a PlantGL shape and descritizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> (<em>openalea.plantgl.scene</em>) – Scene that should be descritized.</p></li>
+<li><p><strong>d</strong> (<em>openalea.plantgl.descritizer</em>) – Descritizer.</p></li>
+<li><p><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertex positions. Defaults to 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.GeometryBase.to_geom_args">
+<span class="sig-name descname"><span class="pre">to_geom_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_as_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#GeometryBase.to_geom_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.GeometryBase.to_geom_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get arguments for creating a PlantGL geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertices. Defaults to 1.0.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Name that should be given to the created
+PlantGL symbol. Defaults to None and is ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Class, arguments and keyword arguments for PlantGL geometry.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.GeometryBase.to_scene">
+<span class="sig-name descname"><span class="pre">to_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#GeometryBase.to_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.GeometryBase.to_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a PlantGL scene from a geometry dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertices. Defaults to 1.0.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Name that should be given to the created
+PlantGL symbol. Defaults to None and is ignored.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.PlyDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.PlySerialize.</span></span><span class="sig-name descname"><span class="pre">PlyDict</span></span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#PlyDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.PlyDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.PlySerialize.GeometryBase" title="yggdrasil.serialize.PlySerialize.GeometryBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryBase</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Ply</span></code></p>
+<p>Enhanced dictionary class for storing Ply information.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.PlySerialize">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.PlySerialize.</span></span><span class="sig-name descname"><span class="pre">PlySerialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#PlySerialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.PlySerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="yggdrasil.serialize.SerializeBase.SerializeBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SerializeBase</span></code></a></p>
@@ -1534,6 +1917,34 @@ serialized.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.PlySerialize.initialized">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialized</span></span><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.PlySerialize.initialized" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the serializer has been initialized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.PlySerialize.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#PlySerialize.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.PlySerialize.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize a message to conform to the expected datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message arguments.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1584,8 +1995,8 @@ a processed message.</p>
 <dt>concats_as_str (bool): True if serialized objects can be concatenated</dt><dd><p>directly as strings.</p>
 </dd>
 <dt>encoded_datatype (schema): JSON schema defining the type of object</dt><dd><p>produced by the class’s func_serialize method. For most classes
-this will be {‘type’: ‘bytes’}, indicating that the method will
-produce bytes suitable for serialization.</p>
+this will be {‘type’: ‘scalar’, ‘subtype’: ‘string’}, indicating
+that the method will produce bytes suitable for serialization.</p>
 </dd>
 </dl>
 </dd>
@@ -1664,14 +2075,40 @@ structured numpy array.</p>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.default_datatype">
-<span class="sig-name descname"><span class="pre">default_datatype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'type':</span> <span class="pre">'bytes'}</span></em><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.default_datatype" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode message parts into header and body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><em>bytes</em></a>) – Message to be decoded.</p></li>
+<li><p><strong>no_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, only the metadata is returned.
+Defaults to False.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Metadata that should be used to deserialize
+the message instead of the current header content. Defaults to
+None and is not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Deserialized message and header information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a>(obj, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a>)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If msg contains a header, but metadata is also
+    provided as an argument.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.11)"><strong>TypeError</strong></a> – If msg is not bytes.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.default_encoded_datatype">
-<span class="sig-name descname"><span class="pre">default_encoded_datatype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'type':</span> <span class="pre">'bytes'}</span></em><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.default_encoded_datatype" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.default_datatype">
+<span class="sig-name descname"><span class="pre">default_datatype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'subtype':</span> <span class="pre">'string',</span> <span class="pre">'type':</span> <span class="pre">'scalar'}</span></em><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.default_datatype" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1687,8 +2124,8 @@ structured numpy array.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><em>bytes</em></a>) – Message to be deserialized.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the deserialize
-method of the datatype class.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the decode
+method.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1711,6 +2148,26 @@ serializer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fd</strong> (<em>file</em>) – File containing header.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.dict2object">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dict2object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.dict2object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.dict2object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conver a dictionary to a message object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Dictionary to convert to serializable object.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Serializable object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1740,13 +2197,29 @@ included in the serializations.</p>
 the serializations.</p>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.encoded_typedef">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">encoded_typedef</span></span><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.encoded_typedef" title="Permalink to this definition">¶</a></dt>
-<dd><p>Type definition for encoded data objects.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_header_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode the message with metadata in a header.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><em>bytes</em></a>) – Message data serialized into bytes.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Metadata that should be included in the message
+header.</p></li>
+<li><p><strong>no_metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, no metadata will be added
+to the serialized message. Defaults to False.</p></li>
+<li><p><strong>max_header_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum size that header
+should occupy in order to be sent in a single message.
+A value of 0 indicates that any size header is valid.
+Defaults to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Encoded message with header.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1856,7 +2329,7 @@ empty list if not provided.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.get_testing_options">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_testing_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_example</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_oldkws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_string_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bytes'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.get_testing_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_testing_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_example</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_oldkws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_string_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bytes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.get_testing_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.get_testing_options" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to return a dictionary of testing options for this class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1873,6 +2346,8 @@ added to the returned options. This will only have an effect if
 table_example is True. Defaults to False.</p></li>
 <li><p><strong>table_string_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Type that should be used
 for the string column in the table. Defaults to ‘bytes’.</p></li>
+<li><p><strong>no_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, an example is returned where the
+names are not provided to the deserializer. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1909,7 +2384,7 @@ from contents.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.initialize_from_message">
-<span class="sig-name descname"><span class="pre">initialize_from_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.initialize_from_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.initialize_from_message" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">initialize_from_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.initialize_from_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.initialize_from_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the serializer based on recieved message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1923,19 +2398,25 @@ may contain additional information for initializing the serializer.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.initialize_serializer">
-<span class="sig-name descname"><span class="pre">initialize_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.initialize_serializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.initialize_serializer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a serializer based on received metadata. This method will
-exit early if the serializer has already been intialized.</p>
+<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.initialize_from_metadata">
+<span class="sig-name descname"><span class="pre">initialize_from_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.initialize_from_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.initialize_from_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a serializer based on received metadata. This method
+will exit early if the serializer has already been intialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Header information including type info that should be
-used to initialize the serializer class.</p></li>
-<li><p><strong>extract</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the type will be defined using a
-subset of the type information in metadata. If False, all of the
-type information will be used. Defaults to False.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Header information including type info that
+should be used to initialize the serializer class.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialized</span></span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the serializer has been initialized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1957,20 +2438,18 @@ type information will be used. Defaults to False.</p></li>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.is_initialized">
-<span class="sig-name descname"><span class="pre">is_initialized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.is_initialized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.is_initialized" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the serializer has been initialized by comparing the
-current datatype against the default for the class.</p>
+<dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize a message to conform to the expected datatype.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>True if the current datatype is different than the default,</dt><dd><p>False otherwise.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message arguments.</p>
 </dd>
-</dl>
-</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized message.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2069,13 +2548,13 @@ should be returned in a dictionary form.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.serialize">
-<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_serializer_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_header_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.serialize" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_serializer_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_header_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>args</strong> (<em>obj</em>) – List of arguments to be formatted or a ready made message.</p></li>
-<li><p><strong>header_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments that should be
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments that should be
 added to the header. Defaults to None and no header is added.</p></li>
 <li><p><strong>add_serializer_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, serializer information
 will be added to the metadata. Defaults to False.</p></li>
@@ -2128,7 +2607,7 @@ to files serialized using this class.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.typedef">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">typedef</span></span><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.typedef" title="Permalink to this definition">¶</a></dt>
-<dd><p>Type definition.</p>
+<dd><p>Alias for datatype.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
@@ -2138,15 +2617,11 @@ to files serialized using this class.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.serialize.SerializeBase.SerializeBase.update_serializer">
-<span class="sig-name descname"><span class="pre">update_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extract</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.update_serializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.update_serializer" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seritype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase.update_serializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase.update_serializer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update serializer with provided information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>extract</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the updated typedef will be
-the bare minimum as extracted from total set of provided
-keywords, otherwise the entire set will be sued. Defaults to
-False.</p></li>
 <li><p><strong>skip_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, everything is updated except
 the data type. Defaults to False.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are processed as part of
@@ -2154,7 +2629,7 @@ they type definition and are parsed for old-style keywords.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – If there are keywords that are not valid typedef
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – If there are keywords that are not valid datatype
     keywords (currect or old-style).</p>
 </dd>
 </dl>
@@ -2358,6 +2833,55 @@ serialized in the flow style. See
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.serialize.YAMLSerialize.decode_yaml">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.YAMLSerialize.</span></span><span class="sig-name descname"><span class="pre">decode_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorted_dict_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/YAMLSerialize.html#decode_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.YAMLSerialize.decode_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode a Python object from a YAML serialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – YAML serialization to decode.</p></li>
+<li><p><strong>sorted_dict_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.11)"><em>type</em></a><em>, </em><em>optional</em>) – Class that should be used to
+contain mapping objects while preserving order. Defaults to
+None and is ignored.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to yaml.load.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Deserialized Python object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.serialize.YAMLSerialize.encode_yaml">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.serialize.YAMLSerialize.</span></span><span class="sig-name descname"><span class="pre">encode_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorted_dict_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/YAMLSerialize.html#encode_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.YAMLSerialize.encode_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode a Python object in YAML format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Python object to encode.</p></li>
+<li><p><strong>fd</strong> (<em>file</em><em>, </em><em>optional</em>) – File descriptor for file that encoded object
+should be written to. Defaults to None and string is returned.</p></li>
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Indentation for new lines in encoded
+string. Defaults to None.</p></li>
+<li><p><strong>sort_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, dictionaries will be sorted
+alphabetically by key. Defaults to True.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to yaml.dump.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Encoded object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)">bytes</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

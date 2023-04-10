@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.command_line &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.command_line &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -118,14 +118,16 @@
 <div class="viewcode-block" id="githook"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.githook">[docs]</a><span class="k">def</span> <span class="nf">githook</span><span class="p">():</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Git hook to determine if the Github workflow need to be</span>
 <span class="sd">    re-generated.&quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
-            <span class="p">[</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;diff-index&quot;</span><span class="p">,</span> <span class="s2">&quot;--cached&quot;</span><span class="p">,</span> <span class="s2">&quot;--name-only&quot;</span><span class="p">,</span>
-             <span class="s2">&quot;--diff-filter=ACMRTUXB&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">],</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
-    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
-    <span class="n">regen</span> <span class="o">=</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;test-install-base.yml&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">files</span><span class="p">)</span>
+    <span class="c1"># This check is not required when using pre-commit package</span>
+    <span class="c1"># try:</span>
+    <span class="c1">#     files = subprocess.check_output(</span>
+    <span class="c1">#         [&quot;git&quot;, &quot;diff-index&quot;, &quot;--cached&quot;, &quot;--name-only&quot;,</span>
+    <span class="c1">#          &quot;--diff-filter=ACMRTUXB&quot;, &quot;HEAD&quot;],</span>
+    <span class="c1">#         stderr=subprocess.PIPE).decode(&#39;utf-8&#39;).splitlines()</span>
+    <span class="c1"># except subprocess.CalledProcessError:</span>
+    <span class="c1">#     return 1</span>
+    <span class="c1"># regen = (os.path.join(&#39;utils&#39;, &#39;test-install-base.yml&#39;) in files)</span>
+    <span class="n">regen</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="n">regen</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">gitdir</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
@@ -341,6 +343,18 @@
         <span class="p">((</span><span class="s1">&#39;--with-asan&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Compile models with the address sanitizer enabled.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--as-service&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Run the provided YAMLs as a service.&#39;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--partial-commtype&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;rest&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Type of communicator to use for partial comms when &#39;</span>
+                   <span class="s1">&#39;--as-service is passed&#39;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--client-id&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;ID associated with the client requesting a service. &#39;</span>
+                   <span class="s1">&#39;(This should only be passed when running with &#39;</span>
+                   <span class="s1">&#39;--as-service)&#39;</span><span class="p">)}),</span>
     <span class="p">]</span>
 
 <div class="viewcode-block" id="yggrun.add_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggrun.add_arguments">[docs]</a>    <span class="nd">@classmethod</span>
@@ -366,13 +380,26 @@
         <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">config</span>
         <span class="n">prog</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">parser_config</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-            <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">,</span> <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span>
-                       <span class="n">production_run</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">,</span>
-                       <span class="n">mpi_tag_start</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mpi_tag_start</span><span class="p">,</span>
-                       <span class="n">validate</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">validate</span><span class="p">,</span>
-                       <span class="n">with_debugger</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_debugger</span><span class="p">,</span>
-                       <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
-                       <span class="n">with_asan</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">)</span></div></div>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span>
+                <span class="n">production_run</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">,</span>
+                <span class="n">mpi_tag_start</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">mpi_tag_start</span><span class="p">,</span>
+                <span class="n">validate</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">validate</span><span class="p">,</span>
+                <span class="n">with_debugger</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_debugger</span><span class="p">,</span>
+                <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">disable_python_c_api</span><span class="p">,</span>
+                <span class="n">with_asan</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">with_asan</span><span class="p">,</span>
+                <span class="n">as_service</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">as_service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">as_service</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;complete_partial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">partial_commtype</span><span class="p">:</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">partial_commtype</span> <span class="o">=</span> <span class="s1">&#39;rest&#39;</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">partial_commtype</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;partial_commtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">partial_commtype</span><span class="p">}</span>
+                <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">as_service</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">partial_commtype</span> <span class="o">==</span> <span class="s1">&#39;rest&#39;</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">client_id</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;partial_commtype&#39;</span><span class="p">][</span><span class="s1">&#39;client_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">client_id</span>
+            <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="integration_service_manager"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.integration_service_manager">[docs]</a><span class="k">class</span> <span class="nc">integration_service_manager</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
@@ -966,6 +993,12 @@
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sysconfig</span><span class="o">.</span><span class="n">get_config_vars</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">vardict</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">curr_prefix</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
                 <span class="n">curr_prefix</span> <span class="o">=</span> <span class="n">curr_prefix</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># ASAN library</span>
+                <span class="n">asan_library</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">Cdrv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">Cdrv</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
+                    <span class="n">asan_library</span> <span class="o">=</span> <span class="n">Cdrv</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s2">&quot;compiler&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">asan_library</span><span class="p">()</span>
+                <span class="n">vardict</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;Asan Library:&quot;</span><span class="p">,</span> <span class="n">asan_library</span><span class="p">))</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="c1"># Print things</span>
             <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vardict</span><span class="p">)</span>
@@ -1307,7 +1340,7 @@
           <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
            <span class="c1"># &#39;choices&#39;: [&#39;all&#39;] + LANGUAGES_WITH_ALIASES.get(&#39;all&#39;, []),</span>
            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
-           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;One or more languages that should be configured.&#39;</span><span class="p">}),</span>
+           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;One or more languages that should be installed.&#39;</span><span class="p">}),</span>
          <span class="p">((</span><span class="s1">&#39;--no-import&#39;</span><span class="p">,</span> <span class="p">),</span>
           <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
            <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t import the yggdrasil package in &#39;</span>
@@ -1327,6 +1360,7 @@
 <div class="viewcode-block" id="ygginstall.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginstall.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">install_languages</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span>
         <span class="n">languages</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">languages</span>
         <span class="k">if</span> <span class="p">(((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">languages</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">))</span>
              <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;all&#39;</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">)))):</span>
@@ -1337,7 +1371,9 @@
             <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
             <span class="n">CModelDriver</span><span class="o">.</span><span class="n">set_asan_env</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
-            <span class="n">install_languages</span><span class="o">.</span><span class="n">install_language</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span></div></div>
+            <span class="n">install_languages</span><span class="o">.</span><span class="n">install_language</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">usr_config_file</span><span class="p">):</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="update_config"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.update_config">[docs]</a><span class="k">class</span> <span class="nc">update_config</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
@@ -1506,22 +1542,6 @@
             <span class="n">lang_kwargs</span><span class="o">=</span><span class="n">lang_kwargs</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="regen_metaschema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.regen_metaschema">[docs]</a><span class="k">class</span> <span class="nc">regen_metaschema</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Regenerate the yggdrasil metaschema.&quot;&quot;&quot;</span>
-
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;metaschema&quot;</span>
-    <span class="n">help</span> <span class="o">=</span> <span class="s2">&quot;Regenerate the yggdrasil metaschema.&quot;</span>
-
-<div class="viewcode-block" id="regen_metaschema.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.regen_metaschema.func">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">metaschema</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema_fname</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema_fname</span><span class="p">)</span>
-        <span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">metaschema</span><span class="o">.</span><span class="n">_validator</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">metaschema</span><span class="o">.</span><span class="n">get_metaschema</span><span class="p">()</span></div></div>
-
-
 <div class="viewcode-block" id="regen_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.regen_schema">[docs]</a><span class="k">class</span> <span class="nc">regen_schema</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Regenerate the yggdrasil schema.&quot;&quot;&quot;</span>
 
@@ -1531,16 +1551,21 @@
         <span class="p">((</span><span class="s1">&#39;--only-constants&#39;</span><span class="p">,</span> <span class="p">),</span>
          <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
           <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Only update the constants.py file without updating &#39;</span>
-                   <span class="s1">&#39;the schema.&#39;</span><span class="p">)})]</span>
+                   <span class="s1">&#39;the schema.&#39;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--filename&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Name where schema should be saved.&#39;</span><span class="p">})]</span>
 
 <div class="viewcode-block" id="regen_schema.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.regen_schema.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">schema</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">only_constants</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_schema_fname</span><span class="p">):</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_schema_fname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">_schema_fname</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
             <span class="n">schema</span><span class="o">.</span><span class="n">clear_schema</span><span class="p">()</span>
-            <span class="n">schema</span><span class="o">.</span><span class="n">init_schema</span><span class="p">()</span>
+            <span class="n">schema</span><span class="o">.</span><span class="n">init_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">schema</span><span class="o">.</span><span class="n">update_constants</span><span class="p">()</span></div></div>
 
@@ -1638,6 +1663,64 @@
             <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">comparison</span><span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="coveragerc"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.coveragerc">[docs]</a><span class="k">class</span> <span class="nc">coveragerc</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a .coveragerc file.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;coveragerc&quot;</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Generate a coveragerc file that covers/ignores lines based on &quot;</span>
+        <span class="s2">&quot;installed languages or options.&quot;</span><span class="p">)</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">((</span><span class="s1">&#39;--method&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;installed&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+          <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Method that should be used to select languages that &quot;</span>
+                   <span class="s2">&quot;should be covered. &#39;env&#39; covers languages based on &quot;</span>
+                   <span class="s2">&quot;the value of environment variables of the form &quot;</span>
+                   <span class="s2">&quot;&#39;INSTALL</span><span class="si">{language}</span><span class="s2">&#39;. &#39;installed&#39; covers languages &quot;</span>
+                   <span class="s2">&quot;that yggdrasil considers installed.&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--cover-languages&#39;</span><span class="p">,</span> <span class="s1">&#39;--cover-language&#39;</span><span class="p">,</span> <span class="s1">&#39;--cover&#39;</span><span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="n">LANGUAGES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Language(s) to cover.&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--dont-cover-languages&#39;</span><span class="p">,</span> <span class="s1">&#39;--dont-cover-language&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;--dont-cover&#39;</span><span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="n">LANGUAGES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Language(s) to ignore in coverage.&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--filename&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;File to save coveragerc to&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--setup-cfg&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;setup.cfg file containing coverage options&quot;</span><span class="p">}),</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="coveragerc.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.coveragerc.func">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">is_lang_installed</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">create_coveragerc</span>
+        <span class="n">covered_languages</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;env&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">LANGUAGES</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INSTALL</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">covered_languages</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;installed&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">LANGUAGES</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]:</span>
+                <span class="n">covered_languages</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_lang_installed</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">cover_languages</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">cover_languages</span><span class="p">:</span>
+                <span class="n">covered_languages</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dont_cover_languages</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">dont_cover_languages</span><span class="p">:</span>
+                <span class="n">covered_languages</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">LANGUAGES</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]:</span>
+            <span class="n">covered_languages</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">create_coveragerc</span><span class="p">(</span><span class="n">covered_languages</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                          <span class="n">setup_cfg</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">setup_cfg</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="generate_gha_workflow"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.generate_gha_workflow">[docs]</a><span class="k">class</span> <span class="nc">generate_gha_workflow</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Re-generate the Github actions workflow yaml.&quot;&quot;&quot;</span>
 
@@ -1659,7 +1742,7 @@
 <div class="viewcode-block" id="generate_gha_workflow.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.generate_gha_workflow.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">gitdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">yaml</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">decode_yaml</span><span class="p">,</span> <span class="n">encode_yaml</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.serialize.YAMLSerialize</span> <span class="kn">import</span> <span class="n">decode_yaml</span><span class="p">,</span> <span class="n">encode_yaml</span>
         <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 
         <span class="k">class</span> <span class="nc">NoAliasDumper</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">):</span>
@@ -1738,11 +1821,10 @@
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">subcommands</span> <span class="o">=</span> <span class="p">[</span><span class="n">yggrun</span><span class="p">,</span> <span class="n">ygginfo</span><span class="p">,</span> <span class="n">validate_yaml</span><span class="p">,</span>
                    <span class="n">yggcc</span><span class="p">,</span> <span class="n">yggcompile</span><span class="p">,</span> <span class="n">yggclean</span><span class="p">,</span>
-                   <span class="n">ygginstall</span><span class="p">,</span> <span class="n">update_config</span><span class="p">,</span>
-                   <span class="n">regen_metaschema</span><span class="p">,</span> <span class="n">regen_schema</span><span class="p">,</span>
+                   <span class="n">ygginstall</span><span class="p">,</span> <span class="n">update_config</span><span class="p">,</span> <span class="n">regen_schema</span><span class="p">,</span>
                    <span class="n">yggmodelform</span><span class="p">,</span> <span class="n">yggdevup</span><span class="p">,</span>
                    <span class="n">timing_plots</span><span class="p">,</span> <span class="n">generate_gha_workflow</span><span class="p">,</span>
-                   <span class="n">integration_service_manager</span><span class="p">]</span>
+                   <span class="n">integration_service_manager</span><span class="p">,</span> <span class="n">coveragerc</span><span class="p">]</span>
 
 <div class="viewcode-block" id="main.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

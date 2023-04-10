@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -100,10 +100,12 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">,</span> <span class="n">MSVCCompiler</span><span class="p">,</span>
     <span class="n">GCCLinker</span><span class="p">,</span> <span class="n">ClangLinker</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="CPPCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">CPPCompilerBase</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
@@ -302,6 +304,14 @@
         <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = </span><span class="si">{channel_obj}</span><span class="s1">.recv(</span><span class="si">{nargs}</span><span class="s1">, </span><span class="si">{input_refs}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;call&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = </span><span class="si">{channel_obj}</span><span class="s1">.call(</span><span class="si">{nargs}</span><span class="s1">, </span><span class="si">{outputs}</span><span class="s1">, </span><span class="si">{input_refs}</span><span class="s1">)&#39;</span><span class="p">,</span>
     <span class="p">}</span>
+    <span class="n">type_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">CModelDriver</span><span class="o">.</span><span class="n">type_map</span><span class="p">,</span>
+        <span class="n">array</span><span class="o">=</span><span class="s1">&#39;rapidjson::Document&#39;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="s1">&#39;rapidjson::Document&#39;</span><span class="p">,</span>
+        <span class="nb">any</span><span class="o">=</span><span class="s1">&#39;rapidjson::Document&#39;</span><span class="p">,</span>
+        <span class="n">schema</span><span class="o">=</span><span class="s1">&#39;rapidjson::Document&#39;</span><span class="p">,</span>
+        <span class="n">ply</span><span class="o">=</span><span class="s1">&#39;rapidjson::Ply&#39;</span><span class="p">,</span>
+        <span class="n">obj</span><span class="o">=</span><span class="s1">&#39;rapidjson::ObjWavefront&#39;</span><span class="p">)</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">CModelDriver</span><span class="o">.</span><span class="n">function_param</span><span class="p">,</span>
         <span class="nb">input</span><span class="o">=</span><span class="s1">&#39;YggInput </span><span class="si">{channel}</span><span class="s1">(</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">, </span><span class="si">{channel_type}</span><span class="s1">);&#39;</span><span class="p">,</span>
@@ -312,14 +322,16 @@
         <span class="n">send_function</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1">.send&#39;</span><span class="p">,</span>
         <span class="n">exec_prefix</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;#include &lt;iostream&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
                      <span class="s1">&#39;#include &lt;exception&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span>
-        <span class="n">print_generic</span><span class="o">=</span><span class="s1">&#39;std::cout &lt;&lt; </span><span class="si">{object}</span><span class="s1"> &lt;&lt; std::endl &lt;&lt; std::flush;&#39;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="s1">&#39;throw </span><span class="se">\&quot;</span><span class="si">{error_msg}</span><span class="se">\&quot;</span><span class="s1">;&#39;</span><span class="p">,</span>
         <span class="n">try_begin</span><span class="o">=</span><span class="s1">&#39;try {&#39;</span><span class="p">,</span>
         <span class="n">try_error_type</span><span class="o">=</span><span class="s1">&#39;const std::exception&amp;&#39;</span><span class="p">,</span>
         <span class="n">try_except</span><span class="o">=</span><span class="s1">&#39;}} catch (</span><span class="si">{error_type}</span><span class="s1"> </span><span class="si">{error_var}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
         <span class="n">function_def_regex</span><span class="o">=</span><span class="p">(</span>
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;flag_type&gt;.+?)\s*</span><span class="si">{function_name}</span><span class="s1">\s*&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;\((?P&lt;inputs&gt;(?:[^{{\&amp;])*?)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\(\s*(?P&lt;inputs&gt;&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:(?:const\s+[^{{\&amp;]+\s+\&amp;[^{{\&amp;]+)|(?:[^{{\&amp;]+))&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*,\s*(?:const\s+[^{{\&amp;]+\s+\&amp;[^{{\&amp;]+)|(?:[^{{\&amp;]+))*?&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;)&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:,\s*(?P&lt;outputs&gt;&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:\s*(?:[^\s\&amp;]+)&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:(?:\&amp;\s+)|(?:\s+(?:\()?\&amp;))&#39;</span>
@@ -327,6 +339,12 @@
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;body&gt;(?:.*?\n?)*?)&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:(?:return +(?P&lt;flag_var&gt;.+?)?;(?:.*?\n?)*?\}})&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;|(?:\}}))&#39;</span><span class="p">),</span>
+        <span class="n">inputs_def_regex</span><span class="o">=</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\s*(?:const\s+)?(?P&lt;native_type&gt;(?:[^\s\*\&amp;])+(\s+)?&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;ptr&gt;\*+)?)(?:\s*\&amp;)?&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?(ptr)(?(1)(?:\s*)|(?:\s+)))&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(\((?P&lt;name_ptr&gt;\*+)?)?(?P&lt;name&gt;[^\&amp;]+?)(?(4)(?:\)))&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?P&lt;shape&gt;(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?&#39;</span><span class="p">),</span>
         <span class="n">outputs_def_regex</span><span class="o">=</span><span class="p">(</span>
             <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;native_type&gt;(?:[^\s])+)(\s+)?&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(\()?(?P&lt;ref&gt;\&amp;)(?(1)(?:\s*)|(?:\s+))&#39;</span>
@@ -335,6 +353,8 @@
     <span class="n">include_arg_count</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">include_channel_obj</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">dont_declare_channel</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_document_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">,</span> <span class="s1">&#39;any&#39;</span><span class="p">]</span>
+    <span class="n">_cpp_class_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">]</span>
     
 <div class="viewcode-block" id="CPPModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -348,6 +368,15 @@
             <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;cl&#39;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;std::cout &lt;&lt; &quot;</span><span class="si">{message}</span><span class="s1">&quot; &lt;&lt; std::endl;&#39;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_document_types</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_cpp_class_types</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;init_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;print_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;copy_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_document_types</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;print_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;std::cout &lt;&lt; document2string(</span><span class="si">{object}</span><span class="s1">) &lt;&lt; std::endl;&#39;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;copy_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1">.CopyFrom(</span><span class="si">{value}</span><span class="s1">, </span><span class="si">{name}</span><span class="s1">.GetAllocator(), true);&#39;</span><span class="p">)</span>
         <span class="n">CModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;second_pass&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">return</span>
@@ -454,7 +483,41 @@
             <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;vector_regex&#39;</span><span class="p">],</span>
                                 <span class="n">var</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="CPPModelDriver.is_cpp_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.is_cpp_class">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_cpp_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable uses a C++ class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var (dict): Variable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if it is a C++ class, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                     <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">]</span>
+                     <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;::&#39;</span> <span class="ow">in</span> <span class="n">var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;native_type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                         <span class="ow">and</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ptr&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))))</span></div>
     
+<div class="viewcode-block" id="CPPModelDriver.allows_realloc"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.allows_realloc">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">allows_realloc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable allows the receive call to perform</span>
+<span class="sd">        realloc.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var (dict): Dictionary of variable properties.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the variable allows realloc, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_cpp_class</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_vector</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">var</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="CPPModelDriver.requires_length_var"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.requires_length_var">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">requires_length_var</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a variable requires a separate length variable.</span>
@@ -496,6 +559,40 @@
             <span class="k">return</span> <span class="n">out</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_declaration</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="CPPModelDriver.prepare_input_variables"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.prepare_input_variables">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">prepare_input_variables</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vars_list</span><span class="p">,</span> <span class="n">in_definition</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">for_yggdrasil</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate a set of input variables such that it can be passed as a</span>
+<span class="sd">        single string to the function_call parameter.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vars_list (list): List of variable dictionaries containing info</span>
+<span class="sd">                (e.g. names) that should be used to prepare a string representing</span>
+<span class="sd">                input to a function call.</span>
+<span class="sd">            in_definition (bool, optional): If True, the returned sequence</span>
+<span class="sd">                will be of the format required for specifying input</span>
+<span class="sd">                variables in a function definition. Defaults to False.</span>
+<span class="sd">            for_yggdrasil (bool, optional): If True, the variables will be</span>
+<span class="sd">                prepared in the formated expected by calls to yggdarsil</span>
+<span class="sd">                send/recv methods. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Concatentated variables list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">in_definition</span><span class="p">:</span>
+            <span class="n">new_vars_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vars_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_cpp_class</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                    <span class="n">new_vars_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&amp;</span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                              <span class="n">const</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_vars_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">vars_list</span> <span class="o">=</span> <span class="n">new_vars_list</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_input_variables</span><span class="p">(</span>
+            <span class="n">vars_list</span><span class="p">,</span> <span class="n">in_definition</span><span class="o">=</span><span class="n">in_definition</span><span class="p">,</span>
+            <span class="n">for_yggdrasil</span><span class="o">=</span><span class="n">for_yggdrasil</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="CPPModelDriver.write_model_recv"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.write_model_recv">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_model_recv</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">recv_var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -573,6 +670,8 @@
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">channels2vars</span><span class="p">(</span><span class="n">send_var</span><span class="p">):</span>
                 <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_vector</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
                     <span class="n">send_var_par</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;ptr_var&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;length_var&#39;</span><span class="p">]]</span>
+                <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_cpp_class</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="n">send_var_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&amp;</span><span class="si">{</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">send_var_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="n">send_var_str</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prepare_input_variables</span><span class="p">(</span>

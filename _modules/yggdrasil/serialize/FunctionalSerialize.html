@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.FunctionalSerialize &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.serialize.FunctionalSerialize &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -140,30 +140,11 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;func_deserialize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;func_deserialize&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">func_deserialize</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FunctionalSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="c1"># @property</span>
-    <span class="c1"># def base_class(self):</span>
-    <span class="c1">#     r&quot;&quot;&quot;DefaultSerialize: Default version of serialization.&quot;&quot;&quot;</span>
-    <span class="c1">#     if getattr(self, &#39;_base_class&#39;, None) is None:</span>
-    <span class="c1">#         self._base_class = DefaultSerialize(datatype=self.typedef,</span>
-    <span class="c1">#                                             **self.serializer_info)</span>
-    <span class="c1">#     return self._base_class</span>
-
-    <span class="c1"># TODO: In some cases this should be the object typedef</span>
-    <span class="c1"># @property</span>
-    <span class="c1"># def typedef(self):</span>
-    <span class="c1">#     r&quot;&quot;&quot;dict: Type definition.&quot;&quot;&quot;</span>
-    <span class="c1">#     return self.encoded_typedef</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serializer_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Serializer info.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot define serializer information for user &quot;</span>
-                           <span class="o">+</span> <span class="s2">&quot;supplied functions.&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">empty_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_datatype</span><span class="o">.</span><span class="n">_empty_msg</span></div>
+                           <span class="o">+</span> <span class="s2">&quot;supplied functions.&quot;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

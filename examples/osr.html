@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>osr &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>osr &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -351,6 +351,122 @@
 <span class="linenos">114</span>
 </pre></div>
 </div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+<span class="linenos">  2</span>&lt;!--
+<span class="linenos">  3</span>	Simulation file for SimRoot version 5. This development version, build July 2007
+<span class="linenos">  4</span>	Author: Jouke Postma
+<span class="linenos">  5</span>	Note: 
+<span class="linenos">  6</span>	
+<span class="linenos">  7</span>	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+<span class="linenos">  8</span>
+<span class="linenos">  9</span>	change log: 
+<span class="linenos"> 10</span>	11-july-07 added support for include files. 
+<span class="linenos"> 11</span>	
+<span class="linenos"> 12</span>	
+<span class="linenos"> 13</span>--&gt;
+<span class="linenos"> 14</span>&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
+<span class="linenos"> 15</span>&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
+<span class="linenos"> 16</span>&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
+<span class="linenos"> 17</span>
+<span class="linenos"> 18</span>&lt;!--SIMULATION MODEL--&gt;
+<span class="linenos"> 19</span>&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
+<span class="linenos"> 20</span>  
+<span class="linenos"> 21</span>	&lt;SimulaBase name=&quot;soil&quot;&gt;
+<span class="linenos"> 22</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>	
+<span class="linenos"> 25</span>	&lt;SimulaBase name=&quot;plants&quot;&gt;
+<span class="linenos"> 26</span>		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
+<span class="linenos"> 27</span>			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
+<span class="linenos"> 28</span>			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
+<span class="linenos"> 29</span>				maize-aerenchyma
+<span class="linenos"> 30</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 31</span>			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
+<span class="linenos"> 32</span>				0
+<span class="linenos"> 33</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 34</span>			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
+<span class="linenos"> 35</span>					0 -2 0
+<span class="linenos"> 36</span>			&lt;/SimulaConstant&gt;
+<span class="linenos"> 37</span>		&lt;/SimulaBase&gt;	
+<span class="linenos"> 38</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
+<span class="linenos"> 41</span>	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
+<span class="linenos"> 42</span>		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
+<span class="linenos"> 43</span>			&lt;SimulaBase name=&quot;defaults&quot;&gt;
+<span class="linenos"> 44</span>			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
+<span class="linenos"> 45</span>				&lt;SimulaConstant
+<span class="linenos"> 46</span>					name=&quot;startTime&quot;
+<span class="linenos"> 47</span>					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
+<span class="linenos"> 48</span>				&lt;SimulaConstant
+<span class="linenos"> 49</span>					name=&quot;endTime&quot;
+<span class="linenos"> 50</span>					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 51</span>				&lt;SimulaConstant
+<span class="linenos"> 52</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 53</span>					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
+<span class="linenos"> 54</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 55</span>			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
+<span class="linenos"> 56</span>				&lt;SimulaConstant
+<span class="linenos"> 57</span>					name=&quot;run&quot;
+<span class="linenos"> 58</span>					type=&quot;bool&quot;&gt;
+<span class="linenos"> 59</span>					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
+<span class="linenos"> 60</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 61</span>				&lt;SimulaConstant
+<span class="linenos"> 62</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 63</span>					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
+<span class="linenos"> 64</span>				&lt;SimulaConstant
+<span class="linenos"> 65</span>					name=&quot;requestedVariables&quot;
+<span class="linenos"> 66</span>					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
+<span class="linenos"> 67</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 68</span>			&lt;/SimulaBase&gt;	
+<span class="linenos"> 69</span>			&lt;SimulaBase name=&quot;table&quot;&gt;
+<span class="linenos"> 70</span>				&lt;SimulaConstant
+<span class="linenos"> 71</span>					name=&quot;run&quot;
+<span class="linenos"> 72</span>					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 73</span>				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
+<span class="linenos"> 74</span>				&lt;SimulaConstant
+<span class="linenos"> 75</span>					name=&quot;searchingDepth&quot;
+<span class="linenos"> 76</span>					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
+<span class="linenos"> 77</span>				&lt;SimulaConstant
+<span class="linenos"> 78</span>					name=&quot;skipTheseVariables&quot;
+<span class="linenos"> 79</span>					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
+<span class="linenos"> 80</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 81</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 82</span>		&lt;/SimulaBase&gt;
+<span class="linenos"> 83</span>	&lt;/SimulaBase&gt;
+<span class="linenos"> 84</span>	
+<span class="linenos"> 85</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
+<span class="linenos"> 86</span>	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
+<span class="linenos"> 87</span>	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
+<span class="linenos"> 90</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
+<span class="linenos"> 93</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
+<span class="linenos"> 94</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
+<span class="linenos"> 95</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
+<span class="linenos"> 96</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
+<span class="linenos"> 97</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
+<span class="linenos">100</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
+<span class="linenos">101</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
+<span class="linenos">102</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
+<span class="linenos">103</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
+<span class="linenos">104</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
+<span class="linenos">105</span>
+<span class="linenos">106</span>	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
+<span class="linenos">107</span>	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
+<span class="linenos">108</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
+<span class="linenos">109</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
+<span class="linenos">110</span>	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
+<span class="linenos">111</span>	&lt;/SimulaBase&gt;
+<span class="linenos">112</span>&lt;/SimulationModel&gt;
+<span class="linenos">113</span>
+<span class="linenos">114</span>
+</pre></div>
+</div>
 <p>Model YAML:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
 <span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timesync</span>
@@ -394,121 +510,217 @@
 <span class="linenos">  4</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;YggInterface.hpp&quot;</span>
 <span class="linenos">  5</span>
 <span class="linenos">  6</span>
-<span class="linenos">  7</span><span class="kt">int</span><span class="w"> </span><span class="nf">timestep_calc</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">t_units</span><span class="p">,</span><span class="w"> </span><span class="n">generic_t</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos">  8</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos">  9</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 10</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;carbonAllocation2Roots&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;g&quot;</span><span class="p">);</span>
-<span class="linenos"> 11</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 12</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 13</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;saturatedConductivity&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cm/day&quot;</span><span class="p">);</span>
-<span class="linenos"> 14</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 15</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
-<span class="linenos"> 16</span><span class="p">}</span>
+<span class="linenos">  7</span><span class="kt">void</span><span class="w"> </span><span class="nf">timestep_calc</span><span class="p">(</span><span class="n">rapidjson</span><span class="o">::</span><span class="n">units</span><span class="o">::</span><span class="n">Quantity</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">t</span><span class="p">,</span>
+<span class="linenos">  8</span><span class="w">		   </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Document</span><span class="o">&amp;</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos">  9</span><span class="cp">#define SET_(key, val)							\</span>
+<span class="linenos"> 10</span><span class="cp">  if (!state.HasMember(key)) {						\</span>
+<span class="linenos"> 11</span><span class="cp">    state.AddMember(key,						\</span>
+<span class="linenos"> 12</span><span class="cp">		    rapidjson::Value(val),				\</span>
+<span class="linenos"> 13</span><span class="cp">		    state.GetAllocator());				\</span>
+<span class="linenos"> 14</span><span class="cp">  } else {								\</span>
+<span class="linenos"> 15</span><span class="cp">    state[key].SetScalar(val);						\</span>
+<span class="linenos"> 16</span><span class="cp">  }</span>
+<span class="linenos"> 17</span><span class="w">  </span><span class="c1">// TODO: Update timesync/OSR to convert units</span>
+<span class="linenos"> 18</span><span class="w">  </span><span class="c1">// rapidjson::units::Quantity&lt;double&gt; x(10.0, &quot;g&quot;);</span>
+<span class="linenos"> 19</span><span class="w">  </span><span class="c1">// rapidjson::units::Quantity&lt;double&gt; y(10.0, &quot;cm/day&quot;);</span>
+<span class="linenos"> 20</span><span class="w">  </span><span class="n">SET_</span><span class="p">(</span><span class="s">&quot;carbonAllocation2Roots&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">)</span>
+<span class="linenos"> 21</span><span class="w">  </span><span class="n">SET_</span><span class="p">(</span><span class="s">&quot;saturatedConductivity&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">)</span>
+<span class="linenos"> 22</span><span class="p">}</span>
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>
+<span class="linenos"> 25</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 26</span>
+<span class="linenos"> 27</span><span class="w">  </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">t_units</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="linenos"> 28</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">units</span><span class="o">::</span><span class="n">Quantity</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">t_step</span><span class="p">(</span><span class="n">atof</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
+<span class="linenos"> 29</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Hello from C++ other_model: timestep &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t_step</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 30</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">units</span><span class="o">::</span><span class="n">Quantity</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">t_start</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
+<span class="linenos"> 31</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">units</span><span class="o">::</span><span class="n">Quantity</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">t_end</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;days&quot;</span><span class="p">);</span>
+<span class="linenos"> 32</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">state_send</span><span class="p">(</span><span class="n">rapidjson</span><span class="o">::</span><span class="n">kObjectType</span><span class="p">);</span>
+<span class="linenos"> 33</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">state_recv</span><span class="p">(</span><span class="n">rapidjson</span><span class="o">::</span><span class="n">kObjectType</span><span class="p">);</span>
+<span class="linenos"> 34</span><span class="w">  </span><span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span><span class="w"> </span><span class="n">state_send</span><span class="p">);</span>
+<span class="linenos"> 35</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos"> 36</span><span class="w">  </span>
+<span class="linenos"> 37</span><span class="w">  </span><span class="c1">// Set up connections matching yaml</span>
+<span class="linenos"> 38</span><span class="w">  </span><span class="c1">// Timestep synchronization connection will default to &#39;timesync&#39;</span>
+<span class="linenos"> 39</span><span class="w">  </span><span class="n">YggTimesync</span><span class="w"> </span><span class="n">timesync</span><span class="p">(</span><span class="s">&quot;timesync&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
+<span class="linenos"> 40</span><span class="w">  </span><span class="n">dtype_t</span><span class="o">*</span><span class="w"> </span><span class="n">out_dtype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">create_dtype_json_object</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+<span class="linenos"> 41</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">out</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">out_dtype</span><span class="p">);</span>
+<span class="linenos"> 42</span>
+<span class="linenos"> 43</span><span class="w">  </span><span class="c1">// Initialize state and synchronize with other models</span>
+<span class="linenos"> 44</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">units</span><span class="o">::</span><span class="n">Quantity</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t_start</span><span class="p">;</span>
+<span class="linenos"> 45</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">value</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state_send</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state_recv</span><span class="p">);</span>
+<span class="linenos"> 46</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 47</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;other_model(C++): Initial sync failed.&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 48</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos"> 49</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 50</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;other_model(C++): t = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span><span class="p">;</span>
+<span class="linenos"> 51</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Value</span><span class="o">::</span><span class="n">MemberIterator</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state_recv</span><span class="p">.</span><span class="n">MemberBegin</span><span class="p">();</span>
+<span class="linenos"> 52</span><span class="w">       </span><span class="n">it</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">state_recv</span><span class="p">.</span><span class="n">MemberEnd</span><span class="p">();</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span>
+<span class="linenos"> 53</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">it</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">.</span><span class="n">GetString</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span>
+<span class="linenos"> 54</span><span class="w">      </span><span class="s">&quot; = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">it</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">.</span><span class="n">GetDouble</span><span class="p">();</span>
+<span class="linenos"> 55</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 56</span>
+<span class="linenos"> 57</span><span class="w">  </span><span class="c1">// Send initial state to output</span>
+<span class="linenos"> 58</span><span class="w">  </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<span class="linenos"> 59</span><span class="w">  </span><span class="n">msg</span><span class="p">.</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">state_recv</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">.</span><span class="n">GetAllocator</span><span class="p">());</span>
+<span class="linenos"> 60</span><span class="w">  </span><span class="n">msg</span><span class="p">.</span><span class="n">AddMember</span><span class="p">(</span><span class="s">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Value</span><span class="p">(</span><span class="n">t</span><span class="p">).</span><span class="n">Move</span><span class="p">(),</span><span class="w"> </span><span class="n">msg</span><span class="p">.</span><span class="n">GetAllocator</span><span class="p">());</span>
+<span class="linenos"> 61</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
+<span class="linenos"> 62</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 63</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;other_model(C++): Failed to send initial output for t=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span>
+<span class="linenos"> 64</span><span class="w">      </span><span class="n">t</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 65</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos"> 66</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 67</span>
+<span class="linenos"> 68</span><span class="w">  </span><span class="c1">// Iterate until end</span>
+<span class="linenos"> 69</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">t_end</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 70</span>
+<span class="linenos"> 71</span><span class="w">    </span><span class="c1">// Perform calculations to update the state</span>
+<span class="linenos"> 72</span><span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">t_step</span><span class="p">;</span>
+<span class="linenos"> 73</span><span class="w">    </span><span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">state_send</span><span class="p">);</span>
+<span class="linenos"> 74</span>
+<span class="linenos"> 75</span><span class="w">    </span><span class="c1">// Synchronize the state</span>
+<span class="linenos"> 76</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">value</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state_send</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state_recv</span><span class="p">);</span>
+<span class="linenos"> 77</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 78</span><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;other_model(C++): sync for t=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; failed&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 79</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos"> 80</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos"> 81</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;other_model(C++): t = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span><span class="p">;</span>
+<span class="linenos"> 82</span><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Value</span><span class="o">::</span><span class="n">MemberIterator</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state_recv</span><span class="p">.</span><span class="n">MemberBegin</span><span class="p">();</span>
+<span class="linenos"> 83</span><span class="w">	 </span><span class="n">it</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">state_recv</span><span class="p">.</span><span class="n">MemberEnd</span><span class="p">();</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span>
+<span class="linenos"> 84</span><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">it</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">.</span><span class="n">GetString</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span>
+<span class="linenos"> 85</span><span class="w">	</span><span class="s">&quot; = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">it</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">.</span><span class="n">GetDouble</span><span class="p">();</span>
+<span class="linenos"> 86</span><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 87</span>
+<span class="linenos"> 88</span><span class="w">    </span><span class="c1">// Send output</span>
+<span class="linenos"> 89</span><span class="w">    </span><span class="n">msg</span><span class="p">.</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">state_recv</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">.</span><span class="n">GetAllocator</span><span class="p">());</span>
+<span class="linenos"> 90</span><span class="w">    </span><span class="n">msg</span><span class="p">.</span><span class="n">AddMember</span><span class="p">(</span><span class="s">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rapidjson</span><span class="o">::</span><span class="n">Value</span><span class="p">(</span><span class="n">t</span><span class="p">).</span><span class="n">Move</span><span class="p">(),</span><span class="w"> </span><span class="n">msg</span><span class="p">.</span><span class="n">GetAllocator</span><span class="p">());</span>
+<span class="linenos"> 91</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
+<span class="linenos"> 92</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos"> 93</span><span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;other_model(C++): Failed to send output for t=&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 94</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="linenos"> 95</span><span class="w">    </span><span class="p">}</span>
+<span class="linenos"> 96</span><span class="w">  </span><span class="p">}</span>
+<span class="linenos"> 97</span>
+<span class="linenos"> 98</span><span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Goodbye from C++ other_model&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos"> 99</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos">100</span><span class="w">    </span>
+<span class="linenos">101</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+<span class="linenos">  2</span>&lt;!--
+<span class="linenos">  3</span>	Simulation file for SimRoot version 5. This development version, build July 2007
+<span class="linenos">  4</span>	Author: Jouke Postma
+<span class="linenos">  5</span>	Note: 
+<span class="linenos">  6</span>	
+<span class="linenos">  7</span>	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+<span class="linenos">  8</span>
+<span class="linenos">  9</span>	change log: 
+<span class="linenos"> 10</span>	11-july-07 added support for include files. 
+<span class="linenos"> 11</span>	
+<span class="linenos"> 12</span>	
+<span class="linenos"> 13</span>--&gt;
+<span class="linenos"> 14</span>&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
+<span class="linenos"> 15</span>&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
+<span class="linenos"> 16</span>&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
 <span class="linenos"> 17</span>
-<span class="linenos"> 18</span>
-<span class="linenos"> 19</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 20</span>
-<span class="linenos"> 21</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">t_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-<span class="linenos"> 22</span><span class="w">  </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">t_units</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-<span class="linenos"> 23</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">exit_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos"> 24</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ other_model: timestep %f %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t_step</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
-<span class="linenos"> 25</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">t_start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
-<span class="linenos"> 26</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">t_end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
-<span class="linenos"> 27</span><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">nkeys</span><span class="p">,</span><span class="w"> </span><span class="n">ikey</span><span class="p">;</span>
-<span class="linenos"> 28</span><span class="w">  </span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
-<span class="linenos"> 29</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">t_units</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;hr&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 30</span><span class="w">    </span><span class="n">t_end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">24.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t_end</span><span class="p">;</span>
-<span class="linenos"> 31</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 32</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
-<span class="linenos"> 33</span><span class="w">  </span><span class="n">generic_t</span><span class="w"> </span><span class="n">state_send</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">init_generic_map</span><span class="p">();</span>
-<span class="linenos"> 34</span><span class="w">  </span><span class="n">generic_t</span><span class="w"> </span><span class="n">state_recv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">init_generic_map</span><span class="p">();</span>
-<span class="linenos"> 35</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">,</span><span class="w"> </span><span class="n">state_send</span><span class="p">);</span>
-<span class="linenos"> 36</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 37</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): Error in initial timestep calculation.&quot;</span><span class="p">);</span>
-<span class="linenos"> 38</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos"> 39</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 40</span>
-<span class="linenos"> 41</span><span class="w">  </span><span class="c1">// Set up connections matching yaml</span>
-<span class="linenos"> 42</span><span class="w">  </span><span class="c1">// Timestep synchronization connection will default to &#39;timesync&#39;</span>
-<span class="linenos"> 43</span><span class="w">  </span><span class="n">YggTimesync</span><span class="w"> </span><span class="n">timesync</span><span class="p">(</span><span class="s">&quot;timesync&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
-<span class="linenos"> 44</span><span class="w">  </span><span class="n">dtype_t</span><span class="o">*</span><span class="w"> </span><span class="n">out_dtype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">create_dtype_json_object</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
-<span class="linenos"> 45</span><span class="w">  </span><span class="n">YggOutput</span><span class="w"> </span><span class="n">out</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">out_dtype</span><span class="p">);</span>
-<span class="linenos"> 46</span>
-<span class="linenos"> 47</span><span class="w">  </span><span class="c1">// Initialize state and synchronize with other models</span>
-<span class="linenos"> 48</span><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t_start</span><span class="p">;</span>
-<span class="linenos"> 49</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">state_send</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state_recv</span><span class="p">);</span>
-<span class="linenos"> 50</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 51</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): Initial sync failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 52</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos"> 53</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 54</span><span class="w">  </span><span class="n">nkeys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generic_map_get_keys</span><span class="p">(</span><span class="n">state_recv</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">keys</span><span class="p">);</span>
-<span class="linenos"> 55</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): t = %5.1f %-3s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
-<span class="linenos"> 56</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">ikey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ikey</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nkeys</span><span class="p">;</span><span class="w"> </span><span class="n">ikey</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 57</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;, %s = %+ 5.2f&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">keys</span><span class="p">[</span><span class="n">ikey</span><span class="p">],</span>
-<span class="linenos"> 58</span><span class="w">	   </span><span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state_recv</span><span class="p">,</span><span class="w"> </span><span class="n">keys</span><span class="p">[</span><span class="n">ikey</span><span class="p">]));</span>
-<span class="linenos"> 59</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 60</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 61</span>
-<span class="linenos"> 62</span><span class="w">  </span><span class="c1">// Send initial state to output</span>
-<span class="linenos"> 63</span><span class="w">  </span><span class="n">generic_t</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy_generic</span><span class="p">(</span><span class="n">state_recv</span><span class="p">);</span>
-<span class="linenos"> 64</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
-<span class="linenos"> 65</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 66</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): Failed to set time in initial output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 67</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos"> 68</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 69</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">);</span>
-<span class="linenos"> 70</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 71</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): Failed to send initial output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">);</span>
-<span class="linenos"> 72</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos"> 73</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos"> 74</span><span class="w">  </span><span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
-<span class="linenos"> 75</span>
-<span class="linenos"> 76</span><span class="w">  </span><span class="c1">// Iterate until end</span>
-<span class="linenos"> 77</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">t_end</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 78</span>
-<span class="linenos"> 79</span><span class="w">    </span><span class="c1">// Perform calculations to update the state</span>
-<span class="linenos"> 80</span><span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">t_step</span><span class="p">;</span>
-<span class="linenos"> 81</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">,</span><span class="w"> </span><span class="n">state_send</span><span class="p">);</span>
-<span class="linenos"> 82</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 83</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): Error in timestep calculation for t = %f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">);</span>
-<span class="linenos"> 84</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos"> 85</span><span class="w">    </span><span class="p">}</span>
-<span class="linenos"> 86</span>
-<span class="linenos"> 87</span><span class="w">    </span><span class="c1">// Synchronize the state</span>
-<span class="linenos"> 88</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">state_send</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state_recv</span><span class="p">);</span>
-<span class="linenos"> 89</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 90</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): sync for t=%f failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">);</span>
-<span class="linenos"> 91</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos"> 92</span><span class="w">    </span><span class="p">}</span>
-<span class="linenos"> 93</span><span class="w">    </span><span class="n">nkeys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generic_map_get_keys</span><span class="p">(</span><span class="n">state_recv</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">keys</span><span class="p">);</span>
-<span class="linenos"> 94</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): t = %5.1f %-3s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
-<span class="linenos"> 95</span><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">ikey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ikey</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nkeys</span><span class="p">;</span><span class="w"> </span><span class="n">ikey</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 96</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;, %s = %+ 5.2f&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">keys</span><span class="p">[</span><span class="n">ikey</span><span class="p">],</span>
-<span class="linenos"> 97</span><span class="w">	     </span><span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state_recv</span><span class="p">,</span><span class="w"> </span><span class="n">keys</span><span class="p">[</span><span class="n">ikey</span><span class="p">]));</span>
-<span class="linenos"> 98</span><span class="w">    </span><span class="p">}</span>
-<span class="linenos"> 99</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">100</span>
-<span class="linenos">101</span><span class="w">    </span><span class="c1">// Send output</span>
-<span class="linenos">102</span><span class="w">    </span><span class="n">generic_t</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy_generic</span><span class="p">(</span><span class="n">state_recv</span><span class="p">);</span>
-<span class="linenos">103</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span>
-<span class="linenos">104</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos">105</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): Failed to set time in output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">106</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">107</span><span class="w">    </span><span class="p">}</span>
-<span class="linenos">108</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">);</span>
-<span class="linenos">109</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos">110</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;other_model(C++): Failed to send output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">);</span>
-<span class="linenos">111</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
-<span class="linenos">112</span><span class="w">    </span><span class="p">}</span>
-<span class="linenos">113</span><span class="w">    </span><span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
-<span class="linenos">114</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos">115</span>
-<span class="linenos">116</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ other_model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos">117</span><span class="w">  </span><span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">state_send</span><span class="p">);</span>
-<span class="linenos">118</span><span class="w">  </span><span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">state_recv</span><span class="p">);</span>
-<span class="linenos">119</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos">120</span><span class="w">    </span>
-<span class="linenos">121</span><span class="p">}</span>
+<span class="linenos"> 18</span>&lt;!--SIMULATION MODEL--&gt;
+<span class="linenos"> 19</span>&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
+<span class="linenos"> 20</span>  
+<span class="linenos"> 21</span>	&lt;SimulaBase name=&quot;soil&quot;&gt;
+<span class="linenos"> 22</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>	
+<span class="linenos"> 25</span>	&lt;SimulaBase name=&quot;plants&quot;&gt;
+<span class="linenos"> 26</span>		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
+<span class="linenos"> 27</span>			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
+<span class="linenos"> 28</span>			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
+<span class="linenos"> 29</span>				maize-aerenchyma
+<span class="linenos"> 30</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 31</span>			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
+<span class="linenos"> 32</span>				0
+<span class="linenos"> 33</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 34</span>			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
+<span class="linenos"> 35</span>					0 -2 0
+<span class="linenos"> 36</span>			&lt;/SimulaConstant&gt;
+<span class="linenos"> 37</span>		&lt;/SimulaBase&gt;	
+<span class="linenos"> 38</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
+<span class="linenos"> 41</span>	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
+<span class="linenos"> 42</span>		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
+<span class="linenos"> 43</span>			&lt;SimulaBase name=&quot;defaults&quot;&gt;
+<span class="linenos"> 44</span>			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
+<span class="linenos"> 45</span>				&lt;SimulaConstant
+<span class="linenos"> 46</span>					name=&quot;startTime&quot;
+<span class="linenos"> 47</span>					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
+<span class="linenos"> 48</span>				&lt;SimulaConstant
+<span class="linenos"> 49</span>					name=&quot;endTime&quot;
+<span class="linenos"> 50</span>					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 51</span>				&lt;SimulaConstant
+<span class="linenos"> 52</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 53</span>					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
+<span class="linenos"> 54</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 55</span>			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
+<span class="linenos"> 56</span>				&lt;SimulaConstant
+<span class="linenos"> 57</span>					name=&quot;run&quot;
+<span class="linenos"> 58</span>					type=&quot;bool&quot;&gt;
+<span class="linenos"> 59</span>					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
+<span class="linenos"> 60</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 61</span>				&lt;SimulaConstant
+<span class="linenos"> 62</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 63</span>					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
+<span class="linenos"> 64</span>				&lt;SimulaConstant
+<span class="linenos"> 65</span>					name=&quot;requestedVariables&quot;
+<span class="linenos"> 66</span>					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
+<span class="linenos"> 67</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 68</span>			&lt;/SimulaBase&gt;	
+<span class="linenos"> 69</span>			&lt;SimulaBase name=&quot;table&quot;&gt;
+<span class="linenos"> 70</span>				&lt;SimulaConstant
+<span class="linenos"> 71</span>					name=&quot;run&quot;
+<span class="linenos"> 72</span>					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 73</span>				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
+<span class="linenos"> 74</span>				&lt;SimulaConstant
+<span class="linenos"> 75</span>					name=&quot;searchingDepth&quot;
+<span class="linenos"> 76</span>					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
+<span class="linenos"> 77</span>				&lt;SimulaConstant
+<span class="linenos"> 78</span>					name=&quot;skipTheseVariables&quot;
+<span class="linenos"> 79</span>					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
+<span class="linenos"> 80</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 81</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 82</span>		&lt;/SimulaBase&gt;
+<span class="linenos"> 83</span>	&lt;/SimulaBase&gt;
+<span class="linenos"> 84</span>	
+<span class="linenos"> 85</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
+<span class="linenos"> 86</span>	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
+<span class="linenos"> 87</span>	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
+<span class="linenos"> 90</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
+<span class="linenos"> 93</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
+<span class="linenos"> 94</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
+<span class="linenos"> 95</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
+<span class="linenos"> 96</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
+<span class="linenos"> 97</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
+<span class="linenos">100</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
+<span class="linenos">101</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
+<span class="linenos">102</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
+<span class="linenos">103</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
+<span class="linenos">104</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
+<span class="linenos">105</span>
+<span class="linenos">106</span>	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
+<span class="linenos">107</span>	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
+<span class="linenos">108</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
+<span class="linenos">109</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
+<span class="linenos">110</span>	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
+<span class="linenos">111</span>	&lt;/SimulaBase&gt;
+<span class="linenos">112</span>&lt;/SimulationModel&gt;
+<span class="linenos">113</span>
+<span class="linenos">114</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
@@ -917,6 +1129,122 @@
 <span class="linenos">114</span>
 </pre></div>
 </div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+<span class="linenos">  2</span>&lt;!--
+<span class="linenos">  3</span>	Simulation file for SimRoot version 5. This development version, build July 2007
+<span class="linenos">  4</span>	Author: Jouke Postma
+<span class="linenos">  5</span>	Note: 
+<span class="linenos">  6</span>	
+<span class="linenos">  7</span>	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+<span class="linenos">  8</span>
+<span class="linenos">  9</span>	change log: 
+<span class="linenos"> 10</span>	11-july-07 added support for include files. 
+<span class="linenos"> 11</span>	
+<span class="linenos"> 12</span>	
+<span class="linenos"> 13</span>--&gt;
+<span class="linenos"> 14</span>&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
+<span class="linenos"> 15</span>&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
+<span class="linenos"> 16</span>&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
+<span class="linenos"> 17</span>
+<span class="linenos"> 18</span>&lt;!--SIMULATION MODEL--&gt;
+<span class="linenos"> 19</span>&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
+<span class="linenos"> 20</span>  
+<span class="linenos"> 21</span>	&lt;SimulaBase name=&quot;soil&quot;&gt;
+<span class="linenos"> 22</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>	
+<span class="linenos"> 25</span>	&lt;SimulaBase name=&quot;plants&quot;&gt;
+<span class="linenos"> 26</span>		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
+<span class="linenos"> 27</span>			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
+<span class="linenos"> 28</span>			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
+<span class="linenos"> 29</span>				maize-aerenchyma
+<span class="linenos"> 30</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 31</span>			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
+<span class="linenos"> 32</span>				0
+<span class="linenos"> 33</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 34</span>			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
+<span class="linenos"> 35</span>					0 -2 0
+<span class="linenos"> 36</span>			&lt;/SimulaConstant&gt;
+<span class="linenos"> 37</span>		&lt;/SimulaBase&gt;	
+<span class="linenos"> 38</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
+<span class="linenos"> 41</span>	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
+<span class="linenos"> 42</span>		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
+<span class="linenos"> 43</span>			&lt;SimulaBase name=&quot;defaults&quot;&gt;
+<span class="linenos"> 44</span>			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
+<span class="linenos"> 45</span>				&lt;SimulaConstant
+<span class="linenos"> 46</span>					name=&quot;startTime&quot;
+<span class="linenos"> 47</span>					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
+<span class="linenos"> 48</span>				&lt;SimulaConstant
+<span class="linenos"> 49</span>					name=&quot;endTime&quot;
+<span class="linenos"> 50</span>					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 51</span>				&lt;SimulaConstant
+<span class="linenos"> 52</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 53</span>					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
+<span class="linenos"> 54</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 55</span>			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
+<span class="linenos"> 56</span>				&lt;SimulaConstant
+<span class="linenos"> 57</span>					name=&quot;run&quot;
+<span class="linenos"> 58</span>					type=&quot;bool&quot;&gt;
+<span class="linenos"> 59</span>					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
+<span class="linenos"> 60</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 61</span>				&lt;SimulaConstant
+<span class="linenos"> 62</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 63</span>					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
+<span class="linenos"> 64</span>				&lt;SimulaConstant
+<span class="linenos"> 65</span>					name=&quot;requestedVariables&quot;
+<span class="linenos"> 66</span>					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
+<span class="linenos"> 67</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 68</span>			&lt;/SimulaBase&gt;	
+<span class="linenos"> 69</span>			&lt;SimulaBase name=&quot;table&quot;&gt;
+<span class="linenos"> 70</span>				&lt;SimulaConstant
+<span class="linenos"> 71</span>					name=&quot;run&quot;
+<span class="linenos"> 72</span>					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 73</span>				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
+<span class="linenos"> 74</span>				&lt;SimulaConstant
+<span class="linenos"> 75</span>					name=&quot;searchingDepth&quot;
+<span class="linenos"> 76</span>					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
+<span class="linenos"> 77</span>				&lt;SimulaConstant
+<span class="linenos"> 78</span>					name=&quot;skipTheseVariables&quot;
+<span class="linenos"> 79</span>					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
+<span class="linenos"> 80</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 81</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 82</span>		&lt;/SimulaBase&gt;
+<span class="linenos"> 83</span>	&lt;/SimulaBase&gt;
+<span class="linenos"> 84</span>	
+<span class="linenos"> 85</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
+<span class="linenos"> 86</span>	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
+<span class="linenos"> 87</span>	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
+<span class="linenos"> 90</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
+<span class="linenos"> 93</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
+<span class="linenos"> 94</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
+<span class="linenos"> 95</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
+<span class="linenos"> 96</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
+<span class="linenos"> 97</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
+<span class="linenos">100</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
+<span class="linenos">101</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
+<span class="linenos">102</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
+<span class="linenos">103</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
+<span class="linenos">104</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
+<span class="linenos">105</span>
+<span class="linenos">106</span>	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
+<span class="linenos">107</span>	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
+<span class="linenos">108</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
+<span class="linenos">109</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
+<span class="linenos">110</span>	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
+<span class="linenos">111</span>	&lt;/SimulaBase&gt;
+<span class="linenos">112</span>&lt;/SimulationModel&gt;
+<span class="linenos">113</span>
+<span class="linenos">114</span>
+</pre></div>
+</div>
 <p>Model YAML:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
 <span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timesync</span>
@@ -1028,6 +1356,122 @@
 <span class="linenos">73</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab other_model&#39;</span><span class="p">);</span>
 <span class="linenos">74</span><span class="w">  </span>
 <span class="linenos">75</span><span class="k">end</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+<span class="linenos">  2</span>&lt;!--
+<span class="linenos">  3</span>	Simulation file for SimRoot version 5. This development version, build July 2007
+<span class="linenos">  4</span>	Author: Jouke Postma
+<span class="linenos">  5</span>	Note: 
+<span class="linenos">  6</span>	
+<span class="linenos">  7</span>	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+<span class="linenos">  8</span>
+<span class="linenos">  9</span>	change log: 
+<span class="linenos"> 10</span>	11-july-07 added support for include files. 
+<span class="linenos"> 11</span>	
+<span class="linenos"> 12</span>	
+<span class="linenos"> 13</span>--&gt;
+<span class="linenos"> 14</span>&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
+<span class="linenos"> 15</span>&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
+<span class="linenos"> 16</span>&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
+<span class="linenos"> 17</span>
+<span class="linenos"> 18</span>&lt;!--SIMULATION MODEL--&gt;
+<span class="linenos"> 19</span>&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
+<span class="linenos"> 20</span>  
+<span class="linenos"> 21</span>	&lt;SimulaBase name=&quot;soil&quot;&gt;
+<span class="linenos"> 22</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>	
+<span class="linenos"> 25</span>	&lt;SimulaBase name=&quot;plants&quot;&gt;
+<span class="linenos"> 26</span>		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
+<span class="linenos"> 27</span>			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
+<span class="linenos"> 28</span>			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
+<span class="linenos"> 29</span>				maize-aerenchyma
+<span class="linenos"> 30</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 31</span>			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
+<span class="linenos"> 32</span>				0
+<span class="linenos"> 33</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 34</span>			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
+<span class="linenos"> 35</span>					0 -2 0
+<span class="linenos"> 36</span>			&lt;/SimulaConstant&gt;
+<span class="linenos"> 37</span>		&lt;/SimulaBase&gt;	
+<span class="linenos"> 38</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
+<span class="linenos"> 41</span>	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
+<span class="linenos"> 42</span>		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
+<span class="linenos"> 43</span>			&lt;SimulaBase name=&quot;defaults&quot;&gt;
+<span class="linenos"> 44</span>			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
+<span class="linenos"> 45</span>				&lt;SimulaConstant
+<span class="linenos"> 46</span>					name=&quot;startTime&quot;
+<span class="linenos"> 47</span>					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
+<span class="linenos"> 48</span>				&lt;SimulaConstant
+<span class="linenos"> 49</span>					name=&quot;endTime&quot;
+<span class="linenos"> 50</span>					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 51</span>				&lt;SimulaConstant
+<span class="linenos"> 52</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 53</span>					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
+<span class="linenos"> 54</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 55</span>			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
+<span class="linenos"> 56</span>				&lt;SimulaConstant
+<span class="linenos"> 57</span>					name=&quot;run&quot;
+<span class="linenos"> 58</span>					type=&quot;bool&quot;&gt;
+<span class="linenos"> 59</span>					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
+<span class="linenos"> 60</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 61</span>				&lt;SimulaConstant
+<span class="linenos"> 62</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 63</span>					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
+<span class="linenos"> 64</span>				&lt;SimulaConstant
+<span class="linenos"> 65</span>					name=&quot;requestedVariables&quot;
+<span class="linenos"> 66</span>					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
+<span class="linenos"> 67</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 68</span>			&lt;/SimulaBase&gt;	
+<span class="linenos"> 69</span>			&lt;SimulaBase name=&quot;table&quot;&gt;
+<span class="linenos"> 70</span>				&lt;SimulaConstant
+<span class="linenos"> 71</span>					name=&quot;run&quot;
+<span class="linenos"> 72</span>					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 73</span>				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
+<span class="linenos"> 74</span>				&lt;SimulaConstant
+<span class="linenos"> 75</span>					name=&quot;searchingDepth&quot;
+<span class="linenos"> 76</span>					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
+<span class="linenos"> 77</span>				&lt;SimulaConstant
+<span class="linenos"> 78</span>					name=&quot;skipTheseVariables&quot;
+<span class="linenos"> 79</span>					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
+<span class="linenos"> 80</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 81</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 82</span>		&lt;/SimulaBase&gt;
+<span class="linenos"> 83</span>	&lt;/SimulaBase&gt;
+<span class="linenos"> 84</span>	
+<span class="linenos"> 85</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
+<span class="linenos"> 86</span>	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
+<span class="linenos"> 87</span>	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
+<span class="linenos"> 90</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
+<span class="linenos"> 93</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
+<span class="linenos"> 94</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
+<span class="linenos"> 95</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
+<span class="linenos"> 96</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
+<span class="linenos"> 97</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
+<span class="linenos">100</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
+<span class="linenos">101</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
+<span class="linenos">102</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
+<span class="linenos">103</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
+<span class="linenos">104</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
+<span class="linenos">105</span>
+<span class="linenos">106</span>	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
+<span class="linenos">107</span>	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
+<span class="linenos">108</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
+<span class="linenos">109</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
+<span class="linenos">110</span>	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
+<span class="linenos">111</span>	&lt;/SimulaBase&gt;
+<span class="linenos">112</span>&lt;/SimulationModel&gt;
+<span class="linenos">113</span>
+<span class="linenos">114</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
@@ -1384,6 +1828,122 @@
 <span class="linenos">114</span>
 </pre></div>
 </div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+<span class="linenos">  2</span>&lt;!--
+<span class="linenos">  3</span>	Simulation file for SimRoot version 5. This development version, build July 2007
+<span class="linenos">  4</span>	Author: Jouke Postma
+<span class="linenos">  5</span>	Note: 
+<span class="linenos">  6</span>	
+<span class="linenos">  7</span>	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+<span class="linenos">  8</span>
+<span class="linenos">  9</span>	change log: 
+<span class="linenos"> 10</span>	11-july-07 added support for include files. 
+<span class="linenos"> 11</span>	
+<span class="linenos"> 12</span>	
+<span class="linenos"> 13</span>--&gt;
+<span class="linenos"> 14</span>&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
+<span class="linenos"> 15</span>&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
+<span class="linenos"> 16</span>&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
+<span class="linenos"> 17</span>
+<span class="linenos"> 18</span>&lt;!--SIMULATION MODEL--&gt;
+<span class="linenos"> 19</span>&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
+<span class="linenos"> 20</span>  
+<span class="linenos"> 21</span>	&lt;SimulaBase name=&quot;soil&quot;&gt;
+<span class="linenos"> 22</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>	
+<span class="linenos"> 25</span>	&lt;SimulaBase name=&quot;plants&quot;&gt;
+<span class="linenos"> 26</span>		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
+<span class="linenos"> 27</span>			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
+<span class="linenos"> 28</span>			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
+<span class="linenos"> 29</span>				maize-aerenchyma
+<span class="linenos"> 30</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 31</span>			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
+<span class="linenos"> 32</span>				0
+<span class="linenos"> 33</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 34</span>			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
+<span class="linenos"> 35</span>					0 -2 0
+<span class="linenos"> 36</span>			&lt;/SimulaConstant&gt;
+<span class="linenos"> 37</span>		&lt;/SimulaBase&gt;	
+<span class="linenos"> 38</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
+<span class="linenos"> 41</span>	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
+<span class="linenos"> 42</span>		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
+<span class="linenos"> 43</span>			&lt;SimulaBase name=&quot;defaults&quot;&gt;
+<span class="linenos"> 44</span>			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
+<span class="linenos"> 45</span>				&lt;SimulaConstant
+<span class="linenos"> 46</span>					name=&quot;startTime&quot;
+<span class="linenos"> 47</span>					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
+<span class="linenos"> 48</span>				&lt;SimulaConstant
+<span class="linenos"> 49</span>					name=&quot;endTime&quot;
+<span class="linenos"> 50</span>					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 51</span>				&lt;SimulaConstant
+<span class="linenos"> 52</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 53</span>					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
+<span class="linenos"> 54</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 55</span>			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
+<span class="linenos"> 56</span>				&lt;SimulaConstant
+<span class="linenos"> 57</span>					name=&quot;run&quot;
+<span class="linenos"> 58</span>					type=&quot;bool&quot;&gt;
+<span class="linenos"> 59</span>					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
+<span class="linenos"> 60</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 61</span>				&lt;SimulaConstant
+<span class="linenos"> 62</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 63</span>					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
+<span class="linenos"> 64</span>				&lt;SimulaConstant
+<span class="linenos"> 65</span>					name=&quot;requestedVariables&quot;
+<span class="linenos"> 66</span>					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
+<span class="linenos"> 67</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 68</span>			&lt;/SimulaBase&gt;	
+<span class="linenos"> 69</span>			&lt;SimulaBase name=&quot;table&quot;&gt;
+<span class="linenos"> 70</span>				&lt;SimulaConstant
+<span class="linenos"> 71</span>					name=&quot;run&quot;
+<span class="linenos"> 72</span>					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 73</span>				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
+<span class="linenos"> 74</span>				&lt;SimulaConstant
+<span class="linenos"> 75</span>					name=&quot;searchingDepth&quot;
+<span class="linenos"> 76</span>					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
+<span class="linenos"> 77</span>				&lt;SimulaConstant
+<span class="linenos"> 78</span>					name=&quot;skipTheseVariables&quot;
+<span class="linenos"> 79</span>					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
+<span class="linenos"> 80</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 81</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 82</span>		&lt;/SimulaBase&gt;
+<span class="linenos"> 83</span>	&lt;/SimulaBase&gt;
+<span class="linenos"> 84</span>	
+<span class="linenos"> 85</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
+<span class="linenos"> 86</span>	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
+<span class="linenos"> 87</span>	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
+<span class="linenos"> 90</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
+<span class="linenos"> 93</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
+<span class="linenos"> 94</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
+<span class="linenos"> 95</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
+<span class="linenos"> 96</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
+<span class="linenos"> 97</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
+<span class="linenos">100</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
+<span class="linenos">101</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
+<span class="linenos">102</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
+<span class="linenos">103</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
+<span class="linenos">104</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
+<span class="linenos">105</span>
+<span class="linenos">106</span>	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
+<span class="linenos">107</span>	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
+<span class="linenos">108</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
+<span class="linenos">109</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
+<span class="linenos">110</span>	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
+<span class="linenos">111</span>	&lt;/SimulaBase&gt;
+<span class="linenos">112</span>&lt;/SimulationModel&gt;
+<span class="linenos">113</span>
+<span class="linenos">114</span>
+</pre></div>
+</div>
 <p>Model YAML:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
 <span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timesync</span>
@@ -1498,6 +2058,122 @@
 <span class="linenos">76</span>
 <span class="linenos">77</span>args = commandArgs(trailingOnly=TRUE)
 <span class="linenos">78</span>main(as.double(args[[1]]), args[[2]])
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+<span class="linenos">  2</span>&lt;!--
+<span class="linenos">  3</span>	Simulation file for SimRoot version 5. This development version, build July 2007
+<span class="linenos">  4</span>	Author: Jouke Postma
+<span class="linenos">  5</span>	Note: 
+<span class="linenos">  6</span>	
+<span class="linenos">  7</span>	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+<span class="linenos">  8</span>
+<span class="linenos">  9</span>	change log: 
+<span class="linenos"> 10</span>	11-july-07 added support for include files. 
+<span class="linenos"> 11</span>	
+<span class="linenos"> 12</span>	
+<span class="linenos"> 13</span>--&gt;
+<span class="linenos"> 14</span>&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
+<span class="linenos"> 15</span>&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
+<span class="linenos"> 16</span>&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
+<span class="linenos"> 17</span>
+<span class="linenos"> 18</span>&lt;!--SIMULATION MODEL--&gt;
+<span class="linenos"> 19</span>&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
+<span class="linenos"> 20</span>  
+<span class="linenos"> 21</span>	&lt;SimulaBase name=&quot;soil&quot;&gt;
+<span class="linenos"> 22</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>	
+<span class="linenos"> 25</span>	&lt;SimulaBase name=&quot;plants&quot;&gt;
+<span class="linenos"> 26</span>		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
+<span class="linenos"> 27</span>			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
+<span class="linenos"> 28</span>			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
+<span class="linenos"> 29</span>				maize-aerenchyma
+<span class="linenos"> 30</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 31</span>			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
+<span class="linenos"> 32</span>				0
+<span class="linenos"> 33</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 34</span>			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
+<span class="linenos"> 35</span>					0 -2 0
+<span class="linenos"> 36</span>			&lt;/SimulaConstant&gt;
+<span class="linenos"> 37</span>		&lt;/SimulaBase&gt;	
+<span class="linenos"> 38</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
+<span class="linenos"> 41</span>	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
+<span class="linenos"> 42</span>		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
+<span class="linenos"> 43</span>			&lt;SimulaBase name=&quot;defaults&quot;&gt;
+<span class="linenos"> 44</span>			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
+<span class="linenos"> 45</span>				&lt;SimulaConstant
+<span class="linenos"> 46</span>					name=&quot;startTime&quot;
+<span class="linenos"> 47</span>					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
+<span class="linenos"> 48</span>				&lt;SimulaConstant
+<span class="linenos"> 49</span>					name=&quot;endTime&quot;
+<span class="linenos"> 50</span>					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 51</span>				&lt;SimulaConstant
+<span class="linenos"> 52</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 53</span>					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
+<span class="linenos"> 54</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 55</span>			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
+<span class="linenos"> 56</span>				&lt;SimulaConstant
+<span class="linenos"> 57</span>					name=&quot;run&quot;
+<span class="linenos"> 58</span>					type=&quot;bool&quot;&gt;
+<span class="linenos"> 59</span>					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
+<span class="linenos"> 60</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 61</span>				&lt;SimulaConstant
+<span class="linenos"> 62</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 63</span>					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
+<span class="linenos"> 64</span>				&lt;SimulaConstant
+<span class="linenos"> 65</span>					name=&quot;requestedVariables&quot;
+<span class="linenos"> 66</span>					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
+<span class="linenos"> 67</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 68</span>			&lt;/SimulaBase&gt;	
+<span class="linenos"> 69</span>			&lt;SimulaBase name=&quot;table&quot;&gt;
+<span class="linenos"> 70</span>				&lt;SimulaConstant
+<span class="linenos"> 71</span>					name=&quot;run&quot;
+<span class="linenos"> 72</span>					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 73</span>				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
+<span class="linenos"> 74</span>				&lt;SimulaConstant
+<span class="linenos"> 75</span>					name=&quot;searchingDepth&quot;
+<span class="linenos"> 76</span>					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
+<span class="linenos"> 77</span>				&lt;SimulaConstant
+<span class="linenos"> 78</span>					name=&quot;skipTheseVariables&quot;
+<span class="linenos"> 79</span>					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
+<span class="linenos"> 80</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 81</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 82</span>		&lt;/SimulaBase&gt;
+<span class="linenos"> 83</span>	&lt;/SimulaBase&gt;
+<span class="linenos"> 84</span>	
+<span class="linenos"> 85</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
+<span class="linenos"> 86</span>	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
+<span class="linenos"> 87</span>	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
+<span class="linenos"> 90</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
+<span class="linenos"> 93</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
+<span class="linenos"> 94</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
+<span class="linenos"> 95</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
+<span class="linenos"> 96</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
+<span class="linenos"> 97</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
+<span class="linenos">100</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
+<span class="linenos">101</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
+<span class="linenos">102</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
+<span class="linenos">103</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
+<span class="linenos">104</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
+<span class="linenos">105</span>
+<span class="linenos">106</span>	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
+<span class="linenos">107</span>	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
+<span class="linenos">108</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
+<span class="linenos">109</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
+<span class="linenos">110</span>	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
+<span class="linenos">111</span>	&lt;/SimulaBase&gt;
+<span class="linenos">112</span>&lt;/SimulationModel&gt;
+<span class="linenos">113</span>
+<span class="linenos">114</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;

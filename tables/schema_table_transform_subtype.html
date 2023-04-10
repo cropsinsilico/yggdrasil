@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -99,26 +99,39 @@
   <table class="docutils align-default" id="schema-table-transform-subtype-rst">
 <thead>
 <tr class="row-odd"><th class="head"><p>Transformtype</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>array</p></td>
+<td><p>Consolidate values into an array</p></td>
 </tr>
 <tr class="row-odd"><td><p>direct</p></td>
+<td><p>Pass the message through unchanged</p></td>
 </tr>
 <tr class="row-even"><td><p>filter</p></td>
+<td><p>Pass only some messages based on a filter</p></td>
 </tr>
 <tr class="row-odd"><td><p>function</p></td>
+<td><p>Transform messages using a function.</p></td>
 </tr>
 <tr class="row-even"><td><p>iterate</p></td>
+<td><p>Split messages up into their iterable components</p></td>
 </tr>
 <tr class="row-odd"><td><p>map_fields</p></td>
+<td><p>Change the names of fields in a message</p></td>
 </tr>
 <tr class="row-even"><td><p>pandas</p></td>
+<td><p>Convert messages into Pandas data frames</p></td>
 </tr>
 <tr class="row-odd"><td><p>select_fields</p></td>
+<td><p>Select a subset of fields from a message</p></td>
 </tr>
-<tr class="row-even"><td><p>statement</p></td>
+<tr class="row-even"><td><p>select_scalar</p></td>
+<td><p>Select a single field from a message</p></td>
+</tr>
+<tr class="row-odd"><td><p>statement</p></td>
+<td><p>Transform messages according to a statement</p></td>
 </tr>
 </tbody>
 </table>

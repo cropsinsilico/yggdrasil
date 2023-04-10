@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -301,7 +301,7 @@
     <span class="c1"># RESPONSE COMM</span>
 <div class="viewcode-block" id="ClientComm.create_response_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.create_response_comm">[docs]</a>    <span class="k">def</span> <span class="nf">create_response_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a response comm based on information from the last header.&quot;&quot;&quot;</span>
-        <span class="n">header</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">request_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;request_id&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())}</span>
         <span class="k">while</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -309,7 +309,7 @@
                                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">comm_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_async&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">comm_kwargs</span><span class="p">[</span><span class="s1">&#39;async_recv_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;recv_message&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.client_response_comm&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-client_response_comm&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span>
         <span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">header</span></div>
@@ -329,9 +329,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">add_response_address</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SUCCESS</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">msg</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create_response_comm</span><span class="p">())</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;__meta__&#39;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;__meta__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create_response_comm</span><span class="p">())</span>
             <span class="k">return</span> <span class="n">msg</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;after_prepare_message&#39;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;after_prepare_message&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_response_address</span><span class="p">)</span>
@@ -373,8 +372,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">errors</span>
             <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">!=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SUCCESS</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">break</span>
-            <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">msg</span>
+            <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;__meta__&#39;</span><span class="p">][</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;__meta__&#39;</span><span class="p">][</span><span class="s1">&#39;request_id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">msg</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>

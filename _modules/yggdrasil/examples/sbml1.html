@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.examples.sbml1 &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.examples.sbml1 &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -101,11 +101,28 @@
 
 <div class="viewcode-block" id="get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.examples.sbml1.html#yggdrasil.examples.sbml1.get_testing_options">[docs]</a><span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">():</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing parameters for this example.&quot;&quot;&quot;</span>
+    <span class="n">file_exp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">,</span> <span class="s1">&#39;expected.txt&#39;</span><span class="p">)</span>
+    <span class="n">file_act</span> <span class="o">=</span> <span class="s1">&#39;output.txt&#39;</span>
+    
+    <span class="c1"># def validation_function():</span>
+    <span class="c1">#     from yggdrasil import serialize</span>
+    <span class="c1">#     import numpy as np</span>
+    <span class="c1">#     fname_exp = os.path.join(os.path.dirname(__file__), file_exp)</span>
+    <span class="c1">#     fname_act = os.path.join(os.path.dirname(__file__), file_act)</span>
+    <span class="c1">#     with open(fname_exp, &#39;rb&#39;) as fd:</span>
+    <span class="c1">#         exp = serialize.table_to_array(fd.read(), comment=&#39;#&#39;)</span>
+    <span class="c1">#     with open(fname_act, &#39;rb&#39;) as fd:</span>
+    <span class="c1">#         act = serialize.table_to_array(fd.read(), comment=&#39;#&#39;)</span>
+    <span class="c1">#     assert act.dtype == exp.dtype</span>
+    <span class="c1">#     np.testing.assert_array_equal(act, exp)</span>
+        
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">input_files</span><span class="o">=</span><span class="s1">&#39;input.txt&#39;</span><span class="p">,</span>
-        <span class="n">expected_output_files</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">,</span> <span class="s1">&#39;expected.txt&#39;</span><span class="p">),</span>
+        <span class="n">expected_output_files</span><span class="o">=</span><span class="n">file_exp</span><span class="p">,</span>
+        <span class="c1"># skip_check_results=True,</span>
+        <span class="c1"># validation_function=validation_function,</span>
         <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">output_files</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output.txt&#39;</span><span class="p">])</span></div>
+        <span class="n">output_files</span><span class="o">=</span><span class="p">[</span><span class="n">file_act</span><span class="p">])</span></div>
 </pre></div>
 
            </div>

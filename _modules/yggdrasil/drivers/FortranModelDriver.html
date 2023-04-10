@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -102,7 +102,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">rapidjson</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">get_language_dir</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
@@ -253,6 +253,7 @@
         <span class="n">zmq</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
                            <span class="n">CModelDriver</span><span class="o">.</span><span class="n">CModelDriver</span><span class="o">.</span><span class="n">supported_comm_options</span><span class="p">[</span>
                                <span class="s1">&#39;zmq&#39;</span><span class="p">][</span><span class="s1">&#39;libraries&#39;</span><span class="p">]]})</span>
+    <span class="n">standard_libraries</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">external_libraries</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;cxx&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;stdlib.h&#39;</span><span class="p">,</span>
                                   <span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span>
                                   <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">}}</span>
@@ -287,6 +288,7 @@
         <span class="s1">&#39;array&#39;</span><span class="p">:</span> <span class="s1">&#39;yggarr&#39;</span><span class="p">,</span>
         <span class="s1">&#39;object&#39;</span><span class="p">:</span> <span class="s1">&#39;yggmap&#39;</span><span class="p">,</span>
         <span class="s1">&#39;integer&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="s1">&#39;real(kind = 8)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;boolean&#39;</span><span class="p">:</span> <span class="s1">&#39;logical(kind = X)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;yggnull&#39;</span><span class="p">,</span>
         <span class="s1">&#39;uint&#39;</span><span class="p">:</span> <span class="s1">&#39;ygguintX&#39;</span><span class="p">,</span>  <span class="c1"># Fortran has no unsigned int</span>
@@ -349,6 +351,8 @@
         <span class="s1">&#39;init_function&#39;</span><span class="p">:</span> <span class="s1">&#39;yggpyfunc(init_python())&#39;</span><span class="p">,</span>
         <span class="s1">&#39;init_instance&#39;</span><span class="p">:</span> <span class="s1">&#39;yggpyinst(init_generic())&#39;</span><span class="p">,</span>
         <span class="s1">&#39;init_any&#39;</span><span class="p">:</span> <span class="s1">&#39;init_generic()&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;init_type_from_schema&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;create_dtype_from_schema(</span><span class="se">\&quot;</span><span class="si">{schema}</span><span class="se">\&quot;</span><span class="s1">&#39;</span>
+                                  <span class="s1">&#39;, </span><span class="si">{use_generic}</span><span class="s1">)&#39;</span><span class="p">),</span>
         <span class="s1">&#39;init_type_array&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;create_dtype_json_array(</span><span class="si">{nitems}</span><span class="s1">, &#39;</span>
                             <span class="s1">&#39;</span><span class="si">{items}</span><span class="s1">, </span><span class="si">{use_generic}</span><span class="s1">)&#39;</span><span class="p">),</span>
         <span class="s1">&#39;init_type_object&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;create_dtype_json_object(</span><span class="si">{nitems}</span><span class="s1">, &#39;</span>
@@ -381,8 +385,8 @@
         <span class="s1">&#39;copy_class&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = copy_python(</span><span class="si">{value}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;copy_function&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = yggpyfunc(copy_python(yggpython(</span><span class="si">{value}</span><span class="s1">)))&#39;</span><span class="p">,</span>
         <span class="s1">&#39;copy_instance&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = yggpyinst(copy_generic(ygggeneric(</span><span class="si">{value}</span><span class="s1">)))&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;copy_generic&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = copy_generic(</span><span class="si">{value}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;copy_any&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = copy_generic(</span><span class="si">{value}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;copy_generic&#39;</span><span class="p">:</span> <span class="s1">&#39;call copy_generic_into(</span><span class="si">{name}</span><span class="s1">, </span><span class="si">{value}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;copy_any&#39;</span><span class="p">:</span> <span class="s1">&#39;call copy_generic_into(</span><span class="si">{name}</span><span class="s1">, </span><span class="si">{value}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;free_array&#39;</span><span class="p">:</span> <span class="s1">&#39;call free_generic(ygggeneric(</span><span class="si">{variable}</span><span class="s1">))&#39;</span><span class="p">,</span>
         <span class="s1">&#39;free_object&#39;</span><span class="p">:</span> <span class="s1">&#39;call free_generic(ygggeneric(</span><span class="si">{variable}</span><span class="s1">))&#39;</span><span class="p">,</span>
         <span class="s1">&#39;free_schema&#39;</span><span class="p">:</span> <span class="s1">&#39;call free_generic(ygggeneric(</span><span class="si">{variable}</span><span class="s1">))&#39;</span><span class="p">,</span>
@@ -415,8 +419,10 @@
         <span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="s1">&#39;.or.&#39;</span><span class="p">,</span>
         <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">3</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
         <span class="s1">&#39;quote&#39;</span><span class="p">:</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;escaped_double_quote&#39;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\&quot;\&quot;</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;write(*, </span><span class="se">\&#39;</span><span class="s2">(</span><span class="se">\&quot;</span><span class="si">{error_msg}</span><span class="se">\&quot;</span><span class="s2">)</span><span class="se">\&#39;</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span>
                   <span class="s2">&quot;stop 1&quot;</span><span class="p">),</span>
+        <span class="s1">&#39;continuation_break&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">),</span>
         <span class="s1">&#39;continuation_before&#39;</span><span class="p">:</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;continuation_after&#39;</span><span class="p">:</span> <span class="s1">&#39;     &amp;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;block_end&#39;</span><span class="p">:</span> <span class="s1">&#39;END&#39;</span><span class="p">,</span>
@@ -431,6 +437,7 @@
         <span class="s1">&#39;break&#39;</span><span class="p">:</span> <span class="s1">&#39;EXIT&#39;</span><span class="p">,</span>
         <span class="s1">&#39;exec_begin&#39;</span><span class="p">:</span> <span class="s1">&#39;PROGRAM main</span><span class="se">\n</span><span class="s1">   use iso_c_binding</span><span class="se">\n</span><span class="s1">   use fygg&#39;</span><span class="p">,</span>
         <span class="s1">&#39;exec_end&#39;</span><span class="p">:</span> <span class="s1">&#39;   stop</span><span class="se">\n</span><span class="s1">END PROGRAM main&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;python_init&#39;</span><span class="p">:</span> <span class="s1">&#39;call init_python_API()&#39;</span><span class="p">,</span>
         <span class="s1">&#39;free&#39;</span><span class="p">:</span> <span class="s1">&#39;DEALLOCATE(</span><span class="si">{variable}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;function_def_begin&#39;</span><span class="p">:</span> <span class="p">(</span>
             <span class="s1">&#39;FUNCTION </span><span class="si">{function_name}</span><span class="s1">(</span><span class="si">{input_var}</span><span class="s1">) &#39;</span>
@@ -472,6 +479,10 @@
             <span class="sa">r</span><span class="s1">&#39;(?:\s*,\s*(?P&lt;parameter&gt;parameter))?&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:\s*,\s*intent\((?P&lt;intent&gt;.*?)\))?&#39;</span><span class="p">)</span>
     <span class="p">}</span>
+    <span class="n">default_type_precision</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;real&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;integer&#39;</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="p">}</span>
     <span class="n">outputs_in_inputs</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">include_channel_obj</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">is_typed</span> <span class="o">=</span> <span class="kc">True</span>
@@ -509,10 +520,14 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># GNU takes precedence when present</span>
                     <span class="n">add_cxx_lib</span> <span class="o">=</span> <span class="s1">&#39;stdc++&#39;</span>
-            <span class="k">if</span> <span class="n">add_cxx_lib</span> <span class="ow">and</span> <span class="p">(</span><span class="n">add_cxx_lib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">):</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">add_cxx_lib</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cxx_orig</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">add_cxx_lib</span> <span class="ow">and</span> <span class="p">(</span><span class="n">add_cxx_lib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">standard_libraries</span><span class="p">):</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">standard_libraries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_cxx_lib</span><span class="p">)</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;fygg&#39;</span><span class="p">][</span><span class="s1">&#39;external_dependencies&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">add_cxx_lib</span><span class="p">)</span>
+            <span class="c1"># if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):</span>
+            <span class="c1">#     cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)</span>
+            <span class="c1">#     cls.internal_libraries[&#39;fygg&#39;][&#39;external_dependencies&#39;].append(</span>
+            <span class="c1">#         add_cxx_lib)</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="n">cl_compiler</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;cl&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">cl_compiler</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
@@ -593,7 +608,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_inverse_type_map</span><span class="p">()</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;yggchar_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bytes&#39;</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;yggchar_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;string&#39;</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="FortranModelDriver.get_native_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_native_type">[docs]</a>    <span class="nd">@classmethod</span>
@@ -610,7 +625,8 @@
 <span class="sd">            str: The native type.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">,</span> <span class="n">json_type</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span>
+            <span class="n">return_json</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">intent_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(,\s*intent\(.+?\))&#39;</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">intent_regex</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -633,15 +649,6 @@
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ygg&#39;</span><span class="p">):</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;type(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">out</span>
             <span class="k">return</span> <span class="n">out</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">get_type_class</span>
-        <span class="n">json_type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">json_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">json_type</span><span class="p">}</span>
-        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">json_type</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-        <span class="n">json_type</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">normalize_definition</span><span class="p">(</span>
-            <span class="n">json_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
             <span class="n">dim_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="k">if</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1darray&#39;</span><span class="p">:</span>
@@ -652,7 +659,7 @@
                     <span class="n">dim_str</span> <span class="o">=</span> <span class="s1">&#39;, dimension(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                         <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]])</span>
             <span class="n">json_subtype</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">json_type</span><span class="p">)</span>
-            <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json_subtype</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">)</span>
+            <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;scalar&#39;</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="n">json_subtype</span><span class="p">)</span> <span class="o">+</span> <span class="n">dim_str</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">dim_str</span><span class="p">:</span>
                 <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -660,7 +667,7 @@
                     <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Character array requires precision.&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
+                    <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">])</span>
                 <span class="n">json_subtype</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;ndim&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;type(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span>
                     <span class="nb">type</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_pointer&#39;</span> <span class="o">%</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -672,14 +679,17 @@
                 <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ygguint&#39;</span><span class="p">):</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;type(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">out</span>
                 <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;logical&#39;</span><span class="p">):</span>
-                    <span class="n">precision</span> <span class="o">=</span> <span class="n">json_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+                    <span class="n">precision</span> <span class="o">=</span> <span class="n">json_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">out</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">):</span>
                     <span class="n">precision</span> <span class="o">=</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
-                <span class="k">elif</span> <span class="n">json_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;unicode&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">json_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;unicode&#39;</span>
+                      <span class="ow">or</span> <span class="p">(</span><span class="n">json_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+                          <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">]</span>
+                          <span class="ow">and</span> <span class="n">json_type</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;encoding&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;ascii&#39;</span><span class="p">)):</span>
                     <span class="n">precision</span> <span class="o">=</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">precision</span> <span class="o">=</span> <span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">precision</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)))</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">precision</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="FortranModelDriver.get_json_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_json_type">[docs]</a>    <span class="nd">@classmethod</span>
@@ -707,15 +717,17 @@
             <span class="n">grp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;ygguintX&#39;</span><span class="p">,</span>
                    <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;ygguint&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>
         <span class="k">if</span> <span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">grp</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">])</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">grp</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;complex&#39;</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_type_precision</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_type_precision</span><span class="p">[</span><span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
         <span class="k">if</span> <span class="p">(((</span><span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;logical&#39;</span><span class="p">))</span>
              <span class="ow">and</span> <span class="p">(</span><span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ygguintX&#39;</span><span class="p">))):</span>
             <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;(kind = X)&#39;</span>
         <span class="k">if</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;character&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">*</span> <span class="mi">8</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;precision_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;selected_char_kind(</span><span class="se">\&#39;</span><span class="s1">ISO_10646</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">:</span>
                 <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;(kind = selected_char_kind(</span><span class="se">\&#39;</span><span class="s1">ISO_10646</span><span class="se">\&#39;</span><span class="s1">), len = X)&#39;</span>
                 <span class="k">if</span> <span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
@@ -745,7 +757,7 @@
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ndarray&#39;</span>
                 <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;*:&#39;</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">SCALAR_TYPES</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;scalar&#39;</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -1043,14 +1055,16 @@
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="n">datatype</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">datatype</span><span class="p">}</span>
                 <span class="k">if</span> <span class="p">(((</span><span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-                      <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">])</span>
+                      <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">FLEXIBLE_TYPES</span><span class="p">)</span>
                      <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;precision&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">))):</span>
                     <span class="k">return</span> <span class="kc">True</span>
                 <span class="k">elif</span> <span class="p">(((</span><span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;1darray&#39;</span><span class="p">)</span>
-                       <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;length&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">))):</span>
+                       <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;length&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">)</span>
+                       <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;shape&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">))):</span>
                     <span class="k">return</span> <span class="kc">True</span>
                 <span class="k">elif</span> <span class="p">(((</span><span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">)</span>
-                       <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;shape&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">))):</span>
+                       <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;shape&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">)</span>
+                       <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;length&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">))):</span>
                     <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
         
@@ -1198,12 +1212,8 @@
 <span class="sd">            list: Lines printing the specified variable.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">datatype</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
-            <span class="n">typename</span> <span class="o">=</span> <span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">((((</span><span class="n">typename</span> <span class="o">==</span> <span class="s1">&#39;1darray&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;length&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">))</span>
-                 <span class="ow">or</span> <span class="p">((</span><span class="n">typename</span> <span class="o">==</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;shape&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">)))):</span>
-                <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_print_var</span><span class="p">(</span>
             <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1230,11 +1240,11 @@
                 <span class="n">datatype</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[])</span>
             <span class="k">if</span> <span class="s1">&#39;ndim&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">:</span>
                 <span class="n">datatype</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">datatype</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]))</span>
-        <span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">datatype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">datatype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">FLEXIBLE_TYPES</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;precision&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">datatype</span><span class="p">:</span>
                 <span class="n">datatype</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">datatype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">VALID_TYPES</span><span class="p">:</span>
-            <span class="n">datatype</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">datatype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">datatype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">SCALAR_TYPES</span><span class="p">:</span>
+            <span class="n">datatype</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_type_def</span><span class="p">(</span>
             <span class="n">name</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -1323,8 +1333,7 @@
             <span class="n">knew</span> <span class="o">=</span> <span class="n">k</span>
             <span class="n">vnew</span> <span class="o">=</span> <span class="n">v</span>
             <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
-                <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">}</span>
+                <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
                 <span class="n">vnew</span> <span class="o">=</span> <span class="s1">&#39;real(kind = 4)&#39;</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;1darray&#39;</span><span class="p">:</span>
                     <span class="n">knew</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
@@ -1334,11 +1343,17 @@
                     <span class="n">vnew</span> <span class="o">+=</span> <span class="s1">&#39;, dimension(3,4)&#39;</span>
             <span class="k">elif</span> <span class="s1">&#39;X&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">vnew</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">):</span>
-                    <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">knew</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">}</span>
+                    <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="n">knew</span><span class="p">,</span>
+                            <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;boolean&#39;</span><span class="p">:</span>
+                    <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">knew</span><span class="p">}</span>
+                    <span class="n">vnew</span> <span class="o">=</span> <span class="n">vnew</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="s1">&#39;ISO_10646&#39;</span> <span class="ow">in</span> <span class="n">vnew</span><span class="p">:</span>
-                    <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">knew</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span> <span class="o">*</span> <span class="mi">64</span><span class="p">}</span>
+                    <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="n">knew</span><span class="p">,</span>
+                            <span class="s1">&#39;encoding&#39;</span><span class="p">:</span> <span class="s1">&#39;UCS4&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">}</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">knew</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}</span>
+                    <span class="n">knew</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="n">knew</span><span class="p">,</span>
+                            <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">}</span>
                 <span class="n">vnew</span> <span class="o">=</span> <span class="n">vnew</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;8&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">vnew</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ygg&#39;</span><span class="p">):</span>
                 <span class="n">vnew</span> <span class="o">=</span> <span class="s1">&#39;type(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">vnew</span>
@@ -1350,18 +1365,18 @@
             <span class="c1"># Single output</span>
             <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
                                       <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
              <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
                                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
              <span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;dont_add_lengths&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
             <span class="c1"># No output</span>
             <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
                                       <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
              <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[],</span>
              <span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
@@ -1373,7 +1388,7 @@
                                       <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}},</span>
                         <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;length_x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">SIZE_OF_SIZE_T</span><span class="p">},</span>
                          <span class="s1">&#39;is_length_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
              <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;length_var&#39;</span><span class="p">:</span> <span class="s1">&#39;length_y&#39;</span><span class="p">,</span>
@@ -1382,28 +1397,28 @@
                                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}},</span>
                          <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;length_y&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span>
+                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">SIZE_OF_SIZE_T</span><span class="p">},</span>
                           <span class="s1">&#39;is_length_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
              <span class="s1">&#39;dont_add_lengths&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
             <span class="c1"># Returns output instead of parameter</span>
             <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
                                       <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
              <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
                                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
              <span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;guess_at_outputs_in_inputs&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
             <span class="c1"># Guess at outputs in inputs</span>
             <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
                          <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
                                       <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
              <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                                       <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
                                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">}}],</span>
              <span class="s1">&#39;guess_at_outputs_in_inputs&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
         <span class="p">]</span>

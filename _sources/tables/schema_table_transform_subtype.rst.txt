@@ -1,23 +1,16 @@
 .. _schema_table_transform_subtype_rst:
 
-+---------------+
-| Transformtype |
-+===============+
-| array         |
-+---------------+
-| direct        |
-+---------------+
-| filter        |
-+---------------+
-| function      |
-+---------------+
-| iterate       |
-+---------------+
-| map_fields    |
-+---------------+
-| pandas        |
-+---------------+
-| select_fields |
-+---------------+
-| statement     |
-+---------------+
+=============   ================================================================================
+Transformtype   Description                                                                     
+=============   ================================================================================
+array           Consolidate values into an array                                                
+direct          Pass the message through unchanged                                              
+filter          Pass only some messages based on a filter                                       
+function        Transform messages using a function.                                            
+iterate         Split messages up into their iterable components                                
+map_fields      Change the names of fields in a message                                         
+pandas          Convert messages into Pandas data frames                                        
+select_fields   Select a subset of fields from a message                                        
+select_scalar   Select a single field from a message                                            
+statement       Transform messages according to a statement                                     
+=============   ================================================================================

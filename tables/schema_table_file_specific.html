@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -100,101 +100,116 @@
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
 <th class="head"><p>Type</p></th>
-<th class="head"><p>Description</p></th>
 <th class="head"><p>Valid For ‘Filetype’ Of</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>comment</p></td>
+<tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
-<td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘netcdf’, ‘pandas’, ‘ply’, ‘pickle’, ‘json’, ‘table’, ‘ascii’, ‘obj’, ‘wofost’, ‘map’, ‘yaml’, ‘mat’]</p></td>
+<td><p>[‘mat’, ‘table’, ‘ascii’, ‘map’, ‘pandas’, ‘binary’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
-<tr class="row-odd"><td><p>datatype</p></td>
+<tr class="row-odd"><td><p>comment</p></td>
+<td><p>string</p></td>
+<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘pandas’, ‘wofost’, ‘yaml’, ‘map’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
+</tr>
+<tr class="row-even"><td><p>datatype</p></td>
 <td><p>schema</p></td>
+<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘pandas’, ‘wofost’, ‘yaml’, ‘map’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘netcdf’, ‘pandas’, ‘ply’, ‘pickle’, ‘json’, ‘table’, ‘ascii’, ‘obj’, ‘wofost’, ‘map’, ‘yaml’, ‘mat’]</p></td>
 </tr>
-<tr class="row-even"><td><p>default_flow_style</p></td>
+<tr class="row-odd"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘yaml’]</p></td>
 <td><p>If True, nested collections will be serialized in the block style. If False,
 they will always be serialized in the flow style. See <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a>.</p></td>
-<td><p>[‘yaml’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>delimiter</p></td>
+<tr class="row-even"><td><p>delimiter</p></td>
 <td><p>string</p></td>
+<td><p>[‘table’, ‘wofost’, ‘pandas’, ‘map’]</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘pandas’, ‘wofost’, ‘map’, ‘table’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>driver</p></td>
+<td><p>string</p></td>
+<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘map’, ‘pandas’, ‘wofost’, ‘yaml’, ‘binary’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
-<td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
 <td><p>[‘yaml’]</p></td>
+<td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
 </tr>
 <tr class="row-odd"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
+<td><p>[‘json’, ‘yaml’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
-<tr class="row-even"><td><p>newline</p></td>
+<tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
-<td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘netcdf’, ‘pandas’, ‘ply’, ‘pickle’, ‘json’, ‘table’, ‘ascii’, ‘obj’, ‘wofost’, ‘map’, ‘yaml’, ‘mat’]</p></td>
+<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘map’, ‘pandas’, ‘wofost’, ‘yaml’, ‘binary’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>Name used for component in log messages.</p></td>
 </tr>
-<tr class="row-odd"><td><p>no_header</p></td>
+<tr class="row-odd"><td><p>newline</p></td>
+<td><p>string</p></td>
+<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘pandas’, ‘wofost’, ‘yaml’, ‘map’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
+</tr>
+<tr class="row-even"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘pandas’]</p></td>
 <td><p>If True, headers will not be read or serialized from/to tables. Defaults to
 False.</p></td>
-<td><p>[‘pandas’]</p></td>
 </tr>
-<tr class="row-even"><td><p>read_attributes</p></td>
+<tr class="row-odd"><td><p>read_attributes</p></td>
 <td><p>boolean</p></td>
-<td><p>If True, the attributes are read in as well as the variables. Defaults to False.</p></td>
 <td><p>[‘netcdf’]</p></td>
+<td><p>If True, the attributes are read in as well as the variables. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>read_meth</p></td>
+<tr class="row-even"><td><p>read_meth</p></td>
 <td><p>string</p></td>
+<td><p>[‘binary’]</p></td>
 <td><p>Method that should be used to read data from the file. Defaults to ‘read’.
 Ignored if direction is ‘send’.</p></td>
-<td><p>[‘binary’]</p></td>
 </tr>
-<tr class="row-even"><td><p>serializer</p></td>
+<tr class="row-odd"><td><p>serializer</p></td>
 <td></td>
-<td><p>Class with serialize and deserialize methods that should be used to process sent
-and received messages. Defaults to None and is constructed using provided
-‘serializer_kwargs’.</p></td>
 <td><p>[‘binary’]</p></td>
+<td><p>Class with serialize and deserialize methods that should be used to process sent
+and received messages or a dictionary describing a serializer that obeys the
+serializer schema.</p></td>
 </tr>
-<tr class="row-odd"><td><p>sort_keys</p></td>
+<tr class="row-even"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘json’]</p></td>
 <td><p>If True, the serialization of dictionaries will be in key sorted order. Defaults
 to True.</p></td>
-<td><p>[‘json’]</p></td>
 </tr>
-<tr class="row-even"><td><p>str_as_bytes</p></td>
+<tr class="row-odd"><td><p>str_as_bytes</p></td>
 <td><p>boolean</p></td>
-<td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
 <td><p>[‘pandas’]</p></td>
+<td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>use_astropy</p></td>
+<tr class="row-even"><td><p>use_astropy</p></td>
 <td><p>boolean</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
-<tr class="row-even"><td><p>variables</p></td>
+<tr class="row-odd"><td><p>variables</p></td>
 <td><p>array</p></td>
-<td><p>List of variables to read in. If not provided, all variables will be read.</p></td>
 <td><p>[‘netcdf’]</p></td>
+<td><p>List of variables to read in. If not provided, all variables will be read.</p></td>
 </tr>
-<tr class="row-odd"><td><p>version</p></td>
+<tr class="row-even"><td><p>version</p></td>
 <td><p>integer</p></td>
+<td><p>[‘netcdf’]</p></td>
 <td><p>Version of netCDF format that should be used. Defaults to 1. Options are 1
 (classic format) and 2 (64-bit offset format).</p></td>
-<td><p>[‘netcdf’]</p></td>
 </tr>
 </tbody>
 </table>

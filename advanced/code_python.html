@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Python Code &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Python Code &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -77,15 +77,14 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Python Code</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html">yggdrasil.languages.Python package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-serialize-package">yggdrasil.serialize package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-metaschema-datatypes-package">yggdrasil.metaschema.datatypes package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-drivers-package">yggdrasil.drivers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-communication-package">yggdrasil.communication package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-examples-package">yggdrasil.examples package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.command_line">yggdrasil.command_line module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.components">yggdrasil.components module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.config">yggdrasil.config module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.constants">yggdrasil.constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.datatypes">yggdrasil.datatypes module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.doctools">yggdrasil.doctools module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.multitasking">yggdrasil.multitasking module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-yggdrasil.platform">yggdrasil.platform module</a></li>
@@ -149,15 +148,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil_code.html">yggdrasil.languages.Python package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-serialize-package">yggdrasil.serialize package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-metaschema-datatypes-package">yggdrasil.metaschema.datatypes package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-drivers-package">yggdrasil.drivers package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-communication-package">yggdrasil.communication package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yggdrasil_code.html#yggdrasil-examples-package">yggdrasil.examples package</a></li>
 </ul>
 </div>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
-</section>
+<hr class="docutils" />
 <section id="module-yggdrasil.command_line">
 <span id="yggdrasil-command-line-module"></span><h2>yggdrasil.command_line module<a class="headerlink" href="#module-yggdrasil.command_line" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -332,6 +328,33 @@ library in a C or C++ program.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.command_line.coveragerc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">coveragerc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#coveragerc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.coveragerc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
+<p>Create a .coveragerc file.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.command_line.coveragerc.arguments">
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[(('--method',),</span> <span class="pre">{'choices':</span> <span class="pre">['installed',</span> <span class="pre">'env',</span> <span class="pre">None],</span> <span class="pre">'default':</span> <span class="pre">None,</span> <span class="pre">'help':</span> <span class="pre">&quot;Method</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">select</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">covered.</span> <span class="pre">'env'</span> <span class="pre">covers</span> <span class="pre">languages</span> <span class="pre">based</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">value</span> <span class="pre">of</span> <span class="pre">environment</span> <span class="pre">variables</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">form</span> <span class="pre">'INSTALL{language}'.</span> <span class="pre">'installed'</span> <span class="pre">covers</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">yggdrasil</span> <span class="pre">considers</span> <span class="pre">installed.&quot;}),</span> <span class="pre">(('--cover-languages',</span> <span class="pre">'--cover-language',</span> <span class="pre">'--cover'),</span> <span class="pre">{'nargs':</span> <span class="pre">'*',</span> <span class="pre">'choices':</span> <span class="pre">['c',</span> <span class="pre">'c++',</span> <span class="pre">'fortran',</span> <span class="pre">'R',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'cmake',</span> <span class="pre">'make',</span> <span class="pre">'lpy',</span> <span class="pre">'osr',</span> <span class="pre">'sbml',</span> <span class="pre">'dummy',</span> <span class="pre">'executable',</span> <span class="pre">'mpi',</span> <span class="pre">'timesync'],</span> <span class="pre">'help':</span> <span class="pre">'Language(s)</span> <span class="pre">to</span> <span class="pre">cover.'}),</span> <span class="pre">(('--dont-cover-languages',</span> <span class="pre">'--dont-cover-language',</span> <span class="pre">'--dont-cover'),</span> <span class="pre">{'nargs':</span> <span class="pre">'*',</span> <span class="pre">'choices':</span> <span class="pre">['c',</span> <span class="pre">'c++',</span> <span class="pre">'fortran',</span> <span class="pre">'R',</span> <span class="pre">'matlab',</span> <span class="pre">'python',</span> <span class="pre">'cmake',</span> <span class="pre">'make',</span> <span class="pre">'lpy',</span> <span class="pre">'osr',</span> <span class="pre">'sbml',</span> <span class="pre">'dummy',</span> <span class="pre">'executable',</span> <span class="pre">'mpi',</span> <span class="pre">'timesync'],</span> <span class="pre">'help':</span> <span class="pre">'Language(s)</span> <span class="pre">to</span> <span class="pre">ignore</span> <span class="pre">in</span> <span class="pre">coverage.'}),</span> <span class="pre">(('--filename',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'default':</span> <span class="pre">None,</span> <span class="pre">'help':</span> <span class="pre">'File</span> <span class="pre">to</span> <span class="pre">save</span> <span class="pre">coveragerc</span> <span class="pre">to'}),</span> <span class="pre">(('--setup-cfg',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'default':</span> <span class="pre">None,</span> <span class="pre">'help':</span> <span class="pre">'setup.cfg</span> <span class="pre">file</span> <span class="pre">containing</span> <span class="pre">coverage</span> <span class="pre">options'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.coveragerc.arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.command_line.coveragerc.func">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#coveragerc.func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.coveragerc.func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.command_line.coveragerc.help">
+<span class="sig-name descname"><span class="pre">help</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Generate</span> <span class="pre">a</span> <span class="pre">coveragerc</span> <span class="pre">file</span> <span class="pre">that</span> <span class="pre">covers/ignores</span> <span class="pre">lines</span> <span class="pre">based</span> <span class="pre">on</span> <span class="pre">installed</span> <span class="pre">languages</span> <span class="pre">or</span> <span class="pre">options.'</span></em><a class="headerlink" href="#yggdrasil.command_line.coveragerc.help" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.command_line.coveragerc.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'coveragerc'</span></em><a class="headerlink" href="#yggdrasil.command_line.coveragerc.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.generate_gha_workflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">generate_gha_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#generate_gha_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.generate_gha_workflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
@@ -484,7 +507,7 @@ library in a C or C++ program.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.main.subcommands">
-<span class="sig-name descname"><span class="pre">subcommands</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'yggdrasil.command_line.yggrun'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.ygginfo'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.validate_yaml'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggcc'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggcompile'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggclean'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.ygginstall'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.update_config'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.regen_metaschema'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.regen_schema'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggmodelform'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggdevup'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.timing_plots'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.generate_gha_workflow'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.integration_service_manager'&gt;]</span></em><a class="headerlink" href="#yggdrasil.command_line.main.subcommands" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">subcommands</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'yggdrasil.command_line.yggrun'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.ygginfo'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.validate_yaml'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggcc'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggcompile'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggclean'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.ygginstall'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.update_config'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.regen_schema'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggmodelform'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.yggdevup'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.timing_plots'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.generate_gha_workflow'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.integration_service_manager'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'yggdrasil.command_line.coveragerc'&gt;]</span></em><a class="headerlink" href="#yggdrasil.command_line.main.subcommands" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -496,35 +519,13 @@ library in a C or C++ program.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="yggdrasil.command_line.regen_metaschema">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">regen_metaschema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#regen_metaschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.regen_metaschema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
-<p>Regenerate the yggdrasil metaschema.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.command_line.regen_metaschema.func">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#regen_metaschema.func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.regen_metaschema.func" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.command_line.regen_metaschema.help">
-<span class="sig-name descname"><span class="pre">help</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Regenerate</span> <span class="pre">the</span> <span class="pre">yggdrasil</span> <span class="pre">metaschema.'</span></em><a class="headerlink" href="#yggdrasil.command_line.regen_metaschema.help" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.command_line.regen_metaschema.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'metaschema'</span></em><a class="headerlink" href="#yggdrasil.command_line.regen_metaschema.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.command_line.regen_schema">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.command_line.</span></span><span class="sig-name descname"><span class="pre">regen_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/command_line.html#regen_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.command_line.regen_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.command_line.SubCommand" title="yggdrasil.command_line.SubCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubCommand</span></code></a></p>
 <p>Regenerate the yggdrasil schema.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.regen_schema.arguments">
-<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[(('--only-constants',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Only</span> <span class="pre">update</span> <span class="pre">the</span> <span class="pre">constants.py</span> <span class="pre">file</span> <span class="pre">without</span> <span class="pre">updating</span> <span class="pre">the</span> <span class="pre">schema.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.regen_schema.arguments" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[(('--only-constants',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Only</span> <span class="pre">update</span> <span class="pre">the</span> <span class="pre">constants.py</span> <span class="pre">file</span> <span class="pre">without</span> <span class="pre">updating</span> <span class="pre">the</span> <span class="pre">schema.'}),</span> <span class="pre">(('--filename',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'help':</span> <span class="pre">'Name</span> <span class="pre">where</span> <span class="pre">schema</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">saved.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.regen_schema.arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -784,7 +785,7 @@ development).</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.ygginstall.arguments">
-<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[(('languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'*',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">configured.'}),</span> <span class="pre">(('--no-import',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">import</span> <span class="pre">the</span> <span class="pre">yggdrasil</span> <span class="pre">package</span> <span class="pre">in</span> <span class="pre">calling</span> <span class="pre">the</span> <span class="pre">installation</span> <span class="pre">script.&quot;}),</span> <span class="pre">(('--with-asan',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Load</span> <span class="pre">ASAN</span> <span class="pre">library</span> <span class="pre">before</span> <span class="pre">running</span> <span class="pre">executables.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.ygginstall.arguments" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[(('languages',),</span> <span class="pre">{'nargs':</span> <span class="pre">'*',</span> <span class="pre">'default':</span> <span class="pre">[],</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">languages</span> <span class="pre">that</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">installed.'}),</span> <span class="pre">(('--no-import',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">&quot;Don't</span> <span class="pre">import</span> <span class="pre">the</span> <span class="pre">yggdrasil</span> <span class="pre">package</span> <span class="pre">in</span> <span class="pre">calling</span> <span class="pre">the</span> <span class="pre">installation</span> <span class="pre">script.&quot;}),</span> <span class="pre">(('--with-asan',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Load</span> <span class="pre">ASAN</span> <span class="pre">library</span> <span class="pre">before</span> <span class="pre">running</span> <span class="pre">executables.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.ygginstall.arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -844,7 +845,7 @@ form for composing a model specification files.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.command_line.yggrun.arguments">
-<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[(('yamlfile',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">yaml</span> <span class="pre">specification</span> <span class="pre">files.'}),</span> <span class="pre">(('--with-mpi',</span> <span class="pre">'--mpi-nproc'),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">1,</span> <span class="pre">'help':</span> <span class="pre">'Number</span> <span class="pre">of</span> <span class="pre">MPI</span> <span class="pre">processes</span> <span class="pre">to</span> <span class="pre">run</span> <span class="pre">on.'}),</span> <span class="pre">(('--mpi-tag-start',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">0,</span> <span class="pre">'help':</span> <span class="pre">'Tag</span> <span class="pre">that</span> <span class="pre">MPI</span> <span class="pre">communications</span> <span class="pre">should</span> <span class="pre">start</span> <span class="pre">at.'}),</span> <span class="pre">(('--validate',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Validate</span> <span class="pre">the</span> <span class="pre">run</span> <span class="pre">via</span> <span class="pre">model</span> <span class="pre">validation</span> <span class="pre">commands</span> <span class="pre">on</span> <span class="pre">completion.'}),</span> <span class="pre">(('--with-debugger',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'help':</span> <span class="pre">'Run</span> <span class="pre">all</span> <span class="pre">models</span> <span class="pre">with</span> <span class="pre">a</span> <span class="pre">specific</span> <span class="pre">debuggin</span> <span class="pre">tool.</span> <span class="pre">If</span> <span class="pre">quoted,</span> <span class="pre">this</span> <span class="pre">can</span> <span class="pre">also</span> <span class="pre">include</span> <span class="pre">flags</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">tool.'}),</span> <span class="pre">(('--disable-python-c-api',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Disable</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">Python</span> <span class="pre">C</span> <span class="pre">API</span> <span class="pre">from</span> <span class="pre">yggdrasil.'}),</span> <span class="pre">(('--with-asan',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Compile</span> <span class="pre">models</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">address</span> <span class="pre">sanitizer</span> <span class="pre">enabled.'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.yggrun.arguments" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[(('yamlfile',),</span> <span class="pre">{'nargs':</span> <span class="pre">'+',</span> <span class="pre">'help':</span> <span class="pre">'One</span> <span class="pre">or</span> <span class="pre">more</span> <span class="pre">yaml</span> <span class="pre">specification</span> <span class="pre">files.'}),</span> <span class="pre">(('--with-mpi',</span> <span class="pre">'--mpi-nproc'),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">1,</span> <span class="pre">'help':</span> <span class="pre">'Number</span> <span class="pre">of</span> <span class="pre">MPI</span> <span class="pre">processes</span> <span class="pre">to</span> <span class="pre">run</span> <span class="pre">on.'}),</span> <span class="pre">(('--mpi-tag-start',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'default':</span> <span class="pre">0,</span> <span class="pre">'help':</span> <span class="pre">'Tag</span> <span class="pre">that</span> <span class="pre">MPI</span> <span class="pre">communications</span> <span class="pre">should</span> <span class="pre">start</span> <span class="pre">at.'}),</span> <span class="pre">(('--validate',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Validate</span> <span class="pre">the</span> <span class="pre">run</span> <span class="pre">via</span> <span class="pre">model</span> <span class="pre">validation</span> <span class="pre">commands</span> <span class="pre">on</span> <span class="pre">completion.'}),</span> <span class="pre">(('--with-debugger',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'help':</span> <span class="pre">'Run</span> <span class="pre">all</span> <span class="pre">models</span> <span class="pre">with</span> <span class="pre">a</span> <span class="pre">specific</span> <span class="pre">debuggin</span> <span class="pre">tool.</span> <span class="pre">If</span> <span class="pre">quoted,</span> <span class="pre">this</span> <span class="pre">can</span> <span class="pre">also</span> <span class="pre">include</span> <span class="pre">flags</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">tool.'}),</span> <span class="pre">(('--disable-python-c-api',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Disable</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">Python</span> <span class="pre">C</span> <span class="pre">API</span> <span class="pre">from</span> <span class="pre">yggdrasil.'}),</span> <span class="pre">(('--with-asan',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Compile</span> <span class="pre">models</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">address</span> <span class="pre">sanitizer</span> <span class="pre">enabled.'}),</span> <span class="pre">(('--as-service',),</span> <span class="pre">{'action':</span> <span class="pre">'store_true',</span> <span class="pre">'help':</span> <span class="pre">'Run</span> <span class="pre">the</span> <span class="pre">provided</span> <span class="pre">YAMLs</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">service.'}),</span> <span class="pre">(('--partial-commtype',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'default':</span> <span class="pre">'rest',</span> <span class="pre">'help':</span> <span class="pre">'Type</span> <span class="pre">of</span> <span class="pre">communicator</span> <span class="pre">to</span> <span class="pre">use</span> <span class="pre">for</span> <span class="pre">partial</span> <span class="pre">comms</span> <span class="pre">when</span> <span class="pre">--as-service</span> <span class="pre">is</span> <span class="pre">passed'}),</span> <span class="pre">(('--client-id',),</span> <span class="pre">{'type':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'help':</span> <span class="pre">'ID</span> <span class="pre">associated</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">client</span> <span class="pre">requesting</span> <span class="pre">a</span> <span class="pre">service.</span> <span class="pre">(This</span> <span class="pre">should</span> <span class="pre">only</span> <span class="pre">be</span> <span class="pre">passed</span> <span class="pre">when</span> <span class="pre">running</span> <span class="pre">with</span> <span class="pre">--as-service)'})]</span></em><a class="headerlink" href="#yggdrasil.command_line.yggrun.arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -897,45 +898,6 @@ form for composing a model specification files.</p>
 </section>
 <section id="module-yggdrasil.components">
 <span id="yggdrasil-components-module"></span><h2>yggdrasil.components module<a class="headerlink" href="#module-yggdrasil.components" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.components.</span></span><span class="sig-name descname"><span class="pre">ClassRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">import_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a></p>
-<p>Class for registering classes.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the value for key if key is in the dictionary, else default.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry.has_entry">
-<span class="sig-name descname"><span class="pre">has_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry.has_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry.has_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry.import_classes">
-<span class="sig-name descname"><span class="pre">import_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry.import_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry.import_classes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Import all classes in the same directory.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry.items">
-<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">items</span></span></span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry.items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry.items" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry.keys">
-<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">keys</span></span></span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry.keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry.keys" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.components.ClassRegistry.values">
-<span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">an</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">values</span></span></span><a class="reference internal" href="../_modules/yggdrasil/components.html#ClassRegistry.values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ClassRegistry.values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.components.ComponentBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.components.</span></span><span class="sig-name descname"><span class="pre">ComponentBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/components.html#ComponentBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.components.ComponentBase" title="Permalink to this definition">¶</a></dt>
@@ -994,6 +956,8 @@ class will be inherited instead of the base class. Defaults to True.</p>
 </dd>
 <dt>_dont_register (bool): If True, the component class will be be registered</dt><dd><p>and the before_registration class method will not be called. Defaults
 to False.</p>
+</dd>
+<dt>_schema_no_default_subtype (bool): If True, the subtype schema</dt><dd><p>will not have a default subtype set. Defaults to False.</p>
 </dd>
 </dl>
 </dd>
@@ -1400,6 +1364,26 @@ environment variables should be set to.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.config.add_excl_rule">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">add_excl_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">excl_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#add_excl_rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.add_excl_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an exclusion rule to the list if its not in there.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>excl_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – List of exclusion rules to update.</p></li>
+<li><p><strong>new_rule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – New rule to add to the list if it already exists.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated exclustion rules.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.config.cfg_environment">
 <span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">cfg_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#cfg_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.cfg_environment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set environment variables based on config options.</p>
@@ -1423,6 +1407,39 @@ environment. Defaults to <code class="xref py py-data docutils literal notransla
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cfg</strong> (<a class="reference internal" href="#yggdrasil.config.YggConfigParser" title="yggdrasil.config.YggConfigParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.config.YggConfigParser</span></code></a>, optional) – Config parser with options that should be used to update the
 environment. Defaults to <code class="xref py py-data docutils literal notranslate"><span class="pre">yggdrasil.config.ygg_cfg</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.config.create_coveragerc">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">create_coveragerc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">installed_languages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#create_coveragerc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.create_coveragerc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the coveragerc to reflect the OS, Python version, and
+availability of matlab. Parameters from the setup.cfg file will be
+added. If the .coveragerc file already exists, it will be read first
+before adding setup.cfg options.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>installed_languages</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Dictionary of language/boolean
+key/value pairs indicating optional languages and their state
+of installation.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – File where coveragerc should be saved.
+Defaults to ‘.coveragerc’ in the current directory.</p></li>
+<li><p><strong>setup_cfg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – setup.cfg file containing coverage
+options. If not provided, the current directory will be
+checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>True if the file was created/updated successfully, False</dt><dd><p>otherwise.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1550,6 +1567,26 @@ that should be restored.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.config.rm_excl_rule">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">rm_excl_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">excl_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#rm_excl_rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.rm_excl_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an exclusion rule from the list if its in there.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>excl_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – List of exclusion rules to update.</p></li>
+<li><p><strong>new_rule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – New rule to remove from the list if it exists.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated exclustion rules.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.config.set_ygg_loglevel">
 <span class="sig-prename descclassname"><span class="pre">yggdrasil.config.</span></span><span class="sig-name descname"><span class="pre">set_ygg_loglevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/config.html#set_ygg_loglevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.config.set_ygg_loglevel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the current log level.</p>
@@ -1612,6 +1649,105 @@ specific keyword arguments. Defaults to {}.</p></li>
 <section id="module-yggdrasil.constants">
 <span id="yggdrasil-constants-module"></span><h2>yggdrasil.constants module<a class="headerlink" href="#module-yggdrasil.constants" title="Permalink to this heading">¶</a></h2>
 <p>Constants used by yggdrasil.</p>
+</section>
+<section id="module-yggdrasil.datatypes">
+<span id="yggdrasil-datatypes-module"></span><h2>yggdrasil.datatypes module<a class="headerlink" href="#module-yggdrasil.datatypes" title="Permalink to this heading">¶</a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="yggdrasil.datatypes.DataTypeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.datatypes.</span></span><span class="sig-name descname"><span class="pre">DataTypeError</span></span><a class="reference internal" href="../_modules/yggdrasil/datatypes.html#DataTypeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.datatypes.DataTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a></p>
+<p>Error that should be raised when a class encounters a type it cannot handle.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.datatypes.data2dtype">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.datatypes.</span></span><span class="sig-name descname"><span class="pre">data2dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/datatypes.html#data2dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.datatypes.data2dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get numpy data type for an object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Python object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Numpy data type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.datatypes.definition2dtype">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.datatypes.</span></span><span class="sig-name descname"><span class="pre">definition2dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/datatypes.html#definition2dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.datatypes.definition2dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get numpy data type for a type definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>props</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Type definition properties.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Numpy data type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.datatypes.get_empty_msg">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.datatypes.</span></span><span class="sig-name descname"><span class="pre">get_empty_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typedef</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/datatypes.html#get_empty_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.datatypes.get_empty_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an empty message associated with a type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Type definition via a JSON schema.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Python object representing an empty message for the provided</dt><dd><p>type.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.datatypes.is_default_typedef">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.datatypes.</span></span><span class="sig-name descname"><span class="pre">is_default_typedef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typedef</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/datatypes.html#is_default_typedef"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.datatypes.is_default_typedef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a type definition is the default type definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Type definition to test.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if typedef is the default, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.datatypes.type2numpy">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.datatypes.</span></span><span class="sig-name descname"><span class="pre">type2numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typedef</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/datatypes.html#type2numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.datatypes.type2numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a type definition into a numpy dtype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Type definition.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Numpy data type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-yggdrasil.doctools">
 <span id="yggdrasil-doctools-module"></span><h2>yggdrasil.doctools module<a class="headerlink" href="#module-yggdrasil.doctools" title="Permalink to this heading">¶</a></h2>
@@ -4331,8 +4467,23 @@ associated values of the subtype_key property for this component.</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.append">
-<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.append" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.add_legacy_properties">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_legacy_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.add_legacy_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.add_legacy_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add driver/args legacy properties to the schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Schema to add properties to.</p></li>
+<li><p><strong>driver_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – Drivers that are valid for
+the schema.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.append_class">
+<span class="sig-name descname"><span class="pre">append_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.append_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.append_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append component class to the schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -4340,6 +4491,29 @@ associated values of the subtype_key property for this component.</p></li>
 <li><p><strong>comp_cls</strong> (<em>class</em>) – Component class that should be added.</p></li>
 <li><p><strong>verify</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, verify the schema after
 adding the component class. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.append_schema">
+<span class="sig-name descname"><span class="pre">append_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_no_inherit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.append_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.append_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append component schema to the schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name to store the schema under.</p></li>
+<li><p><strong>new_schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – New schema to store.</p></li>
+<li><p><strong>verify</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, verify the schema after
+adding the schema. Defaults to False.</p></li>
+<li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Description of the base
+subtype property.</p></li>
+<li><p><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Default subtype for base.</p></li>
+<li><p><strong>kwargs_base</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments added to the
+base schema and removed from unique subtype schemas.</p></li>
+<li><p><strong>kwargs_no_inherit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments not
+inherited by other subtypes or the base schema.</p></li>
 </ul>
 </dd>
 </dl>
@@ -4389,13 +4563,41 @@ adding the component class. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.default_subtype">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default_subtype</span></span><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.default_subtype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default subtype.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.compare_body">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['description',</span> <span class="pre">'default',</span> <span class="pre">'maxItems',</span> <span class="pre">'minItems']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.compare_body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.compare_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two schemas, ignoring some keys.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – First schema for comparison.</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Second schema for comparison.</p></li>
+<li><p><strong>only_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – Keys to compare.</p></li>
+<li><p><strong>ignore_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – Keys to ignore.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the schemas are equivalent, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.from_definitions">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.from_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.from_definitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a ComponentSchema from a schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Schema.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Schema with information from schema.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#yggdrasil.schema.ComponentSchema" title="yggdrasil.schema.ComponentSchema">ComponentSchema</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -4423,29 +4625,61 @@ __init__ method.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.from_schema">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.from_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.from_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a ComponentSchema from a schema.</p>
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_base_schema">
+<span class="sig-name descname"><span class="pre">get_base_schema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_base_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_base_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a base schema containing properties that are the same
+for all component subtypes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_definitions">
+<span class="sig-name descname"><span class="pre">get_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_definitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the set of definitions defining this component type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Schema.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>for_form</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema will
+be formatted for easy parsing by form generation tools.
+Defaults to False. Causes relaxed, allow_instance, and
+full to be ignored.</p></li>
+<li><p><strong>allow_instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema
+will validate instances of this component in addition to
+documents describing a component. Defaults to False.</p></li>
+<li><p><strong>allow_driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned
+definitions will include the deprecated driver based
+schemas. Defaults to False.</p></li>
+<li><p><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, properties are made explicit
+for each component subtype resulting in a larger schema
+that has a simplified logic for parsing. If False, the
+schema will be compressed such that properties occuring
+across all component subtypes will only occur once in
+the base schema. Defaults to False.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to
+get_subtype_definitions calls.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Schema with information from schema.</p>
+<dd class="field-even"><p>Set of component definitions.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#yggdrasil.schema.ComponentSchema" title="yggdrasil.schema.ComponentSchema">ComponentSchema</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.full_schema">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">full_schema</span></span><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.full_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Schema for evaluating YAML input file that fully specifies
-the properties for each component.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_driver_definition">
+<span class="sig-name descname"><span class="pre">get_driver_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_driver_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_driver_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a definition for a driver schema.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>allow_driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If not True, the outputs will
+be a null schema. Defaults to False.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Driver schema.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
@@ -4453,21 +4687,18 @@ the properties for each component.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_schema">
-<span class="sig-name descname"><span class="pre">get_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_schema" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the schema defining this component.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>relaxed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema (and any
-definitions it includes) are relaxed to allow for objects with
-objects with additional properties to pass validation. Defaults
-to False.</p></li>
-<li><p><strong>allow_instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema will
-validate instances of this component in addition to documents
-describing a component. Defaults to False.</p></li>
-<li><p><strong>for_form</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema will be
-formatted for easy parsing by form generation tools. Defaults
-to False. Causes relaxed and allow_instance to be ignored.</p></li>
+<li><p><strong>for_form</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema will
+be formatted for easy parsing by form generation tools.
+Defaults to False. Causes relaxed, allow_instance, and
+full to be ignored.</p></li>
+<li><p><strong>allow_instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema
+will validate instances of this component in addition to
+documents describing a component. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -4475,6 +4706,57 @@ to False. Causes relaxed and allow_instance to be ignored.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_subtype_definition_ref">
+<span class="sig-name descname"><span class="pre">get_subtype_definition_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_subtype_definition_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_subtype_definition_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the address for a subtype’s schema definition that can
+be used in references.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>subtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Component subtype.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Definition address.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_subtype_definitions">
+<span class="sig-name descname"><span class="pre">get_subtype_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_subtype_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_subtype_definitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get subtype definitions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Additional keyword arguments are passed to
+get_subtype_schema calls for each subtype.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of subtype definitions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_subtype_order">
+<span class="sig-name descname"><span class="pre">get_subtype_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_subtype_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_subtype_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the order that subtypes should be in the schema, with the
+base subtype first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Subtypes in order.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -4498,7 +4780,7 @@ to False. Causes relaxed and allow_instance to be ignored.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.get_subtype_schema">
-<span class="sig-name descname"><span class="pre">get_subtype_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_subtype_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_subtype_schema" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_subtype_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partnered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ComponentSchema.get_subtype_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.get_subtype_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the schema for the specified subtype.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -4542,28 +4824,6 @@ against the schemas for the different subtypes.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.properties">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.properties" title="Permalink to this definition">¶</a></dt>
-<dd><p>Valid properties for this component.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="yggdrasil.schema.ComponentSchema.schema">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">schema</span></span><a class="headerlink" href="#yggdrasil.schema.ComponentSchema.schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Schema for this component.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -4657,39 +4917,10 @@ Defaults to None and the registry will be empty.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.full_schema">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">full_schema</span></span><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.full_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Schema for evaluating YAML input file that fully specifies
-the properties for each component.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.get">
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a component schema from the registry.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.get_component_keys">
-<span class="sig-name descname"><span class="pre">get_component_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.get_component_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.get_component_keys" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the properties associated with a certain component.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>comp_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the component to return keys for.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>All of the valid properties for the specified component.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4731,7 +4962,7 @@ get_subtype_schema for the selected component type.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.get_definitions">
-<span class="sig-name descname"><span class="pre">get_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.get_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.get_definitions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.get_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.get_definitions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get schema definitions for the registered components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -4745,9 +4976,19 @@ validate instances of the components in addition to documents
 describing components. Defaults to False.</p></li>
 <li><p><strong>for_form</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema will be
 formatted for easy parsing by form generation tools. Defaults
-to False. Causes relaxed and allow_instance to be ignored.</p></li>
+to False. Causes relaxed, allow_instance, and full to be
+ignored.</p></li>
 <li><p><strong>dont_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, a the cached definitions
 are returned without copying. Defaults to False.</p></li>
+<li><p><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, properties are made explicit for
+each component subtype resulting in a larger schema that has
+a simplified logic for parsing. If False, the schema will be
+compressed such that properties occuring across all component
+subtypes will only occur once in the base schema. Defaults to
+False.</p></li>
+<li><p><strong>allow_driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned definitions
+will include the deprecated driver based schemas. Defaults to
+False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -4761,21 +5002,34 @@ are returned without copying. Defaults to False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.get_schema">
-<span class="sig-name descname"><span class="pre">get_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.get_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.get_schema" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relaxed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.get_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.get_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the schema defining this component.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>relaxed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema (and any
 definitions it includes) are relaxed to allow for objects with
-objects with additional properties to pass validation. Defaults
-to False.</p></li>
+objects with additional properties to pass validation.
+Defaults to False.</p></li>
 <li><p><strong>allow_instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema will
 validate instances of this component in addition to documents
 describing a component. Defaults to False.</p></li>
 <li><p><strong>for_form</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema will be
 formatted for easy parsing by form generation tools. Defaults
-to False. Causes relaxed and allow_instance to be ignored.</p></li>
+to False. Causes relaxed, allow_instance, and full to be
+ignored.</p></li>
+<li><p><strong>partial</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the schema for individual
+yaml files will be used which allows for partial integration
+specification. Defaults to False.</p></li>
+<li><p><strong>full</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, properties are made explicit for
+each component subtype resulting in a larger schema that has
+a simplified logic for parsing. If False, the schema will be
+compressed such that properties occuring across all component
+subtypes will only occur once in the base schema. Defaults to
+False.</p></li>
+<li><p><strong>allow_driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned schema
+will include the deprecated driver based schemas. Defaults to
+True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -4783,26 +5037,6 @@ to False. Causes relaxed and allow_instance to be ignored.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.is_valid_component">
-<span class="sig-name descname"><span class="pre">is_valid_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.is_valid_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.is_valid_component" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if an object is a valid represenation of a component.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>comp_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Name of the component to validate against.</p></li>
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Object to validate.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the object is valid, False otherwise.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -4853,13 +5087,15 @@ model form schema.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.normalize">
-<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backwards_compat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.normalize" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize an object against this schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Object to normalize.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to normalize_instance.</p></li>
+<li><p><strong>norm_kws</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments that should be
+passed to rapidjson.normalize. Defaults to {}.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to get_schema.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -4872,32 +5108,14 @@ model form schema.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.register_normalizer">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_normalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.register_normalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.register_normalizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a normalizer that will be applied to elements in the
-instance at the specified path.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a>) – Location in schema where normalizer will be applied.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Decorator for registering the normalizer function.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>function</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.save" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the schema to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Full path to the file the schema should be saved to.</p></li>
-<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – yggdrasil YAML options.</p></li>
+<li><p><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – yggdrasil YAML options.</p></li>
 </ul>
 </dd>
 </dl>
@@ -4910,20 +5128,6 @@ instance at the specified path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate an object against this schema.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Object to valdiate.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to validate_instance.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -4946,53 +5150,16 @@ get_component_schema.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.schema.SchemaRegistry.validate_model_submission">
-<span class="sig-name descname"><span class="pre">validate_model_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.validate_model_submission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.validate_model_submission" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">validate_model_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#SchemaRegistry.validate_model_submission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.SchemaRegistry.validate_model_submission" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate an object against the schema for models submitted to
 the yggdrasil model repository.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Object to validate.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Object to validate.</p>
 </dd>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="yggdrasil.schema.cdriver2commtype">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">cdriver2commtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#cdriver2commtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.cdriver2commtype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a connection driver to a file type.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the connection driver.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The corresponding file type for the driver.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="yggdrasil.schema.cdriver2filetype">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">cdriver2filetype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#cdriver2filetype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.cdriver2filetype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a connection driver to a file type.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the connection driver.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The corresponding file type for the driver.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -5117,30 +5284,6 @@ _schema_fname.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="yggdrasil.schema.migrate_keys">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">migrate_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_key_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_key_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#migrate_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.migrate_keys" title="Permalink to this definition">¶</a></dt>
-<dd><p>Migrate keys from one component to another that are not in a list
-of predefined keys.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>from_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Component dictionary to migrate keys from.</p></li>
-<li><p><strong>to_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – List of component dictionaries to migrate keys to. If
-this is an empty list, keys will not be migrated.</p></li>
-<li><p><strong>exclude_key_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – List of keys in from_dict that
-should not be migrated to to_dict. All keys in include_key_list
-that are not in this list are moved. Defaults to None and no keys
-are excluded.</p></li>
-<li><p><strong>include_key_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – List of keys that should be migrated
-from from_dict to to_dict dictionaries. If not provided, all keys
-in from_dict that are not in exclude_key_list are moved. Defaults
-to None and all keys in from_dict are included.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.schema.ordered_dump">
 <span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">ordered_dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#ordered_dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.ordered_dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dump object as a YAML document, representing SchemaDict objects as
@@ -5180,46 +5323,6 @@ represent loaded maps. Defaults to SchemaDict.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="yggdrasil.schema.rwmeth2filetype">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">rwmeth2filetype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rw_meth</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#rwmeth2filetype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.rwmeth2filetype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the alternate properties that corresponding to the old
-read_meth/write_meth keywords.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rw_meth</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Read/write method name.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Property values equivalent to provided read/write method.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="yggdrasil.schema.standardize">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.schema.</span></span><span class="sig-name descname"><span class="pre">standardize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_singular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/schema.html#standardize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.schema.standardize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Standardize a component such that each key contains a list of dictionaries.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Component to standardize.</p></li>
-<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – Keys to standardize in the instance.</p></li>
-<li><p><strong>is_singular</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If False, the keys are assumed to be plural
-and singular alternatives are also checked. If True, the keys are
-assumed to be singular and plural alternatives are also checked.
-Defaults to False.</p></li>
-<li><p><strong>suffixes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – Suffixes to add to the keys to get a set of
-alternate keys that should also be checked. Defaults to None as is
-ignored.</p></li>
-<li><p><strong>altkeys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – List of lists of alternate keys. Defaults to None.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -8496,23 +8599,21 @@ on msg_format to create the log message.</p></li>
 <span id="yggdrasil-units-module"></span><h2>yggdrasil.units module<a class="headerlink" href="#module-yggdrasil.units" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.units.add_units">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.units.</span></span><span class="sig-name descname"><span class="pre">add_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/units.html#add_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.units.add_units" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.units.</span></span><span class="sig-name descname"><span class="pre">add_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/units.html#add_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.units.add_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add units to an array or scalar.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>arr</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Scalar or array of data to add units to.</p></li>
 <li><p><strong>unit_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Unit string.</p></li>
-<li><p><strong>dtype</strong> (<em>np.dtype</em><em>, </em><em>optional</em>) – Numpy data type that should be maintained for
-array/qunatity with units. If not provided, this is determined from the
-array.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the unit constructor.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Array with units.</p>
+<dd class="field-even"><p>Scalar or array with units.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>unyt.unyt_array</p>
+<dd class="field-odd"><p>Quantity ro QuantityArray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -8549,7 +8650,7 @@ array.</p></li>
 <dd class="field-even"><p>Unit object.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>unyt.Unit</p>
+<dd class="field-odd"><p>Units</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the string is not a recognized unit.</p>
@@ -8619,16 +8720,16 @@ will be returned with the new units.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>arr</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>unyt.unyt_array</em>) – Quantity with or
-without units.</p></li>
+<li><p><strong>arr</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>Quantity</em><em>, </em><em>QuantityArray</em>) – Quantity with
+or without units.</p></li>
 <li><p><strong>new_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – New units that should be applied.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Array with new units.</p>
+<dd class="field-even"><p>Scalar or array with new units.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>unyt.unyt_array</p>
+<dd class="field-odd"><p>Quantity, QuantityArray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -8717,11 +8818,14 @@ to another.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.units.get_units">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.units.</span></span><span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/units.html#get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.units.get_units" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.units.</span></span><span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/units.html#get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.units.get_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the string representation of the units.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Object to get units for.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Object to get units for.</p></li>
+<li><p><strong>for_language</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Language requesting units.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Units, empty if input object has none.</p>
@@ -8730,12 +8834,6 @@ to another.</p>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="yggdrasil.units.get_ureg">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.units.</span></span><span class="sig-name descname"><span class="pre">get_ureg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/units.html#get_ureg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.units.get_ureg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the unit registry.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -8802,6 +8900,42 @@ dimensionless units will return True.</p></li>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></a></p>
 <p>Error raised when the yaml specification does not meet expectations.</p>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.yamlfile.backward_compat">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">backward_compat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iodict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#backward_compat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.backward_compat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize a yggdrasil input file for use with backward compatible
+features after it has been normalized via rapidjson.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – JSON document pre-normalized via rapidjson.</p></li>
+<li><p><strong>iodict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Utility dictionary tracking processed elements.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Backward compatible instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.yamlfile.backward_compat_connections">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">backward_compat_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iodict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#backward_compat_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.backward_compat_connections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.yamlfile.backward_compat_model_io">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">backward_compat_model_io</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iodict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#backward_compat_model_io"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.backward_compat_model_io" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.yamlfile.backward_compat_models">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">backward_compat_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iodict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#backward_compat_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.backward_compat_models" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.yamlfile.clone_github_repo">
@@ -8875,7 +9009,7 @@ None and will be ignored.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.yamlfile.load_yaml">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">load_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_for_clones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#load_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.load_yaml" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">load_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_for_clones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_submission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#load_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.load_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a yaml file defining a run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -8894,6 +9028,11 @@ ignored.</p></li>
 <li><p><strong>directory_for_clones</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Directory that git repositories
 should be cloned into. Defaults to None and the current working
 directory will be used.</p></li>
+<li><p><strong>model_submission</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the YAML will be evaluated
+as a submission to the yggdrasil model repository and model_only
+will be set to True. Defaults to False.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, steps of the YAML parsing
+process will be printed. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -8922,8 +9061,7 @@ existing components.</p>
 <li><p><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – YAML dictionary for a component.</p></li>
 <li><p><strong>ctype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Component type. This can be ‘input’, ‘output’,
 ‘model’, or ‘connection’.</p></li>
-<li><p><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary of existing components.
-Defaults to empty dict.</p></li>
+<li><p><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Dictionary of existing components.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -8992,7 +9130,7 @@ Defaults to empty dict.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.yamlfile.parse_yaml">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">parse_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complete_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_commtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_submission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_for_clones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.parse_yaml" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">parse_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complete_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_commtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_submission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_for_clones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.parse_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse list of yaml files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -9017,6 +9155,8 @@ ignored.</p></li>
 <li><p><strong>directory_for_clones</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Directory that git repositories
 should be cloned into. Defaults to None and the current working
 directory will be used.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, steps of the YAML parsing
+process will be printed. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -9038,8 +9178,8 @@ directory will be used.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="yggdrasil.yamlfile.prep_yaml">
-<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">prep_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_for_clones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#prep_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.prep_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare yaml to be parsed by jsonschema including covering backwards
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">prep_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_for_clones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_submission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#prep_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.prep_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare yaml to be parsed by rapidjson including covering backwards
 compatible options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -9053,10 +9193,33 @@ ignored.</p></li>
 <li><p><strong>directory_for_clones</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Directory that git repositories
 should be cloned into. Defaults to None and the current working
 directory will be used.</p></li>
+<li><p><strong>model_submission</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the YAML will be evaluated
+as a submission to the yggdrasil model repository and model_only
+will be set to True. Defaults to False.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, steps of the YAML parsing
+process will be printed. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>YAML ready to be parsed using schema.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yggdrasil.yamlfile.rwmeth2filetype">
+<span class="sig-prename descclassname"><span class="pre">yggdrasil.yamlfile.</span></span><span class="sig-name descname"><span class="pre">rwmeth2filetype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rw_meth</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/yamlfile.html#rwmeth2filetype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.yamlfile.rwmeth2filetype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the alternate properties that corresponding to the old
+read_meth/write_meth keywords.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rw_meth</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Read/write method name.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Property values equivalent to provided read/write method.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>

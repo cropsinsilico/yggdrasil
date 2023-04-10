@@ -1,41 +1,41 @@
 .. _schema_table_serializer_specific_rst:
 
-==================   =================   ================================================================================   ====================================
-Option               Type                Description                                                                        Valid For 'Seritype' Of             
-==================   =================   ================================================================================   ====================================
-as_array             boolean             If True, each of the arguments being serialized/deserialized will be arrays that   ['table']                           
-                                         are converted to/from bytes in column major ('F') order. Otherwise, each                                               
-                                         argument should be a scalar. Defaults to False.                                                                        
-default_flow_style   boolean             If True, nested collections will be serialized in the block style. If False,       ['yaml']                            
-                                         they will always be serialized in the flow style. See `PyYAML Documentation                                            
-                                         <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.                                                                       
-delimiter            string              Delimiter that should be used to separate name/value pairs in the map. Defaults    ['pandas', 'wofost', 'map', 'table']
-                                         to \t.                                                                                                                 
-encoded_datatype     schema              JSON schema describing the type that serialized objects should conform to.         ['functional']                      
-                                         Defaults to the class attribute default_encoded_datatype. If either                                                    
-                                         func_serialize or func_deserialize are not provided, this needs to be specified                                        
-                                         in order to serialize non-bytes objects.                                                                               
-encoding             string              Encoding that should be used to serialize the object. Defaults to 'utf-8'.         ['yaml']                            
-field_names          array               The names of fields in the format string. If not provided, names are set based     ['pandas', 'table']                 
-                                         on the order of the fields in the format string.                                                                       
-field_units          array               The units of fields in the format string. If not provided, all fields are          ['pandas', 'table']                 
-                                         assumed to be dimensionless.                                                                                           
-format_str           string              If provided, this string will be used to format messages from a list of            ['pandas', 'table']                 
-                                         arguments and parse messages to get a list of arguments in C printf/scanf style.                                       
-                                         Defaults to None and messages are assumed to already be bytes.                                                         
-func_deserialize     function            Callable object that takes objects of a type that conforms to encoded_datatype     ['functional']                      
-                                         and returns a deserialized Python object. Defaults to None and the default                                             
-                                         deserialization for encoded_datatype will be used.                                                                     
-func_serialize       function            Callable object that takes Python objects as input and returns a representation    ['functional']                      
-                                         that conforms to encoded_datatype. Defaults to None and the default                                                    
-                                         serialization for encoded_datatype will be used.                                                                       
-indent               ['string', 'int']   String or number of spaces that should be used to indent each level within the     ['yaml', 'json']                    
-                                         seiralized structure. Defaults to '\t'.                                                                                
-no_header            boolean             If True, headers will not be read or serialized from/to tables. Defaults to        ['pandas']                          
-                                         False.                                                                                                                 
-sort_keys            boolean             If True, the serialization of dictionaries will be in key sorted order. Defaults   ['json']                            
-                                         to True.                                                                                                               
-str_as_bytes         boolean             If True, strings in columns are read as bytes. Defaults to False.                  ['pandas']                          
-use_astropy          boolean             If True, the astropy package will be used to serialize/deserialize table.          ['pandas', 'table']                 
-                                         Defaults to False.                                                                                                     
-==================   =================   ================================================================================   ====================================
+==================   =================   ====================================   ================================================================================
+Option               Type                Valid For 'Seritype' Of                Description                                                                     
+==================   =================   ====================================   ================================================================================
+as_array             boolean             ['table']                              If True, each of the arguments being serialized/deserialized will be arrays that
+                                                                                are converted to/from bytes in column major ('F') order. Otherwise, each        
+                                                                                argument should be a scalar. Defaults to False.                                 
+default_flow_style   boolean             ['yaml']                               If True, nested collections will be serialized in the block style. If False,    
+                                                                                they will always be serialized in the flow style. See `PyYAML Documentation     
+                                                                                <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.                                
+delimiter            string              ['table', 'wofost', 'pandas', 'map']   Delimiter that should be used to separate name/value pairs in the map. Defaults 
+                                                                                to \t.                                                                          
+encoded_datatype     schema              ['functional']                         JSON schema describing the type that serialized objects should conform to.      
+                                                                                Defaults to the class attribute default_encoded_datatype. If either             
+                                                                                func_serialize or func_deserialize are not provided, this needs to be specified 
+                                                                                in order to serialize non-bytes objects.                                        
+encoding             string              ['yaml']                               Encoding that should be used to serialize the object. Defaults to 'utf-8'.      
+field_names          array               ['table', 'pandas']                    The names of fields in the format string. If not provided, names are set based  
+                                                                                on the order of the fields in the format string.                                
+field_units          array               ['table', 'pandas']                    The units of fields in the format string. If not provided, all fields are       
+                                                                                assumed to be dimensionless.                                                    
+format_str           string              ['table', 'pandas']                    If provided, this string will be used to format messages from a list of         
+                                                                                arguments and parse messages to get a list of arguments in C printf/scanf style.
+                                                                                Defaults to None and messages are assumed to already be bytes.                  
+func_deserialize     function            ['functional']                         Callable object that takes objects of a type that conforms to encoded_datatype  
+                                                                                and returns a deserialized Python object. Defaults to None and the default      
+                                                                                deserialization for encoded_datatype will be used.                              
+func_serialize       function            ['functional']                         Callable object that takes Python objects as input and returns a representation 
+                                                                                that conforms to encoded_datatype. Defaults to None and the default             
+                                                                                serialization for encoded_datatype will be used.                                
+indent               ['string', 'int']   ['json', 'yaml']                       String or number of spaces that should be used to indent each level within the  
+                                                                                seiralized structure. Defaults to '\t'.                                         
+no_header            boolean             ['pandas']                             If True, headers will not be read or serialized from/to tables. Defaults to     
+                                                                                False.                                                                          
+sort_keys            boolean             ['json']                               If True, the serialization of dictionaries will be in key sorted order. Defaults
+                                                                                to True.                                                                        
+str_as_bytes         boolean             ['pandas']                             If True, strings in columns are read as bytes. Defaults to False.               
+use_astropy          boolean             ['table', 'pandas']                    If True, the astropy package will be used to serialize/deserialize table.       
+                                                                                Defaults to False.                                                              
+==================   =================   ====================================   ================================================================================

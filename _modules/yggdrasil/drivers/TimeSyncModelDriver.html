@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.TimeSyncModelDriver &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.drivers.TimeSyncModelDriver &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -152,7 +152,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is dedicated to synchronizing&#39;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is dedicated to synchronizing &#39;</span>
                                    <span class="s1">&#39;timesteps between other models.&#39;</span><span class="p">)</span>
     <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;synonyms&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
@@ -196,7 +196,11 @@
             <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
             <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                                      <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{}}}</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{}},</span>
+        <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                 <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;number&#39;</span><span class="p">]},</span>
+                 <span class="s1">&#39;allowSingular&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}}</span>
+    <span class="n">_schema_no_default_subtype</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;timesync&#39;</span>
     <span class="n">executable_type</span> <span class="o">=</span> <span class="s1">&#39;other&#39;</span>
 

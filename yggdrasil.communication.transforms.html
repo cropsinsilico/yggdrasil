@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.transforms package &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.communication.transforms package &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -108,6 +108,11 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.transforms.ArrayTransform.</span></span><span class="sig-name descname"><span class="pre">ArrayTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/ArrayTransform.html#ArrayTransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.ArrayTransform.ArrayTransform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.transforms.TransformBase.TransformBase" title="yggdrasil.communication.transforms.TransformBase.TransformBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformBase</span></code></a></p>
 <p>Class for consolidating values into an array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – Names of fields in the array.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.transforms.ArrayTransform.ArrayTransform.check_array_items">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_array_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items_as_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/ArrayTransform.html#ArrayTransform.check_array_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.ArrayTransform.ArrayTransform.check_array_items" title="Permalink to this definition">¶</a></dt>
@@ -374,6 +379,12 @@ keywords.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.transforms.FilterTransform.</span></span><span class="sig-name descname"><span class="pre">FilterTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/FilterTransform.html#FilterTransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.FilterTransform.FilterTransform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.transforms.TransformBase.TransformBase" title="yggdrasil.communication.transforms.TransformBase.TransformBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformBase</span></code></a></p>
 <p>Class for applying a filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<a class="reference internal" href="yggdrasil.communication.filters.html#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><em>FilterBase</em></a>) – Filter used to exclude some messages based
+on their contents.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.transforms.FilterTransform.FilterTransform.evaluate_transform">
 <span class="sig-name descname"><span class="pre">evaluate_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/FilterTransform.html#FilterTransform.evaluate_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.FilterTransform.FilterTransform.evaluate_transform" title="Permalink to this definition">¶</a></dt>
@@ -841,6 +852,93 @@ to the supplied datatype.</p>
 </dd></dl>
 
 </section>
+<section id="module-yggdrasil.communication.transforms.SelectScalarTransform">
+<span id="yggdrasil-communication-transforms-selectscalartransform-module"></span><h2>yggdrasil.communication.transforms.SelectScalarTransform module<a class="headerlink" href="#module-yggdrasil.communication.transforms.SelectScalarTransform" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.transforms.SelectScalarTransform.</span></span><span class="sig-name descname"><span class="pre">SelectScalarTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/SelectScalarTransform.html#SelectScalarTransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.transforms.SelectFieldsTransform.SelectFieldsTransform" title="yggdrasil.communication.transforms.SelectFieldsTransform.SelectFieldsTransform"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelectFieldsTransform</span></code></a></p>
+<p>Class for selecting a single element from an array or dict
+and returning it as a scalar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>string</em><em>, </em><em>optional</em>) – Array index or dictionary
+key to select. Defaults to selecting the first element in
+an array or the first key alphabetically.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.evaluate_transform">
+<span class="sig-name descname"><span class="pre">evaluate_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/SelectScalarTransform.html#SelectScalarTransform.evaluate_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.evaluate_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call transform on the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message object to transform.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the
+parent class.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.get_testing_options">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_testing_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/SelectScalarTransform.html#SelectScalarTransform.get_testing_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options for the transform class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Multiple dictionaries of keywords and messages before/after</dt><dd><p>pairs that will result from the transform created by the provided
+keywords.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.selected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">selected</span></span><a class="headerlink" href="#yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selected fields for use by base class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.transform_datatype">
+<span class="sig-name descname"><span class="pre">transform_datatype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/SelectScalarTransform.html#SelectScalarTransform.transform_datatype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.SelectScalarTransform.SelectScalarTransform.transform_datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the datatype that will result from applying the transform
+to the supplied datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Datatype to transform.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed datatype.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-yggdrasil.communication.transforms.StatementTransform">
 <span id="yggdrasil-communication-transforms-statementtransform-module"></span><h2>yggdrasil.communication.transforms.StatementTransform module<a class="headerlink" href="#module-yggdrasil.communication.transforms.StatementTransform" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -928,17 +1026,39 @@ messages. Defaults to None.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.transforms.TransformBase.TransformBase.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/TransformBase.html#TransformBase.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.__call__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/TransformBase.html#TransformBase.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call transform on the provided message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message object to transform.</p></li>
-<li><p><strong>no_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the transformation occurs in
-place. Otherwise a copy is created and transformed. Defaults
-to False.</p></li>
 <li><p><strong>no_init</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the datatype is not initialized
 if it is not already set. Defaults to False.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to
+call_transform.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.TransformBase.TransformBase.call_transform">
+<span class="sig-name descname"><span class="pre">call_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/TransformBase.html#TransformBase.call_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.call_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call transform, setting datatypes during the process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message object to transform.</p></li>
+<li><p><strong>no_init</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the datatype is not initialized
+if it is not already set. Defaults to False.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to
+evaluate_transform.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -984,6 +1104,39 @@ to False.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.TransformBase.TransformBase.set_original_datatype_from_data">
+<span class="sig-name descname"><span class="pre">set_original_datatype_from_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/TransformBase.html#TransformBase.set_original_datatype_from_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.set_original_datatype_from_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set datatype from data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Data object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.TransformBase.TransformBase.set_transformed_datatype">
+<span class="sig-name descname"><span class="pre">set_transformed_datatype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/TransformBase.html#TransformBase.set_transformed_datatype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.set_transformed_datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Datatype.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.TransformBase.TransformBase.set_transformed_datatype_from_data">
+<span class="sig-name descname"><span class="pre">set_transformed_datatype_from_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/TransformBase.html#TransformBase.set_transformed_datatype_from_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.set_transformed_datatype_from_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set datatype from data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Data object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.transforms.TransformBase.TransformBase.transform_datatype">
 <span class="sig-name descname"><span class="pre">transform_datatype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/TransformBase.html#TransformBase.transform_datatype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.transform_datatype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the datatype that will result from applying the transform
@@ -996,6 +1149,17 @@ to the supplied datatype.</p>
 <dd class="field-even"><p>Transformed datatype.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.TransformBase.TransformBase.transformed_datatype">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transformed_datatype</span></span><a class="headerlink" href="#yggdrasil.communication.transforms.TransformBase.TransformBase.transformed_datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>The transformed datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
 </dd>
 </dl>

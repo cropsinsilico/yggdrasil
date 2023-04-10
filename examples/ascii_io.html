@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ascii_io &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>ascii_io &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -142,11 +142,11 @@
 <span class="linenos"> 26</span><span class="w">  </span><span class="c1">// Read lines from ASCII text file until end of file is reached.</span>
 <span class="linenos"> 27</span><span class="w">  </span><span class="c1">// As each line is received, it is then sent to the output ASCII file.</span>
 <span class="linenos"> 28</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;ascii_io(C): Receiving/sending ASCII file.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 29</span><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">;</span>
+<span class="linenos"> 29</span><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">;</span>
 <span class="linenos"> 30</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">line_size</span><span class="p">);</span>
 <span class="linenos"> 31</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos"> 32</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 33</span><span class="w">    </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">;</span><span class="w"> </span><span class="c1">// Reset to size of buffer</span>
+<span class="linenos"> 33</span><span class="w">    </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">;</span><span class="w"> </span><span class="c1">// Reset to size of buffer</span>
 <span class="linenos"> 34</span>
 <span class="linenos"> 35</span><span class="w">    </span><span class="c1">// Receive a single line</span>
 <span class="linenos"> 36</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRecvRealloc</span><span class="p">(</span><span class="n">FileInput</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">line_size</span><span class="p">);</span>
@@ -269,12 +269,12 @@
 <span class="linenos"> 25</span><span class="w">  </span><span class="c1">// Read lines from ASCII text file until end of file is reached.</span>
 <span class="linenos"> 26</span><span class="w">  </span><span class="c1">// As each line is received, it is then sent to the output ASCII file.</span>
 <span class="linenos"> 27</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;ascii_io(CPP): Receiving/sending ASCII file.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 28</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">LINE_SIZE_MAX</span><span class="p">);</span>
-<span class="linenos"> 29</span><span class="w">  </span><span class="c1">// char line[LINE_SIZE_MAX];</span>
+<span class="linenos"> 28</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">BSIZE</span><span class="p">);</span>
+<span class="linenos"> 29</span><span class="w">  </span><span class="c1">// char line[BSIZE];</span>
 <span class="linenos"> 30</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos"> 31</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 32</span><span class="w">    </span><span class="c1">// Receive a single line</span>
-<span class="linenos"> 33</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileInput</span><span class="p">.</span><span class="n">recv_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">);</span>
+<span class="linenos"> 33</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileInput</span><span class="p">.</span><span class="n">recv_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span>
 <span class="linenos"> 34</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 35</span><span class="w">      </span><span class="c1">// If the receive was succesful, send the line to output</span>
 <span class="linenos"> 36</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;File: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="p">);</span>
@@ -378,7 +378,7 @@
 <span class="linenos">  7</span>  integer :: error_code = 0
 <span class="linenos">  8</span>  type(yggcomm) :: file_input, file_output, &amp;
 <span class="linenos">  9</span>       table_input, table_output, array_input, array_output
-<span class="linenos"> 10</span>  integer(kind=c_size_t), target :: line_size = LINE_SIZE_MAX
+<span class="linenos"> 10</span>  integer(kind=c_size_t), target :: line_size = BSIZE
 <span class="linenos"> 11</span>  type(yggchar_r) :: line  ! Wrapped to be reallocatable
 <span class="linenos"> 12</span>  character(len=BSIZE), target :: name
 <span class="linenos"> 13</span>  integer(kind=c_size_t), target :: name_siz = BSIZE
@@ -714,7 +714,7 @@
 <span class="linenos">44</span>  if (ret) {
 <span class="linenos">45</span>    # If the receive was succesful, send the values to output.
 <span class="linenos">46</span>    # Formatting is taken care of on the output driver side.
-<span class="linenos">47</span>    fprintf(&quot;Table: %s, %d, %3.1f, %s&quot;, line[[1]], line[[2]], line[[3]], line[[4]])
+<span class="linenos">47</span>    fprintf(&quot;Table: %s, %f, %3.1f, %s&quot;, line[[1]], line[[2]], line[[3]], line[[4]])
 <span class="linenos">48</span>    ret &lt;- out_table$send(line[[1]], line[[2]], line[[3]], line[[4]])
 <span class="linenos">49</span>    if (!ret) {
 <span class="linenos">50</span>      stop(&quot;ascii_io(R): ERROR SENDING ROW&quot;)
@@ -956,11 +956,11 @@
 <span class="linenos"> 26</span><span class="w">  </span><span class="c1">// Read lines from ASCII text file until end of file is reached.</span>
 <span class="linenos"> 27</span><span class="w">  </span><span class="c1">// As each line is received, it is then sent to the output ASCII file.</span>
 <span class="linenos"> 28</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;ascii_io(C): Receiving/sending ASCII file.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 29</span><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">;</span>
+<span class="linenos"> 29</span><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">;</span>
 <span class="linenos"> 30</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">line_size</span><span class="p">);</span>
 <span class="linenos"> 31</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos"> 32</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 33</span><span class="w">    </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">;</span><span class="w"> </span><span class="c1">// Reset to size of buffer</span>
+<span class="linenos"> 33</span><span class="w">    </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">;</span><span class="w"> </span><span class="c1">// Reset to size of buffer</span>
 <span class="linenos"> 34</span>
 <span class="linenos"> 35</span><span class="w">    </span><span class="c1">// Receive a single line</span>
 <span class="linenos"> 36</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRecvRealloc</span><span class="p">(</span><span class="n">FileInput</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">line_size</span><span class="p">);</span>
@@ -1083,12 +1083,12 @@
 <span class="linenos"> 25</span><span class="w">  </span><span class="c1">// Read lines from ASCII text file until end of file is reached.</span>
 <span class="linenos"> 26</span><span class="w">  </span><span class="c1">// As each line is received, it is then sent to the output ASCII file.</span>
 <span class="linenos"> 27</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;ascii_io(CPP): Receiving/sending ASCII file.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 28</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">LINE_SIZE_MAX</span><span class="p">);</span>
-<span class="linenos"> 29</span><span class="w">  </span><span class="c1">// char line[LINE_SIZE_MAX];</span>
+<span class="linenos"> 28</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">BSIZE</span><span class="p">);</span>
+<span class="linenos"> 29</span><span class="w">  </span><span class="c1">// char line[BSIZE];</span>
 <span class="linenos"> 30</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos"> 31</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 32</span><span class="w">    </span><span class="c1">// Receive a single line</span>
-<span class="linenos"> 33</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileInput</span><span class="p">.</span><span class="n">recv_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">);</span>
+<span class="linenos"> 33</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileInput</span><span class="p">.</span><span class="n">recv_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span>
 <span class="linenos"> 34</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 35</span><span class="w">      </span><span class="c1">// If the receive was succesful, send the line to output</span>
 <span class="linenos"> 36</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;File: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="p">);</span>
@@ -1192,7 +1192,7 @@
 <span class="linenos">  7</span>  integer :: error_code = 0
 <span class="linenos">  8</span>  type(yggcomm) :: file_input, file_output, &amp;
 <span class="linenos">  9</span>       table_input, table_output, array_input, array_output
-<span class="linenos"> 10</span>  integer(kind=c_size_t), target :: line_size = LINE_SIZE_MAX
+<span class="linenos"> 10</span>  integer(kind=c_size_t), target :: line_size = BSIZE
 <span class="linenos"> 11</span>  type(yggchar_r) :: line  ! Wrapped to be reallocatable
 <span class="linenos"> 12</span>  character(len=BSIZE), target :: name
 <span class="linenos"> 13</span>  integer(kind=c_size_t), target :: name_siz = BSIZE
@@ -1442,7 +1442,7 @@
 <span class="linenos">44</span>  if (ret) {
 <span class="linenos">45</span>    # If the receive was succesful, send the values to output.
 <span class="linenos">46</span>    # Formatting is taken care of on the output driver side.
-<span class="linenos">47</span>    fprintf(&quot;Table: %s, %d, %3.1f, %s&quot;, line[[1]], line[[2]], line[[3]], line[[4]])
+<span class="linenos">47</span>    fprintf(&quot;Table: %s, %f, %3.1f, %s&quot;, line[[1]], line[[2]], line[[3]], line[[4]])
 <span class="linenos">48</span>    ret &lt;- out_table$send(line[[1]], line[[2]], line[[3]], line[[4]])
 <span class="linenos">49</span>    if (!ret) {
 <span class="linenos">50</span>      stop(&quot;ascii_io(R): ERROR SENDING ROW&quot;)
@@ -1651,11 +1651,11 @@
 <span class="linenos"> 26</span><span class="w">  </span><span class="c1">// Read lines from ASCII text file until end of file is reached.</span>
 <span class="linenos"> 27</span><span class="w">  </span><span class="c1">// As each line is received, it is then sent to the output ASCII file.</span>
 <span class="linenos"> 28</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;ascii_io(C): Receiving/sending ASCII file.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 29</span><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">;</span>
+<span class="linenos"> 29</span><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">;</span>
 <span class="linenos"> 30</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">line_size</span><span class="p">);</span>
 <span class="linenos"> 31</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos"> 32</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos"> 33</span><span class="w">    </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">;</span><span class="w"> </span><span class="c1">// Reset to size of buffer</span>
+<span class="linenos"> 33</span><span class="w">    </span><span class="n">line_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">;</span><span class="w"> </span><span class="c1">// Reset to size of buffer</span>
 <span class="linenos"> 34</span>
 <span class="linenos"> 35</span><span class="w">    </span><span class="c1">// Receive a single line</span>
 <span class="linenos"> 36</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">yggRecvRealloc</span><span class="p">(</span><span class="n">FileInput</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">line_size</span><span class="p">);</span>
@@ -1824,12 +1824,12 @@
 <span class="linenos"> 25</span><span class="w">  </span><span class="c1">// Read lines from ASCII text file until end of file is reached.</span>
 <span class="linenos"> 26</span><span class="w">  </span><span class="c1">// As each line is received, it is then sent to the output ASCII file.</span>
 <span class="linenos"> 27</span><span class="w">  </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;ascii_io(CPP): Receiving/sending ASCII file.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-<span class="linenos"> 28</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">LINE_SIZE_MAX</span><span class="p">);</span>
-<span class="linenos"> 29</span><span class="w">  </span><span class="c1">// char line[LINE_SIZE_MAX];</span>
+<span class="linenos"> 28</span><span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">BSIZE</span><span class="p">);</span>
+<span class="linenos"> 29</span><span class="w">  </span><span class="c1">// char line[BSIZE];</span>
 <span class="linenos"> 30</span><span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos"> 31</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 32</span><span class="w">    </span><span class="c1">// Receive a single line</span>
-<span class="linenos"> 33</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileInput</span><span class="p">.</span><span class="n">recv_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="n">LINE_SIZE_MAX</span><span class="p">);</span>
+<span class="linenos"> 33</span><span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileInput</span><span class="p">.</span><span class="n">recv_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="n">BSIZE</span><span class="p">);</span>
 <span class="linenos"> 34</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 35</span><span class="w">      </span><span class="c1">// If the receive was succesful, send the line to output</span>
 <span class="linenos"> 36</span><span class="w">      </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;File: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="p">);</span>
@@ -1979,7 +1979,7 @@
 <span class="linenos">  7</span>  integer :: error_code = 0
 <span class="linenos">  8</span>  type(yggcomm) :: file_input, file_output, &amp;
 <span class="linenos">  9</span>       table_input, table_output, array_input, array_output
-<span class="linenos"> 10</span>  integer(kind=c_size_t), target :: line_size = LINE_SIZE_MAX
+<span class="linenos"> 10</span>  integer(kind=c_size_t), target :: line_size = BSIZE
 <span class="linenos"> 11</span>  type(yggchar_r) :: line  ! Wrapped to be reallocatable
 <span class="linenos"> 12</span>  character(len=BSIZE), target :: name
 <span class="linenos"> 13</span>  integer(kind=c_size_t), target :: name_siz = BSIZE
@@ -2453,7 +2453,7 @@
 <span class="linenos">44</span>  if (ret) {
 <span class="linenos">45</span>    # If the receive was succesful, send the values to output.
 <span class="linenos">46</span>    # Formatting is taken care of on the output driver side.
-<span class="linenos">47</span>    fprintf(&quot;Table: %s, %d, %3.1f, %s&quot;, line[[1]], line[[2]], line[[3]], line[[4]])
+<span class="linenos">47</span>    fprintf(&quot;Table: %s, %f, %3.1f, %s&quot;, line[[1]], line[[2]], line[[3]], line[[4]])
 <span class="linenos">48</span>    ret &lt;- out_table$send(line[[1]], line[[2]], line[[3]], line[[4]])
 <span class="linenos">49</span>    if (!ret) {
 <span class="linenos">50</span>      stop(&quot;ascii_io(R): ERROR SENDING ROW&quot;)

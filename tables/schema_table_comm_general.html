@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -105,12 +105,7 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>commtype</p></td>
-<td><p>string</p></td>
-<td><p>X</p></td>
-<td><p>Communication mechanism that should be used. (Options described <a class="reference internal" href="../yaml.html#schema-table-comm-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
-</tr>
-<tr class="row-odd"><td><p>datatype</p></td>
+<tr class="row-even"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>X</p></td>
 <td><p>JSON schema (with expanded core types defined by yggdrasil) that constrains
@@ -118,21 +113,16 @@ the type of data that should be sent/received by this object. Defaults to
 {‘type’: ‘bytes’}. Additional information on specifying datatypes can be found
 <a class="reference internal" href="../advanced/datatypes.html#datatypes-rst"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>name</p></td>
+<tr class="row-odd"><td><p>name</p></td>
 <td><p>string</p></td>
 <td><p>X</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
-<tr class="row-odd"><td><p>address</p></td>
+<tr class="row-even"><td><p>address</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>Communication info. Default to None and address is taken from the environment
 variable.</p></td>
-</tr>
-<tr class="row-even"><td><p>args</p></td>
-<td><p>string</p></td>
-<td></td>
-<td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
 <tr class="row-odd"><td><p>as_array</p></td>
 <td><p>boolean</p></td>
@@ -140,20 +130,23 @@ variable.</p></td>
 <td><p>[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved
 with either columns rather than row by row. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>default_file</p></td>
+<tr class="row-even"><td><p>commtype</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td><p>Comm information for a file that input should be drawn from (for input comms) or
-that output should be sent to (for output comms) in the event that a yaml does
-not pair the comm with another model comm or a file.</p></td>
+<td><p>Communication mechanism that should be used. (Options described <a class="reference internal" href="../yaml.html#schema-table-comm-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
 </tr>
-<tr class="row-odd"><td><p>default_value</p></td>
+<tr class="row-odd"><td><p>default_file</p></td>
+<td><p>object</p></td>
+<td></td>
+<td><p>Schema for file components.</p></td>
+</tr>
+<tr class="row-even"><td><p>default_value</p></td>
 <td><p>any</p></td>
 <td></td>
 <td><p>Value that should be returned in the event that a yaml does not pair the comm
 with another model comm or a file.</p></td>
 </tr>
-<tr class="row-even"><td><p>dont_copy</p></td>
+<tr class="row-odd"><td><p>dont_copy</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, the comm will not be duplicated in the even a model is duplicated via
@@ -161,54 +154,58 @@ the ‘copies’ parameter. Defaults to False except for in the case that a mode
 wrapped and the comm is inside the loop or that a model is a RPC input to a
 model server.</p></td>
 </tr>
-<tr class="row-odd"><td><p>driver</p></td>
+<tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>field_names</p></td>
+<tr class="row-odd"><td><p>field_names</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field names that should be used to label fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 field names are created based on the field order.</p></td>
 </tr>
-<tr class="row-odd"><td><p>field_units</p></td>
+<tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field units that should be used to convert fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 all fields are assumed to be unitless.</p></td>
 </tr>
-<tr class="row-even"><td><p>filter</p></td>
+<tr class="row-odd"><td><p>filter</p></td>
+<td><p>object</p></td>
 <td></td>
-<td></td>
-<td><p>Filter that will be used to determine when messages should be sent/received.
-Ignored if not provided.</p></td>
+<td><p>Schema for filter components.</p></td>
 </tr>
-<tr class="row-odd"><td><p>for_service</p></td>
+<tr class="row-even"><td><p>for_service</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, this comm bridges the gap to an integration running as a service,
 possibly on a remote machine. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>format_str</p></td>
+<tr class="row-odd"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>String that should be used to format/parse messages. Default to None.</p></td>
 </tr>
-<tr class="row-odd"><td><p>is_default</p></td>
+<tr class="row-even"><td><p>is_default</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, this comm was created to handle all input/output variables to/from a
 model. Defaults to False. This variable is used internally and should not be set
 explicitly in the YAML.</p></td>
 </tr>
-<tr class="row-even"><td><p>length_map</p></td>
+<tr class="row-odd"><td><p>length_map</p></td>
 <td><p>object</p></td>
 <td></td>
 <td><p>Map from pointer variable names to the names of variables where their length
 will be stored. Defaults to {}.</p></td>
+</tr>
+<tr class="row-even"><td><p>onexit</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>[DEPRECATED] Method of input/output driver to call when the connection closes</p></td>
 </tr>
 <tr class="row-odd"><td><p>outside_loop</p></td>
 <td><p>boolean</p></td>
@@ -217,26 +214,26 @@ will be stored. Defaults to {}.</p></td>
 receive/send calls for this comm will be outside the loop for the model.
 Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>recv_converter</p></td>
+<tr class="row-even"><td><p>serializer</p></td>
+<td><p>object</p></td>
 <td></td>
-<td></td>
-<td><p>Converter that should be used on received objects. Defaults to None.</p></td>
+<td><p>Schema for serializer components.</p></td>
 </tr>
-<tr class="row-odd"><td><p>send_converter</p></td>
-<td></td>
-<td></td>
-<td><p>Converter that should be used on sent objects. Defaults to None.</p></td>
-</tr>
-<tr class="row-even"><td><p>transform</p></td>
-<td></td>
+<tr class="row-odd"><td><p>transform</p></td>
+<td><p>array</p></td>
 <td></td>
 <td><p>One or more transformations that will be applied to messages that are
 sent/received. Ignored if not provided.</p></td>
 </tr>
-<tr class="row-odd"><td><p>vars</p></td>
+<tr class="row-even"><td><p>vars</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Names of variables to be sent/received by this comm. Defaults to [].</p></td>
+</tr>
+<tr class="row-odd"><td><p>working_dir</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>Working directory. If not provided, the current working directory is used.</p></td>
 </tr>
 </tbody>
 </table>

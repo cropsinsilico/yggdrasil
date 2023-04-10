@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C++ Interface &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>C++ Interface &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -120,13 +120,21 @@
              
   <section id="c-interface">
 <h1>C++ Interface<a class="headerlink" href="#c-interface" title="Permalink to this heading">¶</a></h1>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RAPIDJSON_YGGDRASIL">
+<span class="target" id="_ygg_interface_8hpp_1accd529b2d8761bc8a042e3fc56afcbd7"></span><span class="sig-name descname"><span class="n"><span class="pre">RAPIDJSON_YGGDRASIL</span></span></span><a class="headerlink" href="#c.RAPIDJSON_YGGDRASIL" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Flag for checking if YggInterface.hpp has already been included. </p>
+</dd></dl>
+
+</div>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv48YggInput">
 <span id="_CPPv38YggInput"></span><span id="_CPPv28YggInput"></span><span id="YggInput"></span><span class="target" id="class_ygg_input"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">YggInput</span></span></span><a class="headerlink" href="#_CPPv48YggInput" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;YggInterface.hpp&gt;</em></div>
-<p>Flag for checking if YggInterface.hpp has already been included. </p>
-<p>C++ interface to yggInput_t functionality.</p>
+<p>C++ interface to yggInput_t functionality. </p>
 <p>The <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> class is a basic wrapper around the C yggInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic input via an IPC queue. </p>
 <p>Subclassed by <a class="reference internal" href="#class_ygg_any_input"><span class="std std-ref">YggAnyInput</span></a>, <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>, <a class="reference internal" href="#class_ygg_generic_input"><span class="std std-ref">YggGenericInput</span></a>, <a class="reference internal" href="#class_ygg_j_s_o_n_array_input"><span class="std std-ref">YggJSONArrayInput</span></a>, <a class="reference internal" href="#class_ygg_j_s_o_n_object_input"><span class="std std-ref">YggJSONObjectInput</span></a>, <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>, <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a></p>
 <div class="breathe-sectiondef docutils container">

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Serialization &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Serialization &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -126,10 +126,9 @@
 of some type in the sending model’s language into bytes and then reversing
 the process (deserialization) by turning the bytes into a variable of an
 analagous type in the language of the receiving model.</p>
-<p>For most types, yggdrasil uses an enhanced version of
+<p>For most types, yggdrasil uses an <a class="reference external" href="https://github.com/cropsinsilico/rapidjson">enhanced version</a> of
 the <a class="reference external" href="https://www.json.org/">JSON data interchange format</a> to serialize
-data structures and uses <a class="reference external" href="https://json-schema.org/">JSON Schema</a> to describe
-and validate them. The use of JSON and JSON schema has the advantage that there
+data structures and uses <a class="reference external" href="https://json-schema.org/">JSON Schema</a> to describe, validate, and normalize them. The use of JSON and JSON schema has the advantage that there
 are many existing tools for reading, writing, and validating JSON serialized
 data that will make it easier to expand support to other languages in the future.
 For more complex data structures that are not easily or efficiently represented in
@@ -149,26 +148,16 @@ expansion type to the core set of JSON types.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>1darray</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>array</p></td>
+<tr class="row-even"><td><p>array</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Document</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggarr</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">cell</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
-<td><p>Support for dynamic arrays in C/C++ is
-still under development.</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><p>boolean</p></td>
+<tr class="row-odd"><td><p>boolean</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">logical</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
@@ -177,43 +166,43 @@ still under development.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>bytes</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">character(len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">bytes</span></code></p></td>
-<td><p>Precision X is preserved.</p></td>
+<tr class="row-even"><td><p>class</p></td>
+<td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python_class_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python_class_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggpython</span></code></p></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><p>complex</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">complex(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">numpy.complexX</span></code></p></td>
-<td><p>Precision X is preserved.</p></td>
+<tr class="row-odd"><td><p>function</p></td>
+<td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python_function_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python_function_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggpyfunc</span></code></p></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><p>float</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">real(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">single,</span> <span class="pre">double</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">numpy.floatX</span></code></p></td>
-<td><p>Precision X is preserved.</p></td>
+<tr class="row-even"><td><p>instance</p></td>
+<td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python_instance_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python_instance_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggpyinst</span></code></p></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><p>int</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">integer,</span> <span class="pre">bit64::integer64</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">integer(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">intX</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">numpy.intX</span></code></p></td>
-<td><p>Precision X is preserved.</p></td>
+<tr class="row-odd"><td><p>integer</p></td>
+<td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">integer</span></code></p></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><p>ndarray</p></td>
+<tr class="row-even"><td><p>ndarray</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
@@ -222,7 +211,7 @@ still under development.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>null</p></td>
+<tr class="row-odd"><td><p>null</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">NA</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
@@ -231,90 +220,72 @@ still under development.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>number</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<tr class="row-even"><td><p>number</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">real(kind</span> <span class="pre">=</span> <span class="pre">8)</span></code></p></td>
 <td></td>
 <td></td>
 <td><p>This covers the JSON default for
 floating point or integer values.</p></td>
 </tr>
-<tr class="row-even"><td><p>obj</p></td>
+<tr class="row-odd"><td><p>obj</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::ObjWavefront</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggobj</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>object</p></td>
+<tr class="row-even"><td><p>object</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Document</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggmap</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
-<td><p>Support for dynamic objects in C/C++ is
-still under development.</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><p>ply</p></td>
+<tr class="row-odd"><td><p>ply</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Ply</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggply</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>scalar</p></td>
+<tr class="row-even"><td><p>scalar</p></td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
-<td><p>yggdrasil defines scalars as an
-umbrella type encompassing int, uint,
-float, bytes, and unicode.</p></td>
+<td><p>yggdrasil defines scalars as an umbrella
+type encompassing int, uint, float,
+bytes, and unicode.</p></td>
 </tr>
-<tr class="row-even"><td><p>schema</p></td>
+<tr class="row-odd"><td><p>schema</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Document</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggschema</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>string</p></td>
+<tr class="row-even"><td><p>string</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character(len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
-<td><p>Encoding dependent on JSON library.</p></td>
-</tr>
-<tr class="row-even"><td><p>uint</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">integer</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">ygguintX</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">uintX</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">numpy.uintX</span></code></p></td>
-<td><p>Precision X is preserved.</p></td>
-</tr>
-<tr class="row-odd"><td><p>unicode</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">character(kind</span> <span class="pre">=</span> <span class="pre">selected_char_kind('ISO_10646'),</span> <span class="pre">len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
-<td><p>Precision X is preserved.</p></td>
+<td><p>User can specify an encoding for scalar
+strings.</p></td>
 </tr>
 </tbody>
 </table>
@@ -329,7 +300,7 @@ a dedicated string <code class="docutils literal notranslate"><span class="pre">
 <section id="message-header">
 <h2>Message Header<a class="headerlink" href="#message-header" title="Permalink to this heading">¶</a></h2>
 <p>Message headers are serialized JSON objects with properites that describe the message
-and can be used to deserialize and validate the message on receipt. Although each
+and can be used to ensure the message is complete on receipt. Although each
 header can contain any information, at a minimum the header must include the
 following properties:</p>
 <table class="docutils align-default" id="header-parameter-table-rst">
@@ -360,15 +331,9 @@ message is complete.</p></td>
 </tr>
 </tbody>
 </table>
-<p>Depending on the datatype of the object encoded in the body, additional properties
-may be required in order to deserialize and/or validate the object. The properties
-required by each type are defined in the yggdrasil
-<a class="reference internal" href="metaschema.html#metaschema-rst"><span class="std std-ref">JSON metaschema</span></a>. On deserialization, the header is
-validated against the metaschema, used to inform deserialization of the body, and
-then used as a JSON schema to validate the decoded data decoded from the body of the message.</p>
-<p>In addition to type information, the header is also used to pass information
+<p>The header is also used to pass information
 between models reguarding communication. This information can include things
-like addresses of temporary communication resources, acknowledgement that a
+like the type of messages that should be expected, metadata about the messages that was not serialized, addresses of temporary communication resources, acknowledgement that a
 message was received, and notifications about new or broken connections.</p>
 </section>
 <section id="message-body">
@@ -376,7 +341,7 @@ message was received, and notifications about new or broken connections.</p>
 <p>The message body is also a serialized JSON document, but during the encoding
 process, data of some types undergo an additional pre-encoding step in order
 to transform the data into a form that is more efficiently JSON encodable prior
-to actually serializing the data via JSON encoding. For
+to actually serializing the data via JSON encoding. This is handled in an <a class="reference external" href="https://github.com/cropsinsilico/rapidjson">extended version</a>  of the rapidjson package with a corresponding <a class="reference external" href="https://github.com/cropsinsilico/python-rapidjson">Python wrapper</a>. For
 example, encoding one million 64bit floats would 1) produce a very large JSON
 array and 2) require a large number of digits in order to preserve precision to
 the level of round-off error as would be expected when passing floats between
@@ -405,14 +370,8 @@ three different string related types. In addition to the core JSON <code class="
 type, which will be encoded and mapped to a datatype in
 the programming language of the receiving model according to the JSON
 implementation that is used (the JSON spec indicates UTF-8 should be used by
-default), yggdrasil also supports types of <code class="docutils literal notranslate"><span class="pre">unicode</span></code> and <code class="docutils literal notranslate"><span class="pre">bytes</span></code>.
-Data identified with the <code class="docutils literal notranslate"><span class="pre">bytes</span></code> type will be pre-encoded as ASCII strings
-using the base64 encoding. Data identified with the <code class="docutils literal notranslate"><span class="pre">unicode</span></code> type will
-be pre-encoded by encoding them as bytes using UTF-32 and then encoding those
-bytes as ASCII strings using the base64 encoding. On receipt, messages
-of either type are decoded from base64. Messages containing data specified
-as <code class="docutils literal notranslate"><span class="pre">unicode</span></code> will be decoded and stored in a unicode data type if one
-is available in the receiving language.
+default), yggdrasil also supports scalar strings that have explicit encodings. Support string scalar encodings currently include “ASCII”, “UTF8”, “UTF16”, “UTF32”, and “UCS4”. If no encoding is specified for a string scalar, “ASCII” is assumed. In addition to <code class="docutils literal notranslate"><span class="pre">string</span></code> scalars, two additional strings are supported for backwards compatibility: <code class="docutils literal notranslate"><span class="pre">unicode</span></code> and <code class="docutils literal notranslate"><span class="pre">bytes</span></code>. If not explicit encoding is provided with these types, <code class="docutils literal notranslate"><span class="pre">bytes</span></code> is treated as implying “ASCII” encoding and <code class="docutils literal notranslate"><span class="pre">unicode</span></code> is treated as implying “UCS4” encoding.
+Like other scalars, string scalars will also be encoded has ASCII via base64 on serialization and decoded when deserialized.
 If the receiving language dosn’t have a built-in unicode type (e.g. C),
 the message will be preserved in the encoded UTF-32 bytes format.</p>
 </section>

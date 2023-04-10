@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conditional I/O &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>Conditional I/O &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -196,9 +196,9 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>filtertype</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td><p>(Options described <a class="reference internal" href="tables/schema_table_filter_subtype.html#schema-table-filter-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+<td><p>Pass every message (Options described <a class="reference internal" href="tables/schema_table_filter_subtype.html#schema-table-filter-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
 </tr>
 </tbody>
 </table>
@@ -208,14 +208,18 @@
 <table class="docutils align-default" id="schema-table-filter-subtype-rst">
 <thead>
 <tr class="row-odd"><th class="head"><p>Filtertype</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>direct</p></td>
+<td><p>Pass every message</p></td>
 </tr>
 <tr class="row-odd"><td><p>function</p></td>
+<td><p>Filter messages based on a function</p></td>
 </tr>
 <tr class="row-even"><td><p>statement</p></td>
+<td><p>Filter messages based on a statement</p></td>
 </tr>
 </tbody>
 </table>
@@ -226,13 +230,14 @@
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
 <th class="head"><p>Type</p></th>
-<th class="head"><p>Description</p></th>
 <th class="head"><p>Valid For ‘Filtertype’ Of</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>function</p></td>
 <td><p>function</p></td>
+<td><p>[‘function’]</p></td>
 <td><p>The handle for a callable Python object (e.g. function) that should be used to
 determine if a message should be filtered or a string of the form “&lt;function
 file&gt;:&lt;function name&gt;” identifying a function where “&lt;function file&gt;” is the
@@ -240,16 +245,15 @@ module or Python file containing the function and “&lt;function name&gt;” is
 of the function. The function should take the message as input and return a
 boolean, True if the message should pass through the filter, False if it should
 not.</p></td>
-<td><p>[‘function’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>statement</p></td>
 <td><p>string</p></td>
+<td><p>[‘statement’]</p></td>
 <td><p>Python statement in terms of the message as represented by the string “%x%” that
 should evaluate to a boolean, True if the message should pass through the
 filter, False if it should not. The statement should only use a limited set of
 builtins and the math library (See yggdrasil.tools.safe_eval). If more complex
 relationships are required, use the FunctionFilter class.</p></td>
-<td><p>[‘statement’]</p></td>
 </tr>
 </tbody>
 </table>

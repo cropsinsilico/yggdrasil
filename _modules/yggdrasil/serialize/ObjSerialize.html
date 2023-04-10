@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.ObjSerialize &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.serialize.ObjSerialize &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -96,9 +96,152 @@
            <div itemprop="articleBody">
              
   <h1>Source code for yggdrasil.serialize.ObjSerialize</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.serialize.PlySerialize</span> <span class="kn">import</span> <span class="n">PlySerialize</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.ObjMetaschemaType</span> <span class="kn">import</span> <span class="n">ObjDict</span>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">rapidjson</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.PlySerialize</span> <span class="kn">import</span> <span class="n">PlySerialize</span><span class="p">,</span> <span class="n">GeometryBase</span>
 
+
+<div class="viewcode-block" id="ObjDict"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjDict">[docs]</a><span class="k">class</span> <span class="nc">ObjDict</span><span class="p">(</span><span class="n">GeometryBase</span><span class="p">,</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">ObjWavefront</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Enhanced dictionary class for storing Obj information.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ObjDict.from_shape"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjDict.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scene (openalea.plantgl.scene): Scene that should be descritized.</span>
+<span class="sd">            d (openalea.plantgl.descritizer): Descritizer.</span>
+<span class="sd">            conversion (float, optional): Conversion factor that should be</span>
+<span class="sd">                applied to the vertex positions. Defaults to 1.0.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iobj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">,</span>
+                                              <span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">iobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Texcoords</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordList</span><span class="p">:</span>
+                <span class="n">iobj</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;texcoords&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordList</span><span class="p">:</span>
+                    <span class="c1"># TODO: Should the coords be scaled?</span>
+                    <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">y</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordIndexList</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordIndexList</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]):</span>
+                            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                                <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="c1"># Normals</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalList</span><span class="p">:</span>
+                <span class="n">iobj</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;normals&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalList</span><span class="p">:</span>
+                    <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">z</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalIndexList</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalIndexList</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">]):</span>
+                            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                                <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;normal_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">iobj</span></div>
+
+<div class="viewcode-block" id="ObjDict.to_geom_args"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjDict.to_geom_args">[docs]</a>    <span class="k">def</span> <span class="nf">to_geom_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            conversion (float, optional): Conversion factor that should be</span>
+<span class="sd">                applied to the vertices. Defaults to 1.0.</span>
+<span class="sd">            name (str, optional): Name that should be given to the created</span>
+<span class="sd">                PlantGL symbol. Defaults to None and is ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: Class, arguments and keyword arguments for PlantGL geometry.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">openalea.plantgl.all</span> <span class="k">as</span> <span class="nn">pgl</span>
+        <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_geom_args</span><span class="p">(</span>
+            <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">index_class</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">Index</span>
+        <span class="n">array_class</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">IndexArray</span>
+        <span class="c1"># Texture coords</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;texcoords&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">obj_texcoords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]:</span>
+                <span class="n">obj_texcoords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pgl</span><span class="o">.</span><span class="n">Vector2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]),</span>
+                                                 <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))))</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;texCoordList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">Point2Array</span><span class="p">(</span><span class="n">obj_texcoords</span><span class="p">)</span>
+            <span class="n">obj_ftexcoords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]):</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">_f</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;texcoord_index&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_f</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;&#39;texcoord_index&#39; missing from face&quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">, texcoord indices will be &quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;ignored.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="n">obj_ftexcoords</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">break</span>
+                    <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_f</span><span class="p">[</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">obj_ftexcoords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_class</span><span class="p">(</span><span class="o">*</span><span class="n">entry</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">obj_ftexcoords</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;texCoordIndexList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_class</span><span class="p">(</span><span class="n">obj_ftexcoords</span><span class="p">)</span>
+        <span class="c1"># Normals</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;normals&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">obj_normals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">]:</span>
+                <span class="n">obj_normals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pgl</span><span class="o">.</span><span class="n">Vector3</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">]),</span>
+                                               <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="s1">&#39;j&#39;</span><span class="p">]),</span>
+                                               <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">])))</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">Point3Array</span><span class="p">(</span><span class="n">obj_normals</span><span class="p">)</span>
+            <span class="n">obj_fnormals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]):</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">_f</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;normal_index&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_f</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;&#39;normal_index&#39; missing from face&quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">, normal indices will be &quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;ignored.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="n">obj_fnormals</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">break</span>
+                    <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_f</span><span class="p">[</span><span class="s1">&#39;normal_index&#39;</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">obj_fnormals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_class</span><span class="p">(</span><span class="o">*</span><span class="n">entry</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">obj_fnormals</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalIndexList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_class</span><span class="p">(</span><span class="n">obj_fnormals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="ObjDict.apply_scalar_map"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjDict.apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the color of faces in a 3D object based on a scalar map.</span>
+<span class="sd">        This creates a copy unless no_copy is True.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scalar_arr (arr): Scalar values that should be mapped to colors</span>
+<span class="sd">                for each face.</span>
+<span class="sd">            color_map (str, optional): The name of the color map that should</span>
+<span class="sd">                be used. Defaults to &#39;plasma&#39;.</span>
+<span class="sd">            vmin (float, optional): Value that should map to the minimum of the</span>
+<span class="sd">                colormap. Defaults to min(scalar_arr).</span>
+<span class="sd">            vmax (float, optional): Value that should map to the maximum of the</span>
+<span class="sd">                colormap. Defaults to max(scalar_arr).</span>
+<span class="sd">            scaling (str, optional): Scaling that should be used to map the scalar</span>
+<span class="sd">                array onto the colormap. Defaults to &#39;linear&#39;.</span>
+<span class="sd">            scale_by_area (bool, optional): If True, the elements of the scalar</span>
+<span class="sd">                array will be multiplied by the area of the corresponding face.</span>
+<span class="sd">                If True, vmin and vmax should be in terms of the scaled array.</span>
+<span class="sd">                Defaults to False.</span>
+<span class="sd">            no_copy (bool, optional): If True, the returned object will not be a</span>
+<span class="sd">                copy. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Obj with updated vertex colors.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;_as_obj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">apply_scalar_map</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+    
 
 <div class="viewcode-block" id="ObjSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize">[docs]</a><span class="k">class</span> <span class="nc">ObjSerialize</span><span class="p">(</span><span class="n">PlySerialize</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing .obj file formats. Reader</span>
@@ -119,7 +262,8 @@
 <span class="sd">            bytes: Serialized message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">ObjDict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ObjSerialize.func_deserialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
@@ -131,8 +275,22 @@
 <span class="sd">            obj: Deserialized message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ObjDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">ObjDict</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
 
+<div class="viewcode-block" id="ObjSerialize.normalize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize a message to conform to the expected datatype.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (object): Message arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Normalized message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">ObjDict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">args</span>
+        <span class="k">return</span> <span class="n">ObjDict</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">PlySerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
+        
 <div class="viewcode-block" id="ObjSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
@@ -142,23 +300,42 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">ObjDict</span><span class="p">({</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">)},</span>
-                                    <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
-                                    <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)}],</span>
-                       <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">)},</span>
-                                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
-                                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)}]]})</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">ObjDict</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">)},</span>
+                          <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+                          <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+                          <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)}],</span>
+             <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[</span>
+                 <span class="p">[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">)},</span>
+                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)}],</span>
+                 <span class="p">[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)},</span>
+                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span><span class="p">)}],</span>
+                 <span class="p">[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">)},</span>
+                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)},</span>
+                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span><span class="p">)}]],</span>
+             <span class="s1">&#39;comments&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Author ygg_auto&quot;</span><span class="p">,</span> <span class="s2">&quot;Generated by yggdrasil&quot;</span><span class="p">]})</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;# Author ygg_auto</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# Generated by yggdrasil</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 0.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 1.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 0.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 1.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 1// 2// 3//</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 4// 5// 6//</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# Generated by yggdrasil</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0 0.0 0.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0 0.0 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0 1.0 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 1.0 1.0 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 1 2 3</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 2 3 4</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 1 2 3 4</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# Author ygg_auto</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# Generated by yggdrasil</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0 0.0 0.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0 0.0 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0 1.0 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 1.0 1.0 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 5 6 7</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 6 7 8</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 5 6 7 8&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

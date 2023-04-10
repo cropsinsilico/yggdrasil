@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.CompiledModelDriver &mdash; yggdrasil v1.8.5 documentation</title>
+  <title>yggdrasil.drivers.CompiledModelDriver &mdash; yggdrasil v1.9.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.8.5
+                v1.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -870,7 +870,7 @@
 <div class="viewcode-block" id="CompilationToolBase.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilationToolBase.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_first</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">unused_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_defaults</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">dont_skip_env_defaults</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">dont_skip_env_defaults</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># remove_flags=None,</span>
                   <span class="n">with_asan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of flags for the tool.</span>
 
@@ -910,8 +910,6 @@
             <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">out</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">output_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">output_first</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">output_first</span>
-        <span class="k">if</span> <span class="n">with_asan</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">asan_flags</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">asan_flags</span>
         <span class="c1"># Add default &amp; user defined flags</span>
         <span class="k">if</span> <span class="n">skip_defaults</span><span class="p">:</span>
             <span class="c1"># Include flags set by the environment (this is especially</span>
@@ -933,13 +931,15 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">outfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">output_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">append_flags</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">output_key</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span>
                              <span class="n">prepend</span><span class="o">=</span><span class="n">output_first</span><span class="p">,</span> <span class="n">no_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">with_asan</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">asan_flags</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">asan_flags</span>
         <span class="c1"># Handle unused keyword argumetns</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unused_kwargs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">unused_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">remove_flags</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">remove_flags</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                    <span class="n">out</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># if isinstance(remove_flags, list):</span>
+        <span class="c1">#     for x in remove_flags:</span>
+        <span class="c1">#         if x in out:</span>
+        <span class="c1">#             out.remove(x)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CompilationToolBase.get_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilationToolBase.get_executable">[docs]</a>    <span class="nd">@classmethod</span>
@@ -1441,15 +1441,15 @@
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not call command &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span>
                                    <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">),</span> <span class="n">e</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected call error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected call error </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">tools</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">raise</span>
         <span class="c1"># Check for output</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">skip_flags</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">out</span> <span class="o">!=</span> <span class="s1">&#39;clean&#39;</span><span class="p">):</span>
                 <span class="n">expected_products</span> <span class="o">=</span> <span class="p">[</span><span class="n">out</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;import_lib&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                    <span class="n">expected_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;import_lib&#39;</span><span class="p">])</span>
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">expected_products</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                             <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
@@ -1685,10 +1685,16 @@
                 <span class="n">dont_link</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dont_link</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="c1"># Add flag that model is yggdrasil</span>
+        <span class="c1"># Add flag that model is yggdrasil and set yggdrasil version</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_build_tool</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">__version__</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;definitions&#39;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;WITH_YGGDRASIL&#39;</span><span class="p">)</span>
+            <span class="n">yggver</span> <span class="o">=</span> <span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">yggver</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;YGGVER_MAJOR=</span><span class="si">{</span><span class="n">yggver</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+            <span class="c1"># if len(yggver) &gt; 1:</span>
+            <span class="c1">#     kwargs[&#39;definitions&#39;] += [f&#39;YGGVER_MINOR={yggver[1]}&#39;]</span>
         <span class="c1"># Add logging level as a definition</span>
         <span class="k">if</span> <span class="n">logging_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;definitions&#39;</span><span class="p">,</span> <span class="p">[])</span>
@@ -1955,7 +1961,8 @@
 <div class="viewcode-block" id="CompilerBase.asan_library"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilerBase.asan_library">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">asan_library</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the address sanitizer library.&quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">asan_flags</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">object_tool</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">asan_flags</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">object_tool</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="s1">&#39;asan_library&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_language_cache</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_language_cache</span><span class="p">[</span><span class="s1">&#39;asan_library&#39;</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
@@ -2224,7 +2231,7 @@
                     <span class="n">library_libs_nonstd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_f</span><span class="p">)</span>
                 <span class="k">if</span> <span class="p">(((</span><span class="bp">cls</span><span class="o">.</span><span class="n">tooltype</span> <span class="o">==</span> <span class="s1">&#39;linker&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x_f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">library_ext</span><span class="p">)</span>
                      <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;library_rpath&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">flag_options</span><span class="p">))):</span>
-                    <span class="k">if</span> <span class="n">x_d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">library_rpath</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">x_d</span> <span class="ow">and</span> <span class="n">x_d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">library_rpath</span><span class="p">:</span>
                         <span class="n">library_rpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_d</span><span class="p">)</span>
         <span class="c1"># Add libraries to library_flags instead of flags so they can be</span>
         <span class="c1"># used elsewhere</span>
@@ -2522,6 +2529,9 @@
     <span class="n">allow_parallel_build</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">locked_buildfile</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">kwargs_in_suffix</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;with_asan&#39;</span><span class="p">,</span> <span class="s1">&#39;disable_python_c_api&#39;</span><span class="p">,</span> <span class="s1">&#39;commtype&#39;</span><span class="p">]</span>
+    <span class="n">standard_libraries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">external_libraries</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">internal_libraries</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">skip_compile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buildfile_lock</span> <span class="o">=</span> <span class="kc">None</span>
@@ -3210,6 +3220,9 @@
         <span class="k">elif</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
             <span class="n">libclass</span> <span class="o">=</span> <span class="s1">&#39;external&#39;</span>
             <span class="n">libinfo</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">dep</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">standard_libraries</span><span class="p">:</span>
+            <span class="n">libclass</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span>
+            <span class="n">libinfo</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;libtype&#39;</span><span class="p">:</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">}</span>
         <span class="n">toolname</span> <span class="o">=</span> <span class="n">libinfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;toolname&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="p">)</span>
         <span class="c1"># Get default libtype and return if header_only library</span>
         <span class="k">if</span> <span class="n">libtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3261,24 +3274,21 @@
             <span class="n">dep_lang</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_info</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                 <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
             <span class="n">tool</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">dep_lang</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span>
-            <span class="n">import_lib</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="p">(((</span><span class="n">libinfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;windows_import&#39;</span><span class="p">)</span>
-                 <span class="ow">and</span> <span class="p">(</span><span class="n">libtype</span> <span class="o">==</span> <span class="s1">&#39;static&#39;</span><span class="p">))):</span>
-                <span class="c1"># Name import lib using dll</span>
-                <span class="n">import_lib</span> <span class="o">=</span> <span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">toolname</span> <span class="o">==</span> <span class="s1">&#39;cl&#39;</span><span class="p">)</span>
-                <span class="n">libtype</span> <span class="o">=</span> <span class="s1">&#39;shared&#39;</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">get_output_file</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="n">libtype</span><span class="p">,</span> <span class="n">no_src_ext</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                        <span class="n">build_library</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                        <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
                                        <span class="n">working_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">import_lib</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">out</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.lib&#39;</span>
+        <span class="k">elif</span> <span class="n">libclass</span> <span class="o">==</span> <span class="s1">&#39;standard&#39;</span><span class="p">:</span>
+            <span class="n">tool</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                                <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span><span class="o">.</span><span class="n">linker</span><span class="p">()</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tool</span><span class="o">.</span><span class="n">library_prefix</span><span class="si">}{</span><span class="n">dep</span><span class="si">}{</span><span class="n">tool</span><span class="o">.</span><span class="n">library_ext</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dep</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">dep</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not determine library path for &quot;</span>
-                                 <span class="s2">&quot;dependency &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">dep</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not determine library path for &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;dependency &#39;</span><span class="si">{</span><span class="n">dep</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;(libclass = </span><span class="si">{</span><span class="n">libclass</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">default</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -3331,6 +3341,8 @@
             <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dep_lang</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_include&#39;</span> <span class="o">%</span> <span class="n">dep</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">standard_libraries</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dep</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
@@ -3400,6 +3412,29 @@
                 <span class="n">new_deps</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[:</span><span class="n">min_dep</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_deps</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="n">min_dep</span><span class="p">:]</span>
         <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="CompiledModelDriver.is_standard_library"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.is_standard_library">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_standard_library</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dep</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is a standard library.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dep (str, tuple): Dependency name or tuple with language and</span>
+<span class="sd">                dependency name.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the dependency is a standard library, false</span>
+<span class="sd">                otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">drv</span> <span class="o">=</span> <span class="bp">cls</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="n">dep_lang</span> <span class="o">=</span> <span class="n">dep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dep</span> <span class="o">=</span> <span class="n">dep</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dep_lang</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
+                <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">dep_lang</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_standard_library</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">dep</span> <span class="ow">in</span> <span class="n">drv</span><span class="o">.</span><span class="n">standard_libraries</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompiledModelDriver.get_compiler_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompiledModelDriver.get_compiler_flags">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_compiler_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -3626,13 +3661,6 @@
             <span class="k">if</span> <span class="p">(((</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
                  <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">internal_dependencies</span><span class="p">))):</span>
                 <span class="n">internal_dependencies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_order</span><span class="p">(</span>
-                        <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">],</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
-                        <span class="n">disable_python_c_api</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;disable_python_c_api&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="n">dep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">internal_dependencies</span><span class="p">:</span>
-                        <span class="n">dep_info</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_info</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">dep_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">]:</span>
-                            <span class="n">internal_dependencies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_external_libraries</span><span class="p">(</span><span class="n">no_comm_libs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">external_dependencies</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_library_installed</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                     <span class="n">external_dependencies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -3647,7 +3675,8 @@
                 <span class="n">dep</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span> <span class="o">**</span><span class="n">suffix_kws</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dep_lib</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dry_run&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
-                     <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dep_lib</span><span class="p">)))):</span>
+                     <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dep_lib</span><span class="p">))</span>
+                     <span class="ow">and</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_standard_library</span><span class="p">(</span><span class="n">dep</span><span class="p">))):</span>
                     <span class="k">if</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">internal_dependencies</span><span class="p">:</span>
                         <span class="c1"># If this is called recursively, verify that</span>
                         <span class="c1"># dep_lib is produced by compiling dep.</span>
@@ -3663,7 +3692,7 @@
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dep_lib</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                             <span class="sa">f</span><span class="s2">&quot;Library for </span><span class="si">{</span><span class="n">dep</span><span class="si">}</span><span class="s2"> dependency does not &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;exist: &#39;dep_lib&#39;.&quot;</span><span class="p">)</span>
+                            <span class="sa">f</span><span class="s2">&quot;exist: &#39;</span><span class="si">{</span><span class="n">dep_lib</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">use_library_path_internal</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dep</span> <span class="ow">in</span> <span class="n">internal_dependencies</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skip_library_libs&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_library_path_internal</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
@@ -3797,6 +3826,8 @@
         <span class="k">if</span> <span class="n">lib</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">:</span>
             <span class="n">src</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_source</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lib</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">standard_libraries</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="n">dep_lang</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">lib</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">lib_typ</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">lib</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">lib_typ</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;for_python_api&#39;</span><span class="p">]:</span>
@@ -4309,23 +4340,13 @@
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_info</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">:</span>
                     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;toolname&#39;</span><span class="p">:</span>
-                    <span class="n">toolname</span> <span class="o">=</span> <span class="n">v</span>
-                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;for_python_api&#39;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dry_run&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                        <span class="k">assert</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;disable_python_c_api&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="n">src</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">src</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">src</span><span class="p">)):</span>
                 <span class="n">src</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_source</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;for_api&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="n">_default_libtype</span><span class="p">)</span>
             <span class="n">suffix_kws</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">select_suffix_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="n">windows_import</span> <span class="o">=</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;windows_import&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">windows_import</span><span class="p">:</span>
-                <span class="c1"># Compile dynamic library</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;shared&#39;</span>
             <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;header_only&#39;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">src</span>
             <span class="k">elif</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">]:</span>
@@ -4335,10 +4356,6 @@
                         <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span> <span class="o">**</span><span class="n">suffix_kws</span><span class="p">))</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;static&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;linker_language&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
                     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;archiver_language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;linker_language&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">windows_import</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
-                        <span class="s1">&#39;import_lib&#39;</span><span class="p">,</span>
-                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.lib&#39;</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;suffix&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;suffix&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_internal_suffix</span><span class="p">(</span><span class="o">**</span><span class="n">suffix_kws</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">call_compiler</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
