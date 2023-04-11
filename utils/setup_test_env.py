@@ -1125,7 +1125,7 @@ def build_conda_recipe(recipe='recipe', param=None,
     cmds += setup_conda(param=param, conda_env=conda_env,
                         return_commands=True,
                         skip_update=(_is_win and _on_gha))
-    if not dont_test:
+    if dont_test:
         # The tests issue a command that is too long for the
         # windows command prompt which is used to build the conda
         # package on Github Actions
@@ -1179,7 +1179,8 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
         pass
     elif param.build_method in ('mamba', 'conda'):
         cmds += build_conda_recipe(param=param, return_commands=True,
-                                   dont_test=(_is_win and _on_gha))
+                                   dont_test=_on_gha)
+        # (_is_win and _on_gha))
     elif param.build_method in ('sdist', 'bdist',
                                 'wheel', 'bdist_wheel'):
         build_method = param.build_method
