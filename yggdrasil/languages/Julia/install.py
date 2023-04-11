@@ -119,22 +119,7 @@ def call_julia(julia_cmd, **kwargs):
         bool: True if the call was successful, False otherwise.
 
     """
-    if 'env' not in kwargs:
-        kwargs['env'] = os.environ.copy()
-    kwargs['env']['PYTHON'] = sys.executable
-    if ((kwargs['env'].get('CONDA_PREFIX', None)
-         and not kwargs['env'].get('JULIA_DEPOT_PATH', None))):
-        kwargs['env']['JULIA_DEPOT_PATH'] = os.pathsep.join(
-            [os.path.join(kwargs['env']['CONDA_PREFIX'], 'share', 'julia'),
-             ''])
-        kwargs['env']['JULIA_PROJECT'] = (
-            f"@{os.path.basename(kwargs['env']['CONDA_PREFIX'])}")
-        kwargs['env']['JULIA_LOAD_PATH'] = os.pathsep.join(
-            ["@", kwargs['env']['JULIA_PROJECT'], "@stdlib"])
-        kwargs['env']['CONDA_JL_HOME'] = kwargs['env']['CONDA_PREFIX']
-        kwargs['env']['CONDA_JL_CONDA_EXE'] = kwargs['env']['CONDA_EXE']
-        kwargs['env']['JULIA_SSL_CA_ROOTS_PATH'] = os.path.join(
-            kwargs['env']['CONDA_PREFIX'], 'ssl', 'cacert.pem')
+    kwargs['env'] = set_env(kwargs.get('env', None))
     julia_script = os.path.join(tempfile.gettempdir(),
                                 'wrapper_%s.jl' % (
                                     str(uuid.uuid4()).replace('-', '_')))
@@ -149,6 +134,36 @@ def call_julia(julia_cmd, **kwargs):
     finally:
         os.remove(julia_script)
     return out
+
+
+def set_env(env=None):
+    r"""Set environment variables required to install yggdrasil package.
+
+    Args:
+        env (dict, optional): Dictionary to add environment variables to.
+
+    Returns:
+        dict: Updated dictionary.
+
+    """
+    if env is None:
+        env = os.environ.copy()
+    env['PYTHON'] = sys.executable
+    julia_exe = shutil.which('julia')
+    if ((julia_exe and env.get('CONDA_PREFIX', None)
+         and julia_exe.startswith(env['CONDA_PREFIX'])
+         and not env.get('JULIA_DEPOT_PATH', None))):
+        env['JULIA_DEPOT_PATH'] = os.pathsep.join(
+            [os.path.join(env['CONDA_PREFIX'], 'share', 'julia'), ''])
+        env['JULIA_PROJECT'] = (
+            f"@{os.path.basename(env['CONDA_PREFIX'])}")
+        env['JULIA_LOAD_PATH'] = os.pathsep.join(
+            ["@", env['JULIA_PROJECT'], "@stdlib"])
+        env['CONDA_JL_HOME'] = env['CONDA_PREFIX']
+        env['CONDA_JL_CONDA_EXE'] = env['CONDA_EXE']
+        env['JULIA_SSL_CA_ROOTS_PATH'] = os.path.join(
+            env['CONDA_PREFIX'], 'ssl', 'cacert.pem')
+    return env
 
 
 def make_call(julia_cmd, with_sudo=False, **kwargs):
