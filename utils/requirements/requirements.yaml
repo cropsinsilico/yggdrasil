@@ -63,6 +63,9 @@ general:
 extras:
   c:
     description: Dependencies required to compile and run models written in C/C++ as part of yggdrasil integrations
+    requires_extras:
+    - name: zmq
+      os: win
     requirements:
     - cmake:
         method: conda
@@ -159,7 +162,6 @@ extras:
         - method: conda_skip
   zmq:
     description: Dependencies required to run models using ZeroMQ sockets for communication in C/C++/Fortran
-    requires_extras: [c]
     requirements:
     - czmq:
         - method: conda
