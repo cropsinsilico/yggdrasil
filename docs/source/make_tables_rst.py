@@ -24,3 +24,4 @@ doctools.write_datatype_mapping_table(fname_dir=tables_dir, verbose=False)
 doctools.write_comm_devnotes_table(fname_dir=tables_dir, verbose=False)
 doctools.write_interface_mapping_table(fname_dir=tables_dir, verbose=False,
                                        style='list')
+doctools.write_package_extras_table(fname_dir=tables_dir, verbose=False)

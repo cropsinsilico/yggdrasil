@@ -438,6 +438,7 @@ class YggRequirementsList(UserList):
             args = (kwargs.pop('requirements'), )
         requires_extras = kwargs.pop('requires_extras', None)
         extras = kwargs.pop('extras', None)
+        description = kwargs.pop('description', None)
         if requires_extras:
             if extras is None:
                 extras = []
@@ -448,6 +449,7 @@ class YggRequirementsList(UserList):
         self.extras = extras
         self.data = [YggRequirement.from_file(x, extras=extras)
                      for x in self.data]
+        self.description = description
 
     @classmethod
     def from_files(cls, fname, skip=None, add=None):

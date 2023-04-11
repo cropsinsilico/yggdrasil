@@ -44,7 +44,8 @@ jobs:
         CIBW_ENVIRONMENT: PIP_ONLY_BINARY=numpy
         CIBW_SKIP: cp2* cp33* cp34* cp35* cp36* pp* cp310-manylinux_i686 cp311-manylinux_i686
           *-musllinux_*
-        CIBW_TEST_COMMAND: pytest -m representative_subset {project}/tests
+        CIBW_TEST_COMMAND: pytest -m representative_subset --import-mode=importlib
+          {project}/tests
         CIBW_TEST_REQUIRES: pytest flaky
       name: Build wheels
       uses: pypa/cibuildwheel@v2.12.1
