@@ -6,6 +6,7 @@ from tests.examples import TestExample as base_class
 
 
 @pytest.mark.extra_example
+@pytest.mark.representative_subset
 class TestExampleAsciiIO(base_class):
     r"""Test the AsciiIO example."""
 
@@ -57,9 +58,9 @@ class TestExampleAsciiIO(base_class):
     @pytest.fixture
     def results(self, input_file, input_table, input_array):
         r"""list: Results that should be found in the output files."""
-        assert(os.path.isfile(input_file))
-        assert(os.path.isfile(input_table))
-        assert(os.path.isfile(input_array))
+        assert os.path.isfile(input_file)
+        assert os.path.isfile(input_table)
+        assert os.path.isfile(input_array)
         with open(input_file, 'r') as fd:
             icont = fd.read()
         with open(input_table, 'rb') as fd:
