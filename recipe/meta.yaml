@@ -73,6 +73,7 @@ requirements:
     - scipy
     - six
     - sysv_ipc  # [not win]
+    - toml
     - unyt
 
 test:
@@ -161,7 +162,6 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - julia >=1.1.1  # [not win]
-        - toml
   - name: yggdrasil.mpi
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

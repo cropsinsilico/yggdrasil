@@ -125,12 +125,12 @@ def call_julia(julia_cmd, **kwargs):
     if ((kwargs['env'].get('CONDA_PREFIX', None)
          and not kwargs['env'].get('JULIA_DEPOT_PATH', None))):
         kwargs['env']['JULIA_DEPOT_PATH'] = os.pathsep.join(
-            os.path.join(kwargs['env']['CONDA_PREFIX'], 'share', 'julia'),
-            '')
+            [os.path.join(kwargs['env']['CONDA_PREFIX'], 'share', 'julia'),
+             ''])
         kwargs['env']['JULIA_PROJECT'] = (
             f"@{os.path.basename(kwargs['env']['CONDA_PREFIX'])}")
         kwargs['env']['JULIA_LOAD_PATH'] = os.pathsep.join(
-            "@", kwargs['env']['JULIA_PROJECT'], "@stdlib")
+            ["@", kwargs['env']['JULIA_PROJECT'], "@stdlib"])
         kwargs['env']['CONDA_JL_HOME'] = kwargs['env']['CONDA_PREFIX']
         kwargs['env']['CONDA_JL_CONDA_EXE'] = kwargs['env']['CONDA_EXE']
         kwargs['env']['JULIA_SSL_CA_ROOTS_PATH'] = os.path.join(

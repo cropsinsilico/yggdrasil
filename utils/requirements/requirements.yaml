@@ -54,6 +54,7 @@ general:
       flags:
         method_in_setup: conda
   - six
+  - toml
   - unyt
   - GitPython
   - sysv_ipc:
@@ -194,7 +195,6 @@ extras:
           os: unix
         - method: conda_skip
           os: win
-    - toml
   mpi:
     - mpi4py
     - mpi:

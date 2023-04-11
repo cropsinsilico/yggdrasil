@@ -94,6 +94,7 @@
       }
     },
     "six",
+    "toml",
     "unyt",
     "GitPython",
     {
@@ -366,8 +367,7 @@
             }
           ]
         }
-      },
-      "toml"
+      }
     ],
     "mpi": [
       "mpi4py",
