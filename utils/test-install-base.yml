@@ -502,27 +502,84 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: gh-pages
         FOLDER: docs/build/html/
-  deploy:
-    name: Publish package
-    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+
+  build_wheels:
+    name: Build wheels on ${{matrix.arch}} for ${{ matrix.os }}
+    # needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+          - macOS-11
+          - windows-2019
+      fail-fast: false
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - uses: docker/setup-qemu-action@v1
+        if: runner.os == 'Linux'
+        name: Set up QEMU
+        with:
+          platforms: all
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.12.1
+        env:
+          CIBW_ARCHS_LINUX: auto aarch64 ppc64le
+          CIBW_ARCHS_MACOS: x86_64 arm64
+          # CIBW_TEST_REQUIRES: "pytest pytest-benchmark pytz"
+          # CIBW_TEST_COMMAND: "pytest {project}/tests"
+          CIBW_SKIP: "cp2* cp33* cp34* cp35* cp36* pp* cp310-manylinux_i686 cp311-manylinux_i686 *-musllinux_*"
+          CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy"
+          CIBW_BEFORE_BUILD: pip install oldest-supported-numpy
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
+  
+  # deploy:
+  #   name: Publish package
+  #   needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     with:
+  #       submodules: true
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: 3.8
+  #   - name: Install dependencies
+  #     run: python utils/setup_test_env.py install pip
+  #   - name: Verify installation
+  #     run: python utils/setup_test_env.py verify
+  #   - name: Build the package
+  #     run: |
+  #       python setup.py sdist
+  #       python setup.py bdist_wheel
+  
+  upload_wheels:
+    name: Upload wheels
+    needs: build_wheels
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v2
       with:
-        submodules: true
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: python utils/setup_test_env.py install pip
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Build the package
-      run: |
-        python setup.py sdist
-        python setup.py bdist_wheel
+        name: artifact
+        path: dist
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:

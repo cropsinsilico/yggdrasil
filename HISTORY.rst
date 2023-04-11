@@ -2,7 +2,7 @@
 History
 =======
 
-1.9.0 (2023-04-07) Migrate to using extended version of rapidjson/python-rapidjson for serialization
+1.9.0 (2023-04-11) Migrate to using extended version of rapidjson/python-rapidjson for serialization
 ------------------
 
 * Dropped support for Python 3.5
