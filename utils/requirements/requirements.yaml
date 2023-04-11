@@ -196,9 +196,6 @@ extras:
         - name: juliaup
           method: conda
           host: true
-          os: unix
-        - method: conda_skip
-          os: win
   mpi:
     - mpi4py
     - mpi:

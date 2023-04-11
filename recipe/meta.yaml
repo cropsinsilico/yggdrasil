@@ -157,11 +157,11 @@ outputs:
         - {{ pin_subpackage('yggdrasil.julia') }}
     requirements:
       host:
-        - juliaup  # [not win]
+        - juliaup
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - juliaup  # [not win]
+        - juliaup
   - name: yggdrasil.mpi
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
