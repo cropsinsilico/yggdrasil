@@ -356,7 +356,7 @@
               "method": "choco"
             },
             {
-              "name": "julia>=1.1.1",
+              "name": "juliaup",
               "method": "conda",
               "host": true,
               "os": "unix"
