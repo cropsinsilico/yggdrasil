@@ -178,6 +178,7 @@ def test_save_load_schema():
     os.remove(fname)
 
 
+@pytest.mark.subset_rapidjson
 def test_normalize(normalize_objects, display_diff):
     r"""Test normalization of legacy formats."""
     s = schema.get_schema()
@@ -201,6 +202,7 @@ def test_normalize(normalize_objects, display_diff):
             raise
 
 
+@pytest.mark.subset_rapidjson
 def test_get_schema_subtype():
     r"""Test get_schema_subtype for allow_instance=True."""
     component = 'serializer'
@@ -258,6 +260,7 @@ def test_get_full_schema():
     s.get_schema(full=True)
 
 
+@pytest.mark.subset_rapidjson
 def test_validate_component():
     r"""Test validate_component."""
     s = schema.get_schema()

@@ -35,8 +35,10 @@ _markers = [
      "tests that must connect to a running remote service", None),
     ("serial", None,
      "tests that must be run in serial", None),
-    ("representative_subset", None,
-     "tests that represent a limited subset of the total tests", None)
+    ("subset_representative", None,
+     "tests that represent a limited subset of the total tests", None),
+    ("subset_rapidjson", None,
+     "tests that represent a limited subset of the rapidjson submodule", None)
 ]
 _params = {
     "example_name": [],

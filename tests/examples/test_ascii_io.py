@@ -6,7 +6,7 @@ from tests.examples import TestExample as base_class
 
 
 @pytest.mark.extra_example
-@pytest.mark.representative_subset
+@pytest.mark.subset_representative
 class TestExampleAsciiIO(base_class):
     r"""Test the AsciiIO example."""
 
