@@ -184,7 +184,6 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - codecov
         - conda-tree
         - coverage
         - flake8

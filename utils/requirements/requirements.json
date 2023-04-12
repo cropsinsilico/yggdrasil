@@ -458,7 +458,6 @@
     "testing": {
       "description": "Dependencies required to run yggdrasil tests",
       "requirements": [
-        "codecov",
         {
           "conda-tree": {
             "method": "conda"
