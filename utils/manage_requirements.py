@@ -107,10 +107,10 @@ class YggRequirements(UserDict):
             self.data['general'])
         for k in self.data['extras'].keys():
             self.data['extras'][k] = YggRequirementsList(
-                self.data['extras'][k], extras=[k])
+                self.data['extras'][k], extras=[{'name': k}])
         for k in self.data.pop('bespoke_extras', []):
             self.data['extras'][k] = YggRequirementsList(
-                [k], extras=[k])
+                [k], extras=[{'name': k}])
     
     @classmethod
     def from_file(cls, fname=None, force_yaml=False, add=None):
@@ -189,7 +189,7 @@ class YggRequirements(UserDict):
         out = YggRequirementsList()
         if param.for_development:
             out += self.data['general'].select(param, **kwargs)
-        for extra in self.data['extras']:
+        for extra in self.data['extras'].keys():
             if not param.install_opts[extra]:
                 continue
             out += self.data['extras'][extra].select(param, **kwargs)
@@ -223,7 +223,7 @@ class YggRequirements(UserDict):
             kwargs = {}
             if varient is not None:
                 for x in self.data['extras'][varient].extras:
-                    install_opts[x] = True
+                    install_opts[x['name']] = True
             elif 'conda' not in format_kws.get('included_methods', []):
                 kwargs['fallback_to_conda'] = False
             param = SetupParam(install_opts=install_opts, **kwargs)
@@ -319,7 +319,7 @@ class YggRequirements(UserDict):
             install_opts = get_install_opts(empty=True)
             if varient is not None:
                 for x in self.data['extras'][varient].extras:
-                    install_opts[x] = True
+                    install_opts[x['name']] = True
             param = SetupParam('conda', install_opts=install_opts,
                                deps_method='conda_recipe')
         if format_kws is None:
@@ -438,16 +438,26 @@ class YggRequirementsList(UserList):
             args = (kwargs.pop('requirements'), )
         requires_extras = kwargs.pop('requires_extras', None)
         extras = kwargs.pop('extras', None)
+        description = kwargs.pop('description', None)
+        if extras is not None:
+            for i in range(len(extras)):
+                if not isinstance(extras[i], dict):
+                    extras[i] = {'name': extras[i]}
         if requires_extras:
-            if extras is None:
-                extras = []
-            for k in requires_extras:
-                if k not in extras:
-                    extras.append(k)
+            for i in range(len(requires_extras)):
+                if not isinstance(requires_extras[i], dict):
+                    requires_extras[i] = {'name': requires_extras[i]}
+            # if extras is None:
+            #     extras = []
+            # for k in requires_extras:
+            #     if k['name'] not in [x['name'] for x in extras]:
+            #         extras.append(k)
         super(YggRequirementsList, self).__init__(*args, **kwargs)
+        self.requires_extras = requires_extras
         self.extras = extras
         self.data = [YggRequirement.from_file(x, extras=extras)
                      for x in self.data]
+        self.description = description
 
     @classmethod
     def from_files(cls, fname, skip=None, add=None):
@@ -540,7 +550,8 @@ class YggRequirementsList(UserList):
             included_methods = []
         if excluded_methods is None:
             excluded_methods = []
-        out = YggRequirementsList(extras=self.extras)
+        out = YggRequirementsList(extras=self.extras,
+                                  requires_extras=self.requires_extras)
         for x in self.data:
             if ((x.method in included_methods
                  and x.method not in excluded_methods)):
@@ -561,7 +572,8 @@ class YggRequirementsList(UserList):
             YggRequirementsList: List of selected requirements.
 
         """
-        out = YggRequirementsList(extras=self.extras)
+        out = YggRequirementsList(extras=self.extras,
+                                  requires_extras=self.requires_extras)
         for x in self.data:
             x.add_option(out, param, **kwargs)
         return out
@@ -635,7 +647,7 @@ class YggRequirementsList(UserList):
                 if x.flags.get('build', False)]
             if self.extras:
                 host_req.append('python')
-                name = self.extras[0]
+                name = self.extras[0]['name']
                 out['name'] = f"yggdrasil.{name}"
                 out['build'] = OrderedDict([
                     ('string', (
@@ -645,13 +657,22 @@ class YggRequirementsList(UserList):
                         f"{{{{ pin_subpackage('yggdrasil.{name}') }}}}"
                     ])
                 ])
-                if len(self.extras) > 1:
-                    req = [
-                        f"{{{{ pin_subpackage('yggdrasil.{x}', exact=True) }}}}"
-                        for x in self.extras[1:]] + req
-                else:
-                    req.insert(
-                        0, "{{ pin_subpackage('yggdrasil', exact=True) }}")
+            if self.requires_extras:
+                print('HERE', self, self.requires_extras)
+                req_old = req
+                req = []
+                for x in self.requires_extras:
+                    kws = dict(x)
+                    kws.pop('name')
+                    name = (f"{{{{ pin_subpackage("
+                            f"'yggdrasil.{x['name']}', "
+                            f"exact=True) }}}}")
+                    v = YggRequirement(name, **kws)
+                    req.append(v.conda_requirement(dont_isolate=True))
+                req += req_old
+            elif self.extras:
+                req.insert(
+                    0, "{{ pin_subpackage('yggdrasil', exact=True) }}")
             out['requirements'] = OrderedDict()
             if build_req:
                 out['requirements']['build'] = sorted(build_req)
@@ -1022,7 +1043,7 @@ class YggRequirement(object):
         if include_method and self.method != 'python':
             varients.append(self.method)
         if include_extra and self.extras is not None:
-            varients += self.extras
+            varients += [x['name'] for x in self.extras]
         if varients:
             suffix = self.format_varients(varients)
             out = self.add_padded_suffix(out, suffix, padding=padding)
@@ -1038,7 +1059,8 @@ class YggRequirement(object):
             out = '\n'.join(out)
         return out
 
-    def conda_requirement(self, for_build=False, padding=0):
+    def conda_requirement(self, for_build=False, padding=0,
+                          dont_isolate=False):
         r"""Get the formatted conda requirement string.
 
         Args:
@@ -1048,6 +1070,8 @@ class YggRequirement(object):
                 False.
             padding (int, optional): Number of spaces to pad with
                before varients.
+            dont_isolate (bool, optional): If True, don't isolate the
+               package name. Defaults to False.
 
         Returns:
             str: Conda requirement.
@@ -1062,9 +1086,10 @@ class YggRequirement(object):
             else:
                 varients.append(self.os)
         out = self.full_name
-        out_name = isolate_package_name(out)
-        if out_name != out:
-            out = out.replace(out_name, out_name + ' ')
+        if not dont_isolate:
+            out_name = isolate_package_name(out)
+            if out_name != out:
+                out = out.replace(out_name, out_name + ' ')
         if varients:
             suffix = self.format_varients(varients)
             out = self.add_padded_suffix(out, suffix, padding=padding)
@@ -1322,7 +1347,7 @@ class YggRequirement(object):
             allow_missing = True
         kwargs.update(os_covered=os_covered,
                       allow_multiple=allow_multiple)
-        if self.extras and not all([param.install_opts[x]
+        if self.extras and not all([param.install_opts[x['name']]
                                     for x in self.extras]):
             return False
         if self.options is None:
@@ -1430,7 +1455,7 @@ class YggRequirement(object):
                         kwargs['os'] = v
                     else:
                         kwargs.setdefault('extras', [])
-                        kwargs['extras'].append(v)
+                        kwargs['extras'].append({'name': v})
                 if verbose:
                     print(f'src = {src}, values = {values}')
         if ';' in name:
@@ -1500,13 +1525,18 @@ class YggRequirement(object):
             if parent is None:
                 raise RuntimeError(f"Could not determine name: {src}")
             name = parent
+        if extras is not None:
+            extras = list(extras)
+            for i in range(len(extras)):
+                if not isinstance(extras[i], dict):
+                    extras[i] = {'name': extras[i]}
         if 'requires_extras' in kwargs:
             if extras is None:
                 extras = []
-            else:
-                extras = list(extras)
             for k in kwargs.pop('requires_extras'):
-                if k not in extras:
+                if not isinstance(k, dict):
+                    k = {'name': k}
+                if k['name'] not in [x['name'] for x in extras]:
                     extras.append(k)
         if extras is not None:
             kwargs['extras'] = extras

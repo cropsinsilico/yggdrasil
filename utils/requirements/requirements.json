@@ -105,37 +105,47 @@
     }
   ],
   "extras": {
-    "c": [
-      {
-        "cmake": {
-          "method": "conda",
-          "os": "unix"
+    "c": {
+      "description": "Dependencies required to compile and run models written in C/C++ as part of yggdrasil integrations",
+      "requires_extras": [
+        {
+          "name": "zmq",
+          "os": "win"
         }
-      },
-      {
-        "make": {
-          "method": "conda",
-          "os": "unix"
+      ],
+      "requirements": [
+        {
+          "cmake": {
+            "method": "conda",
+            "os": "unix"
+          }
+        },
+        {
+          "make": {
+            "method": "conda",
+            "os": "unix"
+          }
+        },
+        {
+          "{{ compiler('c') }}": {
+            "method": "conda_recipe"
+          }
+        },
+        {
+          "{{ compiler('cxx') }}": {
+            "method": "conda_recipe"
+          }
+        },
+        {
+          "compiler-rt": {
+            "method": "conda",
+            "os": "osx"
+          }
         }
-      },
-      {
-        "{{ compiler('c') }}": {
-          "method": "conda_recipe"
-        }
-      },
-      {
-        "{{ compiler('cxx') }}": {
-          "method": "conda_recipe"
-        }
-      },
-      {
-        "compiler-rt": {
-          "method": "conda",
-          "os": "osx"
-        }
-      }
-    ],
+      ]
+    },
     "fortran": {
+      "description": "Dependencies required to compile and run models written in Fortran as part of yggdrasil integrations",
       "requires_extras": [
         "c"
       ],
@@ -184,107 +194,108 @@
         }
       ]
     },
-    "r": [
-      {
-        "r-base": {
-          "executable": "R",
-          "options": [
+    "r": {
+      "description": "Dependencies required to run models written in R as part of yggdrasil integrations",
+      "requirements": [
+        {
+          "r-base": {
+            "executable": "R",
+            "options": [
+              {
+                "method": "conda",
+                "host": true
+              },
+              {
+                "method": "apt",
+                "add": [
+                  "r-base-dev"
+                ]
+              },
+              {
+                "name": "r",
+                "method": "brew"
+              }
+            ]
+          }
+        },
+        {
+          "r-bit64": [
             {
               "method": "conda",
               "host": true
             },
             {
-              "method": "apt",
-              "add": [
-                "r-base-dev"
-              ]
+              "method": "cran"
+            }
+          ]
+        },
+        {
+          "r-r6": [
+            {
+              "method": "conda",
+              "host": true
             },
             {
-              "name": "r",
+              "method": "cran"
+            }
+          ]
+        },
+        {
+          "r-reticulate": [
+            {
+              "method": "conda",
+              "host": true
+            },
+            {
+              "method": "cran"
+            }
+          ]
+        },
+        {
+          "r-zeallot": [
+            {
+              "method": "conda",
+              "host": true
+            },
+            {
+              "method": "cran"
+            }
+          ]
+        },
+        {
+          "r-units": [
+            {
+              "method": "conda",
+              "host": true
+            },
+            {
+              "method": "cran"
+            }
+          ]
+        },
+        {
+          "udunits": [
+            {
+              "name": "libudunits2-dev",
+              "method": "apt"
+            },
+            {
+              "name": "udunits",
               "method": "brew"
+            },
+            {
+              "method": "skip",
+              "os": "win"
+            },
+            {
+              "method": "conda_skip"
             }
           ]
         }
-      },
-      {
-        "r-bit64": [
-          {
-            "method": "conda",
-            "host": true
-          },
-          {
-            "method": "cran"
-          }
-        ]
-      },
-      {
-        "r-r6": [
-          {
-            "method": "conda",
-            "host": true
-          },
-          {
-            "method": "cran"
-          }
-        ]
-      },
-      {
-        "r-reticulate": [
-          {
-            "method": "conda",
-            "host": true
-          },
-          {
-            "method": "cran"
-          }
-        ]
-      },
-      {
-        "r-zeallot": [
-          {
-            "method": "conda",
-            "host": true
-          },
-          {
-            "method": "cran"
-          }
-        ]
-      },
-      {
-        "r-units": [
-          {
-            "method": "conda",
-            "host": true
-          },
-          {
-            "method": "cran"
-          }
-        ]
-      },
-      {
-        "udunits": [
-          {
-            "name": "libudunits2-dev",
-            "method": "apt"
-          },
-          {
-            "name": "udunits",
-            "method": "brew"
-          },
-          {
-            "method": "skip",
-            "os": "win"
-          },
-          {
-            "method": "conda_skip"
-          }
-        ]
-      }
-    ],
+      ]
+    },
     "zmq": {
-      "requires_extras": [
-        "c"
-      ],
+      "description": "Dependencies required to run models using ZeroMQ sockets for communication in C/C++/Fortran",
       "requirements": [
         {
           "czmq": [
@@ -344,113 +355,132 @@
         }
       ]
     },
-    "julia": [
-      {
-        "julia": {
-          "executable": "julia",
-          "options": [
+    "julia": {
+      "description": "Dependencies required to run models written in R as part of yggdrasil integrations",
+      "requirements": [
+        {
+          "julia": {
+            "executable": "julia",
+            "options": [
+              {
+                "method": "brew"
+              },
+              {
+                "method": "choco"
+              },
+              {
+                "name": "juliaup",
+                "method": "conda",
+                "host": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "mpi": {
+      "description": "Dependencies required to run integrations as MPI parallel jobs",
+      "requirements": [
+        "mpi4py",
+        {
+          "mpi": [
             {
-              "method": "brew"
+              "name": "mpich",
+              "os": "linux",
+              "method": "conda"
             },
             {
-              "method": "choco"
+              "name": "openmpi",
+              "os": "osx",
+              "method": "conda"
             },
             {
-              "name": "juliaup",
-              "method": "conda",
-              "host": true
+              "name": "msmpi",
+              "os": "win",
+              "method": "conda"
+            },
+            {
+              "name": "openmpi-bin",
+              "method": "apt",
+              "add": [
+                "libopenmpi-dev"
+              ]
+            },
+            {
+              "name": "openmpi",
+              "method": "brew",
+              "flags": {
+                "method_validate": "conda_supp"
+              },
+              "os": "osx"
             }
           ]
         }
-      }
-    ],
-    "mpi": [
-      "mpi4py",
-      {
-        "mpi": [
-          {
-            "name": "mpich",
-            "os": "linux",
-            "method": "conda"
-          },
-          {
-            "name": "openmpi",
-            "os": "osx",
-            "method": "conda"
-          },
-          {
-            "name": "msmpi",
-            "os": "win",
-            "method": "conda"
-          },
-          {
-            "name": "openmpi-bin",
-            "method": "apt",
-            "add": [
-              "libopenmpi-dev"
-            ]
-          },
-          {
-            "name": "openmpi",
-            "method": "brew",
-            "flags": {
-              "method_validate": "conda_supp"
+      ]
+    },
+    "omp": {
+      "description": "Dependencies required to run integrations that use OpenMP",
+      "requirements": [
+        {
+          "libomp": [
+            {
+              "name": "libomp-dev",
+              "method": "apt"
             },
-            "os": "osx"
-          }
-        ]
-      }
-    ],
-    "omp": [
-      {
-        "libomp": [
-          {
-            "name": "libomp-dev",
-            "method": "apt"
-          },
-          {
-            "method": "brew",
-            "add": [
-              "llvm"
-            ]
-          },
-          {
-            "method": "skip",
-            "os": "win"
-          },
-          {
-            "method": "conda_skip"
-          }
-        ]
-      }
-    ],
-    "rmq": [
-      "pika>=1.0.0"
-    ],
-    "sbml": [
-      {
-        "name": "libroadrunner",
-        "method": "pip"
-      }
-    ],
-    "lpy": [
-      {
-        "name": "lpy",
-        "method": "conda",
-        "add": [
-          "boost==1.66.0"
-        ],
-        "flags": {
-          "install_flags": [
-            "-c",
-            "openalea"
-          ],
-          "not_in_recipe": true,
-          "not_in_txt": true
+            {
+              "method": "brew",
+              "add": [
+                "llvm"
+              ]
+            },
+            {
+              "method": "skip",
+              "os": "win"
+            },
+            {
+              "method": "conda_skip"
+            }
+          ]
         }
-      }
-    ],
+      ]
+    },
+    "rmq": {
+      "description": "Dependencies required to run integrations with RabbitMQ communication",
+      "requirements": [
+        "pika>=1.0.0"
+      ]
+    },
+    "sbml": {
+      "description": "Dependencies required to run SBML models as part of yggdrasil integrations",
+      "requirements": [
+        {
+          "name": "libroadrunner",
+          "method": "pip"
+        }
+      ]
+    },
+    "lpy": {
+      "description": "Dependencies required to run LPy models as part of yggdrasil integrations",
+      "requirements": [
+        {
+          "name": "lpy",
+          "method": "conda",
+          "add": [
+            "boost==1.66.0"
+          ],
+          "flags": {
+            "install_flags": [
+              "-c",
+              "openalea"
+            ],
+            "not_in_recipe": true,
+            "not_in_txt": true
+          }
+        }
+      ]
+    },
     "testing": {
+      "description": "Dependencies required to run yggdrasil tests",
       "requirements": [
         {
           "conda-tree": {
@@ -502,69 +532,75 @@
         }
       ]
     },
-    "docs": [
-      "breathe",
-      {
-        "doxygen": [
-          {
+    "docs": {
+      "description": "Dependencies required to build yggdrasil docs",
+      "requirements": [
+        "breathe",
+        {
+          "doxygen": [
+            {
+              "method": "conda"
+            },
+            {
+              "method": "apt"
+            },
+            {
+              "method": "brew"
+            },
+            {
+              "method": "choco"
+            },
+            {
+              "method": "vcpkg"
+            }
+          ]
+        },
+        {
+          "pandoc": [
+            {
+              "method": "apt"
+            },
+            {
+              "name": "pandoc-citeproc",
+              "method": "brew",
+              "add": [
+                "Caskroom/cask/mactex"
+              ]
+            },
+            {
+              "method": "skip",
+              "os": "win"
+            },
+            {
+              "method": "conda_skip"
+            }
+          ]
+        },
+        "pypandoc",
+        {
+          "r-roxygen2": {
             "method": "conda"
-          },
-          {
-            "method": "apt"
-          },
-          {
-            "method": "brew"
-          },
-          {
-            "method": "choco"
-          },
-          {
-            "method": "vcpkg"
           }
-        ]
-      },
-      {
-        "pandoc": [
-          {
-            "method": "apt"
-          },
-          {
-            "name": "pandoc-citeproc",
-            "method": "brew",
-            "add": [
-              "Caskroom/cask/mactex"
-            ]
-          },
-          {
-            "method": "skip",
-            "os": "win"
-          },
-          {
-            "method": "conda_skip"
+        },
+        "sphinx",
+        "sphinx_rtd_theme",
+        "sphinx-argparse"
+      ]
+    },
+    "dev": {
+      "description": "Dependencies recommended for yggdrasil development",
+      "requirements": [
+        "black",
+        "ipython",
+        "PyGithub",
+        "pre-commit",
+        {
+          "emacs": {
+            "method": "conda"
           }
-        ]
-      },
-      "pypandoc",
-      {
-        "r-roxygen2": {
-          "method": "conda"
         }
-      },
-      "sphinx",
-      "sphinx_rtd_theme",
-      "sphinx-argparse"
-    ],
-    "dev": [
-      "black",
-      "ipython",
-      "PyGithub",
-      "pre-commit",
-      {
-        "emacs": {
-          "method": "conda"
-        }
-      }
-    ]
+      ]
+    }
   },
   "bespoke_extras": [
     "astropy",

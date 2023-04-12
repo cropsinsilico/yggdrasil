@@ -66,6 +66,7 @@ def test_load_yaml_git():
     git.rmtree("cropsinsilico")
     
 
+@pytest.mark.subset_rapidjson
 class YamlTestBase(base_class):
     r"""Test base for yamlfile."""
     
@@ -158,6 +159,7 @@ class YamlTestBase(base_class):
             yamlfile.parse_yaml(files, **parse_kwargs)
 
 
+@pytest.mark.subset_rapidjson
 class YamlTestBaseError(YamlTestBase):
     r"""Test error for yamlfile."""
     

@@ -558,7 +558,7 @@ try:
                               ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
         _python_lib = tools.get_python_c_library(
-            allow_failure=False, libtype=libtype_order[0])
+            allow_failure=True, libtype=libtype_order[0])
 except BaseException as e:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
     _python_lib = None
@@ -604,7 +604,8 @@ class CModelDriver(CompiledModelDriver):
                   'for_python_api': True},
         'python': {'include': os.path.join(_python_inc, 'Python.h'),
                    'language': 'c',
-                   'for_python_api': True}}
+                   'for_python_api': True,
+                   'standard': True}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'language': 'c',
@@ -974,8 +975,10 @@ class CModelDriver(CompiledModelDriver):
             paths_to_add = []
         paths_to_add = paths_to_add + [cls.get_language_dir()]
         if add_libpython_dir:
-            paths_to_add = paths_to_add + [os.path.dirname(
-                cls.get_dependency_library('python', toolname=toolname))]
+            python_lib = cls.get_dependency_library(
+                'python', toolname=toolname)
+            if os.path.isfile(python_lib):
+                paths_to_add.append(os.path.dirname(python_lib))
         if platform._is_win and ygg_cfg.get('c', 'vcpkg_dir', None):
             if platform._is_64bit:
                 arch = 'x64-windows'

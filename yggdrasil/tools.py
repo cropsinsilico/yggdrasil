@@ -423,14 +423,15 @@ def get_python_c_library(allow_failure=False, libtype=None):
         x = os.path.join(idir, base)
         if os.path.isfile(x):
             return x
+    error = (f"Could not determine the location of the Python "
+             f"C API library: {base}.\n"
+             f"sysconfig.get_paths():\n{pprint.pformat(paths)}\n"
+             f"sysconfig.get_config_vars():\n{pprint.pformat(cvars)}\n"
+             f"tried:\n{pprint.pformat(dir_try)}")  # pragma: debug
     if allow_failure:  # pragma: debug
+        warnings.warn(error)
         return base
-    raise RuntimeError(("Could not determine the location of the Python "
-                        "C API library: %s.\n"
-                        "sysconfig.get_paths():\n%s\n"
-                        "sysconfig.get_config_vars():\n%s\n")
-                       % (base, pprint.pformat(paths),
-                          pprint.pformat(cvars)))  # pragma: debug
+    raise RuntimeError(error)  # pragma: debug
 
 
 def get_env_prefixes():

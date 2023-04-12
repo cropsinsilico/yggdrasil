@@ -1,5 +1,7 @@
+from collections import OrderedDict
 import re
 import os
+import sys
 import textwrap
 
 
@@ -478,7 +480,7 @@ def dict2table(args, key_column_name='option', val_column_name='description',
                column_order=None, wrapped_columns=None, list_columns=None,
                sort_on_key=True, sort_required_first=True,
                last_column=None, prune_empty_columns=False,
-               style='simple', **kwargs):
+               style='simple', textwrap_kwargs={}, **kwargs):
     r"""Convert a dictionary to a table.
 
     Args:
@@ -516,6 +518,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         style (str, optional): Style of table that should be used. 'simple'
             dosn't allow for multi-column or row cells, while 'complex'
             does. Defaults to 'simple'.
+        textwrap_kwargs (dict, optional): Keyword arguments to pass to
+            textwrap.wrap.
         **kwargs: Additional keyword arguments are ignored.
             
     Returns:
@@ -541,7 +545,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             v = args[k]
             if isinstance(v, dict) and v.get('required', False):
                 prop_req.append(k)
-        prop_order = list(set(prop_order) - set(prop_req))
+        if prop_req:
+            prop_order = list(set(prop_order) - set(prop_req))
     if sort_on_key:
         prop_req = sorted(prop_req)
         prop_order = sorted(prop_order)
@@ -672,7 +677,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             max_row_len = 1
             for k in column_order:
                 if k in wrapped_columns:
-                    row.append(textwrap.wrap(columns[k][i], wrapped_columns[k]))
+                    row.append(textwrap.wrap(columns[k][i], wrapped_columns[k],
+                                             **textwrap_kwargs))
                 elif k in list_columns:
                     row.append(columns[k][i])
                 else:
@@ -850,3 +856,79 @@ def document_cli_subcommand(prog, sub, alias=None, dummy_file=None,
     else:
         out += [f"Alias for ``{alias}``"]
     return out + ["", ""]
+
+
+def write_package_extras_table(**kwargs):
+    r"""Write a table describing the optional Python packages.
+
+    Args:
+        **kwargs: Additional keyword arguments are passed to dict2table and
+            write_table.
+
+    Returns:
+        str, list: Name of file or files created.
+
+    """
+    from yggdrasil import tools
+    utils_dir = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), 'utils')
+    try:
+        sys.path.insert(0, utils_dir)
+        from manage_requirements import YggRequirements
+        reqs = YggRequirements.from_file(None)
+        args = OrderedDict([(k.lower(), {}) for k in
+                            sorted(tools.get_supported_lang())
+                            if k.lower() in reqs['extras']])
+        conda_reqs_width = 10
+        pip_reqs_width = 10
+        for k, v in reqs['extras'].items():
+            args.setdefault(k, {})
+            args[k].update({
+                'description': str(v.description).replace(
+                    'yggdrasil', '|yggdrasil|'),
+                'conda syntax': 'n/a',
+                # 'conda deps': 'n/a',
+                'pip syntax': 'n/a',
+                # 'pip deps': 'n/a'
+            })
+            conda_reqs_extra = reqs.create_conda_recipe_varient(k)
+            if conda_reqs_extra:
+                conda_reqs = [
+                    x for x in conda_reqs_extra['requirements']['run']
+                    if 'pin_subpackage(' not in x]
+            if conda_reqs:
+                conda_reqs_width = max(conda_reqs_width,
+                                       len(max(conda_reqs, key=len)))
+                args[k]['conda syntax'] = f"yggdrasil.{k}"
+                # args[k]['conda deps'] = conda_reqs
+            pip_reqs = reqs.create_requirements_file_varient(
+                k, format_kws={'include_method': False,
+                               'include_extra': False})
+            if pip_reqs:
+                pip_reqs_width = max(pip_reqs_width,
+                                     len(max(pip_reqs, key=len)))
+                args[k]['pip syntax'] = f"yggdrasil[{k}]"
+                # args[k]['pip deps'] = pip_reqs
+        # for k, v in args.items():
+        #     for deps, deps_len in [('conda deps', conda_reqs_width),
+        #                            ('pip deps', pip_reqs_width)]:
+        #         if isinstance(v[deps], list):
+        #             v[deps] = ' '.join([x + ' ' * (deps_len - len(x))
+        #                                 for x in v[deps]])
+        # TODO: Fix deps table output
+        kwargs.setdefault('column_order', [
+            'extra', 'conda syntax', 'pip syntax'])
+        kwargs.setdefault('fname_base', 'package_extras.rst')
+        kwargs.setdefault('key_column_name', 'extra')
+        kwargs.setdefault('wrapped_columns',
+                          {'description': 40,
+                           'conda deps': conda_reqs_width,
+                           'pip deps': pip_reqs_width})
+        kwargs.setdefault('sort_on_key', False)
+        kwargs.setdefault('sort_required_first', False)
+        kwargs.setdefault('textwrap_kwargs', {'replace_whitespace': False})
+        lines = dict2table(args, **kwargs)
+        out = write_table(lines, **kwargs)
+    finally:
+        sys.path.pop(0)
+    return out

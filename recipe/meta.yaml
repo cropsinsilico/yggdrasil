@@ -93,7 +93,7 @@ outputs:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - {{ pin_subpackage('yggdrasil.zmq', exact=True) }}  # [win]
         - cmake  # [not win]
         - compiler-rt  # [osx]
         - make  # [not win]
@@ -146,7 +146,7 @@ outputs:
         - python
         - zeromq
       run:
-        - {{ pin_subpackage('yggdrasil.c', exact=True) }}
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
         - czmq
         - lz4
         - zeromq

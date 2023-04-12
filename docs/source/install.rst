@@ -48,6 +48,14 @@ the terminal (or Anaconda Prompt on Windows).::
 
   $ conda config --add channels conda-forge
 
+Optional dependencies for supported languages |yggdrasil| are grouped into utility "extra" subpackages. For example, to install C, C++, Fortran, and R and their dependencies, you could run the following::
+
+  $ conda install -c conda-forge yggdrasil yggdrasil.c yggdrasil.fortran yggdrasil.r
+
+There are also several additional extras subpackages containing optional dependencies for additional communication mechanisms and |yggdrasil| development. The table below describes all of the subpackages
+
+.. include:: tables/package_extras.rst
+  
 .. note::
    **Windows Users** If you see the warning::
 
@@ -146,6 +154,12 @@ Python commands::
   >>> import os
   >>> from distutils.sysconfig import get_python_lib
   >>> os.path.realpath(os.path.join(get_python_lib(), '..', '..', '..', 'bin'))
+
+Optional dependencies can be specified using pip "extra" syntax. For example, to install the packages required to run SBML models and enable communication using RabbitMQ, you could run the following::
+
+  $ pip install yggdrasil-framework[sbml,rmq]
+
+Additional extras for pip installation can be found :ref:`here <package_extras_rst>`.
 
 .. note::
    *Windows Users* If you used the Windows store to install Python, the above commands will not yield the correct scripts directory. It will be something along the lines of ``%userprofile%\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts``

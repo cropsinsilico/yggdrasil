@@ -63,6 +63,11 @@ general:
   
 extras:
   c:
+    description: Dependencies required to compile and run models written in C/C++ as part of yggdrasil integrations
+    requires_extras:
+    - name: zmq
+      os: win
+    requirements:
     - cmake:
         method: conda
         os: unix
@@ -89,6 +94,7 @@ extras:
         method: conda
         os: osx
   fortran:
+    description: Dependencies required to compile and run models written in Fortran as part of yggdrasil integrations
     requires_extras: [c]
     requirements:
     - gfortran:
@@ -116,6 +122,8 @@ extras:
         # - name: vcpkg-gfortran
         #   method: vcpkg
   r:
+    description: Dependencies required to run models written in R as part of yggdrasil integrations
+    requirements:
     - r-base:
         executable: R
         options:
@@ -154,7 +162,7 @@ extras:
           os: win
         - method: conda_skip
   zmq:
-    requires_extras: [c]
+    description: Dependencies required to run models using ZeroMQ sockets for communication in C/C++/Fortran
     requirements:
     - czmq:
         - method: conda
@@ -182,6 +190,8 @@ extras:
             from_src_on_travis: true
         - method: vcpkg
   julia:
+    description: Dependencies required to run models written in R as part of yggdrasil integrations
+    requirements:
     - julia:
         executable: julia
         options:
@@ -197,6 +207,8 @@ extras:
           method: conda
           host: true
   mpi:
+    description: Dependencies required to run integrations as MPI parallel jobs
+    requirements:
     - mpi4py
     - mpi:
         - name: mpich
@@ -217,6 +229,8 @@ extras:
             method_validate: conda_supp
           os: osx
   omp:
+    description: Dependencies required to run integrations that use OpenMP
+    requirements:
     - libomp:
         - name: libomp-dev
           method: apt
@@ -226,8 +240,12 @@ extras:
           os: win
         - method: conda_skip
   rmq:
+    description: Dependencies required to run integrations with RabbitMQ communication
+    requirements:
     - pika>=1.0.0
   sbml:
+    description: Dependencies required to run SBML models as part of yggdrasil integrations
+    requirements:
     - name: libroadrunner
       method: pip
     # - ncurses:
@@ -243,6 +261,8 @@ extras:
     #     - method: skip
     #       os: win
   lpy:
+    description: Dependencies required to run LPy models as part of yggdrasil integrations
+    requirements:
     - name: lpy
       method: conda
       add:
@@ -252,6 +272,7 @@ extras:
         not_in_recipe: true
         not_in_txt: true
   testing:
+    description: Dependencies required to run yggdrasil tests
     requirements:
     - conda-tree:
         method: conda
@@ -285,6 +306,8 @@ extras:
         flags:
           method_validate: conda_supp
   docs:
+    description: Dependencies required to build yggdrasil docs
+    requirements:
     - breathe
     - doxygen:
         - method: conda
@@ -309,6 +332,8 @@ extras:
     - sphinx_rtd_theme
     - sphinx-argparse
   dev:
+    description: Dependencies recommended for yggdrasil development
+    requirements:
     - black
     - ipython
     - PyGithub

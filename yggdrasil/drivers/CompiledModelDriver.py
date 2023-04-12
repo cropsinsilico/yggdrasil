@@ -29,6 +29,7 @@ if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
 _buildfile_locks_lock = threading.RLock()
 _buildfile_locks = {}
+_library_types = ['include', 'static', 'shared', 'windows_import']
 
 
 class LockedFile(object):
@@ -3143,7 +3144,8 @@ class CompiledModelDriver(ModelDriver):
         if libclass == 'external':
             dep_lang = libinfo.get('language', cls.language)
             if libtype in libinfo:
-                if os.path.isfile(libinfo[libtype]):
+                if ((os.path.isfile(libinfo[libtype])
+                     or libinfo.get('standard', False))):
                     out = libinfo[libtype]
                 else:  # pragma: no cover
                     out = cls.cfg.get(dep_lang, f'{dep}_{libtype}', None)
@@ -3335,7 +3337,9 @@ class CompiledModelDriver(ModelDriver):
             if dep_lang != cls.language:
                 drv = import_component('model', dep_lang)
                 return drv.is_standard_library(dep)
-        return (dep in drv.standard_libraries)
+        return (dep in drv.standard_libraries
+                or drv.external_libraries.get(dep, {}).get(
+                    'standard', False))
 
     @classmethod
     def get_compiler_flags(cls, toolname=None, compiler=None, **kwargs):
@@ -3731,7 +3735,7 @@ class CompiledModelDriver(ModelDriver):
             return True
         dep_lang = cls.external_libraries[lib].get('language', cls.language)
         for lib_typ in cls.external_libraries[lib].keys():
-            if lib_typ in ['libtype', 'language', 'for_python_api']:
+            if lib_typ not in _library_types:
                 continue
             if not out:  # pragma: no cover
                 break
@@ -3906,14 +3910,12 @@ class CompiledModelDriver(ModelDriver):
         out = []
         k_lang = v.get('language', cls.language)
         for t in v.keys():
-            if t in ['for_python_api']:
+            if t not in _library_types:
                 continue
             fname = v[t]
             assert isinstance(fname, str)
             opt = f'{k}_{t}'
-            if t in ['libtype', 'language']:
-                continue
-            elif t in ['include']:
+            if t in ['include']:
                 desc_end = f'{k} headers'
             elif t in ['static', 'shared']:
                 desc_end = f'{k} {t} library'

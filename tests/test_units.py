@@ -10,8 +10,9 @@ class DummyUnits(int):
     units = 'cm'
 
 
+@pytest.mark.subset_rapidjson
 class TestUnits(base_class):
-    r"""Tests for using pint for units."""
+    r"""Tests for using rapidjson for units."""
 
     @pytest.fixture(scope="class")
     def vars_nounits(self):

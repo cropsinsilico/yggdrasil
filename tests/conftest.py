@@ -33,8 +33,12 @@ _markers = [
     ("production_run", "--production-run", None),
     ("remote_service", "--remote-service",
      "tests that must connect to a running remote service", None),
-    ("serial", "--serial",
-     "tests that must be run in serial", None)
+    ("serial", None,
+     "tests that must be run in serial", None),
+    ("subset_representative", None,
+     "tests that represent a limited subset of the total tests", None),
+    ("subset_rapidjson", None,
+     "tests that represent a limited subset of the rapidjson submodule", None)
 ]
 _params = {
     "example_name": [],
@@ -234,7 +238,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     for x in pargs.separate_tests:
         x_args = x.split()
         x_args_copy = copy.copy(args)
-        excluded = ([m[1] for m in _markers]
+        excluded = ([m[1] for m in _markers if m[1]]
                     + ['suite', 'language', 'skip_language', 'default_comm']
                     + [f'parametrize_{k}' for k in _params.keys()])
         remove_option(x_args_copy, excluded, remove_file_or_dir=True)
@@ -274,6 +278,8 @@ def pytest_addoption(parser):
 def add_options_to_parser(parser):
     languages = sorted(get_supported_lang())
     for x in _markers:
+        if not x[1]:
+            continue
         parser.addoption(x[1], action="store_true", default=False,
                          help=f"run {x[2]} tests")
     for k, v in _params.items():
@@ -378,12 +384,28 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(config, items):
+    active_markers = config.getoption('-m')
+    compiledMarkExpr = None
+    if active_markers:
+        from _pytest.mark.expression import Expression
+        compiledMarkExpr = Expression.compile(active_markers)
+    _marker_names = [x[0] for x in _markers]
+    
+    def check_item_enabled(item, markers=None):
+        if not compiledMarkExpr:
+            return False
+        if markers is None:
+            markers = _marker_names
+        item_markers = [x.name for x in item.iter_markers()
+                        if x.name in markers]
+        return compiledMarkExpr.evaluate(lambda x: x in item_markers)
+    
     for x in _markers:
-        if config.getoption(x[1]):
+        if (not x[1]) or config.getoption(x[1]):
             continue
         skip_x = pytest.mark.skip(reason=f"need {x[1]} to run")
         for item in items:
-            if x[0] in item.keywords:
+            if x[0] in item.keywords and not check_item_enabled(item):
                 item.add_marker(skip_x)
     # Handle suite & language markers
     selected_suites = config.getoption('--suite')
@@ -406,8 +428,11 @@ def pytest_collection_modifyitems(config, items):
                 suites.append('examples_part1')
             else:
                 suites.append('examples_part2')
-        suites_disabled = [mark.kwargs.get('disabled', False)
-                           for mark in item.iter_markers(name="suite")]
+        if check_item_enabled(item):
+            suites_disabled = []
+        else:
+            suites_disabled = [mark.kwargs.get('disabled', False)
+                               for mark in item.iter_markers(name="suite")]
         if suites and not any(suites_disabled):
             suites.append('top')
         skip_x = None
