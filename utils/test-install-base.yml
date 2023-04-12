@@ -520,11 +520,11 @@ jobs:
           - ubuntu-20.04
           - macOS-11
           - windows-2019
-        # windows_arch:
-        #   - AMD64
-        # include:
-        #   - os: windows-2019
-        #     windows_arch: x86
+        windows_arch:
+          - AMD64
+        include:
+          - os: windows-2019
+            windows_arch: x86
       fail-fast: false
     steps:
       - name: Checkout sources
@@ -538,12 +538,12 @@ jobs:
         with:
           platforms: all
 
-      # - name: setup rtools for 32-bit
-      #   run: |
-      #     echo "PLAT=i686" >> $env:GITHUB_ENV
-      #     echo "PATH=$env:RTOOLS40_HOME\mingw32\bin;$env:PATH" >> $env:GITHUB_ENV
-      #     gfortran --version
-      #   if: ${{ matrix.windows_arch == 'x86' }}
+      - name: setup rtools for 32-bit
+        run: |
+          echo "PLAT=i686" >> $env:GITHUB_ENV
+          echo "PATH=$env:RTOOLS40_HOME\mingw32\bin;$env:PATH" >> $env:GITHUB_ENV
+          gfortran --version
+        if: ${{ matrix.windows_arch == 'x86' }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
@@ -551,13 +551,13 @@ jobs:
           # CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
           CIBW_ARCHS_LINUX: auto aarch64 ppc64le
           CIBW_ARCHS_MACOS: x86_64 arm64
-          # CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
-          CIBW_TEST_REQUIRES: "pytest flaky"
-          CIBW_TEST_COMMAND: "ygginfo && pytest -m subset_rapidjson --import-mode=importlib {project}/tests"
+          CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
+          # CIBW_TEST_REQUIRES: "pytest flaky"
+          # CIBW_TEST_COMMAND: "ygginfo && pytest -m subset_rapidjson --import-mode=importlib {project}/tests"
           # Many of these can be enabled if openblas/lapack can be installed
-          CIBW_SKIP: "cp2* cp33* cp34* cp35* cp36* pp* cp38-win32 cp39-win32 cp310-win32 cp311-win32 cp38-manylinux_i686 cp39-manylinux_i686 cp310-manylinux_i686 cp311-manylinux_i686 *-musllinux_*"
-          CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy"
-          # CIBW_BEFORE_ALL_LINUX: "yum install -y blas-devel lapack-devel"
+          # CIBW_SKIP: "cp2* cp33* cp34* cp35* cp36* pp* cp38-win32 cp39-win32 cp310-win32 cp311-win32 cp38-manylinux_i686 cp39-manylinux_i686 cp310-manylinux_i686 cp311-manylinux_i686 *-musllinux_*"
+          # CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy,scipy"
+          # CIBW_BEFORE_ALL_LINUX: "yum install -y openblas-devel lapack-devel"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -584,7 +584,7 @@ jobs:
       - name: Install sdist
         run: |
           python -m pip install dist/*.gz
-          python utils/setup_test_env.py deps pip --python-only
+          python utils/setup_test_env.py deps pip
       - name: Test sdist
         run: |
           ygginfo
