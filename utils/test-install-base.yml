@@ -520,24 +520,11 @@ jobs:
           - ubuntu-20.04
           - macOS-11
           - windows-2019
-        windows_arch:
-          - AMD64
-        include:
-          - os: windows-2019
-            windows_arch: x86
-        # buildplat:
-        #   - [ubuntu-20.04, manylinux_x86_64]
-        #   - [ubuntu-20.04, musllinux_x86_64]
-        #   - [macos-12, macosx_x86_64]
-        #   - [windows-2019, win_amd64]
-        #   - [windows-2019, win32]
-        # python: ["cp37", "cp38", "cp39", "cp310", "cp311", "pp39"]
-        # exclude:
-        #   # Don't build PyPy 32-bit windows
-        #   - buildplat: [windows-2019, win32]
-        #     python: "pp39"
-        #   - buildplat: [ ubuntu-20.04, musllinux_x86_64 ]
-        #     python: "pp39"
+        # windows_arch:
+        #   - AMD64
+        # include:
+        #   - os: windows-2019
+        #     windows_arch: x86
       fail-fast: false
     steps:
       - name: Checkout sources
@@ -551,12 +538,12 @@ jobs:
         with:
           platforms: all
 
-      - name: setup rtools for 32-bit
-        run: |
-          echo "PLAT=i686" >> $env:GITHUB_ENV
-          echo "PATH=$env:RTOOLS40_HOME\mingw32\bin;$env:PATH" >> $env:GITHUB_ENV
-          gfortran --version
-        if: ${{ matrix.windows_arch == 'x86' }}
+      # - name: setup rtools for 32-bit
+      #   run: |
+      #     echo "PLAT=i686" >> $env:GITHUB_ENV
+      #     echo "PATH=$env:RTOOLS40_HOME\mingw32\bin;$env:PATH" >> $env:GITHUB_ENV
+      #     gfortran --version
+      #   if: ${{ matrix.windows_arch == 'x86' }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
@@ -564,12 +551,12 @@ jobs:
           # CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
           CIBW_ARCHS_LINUX: auto aarch64 ppc64le
           CIBW_ARCHS_MACOS: x86_64 arm64
-          CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
+          # CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
           CIBW_TEST_REQUIRES: "pytest flaky"
           CIBW_TEST_COMMAND: "ygginfo && pytest -m subset_rapidjson --import-mode=importlib {project}/tests"
-          CIBW_SKIP: "cp2* cp33* cp34* cp35* cp36* pp* cp310-manylinux_i686 cp311-manylinux_i686 *-musllinux_*"
+          CIBW_SKIP: "cp2* cp33* cp34* cp35* cp36* pp* cp38-win32 cp38-manylinux_i686 cp310-manylinux_i686 cp311-manylinux_i686 *-musllinux_*"
           CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy"
-          CIBW_BEFORE_ALL_LINUX: "yum install -y blas-devel lapack-devel"
+          # CIBW_BEFORE_ALL_LINUX: "yum install -y blas-devel lapack-devel"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
