@@ -1998,9 +1998,8 @@ class ModelDriver(Driver):
                 inst.cleanup()
 
     @classmethod
-    def format_function_param(cls, key, default=None, default_key=None,
-                              replacement=None, ignore_method=False,
-                              **kwargs):
+    def format_function_param(cls, key, default=None, replacement=None,
+                              ignore_method=False, **kwargs):
         r"""Return the formatted version of the specified key.
 
         Args:
@@ -2008,8 +2007,6 @@ class ModelDriver(Driver):
                 formatted.
             default (str, optional): Format that should be returned if key
                 is not in cls.function_param. Defaults to None.
-            default_key (str, optional): Key that should be used in place
-                of the provided on if it does not exist. Defaults to None.
             replacement (str, optional): Format that should be used instead
                 of the one in cls.function_param. Defaults to None.
             **kwargs: Additional keyword arguments are used in formatting the
@@ -2028,8 +2025,6 @@ class ModelDriver(Driver):
         elif (not ignore_method) and hasattr(cls, 'format_function_param_%s' % key):
             return getattr(cls, 'format_function_param_%s' % key)(**kwargs)
         else:
-            if key not in cls.function_param and default_key:
-                key = default_key
             if (key not in cls.function_param) and (default is None):
                 raise NotImplementedError(("Language %s dosn't have an entry in "
                                            "function_param for key '%s'")
