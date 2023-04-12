@@ -521,6 +521,12 @@ jobs:
         with:
           submodules: true
 
+      - name: (WINDOWS) Set up MSVC Compiler
+        uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          toolset: 14.0
+
       - name: Install Python
         uses: actions/setup-python@v4
         with:
@@ -528,7 +534,7 @@ jobs:
 
       - uses: docker/setup-qemu-action@v1
         if: runner.os == 'Linux'
-        name: Set up QEMU
+        name: (LINUX) Set up QEMU
         with:
           platforms: all
 
