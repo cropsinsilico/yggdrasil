@@ -113,19 +113,6 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
                                    env=cls.set_env_class())
                 cls._library_cache[lib] = True
             except RuntimeError:
-                try:
-                    import uuid
-                    import os
-                    fname = f'wrapper{uuid.uuid4()}.jl'
-                    assert not os.path.isfile(fname)
-                    with open(fname, 'w') as fd:
-                        fd.write('using Pkg\nPkg.status()\n')
-                    print(cls.run_executable([fname]))
-                    print(cls.run_executable([fname],
-                                             env=cls.set_env_class()))
-                finally:
-                    if os.path.isfile(fname):
-                        os.remove(fname)
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
 
