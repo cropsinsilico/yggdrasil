@@ -594,7 +594,7 @@ jobs:
       - name: Test sdist
         run: |
           ygginfo
-          pytest -m subset_rapidjson --import-mode=importlib {project}/tests
+          pytest -m subset_rapidjson --import-mode=importlib tests
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
