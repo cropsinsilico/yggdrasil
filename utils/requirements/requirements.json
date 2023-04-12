@@ -450,57 +450,58 @@
         }
       }
     ],
-    "testing": [
-      "codecov",
-      {
-        "conda-tree": {
-          "method": "conda"
-        }
-      },
-      "coverage",
-      "flake8",
-      "flaky",
-      "pytest",
-      "pytest-cov",
-      "pytest-mpi",
-      {
-        "pytest-drop-dup-tests": {
-          "method": "pip"
-        }
-      },
-      "pytest-rerunfailures",
-      "pytest-repeat",
-      "pytest-timeout",
-      "pytest-xdist",
-      {
-        "ccache": {
-          "method": "conda",
-          "os": "unix",
-          "flags": {
-            "method_validate": "conda_supp",
-            "not_in_recipe": true
+    "testing": {
+      "requirements": [
+        {
+          "conda-tree": {
+            "method": "conda"
+          }
+        },
+        "coverage",
+        "flake8",
+        "flaky",
+        "pytest",
+        "pytest-cov",
+        "pytest-mpi",
+        {
+          "pytest-drop-dup-tests": {
+            "method": "pip"
+          }
+        },
+        "pytest-rerunfailures",
+        "pytest-repeat",
+        "pytest-timeout",
+        "pytest-xdist",
+        {
+          "ccache": {
+            "method": "conda",
+            "os": "unix",
+            "flags": {
+              "method_validate": "conda_supp",
+              "not_in_recipe": true
+            }
+          }
+        },
+        {
+          "strace": {
+            "method": "apt",
+            "os": "linux",
+            "flags": {
+              "method_validate": "conda_supp"
+            }
+          }
+        },
+        {
+          "valgrind": {
+            "method": "apt",
+            "os": "linux",
+            "flags": {
+              "method_validate": "conda_supp"
+            }
           }
         }
-      },
-      {
-        "strace": {
-          "method": "apt",
-          "os": "linux",
-          "flags": {
-            "method_validate": "conda_supp"
-          }
-        }
-      },
-      {
-        "valgrind": {
-          "method": "apt",
-          "os": "linux",
-          "flags": {
-            "method_validate": "conda_supp"
-          }
-        }
-      }
-    ],
+      ]
+    },
     "docs": [
       "breathe",
       {

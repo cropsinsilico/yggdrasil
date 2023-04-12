@@ -252,7 +252,7 @@ extras:
         not_in_recipe: true
         not_in_txt: true
   testing:
-    - codecov
+    requirements:
     - conda-tree:
         method: conda
     - coverage

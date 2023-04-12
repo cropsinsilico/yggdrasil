@@ -9,7 +9,6 @@
     "libroadrunner"
   ],
   "testing": [
-    "codecov",
     "coverage",
     "flake8",
     "flaky",
