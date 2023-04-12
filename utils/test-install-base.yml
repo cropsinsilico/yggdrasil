@@ -550,7 +550,7 @@ jobs:
           echo "PLAT=i686" >> $env:GITHUB_ENV
           echo "PATH=$env:RTOOLS40_HOME\mingw32\bin;$env:PATH" >> $env:GITHUB_ENV
           gfortran --version
-        if: ${{ matrix.windows_arch == 'win32' }}
+        if: ${{ matrix.windows_arch == 'x86' }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1

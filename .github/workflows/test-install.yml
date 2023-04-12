@@ -66,7 +66,7 @@ jobs:
       uses: docker/setup-qemu-action@v1
       with:
         platforms: all
-    - if: ${{ matrix.windows_arch == 'win32' }}
+    - if: ${{ matrix.windows_arch == 'x86' }}
       name: setup rtools for 32-bit
       run: 'echo "PLAT=i686" >> $env:GITHUB_ENV
 
