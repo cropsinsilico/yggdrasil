@@ -548,16 +548,10 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
-          # CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
-          CIBW_ARCHS_LINUX: i686 aarch64 ppc64le
+          # CIBW_ARCHS_LINUX: auto aarch64 ppc64le
+          CIBW_ARCHS_LINUX: ppc64le
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
-          # CIBW_TEST_REQUIRES: "pytest flaky"
-          # CIBW_TEST_COMMAND: "ygginfo && pytest -m subset_rapidjson --import-mode=importlib {project}/tests"
-          # Many of these can be enabled if openblas/lapack can be installed
-          # CIBW_SKIP: "cp2* cp33* cp34* cp35* cp36* pp* cp38-win32 cp39-win32 cp310-win32 cp311-win32 cp38-manylinux_i686 cp39-manylinux_i686 cp310-manylinux_i686 cp311-manylinux_i686 *-musllinux_*"
-          # CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy,scipy"
-          # CIBW_BEFORE_ALL_LINUX: "yum install -y openblas-devel lapack-devel"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

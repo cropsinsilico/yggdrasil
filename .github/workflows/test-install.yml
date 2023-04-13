@@ -77,7 +77,7 @@ jobs:
 
         '
     - env:
-        CIBW_ARCHS_LINUX: i686 aarch64 ppc64le
+        CIBW_ARCHS_LINUX: ppc64le
         CIBW_ARCHS_MACOS: x86_64 arm64
         CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
       name: Build wheels
