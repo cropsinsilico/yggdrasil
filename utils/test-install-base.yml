@@ -549,7 +549,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.12.1
         env:
           # CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
-          CIBW_ARCHS_LINUX: auto aarch64 ppc64le
+          CIBW_ARCHS_LINUX: i686 aarch64 ppc64le
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
           # CIBW_TEST_REQUIRES: "pytest flaky"
