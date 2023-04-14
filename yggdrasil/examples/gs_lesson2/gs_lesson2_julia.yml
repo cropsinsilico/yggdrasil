@@ -1,0 +1,8 @@
+models:
+  - name: julia_model1
+    language: julia  # Runs the julia script using default Julia
+    args: ./src/gs_lesson2.jl
+
+  - name: julia_model2
+    language: julia
+    args: ./src/gs_lesson2.jl

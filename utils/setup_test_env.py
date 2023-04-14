@@ -830,6 +830,7 @@ def get_install_opts(old=None, empty=False):
             'lpy': (os.environ.get('INSTALLLPY', '0') == '1'),
             'r': (os.environ.get('INSTALLR', '0') == '1'),
             'fortran': (os.environ.get('INSTALLFORTRAN', '0') == '1'),
+            'julia': (os.environ.get('INSTALLJULIA', '0') == '1'),
             'zmq': (os.environ.get('INSTALLZMQ', '0') == '1'),
             'sbml': (os.environ.get('INSTALLSBML', '0') == '1'),
             'astropy': (os.environ.get('INSTALLAPY', '0') == '1'),
@@ -851,6 +852,7 @@ def get_install_opts(old=None, empty=False):
             'lpy': False,
             'r': True,
             'fortran': True,
+            'julia': True,
             'zmq': True,
             'sbml': False,
             'astropy': False,
@@ -1123,7 +1125,7 @@ def build_conda_recipe(recipe='recipe', param=None,
     cmds += setup_conda(param=param, conda_env=conda_env,
                         return_commands=True,
                         skip_update=(_is_win and _on_gha))
-    if not dont_test:
+    if dont_test:
         # The tests issue a command that is too long for the
         # windows command prompt which is used to build the conda
         # package on Github Actions
@@ -1177,7 +1179,8 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
         pass
     elif param.build_method in ('mamba', 'conda'):
         cmds += build_conda_recipe(param=param, return_commands=True,
-                                   dont_test=(_is_win and _on_gha))
+                                   dont_test=_on_gha)
+        # (_is_win and _on_gha))
     elif param.build_method in ('sdist', 'bdist',
                                 'wheel', 'bdist_wheel'):
         build_method = param.build_method
@@ -1484,6 +1487,9 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
         param = SetupParam(method, **kwargs)
     cmds = []
     install_flags = ''
+    install_prefix = ''
+    if param.fallback_to_conda and param.conda_env:
+        install_prefix = f"conda run -n {param.conda_env} "
     if param.install_opts['r']:
         if param.fallback_to_conda:
             R_exe = locate_conda_exe(param.conda_env, 'R',
@@ -1497,7 +1503,7 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
         src_dir = os.path.abspath(src_dir)
     cmds += [
         f"cd {os.path.dirname(src_dir)}",  # avoid accidentally calling local
-        f"{param.python_cmd} -m yggdrasil install all{install_flags}"]
+        f"{install_prefix}{param.python_cmd} -m yggdrasil install all{install_flags}"]
     # TODO: Call configure?
     if _on_ci or param.for_development:
         coverage_flags = ''
@@ -1725,7 +1731,7 @@ def verify_pkg(install_opts=None):
     sys.stdout.flush()
     from yggdrasil.tools import is_lang_installed, is_comm_installed
     errors = []
-    for name in ['c', 'r', 'fortran', 'sbml', 'lpy']:
+    for name in ['c', 'r', 'fortran', 'sbml', 'lpy', 'julia']:
         flag = install_opts[name]
         if flag and (not is_lang_installed(name)):
             errors.append("Language '%s' should be installed, but is not."

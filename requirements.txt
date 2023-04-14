@@ -13,4 +13,5 @@ requests
 scipy
 six
 sysv_ipc; platform_system != 'Windows'
+toml
 unyt

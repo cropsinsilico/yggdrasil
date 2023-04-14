@@ -200,10 +200,13 @@ class TestTimedRun(TimedRunTestBase):
     def close_figures(self):
         r"""Close figures after the test."""
         yield
-        import matplotlib.pyplot as plt  # noqa: E402
-        plt.clf()
-        plt.cla()
-        plt.close('all')
+        try:
+            import matplotlib.pyplot as plt  # noqa: E402
+            plt.clf()
+            plt.cla()
+            plt.close('all')
+        except ImportError:  # pragma: debug
+            pass
 
     def test_plot_scaling_joint(self, check_filename, instance, count, size,
                                 close_figures, disable_verify_count_fds):

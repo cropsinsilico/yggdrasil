@@ -135,20 +135,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     zero_based = False
 
     @classmethod
-    def are_dependencies_installed(cls, **kwargs):
-        r"""Determine if the dependencies are installed for the interface (not
-        including dependencies needed by a particular communication type).
-
-        Returns:
-            bool: True if the dependencies are installed. False otherwise.
-
-        """
-        # Short cut by checking if yggdrasil installed
-        if not cls.is_interface_installed():  # pragma: config
-            return super(RModelDriver, cls).are_dependencies_installed(**kwargs)
-        return True
-            
-    @classmethod
     def is_library_installed(cls, lib, **kwargs):
         r"""Determine if a dependency is installed.
 

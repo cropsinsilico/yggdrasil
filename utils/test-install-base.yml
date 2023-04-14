@@ -17,6 +17,7 @@ env:
   INSTALLFORTRAN: 1
   INSTALLSBML: 0
   INSTALLLPY: 0
+  INSTALLJULIA: 1
   INSTALLZMQ: 1
   INSTALLRMQ: 0
   INSTALLTRIMESH: 1
@@ -133,6 +134,11 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
+      if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+      # with
+      #  version: '1.0.4'
     - name: Set up Matlab
       uses: matlab-actions/setup-matlab@v1
       if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
@@ -173,9 +179,9 @@ jobs:
     #     key:
     #       ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
     #       hashFiles('recipe/meta.yaml') }}
-    - name: (WINDOWS,CONDA) Set up miniconda base environment
+    - name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
-      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')  #  && runner.os == 'Windows'
+      if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
@@ -232,7 +238,7 @@ jobs:
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
       run: |
-        install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+        [[ -d $CONDA_PREFIX/lib/clang/9.0.1 ]] && install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
         yggconfig --allow-multiple-omp
     # ========================================================
 
@@ -505,8 +511,8 @@ jobs:
 
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
-    # needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
-    # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -514,24 +520,19 @@ jobs:
           - ubuntu-20.04
           - macOS-11
           - windows-2019
+        linux_arch:
+          - auto
         windows_arch:
           - AMD64
+        mac_arch:
+          - x86_64 arm64
         include:
           - os: windows-2019
             windows_arch: x86
-        # buildplat:
-        #   - [ubuntu-20.04, manylinux_x86_64]
-        #   - [ubuntu-20.04, musllinux_x86_64]
-        #   - [macos-12, macosx_x86_64]
-        #   - [windows-2019, win_amd64]
-        #   - [windows-2019, win32]
-        # python: ["cp37", "cp38", "cp39", "cp310", "cp311", "pp39"]
-        # exclude:
-        #   # Don't build PyPy 32-bit windows
-        #   - buildplat: [windows-2019, win32]
-        #     python: "pp39"
-        #   - buildplat: [ ubuntu-20.04, musllinux_x86_64 ]
-        #     python: "pp39"
+          - os: ubuntu-20.04
+            linux_arch: aarch64
+          - os: ubuntu-20.04
+            linux_arch: ppc64le
       fail-fast: false
     steps:
       - name: Checkout sources
@@ -555,15 +556,9 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
-          # CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
-          CIBW_ARCHS_LINUX: auto aarch64 ppc64le
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_LINUX: ${{ matrix.linux_arch }}
+          CIBW_ARCHS_MACOS: ${{ matrix.mac_arch }}
           CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
-          CIBW_TEST_REQUIRES: "pytest flaky"
-          CIBW_TEST_COMMAND: "ygginfo && pytest -m subset_rapidjson --import-mode=importlib {project}/tests"
-          CIBW_SKIP: "cp2* cp33* cp34* cp35* cp36* pp* cp310-manylinux_i686 cp311-manylinux_i686 *-musllinux_*"
-          CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy"
-          CIBW_BEFORE_ALL_LINUX: "yum install -y blas-devel lapack-devel"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -572,8 +567,8 @@ jobs:
   
   build_sdist:
     name: Build source distribution
-    # needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
-    # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -601,28 +596,6 @@ jobs:
           name: sdist
           path: ./dist/*
 
-  # deploy:
-  #   name: Publish package
-  #   needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
-  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v3
-  #     with:
-  #       submodules: true
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v4
-  #     with:
-  #       python-version: 3.8
-  #   - name: Install dependencies
-  #     run: python utils/setup_test_env.py install pip
-  #   - name: Verify installation
-  #     run: python utils/setup_test_env.py verify
-  #   - name: Build the package
-  #     run: |
-  #       python setup.py sdist
-  #       python setup.py bdist_wheel
-  
   upload_wheels:
     name: Upload wheels
     needs: [build_wheels, build_sdist]

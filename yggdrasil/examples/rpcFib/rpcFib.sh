@@ -65,6 +65,12 @@ case $1 in
 	yaml2='rpcFibCli_fortran.yml'
 	yaml3='rpcFibCliPar_fortran.yml'
 	;;
+    -j | --julia )
+	echo "Running Julia"
+	yaml1='rpcFibSrv_julia.yml'
+	yaml2='rpcFibCli_julia.yml'
+	yaml3='rpcFibCliPar_julia.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1

@@ -113,6 +113,20 @@ class InterpretedModelDriver(ModelDriver):
             except ValueError:
                 pass
                 
+    @classmethod
+    def are_dependencies_installed(cls, **kwargs):
+        r"""Determine if the dependencies are installed for the interface (not
+        including dependencies needed by a particular communication type).
+
+        Returns:
+            bool: True if the dependencies are installed. False otherwise.
+
+        """
+        # Short cut by checking if yggdrasil installed
+        if not (cls.full_language and cls.is_interface_installed()):  # pragma: config
+            return super(InterpretedModelDriver, cls).are_dependencies_installed(**kwargs)
+        return True
+            
     def parse_arguments(self, *args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.

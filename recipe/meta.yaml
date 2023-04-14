@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.9.0" %}
+{% set version = "1.9.1" %}
 {% set PY_VER_MAJOR = PY_VER.split('.')[0] %}
 {% set PY_VER_MINOR = PY_VER.split('.')[1] %}
 
@@ -73,6 +73,7 @@ requirements:
     - scipy
     - six
     - sysv_ipc  # [not win]
+    - toml
     - unyt
 
 test:
@@ -149,6 +150,18 @@ outputs:
         - czmq
         - lz4
         - zeromq
+  - name: yggdrasil.julia
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.julia') }}
+    requirements:
+      host:
+        - juliaup
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - juliaup
   - name: yggdrasil.mpi
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

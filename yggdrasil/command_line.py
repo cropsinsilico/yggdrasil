@@ -746,7 +746,10 @@ class ygginfo(SubCommand):
                 env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT', 'CC',
                             'CXX', 'FC', 'GFORTRAN', 'DISPLAY', 'CL',
                             '_CL_', 'LD', 'CFLAGS', 'CXXFLAGS',
-                            'LDFLAGS']
+                            'LDFLAGS', 'CONDA_JL_HOME',
+                            'CONDA_JL_CONDA_EXE', 'JULIA_DEPOT_PATH',
+                            'JULIA_LOAD_PATH', 'JULIA_PROJECT',
+                            'JULIA_SSL_CA_ROOTS_PATH']
                 if platform._is_win:  # pragma: windows
                     env_vars += ['VCPKG_ROOT']
                 vardict.append(('Environment variables:', ''))

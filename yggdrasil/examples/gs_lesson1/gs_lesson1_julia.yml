@@ -1,0 +1,4 @@
+models:
+  - name: julia_model
+    language: julia  # Runs the julia script using default Julia
+    args: ./src/gs_lesson1.jl

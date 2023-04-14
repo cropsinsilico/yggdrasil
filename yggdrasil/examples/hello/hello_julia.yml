@@ -1,0 +1,22 @@
+---
+
+model:
+  name: hello_julia
+  language: julia
+  args: ./src/hello.jl  # Runs the julia script using the julia interpreter
+
+  inputs:
+    - name: inFile
+      default_file: ./Input/input.txt
+    - helloQueueIn
+  outputs:
+    - helloQueueOut
+    - name: outFile
+      default_file:
+        name: output_hello.txt
+        in_temp: True
+
+connections:
+  - input: helloQueueOut
+    output: helloQueueIn
+    onexit: printStatus

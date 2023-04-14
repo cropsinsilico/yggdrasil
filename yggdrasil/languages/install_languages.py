@@ -104,6 +104,9 @@ def import_language_install(language, no_import=False):
             sys.path.insert(0, os.path.join(lang_dir, language))
             import install
             yield install
+        except BaseException:  # pragma: debug
+            install = None
+            raise
         finally:
             sys.path.pop(0)
             if install is not None:
