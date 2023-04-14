@@ -520,11 +520,19 @@ jobs:
           - ubuntu-20.04
           - macOS-11
           - windows-2019
+        linux_arch:
+          - auto
         windows_arch:
           - AMD64
+        mac_arch:
+          - x86_64 arm64
         include:
           - os: windows-2019
             windows_arch: x86
+          - os: ubuntu-20.04
+            linux_arch: aarch64
+          - os: ubuntu-20.04
+            linux_arch: ppc64le
       fail-fast: false
     steps:
       - name: Checkout sources
@@ -547,11 +555,10 @@ jobs:
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
-        timeout-minutes: 120
+        # timeout-minutes: 120
         env:
-          # CIBW_ARCHS_LINUX: auto aarch64 ppc64le
-          CIBW_ARCHS_LINUX: aarch64 ppc64le
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_LINUX: ${{ matrix.linux_arch }}
+          CIBW_ARCHS_MACOS: ${{ matrix.mac_arch }}
           CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
 
       - name: Upload artifacts
