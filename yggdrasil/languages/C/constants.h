@@ -23,6 +23,11 @@
 #define PSI_MSG_BUF YGG_MSG_BUF
 #define PSI_MSG_EOF YGG_MSG_EOF
 
+#define MSG_HEAD_SEP "YGG_MSG_HEAD"
+/*! @brief Size of COMM buffer. */
+#define COMMBUFFSIZ 2000
+#define FMT_LEN 100
+
 /*! @brief Bit flags. */
 #define HEAD_FLAG_VALID      0x00000001  //!< Set if the header is valid.
 #define HEAD_FLAG_MULTIPART  0x00000002  //!< Set if the header is for a multipart message

@@ -17,7 +17,11 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/schema.h"
 #include "rapidjson/va_list.h"
+#include <string.h>
 
+
+#define STRLEN_RJ(var)				\
+  static_cast<rapidjson::SizeType>(strlen(var))
 
 /*!
   @brief Split header and body of message.
@@ -83,6 +87,217 @@ int split_head_body(const char *buf, const size_t buf_siz,
 };
 
 
+bool add_dtype(rapidjson::Document* d,
+	       const char* type, const char* subtype,
+	       const size_t precision,
+	       const size_t ndim=0, const size_t* shape=NULL,
+	       const char* units=NULL) {
+  size_t N = 0;
+  if (!d->StartObject())
+    return false;
+  // type
+  if (!d->Key("type", 4, true))
+    return false;
+  if (!d->String(type, STRLEN_RJ(type), true))
+    return false;
+  N++;
+  // subtype
+  if (!d->Key("subtype", 7, true))
+    return false;
+  if (strcmp(subtype, "bytes") == 0) {
+    if (!d->String("string", 6, true))
+      return false;
+  } else if (strcmp(subtype, "unicode") == 0) {
+    if (!d->String("string", 6, true))
+      return false;
+    if (!d->Key("encoding", 8, true))
+      return false;
+    if (!d->String("UTF8", 4, true))
+      return false;
+    N++;
+  } else {
+    if (!d->String(subtype, STRLEN_RJ(subtype), true))
+      return false;
+  }
+  N++;
+  // precision
+  if (precision > 0) {
+    if (!d->Key("precision", 9, true))
+      return false;
+    if (!d->Uint(precision))
+      return false;
+    N++;
+  }
+  // shape
+  if (ndim > 0) {
+    if (shape != NULL) {
+      if (!d->Key("shape", 5, true))
+	return false;
+      if (!d->StartArray())
+	return false;
+      for (size_t i = 0; i < ndim; i++) {
+	if (!d->Uint(shape[i]))
+	  return false;
+      }
+      if (!d->EndArray(ndim))
+	return false;
+    } else {
+      if (!d->Key("ndim", 4, true))
+	return false;
+      if (!d->Uint(ndim))
+	return false;
+    }
+    N++;
+  }
+  // units
+  if (units && strlen(units) > 0) {
+    if (!d->Key("units", 5, true))
+      return false;
+    if (!d->String(units, STRLEN_RJ(units), true))
+      return false;
+    N++;
+  }
+  // end
+  return d->EndObject(N);
+}
+
+void format_str2metadata(rapidjson::Document& out,
+			 const char* format_str,
+			 const int as_array = 0) {
+  out.StartObject();
+  out.Key("serializer", 10, true);
+  out.StartObject();
+  out.Key("format_str", 10, true);
+  out.String(format_str, STRLEN_RJ(format_str), true);
+  out.Key("datatype", 8, true);
+  out.StartObject();
+  int nDtype = 0;
+  nDtype++;
+  out.Key("type", 4, true);
+  out.String("array", 5, true);
+  nDtype++;
+  out.Key("items", 5, true);
+  out.StartArray();
+  // Loop over string
+  int mres;
+  size_t sind, eind, beg = 0, end;
+  char ifmt[FMT_LEN + 1];
+  char re_fmt[FMT_LEN + 1];
+  char re_fmt_eof[FMT_LEN + 1];
+  snprintf(re_fmt, FMT_LEN, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
+  snprintf(re_fmt_eof, FMT_LEN, "%%[^%s%s ]+", "\t", "\n");
+  size_t iprecision = 0;
+  size_t nOuter = 0;
+  const char* element_type;
+  if (as_array)
+    element_type = "ndarray";
+  else
+    element_type = "scalar";
+  while (beg < strlen(format_str)) {
+    char isubtype[FMT_LEN] = "";
+    mres = find_match(re_fmt, format_str + beg, &sind, &eind);
+    if (mres < 0) {
+      ygglog_throw_error("format_str2metadata: find_match returned %d", mres);
+    } else if (mres == 0) {
+      // Make sure its not just a format string with no newline
+      mres = find_match(re_fmt_eof, format_str + beg, &sind, &eind);
+      if (mres <= 0) {
+	beg++;
+	continue;
+      }
+    }
+    beg += sind;
+    end = beg + (eind - sind);
+    strncpy(ifmt, format_str + beg, end-beg);
+    ifmt[end-beg] = '\0';
+    // String
+    if (find_match("%(.*)s", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "string", FMT_LEN); // or unicode
+      mres = regex_replace_sub(ifmt, FMT_LEN,
+			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
+      iprecision = atoi(ifmt);
+      // Complex
+#ifdef _WIN32
+    } else if (find_match("(%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+#else
+    } else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+#endif
+      strncpy(isubtype, "complex", FMT_LEN);
+      iprecision = 2 * sizeof(double);
+    }
+    // Floats
+    else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "float", FMT_LEN);
+      iprecision = sizeof(double);
+    }
+    // Integers
+    else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = sizeof(char);
+    } else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = sizeof(short);
+    } else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = sizeof(long long);
+    } else if (find_match("%.*l64[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = sizeof(long long);
+    } else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = sizeof(long);
+    } else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "int", FMT_LEN);
+      iprecision = sizeof(int);
+    }
+    // Unsigned integers
+    else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = sizeof(unsigned char);
+    } else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = sizeof(unsigned short);
+    } else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = sizeof(unsigned long long);
+    } else if (find_match("%.*l64[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = sizeof(unsigned long long);
+    } else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = sizeof(unsigned long);
+    } else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
+      strncpy(isubtype, "uint", FMT_LEN);
+      iprecision = sizeof(unsigned int);
+    } else {
+      ygglog_throw_error("format_str2metadata: Could not parse format string: %s", ifmt);
+    }
+    ygglog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
+		 isubtype, iprecision, ifmt);
+    if (!add_dtype(&out, element_type, isubtype, iprecision)) {
+      ygglog_throw_error("format_str2metadata: Error in add_dtype");
+    }
+    nOuter++;
+    beg = end;
+  }
+  out.EndArray(nOuter);
+  if (nOuter == 1) {
+    nDtype++;
+    out.Key("allowSingular", 13, true);
+    out.Bool(true);
+  }
+  out.EndObject(nDtype);
+  out.EndObject(2);
+  out.EndObject(1);
+  out.FinalizeFromStack();
+  // if (nOuter == 1) {
+  //   typename rapidjson::Document::ValueType tmp;
+  //   out["serializer"]["datatype"].Swap(tmp);
+  //   out["serializer"]["datatype"].Swap(tmp["items"][0]);
+  //   out["serializer"].RemoveMember("format_str");
+  // }
+};
+
 class Header {
 public:
   Header() :
@@ -92,6 +307,13 @@ public:
   ~Header() {
     if ((flags & HEAD_FLAG_OWNSDATA) && data_)
       free(data_);
+  }
+
+  bool isValid() {
+    return (flags & HEAD_FLAG_VALID);
+  }
+  void invalidate() {
+    flags &= ~HEAD_FLAG_VALID;
   }
 
   void add_schema(rapidjson::Value& src) {
@@ -269,6 +491,10 @@ public:
   size_t format(const char* buf, size_t buf_siz,
 		size_t size_max, bool metaOnly=false) {
     flags |= (HEAD_FLAG_ALLOW_REALLOC | HEAD_FLAG_OWNSDATA);
+    if (strcmp(buf, YGG_MSG_EOF) == 0) {
+      flags |= HEAD_FLAG_EOF;
+      metaOnly = true;
+    }
     data = &data_;
     size_data = buf_siz;
     SetMetaInt("size", buf_siz);
@@ -337,46 +563,55 @@ public:
     data[0] += eind;
   }
   
-#define GET_SET_METHOD_(type, method, setargs)				\
-  type GetMeta ## method(const char* name) {				\
+#define GET_SET_METHOD_(type_in, type_out, method, setargs)		\
+  type_out GetMeta ## method(const std::string name) {			\
     if (!(metadata.IsObject() && metadata.HasMember("__meta__")))	\
-      ygglog_throw_error("Get%s: No __meta__ in metadata");		\
+      ygglog_throw_error("Get%s: No __meta__ in metadata", #method);	\
     rapidjson::Value &meta_doc = metadata["__meta__"];			\
-    if (!(meta_doc.HasMember(name)))					\
-      ygglog_throw_error("Get%s: No %s information in the header.", #method, name); \
-    if (!(meta_doc[name].Is ## method()))				\
-      ygglog_throw_error("Get%s: %s is not %s.", #method, name, #type);	\
-    return meta_doc[name].Get ## method();				\
+    if (!(meta_doc.HasMember(name.c_str())))				\
+      ygglog_throw_error("Get%s: No %s information in the header.", #method, name.c_str()); \
+    if (!(meta_doc[name.c_str()].Is ## method()))			\
+      ygglog_throw_error("Get%s: %s is not %s.", #method, name.c_str(), #type_in); \
+    return meta_doc[name.c_str()].Get ## method();			\
   }									\
-  type GetMeta ## method ## Optional(const char* name, type defV) {	\
+  type_out GetMeta ## method ## Optional(const std::string name, type_out defV) { \
     if (!(metadata.IsObject() && metadata.HasMember("__meta__")))	\
-      ygglog_throw_error("Get%s: No __meta__ in metadata");		\
+      ygglog_throw_error("Get%s: No __meta__ in metadata", #method);	\
     rapidjson::Value &meta_doc = metadata["__meta__"];			\
-    if (!(meta_doc.HasMember(name)))					\
+    if (!(meta_doc.HasMember(name.c_str())))				\
       return defV;							\
-    if (!(meta_doc[name].Is ## method()))				\
-      ygglog_throw_error("Get%s: %s is not %s.", #method, name, #type);	\
-    return meta_doc[name].Get ## method();				\
+    if (!(meta_doc[name.c_str()].Is ## method()))			\
+      ygglog_throw_error("Get%s: %s is not %s.", #method, name.c_str(), #type_in); \
+    return meta_doc[name.c_str()].Get ## method();			\
   }									\
-  bool SetMeta ## method(const char* name, type x) {			\
+  bool SetMeta ## method(const std::string name, type_in x) {		\
     if (!(metadata.IsObject() && metadata.HasMember("__meta__")))	\
-      ygglog_throw_error("Set%s: No __meta__ in metadata");		\
+      ygglog_throw_error("Set%s: No __meta__ in metadata", #method);	\
     rapidjson::Value &meta_doc = metadata["__meta__"];			\
     rapidjson::Value x_val setargs;					\
-    meta_doc.AddMember(rapidjson::Value(name, strlen(name)).Move(),	\
+    meta_doc.AddMember(rapidjson::Value(name.c_str(), name.size(),	\
+					metadata.GetAllocator()).Move(),\
 		       x_val, metadata.GetAllocator());			\
     return true;							\
   }
-  GET_SET_METHOD_(int, Int, (x));
-  GET_SET_METHOD_(bool, Bool, (x));
-  GET_SET_METHOD_(const char*, String, (x, strlen(x), metadata.GetAllocator()));
+  GET_SET_METHOD_(int, int, Int, (x));
+  GET_SET_METHOD_(bool, bool, Bool, (x));
+  // GET_SET_METHOD_(const char*, String, (x, strlen(x), metadata.GetAllocator()));
+  GET_SET_METHOD_(const std::string&, const char*, String, (x.c_str(), x.size(), metadata.GetAllocator()));
 #undef GET_SET_METHOD_
-  bool SetMetaID(const char* name, const char** id=NULL) {
+  bool SetMetaID(const std::string name, const char** id=NULL) {
     char new_id[100];
     snprintf(new_id, 100, "%d", rand());
     bool out = SetMetaString(name, new_id);
     if (out && id)
       id[0] = GetMetaString(name);
+    return out;
+  }
+  bool SetMetaID(const std::string name, std::string& id) {
+    const char* id_str;
+    bool out = SetMetaID(name, &id_str);
+    if (out)
+      id.assign(id_str);
     return out;
   }
   char* data_;

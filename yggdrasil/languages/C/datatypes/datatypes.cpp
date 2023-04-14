@@ -12,9 +12,6 @@
 #include "rapidjson/va_list.h"
 
 
-#define STRLEN_RJ(var)				\
-  static_cast<rapidjson::SizeType>(strlen(var))
-
 #define CSafe(x)  \
   try		  \
     {		  \
@@ -79,80 +76,6 @@ rapidjson::Document::AllocatorType& dtype_allocator(dtype_t& x) {
 // };
 
 
-bool add_dtype(rapidjson::Document* d,
-	       const char* type, const char* subtype,
-	       const size_t precision,
-	       const size_t ndim=0, const size_t* shape=NULL,
-	       const char* units=NULL) {
-  size_t N = 0;
-  if (!d->StartObject())
-    return false;
-  // type
-  if (!d->Key("type", 4, true))
-    return false;
-  if (!d->String(type, STRLEN_RJ(type), true))
-    return false;
-  N++;
-  // subtype
-  if (!d->Key("subtype", 7, true))
-    return false;
-  if (strcmp(subtype, "bytes") == 0) {
-    if (!d->String("string", 6, true))
-      return false;
-  } else if (strcmp(subtype, "unicode") == 0) {
-    if (!d->String("string", 6, true))
-      return false;
-    if (!d->Key("encoding", 8, true))
-      return false;
-    if (!d->String("UTF8", 4, true))
-      return false;
-    N++;
-  } else {
-    if (!d->String(subtype, STRLEN_RJ(subtype), true))
-      return false;
-  }
-  N++;
-  // precision
-  if (precision > 0) {
-    if (!d->Key("precision", 9, true))
-      return false;
-    if (!d->Uint(precision))
-      return false;
-    N++;
-  }
-  // shape
-  if (ndim > 0) {
-    if (shape != NULL) {
-      if (!d->Key("shape", 5, true))
-	return false;
-      if (!d->StartArray())
-	return false;
-      for (size_t i = 0; i < ndim; i++) {
-	if (!d->Uint(shape[i]))
-	  return false;
-      }
-      if (!d->EndArray(ndim))
-	return false;
-    } else {
-      if (!d->Key("ndim", 4, true))
-	return false;
-      if (!d->Uint(ndim))
-	return false;
-    }
-    N++;
-  }
-  // units
-  if (units && strlen(units) > 0) {
-    if (!d->Key("units", 5, true))
-      return false;
-    if (!d->String(units, STRLEN_RJ(units), true))
-      return false;
-    N++;
-  }
-  // end
-  return d->EndObject(N);
-}
-
 rapidjson::Document* copy_document(rapidjson::Value* rhs) {
   rapidjson::Document* out = NULL;
   if (rhs != NULL) {
@@ -175,144 +98,6 @@ void display_document(rapidjson::Value* rhs, const char* indent="") {
   std::string s = document2string(*rhs, indent);
   printf("%s\n", s.c_str());
 }
-
-rapidjson::Document* create_dtype_format_class(const char *format_str,
-					       const int as_array = 0) {
-  rapidjson::Document* out = new rapidjson::Document;
-  out->StartObject();
-  out->Key("serializer", 10, true);
-  out->StartObject();
-  out->Key("format_str", 10, true);
-  out->String(format_str, STRLEN_RJ(format_str), true);
-  out->Key("datatype", 8, true);
-  out->StartObject();
-  int nDtype = 0;
-  nDtype++;
-  out->Key("type", 4, true);
-  out->String("array", 5, true);
-  nDtype++;
-  out->Key("items", 5, true);
-  out->StartArray();
-  // Loop over string
-  int mres;
-  size_t sind, eind, beg = 0, end;
-  char ifmt[FMT_LEN + 1];
-  char re_fmt[FMT_LEN + 1];
-  char re_fmt_eof[FMT_LEN + 1];
-  snprintf(re_fmt, FMT_LEN, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
-  snprintf(re_fmt_eof, FMT_LEN, "%%[^%s%s ]+", "\t", "\n");
-  size_t iprecision = 0;
-  size_t nOuter = 0;
-  const char* element_type;
-  if (as_array)
-    element_type = "ndarray";
-  else
-    element_type = "scalar";
-  while (beg < strlen(format_str)) {
-    char isubtype[FMT_LEN] = "";
-    mres = find_match(re_fmt, format_str + beg, &sind, &eind);
-    if (mres < 0) {
-      ygglog_throw_error("create_dtype_format_class: find_match returned %d", mres);
-    } else if (mres == 0) {
-      // Make sure its not just a format string with no newline
-      mres = find_match(re_fmt_eof, format_str + beg, &sind, &eind);
-      if (mres <= 0) {
-	beg++;
-	continue;
-      }
-    }
-    beg += sind;
-    end = beg + (eind - sind);
-    strncpy(ifmt, format_str + beg, end-beg);
-    ifmt[end-beg] = '\0';
-    // String
-    if (find_match("%.*s", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "string", FMT_LEN); // or unicode
-      mres = regex_replace_sub(ifmt, FMT_LEN,
-			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
-      iprecision = atoi(ifmt);
-      // Complex
-#ifdef _WIN32
-    } else if (find_match("(%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
-#else
-    } else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
-#endif
-      strncpy(isubtype, "complex", FMT_LEN);
-      iprecision = 2 * sizeof(double);
-    }
-    // Floats
-    else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "float", FMT_LEN);
-      iprecision = sizeof(double);
-    }
-    // Integers
-    else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(char);
-    } else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(short);
-    } else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(long long);
-    } else if (find_match("%.*l64[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(long long);
-    } else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(long);
-    } else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(int);
-    }
-    // Unsigned integers
-    else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned char);
-    } else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned short);
-    } else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned long long);
-    } else if (find_match("%.*l64[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned long long);
-    } else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned long);
-    } else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned int);
-    } else {
-      ygglog_throw_error("create_dtype_format_class: Could not parse format string: %s", ifmt);
-    }
-    ygglog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
-		 isubtype, iprecision, ifmt);
-    if (!add_dtype(out, element_type, isubtype, iprecision)) {
-      ygglog_throw_error("create_dtype_format_class: Error in add_dtype");
-    }
-    nOuter++;
-    beg = end;
-  }
-  out->EndArray(nOuter);
-  if (nOuter == 1) {
-    nDtype++;
-    out->Key("allowSingular", 13, true);
-    out->Bool(true);
-  }
-  out->EndObject(nDtype);
-  out->EndObject(2);
-  out->EndObject(1);
-  out->FinalizeFromStack();
-  // if (nOuter == 1) {
-  //   typename rapidjson::Document::ValueType tmp;
-  //   (*out)["serializer"]["datatype"].Swap(tmp);
-  //   (*out)["serializer"]["datatype"].Swap(tmp["items"][0]);
-  //   (*out)["serializer"].RemoveMember("format_str");
-  // }
-  return out;
-};
 
 rapidjson::Document* encode_schema(rapidjson::Value* document) {
   rapidjson::SchemaEncoder encoder(true);
@@ -2199,7 +1984,8 @@ extern "C" {
 			       const bool use_generic = false) {
     rapidjson::Document* obj = NULL;
     try {
-      obj = create_dtype_format_class(format_str, as_array);
+      obj = new rapidjson::Document();
+      format_str2metadata(*obj, format_str, as_array);
       return create_dtype(obj, use_generic, false, true);
     } catch(...) {
       ygglog_error("create_dtype_format: C++ exception thrown.");

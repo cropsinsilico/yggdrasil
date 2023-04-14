@@ -5,12 +5,6 @@
 
 #include "../tools.h"
 
-#define MSG_HEAD_SEP "YGG_MSG_HEAD"
-/*! @brief Size of COMM buffer. */
-#define COMMBUFFSIZ 2000
-#define FMT_LEN 100
-
-
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
