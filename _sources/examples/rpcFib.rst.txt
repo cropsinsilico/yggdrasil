@@ -178,6 +178,40 @@ Model YAML:
 
 
 
+Julia Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCli.jl
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibCliPar.jl
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/src/rpcFibSrv.jl
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCli_julia.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibCliPar_julia.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/rpcFib/rpcFibSrv_julia.yml
+   :language: yaml
+   :linenos:
+
+
+
 Matlab Version
 --------------
 

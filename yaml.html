@@ -545,36 +545,40 @@ languages can be found <a class="reference internal" href="#schema-table-model-s
 <td><p>Model is written in Fortran.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>lpy</p></td>
+<tr class="row-odd"><td><p>julia</p></td>
+<td><p>Model is written in Julia.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>lpy</p></td>
 <td><p>Model is an LPy system.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>make</p></td>
+<tr class="row-odd"><td><p>make</p></td>
 <td><p>Model is written in C/C++ and has a Makefile for compilation.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>matlab</p></td>
+<tr class="row-even"><td><p>matlab</p></td>
 <td><p>Model is written in Matlab.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>mpi</p></td>
+<tr class="row-odd"><td><p>mpi</p></td>
 <td><p>Model is being run on another MPI process and this driver is used as as stand-in
 to monitor it on the root process.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>osr</p></td>
+<tr class="row-even"><td><p>osr</p></td>
 <td><p>Model is an OSR model.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>python</p></td>
+<tr class="row-odd"><td><p>python</p></td>
 <td><p>Model is written in Python.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>sbml</p></td>
+<tr class="row-even"><td><p>sbml</p></td>
 <td><p>Model is an SBML model.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>timesync</p></td>
+<tr class="row-odd"><td><p>timesync</p></td>
 <td><p>Model is dedicated to synchronizing timesteps between other models.</p></td>
 <td></td>
 </tr>
@@ -604,7 +608,7 @@ to monitor it on the root process.</p></td>
 </tr>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>array</p></td>
-<td><p>[‘executable’, ‘lpy’, ‘sbml’, ‘fortran’, ‘osr’, ‘cmake’, ‘python’, ‘cxx’, ‘mpi’, ‘make’, ‘cpp’, ‘timesync’, ‘c’, ‘dummy’, ‘matlab’, ‘R’, ‘r’, ‘c++’]</p></td>
+<td><p>[‘cpp’, ‘c’, ‘mpi’, ‘make’, ‘python’, ‘timesync’, ‘R’, ‘cmake’, ‘executable’, ‘julia’, ‘fortran’, ‘r’, ‘osr’, ‘lpy’, ‘dummy’, ‘c++’, ‘sbml’, ‘cxx’, ‘matlab’]</p></td>
 <td><p>The path to the file containing the model program that will be run by the driver
 for the model’s language and/or a list of arguments that should be passed as
 input to the model program or language executable (e.g. source code or
@@ -612,18 +616,18 @@ configuration file for a domain specific language).</p></td>
 </tr>
 <tr class="row-odd"><td><p>builddir</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Directory where the build should be saved. Defaults to &lt;sourcedir&gt;/build. It can
 be relative to working_dir or absolute.</p></td>
 </tr>
 <tr class="row-even"><td><p>buildfile</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>compiler</p></td>
 <td><p>string</p></td>
-<td><p>[‘fortran’, ‘cmake’, ‘cxx’, ‘make’, ‘cpp’, ‘c’, ‘c++’]</p></td>
+<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
 <td><p>Command or path to executable that should be used to compile the model. If not
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
@@ -631,7 +635,7 @@ current operating system.</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘fortran’, ‘cmake’, ‘cxx’, ‘make’, ‘cpp’, ‘c’, ‘c++’]</p></td>
+<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
 <td><p>Flags that should be passed to the compiler during compilation. If nto provided,
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
@@ -652,38 +656,38 @@ relative. Defaults to False.</p></td>
 </tr>
 <tr class="row-odd"><td><p>disable_python_c_api</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘fortran’, ‘osr’, ‘cmake’, ‘cxx’, ‘make’, ‘cpp’, ‘c’, ‘c++’]</p></td>
+<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘osr’, ‘cmake’]</p></td>
 <td><p>If True, the Python C API will be disabled. Defaults to False.</p></td>
 </tr>
 <tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>[‘executable’, ‘lpy’, ‘sbml’, ‘fortran’, ‘osr’, ‘cmake’, ‘python’, ‘cxx’, ‘mpi’, ‘make’, ‘cpp’, ‘timesync’, ‘c’, ‘dummy’, ‘matlab’, ‘R’, ‘r’, ‘c++’]</p></td>
+<td><p>[‘cpp’, ‘c’, ‘mpi’, ‘make’, ‘python’, ‘timesync’, ‘R’, ‘cmake’, ‘executable’, ‘julia’, ‘fortran’, ‘r’, ‘osr’, ‘lpy’, ‘dummy’, ‘c++’, ‘sbml’, ‘cxx’, ‘matlab’]</p></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_compiler</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Environment variable where the compiler executable should be stored for use
 within the Makefile. If not provided, this will be determined by the target
 language driver.</p></td>
 </tr>
 <tr class="row-even"><td><p>env_compiler_flags</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Environment variable where the compiler flags should be stored (including those
 required to compile against the yggdrasil interface). If not provided, this
 will be determined by the target language driver.</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_linker</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Environment variable where the linker executable should be stored for use within
 the Makefile. If not provided, this will be determined by the target language
 driver.</p></td>
 </tr>
 <tr class="row-even"><td><p>env_linker_flags</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Environment variable where the linker flags should be stored (including those
 required to link against the yggdrasil interface). If not provided, this will
 be determined by the target language driver.</p></td>
@@ -706,21 +710,21 @@ be determined by the target language driver.</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter</p></td>
 <td><p>string</p></td>
-<td><p>[‘lpy’, ‘sbml’, ‘python’, ‘timesync’, ‘dummy’, ‘matlab’, ‘R’, ‘r’]</p></td>
+<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
 </tr>
 <tr class="row-odd"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘lpy’, ‘sbml’, ‘python’, ‘timesync’, ‘dummy’, ‘matlab’, ‘R’, ‘r’]</p></td>
+<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
 </tr>
 <tr class="row-even"><td><p>linker</p></td>
 <td><p>string</p></td>
-<td><p>[‘fortran’, ‘cmake’, ‘cxx’, ‘make’, ‘cpp’, ‘c’, ‘c++’]</p></td>
+<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
 <td><p>Command or path to executable that should be used to link the model. If not
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
@@ -728,7 +732,7 @@ current operating system</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘fortran’, ‘cmake’, ‘cxx’, ‘make’, ‘cpp’, ‘c’, ‘c++’]</p></td>
+<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
 <td><p>Flags that should be passed to the linker during compilation. If not provided,
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
@@ -766,7 +770,7 @@ selections will be returned.</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_interpreter</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘lpy’, ‘sbml’, ‘python’, ‘timesync’, ‘dummy’, ‘matlab’, ‘R’, ‘r’]</p></td>
+<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
@@ -779,7 +783,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 </tr>
 <tr class="row-odd"><td><p>source_files</p></td>
 <td><p>array</p></td>
-<td><p>[‘fortran’, ‘cmake’, ‘cxx’, ‘make’, ‘cpp’, ‘c’, ‘c++’]</p></td>
+<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
@@ -829,37 +833,37 @@ variable in everything but name and units) or mappings with the keys:</p></td>
 </tr>
 <tr class="row-odd"><td><p>target</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Make target that should be built to create the model executable. Defaults to
 None.</p></td>
 </tr>
 <tr class="row-even"><td><p>target_compiler</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Compilation tool that should be used to compile the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_compiler_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Compilation flags that should be passed to the target language compiler.
 Defaults to [].</p></td>
 </tr>
 <tr class="row-even"><td><p>target_language</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Language that the target is written in. Defaults to None and will be set based
 on the source files provided.</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_linker</p></td>
 <td><p>string</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Compilation tool that should be used to link the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
 </tr>
 <tr class="row-even"><td><p>target_linker_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 <td><p>Linking flags that should be passed to the target language linker. Defaults to
 [].</p></td>
 </tr>
@@ -879,7 +883,7 @@ symunit. Defaults to False.</p></td>
 </tr>
 <tr class="row-odd"><td><p>with_asan</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘fortran’, ‘osr’, ‘cmake’, ‘cxx’, ‘make’, ‘cpp’, ‘c’, ‘c++’]</p></td>
+<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘osr’, ‘cmake’]</p></td>
 <td><p>If True, the model will be compiled and linked with the address sanitizer
 enabled (if there is one available for the selected compiler).</p></td>
 </tr>
@@ -1271,17 +1275,17 @@ for 3D structures.</p></td>
 <tbody>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
-<td><p>[‘mat’, ‘table’, ‘ascii’, ‘map’, ‘pandas’, ‘binary’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[‘pickle’, ‘ply’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
 <td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
 <tr class="row-odd"><td><p>comment</p></td>
 <td><p>string</p></td>
-<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘pandas’, ‘wofost’, ‘yaml’, ‘map’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
 </tr>
 <tr class="row-even"><td><p>datatype</p></td>
 <td><p>schema</p></td>
-<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘pandas’, ‘wofost’, ‘yaml’, ‘map’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
 </tr>
@@ -1299,7 +1303,7 @@ to t.</p></td>
 </tr>
 <tr class="row-odd"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘map’, ‘pandas’, ‘wofost’, ‘yaml’, ‘binary’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
@@ -1309,18 +1313,18 @@ to t.</p></td>
 </tr>
 <tr class="row-odd"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
 </tr>
 <tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
-<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘map’, ‘pandas’, ‘wofost’, ‘yaml’, ‘binary’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
 <tr class="row-odd"><td><p>newline</p></td>
 <td><p>string</p></td>
-<td><p>[‘mat’, ‘table’, ‘json’, ‘ascii’, ‘netcdf’, ‘pandas’, ‘wofost’, ‘yaml’, ‘map’, ‘pickle’, ‘ply’, ‘obj’]</p></td>
+<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
 </tr>
 <tr class="row-even"><td><p>no_header</p></td>

@@ -166,6 +166,28 @@
     <span class="k">return</span> <span class="n">add_units</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(),</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="convert_julia_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_julia_unit_string">[docs]</a><span class="k">def</span> <span class="nf">convert_julia_unit_string</span><span class="p">(</span><span class="n">in_str</span><span class="p">):</span>  <span class="c1"># pragma: julia</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert unit string to version that julia Unitful package can</span>
+<span class="sd">    understand.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_str (str): String unit to convert.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Converted string.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">replacements</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;**&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;days&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;day&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;degC&#39;</span><span class="p">,</span> <span class="s1">&#39;°C&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;degF&#39;</span><span class="p">,</span> <span class="s1">&#39;°F&#39;</span><span class="p">)]</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">in_str</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">replacements</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
 <div class="viewcode-block" id="convert_matlab_unit_string"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.units.convert_matlab_unit_string">[docs]</a><span class="k">def</span> <span class="nf">convert_matlab_unit_string</span><span class="p">(</span><span class="n">m_str</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert Matlab unit string to string that the Python package</span>
 <span class="sd">    can understand.</span>

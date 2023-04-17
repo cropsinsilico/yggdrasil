@@ -74,6 +74,28 @@ Model YAML:
 
 
 
+Julia Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/timed_pipe/src/timed_pipe_dst.jl
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/timed_pipe/src/timed_pipe_src.jl
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/timed_pipe/timed_pipe_julia.yml
+   :language: yaml
+   :linenos:
+
+
+
 Matlab Version
 --------------
 

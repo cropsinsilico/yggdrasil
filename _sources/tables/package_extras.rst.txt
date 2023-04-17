@@ -1,0 +1,40 @@
+.. _package_extras_rst:
+
+========   ==================   ===================   ========================================
+Extra      Conda Syntax         Pip Syntax            Description                             
+========   ==================   ===================   ========================================
+r          yggdrasil.r          n/a                   Dependencies required to run models     
+                                                      written in R as part of |yggdrasil|     
+                                                      integrations                            
+c          yggdrasil.c          n/a                   Dependencies required to compile and run
+                                                      models written in C/C++ as part of      
+                                                      |yggdrasil| integrations                
+fortran    yggdrasil.fortran    n/a                   Dependencies required to compile and run
+                                                      models written in Fortran as part of    
+                                                      |yggdrasil| integrations                
+julia      yggdrasil.julia      n/a                   Dependencies required to run models     
+                                                      written in R as part of |yggdrasil|     
+                                                      integrations                            
+lpy        yggdrasil.lpy        n/a                   Dependencies required to run LPy models 
+                                                      as part of |yggdrasil| integrations     
+mpi        yggdrasil.mpi        yggdrasil[mpi]        Dependencies required to run            
+                                                      integrations as MPI parallel jobs       
+sbml       yggdrasil.sbml       yggdrasil[sbml]       Dependencies required to run SBML models
+                                                      as part of |yggdrasil| integrations     
+zmq        yggdrasil.zmq        n/a                   Dependencies required to run models     
+                                                      using ZeroMQ sockets for communication  
+                                                      in C/C++/Fortran                        
+omp        yggdrasil.omp        n/a                   Dependencies required to run            
+                                                      integrations that use OpenMP            
+rmq        yggdrasil.rmq        yggdrasil[rmq]        Dependencies required to run            
+                                                      integrations with RabbitMQ communication
+testing    yggdrasil.testing    yggdrasil[testing]    Dependencies required to run |yggdrasil|
+                                                      tests                                   
+docs       yggdrasil.docs       yggdrasil[docs]       Dependencies required to build          
+                                                      |yggdrasil| docs                        
+dev        yggdrasil.dev        yggdrasil[dev]        Dependencies recommended for |yggdrasil|
+                                                      development                             
+astropy    yggdrasil.astropy    yggdrasil[astropy]    None                                    
+pygments   yggdrasil.pygments   yggdrasil[pygments]   None                                    
+trimesh    yggdrasil.trimesh    yggdrasil[trimesh]    None                                    
+========   ==================   ===================   ========================================

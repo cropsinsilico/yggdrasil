@@ -104,9 +104,10 @@
 <li><p><a class="reference internal" href="#c-version" id="id2">C Version</a></p></li>
 <li><p><a class="reference internal" href="#id1" id="id3">C++ Version</a></p></li>
 <li><p><a class="reference internal" href="#fortran-version" id="id4">Fortran Version</a></p></li>
-<li><p><a class="reference internal" href="#matlab-version" id="id5">Matlab Version</a></p></li>
-<li><p><a class="reference internal" href="#python-version" id="id6">Python Version</a></p></li>
-<li><p><a class="reference internal" href="#r-version" id="id7">R Version</a></p></li>
+<li><p><a class="reference internal" href="#julia-version" id="id5">Julia Version</a></p></li>
+<li><p><a class="reference internal" href="#matlab-version" id="id6">Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#python-version" id="id7">Python Version</a></p></li>
+<li><p><a class="reference internal" href="#r-version" id="id8">R Version</a></p></li>
 </ul>
 </nav>
 <section id="c-version">
@@ -500,8 +501,109 @@
 </pre></div>
 </div>
 </section>
+<section id="julia-version">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Julia Version</a><a class="headerlink" href="#julia-version" title="Permalink to this heading">¶</a></h2>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>using Yggdrasil
+<span class="linenos"> 2</span>using Printf
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>function run(args)
+<span class="linenos"> 6</span>  println(&quot;Hello from Julia pipe_dst&quot;)
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>  # Ins/outs matching with the the model yaml
+<span class="linenos"> 9</span>  inq = Yggdrasil.YggInterface(&quot;YggInput&quot;, &quot;input_pipe&quot;)
+<span class="linenos">10</span>  outf = Yggdrasil.YggInterface(&quot;YggOutput&quot;, &quot;output_file&quot;)
+<span class="linenos">11</span>  println(&quot;pipe_dst(Julia): Created I/O channels&quot;)
+<span class="linenos">12</span>
+<span class="linenos">13</span>  # Continue receiving input from the queue
+<span class="linenos">14</span>  global count = 0
+<span class="linenos">15</span>  while (true)
+<span class="linenos">16</span>    ret, buf = inq.recv()
+<span class="linenos">17</span>    if (!ret)
+<span class="linenos">18</span>      println(&quot;pipe_dst(Julia): Input channel closed&quot;)
+<span class="linenos">19</span>      break
+<span class="linenos">20</span>    end
+<span class="linenos">21</span>    ret = outf.send(buf)
+<span class="linenos">22</span>    if (!ret)
+<span class="linenos">23</span>      error(@sprintf(&quot;pipe_dst(Julia): SEND ERROR ON MSG %d\n&quot;, count))
+<span class="linenos">24</span>    end
+<span class="linenos">25</span>    global count = count + 1
+<span class="linenos">26</span>  end
+<span class="linenos">27</span>
+<span class="linenos">28</span>  @printf(&quot;Goodbye from Julia destination. Received %d messages.\n&quot;, count)
+<span class="linenos">29</span>end
+<span class="linenos">30</span>    
+<span class="linenos">31</span>
+<span class="linenos">32</span>run(ARGS)
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>using Yggdrasil
+<span class="linenos"> 2</span>using Printf
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>function run(args)
+<span class="linenos"> 6</span>  msg_count = parse(Int64, args[1])
+<span class="linenos"> 7</span>  msg_size = parse(Int64, args[2])
+<span class="linenos"> 8</span>  @printf(&quot;Hello from Julia pipe_src: msg_count = %d, msg_size = %d\n&quot;,
+<span class="linenos"> 9</span>          msg_count, msg_size)
+<span class="linenos">10</span>
+<span class="linenos">11</span>  # Ins/outs matching with the the model yaml
+<span class="linenos">12</span>  outq = Yggdrasil.YggInterface(&quot;YggOutput&quot;, &quot;output_pipe&quot;)
+<span class="linenos">13</span>  println(&quot;pipe_src(Julia): Created I/O channels&quot;)
+<span class="linenos">14</span>
+<span class="linenos">15</span>  # Send test message multiple times
+<span class="linenos">16</span>  test_msg = &quot;0&quot;^msg_size
+<span class="linenos">17</span>  global count = 0
+<span class="linenos">18</span>  for i = 1:msg_count
+<span class="linenos">19</span>    ret = outq.send(test_msg)
+<span class="linenos">20</span>    if (!ret)
+<span class="linenos">21</span>      error(@sprintf(&quot;pipe_src(Julia): SEND ERROR ON MSG %d&quot;, i))
+<span class="linenos">22</span>    end
+<span class="linenos">23</span>    global count = count + 1
+<span class="linenos">24</span>  end
+<span class="linenos">25</span>
+<span class="linenos">26</span>  @printf(&quot;Goodbye from Julia source. Sent %d messages.\n&quot;, count)
+<span class="linenos">27</span>end
+<span class="linenos">28</span>    
+<span class="linenos">29</span>
+<span class="linenos">30</span>run(ARGS)
+</pre></div>
+</div>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_src</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_src.jl</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_COUNT}}&quot;</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{PIPE_MSG_SIZE}}&quot;</span>
+<span class="linenos">10</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">11</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timed_pipe_dst</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timed_pipe_dst.jl</span>
+<span class="linenos">16</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">17</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">22</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_pipe</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_pipe</span>
+<span class="linenos">24</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_file</span>
+<span class="linenos">25</span><span class="w">    </span><span class="nt">output_file</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_timed_pipe.txt</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</div>
+</section>
 <section id="matlab-version">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab pipe_dst&#39;</span><span class="p">);</span>
 <span class="linenos"> 2</span>
@@ -588,7 +690,7 @@
 </div>
 </section>
 <section id="python-version">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
@@ -685,7 +787,7 @@
 </div>
 </section>
 <section id="r-version">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>library(yggdrasil)
 <span class="linenos"> 2</span>

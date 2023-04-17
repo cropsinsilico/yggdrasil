@@ -3,7 +3,7 @@
 ================   =====================   ==================================   ================================================================================
 Option             Type                    Valid For 'Transformtype' Of         Description                                                                     
 ================   =====================   ==================================   ================================================================================
-field_names        array                   ['pandas', 'array']                  Names of fields in the array.                                                   
+field_names        array                   ['array', 'pandas']                  Names of fields in the array.                                                   
 filter             object                  ['filter']                           Schema for filter components.                                                   
 function           function                ['function']                         The handle for a callable Python object (e.g. function) that should be used to  
                                                                                 transform messages or a string of the form "<function file>:<function name>"    
@@ -13,7 +13,7 @@ function           function                ['function']                         
 index              ['integer', 'string']   ['select_scalar']                    Array index or dictionary key to select. Defaults to selecting the first element
                                                                                 in an array or the first key alphabetically.                                    
 map                object                  ['map_fields']                       A mapping from original field name to new field names.                          
-original_order     array                   ['select_scalar', 'select_fields']   The original order of fields that should be used for selecting from             
+original_order     array                   ['select_fields', 'select_scalar']   The original order of fields that should be used for selecting from             
                                                                                 lists/tuples.                                                                   
 selected           array                   ['select_fields']                    A list of fields that should be selected.                                       
 single_as_scalar   boolean                 ['select_fields']                    If True and only a single field is selected, the transformed messages will be   

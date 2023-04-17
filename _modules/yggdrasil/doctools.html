@@ -96,8 +96,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for yggdrasil.doctools</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">textwrap</span>
 
 
@@ -204,6 +206,8 @@
                         <span class="s1">&#39;unicode.&#39;</span><span class="p">),</span>
              <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="s1">&#39;User can specify an encoding for scalar strings.&#39;</span><span class="p">}</span>
     <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALL_TYPES</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">PYTHON_SCALARS</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{})</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">notes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;notes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
@@ -574,7 +578,7 @@
                <span class="n">column_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wrapped_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">sort_on_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort_required_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                <span class="n">last_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prune_empty_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-               <span class="n">style</span><span class="o">=</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+               <span class="n">style</span><span class="o">=</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="n">textwrap_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a dictionary to a table.</span>
 
 <span class="sd">    Args:</span>
@@ -612,6 +616,8 @@
 <span class="sd">        style (str, optional): Style of table that should be used. &#39;simple&#39;</span>
 <span class="sd">            dosn&#39;t allow for multi-column or row cells, while &#39;complex&#39;</span>
 <span class="sd">            does. Defaults to &#39;simple&#39;.</span>
+<span class="sd">        textwrap_kwargs (dict, optional): Keyword arguments to pass to</span>
+<span class="sd">            textwrap.wrap.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are ignored.</span>
 <span class="sd">            </span>
 <span class="sd">    Returns:</span>
@@ -637,7 +643,8 @@
             <span class="n">v</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">prop_req</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-        <span class="n">prop_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">prop_order</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop_req</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">prop_req</span><span class="p">:</span>
+            <span class="n">prop_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">prop_order</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop_req</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">sort_on_key</span><span class="p">:</span>
         <span class="n">prop_req</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prop_req</span><span class="p">)</span>
         <span class="n">prop_order</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prop_order</span><span class="p">)</span>
@@ -768,7 +775,8 @@
             <span class="n">max_row_len</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">wrapped_columns</span><span class="p">:</span>
-                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">wrapped_columns</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">wrapped_columns</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+                                             <span class="o">**</span><span class="n">textwrap_kwargs</span><span class="p">))</span>
                 <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_columns</span><span class="p">:</span>
                     <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -946,6 +954,82 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Alias for ``</span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">``&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="write_package_extras_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_package_extras_table">[docs]</a><span class="k">def</span> <span class="nf">write_package_extras_table</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table describing the optional Python packages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table and</span>
+<span class="sd">            write_table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Name of file or files created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
+    <span class="n">utils_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="s1">&#39;utils&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">utils_dir</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">manage_requirements</span> <span class="kn">import</span> <span class="n">YggRequirements</span>
+        <span class="n">reqs</span> <span class="o">=</span> <span class="n">YggRequirements</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span>
+                            <span class="nb">sorted</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">())</span>
+                            <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">reqs</span><span class="p">[</span><span class="s1">&#39;extras&#39;</span><span class="p">]])</span>
+        <span class="n">conda_reqs_width</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">pip_reqs_width</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">reqs</span><span class="p">[</span><span class="s1">&#39;extras&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">description</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s1">&#39;yggdrasil&#39;</span><span class="p">,</span> <span class="s1">&#39;|yggdrasil|&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;conda syntax&#39;</span><span class="p">:</span> <span class="s1">&#39;n/a&#39;</span><span class="p">,</span>
+                <span class="c1"># &#39;conda deps&#39;: &#39;n/a&#39;,</span>
+                <span class="s1">&#39;pip syntax&#39;</span><span class="p">:</span> <span class="s1">&#39;n/a&#39;</span><span class="p">,</span>
+                <span class="c1"># &#39;pip deps&#39;: &#39;n/a&#39;</span>
+            <span class="p">})</span>
+            <span class="n">conda_reqs_extra</span> <span class="o">=</span> <span class="n">reqs</span><span class="o">.</span><span class="n">create_conda_recipe_varient</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conda_reqs_extra</span><span class="p">:</span>
+                <span class="n">conda_reqs</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">conda_reqs_extra</span><span class="p">[</span><span class="s1">&#39;requirements&#39;</span><span class="p">][</span><span class="s1">&#39;run&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s1">&#39;pin_subpackage(&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">conda_reqs</span><span class="p">:</span>
+                <span class="n">conda_reqs_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">conda_reqs_width</span><span class="p">,</span>
+                                       <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">conda_reqs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)))</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;conda syntax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;yggdrasil.</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="c1"># args[k][&#39;conda deps&#39;] = conda_reqs</span>
+            <span class="n">pip_reqs</span> <span class="o">=</span> <span class="n">reqs</span><span class="o">.</span><span class="n">create_requirements_file_varient</span><span class="p">(</span>
+                <span class="n">k</span><span class="p">,</span> <span class="n">format_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;include_method&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                               <span class="s1">&#39;include_extra&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">pip_reqs</span><span class="p">:</span>
+                <span class="n">pip_reqs_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">pip_reqs_width</span><span class="p">,</span>
+                                     <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">pip_reqs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)))</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;pip syntax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;yggdrasil[</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">]&quot;</span>
+                <span class="c1"># args[k][&#39;pip deps&#39;] = pip_reqs</span>
+        <span class="c1"># for k, v in args.items():</span>
+        <span class="c1">#     for deps, deps_len in [(&#39;conda deps&#39;, conda_reqs_width),</span>
+        <span class="c1">#                            (&#39;pip deps&#39;, pip_reqs_width)]:</span>
+        <span class="c1">#         if isinstance(v[deps], list):</span>
+        <span class="c1">#             v[deps] = &#39; &#39;.join([x + &#39; &#39; * (deps_len - len(x))</span>
+        <span class="c1">#                                 for x in v[deps]])</span>
+        <span class="c1"># TODO: Fix deps table output</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;column_order&#39;</span><span class="p">,</span> <span class="p">[</span>
+            <span class="s1">&#39;extra&#39;</span><span class="p">,</span> <span class="s1">&#39;conda syntax&#39;</span><span class="p">,</span> <span class="s1">&#39;pip syntax&#39;</span><span class="p">])</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="s1">&#39;package_extras.rst&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;extra&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wrapped_columns&#39;</span><span class="p">,</span>
+                          <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
+                           <span class="s1">&#39;conda deps&#39;</span><span class="p">:</span> <span class="n">conda_reqs_width</span><span class="p">,</span>
+                           <span class="s1">&#39;pip deps&#39;</span><span class="p">:</span> <span class="n">pip_reqs_width</span><span class="p">})</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;sort_on_key&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;sort_required_first&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;textwrap_kwargs&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;replace_whitespace&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
            </div>

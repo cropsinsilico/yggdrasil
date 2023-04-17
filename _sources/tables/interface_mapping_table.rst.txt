@@ -53,6 +53,16 @@
      - ``flag = ygg_send_var({channel_obj}, [yggarg({outputs})])``
      - ``flag = ygg_recv_var({channel_obj}, [yggarg({inputs})])``
      - ``flag = ygg_rpc_call({channel_obj}, [yggarg({outputs})], [yggarg({inputs})])``
+   * - julia
+     - ``import Yggdrasil: commtype``
+     - ``Yggdrasil.YggInterface("YggInput", "{channel_name}")``
+     - ``Yggdrasil.YggInterface("YggOutput", "{channel_name}")``
+     - ``Yggdrasil.YggInterface("YggRpcServer", "{channel_name}")``
+     - ``Yggdrasil.YggInterface("YggRpcClient", "{channel_name}")``
+     - ``Yggdrasil.YggInterface("YggTimesync", "{channel_name}")``
+     - ``flag = {channel_obj}.send({outputs})``
+     - ``flag, {inputs} = {channel_obj}.recv()``
+     - ``flag, {inputs} = {channel_obj}.call({outputs})``
    * - matlab
      - 
      - ``YggInterface('YggInput', '{channel_name}')``

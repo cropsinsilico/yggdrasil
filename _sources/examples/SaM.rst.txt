@@ -25,6 +25,10 @@ Model Code:
    :language: python
    :linenos:
 
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/src/SaM.jl
+   :language: python
+   :linenos:
+
 .. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/src/SaM.m
    :language: matlab
    :linenos:
@@ -60,6 +64,10 @@ Model Code:
    :linenos:
 
 .. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/src/SaM.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/src/SaM.jl
    :language: python
    :linenos:
 
@@ -129,6 +137,24 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/SaM_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Julia Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/src/SaM.jl
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/SaM/SaM_julia.yml
    :language: yaml
    :linenos:
 

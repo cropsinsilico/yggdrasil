@@ -844,7 +844,10 @@
                 <span class="n">env_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CONDA_PREFIX&#39;</span><span class="p">,</span> <span class="s1">&#39;CONDA&#39;</span><span class="p">,</span> <span class="s1">&#39;SDKROOT&#39;</span><span class="p">,</span> <span class="s1">&#39;CC&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;CXX&#39;</span><span class="p">,</span> <span class="s1">&#39;FC&#39;</span><span class="p">,</span> <span class="s1">&#39;GFORTRAN&#39;</span><span class="p">,</span> <span class="s1">&#39;DISPLAY&#39;</span><span class="p">,</span> <span class="s1">&#39;CL&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;_CL_&#39;</span><span class="p">,</span> <span class="s1">&#39;LD&#39;</span><span class="p">,</span> <span class="s1">&#39;CFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">]</span>
+                            <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CONDA_JL_HOME&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;CONDA_JL_CONDA_EXE&#39;</span><span class="p">,</span> <span class="s1">&#39;JULIA_DEPOT_PATH&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;JULIA_LOAD_PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;JULIA_PROJECT&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;JULIA_SSL_CA_ROOTS_PATH&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
                     <span class="n">env_vars</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;VCPKG_ROOT&#39;</span><span class="p">]</span>
                 <span class="n">vardict</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Environment variables:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>

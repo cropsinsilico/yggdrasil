@@ -212,6 +212,20 @@
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">pass</span></div>
                 
+<div class="viewcode-block" id="InterpretedModelDriver.are_dependencies_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.are_dependencies_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">are_dependencies_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the dependencies are installed for the interface (not</span>
+<span class="sd">        including dependencies needed by a particular communication type).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the dependencies are installed. False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Short cut by checking if yggdrasil installed</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">full_language</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_interface_installed</span><span class="p">()):</span>  <span class="c1"># pragma: config</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">are_dependencies_installed</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+            
 <div class="viewcode-block" id="InterpretedModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
 <span class="sd">        and which ones are arguments.</span>

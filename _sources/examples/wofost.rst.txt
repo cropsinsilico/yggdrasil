@@ -62,6 +62,24 @@ Model YAML:
 
 
 
+Julia Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/wofost/src/wofost.jl
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/wofost/wofost_julia.yml
+   :language: yaml
+   :linenos:
+
+
+
 Matlab Version
 --------------
 

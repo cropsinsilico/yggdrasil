@@ -70,6 +70,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-rabbitmq-message-passing">Additional Steps for RabbitMQ Message Passing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-opensimroot">Additional Steps for OpenSimRoot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-julia-models">Additional Steps for Julia Models</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -165,6 +166,120 @@ the terminal (or Anaconda Prompt on Windows).:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels conda-forge
 </pre></div>
 </div>
+<p>Optional dependencies for supported languages yggdrasil are grouped into utility “extra” subpackages. For example, to install C, C++, Fortran, and R and their dependencies, you could run the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge yggdrasil yggdrasil.c yggdrasil.fortran yggdrasil.r
+</pre></div>
+</div>
+<p>There are also several additional extras subpackages containing optional dependencies for additional communication mechanisms and yggdrasil development. The table below describes all of the subpackages</p>
+<table class="docutils align-default" id="package-extras-rst">
+<thead>
+<tr class="row-odd"><th class="head"><p>Extra</p></th>
+<th class="head"><p>Conda Syntax</p></th>
+<th class="head"><p>Pip Syntax</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>r</p></td>
+<td><p>yggdrasil.r</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run models
+written in R as part of yggdrasil
+integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>c</p></td>
+<td><p>yggdrasil.c</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to compile and run
+models written in C/C++ as part of
+yggdrasil integrations</p></td>
+</tr>
+<tr class="row-even"><td><p>fortran</p></td>
+<td><p>yggdrasil.fortran</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to compile and run
+models written in Fortran as part of
+yggdrasil integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>julia</p></td>
+<td><p>yggdrasil.julia</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run models
+written in R as part of yggdrasil
+integrations</p></td>
+</tr>
+<tr class="row-even"><td><p>lpy</p></td>
+<td><p>yggdrasil.lpy</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run LPy models
+as part of yggdrasil integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>mpi</p></td>
+<td><p>yggdrasil.mpi</p></td>
+<td><p>yggdrasil[mpi]</p></td>
+<td><p>Dependencies required to run
+integrations as MPI parallel jobs</p></td>
+</tr>
+<tr class="row-even"><td><p>sbml</p></td>
+<td><p>yggdrasil.sbml</p></td>
+<td><p>yggdrasil[sbml]</p></td>
+<td><p>Dependencies required to run SBML models
+as part of yggdrasil integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>zmq</p></td>
+<td><p>yggdrasil.zmq</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run models
+using ZeroMQ sockets for communication
+in C/C++/Fortran</p></td>
+</tr>
+<tr class="row-even"><td><p>omp</p></td>
+<td><p>yggdrasil.omp</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run
+integrations that use OpenMP</p></td>
+</tr>
+<tr class="row-odd"><td><p>rmq</p></td>
+<td><p>yggdrasil.rmq</p></td>
+<td><p>yggdrasil[rmq]</p></td>
+<td><p>Dependencies required to run
+integrations with RabbitMQ communication</p></td>
+</tr>
+<tr class="row-even"><td><p>testing</p></td>
+<td><p>yggdrasil.testing</p></td>
+<td><p>yggdrasil[testing]</p></td>
+<td><p>Dependencies required to run yggdrasil
+tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>docs</p></td>
+<td><p>yggdrasil.docs</p></td>
+<td><p>yggdrasil[docs]</p></td>
+<td><p>Dependencies required to build
+yggdrasil docs</p></td>
+</tr>
+<tr class="row-even"><td><p>dev</p></td>
+<td><p>yggdrasil.dev</p></td>
+<td><p>yggdrasil[dev]</p></td>
+<td><p>Dependencies recommended for yggdrasil
+development</p></td>
+</tr>
+<tr class="row-odd"><td><p>astropy</p></td>
+<td><p>yggdrasil.astropy</p></td>
+<td><p>yggdrasil[astropy]</p></td>
+<td><p>None</p></td>
+</tr>
+<tr class="row-even"><td><p>pygments</p></td>
+<td><p>yggdrasil.pygments</p></td>
+<td><p>yggdrasil[pygments]</p></td>
+<td><p>None</p></td>
+</tr>
+<tr class="row-odd"><td><p>trimesh</p></td>
+<td><p>yggdrasil.trimesh</p></td>
+<td><p>yggdrasil[trimesh]</p></td>
+<td><p>None</p></td>
+</tr>
+</tbody>
+</table>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Windows Users</strong> If you see the warning:</p>
@@ -266,6 +381,11 @@ Python commands:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_python_lib</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
+<p>Optional dependencies can be specified using pip “extra” syntax. For example, to install the packages required to run SBML models and enable communication using RabbitMQ, you could run the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install yggdrasil-framework[sbml,rmq]
+</pre></div>
+</div>
+<p>Additional extras for pip installation can be found <a class="reference internal" href="tables/package_extras.html#package-extras-rst"><span class="std std-ref">here</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><em>Windows Users</em> If you used the Windows store to install Python, the above commands will not yield the correct scripts directory. It will be something along the lines of <code class="docutils literal notranslate"><span class="pre">%userprofile%\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts</span></code></p>
@@ -506,6 +626,14 @@ for starting a RabbitMQ server.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">make</span></code> on Linux</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">choco</span> <span class="pre">install</span> <span class="pre">make</span></code> on Windows</p></li>
 </ul>
+</section>
+<section id="additional-steps-for-julia-models">
+<h2>Additional Steps for Julia Models<a class="headerlink" href="#additional-steps-for-julia-models" title="Permalink to this heading">¶</a></h2>
+<p>If you do not use conda/mamba to install <code class="docutils literal notranslate"><span class="pre">julia</span></code>, or you are installing yggdrasil on a Windows machine or an M1/M2 Mac (there are not currently <code class="docutils literal notranslate"><span class="pre">julia</span></code> conda packages for these systems as of 2023/04/07, but this may change), you will need to install it yourself. Julia downloads can be found <a class="reference external" href="https://julialang.org/downloads/">here</a>.</p>
+<p>Once julia is installed, you can complete the installation of the yggdrasil Julia interface via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ygginstall julia
+</pre></div>
+</div>
 </section>
 </section>
 

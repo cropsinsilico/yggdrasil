@@ -74,6 +74,28 @@ Model YAML:
 
 
 
+Julia Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io9/src/formatted_io9_modelA.jl
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io9/src/formatted_io9_modelB.jl
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io9/formatted_io9_julia.yml
+   :language: yaml
+   :linenos:
+
+
+
 Matlab Version
 --------------
 

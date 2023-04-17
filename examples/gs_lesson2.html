@@ -104,9 +104,10 @@
 <li><p><a class="reference internal" href="#c-version" id="id2">C Version</a></p></li>
 <li><p><a class="reference internal" href="#id1" id="id3">C++ Version</a></p></li>
 <li><p><a class="reference internal" href="#fortran-version" id="id4">Fortran Version</a></p></li>
-<li><p><a class="reference internal" href="#matlab-version" id="id5">Matlab Version</a></p></li>
-<li><p><a class="reference internal" href="#python-version" id="id6">Python Version</a></p></li>
-<li><p><a class="reference internal" href="#r-version" id="id7">R Version</a></p></li>
+<li><p><a class="reference internal" href="#julia-version" id="id5">Julia Version</a></p></li>
+<li><p><a class="reference internal" href="#matlab-version" id="id6">Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#python-version" id="id7">Python Version</a></p></li>
+<li><p><a class="reference internal" href="#r-version" id="id8">R Version</a></p></li>
 </ul>
 </nav>
 <section id="c-version">
@@ -179,8 +180,26 @@
 </pre></div>
 </div>
 </section>
+<section id="julia-version">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Julia Version</a><a class="headerlink" href="#julia-version" title="Permalink to this heading">¶</a></h2>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;Hello from Julia&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos">2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia_model1</span>
+<span class="linenos">3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span><span class="w">  </span><span class="c1"># Runs the julia script using default Julia</span>
+<span class="linenos">4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.jl</span>
+<span class="linenos">5</span>
+<span class="linenos">6</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia_model2</span>
+<span class="linenos">7</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span>
+<span class="linenos">8</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.jl</span>
+</pre></div>
+</div>
+</section>
 <section id="matlab-version">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Hello from Matlab&#39;</span><span class="p">);</span>
 </pre></div>
@@ -198,7 +217,7 @@
 </div>
 </section>
 <section id="python-version">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python&#39;</span><span class="p">)</span>
 </pre></div>
@@ -216,7 +235,7 @@
 </div>
 </section>
 <section id="r-version">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from R&#39;</span><span class="p">)</span>
 </pre></div>

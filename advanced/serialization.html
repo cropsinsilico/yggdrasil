@@ -142,6 +142,7 @@ expansion type to the core set of JSON types.</p>
 <th class="head"><p>C</p></th>
 <th class="head"><p>C++</p></th>
 <th class="head"><p>Fortran</p></th>
+<th class="head"><p>Julia</p></th>
 <th class="head"><p>Matlab</p></th>
 <th class="head"><p>Python</p></th>
 <th class="head"><p>Notes</p></th>
@@ -153,6 +154,7 @@ expansion type to the core set of JSON types.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Document</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggarr</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Array</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">cell</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td></td>
@@ -162,11 +164,22 @@ expansion type to the core set of JSON types.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">logical(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">logical</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>class</p></td>
+<tr class="row-even"><td><p>bytes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">character(len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CodeUnits{UInt8,String}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bytes</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
+</tr>
+<tr class="row-odd"><td><p>class</p></td>
 <td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">python_class_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">python_class_t</span></code></p></td>
@@ -174,8 +187,29 @@ expansion type to the core set of JSON types.</p>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><p>function</p></td>
+<tr class="row-even"><td><p>complex</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Complex</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.complexX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
+</tr>
+<tr class="row-odd"><td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">real(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Float</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">single,</span> <span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.floatX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
+</tr>
+<tr class="row-even"><td><p>function</p></td>
 <td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">python_function_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">python_function_t</span></code></p></td>
@@ -183,8 +217,9 @@ expansion type to the core set of JSON types.</p>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><p>instance</p></td>
+<tr class="row-odd"><td><p>instance</p></td>
 <td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">python_instance_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">python_instance_t</span></code></p></td>
@@ -192,6 +227,17 @@ expansion type to the core set of JSON types.</p>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>int</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">integer,</span> <span class="pre">bit64::integer64</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">integer(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">intX</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.intX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
 <tr class="row-odd"><td><p>integer</p></td>
 <td></td>
@@ -201,12 +247,14 @@ expansion type to the core set of JSON types.</p>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><p>ndarray</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Array{X}</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></td>
 <td></td>
@@ -216,6 +264,7 @@ expansion type to the core set of JSON types.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggnull</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Nothing</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">NaN</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
 <td></td>
@@ -227,6 +276,7 @@ expansion type to the core set of JSON types.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">real(kind</span> <span class="pre">=</span> <span class="pre">8)</span></code></p></td>
 <td></td>
 <td></td>
+<td></td>
 <td><p>This covers the JSON default for
 floating point or integer values.</p></td>
 </tr>
@@ -235,6 +285,7 @@ floating point or integer values.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::ObjWavefront</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggobj</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></p></td>
 <td></td>
@@ -244,6 +295,7 @@ floating point or integer values.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Document</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggmap</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Dict{AbstractString,Any}</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
 <td></td>
@@ -253,11 +305,13 @@ floating point or integer values.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Ply</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggply</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>scalar</p></td>
+<td></td>
 <td></td>
 <td></td>
 <td></td>
@@ -273,6 +327,7 @@ bytes, and unicode.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">rapidjson::Document</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggschema</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Dict</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
 <td></td>
@@ -282,10 +337,31 @@ bytes, and unicode.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character(len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">String</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
 <td><p>User can specify an encoding for scalar
 strings.</p></td>
+</tr>
+<tr class="row-odd"><td><p>uint</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">integer</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ygguintX</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Uint</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uintX</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.uintX</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
+</tr>
+<tr class="row-even"><td><p>unicode</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">character(kind</span> <span class="pre">=</span> <span class="pre">selected_char_kind('ISO_10646'),</span> <span class="pre">len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">String</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Precision X is preserved.</p></td>
 </tr>
 </tbody>
 </table>

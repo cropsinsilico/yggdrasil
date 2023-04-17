@@ -118,16 +118,21 @@
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">ygg_platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.multitasking</span> <span class="kn">import</span> <span class="n">wait_on_function</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">MatlabModelDriver</span>
-<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DISPLAY&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-    <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">ygg_platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>  <span class="c1"># pragma: travis</span>
-    <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;TkAgg&#39;</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># noqa: E402</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DISPLAY&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ygg_platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>  <span class="c1"># pragma: travis</span>
+        <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;TkAgg&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># noqa: E402</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Plotting disabled&quot;</span><span class="p">)</span>
+    <span class="n">mpl</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">plt</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">_linewidth</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">_legend_fontsize</span> <span class="o">=</span> <span class="mi">14</span>
-<span class="n">mpl</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
 <span class="n">_pyperf_warmups</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">_python_version</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">.</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
@@ -890,7 +895,7 @@
             <span class="n">msg_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_msg_size</span>
         <span class="k">if</span> <span class="n">msg_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">msg_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_msg_count</span>
-        <span class="k">if</span> <span class="n">axs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">plt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">figure_size</span> <span class="o">=</span> <span class="p">(</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)</span>
             <span class="n">figure_buff</span> <span class="o">=</span> <span class="mf">0.75</span>
             <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figure_size</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -908,8 +913,9 @@
                     <span class="n">axs_width</span><span class="p">,</span> <span class="n">axs_height</span><span class="p">]</span>
             <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">pos1</span><span class="p">)</span>
             <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">pos2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="n">msg_size0</span><span class="p">,</span> <span class="n">msg_count</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="n">msg_size</span><span class="p">,</span> <span class="n">msg_count0</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="n">msg_size0</span><span class="p">,</span> <span class="n">msg_count</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="n">msg_size</span><span class="p">,</span> <span class="n">msg_count0</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Get slopes</span>
         <span class="n">fit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_scaling_count</span><span class="p">(</span><span class="n">msg_size</span><span class="o">=</span><span class="n">msg_size0</span><span class="p">,</span> <span class="n">counts</span><span class="o">=</span><span class="n">msg_count</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;fit: slope = </span><span class="si">%f</span><span class="s1">, intercept = </span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fit</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -917,7 +923,9 @@
         <span class="c1"># xname = &#39;size&#39;</span>
         <span class="c1"># self.info(&#39;%s: slope = %f, intercept = %f&#39;, xname, m, b)</span>
         <span class="c1"># Legend</span>
-        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_legend_fontsize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                          <span class="n">fontsize</span><span class="o">=</span><span class="n">_legend_fontsize</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">axs</span><span class="p">,</span> <span class="n">fit</span></div>
         
 <div class="viewcode-block" id="TimedRun.plot_scaling"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.timing.TimedRun.plot_scaling">[docs]</a>    <span class="k">def</span> <span class="nf">plot_scaling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_size</span><span class="p">,</span> <span class="n">msg_count</span><span class="p">,</span> <span class="n">axs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -954,6 +962,8 @@
 <span class="sd">            matplotlib.Axes: Axes containing the plotted scaling.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">plt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">return</span> <span class="n">axs</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg_size</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">msg_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">msg_size</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg_count</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1469,10 +1479,11 @@
         <span class="n">v</span> <span class="o">=</span> <span class="n">fits</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">fmt_row</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="c1"># Save plot</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plotfile</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;plotfile: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">plotfile</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">cleanup_plot</span><span class="p">:</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plotfile</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;plotfile: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">plotfile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cleanup_plot</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">plotfile</span></div>
 
 

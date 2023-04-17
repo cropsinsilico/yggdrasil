@@ -155,7 +155,18 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">ygg_recv_var({channel_obj},</span> <span class="pre">[yggarg({inputs})])</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">ygg_rpc_call({channel_obj},</span> <span class="pre">[yggarg({outputs})],</span> <span class="pre">[yggarg({inputs})])</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>matlab</p></td>
+<tr class="row-even"><td><p>julia</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">Yggdrasil:</span> <span class="pre">commtype</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Yggdrasil.YggInterface(&quot;YggInput&quot;,</span> <span class="pre">&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Yggdrasil.YggInterface(&quot;YggOutput&quot;,</span> <span class="pre">&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Yggdrasil.YggInterface(&quot;YggRpcServer&quot;,</span> <span class="pre">&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Yggdrasil.YggInterface(&quot;YggRpcClient&quot;,</span> <span class="pre">&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Yggdrasil.YggInterface(&quot;YggTimesync&quot;,</span> <span class="pre">&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">{channel_obj}.send({outputs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag,</span> <span class="pre">{inputs}</span> <span class="pre">=</span> <span class="pre">{channel_obj}.recv()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag,</span> <span class="pre">{inputs}</span> <span class="pre">=</span> <span class="pre">{channel_obj}.call({outputs})</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>matlab</p></td>
 <td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggInput',</span> <span class="pre">'{channel_name}')</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggOutput',</span> <span class="pre">'{channel_name}')</span></code></p></td>
@@ -166,7 +177,7 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">[flag,</span> <span class="pre">{inputs}]</span> <span class="pre">=</span> <span class="pre">{channel_obj}.recv()</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">[flag,</span> <span class="pre">{inputs}]</span> <span class="pre">=</span> <span class="pre">{channel_obj}.call({outputs})</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>python</p></td>
+<tr class="row-even"><td><p>python</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">yggdrasil.languages.Python.YggInterface</span> <span class="pre">import</span> <span class="pre">{commtype}</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">YggInput(&quot;{channel_name}&quot;)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">YggOutput(&quot;{channel_name}&quot;)</span></code></p></td>

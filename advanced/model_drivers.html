@@ -169,6 +169,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.recv_converters"><code class="docutils literal notranslate"><span class="pre">InterpretedModelDriver.recv_converters</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.send_converters"><code class="docutils literal notranslate"><span class="pre">InterpretedModelDriver.send_converters</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.after_registration"><code class="docutils literal notranslate"><span class="pre">InterpretedModelDriver.after_registration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.are_dependencies_installed"><code class="docutils literal notranslate"><span class="pre">InterpretedModelDriver.are_dependencies_installed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.executable_command"><code class="docutils literal notranslate"><span class="pre">InterpretedModelDriver.executable_command()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter"><code class="docutils literal notranslate"><span class="pre">InterpretedModelDriver.get_interpreter()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.get_interpreter_flags"><code class="docutils literal notranslate"><span class="pre">InterpretedModelDriver.get_interpreter_flags()</span></code></a></li>
@@ -1650,6 +1651,21 @@ registration. For compiled languages this includes selecting the
 default compiler. The order of precedence is the config file ‘compiler’
 option for the language, followed by the environment variable set by
 _compiler_env, followed by the existing class attribute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.are_dependencies_installed">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">are_dependencies_installed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InterpretedModelDriver.html#InterpretedModelDriver.are_dependencies_installed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.are_dependencies_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the dependencies are installed for the interface (not
+including dependencies needed by a particular communication type).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the dependencies are installed. False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

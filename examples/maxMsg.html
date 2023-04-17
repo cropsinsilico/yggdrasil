@@ -106,9 +106,10 @@
 <li><p><a class="reference internal" href="#c-version" id="id4">C Version</a></p></li>
 <li><p><a class="reference internal" href="#id1" id="id5">C++ Version</a></p></li>
 <li><p><a class="reference internal" href="#fortran-version" id="id6">Fortran Version</a></p></li>
-<li><p><a class="reference internal" href="#matlab-version" id="id7">Matlab Version</a></p></li>
-<li><p><a class="reference internal" href="#python-version" id="id8">Python Version</a></p></li>
-<li><p><a class="reference internal" href="#r-version" id="id9">R Version</a></p></li>
+<li><p><a class="reference internal" href="#julia-version" id="id7">Julia Version</a></p></li>
+<li><p><a class="reference internal" href="#matlab-version" id="id8">Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#python-version" id="id9">Python Version</a></p></li>
+<li><p><a class="reference internal" href="#r-version" id="id10">R Version</a></p></li>
 </ul>
 </nav>
 <section id="mixed-version">
@@ -657,8 +658,85 @@
 </pre></div>
 </div>
 </section>
+<section id="julia-version">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Julia Version</a><a class="headerlink" href="#julia-version" title="Permalink to this heading">¶</a></h2>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>using Yggdrasil
+<span class="linenos"> 2</span>using Printf
+<span class="linenos"> 3</span>using Random
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>msg_size = Yggdrasil.YggInterface(&quot;YGG_MSG_BUF&quot;)
+<span class="linenos"> 7</span>@printf(&quot;maxMsgCli(Julia): Hello message size %d.\n&quot;, msg_size)
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span># Create a max message, send/recv and verify
+<span class="linenos">10</span>rpc = Yggdrasil.YggInterface(&quot;YggRpcClient&quot;, &quot;maxMsgSrv_maxMsgCli&quot;, &quot;%s&quot;, &quot;%s&quot;)
+<span class="linenos">11</span>
+<span class="linenos">12</span># Create a max message
+<span class="linenos">13</span>output = Yggdrasil.Bytes(Random.randstring(msg_size))
+<span class="linenos">14</span>
+<span class="linenos">15</span># Call RPC server
+<span class="linenos">16</span>ret, input = rpc.call(output)
+<span class="linenos">17</span>if (!ret)
+<span class="linenos">18</span>    error(&quot;maxMsgCli(Julia): RPC ERROR&quot;)
+<span class="linenos">19</span>end
+<span class="linenos">20</span>
+<span class="linenos">21</span># Check to see if response matches
+<span class="linenos">22</span>if (input[1] != output)
+<span class="linenos">23</span>    error(&quot;maxMsgCli(Julia): ERROR: input/output do not match&quot;)
+<span class="linenos">24</span>else
+<span class="linenos">25</span>    println(&quot;maxMsgCli(Julia): CONFIRM&quot;)
+<span class="linenos">26</span>end
+<span class="linenos">27</span>
+<span class="linenos">28</span># All done, say goodbye
+<span class="linenos">29</span>println(&quot;maxMsgCli(Julia): Goodbye!&quot;)
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span># Import library for input/output channels
+<span class="linenos"> 2</span>using Yggdrasil
+<span class="linenos"> 3</span>using Printf
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>println(&quot;maxMsgSrv(Julia): Hello!&quot;)
+<span class="linenos"> 7</span>rpc = Yggdrasil.YggInterface(&quot;YggRpcServer&quot;, &quot;maxMsgSrv&quot;, &quot;%s&quot;, &quot;%s&quot;)
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>while true
+<span class="linenos">10</span>    ret, input = rpc.recv()
+<span class="linenos">11</span>    if (!ret)
+<span class="linenos">12</span>	break
+<span class="linenos">13</span>    end
+<span class="linenos">14</span>    @printf(&quot;maxMsgSrv(Julia): rpcRecv returned %s, input %.10s...\n&quot;, ret, input[1])
+<span class="linenos">15</span>    flag = rpc.send(input[1])
+<span class="linenos">16</span>    if (!flag)
+<span class="linenos">17</span>        error(&quot;maxMsgSrv(Julia): Error sending reply.&quot;)
+<span class="linenos">18</span>    end
+<span class="linenos">19</span>end  # while
+<span class="linenos">20</span>
+<span class="linenos">21</span>println(&quot;maxMsgSrv(Julia): Goodbye!&quot;)
+</pre></div>
+</div>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maxMsgCli</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">JuliaModelDriver</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/maxMsgCli.jl</span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">client_of</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maxMsgSrv</span>
+</pre></div>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nn">---</span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos">4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maxMsgSrv</span>
+<span class="linenos">5</span><span class="w">  </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">JuliaModelDriver</span>
+<span class="linenos">6</span><span class="w">  </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/maxMsgSrv.jl</span>
+<span class="linenos">7</span><span class="w">  </span><span class="nt">is_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</div>
+</section>
 <section id="matlab-version">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="n">charset</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s">&#39;0123456789&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
 <span class="linenos"> 2</span><span class="w">	   </span><span class="s">&#39;abcdefghijklmnopqrstuvwxyz&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
@@ -732,7 +810,7 @@
 </div>
 </section>
 <section id="python-version">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">random</span>
@@ -816,7 +894,7 @@
 </div>
 </section>
 <section id="r-version">
-<h2><a class="toc-backref" href="#id9" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>library(yggdrasil)
 <span class="linenos"> 2</span>

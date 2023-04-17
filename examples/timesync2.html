@@ -104,9 +104,10 @@
 <li><p><a class="reference internal" href="#c-version" id="id2">C Version</a></p></li>
 <li><p><a class="reference internal" href="#id1" id="id3">C++ Version</a></p></li>
 <li><p><a class="reference internal" href="#fortran-version" id="id4">Fortran Version</a></p></li>
-<li><p><a class="reference internal" href="#matlab-version" id="id5">Matlab Version</a></p></li>
-<li><p><a class="reference internal" href="#python-version" id="id6">Python Version</a></p></li>
-<li><p><a class="reference internal" href="#r-version" id="id7">R Version</a></p></li>
+<li><p><a class="reference internal" href="#julia-version" id="id5">Julia Version</a></p></li>
+<li><p><a class="reference internal" href="#matlab-version" id="id6">Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#python-version" id="id7">Python Version</a></p></li>
+<li><p><a class="reference internal" href="#r-version" id="id8">R Version</a></p></li>
 </ul>
 </nav>
 <section id="c-version">
@@ -753,8 +754,160 @@
 </pre></div>
 </div>
 </section>
+<section id="julia-version">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Julia Version</a><a class="headerlink" href="#julia-version" title="Permalink to this heading">¶</a></h2>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>using Yggdrasil
+<span class="linenos"> 2</span>using Unitful
+<span class="linenos"> 3</span>using Printf
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>function timestep_calc(t::Unitful.Quantity, model::String)
+<span class="linenos"> 6</span>  state = Dict()
+<span class="linenos"> 7</span>  if (model == &quot;A&quot;)
+<span class="linenos"> 8</span>    state[&quot;x&quot;] = sin(2.0 * t / Unitful.Quantity(10.0, u&quot;d&quot;))
+<span class="linenos"> 9</span>    state[&quot;y&quot;] = cos(2.0 * t / Unitful.Quantity(5.0, u&quot;d&quot;))
+<span class="linenos">10</span>    state[&quot;z1&quot;] = -cos(2.0 * t / Unitful.Quantity(20.0, u&quot;d&quot;))
+<span class="linenos">11</span>    state[&quot;z2&quot;] = -cos(2.0 * t / Unitful.Quantity(20.0, u&quot;d&quot;))
+<span class="linenos">12</span>    state[&quot;a&quot;] = sin(2.0 * t / Unitful.Quantity(2.5, u&quot;d&quot;))
+<span class="linenos">13</span>  else
+<span class="linenos">14</span>    state[&quot;xvar&quot;] = sin(2.0 * t / Unitful.Quantity(10.0, u&quot;d&quot;))
+<span class="linenos">15</span>    state[&quot;yvar&quot;] = cos(2.0 * t / Unitful.Quantity(5.0, u&quot;d&quot;))
+<span class="linenos">16</span>    state[&quot;z&quot;] = -2.0 * cos(2.0 * t / Unitful.Quantity(20.0, u&quot;d&quot;))
+<span class="linenos">17</span>    state[&quot;b&quot;] = cos(2.0 * t / Unitful.Quantity(2.5, u&quot;d&quot;))
+<span class="linenos">18</span>  end
+<span class="linenos">19</span>  return state
+<span class="linenos">20</span>end
+<span class="linenos">21</span>
+<span class="linenos">22</span>function main(t_step::Float64, t_units::String, model::String)
+<span class="linenos">23</span>
+<span class="linenos">24</span>  @printf(&quot;Hello from Julia timesync: timestep = %f %s\n&quot;, t_step, t_units)
+<span class="linenos">25</span>  t_step = Unitful.Quantity(t_step, Unitful.uparse(t_units))
+<span class="linenos">26</span>  t_start = Unitful.Quantity(0.0, Unitful.uparse(t_units))
+<span class="linenos">27</span>  t_end = Unitful.Quantity(1.0, u&quot;d&quot;)
+<span class="linenos">28</span>  state = timestep_calc(t_start, model)
+<span class="linenos">29</span>
+<span class="linenos">30</span>  # Set up connections matching yaml
+<span class="linenos">31</span>  # Timestep synchronization connection will default to &#39;timesync&#39;
+<span class="linenos">32</span>  timesync = Yggdrasil.YggInterface(&quot;YggTimesync&quot;, &quot;statesync&quot;)
+<span class="linenos">33</span>  out = Yggdrasil.YggInterface(&quot;YggOutput&quot;, &quot;output&quot;)
+<span class="linenos">34</span>
+<span class="linenos">35</span>  # Initialize state and synchronize with other models
+<span class="linenos">36</span>  t = t_start
+<span class="linenos">37</span>  ret, state = timesync.call(t, state)
+<span class="linenos">38</span>  if (!ret)
+<span class="linenos">39</span>    error(&quot;timesync(Julia): Initial sync failed.&quot;)
+<span class="linenos">40</span>  end
+<span class="linenos">41</span>  @printf(&quot;timesync(Julia): t = %s&quot;, t)
+<span class="linenos">42</span>  for (k, v) in state
+<span class="linenos">43</span>    @printf(&quot;, %s = %s&quot;, k, v)
+<span class="linenos">44</span>  end
+<span class="linenos">45</span>  @printf(&quot;\n&quot;)
+<span class="linenos">46</span>
+<span class="linenos">47</span>  # Send initial state to output
+<span class="linenos">48</span>  msg = state
+<span class="linenos">49</span>  msg[&quot;time&quot;] = t
+<span class="linenos">50</span>  flag = out.send(msg)
+<span class="linenos">51</span>  if (!flag)
+<span class="linenos">52</span>    error(@sprintf(&quot;timesync(Julia): Failed to send initial output for t=%s\n&quot;, t))
+<span class="linenos">53</span>  end
+<span class="linenos">54</span>
+<span class="linenos">55</span>  # Iterate until end
+<span class="linenos">56</span>  while (t &lt; t_end)
+<span class="linenos">57</span>
+<span class="linenos">58</span>    # Perform calculations to update the state
+<span class="linenos">59</span>    t = t + t_step
+<span class="linenos">60</span>    state = timestep_calc(t, model)
+<span class="linenos">61</span>
+<span class="linenos">62</span>    # Synchronize the state
+<span class="linenos">63</span>    ret, state = timesync.call(t, state)
+<span class="linenos">64</span>    if (!ret)
+<span class="linenos">65</span>      error(@sprintf(&quot;timesync(Julia): sync for t=%s failed.&quot;, t))
+<span class="linenos">66</span>    end
+<span class="linenos">67</span>    @printf(&quot;timesync(Julia): t = %s&quot;, t)
+<span class="linenos">68</span>    for (k, v) in state
+<span class="linenos">69</span>      @printf(&quot;, %s = %s&quot;, k, v)
+<span class="linenos">70</span>    end
+<span class="linenos">71</span>    @printf(&quot;\n&quot;)
+<span class="linenos">72</span>
+<span class="linenos">73</span>    # Send output
+<span class="linenos">74</span>    msg = state
+<span class="linenos">75</span>    msg[&quot;time&quot;] = t
+<span class="linenos">76</span>    flag = out.send(msg)
+<span class="linenos">77</span>    if (!flag)
+<span class="linenos">78</span>      error(@sprintf(&quot;timesync(Julia): Failed to send output for t=%s.&quot;, t))
+<span class="linenos">79</span>    end
+<span class="linenos">80</span>
+<span class="linenos">81</span>  end
+<span class="linenos">82</span>
+<span class="linenos">83</span>  println(&quot;Goodbye from Julia timesync&quot;)
+<span class="linenos">84</span>
+<span class="linenos">85</span>end
+<span class="linenos">86</span>
+<span class="linenos">87</span>main(parse(Float64, ARGS[1]), ARGS[2], ARGS[3])
+</pre></div>
+</div>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nn">---</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">statesync</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timesync</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="nt">synonyms</span><span class="p">:</span>
+<span class="linenos"> 7</span><span class="w">      </span><span class="nt">modelB</span><span class="p">:</span>
+<span class="linenos"> 8</span><span class="w">        </span><span class="nt">x</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">          </span><span class="nt">alt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xvar</span>
+<span class="linenos">10</span><span class="w">          </span><span class="nt">alt2base</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timesync.py:xvar2x</span>
+<span class="linenos">11</span><span class="w">          </span><span class="nt">base2alt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timesync.py:x2xvar</span>
+<span class="linenos">12</span><span class="w">        </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yvar</span>
+<span class="linenos">13</span><span class="w">      </span><span class="nt">modelA</span><span class="p">:</span>
+<span class="linenos">14</span><span class="w">        </span><span class="nt">z</span><span class="p">:</span>
+<span class="linenos">15</span><span class="w">          </span><span class="nt">alt</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">z1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">z2</span><span class="p p-Indicator">]</span>
+<span class="linenos">16</span><span class="w">          </span><span class="nt">alt2base</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timesync.py:merge_z</span>
+<span class="linenos">17</span><span class="w">          </span><span class="nt">base2alt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timesync.py:split_z</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">interpolation</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">modelA</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krogh</span>
+<span class="linenos">20</span><span class="w">      </span><span class="nt">modelB</span><span class="p">:</span>
+<span class="linenos">21</span><span class="w">        </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spline</span>
+<span class="linenos">22</span><span class="w">        </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="linenos">23</span><span class="w">    </span><span class="nt">aggregation</span><span class="p">:</span>
+<span class="linenos">24</span><span class="w">      </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timesync.py:xagg</span>
+<span class="linenos">25</span><span class="w">      </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sum</span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">additional_variables</span><span class="p">:</span>
+<span class="linenos">27</span><span class="w">      </span><span class="nt">modelA</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">b</span><span class="p p-Indicator">]</span>
+<span class="linenos">28</span><span class="w">      </span><span class="nt">modelB</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">a</span><span class="p p-Indicator">]</span>
+<span class="linenos">29</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelA</span>
+<span class="linenos">30</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos">32</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timesync.jl</span>
+<span class="linenos">33</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span><span class="w">  </span><span class="c1"># Pass the timestep in hours</span>
+<span class="linenos">34</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hr</span>
+<span class="linenos">35</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A</span>
+<span class="linenos">36</span><span class="w">    </span><span class="nt">timesync</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">statesync</span>
+<span class="linenos">37</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">38</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span>
+<span class="linenos">39</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">40</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelA_output.txt</span>
+<span class="linenos">41</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">42</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">43</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelB</span>
+<span class="linenos">44</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span>
+<span class="linenos">45</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="linenos">46</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/timesync.jl</span>
+<span class="linenos">47</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># Pass the timestep in days</span>
+<span class="linenos">48</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">d</span>
+<span class="linenos">49</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">B</span>
+<span class="linenos">50</span><span class="w">    </span><span class="nt">timesync</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">statesync</span>
+<span class="linenos">51</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">52</span><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output</span>
+<span class="linenos">53</span><span class="w">      </span><span class="nt">default_file</span><span class="p">:</span>
+<span class="linenos">54</span><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modelB_output.txt</span>
+<span class="linenos">55</span><span class="w">        </span><span class="nt">in_temp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="linenos">56</span><span class="w">        </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">table</span>
+</pre></div>
+</div>
+</section>
 <section id="matlab-version">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">function</span><span class="w"> </span><span class="nf">timesync</span><span class="p">(</span>t_step, t_units, model<span class="p">)</span>
 <span class="linenos"> 2</span>
@@ -911,7 +1064,7 @@
 </div>
 </section>
 <section id="python-version">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="linenos">  2</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1104,7 +1257,7 @@
 </div>
 </section>
 <section id="r-version">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>library(yggdrasil)
 <span class="linenos"> 2</span>

@@ -104,9 +104,10 @@
 <li><p><a class="reference internal" href="#c-version" id="id2">C Version</a></p></li>
 <li><p><a class="reference internal" href="#id1" id="id3">C++ Version</a></p></li>
 <li><p><a class="reference internal" href="#fortran-version" id="id4">Fortran Version</a></p></li>
-<li><p><a class="reference internal" href="#matlab-version" id="id5">Matlab Version</a></p></li>
-<li><p><a class="reference internal" href="#python-version" id="id6">Python Version</a></p></li>
-<li><p><a class="reference internal" href="#r-version" id="id7">R Version</a></p></li>
+<li><p><a class="reference internal" href="#julia-version" id="id5">Julia Version</a></p></li>
+<li><p><a class="reference internal" href="#matlab-version" id="id6">Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#python-version" id="id7">Python Version</a></p></li>
+<li><p><a class="reference internal" href="#r-version" id="id8">R Version</a></p></li>
 </ul>
 </nav>
 <section id="c-version">
@@ -486,8 +487,109 @@
 </pre></div>
 </div>
 </section>
+<section id="julia-version">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Julia Version</a><a class="headerlink" href="#julia-version" title="Permalink to this heading">¶</a></h2>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span># Import library for input/output channels
+<span class="linenos"> 2</span>using Yggdrasil
+<span class="linenos"> 3</span>using Printf
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span># Initialize input/output channels
+<span class="linenos"> 6</span>in_channel = Yggdrasil.YggInterface(&quot;YggInput&quot;, &quot;inputA&quot;)
+<span class="linenos"> 7</span>out_channel = Yggdrasil.YggInterface(&quot;YggOutput&quot;, &quot;outputA&quot;)
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span># Loop until there is no longer input or the queues are closed
+<span class="linenos">10</span>while true
+<span class="linenos">11</span>
+<span class="linenos">12</span>    # Receive input from input channel
+<span class="linenos">13</span>    # If there is an error, the flag will be false
+<span class="linenos">14</span>    flag, obj = in_channel.recv()
+<span class="linenos">15</span>    if (!flag)
+<span class="linenos">16</span>        println(&quot;Model A: No more input.&quot;)
+<span class="linenos">17</span>	break
+<span class="linenos">18</span>    end
+<span class="linenos">19</span>
+<span class="linenos">20</span>    # Print received message
+<span class="linenos">21</span>    println(obj)
+<span class="linenos">22</span>
+<span class="linenos">23</span>    # Send output to output channel
+<span class="linenos">24</span>    # If there is an error, the flag will be false
+<span class="linenos">25</span>    flag = out_channel.send(obj)
+<span class="linenos">26</span>    if (!flag)
+<span class="linenos">27</span>        error(&quot;Model A: Error sending output.&quot;)
+<span class="linenos">28</span>    end
+<span class="linenos">29</span>
+<span class="linenos">30</span>end  # while
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span># Import library for input/output channels
+<span class="linenos"> 2</span>using Yggdrasil
+<span class="linenos"> 3</span>using Printf
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span># Initialize input/output channels
+<span class="linenos"> 6</span>in_channel = Yggdrasil.YggInterface(&quot;YggInput&quot;, &quot;inputB&quot;)
+<span class="linenos"> 7</span>out_channel = Yggdrasil.YggInterface(&quot;YggOutput&quot;, &quot;outputB&quot;)
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span># Loop until there is no longer input or the queues are closed
+<span class="linenos">10</span>while true
+<span class="linenos">11</span>
+<span class="linenos">12</span>    # Receive input from input channel
+<span class="linenos">13</span>    # If there is an error, the flag will be false
+<span class="linenos">14</span>    flag, obj = in_channel.recv()
+<span class="linenos">15</span>    if (!flag)
+<span class="linenos">16</span>        println(&quot;Model B: No more input.&quot;)
+<span class="linenos">17</span>	break
+<span class="linenos">18</span>    end
+<span class="linenos">19</span>
+<span class="linenos">20</span>    # Print received message
+<span class="linenos">21</span>    println(obj)
+<span class="linenos">22</span>
+<span class="linenos">23</span>    # Send output to output channel
+<span class="linenos">24</span>    # If there is an error, the flag will be false
+<span class="linenos">25</span>    flag = out_channel.send(obj)
+<span class="linenos">26</span>    if (!flag)
+<span class="linenos">27</span>        error(&quot;Model B: Error sending output.&quot;)
+<span class="linenos">28</span>    end
+<span class="linenos">29</span>
+<span class="linenos">30</span>end  # while
+</pre></div>
+</div>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia_modelA</span>
+<span class="linenos"> 3</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/formatted_io7_modelA.jl</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 6</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 7</span><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="linenos"> 8</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos">10</span><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia_modelB</span>
+<span class="linenos">13</span><span class="w">    </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">julia</span>
+<span class="linenos">14</span><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./src/formatted_io7_modelB.jl</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">17</span><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="linenos">18</span><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">19</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">20</span><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">23</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputA</span><span class="w">  </span><span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">24</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">25</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span><span class="w">  </span><span class="c1"># Connection between file and model A input</span>
+<span class="linenos">26</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">27</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">map</span>
+<span class="linenos">28</span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputB</span><span class="w">  </span><span class="c1"># Connection between model B output and file</span>
+<span class="linenos">29</span><span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<span class="linenos">30</span><span class="w">    </span><span class="nt">filetype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">map</span>
+</pre></div>
+</div>
+</section>
 <section id="matlab-version">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c">% Initialize input/output channels </span>
 <span class="linenos"> 2</span><span class="n">in_channel</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;inputA&#39;</span><span class="p">);</span>
@@ -588,7 +690,7 @@
 </div>
 </section>
 <section id="python-version">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
 <span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
@@ -679,7 +781,7 @@
 </div>
 </section>
 <section id="r-version">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this heading">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span># Import library for input/output
 <span class="linenos"> 2</span>library(yggdrasil)

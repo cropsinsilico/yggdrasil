@@ -184,8 +184,12 @@
 
 <div class="viewcode-block" id="ygg_atexit"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ygg_atexit">[docs]</a><span class="k">def</span> <span class="nf">ygg_atexit</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Things to do at exit.&quot;&quot;&quot;</span>
-    <span class="n">check_locks</span><span class="p">()</span>
-    <span class="n">check_threads</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">check_locks</span><span class="p">()</span>
+        <span class="n">check_threads</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="c1"># Allow for logger to have disconnected</span>
+        <span class="k">pass</span>
     <span class="c1"># # This causes a segfault in a C dependency</span>
     <span class="c1"># if not is_subprocess():</span>
     <span class="c1">#     check_sockets()</span>

@@ -132,6 +132,14 @@ yggdrasil.drivers.InterpretedModelDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.JuliaModelDriver module
+-----------------------------------------
+
+.. automodule:: yggdrasil.drivers.JuliaModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.LPyModelDriver module
 ---------------------------------------
 

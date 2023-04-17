@@ -88,7 +88,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">&lt;no title&gt;</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/tables/schema_table_connection_specific.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tables/package_extras.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -96,19 +96,112 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <table class="docutils align-default" id="schema-table-connection-specific-rst">
+  <table class="docutils align-default" id="package-extras-rst">
 <thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Valid For ‘Connection_Type’ Of</p></th>
+<tr class="row-odd"><th class="head"><p>Extra</p></th>
+<th class="head"><p>Conda Syntax</p></th>
+<th class="head"><p>Pip Syntax</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>driver</p></td>
-<td><p>string</p></td>
-<td><p>[‘rpc_request’, ‘rpc_response’, ‘connection’, ‘output’, ‘file_output’, ‘file_input’, ‘input’]</p></td>
-<td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
+<tr class="row-even"><td><p>r</p></td>
+<td><p>yggdrasil.r</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run models
+written in R as part of yggdrasil
+integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>c</p></td>
+<td><p>yggdrasil.c</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to compile and run
+models written in C/C++ as part of
+yggdrasil integrations</p></td>
+</tr>
+<tr class="row-even"><td><p>fortran</p></td>
+<td><p>yggdrasil.fortran</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to compile and run
+models written in Fortran as part of
+yggdrasil integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>julia</p></td>
+<td><p>yggdrasil.julia</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run models
+written in R as part of yggdrasil
+integrations</p></td>
+</tr>
+<tr class="row-even"><td><p>lpy</p></td>
+<td><p>yggdrasil.lpy</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run LPy models
+as part of yggdrasil integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>mpi</p></td>
+<td><p>yggdrasil.mpi</p></td>
+<td><p>yggdrasil[mpi]</p></td>
+<td><p>Dependencies required to run
+integrations as MPI parallel jobs</p></td>
+</tr>
+<tr class="row-even"><td><p>sbml</p></td>
+<td><p>yggdrasil.sbml</p></td>
+<td><p>yggdrasil[sbml]</p></td>
+<td><p>Dependencies required to run SBML models
+as part of yggdrasil integrations</p></td>
+</tr>
+<tr class="row-odd"><td><p>zmq</p></td>
+<td><p>yggdrasil.zmq</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run models
+using ZeroMQ sockets for communication
+in C/C++/Fortran</p></td>
+</tr>
+<tr class="row-even"><td><p>omp</p></td>
+<td><p>yggdrasil.omp</p></td>
+<td><p>n/a</p></td>
+<td><p>Dependencies required to run
+integrations that use OpenMP</p></td>
+</tr>
+<tr class="row-odd"><td><p>rmq</p></td>
+<td><p>yggdrasil.rmq</p></td>
+<td><p>yggdrasil[rmq]</p></td>
+<td><p>Dependencies required to run
+integrations with RabbitMQ communication</p></td>
+</tr>
+<tr class="row-even"><td><p>testing</p></td>
+<td><p>yggdrasil.testing</p></td>
+<td><p>yggdrasil[testing]</p></td>
+<td><p>Dependencies required to run yggdrasil
+tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>docs</p></td>
+<td><p>yggdrasil.docs</p></td>
+<td><p>yggdrasil[docs]</p></td>
+<td><p>Dependencies required to build
+yggdrasil docs</p></td>
+</tr>
+<tr class="row-even"><td><p>dev</p></td>
+<td><p>yggdrasil.dev</p></td>
+<td><p>yggdrasil[dev]</p></td>
+<td><p>Dependencies recommended for yggdrasil
+development</p></td>
+</tr>
+<tr class="row-odd"><td><p>astropy</p></td>
+<td><p>yggdrasil.astropy</p></td>
+<td><p>yggdrasil[astropy]</p></td>
+<td><p>None</p></td>
+</tr>
+<tr class="row-even"><td><p>pygments</p></td>
+<td><p>yggdrasil.pygments</p></td>
+<td><p>yggdrasil[pygments]</p></td>
+<td><p>None</p></td>
+</tr>
+<tr class="row-odd"><td><p>trimesh</p></td>
+<td><p>yggdrasil.trimesh</p></td>
+<td><p>yggdrasil[trimesh]</p></td>
+<td><p>None</p></td>
 </tr>
 </tbody>
 </table>
