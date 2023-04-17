@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgCli
+  driver: JuliaModelDriver
+  args: ./src/maxMsgCli.jl
+  client_of: maxMsgSrv

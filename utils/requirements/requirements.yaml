@@ -54,6 +54,7 @@ general:
       flags:
         method_in_setup: conda
   - six
+  - toml
   - unyt
   - GitPython
   - sysv_ipc:
@@ -188,6 +189,23 @@ extras:
           flags:
             from_src_on_travis: true
         - method: vcpkg
+  julia:
+    description: Dependencies required to run models written in R as part of yggdrasil integrations
+    requirements:
+    - julia:
+        executable: julia
+        options:
+        - method: brew
+        - method: choco
+        # fails currently on Mac M1, but PR in progress to fix it
+        # fails on windows, unclear if it will be added
+        # - name: julia>=1.1.1
+        #   method: conda
+        #   host: True
+        #   os: unix
+        - name: juliaup
+          method: conda
+          host: true
   mpi:
     description: Dependencies required to run integrations as MPI parallel jobs
     requirements:

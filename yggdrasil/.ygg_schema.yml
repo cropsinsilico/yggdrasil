@@ -1895,6 +1895,7 @@ definitions:
       - $ref: '#/definitions/model-subtype-cpp'
       - $ref: '#/definitions/model-subtype-dummy'
       - $ref: '#/definitions/model-subtype-fortran'
+      - $ref: '#/definitions/model-subtype-julia'
       - $ref: '#/definitions/model-subtype-lpy'
       - $ref: '#/definitions/model-subtype-mpi'
       - $ref: '#/definitions/model-subtype-make'
@@ -2115,6 +2116,7 @@ definitions:
         - ExecutableModelDriver
         - FortranModelDriver
         - GCCModelDriver
+        - JuliaModelDriver
         - LPyModelDriver
         - MPIPartnerModel
         - MakeModelDriver
@@ -2270,6 +2272,7 @@ definitions:
         - dummy
         - executable
         - fortran
+        - julia
         - lpy
         - make
         - matlab
@@ -3089,6 +3092,59 @@ definitions:
     - args
     - language
     title: yggdrasil.drivers.FortranModelDriver.FortranModelDriver
+    type: object
+  model-subtype-julia:
+    additionalProperties: true
+    description: Schema for model component ['julia'] subtype.
+    properties:
+      args:
+        allowSingular: true
+        description: The path to the file containing the model program that will be
+          run by the driver for the model's language and/or a list of arguments that
+          should be passed as input to the model program or language executable (e.g.
+          source code or configuration file for a domain specific language).
+        items:
+          type:
+          - string
+          - number
+        type: array
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - JuliaModelDriver
+        type: string
+      interpreter:
+        description: Name or path of interpreter executable that should be used to
+          run the model. If not provided, the interpreter will be determined based
+          on configuration options for the language (if present) and the default_interpreter
+          class attribute.
+        type: string
+      interpreter_flags:
+        default: []
+        description: Flags that should be passed to the interpreter when running the
+          model. If not provided, the flags are determined based on configuration
+          options for the language (if present) and the default_interpreter_flags
+          class attribute.
+        items:
+          type: string
+        type: array
+      language:
+        default: julia
+        description: Model is written in Julia.
+        enum:
+        - julia
+        type: string
+      skip_interpreter:
+        default: false
+        description: If True, no interpreter will be added to the arguments. This
+          should only be used for subclasses that will not be invoking the model via
+          the command line. Defaults to False.
+        type: boolean
+    required:
+    - args
+    - language
+    title: yggdrasil.drivers.JuliaModelDriver.JuliaModelDriver
     type: object
   model-subtype-lpy:
     additionalProperties: true

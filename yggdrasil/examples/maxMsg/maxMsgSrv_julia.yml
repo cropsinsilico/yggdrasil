@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgSrv
+  driver: JuliaModelDriver
+  args: ./src/maxMsgSrv.jl
+  is_server: True

@@ -20,16 +20,21 @@ from yggdrasil import tools, runner, examples, platform, config
 from yggdrasil import platform as ygg_platform
 from yggdrasil.multitasking import wait_on_function
 from yggdrasil.drivers import MatlabModelDriver
-import matplotlib as mpl
-if os.environ.get('DISPLAY', '') == '':  # pragma: debug
-    mpl.use('Agg')
-elif ygg_platform._is_mac:  # pragma: travis
-    mpl.use('TkAgg')
-import matplotlib.pyplot as plt  # noqa: E402
+try:
+    import matplotlib as mpl
+    if os.environ.get('DISPLAY', '') == '':  # pragma: debug
+        mpl.use('Agg')
+    elif ygg_platform._is_mac:  # pragma: travis
+        mpl.use('TkAgg')
+    import matplotlib.pyplot as plt  # noqa: E402
+    mpl.rc('font', size=18)
+except ImportError:  # pragma: debug
+    warnings.warn("Plotting disabled")
+    mpl = None
+    plt = None
 logger = logging.getLogger(__name__)
 _linewidth = 2
 _legend_fontsize = 14
-mpl.rc('font', size=18)
 _pyperf_warmups = 0
 _python_version = '%d.%d' % (sys.version_info[0], sys.version_info[1])
 
@@ -792,7 +797,7 @@ class TimedRun(tools.YggClass):
             msg_size = self.default_msg_size
         if msg_count is None:
             msg_count = self.default_msg_count
-        if axs is None:
+        if axs is None and plt is not None:
             figure_size = (15.0, 6.0)
             figure_buff = 0.75
             fig, axs = plt.subplots(1, 2, figsize=figure_size, sharey=True)
@@ -810,8 +815,9 @@ class TimedRun(tools.YggClass):
                     axs_width, axs_height]
             axs[0].set_position(pos1)
             axs[1].set_position(pos2)
-        self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
-        self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
+        if plt is not None:
+            self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
+            self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
         # Get slopes
         fit = self.fit_scaling_count(msg_size=msg_size0, counts=msg_count)
         self.info('fit: slope = %f, intercept = %f', fit[0], fit[1])
@@ -819,7 +825,9 @@ class TimedRun(tools.YggClass):
         # xname = 'size'
         # self.info('%s: slope = %f, intercept = %f', xname, m, b)
         # Legend
-        axs[1].legend(loc='upper left', ncol=2, fontsize=_legend_fontsize)
+        if plt is not None:
+            axs[1].legend(loc='upper left', ncol=2,
+                          fontsize=_legend_fontsize)
         return axs, fit
         
     def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
@@ -856,6 +864,8 @@ class TimedRun(tools.YggClass):
             matplotlib.Axes: Axes containing the plotted scaling.
 
         """
+        if plt is None:  # pragma: debug
+            return axs
         if isinstance(msg_size, list):
             msg_size = np.array(msg_size)
         if isinstance(msg_count, list):
@@ -1371,10 +1381,11 @@ def plot_scalings(compare='comm_type', compare_values=None,
         v = fits[k]
         print(fmt_row % (k, v[0], v[1]))
     # Save plot
-    plt.savefig(plotfile, dpi=600)
-    logger.info('plotfile: %s', plotfile)
-    if cleanup_plot:
-        os.remove(plotfile)
+    if plt is not None:
+        plt.savefig(plotfile, dpi=600)
+        logger.info('plotfile: %s', plotfile)
+        if cleanup_plot:
+            os.remove(plotfile)
     return plotfile
 
 

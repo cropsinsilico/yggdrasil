@@ -2476,7 +2476,7 @@ class ModelDriver(Driver):
                         assert len(x['datatype']['items']) == len(non_length)
                         for v, t in zip(non_length, x['datatype']['items']):
                             v['datatype'] = t
-                elif any('datatype' in x for x in non_length):
+                elif any(xx.get('datatype', None) for xx in non_length):
                     if (len(non_length) == 1):
                         x['datatype'] = non_length[0]['datatype']
                         x['datatype']['allowWrapped'] = True
@@ -3114,9 +3114,6 @@ class ModelDriver(Driver):
         else:
             recv_var_par = cls.split_variables(recv_var_str)
         expanded_recv_var = None
-        if (len(recv_var_par) > 1) and ('multiple_outputs' in cls.function_param):
-            expanded_recv_var = recv_var_str
-            recv_var_str = 'temp_%s' % recv_var_par[0]['name']
         if isinstance(flag_var, dict):
             flag_var = flag_var['name']
         if isinstance(iter_var, dict):
@@ -3125,6 +3122,10 @@ class ModelDriver(Driver):
             inputs = [recv_var_str]
             outputs = [flag_var]
         else:
+            if (len(recv_var_par) > 1):
+                # and ('multiple_outputs' in cls.function_param):
+                expanded_recv_var = recv_var_str
+                recv_var_str = 'temp_%s' % recv_var_par[0]['name']
             inputs = []
             outputs = [flag_var, recv_var_str]
         if cls.include_channel_obj:

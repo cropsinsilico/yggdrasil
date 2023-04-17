@@ -48,6 +48,11 @@ case $1 in
 	yaml1='maxMsgSrv_fortran.yml'
 	yaml2='maxMsgCli_fortran.yml'
 	;;
+    -j | --julia)
+	echo "Running Julia"
+	yaml1='maxMsgSrv_julia.yml'
+	yaml2='maxMsgCli_julia.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1

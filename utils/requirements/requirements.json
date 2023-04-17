@@ -94,6 +94,7 @@
       }
     },
     "six",
+    "toml",
     "unyt",
     "GitPython",
     {
@@ -351,6 +352,29 @@
               "method": "vcpkg"
             }
           ]
+        }
+      ]
+    },
+    "julia": {
+      "description": "Dependencies required to run models written in R as part of yggdrasil integrations",
+      "requirements": [
+        {
+          "julia": {
+            "executable": "julia",
+            "options": [
+              {
+                "method": "brew"
+              },
+              {
+                "method": "choco"
+              },
+              {
+                "name": "juliaup",
+                "method": "conda",
+                "host": true
+              }
+            ]
+          }
         }
       ]
     },

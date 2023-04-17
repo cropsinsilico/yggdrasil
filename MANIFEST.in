@@ -19,6 +19,7 @@ recursive-include yggdrasil *.txt
 recursive-include yggdrasil *.json
 recursive-include yggdrasil *.f90
 recursive-include yggdrasil *.xml
+recursive-include yggdrasil *.jl
 recursive-include yggdrasil/examples *.py
 recursive-include yggdrasil/examples *.rst
 recursive-include yggdrasil/demos *.py
@@ -34,6 +35,8 @@ include yggdrasil/languages/LPy/lpy_model.py
 include yggdrasil/languages/R/DESCRIPTION
 include yggdrasil/languages/R/NAMESPACE
 include yggdrasil/languages/R/R/*.R
+include yggdrasil/languages/Julia/Yggdrasil/*.toml
+include yggdrasil/languages/Julia/Yggdrasil/src/*.jl
 include yggdrasil/languages/fortran/*.f90
 include yggdrasil/languages/fortran/*.c
 include yggdrasil/languages/fortran/*.h

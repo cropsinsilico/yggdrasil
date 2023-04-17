@@ -90,7 +90,7 @@ def ygg_atexit():  # pragma: debug
         check_locks()
         check_threads()
     except ValueError:
-        # Allow logger to fail
+        # Allow for logger to have disconnected
         pass
     # # This causes a segfault in a C dependency
     # if not is_subprocess():

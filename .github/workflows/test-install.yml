@@ -5,6 +5,7 @@ env:
   BUILDDOCS: 0
   INSTALLC: 1
   INSTALLFORTRAN: 1
+  INSTALLJULIA: 1
   INSTALLLPY: 0
   INSTALLMATLAB: 0
   INSTALLMPI: 1
@@ -21,7 +22,15 @@ env:
   YGG_GHA_JOB_ID_SUFFIX: null
 jobs:
   build_sdist:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Build source distribution
+    needs:
+    - test_pip
+    - test_conda
+    - test_rmq_pip
+    - test_rmq_conda
+    - test_stripped
+    - docs
     runs-on: ubuntu-latest
     steps:
     - name: Checkout sources
@@ -54,7 +63,15 @@ jobs:
         name: sdist
         path: ./dist/*
   build_wheels:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Build wheels on ${{ matrix.os }}
+    needs:
+    - test_pip
+    - test_conda
+    - test_rmq_pip
+    - test_rmq_conda
+    - test_stripped
+    - docs
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout sources
@@ -76,16 +93,9 @@ jobs:
 
         '
     - env:
-        CIBW_ARCHS_LINUX: auto aarch64 ppc64le
-        CIBW_ARCHS_MACOS: x86_64 arm64
+        CIBW_ARCHS_LINUX: ${{ matrix.linux_arch }}
+        CIBW_ARCHS_MACOS: ${{ matrix.mac_arch }}
         CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
-        CIBW_BEFORE_ALL_LINUX: yum install -y blas-devel lapack-devel
-        CIBW_ENVIRONMENT: PIP_ONLY_BINARY=numpy
-        CIBW_SKIP: cp2* cp33* cp34* cp35* cp36* pp* cp310-manylinux_i686 cp311-manylinux_i686
-          *-musllinux_*
-        CIBW_TEST_COMMAND: ygginfo && pytest -m subset_rapidjson --import-mode=importlib
-          {project}/tests
-        CIBW_TEST_REQUIRES: pytest flaky
       name: Build wheels
       uses: pypa/cibuildwheel@v2.12.1
     - name: Upload artifacts
@@ -98,6 +108,14 @@ jobs:
         include:
         - os: windows-2019
           windows_arch: x86
+        - linux_arch: aarch64
+          os: ubuntu-20.04
+        - linux_arch: ppc64le
+          os: ubuntu-20.04
+        linux_arch:
+        - auto
+        mac_arch:
+        - x86_64 arm64
         os:
         - ubuntu-20.04
         - macOS-11
@@ -290,6 +308,9 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+      name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
       name: Set up Matlab
       uses: matlab-actions/setup-matlab@v1
@@ -324,7 +345,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -381,8 +402,8 @@ jobs:
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
       name: (MACOS,CONDA) Set allow_multiple_omp config
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+      run: '[[ -d $CONDA_PREFIX/lib/clang/9.0.1 ]] && install_name_tool -change "@rpath/libc++abi.1.dylib"
+        "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
 
         yggconfig --allow-multiple-omp
 
@@ -618,6 +639,9 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+      name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
       name: Set up Matlab
       uses: matlab-actions/setup-matlab@v1
@@ -652,7 +676,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -709,8 +733,8 @@ jobs:
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
       name: (MACOS,CONDA) Set allow_multiple_omp config
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+      run: '[[ -d $CONDA_PREFIX/lib/clang/9.0.1 ]] && install_name_tool -change "@rpath/libc++abi.1.dylib"
+        "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
 
         yggconfig --allow-multiple-omp
 
@@ -938,6 +962,9 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+      name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
       name: Set up Matlab
       uses: matlab-actions/setup-matlab@v1
@@ -972,7 +999,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -1029,8 +1056,8 @@ jobs:
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
       name: (MACOS,CONDA) Set allow_multiple_omp config
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+      run: '[[ -d $CONDA_PREFIX/lib/clang/9.0.1 ]] && install_name_tool -change "@rpath/libc++abi.1.dylib"
+        "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
 
         yggconfig --allow-multiple-omp
 
@@ -1241,6 +1268,9 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+      name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
       name: Set up Matlab
       uses: matlab-actions/setup-matlab@v1
@@ -1275,7 +1305,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -1332,8 +1362,8 @@ jobs:
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
       name: (MACOS,CONDA) Set allow_multiple_omp config
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+      run: '[[ -d $CONDA_PREFIX/lib/clang/9.0.1 ]] && install_name_tool -change "@rpath/libc++abi.1.dylib"
+        "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
 
         yggconfig --allow-multiple-omp
 
@@ -1543,6 +1573,9 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
+      name: (PIP) Set up Julia
+      uses: julia-actions/setup-julia@v1
     - if: env.INSTALLMATLAB == 1 && runner.os != 'Windows'
       name: Set up Matlab
       uses: matlab-actions/setup-matlab@v1
@@ -1577,7 +1610,7 @@ jobs:
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      name: (WINDOWS,CONDA) Set up miniconda base environment
+      name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
@@ -1634,8 +1667,8 @@ jobs:
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'macOS'
       name: (MACOS,CONDA) Set allow_multiple_omp config
-      run: 'install_name_tool -change "@rpath/libc++abi.1.dylib" "/usr/lib/libc++abi.1.dylib"
-        $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
+      run: '[[ -d $CONDA_PREFIX/lib/clang/9.0.1 ]] && install_name_tool -change "@rpath/libc++abi.1.dylib"
+        "/usr/lib/libc++abi.1.dylib" $CONDA_PREFIX/lib/clang/9.0.1/lib/darwin/libclang_rt.asan_osx_dynamic.dylib
 
         yggconfig --allow-multiple-omp
 

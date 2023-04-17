@@ -404,3 +404,12 @@ If you would like to use OpenSimRoot, you will need to install GNU make. If you 
 * ``brew install make`` on Mac
 * ``apt-get install make`` on Linux
 * ``choco install make`` on Windows
+
+Additional Steps for Julia Models
+---------------------------------
+
+If you do not use conda/mamba to install ``julia``, or you are installing |yggdrasil| on a Windows machine or an M1/M2 Mac (there are not currently ``julia`` conda packages for these systems as of 2023/04/07, but this may change), you will need to install it yourself. Julia downloads can be found `here <https://julialang.org/downloads/>`_.
+
+Once julia is installed, you can complete the installation of the |yggdrasil| Julia interface via::
+
+  $ ygginstall julia
