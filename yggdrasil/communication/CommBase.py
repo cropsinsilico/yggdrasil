@@ -10,7 +10,7 @@ import numpy as np
 from yggdrasil import tools, multitasking, constants, rapidjson
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
-    import_comm, check_env_for_address)
+    import_comm, check_env_for_address, AddressError)
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
 from yggdrasil.datatypes import DataTypeError, type2numpy
@@ -512,8 +512,8 @@ class CommBase(tools.YggClass):
 
     Raises:
         RuntimeError: If the comm class is not installed.
-        RuntimeError: If there is not an environment variable with the specified
-            name.
+        AddressError: If there is not an environment variable with the
+            specified name.
         ValueError: If directions is not 'send' or 'recv'.
 
     """
@@ -626,18 +626,8 @@ class CommBase(tools.YggClass):
         self.name_base = name
         self.suffix = suffix
         self._name = name + suffix
-        if address is None:
-            try:
-                self.address = check_env_for_address(self.env, self.name)
-            except RuntimeError:
-                model_name = self.model_name
-                prefix = '%s:' % model_name
-                if model_name and (not self.name.startswith(prefix)):
-                    self._name = prefix + self.name
-                self.address = check_env_for_address(self.env, self.name)
-        else:
-            self.address = address
         self.direction = direction
+        self._update_address(address)
         if is_interface is None:
             is_interface = False  # tools.is_subprocess()
         self.is_interface = is_interface
@@ -767,7 +757,10 @@ class CommBase(tools.YggClass):
                                         partial_datatype)
         if ((('serializer' not in cls._schema_properties)
              and serializer is None)):
-            serializer = cls._default_serializer
+            if cls._default_serializer:
+                serializer = cls._default_serializer
+            else:
+                serializer = 'direct'
         if isinstance(serializer, str):
             seri_kws.setdefault('seritype', serializer)
             serializer = None
@@ -783,6 +776,25 @@ class CommBase(tools.YggClass):
         else:
             return serializer
 
+    def _update_address(self, address):
+        r"""Set the address based on the provided name.
+
+        Args:
+            address (str): Provided address.
+
+        """
+        if address is not None:
+            self.address = address
+            return
+        try:
+            self.address = check_env_for_address(self.env, self.name)
+        except AddressError:
+            model_name = self.model_name
+            prefix = '%s:' % model_name
+            if model_name and (not self.name.startswith(prefix)):
+                self._name = prefix + self.name
+            self.address = check_env_for_address(self.env, self.name)
+
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base
         class, but before the comm is opened."""
@@ -790,7 +802,10 @@ class CommBase(tools.YggClass):
         seri_kws = getattr(self, 'serializer', {})
         if isinstance(seri_kws, dict):
             # Get serializer class
-            seri_kws.setdefault('seritype', self._default_serializer)
+            if self._default_serializer:
+                seri_kws.setdefault('seritype', self._default_serializer)
+            else:
+                seri_kws.setdefault('seritype', 'direct')
             seri_cls = import_component('serializer',
                                         subtype=seri_kws['seritype'])
             # Recover keyword arguments for serializer passed to comm class
@@ -863,7 +878,10 @@ class CommBase(tools.YggClass):
 
         """
         if serializer is None:
-            serializer = cls._default_serializer
+            if cls._default_serializer:
+                serializer = cls._default_serializer
+            else:
+                serializer = 'direct'
         seri_cls = import_component('serializer', serializer)
         out_seri = seri_cls.get_testing_options(**kwargs)
         out = {'attributes': ['name', 'address', 'direction',

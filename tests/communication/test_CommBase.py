@@ -3,7 +3,7 @@ import uuid
 import copy
 import pytest
 from yggdrasil import platform
-from yggdrasil.communication import new_comm, get_comm
+from yggdrasil.communication import new_comm, get_comm, AddressError
 from yggdrasil.tools import get_supported_comm
 from tests import TestComponentBase
 
@@ -354,7 +354,7 @@ class TestComm(BaseComm):
 
     def test_error_name(self, python_class):
         r"""Test error on missing address."""
-        with pytest.raises(RuntimeError):
+        with pytest.raises(AddressError):
             python_class('test%s' % uuid.uuid4())
 
     def test_error_send(self, monkeypatch, send_comm, testing_options,

@@ -17,6 +17,7 @@ class DefaultSerialize(SerializeBase):
                                    'extended JSON serialization based on a '
                                    'provided type definition (See discussion '
                                    ':ref:`here <serialization_rst>`).')
+    file_extensions = ['.ygg']
     
     def func_serialize(self, args):
         r"""Serialize a message.

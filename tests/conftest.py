@@ -10,6 +10,7 @@ import logging
 import argparse
 import subprocess
 import contextlib
+import numpy as np
 from yggdrasil import platform, constants, rapidjson
 from yggdrasil.serialize.ObjSerialize import ObjDict
 from yggdrasil.serialize.PlySerialize import PlyDict
@@ -1602,3 +1603,14 @@ def display_diff():
         print('\n'.join(diff))
 
     return wrapped
+
+
+@pytest.fixture
+def geom_dict():
+    return {
+        'vertices': np.array([[0, 0, 0, 0, 1, 1, 1, 1],
+                              [0, 0, 1, 1, 0, 0, 1, 1],
+                              [0, 1, 1, 0, 0, 1, 1, 0]], 'float32').T,
+        'faces': np.array([[0, 0, 7, 0, 1, 2, 3],
+                           [1, 2, 6, 4, 5, 6, 7],
+                           [2, 3, 5, 5, 6, 7, 4]], 'int32').T}

@@ -30,10 +30,11 @@ class NetCDFFileComm(FileComm):
         'read_attributes': {'type': 'boolean', 'default': False},
         'variables': {'type': 'array', 'items': {'type': 'string'}},
         'version': {'type': 'integer', 'enum': [1, 2], 'default': 1}}
-    _default_extension = '.nc'
+    _extensions = ['.nc']
     _mode_as_bytes = False
     _synchronous_read = True
     _deprecated_drivers = []
+    _default_serializer = False
 
     def __init__(self, *args, **kwargs):
         self._fd_netcdf = None

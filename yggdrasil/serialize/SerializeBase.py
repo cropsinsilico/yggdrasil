@@ -57,6 +57,7 @@ class SerializeBase(tools.YggClass):
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
     default_datatype = constants.DEFAULT_DATATYPE
+    file_extensions = ['.txt']
     has_header = False
     default_read_meth = 'read'
     is_framed = False
@@ -920,6 +921,45 @@ class SerializeBase(tools.YggClass):
         if no_data:
             return metadata
         return data, metadata
+
+    def load(self, fd, **kwargs):
+        r"""Deserialize from a file.
+
+        Args:
+            fd (str, file): Filename or file-like object to load from.
+            **kwargs: Additional keyword arguments are passed to the
+                created FileComm used for reading.
+
+        Returns:
+            object: The deserialized data object or a list of
+                deserialized data objects if there is more than one.
+
+        """
+        from yggdrasil.communication.FileComm import FileComm
+        kwargs.setdefault("serializer", self)
+        comm = FileComm(fd, direction="recv", **kwargs)
+        try:
+            out = comm.load()
+        finally:
+            comm.close()
+        return out
+
+    def dump(self, fd, obj, **kwargs):
+        r"""Serialize to a file.
+
+        Args:
+            fd (str, file): Filename or file-like object to load from.
+            **kwargs: Additional keyword arguments are passed to the
+                created FileComm used for reading.
+
+        """
+        from yggdrasil.communication.FileComm import FileComm
+        kwargs.setdefault("serializer", self)
+        comm = FileComm(fd, direction="send", **kwargs)
+        try:
+            comm.dump(obj)
+        finally:
+            comm.close()
 
     def enable_file_header(self):  # pragma: no cover
         r"""Set serializer attributes to enable file headers to be included in

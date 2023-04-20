@@ -172,6 +172,7 @@ COMPONENT_REGISTRY = {
         'subtypes': {
             'ascii': 'AsciiFileComm',
             'binary': 'FileComm',
+            'cabo': 'CABOFileComm',
             'json': 'JSONFileComm',
             'map': 'AsciiMapComm',
             'mat': 'MatFileComm',
@@ -181,7 +182,6 @@ COMPONENT_REGISTRY = {
             'pickle': 'PickleFileComm',
             'ply': 'PlyFileComm',
             'table': 'AsciiTableComm',
-            'wofost': 'WOFOSTParamFileComm',
             'yaml': 'YAMLFileComm',
         },
     },
@@ -229,6 +229,7 @@ COMPONENT_REGISTRY = {
         'key': 'seritype',
         'module': 'yggdrasil.serialize',
         'subtypes': {
+            'cabo': 'CABOSerialize',
             'default': 'DefaultSerialize',
             'direct': 'DirectSerialize',
             'functional': 'FunctionalSerialize',
@@ -240,7 +241,6 @@ COMPONENT_REGISTRY = {
             'pickle': 'PickleSerialize',
             'ply': 'PlySerialize',
             'table': 'AsciiTableSerialize',
-            'wofost': 'WOFOSTParamSerialize',
             'yaml': 'YAMLSerialize',
         },
     },
@@ -262,6 +262,35 @@ COMPONENT_REGISTRY = {
             'statement': 'StatementTransform',
         },
     },
+}
+
+# File constants
+FILE2EXT = {
+    'ascii': '.txt',
+    'binary': '.txt',
+    'cabo': '.cab',
+    'json': '.json',
+    'map': '.txt',
+    'mat': '.mat',
+    'netcdf': '.nc',
+    'obj': '.obj',
+    'pandas': '.txt',
+    'pickle': '.pkl',
+    'ply': '.ply',
+    'table': '.txt',
+    'yaml': '.yaml',
+}
+EXT2FILE = {
+    '.cab': 'cabo',
+    '.json': 'json',
+    '.mat': 'mat',
+    '.nc': 'netcdf',
+    '.obj': 'obj',
+    '.pkl': 'pickle',
+    '.ply': 'ply',
+    '.txt': 'ascii',
+    '.yaml': 'yaml',
+    '.yml': 'yaml',
 }
 
 # Language driver constants

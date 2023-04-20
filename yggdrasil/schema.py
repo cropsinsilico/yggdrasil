@@ -257,6 +257,16 @@ def update_constants(schema=None):
             'base': v.base_subtype_class_name,
             'key': v.subtype_key,
             'subtypes': v.subtype2class}
+    # File information
+    files = {
+        k: import_component('file', v)
+        for k, v in component_registry['file']['subtypes'].items()}
+    file2ext = {}
+    ext2file = {'.txt': 'ascii'}
+    for k, f in files.items():
+        file2ext.setdefault(k, f._extensions[0])
+        for ext in f._extensions:
+            ext2file.setdefault(ext, k)
     # Language driver information
     drivers = {k: import_component('model', v)
                for k, v in component_registry['model']['subtypes'].items()}
@@ -314,6 +324,10 @@ def update_constants(schema=None):
     lines += [
         "", "# Component registry",
         f"COMPONENT_REGISTRY = {as_lines(component_registry)}"]
+    lines += [
+        "", "# File constants",
+        "FILE2EXT = %s" % as_lines(file2ext),
+        "EXT2FILE = %s" % as_lines(ext2file)]
     lines += [
         "", "# Language driver constants",
         "LANG2EXT = %s" % as_lines(lang2ext),

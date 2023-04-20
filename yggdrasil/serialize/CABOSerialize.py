@@ -4,17 +4,18 @@ from yggdrasil import tools, units, rapidjson
 from yggdrasil.serialize.AsciiMapSerialize import AsciiMapSerialize
 
 
-class WOFOSTParamSerialize(AsciiMapSerialize):
-    r"""Class for serializing/deserializing WOFOST parameter files."""
+class CABOSerialize(AsciiMapSerialize):
+    r"""Class for serializing/deserializing CABO parameter files."""
 
-    _seritype = 'wofost'
+    _seritype = 'cabo'
     _schema_subtype_description = ('Serialization of mapping between '
                                    'keys and scalar or array values '
-                                   'as used in the WOFOST parameter files.')
+                                   'as used in the CABO parameter files.')
     _schema_properties = {
         'delimiter': {'type': 'string',
                       'default': ' = '}}
     default_datatype = {'type': 'object'}
+    file_extensions = ['.cab']
     concats_as_str = True
     _delimiter = ' = '
     _array_fmt = '%5.5f, %5.5f'
@@ -192,7 +193,7 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
             dict: Dictionary of variables to use for testing.
 
         """
-        out = super(WOFOSTParamSerialize, cls).get_testing_options()
+        out = super(CABOSerialize, cls).get_testing_options()
         out['exact_contents'] = False
         out['objects'] = [{'CRPNAM': 'Grain maize CSA practicals',
                            'TBASEM': units.add_units(4.0, 'degC'),

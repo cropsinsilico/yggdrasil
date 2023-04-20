@@ -1123,6 +1123,7 @@ class yggclean(SubCommand):
             if lang in ['ipc', 'ipcs']:
                 from yggdrasil.communication.IPCComm import ipcrm_queues
                 ipcrm_queues()
+                ipcrm_queues(by_id=True)
             else:
                 import_component('model', lang).cleanup_dependencies(
                     verbose=verbose)
@@ -1626,6 +1627,39 @@ class coveragerc(SubCommand):
                           setup_cfg=args.setup_cfg)
 
 
+class file_converter(SubCommand):
+    r"""Convert between compatible file types."""
+
+    name = "fconvert"
+    help = (
+        "Convert a file of one type into another compatible type.")
+    arguments = [
+        (('src', ),
+         {'help': "Name of file to convert"}),
+        (('dst', ),
+         {'help': "Name of destination file"}),
+        (('--from', '--src-type'),
+         {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+             'file']['subtypes'].keys()),
+          'dest': 'src_type',
+          'default': None,
+          'help': "Source file type"}),
+        (('--to', '--dst-type'),
+         {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+             'file']['subtypes'].keys()),
+          'dest': 'dst_type',
+          'default': None,
+          'help': "Destination file type"})
+    ]
+
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.communication.FileComm import convert_file
+        convert_file(args.src, args.dst,
+                     src_type=args.src_type,
+                     dst_type=args.dst_type)
+
+
 class generate_gha_workflow(SubCommand):
     r"""Re-generate the Github actions workflow yaml."""
 
@@ -1729,7 +1763,8 @@ class main(SubCommand):
                    ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,
                    timing_plots, generate_gha_workflow,
-                   integration_service_manager, coveragerc]
+                   integration_service_manager, coveragerc,
+                   file_converter]
 
     @classmethod
     def get_parser(cls, **kwargs):

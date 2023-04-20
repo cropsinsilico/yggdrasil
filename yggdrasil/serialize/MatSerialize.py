@@ -13,6 +13,7 @@ class MatSerialize(SerializeBase):
     _schema_subtype_description = ('Serializes objects using the Matlab .mat '
                                    'format.')
     default_datatype = {'type': 'object'}
+    file_extensions = ['.mat']
     concats_as_str = False
 
     def func_serialize(self, args):

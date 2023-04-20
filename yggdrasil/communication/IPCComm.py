@@ -84,7 +84,7 @@ def ipcs(options=[]):
         return ''
 
 
-def ipc_queues():
+def ipc_queues(by_id=False):
     r"""Get a list of active IPC queues.
 
     Returns:
@@ -112,9 +112,15 @@ def ipc_queues():
                     break
         if not skip:
             if platform._is_linux:
-                key_col = 0
+                if by_id:
+                    key_col = 1
+                else:
+                    key_col = 0
             elif platform._is_mac:
-                key_col = 2
+                if by_id:
+                    key_col = 1
+                else:
+                    key_col = 2
             else:  # pragma: debug
                 raise NotImplementedError("Unsure what column the queue key "
                                           + "is in on this platform "
@@ -146,7 +152,7 @@ def ipcrm(options=[]):
         logger.warn("IPC not installed. ipcrm cannot be run.")
 
 
-def ipcrm_queues(queue_keys=None):
+def ipcrm_queues(queue_keys=None, by_id=False):
     r"""Delete existing IPC queues.
 
     Args:
@@ -156,11 +162,15 @@ def ipcrm_queues(queue_keys=None):
     """
     if _ipc_installed:
         if queue_keys is None:
-            queue_keys = ipc_queues()
+            queue_keys = ipc_queues(by_id=by_id)
         if isinstance(queue_keys, str):
             queue_keys = [queue_keys]
+        if by_id:
+            flags = '-q'
+        else:
+            flags = '-Q'
         for q in queue_keys:
-            ipcrm(["-Q %s" % q])
+            ipcrm([f"{flags} {q}"])
     else:  # pragma: windows
         logger.warn("IPC not installed. ipcrm cannot be run.")
 

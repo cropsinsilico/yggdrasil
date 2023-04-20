@@ -838,6 +838,7 @@ definitions:
       - $ref: '#/definitions/file-subtype-ascii'
       - $ref: '#/definitions/file-subtype-map'
       - $ref: '#/definitions/file-subtype-table'
+      - $ref: '#/definitions/file-subtype-cabo'
       - $ref: '#/definitions/file-subtype-json'
       - $ref: '#/definitions/file-subtype-mat'
       - $ref: '#/definitions/file-subtype-netcdf'
@@ -845,7 +846,6 @@ definitions:
       - $ref: '#/definitions/file-subtype-pandas'
       - $ref: '#/definitions/file-subtype-pickle'
       - $ref: '#/definitions/file-subtype-ply'
-      - $ref: '#/definitions/file-subtype-wofost'
       - $ref: '#/definitions/file-subtype-yaml'
     description: Schema for file components.
     title: complete-file-filetype
@@ -995,6 +995,7 @@ definitions:
         enum:
         - ascii
         - binary
+        - cabo
         - json
         - map
         - mat
@@ -1004,7 +1005,6 @@ definitions:
         - pickle
         - ply
         - table
-        - wofost
         - yaml
         type: string
       filter:
@@ -1071,7 +1071,6 @@ definitions:
           Defaults to False.
         type: boolean
       read_meth:
-        default: read
         deprecated: true
         description: Method that should be used to read data from the file. Defaults
           to 'read'. Ignored if direction is 'send'.
@@ -1189,7 +1188,6 @@ definitions:
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
         type: string
       read_meth:
-        default: read
         deprecated: true
         description: Method that should be used to read data from the file. Defaults
           to 'read'. Ignored if direction is 'send'.
@@ -1210,6 +1208,50 @@ definitions:
     - filetype
     - serializer
     title: yggdrasil.communication.FileComm.FileComm
+    type: object
+  file-subtype-cabo:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['cabo'] subtype.
+    properties:
+      comment:
+        default: '# '
+        description: One or more characters indicating a comment. Defaults to '# '.
+        type: string
+      datatype:
+        description: JSON schema defining the type of object that the serializer will
+          be used to serialize/deserialize. Defaults to default_datatype.
+        type: schema
+      delimiter:
+        default: ' = '
+        description: Delimiter that should be used to separate name/value pairs in
+          the map. Defaults to \t.
+        type: string
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: cabo
+        description: The file is a CABO parameter file.
+        enum:
+        - cabo
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      newline:
+        default: '
+
+          '
+        description: One or more characters indicating a newline. Defaults to '\n'.
+        type: string
+    required:
+    - filetype
+    title: yggdrasil.communication.CABOFileComm.CABOFileComm
     type: object
   file-subtype-json:
     additionalProperties: true
@@ -1362,14 +1404,6 @@ definitions:
     allowSingular: name
     description: Schema for file component ['netcdf'] subtype.
     properties:
-      comment:
-        default: '# '
-        description: One or more characters indicating a comment. Defaults to '# '.
-        type: string
-      datatype:
-        description: JSON schema defining the type of object that the serializer will
-          be used to serialize/deserialize. Defaults to default_datatype.
-        type: schema
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -1385,12 +1419,6 @@ definitions:
       name:
         description: Name used for component in log messages.
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
-        type: string
-      newline:
-        default: '
-
-          '
-        description: One or more characters indicating a newline. Defaults to '\n'.
         type: string
       read_attributes:
         default: false
@@ -1671,50 +1699,6 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.AsciiTableComm.AsciiTableComm
-    type: object
-  file-subtype-wofost:
-    additionalProperties: true
-    allowSingular: name
-    description: Schema for file component ['wofost'] subtype.
-    properties:
-      comment:
-        default: '# '
-        description: One or more characters indicating a comment. Defaults to '# '.
-        type: string
-      datatype:
-        description: JSON schema defining the type of object that the serializer will
-          be used to serialize/deserialize. Defaults to default_datatype.
-        type: schema
-      delimiter:
-        default: ' = '
-        description: Delimiter that should be used to separate name/value pairs in
-          the map. Defaults to \t.
-        type: string
-      driver:
-        deprecated: true
-        description: '[DEPRECATED] Name of driver class that should be used.'
-        enum:
-        - ''
-        type: string
-      filetype:
-        default: wofost
-        description: The file is a WOFOST parameter file.
-        enum:
-        - wofost
-        type: string
-      name:
-        description: Name used for component in log messages.
-        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
-        type: string
-      newline:
-        default: '
-
-          '
-        description: One or more characters indicating a newline. Defaults to '\n'.
-        type: string
-    required:
-    - filetype
-    title: yggdrasil.communication.WOFOSTParamFileComm.WOFOSTParamFileComm
     type: object
   file-subtype-yaml:
     additionalProperties: true
@@ -3789,6 +3773,7 @@ definitions:
       - $ref: '#/definitions/serializer-subtype-default'
       - $ref: '#/definitions/serializer-subtype-map'
       - $ref: '#/definitions/serializer-subtype-table'
+      - $ref: '#/definitions/serializer-subtype-cabo'
       - $ref: '#/definitions/serializer-subtype-direct'
       - $ref: '#/definitions/serializer-subtype-functional'
       - $ref: '#/definitions/serializer-subtype-json'
@@ -3797,7 +3782,6 @@ definitions:
       - $ref: '#/definitions/serializer-subtype-pandas'
       - $ref: '#/definitions/serializer-subtype-pickle'
       - $ref: '#/definitions/serializer-subtype-ply'
-      - $ref: '#/definitions/serializer-subtype-wofost'
       - $ref: '#/definitions/serializer-subtype-yaml'
     description: Schema for serializer components.
     title: complete-serializer-seritype
@@ -3896,6 +3880,7 @@ definitions:
         default: default
         description: Serializer type.
         enum:
+        - cabo
         - default
         - direct
         - functional
@@ -3907,7 +3892,6 @@ definitions:
         - pickle
         - ply
         - table
-        - wofost
         - yaml
         type: string
       sort_keys:
@@ -3925,6 +3909,26 @@ definitions:
           table. Defaults to False.
         type: boolean
     title: serializer_base
+    type: object
+  serializer-subtype-cabo:
+    additionalProperties: true
+    description: Schema for serializer component ['cabo'] subtype.
+    properties:
+      delimiter:
+        default: ' = '
+        description: Delimiter that should be used to separate name/value pairs in
+          the map. Defaults to \t.
+        type: string
+      seritype:
+        default: cabo
+        description: Serialization of mapping between keys and scalar or array values
+          as used in the CABO parameter files.
+        enum:
+        - cabo
+        type: string
+    required:
+    - seritype
+    title: yggdrasil.serialize.CABOSerialize.CABOSerialize
     type: object
   serializer-subtype-default:
     additionalProperties: true
@@ -4137,7 +4141,7 @@ definitions:
     properties:
       seritype:
         default: ply
-        description: Serialize 3D structures using Ply format.
+        description: Serialize 3D structures using `Ply format <http://paulbourke.net/dataformats/ply/>`_.
         enum:
         - ply
         type: string
@@ -4199,26 +4203,6 @@ definitions:
     required:
     - seritype
     title: yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize
-    type: object
-  serializer-subtype-wofost:
-    additionalProperties: true
-    description: Schema for serializer component ['wofost'] subtype.
-    properties:
-      delimiter:
-        default: ' = '
-        description: Delimiter that should be used to separate name/value pairs in
-          the map. Defaults to \t.
-        type: string
-      seritype:
-        default: wofost
-        description: Serialization of mapping between keys and scalar or array values
-          as used in the WOFOST parameter files.
-        enum:
-        - wofost
-        type: string
-    required:
-    - seritype
-    title: yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize
     type: object
   serializer-subtype-yaml:
     additionalProperties: true

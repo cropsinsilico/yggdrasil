@@ -1,4 +1,6 @@
+import os
 import pytest
+import tempfile
 import numpy as np
 from tests.serialize import TestSerializeBase as base_class
 from yggdrasil import constants
@@ -52,9 +54,8 @@ class TestFunctionalSerialize(base_class):
 
     def test_serialize_sinfo(self, instance, testing_options):
         r"""Test serialize/deserialize with serializer info."""
-        with pytest.raises(RuntimeError):
-            instance.serialize(testing_options['objects'][0],
-                               add_serializer_info=True)
+        instance.serialize(testing_options['objects'][0],
+                           add_serializer_info=True)
     
 
 class FakeSerializer(DefaultSerialize.DefaultSerialize):
@@ -116,3 +117,19 @@ class TestFunctionalSerialize_error(TestFunctionalSerialize):
         r"""Test serialize with function that dosn't return correct type."""
         with pytest.raises(TypeError):
             instance.serialize((1,))
+
+    def test_dump_load(self, instance):
+        r"""Test dumping/loading to/from a file."""
+        ftemp = tempfile.NamedTemporaryFile(delete=False)
+        ftemp.close()
+        fname = ftemp.name
+        try:
+            with pytest.raises(TypeError):
+                instance.dump(fname, (1,))
+        finally:
+            if os.path.isfile(fname):
+                os.remove(fname)
+
+    def test_dump_load_error(self, instance, testing_options):
+        r"""Test error when dumping invalid message."""
+        pytest.skip("Error already raised")

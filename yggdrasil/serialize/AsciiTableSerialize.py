@@ -61,14 +61,15 @@ class AsciiTableSerialize(DefaultSerialize):
     has_header = True
     default_read_meth = 'readline'  # because default for as_array is False
     default_datatype = {'type': 'array'}
+    file_extensions = ['.txt']
 
     def __init__(self, **kwargs):
         self._explicit_delimiter = ('delimiter' in kwargs)
         super(AsciiTableSerialize, self).__init__(**kwargs)
 
     def update_serializer(self, *args, **kwargs):
-        if 'delimiter' in kwargs:
-            self._explicit_delimiter = True
+        # if 'delimiter' in kwargs:
+        #     self._explicit_delimiter = True
         if self._explicit_delimiter and ('format_str' in kwargs):
             info = serialize.format2table(kwargs['format_str'])
             info['delimiter'] = self.delimiter

@@ -1,6 +1,51 @@
 import pytest
+import tempfile
+import os
 import numpy as np
 from tests.serialize import TestSerializeBase as base_class
+
+
+class TestPlyDict:
+    r"""Test class for PlyDict class."""
+
+    @pytest.fixture(scope="class")
+    def geom_cls(self):
+        from yggdrasil.serialize.PlySerialize import PlyDict
+        return PlyDict
+
+    def test_mesh(self, geom_cls, geom_dict):
+        r"""Test construction from a mesh."""
+        x = geom_cls(geom_dict)
+        mesh = x.mesh
+        y = geom_cls.from_mesh(mesh)
+        assert x.mesh == y.mesh
+        assert x.nvert != y.nvert
+        assert x.nface == y.nface
+        z = geom_cls.from_mesh(mesh, prune_duplicates=True)
+        assert x.mesh == z.mesh
+        assert x.nvert == z.nvert
+        assert x.nface == z.nface
+
+    def test_mesh_file(self, geom_cls, geom_dict):
+        r"""Test construciton from a mesh file."""
+        x = geom_cls(geom_dict)
+        mesh = np.asarray(x.mesh)
+        ftemp = tempfile.NamedTemporaryFile(delete=False)
+        np.savetxt(ftemp, mesh)
+        fname = ftemp.name
+        ftemp.close()
+        try:
+            y = geom_cls.from_mesh(fname)
+            assert x.mesh == y.mesh
+            assert x.nvert != y.nvert
+            assert x.nface == y.nface
+            z = geom_cls.from_mesh(fname, prune_duplicates=True)
+            assert x.mesh == z.mesh
+            assert x.nvert == z.nvert
+            assert x.nface == z.nface
+        finally:
+            if os.path.isfile(fname):
+                os.remove(fname)
 
 
 class TestPlySerialize(base_class):
@@ -10,6 +55,16 @@ class TestPlySerialize(base_class):
     def serializer(self):
         r"""str: Serializer being tested."""
         return "ply"
+
+    def test_serialize_mesh(self, geom_dict, instance, testing_options):
+        r"""Test serialize/deserialize of mesh."""
+        iobj = type(testing_options['objects'][0])(geom_dict)
+        mesh = np.asarray(iobj.mesh)
+        msg = instance.serialize(mesh)
+        iout, ihead = instance.deserialize(msg)
+        assert iobj.mesh == iout.mesh
+        assert iobj.nvert == iout.nvert
+        assert iobj.nface == iout.nface
 
     def test_apply_scalar_map(self, class_name, testing_options):
         r"""Test applying a scalar colormap."""
