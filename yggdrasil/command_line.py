@@ -206,7 +206,16 @@ class SubCommand(metaclass=SubCommandMeta):
             raise NotImplementedError("type(x) = %s" % type(x))
 
     @classmethod
+    def runtime_arguments(cls):
+        return []
+
+    @classmethod
     def add_arguments(cls, parser, args=None):
+        args = copy.deepcopy(cls.arguments)
+        for new_param in cls.runtime_arguments():
+            for old_param in args:
+                if new_param[0] == old_param[0]:
+                    old_param[1].update(new_param[1])
         cls.add_argument_to_parser(parser, cls.arguments)
 
     @classmethod
@@ -1639,19 +1648,26 @@ class file_converter(SubCommand):
         (('dst', ),
          {'help': "Name of destination file"}),
         (('--from', '--src-type'),
-         {'choices': [None] + list(constants.COMPONENT_REGISTRY[
-             'file']['subtypes'].keys()),
-          'dest': 'src_type',
+         {'dest': 'src_type',
           'default': None,
           'help': "Source file type"}),
         (('--to', '--dst-type'),
-         {'choices': [None] + list(constants.COMPONENT_REGISTRY[
-             'file']['subtypes'].keys()),
-          'dest': 'dst_type',
+         {'dest': 'dst_type',
           'default': None,
           'help': "Destination file type"})
     ]
 
+    @classmethod
+    def runtime_arguments(cls):
+        return [
+            (('--from', '--src-type'),
+             {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+                 'file']['subtypes'].keys())}),
+            (('--to', '--dst-type'),
+             {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+                 'file']['subtypes'].keys())}),
+        ]
+    
     @classmethod
     def func(cls, args):
         from yggdrasil.communication.FileComm import convert_file
