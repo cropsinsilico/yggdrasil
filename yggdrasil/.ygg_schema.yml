@@ -839,6 +839,7 @@ definitions:
       - $ref: '#/definitions/file-subtype-map'
       - $ref: '#/definitions/file-subtype-table'
       - $ref: '#/definitions/file-subtype-cabo'
+      - $ref: '#/definitions/file-subtype-jpeg'
       - $ref: '#/definitions/file-subtype-json'
       - $ref: '#/definitions/file-subtype-mat'
       - $ref: '#/definitions/file-subtype-netcdf'
@@ -996,6 +997,7 @@ definitions:
         - ascii
         - binary
         - cabo
+        - jpeg
         - json
         - map
         - mat
@@ -1252,6 +1254,31 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.CABOFileComm.CABOFileComm
+    type: object
+  file-subtype-jpeg:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['jpeg'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: jpeg
+        description: The file is read/written as JPEG.
+        enum:
+        - jpeg
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+    required:
+    - filetype
+    title: yggdrasil.communication.JPEGFileComm.JPEGFileComm
     type: object
   file-subtype-json:
     additionalProperties: true

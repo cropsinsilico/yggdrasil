@@ -173,6 +173,7 @@ COMPONENT_REGISTRY = {
             'ascii': 'AsciiFileComm',
             'binary': 'FileComm',
             'cabo': 'CABOFileComm',
+            'jpeg': 'JPEGFileComm',
             'json': 'JSONFileComm',
             'map': 'AsciiMapComm',
             'mat': 'MatFileComm',
@@ -269,6 +270,7 @@ FILE2EXT = {
     'ascii': '.txt',
     'binary': '.txt',
     'cabo': '.cab',
+    'jpeg': '.jpeg',
     'json': '.json',
     'map': '.txt',
     'mat': '.mat',
@@ -282,6 +284,7 @@ FILE2EXT = {
 }
 EXT2FILE = {
     '.cab': 'cabo',
+    '.jpeg': 'jpeg',
     '.json': 'json',
     '.mat': 'mat',
     '.nc': 'netcdf',

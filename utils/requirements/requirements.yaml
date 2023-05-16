@@ -34,6 +34,11 @@ general:
         from_env: NUMPY
         method_in_setup: conda
         build: True
+  - opencv:
+      - name: opencv
+        method: conda
+      - name: opencv-python
+        method: pip
   - pandas
   - pip:
       method: conda_recipe

@@ -63,6 +63,18 @@
         }
       }
     },
+    {
+      "opencv": [
+        {
+          "name": "opencv",
+          "method": "conda"
+        },
+        {
+          "name": "opencv-python",
+          "method": "pip"
+        }
+      ]
+    },
     "pandas",
     {
       "pip": {
