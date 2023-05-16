@@ -2044,7 +2044,7 @@ extern "C" {
       }
       out = create_dtype();
       Metadata* metadata = (Metadata*)(out->metadata);
-      metadata->fromType("object");
+      metadata->fromType("object", use_generic);
       if (nitems > 0) {
 	metadata->SetSchemaValue(
 	  "properties", rapidjson::Value(rapidjson::kObjectType).Move());

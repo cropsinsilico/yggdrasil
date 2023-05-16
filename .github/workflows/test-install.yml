@@ -276,6 +276,8 @@ jobs:
         == 1
       name: Install R
       uses: r-lib/actions/setup-r@v2
+      with:
+        windows-path-include-rtools: false
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
       uses: actions/cache@v3
@@ -607,6 +609,8 @@ jobs:
         == 1
       name: Install R
       uses: r-lib/actions/setup-r@v2
+      with:
+        windows-path-include-rtools: false
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
       uses: actions/cache@v3
@@ -930,6 +934,8 @@ jobs:
         == 1
       name: Install R
       uses: r-lib/actions/setup-r@v2
+      with:
+        windows-path-include-rtools: false
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
       uses: actions/cache@v3
@@ -1236,6 +1242,8 @@ jobs:
         == 1
       name: Install R
       uses: r-lib/actions/setup-r@v2
+      with:
+        windows-path-include-rtools: false
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
       uses: actions/cache@v3
@@ -1541,6 +1549,8 @@ jobs:
         == 1
       name: Install R
       uses: r-lib/actions/setup-r@v2
+      with:
+        windows-path-include-rtools: false
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
       uses: actions/cache@v3
