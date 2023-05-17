@@ -293,8 +293,6 @@ class FileComm(CommBase.CommBase):
                 out['recv_partial'].append([])
         else:
             seri_nme = cls._default_serializer
-            if not seri_nme:
-                seri_nme = 'direct'
             seri_cls = import_component('serializer', seri_nme)
             if seri_cls.concats_as_str:
                 out['recv_partial'] = [[x] for x in out['recv']]

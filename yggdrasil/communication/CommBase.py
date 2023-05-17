@@ -878,10 +878,7 @@ class CommBase(tools.YggClass):
 
         """
         if serializer is None:
-            if cls._default_serializer:
-                serializer = cls._default_serializer
-            else:
-                serializer = 'direct'
+            serializer = cls._default_serializer
         seri_cls = import_component('serializer', serializer)
         out_seri = seri_cls.get_testing_options(**kwargs)
         out = {'attributes': ['name', 'address', 'direction',

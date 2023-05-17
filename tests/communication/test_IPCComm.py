@@ -48,8 +48,9 @@ def test_ipcrm_queues():
     IPCComm.ipcrm_queues(str(mq.key))
     assert len(IPCComm.ipc_queues()) == 0
     mq = IPCComm.get_queue()
-    assert len(IPCComm.ipc_queues()) == 1
+    assert len(IPCComm.ipc_queues(by_id=True)) == 1
     IPCComm.ipcrm_queues(str(mq.id), by_id=True)
+    assert len(IPCComm.ipc_queues(by_id=True)) == 0
 
 
 @pytest.mark.skipif(_ipc_installed, reason="IPC library installed")
