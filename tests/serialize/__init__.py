@@ -152,7 +152,7 @@ class TestSerializeBase(base_class):
                     instance.dump(fd, iobj)
                 assert os.path.isfile(fname)
                 with open(fname, 'rb') as fd:
-                    iout = instance.load(fd)
+                    iout = instance.load('tempfile', address=fd)
                 assert map_sent2recv(iobj) == iout
                 cleanup_fname()
             # From file with contents

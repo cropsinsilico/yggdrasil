@@ -371,14 +371,11 @@ class PlySerialize(SerializeBase):
             bool: True if object is a mesh, false otherwise.
 
         """
-        try:
-            if isinstance(args, list):
-                args = np.asarray(args)
-            return (isinstance(args, np.ndarray) and args.ndim == 2
-                    and (args.shape[1] // 3) > 0
-                    and (args.shape[1] % 3) == 0)
-        except BaseException:
-            return False
+        if isinstance(args, list):
+            args = np.asarray(args)
+        return (isinstance(args, np.ndarray) and args.ndim == 2
+                and (args.shape[1] // 3) > 0
+                and (args.shape[1] % 3) == 0)
 
     def normalize(self, args):
         r"""Normalize a message to conform to the expected datatype.

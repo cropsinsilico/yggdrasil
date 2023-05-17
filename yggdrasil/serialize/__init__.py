@@ -780,6 +780,11 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         arr = np.genfromtxt(fd, **np_kws)
         if dtype is not None:
             arr = arr.astype(dtype)
+        elif arr.ndim == 2 and arr.dtype.names is None:
+            dtype_named = {
+                'names': [f'f{i}' for i in range(arr.shape[1])],
+                'formats': [dtype for i in range(arr.shape[1])]}
+            arr = arr.astype(dtype_named)
     fd.close()
     return arr
 
@@ -1006,24 +1011,22 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
     header.setdefault('format_str', None)
     delimiter = header['delimiter']
     # Handle case where no header is found
-    if not header_lines:
-        if (((not delimiter)
+    if ((not header_lines)
+        and ((not delimiter)
              or (delimiter == constants.DEFAULT_DELIMITER
                  and not header['format_str']
                  and delimiter not in last_line))):
-            if b',' in last_line:
-                p1, p2 = last_line.split(b',', maxsplit=1)
+        for item in [b',', b';']:
+            if item in last_line:
+                p1, p2 = last_line.split(item, maxsplit=1)
                 p1 = p1.rstrip()
                 p2 = p2.lstrip()
-            else:
-                p1, p2 = last_line.split(maxsplit=1)
-            delimiter = last_line[
-                (last_line.index(p1) + len(p1)):last_line.index(p2)]
-            header['delimiter'] = delimiter
-        header['field_names'] = [
-            f'f{i}' for i in range(len(
-                last_line.split(header['newline'])[0].split(
-                    header['delimiter'])))]
+                break
+        else:
+            p1, p2 = last_line.split(maxsplit=1)
+        delimiter = last_line[
+            (last_line.index(p1) + len(p1)):last_line.index(p2)]
+        header['delimiter'] = delimiter
     # Try to determine format from array without header
     str_fmt = b'%s'
     if ((header['format_str'] is None) or (str_fmt in header['format_str'])):
