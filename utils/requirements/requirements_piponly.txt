@@ -1,1 +1,2 @@
 libroadrunner    # [pip,sbml]
+pysam            # [pip,seq]

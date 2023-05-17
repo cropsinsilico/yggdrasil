@@ -462,6 +462,16 @@
         "pika>=1.0.0"
       ]
     },
+    "seq": {
+      "description": "Dependencies required to handle sequence (nucleotide/protein) I/O",
+      "requirements": [
+        "biopython",
+        {
+          "name": "pysam",
+          "method": "pip"
+        }
+      ]
+    },
     "sbml": {
       "description": "Dependencies required to run SBML models as part of yggdrasil integrations",
       "requirements": [

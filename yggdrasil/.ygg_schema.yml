@@ -839,6 +839,8 @@ definitions:
       - $ref: '#/definitions/file-subtype-map'
       - $ref: '#/definitions/file-subtype-table'
       - $ref: '#/definitions/file-subtype-cabo'
+      - $ref: '#/definitions/file-subtype-fasta'
+      - $ref: '#/definitions/file-subtype-fastq'
       - $ref: '#/definitions/file-subtype-jpeg'
       - $ref: '#/definitions/file-subtype-json'
       - $ref: '#/definitions/file-subtype-mat'
@@ -997,6 +999,8 @@ definitions:
         - ascii
         - binary
         - cabo
+        - fasta
+        - fastq
         - jpeg
         - json
         - map
@@ -1067,6 +1071,11 @@ definitions:
         description: '[DEPRECATED] Method of input/output driver to call when the
           connection closes'
         type: string
+      piecemeal:
+        default: false
+        description: If possible read the the file incrementally in multiple messages.
+          This should be used for large files that cannot be loaded into memory.
+        type: boolean
       read_attributes:
         default: false
         description: If True, the attributes are read in as well as the variables.
@@ -1080,6 +1089,9 @@ definitions:
         - read
         - readline
         type: string
+      record_ids:
+        description: IDs of records to read/write. Other records will be ignored.
+        type: array
       serializer:
         allOf:
         - default: {}
@@ -1254,6 +1266,72 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.CABOFileComm.CABOFileComm
+    type: object
+  file-subtype-fasta:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['fasta'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: fasta
+        description: fasta sequence I/O
+        enum:
+        - fasta
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      piecemeal:
+        default: false
+        description: If possible read the the file incrementally in multiple messages.
+          This should be used for large files that cannot be loaded into memory.
+        type: boolean
+      record_ids:
+        description: IDs of records to read/write. Other records will be ignored.
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.FASTAFileComm.FASTAFileComm
+    type: object
+  file-subtype-fastq:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['fastq'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: fastq
+        description: fastq sequence I/O
+        enum:
+        - fastq
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      piecemeal:
+        default: false
+        description: If possible read the the file incrementally in multiple messages.
+          This should be used for large files that cannot be loaded into memory.
+        type: boolean
+      record_ids:
+        description: IDs of records to read/write. Other records will be ignored.
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.FASTQFileComm.FASTQFileComm
     type: object
   file-subtype-jpeg:
     additionalProperties: true

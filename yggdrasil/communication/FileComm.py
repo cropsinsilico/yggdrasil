@@ -237,8 +237,8 @@ class FileComm(CommBase.CommBase):
             
     @staticmethod
     def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
+        r"""Operations that should be performed to modify class
+        attributes prior to registration."""
         CommBase.CommBase.before_registration(cls)
         seri = None
         if cls._default_serializer:

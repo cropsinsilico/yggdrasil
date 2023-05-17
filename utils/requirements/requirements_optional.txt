@@ -1,4 +1,5 @@
 astropy          # [astropy]
+biopython        # [seq]
 mpi4py           # [mpi]
 pika>=1.0.0      # [rmq]
 pygments         # [pygments]

@@ -5,6 +5,10 @@
   "rmq": [
     "pika>=1.0.0"
   ],
+  "seq": [
+    "biopython",
+    "pysam"
+  ],
   "sbml": [
     "libroadrunner"
   ],
