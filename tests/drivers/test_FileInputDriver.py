@@ -50,7 +50,7 @@ class TestFileInputDriver(base_class):
         r"""str: Path to the test file."""
         out = os.path.join(
             tempfile.gettempdir(),
-            f'{name}_input{icomm_python_class._default_extension}')
+            f'{name}_input{icomm_python_class._extensions[0]}')
         with open(out, 'wb') as fd:
             fd.write(contents_to_write)
         try:

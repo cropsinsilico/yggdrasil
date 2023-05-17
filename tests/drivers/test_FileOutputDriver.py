@@ -41,7 +41,7 @@ class TestFileOutputDriver(base_class):
     def filepath(self, name, ocomm_python_class):
         r"""str: Path to the test file."""
         out = os.path.abspath(
-            f'{name}_input{ocomm_python_class._default_extension}')
+            f'{name}_input{ocomm_python_class._extensions}')
         try:
             yield out
         finally:
@@ -68,9 +68,9 @@ class TestFileOutputDriver(base_class):
         def after_instance_started_w(x):
             for x in testing_options['send']:
                 flag = send_comm.send(x)
-                assert(flag)
+                assert flag
             flag = send_comm.send_eof()
-            assert(flag)
+            assert flag
         return after_instance_started_w
 
     @pytest.fixture
@@ -91,11 +91,11 @@ class TestFileOutputDriver(base_class):
         r"""Assertions to make after stopping the driver instance."""
         def assert_after_stop_w():
             assert_after_terminate()
-            assert(os.path.isfile(filepath))
+            assert os.path.isfile(filepath)
             if testing_options.get('exact_contents', True):
                 with open(filepath, 'rb') as fd:
                     data = fd.read()
-                assert(data == contents_to_read)
+                assert data == contents_to_read
         return assert_after_stop_w
     
     # These are disabled to prevent writting extraneous data
