@@ -838,17 +838,22 @@ definitions:
       - $ref: '#/definitions/file-subtype-ascii'
       - $ref: '#/definitions/file-subtype-map'
       - $ref: '#/definitions/file-subtype-table'
+      - $ref: '#/definitions/file-subtype-bmp'
       - $ref: '#/definitions/file-subtype-cabo'
+      - $ref: '#/definitions/file-subtype-eps'
       - $ref: '#/definitions/file-subtype-fasta'
       - $ref: '#/definitions/file-subtype-fastq'
+      - $ref: '#/definitions/file-subtype-gif'
       - $ref: '#/definitions/file-subtype-jpeg'
       - $ref: '#/definitions/file-subtype-json'
       - $ref: '#/definitions/file-subtype-mat'
       - $ref: '#/definitions/file-subtype-netcdf'
       - $ref: '#/definitions/file-subtype-obj'
+      - $ref: '#/definitions/file-subtype-png'
       - $ref: '#/definitions/file-subtype-pandas'
       - $ref: '#/definitions/file-subtype-pickle'
       - $ref: '#/definitions/file-subtype-ply'
+      - $ref: '#/definitions/file-subtype-tiff'
       - $ref: '#/definitions/file-subtype-yaml'
     description: Schema for file components.
     title: complete-file-filetype
@@ -998,9 +1003,12 @@ definitions:
         enum:
         - ascii
         - binary
+        - bmp
         - cabo
+        - eps
         - fasta
         - fastq
+        - gif
         - jpeg
         - json
         - map
@@ -1010,7 +1018,9 @@ definitions:
         - pandas
         - pickle
         - ply
+        - png
         - table
+        - tiff
         - yaml
         type: string
       filter:
@@ -1071,6 +1081,10 @@ definitions:
         description: '[DEPRECATED] Method of input/output driver to call when the
           connection closes'
         type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
       piecemeal:
         default: false
         description: If possible read the the file incrementally in multiple messages.
@@ -1223,6 +1237,35 @@ definitions:
     - serializer
     title: yggdrasil.communication.FileComm.FileComm
     type: object
+  file-subtype-bmp:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['bmp'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: bmp
+        description: bmp image I/O
+        enum:
+        - bmp
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.BMPFileComm
+    type: object
   file-subtype-cabo:
     additionalProperties: true
     allowSingular: name
@@ -1267,6 +1310,35 @@ definitions:
     - filetype
     title: yggdrasil.communication.CABOFileComm.CABOFileComm
     type: object
+  file-subtype-eps:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['eps'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: eps
+        description: eps image I/O
+        enum:
+        - eps
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.EPSFileComm
+    type: object
   file-subtype-fasta:
     additionalProperties: true
     allowSingular: name
@@ -1298,7 +1370,7 @@ definitions:
         type: array
     required:
     - filetype
-    title: yggdrasil.communication.FASTAFileComm.FASTAFileComm
+    title: yggdrasil.communication.SequenceFileBase.FASTAFileComm
     type: object
   file-subtype-fastq:
     additionalProperties: true
@@ -1331,7 +1403,36 @@ definitions:
         type: array
     required:
     - filetype
-    title: yggdrasil.communication.FASTQFileComm.FASTQFileComm
+    title: yggdrasil.communication.SequenceFileBase.FASTQFileComm
+    type: object
+  file-subtype-gif:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['gif'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: gif
+        description: gif image I/O
+        enum:
+        - gif
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.GIFFileComm
     type: object
   file-subtype-jpeg:
     additionalProperties: true
@@ -1346,7 +1447,7 @@ definitions:
         type: string
       filetype:
         default: jpeg
-        description: The file is read/written as JPEG.
+        description: jpeg image I/O
         enum:
         - jpeg
         type: string
@@ -1354,9 +1455,13 @@ definitions:
         description: Name used for component in log messages.
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
         type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
     required:
     - filetype
-    title: yggdrasil.communication.JPEGFileComm.JPEGFileComm
+    title: yggdrasil.communication.ImageFileBase.JPEGFileComm
     type: object
   file-subtype-json:
     additionalProperties: true
@@ -1747,6 +1852,35 @@ definitions:
     - filetype
     title: yggdrasil.communication.PlyFileComm.PlyFileComm
     type: object
+  file-subtype-png:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['png'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: png
+        description: png image I/O
+        enum:
+        - png
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.PNGFileComm
+    type: object
   file-subtype-table:
     additionalProperties: true
     allowSingular: name
@@ -1804,6 +1938,35 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.AsciiTableComm.AsciiTableComm
+    type: object
+  file-subtype-tiff:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['tiff'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: tiff
+        description: tiff image I/O
+        enum:
+        - tiff
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.TIFFFileComm
     type: object
   file-subtype-yaml:
     additionalProperties: true
@@ -1990,6 +2153,7 @@ definitions:
       - $ref: '#/definitions/model-subtype-make'
       - $ref: '#/definitions/model-subtype-matlab'
       - $ref: '#/definitions/model-subtype-osr'
+      - $ref: '#/definitions/model-subtype-pytorch'
       - $ref: '#/definitions/model-subtype-python'
       - $ref: '#/definitions/model-subtype-R'
       - $ref: '#/definitions/model-subtype-sbml'
@@ -2211,6 +2375,7 @@ definitions:
         - MakeModelDriver
         - MatlabModelDriver
         - OSRModelDriver
+        - PyTorchModelDriver
         - PythonModelDriver
         - RModelDriver
         - SBMLModelDriver
@@ -2249,6 +2414,11 @@ definitions:
           source file listed in the first argument. If not provided, the model must
           contain it's own calls to the |yggdrasil| interface.
         type: string
+      input_transform:
+        description: Transformation that should be applied to input to get it into
+          the format expected by the model (including transformation to pytorch tensors
+          as necessary).
+        type: function
       inputs:
         aliases:
         - input
@@ -2368,6 +2538,7 @@ definitions:
         - mpi
         - osr
         - python
+        - pytorch
         - r
         - sbml
         - timesync
@@ -2410,6 +2581,11 @@ definitions:
         default: false
         description: If True, only the final timestep is output. Defaults to False.
         type: boolean
+      output_transform:
+        description: Transformation that should be applied to model output to get
+          it into a format that can be serialized by yggdrasil (i.e. not a pytorch
+          Tensor or model sepecific type).
+        type: function
       outputs:
         aliases:
         - output
@@ -2675,6 +2851,9 @@ definitions:
       validation_command:
         description: Path to a validation command that can be used to verify that
           the model ran as expected. A non-zero return code is taken to indicate failure.
+        type: string
+      weights:
+        description: Path to file where model weights are saved
         type: string
       with_asan:
         description: If True, the model will be compiled and linked with the address
@@ -3637,6 +3816,73 @@ definitions:
     - args
     - language
     title: yggdrasil.drivers.PythonModelDriver.PythonModelDriver
+    type: object
+  model-subtype-pytorch:
+    additionalProperties: true
+    description: Schema for model component ['pytorch'] subtype.
+    properties:
+      args:
+        allowSingular: true
+        description: The path to the file containing the model program that will be
+          run by the driver for the model's language and/or a list of arguments that
+          should be passed as input to the model program or language executable (e.g.
+          source code or configuration file for a domain specific language).
+        items:
+          type:
+          - string
+          - number
+        type: array
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - PyTorchModelDriver
+        type: string
+      input_transform:
+        description: Transformation that should be applied to input to get it into
+          the format expected by the model (including transformation to pytorch tensors
+          as necessary).
+        type: function
+      interpreter:
+        description: Name or path of interpreter executable that should be used to
+          run the model. If not provided, the interpreter will be determined based
+          on configuration options for the language (if present) and the default_interpreter
+          class attribute.
+        type: string
+      interpreter_flags:
+        default: []
+        description: Flags that should be passed to the interpreter when running the
+          model. If not provided, the flags are determined based on configuration
+          options for the language (if present) and the default_interpreter_flags
+          class attribute.
+        items:
+          type: string
+        type: array
+      language:
+        default: pytorch
+        description: Model is a PyTorch model
+        enum:
+        - pytorch
+        type: string
+      output_transform:
+        description: Transformation that should be applied to model output to get
+          it into a format that can be serialized by yggdrasil (i.e. not a pytorch
+          Tensor or model sepecific type).
+        type: function
+      skip_interpreter:
+        default: false
+        description: If True, no interpreter will be added to the arguments. This
+          should only be used for subclasses that will not be invoking the model via
+          the command line. Defaults to False.
+        type: boolean
+      weights:
+        description: Path to file where model weights are saved
+        type: string
+    required:
+    - args
+    - language
+    - weights
+    title: yggdrasil.drivers.PyTorchModelDriver.PyTorchModelDriver
     type: object
   model-subtype-sbml:
     additionalProperties: true

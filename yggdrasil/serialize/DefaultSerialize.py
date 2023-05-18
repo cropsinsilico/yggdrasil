@@ -89,6 +89,8 @@ class DefaultSerialize(SerializeBase):
         if field_names is None:
             assert not as_array
             return super(DefaultSerialize, cls).object2dict(obj, **kwargs)
+        if len(field_names) == 1 and not isinstance(obj, (list, tuple)):
+            return {field_names[0]: obj}
         return serialize.list2dict(obj, names=field_names)
 
     @classmethod

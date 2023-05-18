@@ -54,6 +54,8 @@ def register_example(example_dir):
             lang_avail.remove(k)
     elif example_base.startswith('sbml'):
         lang_avail = ['sbml']
+    elif example_base.startswith('pytorch'):
+        lang_avail = ['pytorch']
     elif example_base.startswith('osr'):
         lang_search = example_base + '_%s.yml'
         lang_base += ['osr']
@@ -147,6 +149,9 @@ def register_example(example_dir):
         elif example_base.startswith('sbml'):
             yml_names = ['%s.yml' % example_base]
             src_names = ['%s.xml' % example_base]
+        elif example_base.startswith('pytorch'):
+            yml_names = ['%s.yml' % example_base]
+            src_names = ['model.py']
         else:
             src_is_abs = True
             yml_names = ['%s_%s.yml' % (example_base, lang)]
@@ -201,7 +206,8 @@ def find_missing(languages=None, ignore_examples=None):
             if constants.LANGUAGE_PROPERTIES.get(k, {}).get('full_language', False)]
     if ignore_examples is None:
         ignore_examples = ['sbml1', 'sbml2', 'sbml3', 'proposal',
-                           'root_to_shoot', 'fakeplant', 'viz']
+                           'root_to_shoot', 'fakeplant', 'viz',
+                           'pytorch1']
     if not isinstance(languages, list):
         languages = [languages]
     examples = discover_examples()[1]

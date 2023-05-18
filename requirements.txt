@@ -4,7 +4,6 @@ deprecation
 flask
 matplotlib       # [pip]
 numpy>=1.13.0
-opencv-python    # [pip]
 pandas
 psutil
 pyperf

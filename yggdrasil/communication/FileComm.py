@@ -255,6 +255,31 @@ class FileComm(CommBase.CommBase):
         cls._commtype = cls._filetype
 
     @classmethod
+    def get_test_contents(cls, data):  # pragma: debug
+        r"""Method for returning the serialized form of a set of test
+        data.
+
+        Args:
+            data (list): List of test data objects to serialize.
+
+        Returns:
+            bytes: Serialized test data.
+
+        """
+        fname = f'contents_{cls._filetype}{cls._extensions[0]}'
+        try:
+            x = cls(fname, direction='send')
+            for msg in data:
+                x.send(msg)
+            x.close()
+            with open(fname, 'rb') as fd:
+                out = fd.read()
+        finally:
+            if os.path.isfile(fname):
+                os.remove(fname)
+        return out
+
+    @classmethod
     def get_testing_options(cls, read_meth=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 

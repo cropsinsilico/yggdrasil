@@ -1,0 +1,18 @@
+model:
+  name: model
+  language: pytorch
+  args: ./src/model.py:NeuralNetwork
+  weights: ./src/model_weights.pth
+  input_transform: ./src/model.py:input_transform
+  output_transform: ./src/model.py:output_transform
+  inputs:
+    - name: input
+      default_file:
+        name: ./Input/input.png
+        filetype: png
+  outputs:
+    - name: output
+      as_array: true
+      default_file:
+        name: ./output.txt
+        filetype: table

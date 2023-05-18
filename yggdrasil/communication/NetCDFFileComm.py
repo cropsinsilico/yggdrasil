@@ -1,7 +1,8 @@
 import sys
 import pprint
 import numpy as np
-from scipy.io import netcdf
+from scipy import io
+# from scipy.io import REVERSE, netcdf_file
 from yggdrasil import units
 from yggdrasil.communication.DedicatedFileBase import DedicatedFileBase
 
@@ -54,8 +55,8 @@ class NetCDFFileComm(DedicatedFileBase):
         x_dtype = np.dtype(x.dtype)
         typecode, size = x_dtype.char, x_dtype.itemsize
         typecode_map = {'l': 'i', 'q': 'i'}
-        if (typecode, size) not in netcdf.REVERSE:
-            REVERSE_keys = list(netcdf.REVERSE.keys())
+        if (typecode, size) not in io._netcdf.REVERSE:
+            REVERSE_keys = list(io._netcdf.REVERSE.keys())
             REVERSE_typecode = [k[0] for k in REVERSE_keys]
             typecode = typecode_map.get(typecode, typecode)
             if typecode == 'S':
@@ -74,7 +75,7 @@ class NetCDFFileComm(DedicatedFileBase):
                 raise RuntimeError(
                     ("Type (%s, %d) is not in set accepted by "
                      "netCDF %s.")
-                    % (typecode, size, pprint.pformat(netcdf.REVERSE)))
+                    % (typecode, size, pprint.pformat(io._netcdf.REVERSE)))
         return x
     
     @property
@@ -85,9 +86,9 @@ class NetCDFFileComm(DedicatedFileBase):
         return super(NetCDFFileComm, self).fd
     
     def _dedicated_open(self, address, mode):
-        self._external_fd = netcdf.netcdf_file(address, mode,
-                                               mmap=True,
-                                               version=self.version)
+        self._external_fd = io.netcdf_file(address, mode,
+                                           mmap=True,
+                                           version=self.version)
         return self._external_fd.fp
 
     def _dedicated_close(self):

@@ -1,6 +1,7 @@
 import copy
 import warnings
 from yggdrasil.communication.DedicatedFileBase import DedicatedFileBase
+from yggdrasil.components import create_component_class
 try:
     from Bio import SeqIO, SeqFeature
     from Bio.SeqRecord import SeqRecord
@@ -25,6 +26,7 @@ class SequenceFileBase(DedicatedFileBase):  # pragma: seq
     
     _stores_fd = True
     _sequence_types = {}
+    _test_parameters = None
 
     @staticmethod
     def before_registration(cls):
@@ -63,6 +65,24 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
     def __init__(self, *args, **kwargs):
         self._records_iterator = None
         return super(BioPythonFileBase, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked. If set to 'any', the
+                result will be True if this comm is installed for any of the
+                supported languages.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        return (language == 'python') and (SeqIO is not None)
 
     @property
     def records_iterator(self):
@@ -227,8 +247,9 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
                'objects': [data],
                'send': [data],
                'recv': [data],
-               'recv_partial': [[data]],
-               'contents': (b'')}
+               'recv_partial': [[data]]}
+        if cls._test_parameters:
+            out.update(cls._test_parameters)
         return out
 
 
@@ -243,6 +264,24 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
 #         'vcf': '.vcf',
 #     }
 
+#     @classmethod
+#     def is_installed(cls, language=None):
+#         r"""Determine if the necessary libraries are installed for this
+#         communication class.
+
+#         Args:
+#             language (str, optional): Specific language that should be checked
+#                 for compatibility. Defaults to None and all languages supported
+#                 on the current platform will be checked. If set to 'any', the
+#                 result will be True if this comm is installed for any of the
+#                 supported languages.
+
+#         Returns:
+#             bool: Is the comm installed.
+
+#         """
+#         return (language == 'python') and (pysam is not None)
+    
 #     @property
 #     def open_mode(self):
 #         r"""str: Mode that should be used to open the file."""
@@ -262,3 +301,31 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
 #     def _file_close(self):
 #         self._fd.close()
 #         self._fd = None
+
+
+_biopython_classes = [
+    ('FASTA', {
+        '_filetype': 'fasta',
+        '_test_parameters': {
+            'contents': (
+                b'>YP_025292.1 toxic membrane protein, small\nMKQHKAMI'
+                b'VALIVICITAVVAALVTRKDLCEVHIRTGQTEVAVF\n'
+            )
+        },
+    }),
+    ('FASTQ', {
+        '_filetype': 'fastq',
+        '_valid_fields': BioPythonFileBase._valid_fields + [
+            'letter_annotations'],
+        '_test_parameters': {
+            'contents': (
+                b'@YP_025292.1 toxic membrane protein, small\nMKQHKAMI'
+                b'VALIVICITAVVAALVTRKDLCEVHIRTGQTEVAVF\n+\n!"#$%&\'()*'
+                b'+,-./0123456789:;<=>?@ABCDEFGHIJKL\n'
+            )
+        }
+    }),
+]
+for name, attr in _biopython_classes:
+    create_component_class(globals(), BioPythonFileBase,
+                           f'{name}FileComm', attr)

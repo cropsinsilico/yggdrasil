@@ -12,6 +12,12 @@
   "sbml": [
     "libroadrunner"
   ],
+  "images": [
+    "pillow"
+  ],
+  "pytorch": [
+    "pytorch"
+  ],
   "testing": [
     "coverage",
     "flake8",

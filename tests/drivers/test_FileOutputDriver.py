@@ -81,8 +81,11 @@ class TestFileOutputDriver(base_class):
         return run_before_stop_w
     
     @pytest.fixture
-    def contents_to_read(self, testing_options):
+    def contents_to_read(self, testing_options, ocomm_python_class):
         r"""str: Contents that should be read to the file."""
+        if 'contents' not in testing_options:
+            print(ocomm_python_class.get_test_contents(
+                testing_options['send']))
         return testing_options['contents']
 
     @pytest.fixture

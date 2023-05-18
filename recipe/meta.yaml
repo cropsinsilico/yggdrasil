@@ -63,7 +63,6 @@ requirements:
     - git
     - matplotlib-base
     - numpy >=1.13.0
-    - opencv
     - pandas
     - psutil
     - pyperf
@@ -199,6 +198,28 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - biopython
+  - name: yggdrasil.images
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.images') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - pillow
+  - name: yggdrasil.pytorch
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.pytorch') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - pytorch
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

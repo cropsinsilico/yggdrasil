@@ -187,12 +187,17 @@ def import_component(comptype, subtype=None, **kwargs):
         class_name = registry["subtypes"][subtype]
     else:
         class_name = subtype
+    if subtype in registry.get("subtype_modules", {}):
+        module_name = registry["subtype_modules"][subtype]
+    else:
+        module_name = class_name
     # Check registered components to prevent importing multiple times
     if class_name not in registry.get("classes", {}):
         registry.setdefault("classes", {})
         try:
             registry["classes"][class_name] = getattr(
-                importlib.import_module(f"{registry['module']}.{class_name}"),
+                importlib.import_module(f"{registry['module']}."
+                                        f"{module_name}"),
                 class_name)
         except ImportError:
             if comptype == 'comm':
@@ -648,3 +653,21 @@ class ComponentBase(ComponentBaseUnregistered):
         These actions will not be performed if the environment variable
         YGGDRASIL_REGISTRATION_IN_PROGRESS is set."""
         pass
+
+
+def create_component_class(globals_dict, base, name, attr):
+    r"""Create a new component class.
+
+    Args:
+        globals_dict (dict): Globals dictionary that new class should be
+            added to.
+        base (type): Base class for new class. The new class will have
+            the same module as base.
+        name (str): Name for the new class.
+        attr (dict): Attributes that should be added to the new class.
+
+    """
+    attr['__module__'] = base.__module__
+    cls = type(name, (base, ), attr)
+    globals_dict[cls.__name__] = cls
+    del cls

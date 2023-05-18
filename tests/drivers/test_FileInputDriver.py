@@ -60,8 +60,11 @@ class TestFileInputDriver(base_class):
                 os.remove(out)
     
     @pytest.fixture(scope="class")
-    def contents_to_write(self, testing_options):
+    def contents_to_write(self, testing_options, icomm_python_class):
         r"""str: Contents that should be written to the file."""
+        if 'contents' not in testing_options:
+            print(icomm_python_class.get_test_contents(
+                testing_options['send']))
         return testing_options['contents']
 
     @pytest.fixture
