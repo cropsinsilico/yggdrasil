@@ -5,18 +5,22 @@
   "rmq": [
     "pika>=1.0.0"
   ],
-  "seq": [
-    "biopython",
-    "pysam"
-  ],
   "sbml": [
     "libroadrunner"
   ],
   "images": [
     "pillow"
   ],
+  "seq": [
+    "biopython",
+    "pysam"
+  ],
   "pytorch": [
     "pytorch"
+  ],
+  "excel": [
+    "openpyxl",
+    "pandas"
   ],
   "testing": [
     "coverage",

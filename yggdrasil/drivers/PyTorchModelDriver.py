@@ -44,8 +44,8 @@ class PyTorchModelDriver(DSLModelDriver):
 
         """
         try:
-            import roadrunner
-            return roadrunner.__version__
+            import torch
+            return torch.__version__
         except ImportError:  # pragma: debug
             raise RuntimeError("roadrunner not installed.")
 

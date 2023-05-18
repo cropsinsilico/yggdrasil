@@ -193,7 +193,7 @@ class SerializeBase(tools.YggClass):
     @classmethod
     def get_testing_options(cls, table_example=False, array_columns=False,
                             include_oldkws=False, table_string_type='bytes',
-                            no_names=False):
+                            no_names=False, no_units=False):
         r"""Method to return a dictionary of testing options for this class.
 
         Arguments:
@@ -211,6 +211,8 @@ class SerializeBase(tools.YggClass):
                 for the string column in the table. Defaults to 'bytes'.
             no_names (bool, optional): If True, an example is returned where the
                 names are not provided to the deserializer. Defaults to False.
+            no_units (bool, optional): If True, units will not be added to
+                the returned array if table_example is True.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -260,18 +262,21 @@ class SerializeBase(tools.YggClass):
                           'subtype': 'string',
                           'encoding': 'UCS4'}
             umol = b'\xce\xbcmol'.decode('utf-8')
+            if no_units:
+                units_line = b''
+            else:
+                units_line = b'# \t\xce\xbcmol\tcm\n'
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
-                   'datatype': {'type': 'array',
-                                'items': [dtype1,
-                                          {'type': 'scalar',
-                                           'subtype': 'int', 'precision': 4,
-                                           'units': umol},
-                                          {'type': 'scalar',
-                                           'subtype': 'float', 'precision': 8,
-                                           'units': 'cm'}]},
+                   'datatype': {
+                       'type': 'array',
+                       'items': [dtype1,
+                                 {'type': 'scalar',
+                                  'subtype': 'int', 'precision': 4},
+                                 {'type': 'scalar',
+                                  'subtype': 'float', 'precision': 8}]},
                    'contents': (b'# name\tcount\tsize\n'
-                                + b'# \t\xce\xbcmol\tcm\n'
+                                + units_line
                                 + b'# '
                                 + table_string_fmt.encode('utf8')
                                 + b'\t%d\t%f\n'
@@ -283,20 +288,26 @@ class SerializeBase(tools.YggClass):
                                 + b'three\t3\t3.000000\n'),
                    'objects': 2 * rows,
                    'field_units': ['', umol, 'cm']}
+            if not no_units:
+                out['field_units'] = ['', umol, 'cm']
+                out['datatype']['items'][1]['units'] = umol
+                out['datatype']['items'][2]['units'] = 'cm'
             if not no_names:
                 out['field_names'] = field_names
                 for x, n in zip(out['datatype']['items'], field_names):
                     x['title'] = n
             if include_oldkws:
-                out['kwargs'].update({'format_str': table_string_fmt + '\t%d\t%f\n',
-                                      'field_units': ['', umol, 'cm']})
+                out['kwargs'].update(
+                    format_str=(table_string_fmt + '\t%d\t%f\n'))
+                if not no_units:
+                    out['kwargs']['field_units'] = ['', umol, 'cm']
+                    out['objects'] = [
+                        [units.add_units(x, u) for x, u in
+                         zip(row, out['kwargs']['field_units'])]
+                        for row in out['objects']]
                 if not no_names:
                     out['kwargs']['field_names'] = field_names
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
-                out['objects'] = [
-                    [units.add_units(x, u) for x, u in
-                     zip(row, out['kwargs']['field_units'])]
-                    for row in out['objects']]
                 if 'format_str' in cls._attr_conv:
                     out['extra_kwargs']['format_str'] = tools.str2bytes(
                         out['extra_kwargs']['format_str'])

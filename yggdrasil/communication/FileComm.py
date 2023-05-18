@@ -267,8 +267,9 @@ class FileComm(CommBase.CommBase):
 
         """
         fname = f'contents_{cls._filetype}{cls._extensions[0]}'
+        assert not os.path.isfile(fname)
         try:
-            x = cls(fname, direction='send')
+            x = cls(fname, direction='send', append=True)
             for msg in data:
                 x.send(msg)
             x.close()
@@ -280,7 +281,7 @@ class FileComm(CommBase.CommBase):
         return out
 
     @classmethod
-    def get_testing_options(cls, read_meth=None, **kwargs):
+    def get_testing_options(cls, read_meth=None, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Args:
@@ -302,14 +303,17 @@ class FileComm(CommBase.CommBase):
                     the messages in 'send'.
 
         """
-        out = super(FileComm, cls).get_testing_options(**kwargs)
+        if serializer is None:
+            serializer = cls._default_serializer
+        out = super(FileComm, cls).get_testing_options(
+            serializer=serializer, **kwargs)
         if 'read_meth' in cls._schema_properties:
             if read_meth is None:
                 read_meth = 'read'
             out['kwargs']['read_meth'] = read_meth
         if read_meth == 'readline':
             out['recv_partial'] = [[x] for x in out['recv']]
-            if cls._default_serializer == 'direct':
+            if serializer == 'direct':
                 comment = tools.str2bytes(
                     cls._schema_properties['comment']['default']
                     + 'Comment\n')
@@ -317,8 +321,7 @@ class FileComm(CommBase.CommBase):
                 out['contents'] += comment
                 out['recv_partial'].append([])
         else:
-            seri_nme = cls._default_serializer
-            seri_cls = import_component('serializer', seri_nme)
+            seri_cls = import_component('serializer', serializer)
             if seri_cls.concats_as_str:
                 out['recv_partial'] = [[x] for x in out['recv']]
                 out['recv'] = seri_cls.concatenate(
@@ -327,7 +330,8 @@ class FileComm(CommBase.CommBase):
                 out['recv_partial'] = [[out['recv'][0]]]
                 for i in range(1, len(out['recv'])):
                     out['recv_partial'].append(seri_cls.concatenate(
-                        out['recv_partial'][-1] + [out['recv'][i]], **out['kwargs']))
+                        out['recv_partial'][-1] + [out['recv'][i]],
+                        **out['kwargs']))
                 out['recv'] = copy.deepcopy(out['recv_partial'][-1])
         return out
         
@@ -856,6 +860,7 @@ class FileComm(CommBase.CommBase):
                 out = out.replace(self.platform_newline, self.serializer.newline)
             if flag and (not self.is_eof(out)):
                 if (((self.read_meth == 'readline')
+                     and isinstance(out, bytes)
                      and out.startswith(self.serializer.comment))):
                     # Exclude comments
                     flag, out = self._recv()

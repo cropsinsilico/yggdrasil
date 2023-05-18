@@ -105,14 +105,18 @@ class DedicatedFileBase(FileComm):
         self._dedicated_send(msg)
         self.file_seek(self.file_size)
 
+    @property
+    def _file_size_recv(self):
+        return self.file_size
+
     def _file_recv(self):
         if self.is_open and ((self._external_fd is None) or self.append):
             self._file_refresh()
         if self.file_size > self._last_size:
             out = self._dedicated_recv()
-            self.file_seek(self.file_size)
+            self.file_seek(self._file_size_recv)
         else:
-            out = self.empty_obj_recv
+            out = self.empty_bytes_msg
         return copy.deepcopy(out)
         
     @property

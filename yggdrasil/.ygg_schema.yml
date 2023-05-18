@@ -841,6 +841,7 @@ definitions:
       - $ref: '#/definitions/file-subtype-bmp'
       - $ref: '#/definitions/file-subtype-cabo'
       - $ref: '#/definitions/file-subtype-eps'
+      - $ref: '#/definitions/file-subtype-excel'
       - $ref: '#/definitions/file-subtype-fasta'
       - $ref: '#/definitions/file-subtype-fastq'
       - $ref: '#/definitions/file-subtype-gif'
@@ -930,6 +931,13 @@ definitions:
           are sent/recieved with either columns rather than row by row. Defaults to
           False.'
         type: boolean
+      columns:
+        description: Names of columns to read/write.
+        items:
+          type:
+          - string
+          - integer
+        type: array
       comment:
         default: '# '
         description: One or more characters indicating a comment. Defaults to '# '.
@@ -977,6 +985,12 @@ definitions:
         description: Encoding that should be used to serialize the object. Defaults
           to 'utf-8'.
         type: string
+      endcol:
+        description: Column to stop read at (non-inclusive).
+        type: integer
+      endrow:
+        description: Row to stop read at (non-inclusive).
+        type: integer
       field_names:
         aliases:
         - column_names
@@ -1006,6 +1020,7 @@ definitions:
         - bmp
         - cabo
         - eps
+        - excel
         - fasta
         - fastq
         - gif
@@ -1113,14 +1128,29 @@ definitions:
         description: Class with serialize and deserialize methods that should be used
           to process sent and received messages or a dictionary describing a serializer
           that obeys the serializer schema.
+      sheets:
+        allowSingular: true
+        description: Name(s) of one more more sheets that should be read/written.
+          If not provided during read, all sheets will be read.
+        items:
+          type: string
+        type: array
       sort_keys:
         default: true
         description: If True, the serialization of dictionaries will be in key sorted
           order. Defaults to True.
         type: boolean
+      startcol:
+        default: 0
+        description: Column to start read/write at.
+        type: integer
+      startrow:
+        default: 0
+        description: Row to start read/write at.
+        type: integer
       str_as_bytes:
         default: false
-        description: If True, strings in columns are read as bytes. Defaults to False.
+        description: If true, strings in columns are read as bytes
         type: boolean
       transform:
         aliases:
@@ -1338,6 +1368,63 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.ImageFileBase.EPSFileComm
+    type: object
+  file-subtype-excel:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['excel'] subtype.
+    properties:
+      columns:
+        description: Names of columns to read/write.
+        items:
+          type:
+          - string
+          - integer
+        type: array
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      endcol:
+        description: Column to stop read at (non-inclusive).
+        type: integer
+      endrow:
+        description: Row to stop read at (non-inclusive).
+        type: integer
+      filetype:
+        default: excel
+        description: The file is read/written as Excel
+        enum:
+        - excel
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      sheets:
+        allowSingular: true
+        description: Name(s) of one more more sheets that should be read/written.
+          If not provided during read, all sheets will be read.
+        items:
+          type: string
+        type: array
+      startcol:
+        default: 0
+        description: Column to start read/write at.
+        type: integer
+      startrow:
+        default: 0
+        description: Row to start read/write at.
+        type: integer
+      str_as_bytes:
+        default: false
+        description: If true, strings in columns are read as bytes
+        type: boolean
+    required:
+    - filetype
+    title: yggdrasil.communication.ExcelFileComm.ExcelFileComm
     type: object
   file-subtype-fasta:
     additionalProperties: true
@@ -2417,7 +2504,8 @@ definitions:
       input_transform:
         description: Transformation that should be applied to input to get it into
           the format expected by the model (including transformation to pytorch tensors
-          as necessary).
+          as necessary). This function should return a tuple of arguments for the
+          model.
         type: function
       inputs:
         aliases:
@@ -3841,7 +3929,8 @@ definitions:
       input_transform:
         description: Transformation that should be applied to input to get it into
           the format expected by the model (including transformation to pytorch tensors
-          as necessary).
+          as necessary). This function should return a tuple of arguments for the
+          model.
         type: function
       interpreter:
         description: Name or path of interpreter executable that should be used to

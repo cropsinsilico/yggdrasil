@@ -1557,7 +1557,8 @@ class CommBase(tools.YggClass):
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        return self.apply_transform(self.serializer.empty_msg, for_empty=True)
+        return self.apply_transform(self.serializer.empty_msg,
+                                    for_empty=True)
 
     def is_empty(self, msg, emsg):
         r"""Check that a message matches an empty message object.
@@ -2358,6 +2359,8 @@ class CommBase(tools.YggClass):
                 if msg.stype is not None:
                     msg.stype = self.apply_transform_to_type(msg.stype)
                 msg.args = self.apply_transform(msg.args)
+            elif msg.flag == FLAG_EMPTY:
+                msg.args = self.empty_obj_recv
             # 2. Filter
             if (msg.flag == FLAG_SUCCESS) and (not self.evaluate_filter(msg.args)):
                 msg.flag = FLAG_SKIP

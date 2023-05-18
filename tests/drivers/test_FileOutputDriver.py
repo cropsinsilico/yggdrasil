@@ -41,7 +41,7 @@ class TestFileOutputDriver(base_class):
     def filepath(self, name, ocomm_python_class):
         r"""str: Path to the test file."""
         out = os.path.abspath(
-            f'{name}_input{ocomm_python_class._extensions}')
+            f'{name}_input{ocomm_python_class._extensions[0]}')
         try:
             yield out
         finally:
@@ -83,9 +83,12 @@ class TestFileOutputDriver(base_class):
     @pytest.fixture
     def contents_to_read(self, testing_options, ocomm_python_class):
         r"""str: Contents that should be read to the file."""
-        if 'contents' not in testing_options:
-            print(ocomm_python_class.get_test_contents(
-                testing_options['send']))
+        if not testing_options.get('contents', None):
+            contents = ocomm_python_class.get_test_contents(
+                testing_options['send'])
+            if testing_options.get('contents', False) is None:
+                return contents
+            print(contents)
         return testing_options['contents']
 
     @pytest.fixture
