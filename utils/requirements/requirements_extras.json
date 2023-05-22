@@ -13,10 +13,7 @@
   ],
   "seq": [
     "biopython",
-    "pysam"
-  ],
-  "pytorch": [
-    "pytorch"
+    "pysam; platform_system != 'Windows'"
   ],
   "excel": [
     "openpyxl",

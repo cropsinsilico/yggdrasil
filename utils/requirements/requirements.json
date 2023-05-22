@@ -491,14 +491,27 @@
         "biopython",
         {
           "name": "pysam",
-          "method": "pip"
+          "method": "pip",
+          "os": "unix"
         }
       ]
     },
     "pytorch": {
       "description": "Dependencies required to run PyTorch models as part of yggdrasil integrations",
       "requirements": [
-        "pytorch"
+        {
+          "name": "pytorch",
+          "options": [
+            {
+              "name": "pytorch",
+              "method": "conda"
+            },
+            {
+              "name": "torch",
+              "method": "pip"
+            }
+          ]
+        }
       ]
     },
     "excel": {

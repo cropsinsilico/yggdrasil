@@ -282,10 +282,16 @@ extras:
     # pysam only currently available on bioconda and not for osx arm64
     - name: pysam
       method: pip
+      os: unix
   pytorch:
     description: Dependencies required to run PyTorch models as part of yggdrasil integrations
     requirements:
-    - pytorch
+    - name: pytorch
+      options:
+      - name: pytorch
+        method: conda
+      - name: torch
+        method: pip
   excel:
     description: Dependencies required to read/write excel files
     requirements:

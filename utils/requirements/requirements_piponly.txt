@@ -1,2 +1,2 @@
 libroadrunner    # [pip,sbml]
-pysam            # [pip,seq]
+pysam; platform_system != 'Windows'  # [pip,seq]
