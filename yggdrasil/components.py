@@ -183,8 +183,12 @@ def import_component(comptype, subtype=None, **kwargs):
         subtype = 'DefaultComm'
     if subtype is None:
         subtype = registry["default"]
+    rev_subtypes = {v: k for k, v in registry["subtypes"].items()}
     if subtype in registry["subtypes"]:
         class_name = registry["subtypes"][subtype]
+    elif subtype in rev_subtypes:
+        class_name = subtype
+        subtype = rev_subtypes[subtype]
     else:
         class_name = subtype
     if subtype in registry.get("subtype_modules", {}):

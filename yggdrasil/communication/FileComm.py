@@ -842,9 +842,10 @@ class FileComm(CommBase.CommBase):
             self.read_header()
             prev_pos = self.file_tell()
             out = self._file_recv()
-        except BaseException:  # pragma: debug
+        except BaseException as e:  # pragma: debug
             # Use this to catch case where close called during receive.
             # In the future this should be handled via a lock.
+            self.info(f"Error during file receive: {e}")
             out = ''
         if len(out) == 0:
             if self.advance_in_series():

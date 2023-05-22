@@ -1128,6 +1128,10 @@ definitions:
         description: Class with serialize and deserialize methods that should be used
           to process sent and received messages or a dictionary describing a serializer
           that obeys the serializer schema.
+      sheet_template:
+        description: Format string that can be completed with % operator to generate
+          names for each subsequent sheet when writing.
+        type: string
       sheets:
         allowSingular: true
         description: Name(s) of one more more sheets that should be read/written.
@@ -1402,6 +1406,10 @@ definitions:
       name:
         description: Name used for component in log messages.
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      sheet_template:
+        description: Format string that can be completed with % operator to generate
+          names for each subsequent sheet when writing.
         type: string
       sheets:
         allowSingular: true

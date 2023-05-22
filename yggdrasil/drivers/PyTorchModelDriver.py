@@ -1,7 +1,7 @@
 import os
 from yggdrasil.drivers.DSLModelDriver import DSLModelDriver
 from yggdrasil import rapidjson
-# TODO: Allow model to be trained by input and return weights
+# TODO: Allow model to be trained by input and return weights?
 
 
 class PyTorchModelDriver(DSLModelDriver):
@@ -30,6 +30,7 @@ class PyTorchModelDriver(DSLModelDriver):
                             'a pytorch Tensor or model sepecific type).')},
     }
     language = 'pytorch'
+    language_ext = '.py'  # '.pth'
     interface_dependencies = ['torch']
 
     @classmethod
@@ -131,3 +132,18 @@ class PyTorchModelDriver(DSLModelDriver):
                 flag = v['comm'].send_dict(iout, key_order=v['vars'])
                 if not flag:  # pragma: debug
                     raise RuntimeError(f"Error sending to {k}")
+                
+    @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(PyTorchModelDriver, cls).get_testing_options()
+        out['kwargs']['weights'] = 'pytorch_model_weights.pth'
+        out['requires_partner'] = True
+        return out

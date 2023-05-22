@@ -445,6 +445,7 @@ LANG2EXT = {
     'matlab': '.m',
     'osr': '.xml',
     'python': '.py',
+    'pytorch': '.py',
     'r': '.R',
     'sbml': '.xml',
     'yaml': '.yml',
