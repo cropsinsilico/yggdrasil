@@ -62,6 +62,12 @@ class PILFileBase(DedicatedFileBase):
             bool: Is the comm installed.
 
         """
+        # import sys
+        # if ((sys.version_info[0] == 3 and sys.version_info[1] <= 6
+        #      and cls._filetype == 'eps')):
+        #     return False
+        if cls._filetype == 'eps':
+            return False
         return (language == 'python') and (Image is not None)
 
     def _dedicated_open(self, address, mode):
