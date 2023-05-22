@@ -15,6 +15,10 @@
     "biopython",
     "pysam; platform_system != 'Windows'"
   ],
+  "pytorch": [
+    "torch",
+    "torchvision"
+  ],
   "excel": [
     "openpyxl",
     "pandas"

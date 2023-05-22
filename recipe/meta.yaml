@@ -219,7 +219,8 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - pytorch
+        - pytorch  # [not win]
+        - torchvision  # [not win]
   - name: yggdrasil.excel
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

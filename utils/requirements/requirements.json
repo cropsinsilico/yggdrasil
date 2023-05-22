@@ -500,15 +500,38 @@
       "description": "Dependencies required to run PyTorch models as part of yggdrasil integrations",
       "requirements": [
         {
+          "name": "torchvision",
+          "options": [
+            {
+              "name": "torchvision",
+              "method": "pip"
+            },
+            {
+              "name": "torchvision",
+              "method": "conda",
+              "os": "unix"
+            },
+            {
+              "method": "conda_skip",
+              "os": "win"
+            }
+          ]
+        },
+        {
           "name": "pytorch",
           "options": [
             {
-              "name": "pytorch",
-              "method": "conda"
-            },
-            {
               "name": "torch",
               "method": "pip"
+            },
+            {
+              "name": "pytorch",
+              "method": "conda",
+              "os": "unix"
+            },
+            {
+              "method": "conda_skip",
+              "os": "win"
             }
           ]
         }

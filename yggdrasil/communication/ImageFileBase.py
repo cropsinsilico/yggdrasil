@@ -82,8 +82,12 @@ class PILFileBase(DedicatedFileBase):
             raise IOError("File address not set")
         with Image.open(self._external_fd, formats=[self._filetype],
                         **self.params) as im:
-            self.info(f"_dedicated_recv: Before asarray {im}")
-            out = np.array(im)
+            self.info(f"_dedicated_recv: Before asarray {im.getdata()}")
+            try:
+                out = np.asarray(im)
+            except SystemError:
+                out = np.array(im.getdata()).reshape(
+                    im.size[0], im.size[1], 3)
             self.info(f"_dedicated_recv: After asarray {out}")
         return out
 
