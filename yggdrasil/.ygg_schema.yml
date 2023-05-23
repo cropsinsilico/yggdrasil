@@ -1134,6 +1134,7 @@ definitions:
         type: string
       sheets:
         allowSingular: true
+        default: []
         description: Name(s) of one more more sheets that should be read/written.
           If not provided during read, all sheets will be read.
         items:
@@ -1413,6 +1414,7 @@ definitions:
         type: string
       sheets:
         allowSingular: true
+        default: []
         description: Name(s) of one more more sheets that should be read/written.
           If not provided during read, all sheets will be read.
         items:

@@ -20,7 +20,7 @@ class ExcelFileComm(DedicatedFileBase):
     _schema_subtype_description = ('The file is read/written as Excel')
     _schema_properties = {
         'sheets': {
-            'type': 'array',
+            'type': 'array', 'default': [],
             'items': {'type': 'string'},
             'allowSingular': True,
             'description': (
