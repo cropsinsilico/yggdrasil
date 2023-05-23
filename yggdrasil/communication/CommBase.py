@@ -1498,7 +1498,7 @@ class CommBase(tools.YggClass):
         """
         if not self.transform:
             return msg_in
-        self.debug(f"Applying transformations to message being {self.direction}.")
+        self.debug(f"Applying transformations to message during {self.direction}.")
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
         if (((self.direction == 'recv') and self.serializer.initialized

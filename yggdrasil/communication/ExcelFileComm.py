@@ -98,6 +98,9 @@ class ExcelFileComm(DedicatedFileBase):
             bool: Is the comm installed.
 
         """
+        import sys
+        if sys.version_info[0] == 3 and sys.version_info[1] <= 6:
+            return False
         return (language == 'python') and (openpyxl is not None)
 
     @property
