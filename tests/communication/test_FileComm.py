@@ -259,6 +259,38 @@ class TestFileComm_readline(TestFileComm):
             *args, **kwargs)
 
 
+class TestSeqFile_piecemeal(TestFileComm):
+    r"""Test for piecemeal communication with sequence data types."""
+
+    parametrize_filetype = ['fasta', 'fastq']
+    
+    @pytest.fixture(scope="class", autouse=True)
+    def options(self, request):
+        r"""Arguments that should be provided when getting testing options."""
+        return {'piecemeal': True}
+
+
+class TestExcelFile_sheets(TestFileComm):
+    r"""Test for excel file communication with sheets/columns."""
+    
+    parametrize_filetype = ['excel']
+    
+    @pytest.fixture(scope="class", autouse=True)
+    def options(self, request):
+        r"""Arguments that should be provided when getting testing options."""
+        return {'sheets': ['Sheet1'], 'columns': ['name', 'count']}
+    
+    @pytest.fixture(scope="class")
+    def map_sent2recv(self, testing_options):
+        r"""Factory for method to convert sent messages to received."""
+        def wrapped_map_sent2recv(obj):
+            if isinstance(obj, dict):
+                return {name: obj[name] for name in
+                        testing_options['kwargs']['columns']}
+            return obj[testing_options['kwargs']['columns']]
+        return wrapped_map_sent2recv
+
+
 @pytest.mark.parametrize(
     'src_type,src_ext,src_contents,dst_type,dst_ext,dst_contents', [
         ('table', '',

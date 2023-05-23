@@ -420,12 +420,15 @@ class ComponentMeta(type):
                     ("default", default_subtype),
                     ("base", cls._schema_base_class),
                     ("key", cls._schema_subtype_key),
-                    ("subtypes", {})])
+                    ("subtypes", {}),
+                    ("subtype_modules", {})])
             elif default_subtype is not None:
                 assert _registry[yaml_typ]["default"] == default_subtype
             if cls.__name__ not in _registry[yaml_typ]["classes"]:
                 _registry[yaml_typ]["classes"][cls.__name__] = cls
                 _registry[yaml_typ]["subtypes"][subtype] = cls.__name__
+                _registry[yaml_typ]["subtype_modules"][subtype] = (
+                    cls.__module__.split('.')[-1])
             if not registration_in_progress():
                 cls.after_registration(cls)
                 cls.finalize_registration(cls)

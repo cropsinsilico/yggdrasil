@@ -7,7 +7,7 @@ from yggdrasil.components import import_component
 from yggdrasil.communication.DedicatedFileBase import DedicatedFileBase
 try:
     import openpyxl
-except ImportError:
+except ImportError:  # pragma: debug
     openpyxl = None
     warnings.warn("openpyxl not installed so reading of excel files will"
                   " be disabled.")
@@ -62,13 +62,20 @@ class ExcelFileComm(DedicatedFileBase):
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('direction', 'send') == 'send':
-            transform = 'pandas'
             kwargs['serializer'] = {'seritype': 'pandas'}
         else:
-            transform = 'array'
             kwargs['serializer'] = {
                 'seritype': 'table', 'as_array': True}
         super(ExcelFileComm, self).__init__(*args, **kwargs)
+
+    def _init_before_open(self, **kwargs):
+        r"""Initialization steps that should be performed after base
+        class, but before the comm is opened."""
+        out = super(ExcelFileComm, self)._init_before_open(**kwargs)
+        if self.direction == 'send':
+            transform = 'pandas'
+        else:
+            transform = 'array'
         if self.direction == 'send' and not (self.sheets
                                              or self.sheet_template):
             self.sheet_template = 'Sheet%d'
@@ -80,7 +87,7 @@ class ExcelFileComm(DedicatedFileBase):
             self._remaining_sheets.append(self.sheet_template)
         self._processed_sheets = []
         self._cached_sheets = {}
-        # self.read_meth = 'readline'
+        return out
 
     @classmethod
     def is_installed(cls, language=None):
@@ -114,6 +121,25 @@ class ExcelFileComm(DedicatedFileBase):
                 len(self._processed_sheets) + 1)
         return None
 
+    def advance_in_series(self, series_index=None):
+        r"""Advance to a certain file in a series.
+
+        Args:
+            series_index (int, optional): Index of file in the series that
+                should be moved to. Defaults to None and call will advance to
+                the next file in the series.
+
+        Returns:
+            bool: True if the file was advanced in the series, False otherwise.
+
+        """
+        advanced = super(ExcelFileComm, self).advance_in_series(
+            series_index=series_index)
+        if advanced:
+            self._remaining_sheets = copy.deepcopy(self.sheets)
+            self._processed_sheets = []
+        return advanced
+        
     def pop_current_sheet(self):
         r"""Remove the current sheet from the list of remaining
         sheets."""
@@ -132,26 +158,6 @@ class ExcelFileComm(DedicatedFileBase):
         info."""
         self.header_was_written = True
 
-    # def record_position(self):
-    #     r"""Record the current position in the file/series."""
-    #     out = list(super(ExcelFileComm, self).record_position())
-    #     out.append(len(self._processed_sheets))
-    #     return tuple(out)
-
-    # def change_position(self, file_pos, series_index=None,
-    #                     header_was_read=None, header_was_written=None,
-    #                     processed_sheets=0):
-    #     r"""Change the position in the file/series."""
-    #     super(ExcelFileComm, self).change_position(
-    #         file_pos, series_index=series_index,
-    #         header_was_read=header_was_read,
-    #         header_was_written=header_was_written)
-    #     allsheets = self._processed_sheets + self._remaining_sheets
-    #     if processed_sheets is not None:
-    #         idx = min(len(allsheets), processed_sheets)
-    #         self._processed_sheets = allsheets[:idx]
-    #         self._remaining_sheets = allsheets[idx:]
-        
     @property
     def file_size(self):
         r"""int: Current size of file."""
@@ -168,10 +174,7 @@ class ExcelFileComm(DedicatedFileBase):
     @property
     def _file_size_recv(self):
         r"""int: Current size of file."""
-        out = super(ExcelFileComm, self).file_size
-        if self.direction == 'recv':
-            return len(self._processed_sheets)
-        return out
+        return len(self._processed_sheets)
 
     def file_seek(self, *args, **kwargs):
         r"""Move in the file to the specified position."""
@@ -180,8 +183,6 @@ class ExcelFileComm(DedicatedFileBase):
             allsheets = self._processed_sheets + self._remaining_sheets
             allsheets[:self._last_size]
             allsheets[self._last_size:]
-            # self._processed_sheets[:self._last_size]
-            # self._remaining_sheets[self._last_size:]
         
     def _dedicated_open(self, address, mode):
         self._external_fd = address
@@ -226,10 +227,6 @@ class ExcelFileComm(DedicatedFileBase):
             if isinstance(out, dict):
                 self._cached_sheets = out
                 if not self.sheets:
-                    # self._processed_sheets = []
-                    # self._remaining_sheets = list(out.keys())
-                    # Do this instead if recv in append mode should only
-                    # read new sheets
                     self._remaining_sheets = [
                         k for k in out.keys() if k not in
                         self._processed_sheets]
@@ -243,9 +240,14 @@ class ExcelFileComm(DedicatedFileBase):
         return out
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, sheets=None, columns=None):
         r"""Method to return a dictionary of testing options for this
         class.
+
+        Args:
+            sheets (list, optional): Sheet names that should be specified.
+            columns (list, optional): Column names that should be
+                specified.
 
         Returns:
             dict: Dictionary of variables to use for testing. Items:
@@ -265,5 +267,12 @@ class ExcelFileComm(DedicatedFileBase):
                    exact_contents=False)
         out.setdefault('kwargs', {})
         out['kwargs']['str_as_bytes'] = True
+        if sheets:
+            out['kwargs']['sheets'] = sheets
+        if columns:
+            out['recv'] = [x[columns] for x in out['recv']]
+            out['recv_partial'] = [
+                [x[columns] for x in y] for y in out['recv_partial']]
+            out['kwargs']['columns'] = columns
         return out
             

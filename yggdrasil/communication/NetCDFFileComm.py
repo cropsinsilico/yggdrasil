@@ -2,9 +2,8 @@ import sys
 import pprint
 import numpy as np
 try:
-    from scipy.io import _netcdf
-    from scipy.io import netcdf_file
-    REVERSE = _netcdf.REVERSE
+    from scipy.io import _netcdf, netcdf_file
+    REVERSE = _netcdf.REVERSE  # pragma: debug
 except ImportError:
     from scipy.io import netcdf
     REVERSE = netcdf.REVERSE

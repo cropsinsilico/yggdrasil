@@ -4,7 +4,7 @@ from yggdrasil.components import create_component_class
 from yggdrasil.communication.DedicatedFileBase import DedicatedFileBase
 try:
     from PIL import Image
-except ImportError:
+except ImportError:  # pragma: debug
     Image = None
     warnings.warn("Pillow not installed. I/O of image files will be "
                   "disabled.")
@@ -31,12 +31,6 @@ class PILFileBase(DedicatedFileBase):
     }
     _test_parameters = None
     _greyscale = False
-
-    def __init__(self, *args, **kwargs):
-        if Image is None:
-            raise ImportError("Pillow is not installed. I/O of image "
-                              "files is disabled.")
-        super(PILFileBase, self).__init__(*args, **kwargs)
 
     @staticmethod
     def before_registration(cls):
@@ -92,7 +86,7 @@ class PILFileBase(DedicatedFileBase):
             self.info(f"_dedicated_recv: Before asarray {im.getdata()}")
             try:
                 out = np.asarray(im)
-            except SystemError:
+            except SystemError:  # pragma: debug
                 out = np.array(im.getdata()).reshape(
                     im.size[0], im.size[1], 3)
             self.info(f"_dedicated_recv: After asarray {out}")

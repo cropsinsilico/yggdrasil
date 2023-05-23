@@ -124,9 +124,8 @@ class PyTorchModelDriver(DSLModelDriver):
             if output_transform:
                 output = output_transform(output)
             if len(output_vars) == 1:
-                output = {output_vars[0]: output}
-            else:
-                output = {k: v for k, v in zip(output_vars, output)}
+                output = [output]
+            output = {k: v for k, v in zip(output_vars, output)}
             for k, v in output_map.items():
                 iout = {ik: output[ik] for ik in v['vars']}
                 flag = v['comm'].send_dict(iout, key_order=v['vars'])

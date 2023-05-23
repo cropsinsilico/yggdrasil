@@ -6,7 +6,7 @@ try:
     from Bio import SeqIO, SeqFeature
     from Bio.SeqRecord import SeqRecord
     from Bio.Seq import Seq
-except ImportError:
+except ImportError:  # pragma: debug
     SeqIO = None
     SeqFeature = None
     SeqRecord = None
@@ -90,7 +90,7 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
         assert self.fd and self.direction == 'recv'
         if self._records_iterator is None:
             if self.record_ids:
-                index = SeqIO.index(self.fd, self._filetype)
+                index = SeqIO.index(self.current_address, self._filetype)
                 self._records_iterator = map(
                     lambda x: index[x], self.record_ids)
             else:
@@ -98,46 +98,46 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
                                                      self._filetype)
         return self._records_iterator
 
-    def ref2dict(self, x):
-        r"""Convert a Reference object to a dictionary."""
-        out = {}
-        for k in ['authors', 'title', 'journal', 'medline_id',
-                  'pubmed_id', 'comment']:
-            out[k] = getattr(x, k)
-        out['location'] = [self.loc2dict(y) for y in x.location]
-        return out
+    # def ref2dict(self, x):
+    #     r"""Convert a Reference object to a dictionary."""
+    #     out = {}
+    #     for k in ['authors', 'title', 'journal', 'medline_id',
+    #               'pubmed_id', 'comment']:
+    #         out[k] = getattr(x, k)
+    #     out['location'] = [self.loc2dict(y) for y in x.location]
+    #     return out
 
-    def dict2ref(self, x):
-        r"""Convert a dictionary to a Reference object."""
-        x['location'] = [self.dict2loc(y) for y in x.get('location', [])]
-        out = SeqFeature.Reference()
-        for k, v in x.items():
-            setattr(out, k, v)
-        return out
+    # def dict2ref(self, x):
+    #     r"""Convert a dictionary to a Reference object."""
+    #     x['location'] = [self.dict2loc(y) for y in x.get('location', [])]
+    #     out = SeqFeature.Reference()
+    #     for k, v in x.items():
+    #         setattr(out, k, v)
+    #     return out
 
-    def loc2dict(self, x):
-        r"""Convert a FeatureLocation object to a dictionary."""
-        out = {}
-        for k in ['start', 'end', 'strand', 'ref', 'ref_db']:
-            out[k] = getattr(x, k)
-        return out
+    # def loc2dict(self, x):
+    #     r"""Convert a FeatureLocation object to a dictionary."""
+    #     out = {}
+    #     for k in ['start', 'end', 'strand', 'ref', 'ref_db']:
+    #         out[k] = getattr(x, k)
+    #     return out
 
-    def dict2loc(self, x):
-        r"""Convert a dictionary to a FeatureLocation."""
-        return SeqFeature.FeatureLocation(**x)
+    # def dict2loc(self, x):
+    #     r"""Convert a dictionary to a FeatureLocation."""
+    #     return SeqFeature.FeatureLocation(**x)
 
-    def feature2dict(self, x):
-        r"""Convert a Feature to a dictionary."""
-        out = {'location': self.loc2dict(x.location)}
-        for k in ['type', 'location_operator', 'id', 'qualifiers']:
-            out[k] = getattr(x, k)
-        return out
+    # def feature2dict(self, x):
+    #     r"""Convert a Feature to a dictionary."""
+    #     out = {'location': self.loc2dict(x.location)}
+    #     for k in ['type', 'location_operator', 'id', 'qualifiers']:
+    #         out[k] = getattr(x, k)
+    #     return out
 
-    def dict2feature(self, x):
-        r"""Convert a dictionary to a Feature."""
-        if x.get('location', False):
-            x['location'] = self.dict2loc(x['location'])
-        return SeqFeature.SeqFeature(**x)
+    # def dict2feature(self, x):
+    #     r"""Convert a dictionary to a Feature."""
+    #     if x.get('location', False):
+    #         x['location'] = self.dict2loc(x['location'])
+    #     return SeqFeature.SeqFeature(**x)
 
     def record2dict(self, x):
         r"""Convert a SeqRecord to a dictionary."""
@@ -196,9 +196,13 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
         return out
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, piecemeal=False):
         r"""Method to return a dictionary of testing options for this
         class.
+
+        Args:
+            piecemeal (bool, optional): If True, the test data will be
+                piecemeal.
 
         Returns:
             dict: Dictionary of variables to use for testing. Items:
@@ -239,7 +243,8 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
             data['letter_annotations'] = {
                 'phred_quality': list(range(len(data['seq'])))
             }
-        data = [data]
+        if not piecemeal:
+            data = [data]
         out = {'kwargs': {},
                'exact_contents': False,
                'msg': data,
@@ -250,6 +255,9 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
                'recv_partial': [[data]]}
         if cls._test_parameters:
             out.update(cls._test_parameters)
+        if piecemeal:
+            out['recv_kwargs'] = {'piecemeal': True,
+                                  'record_ids': ['YP_025292.1']}
         return out
 
 
