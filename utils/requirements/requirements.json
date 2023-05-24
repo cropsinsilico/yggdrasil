@@ -482,7 +482,11 @@
     "images": {
       "description": "Dependencies required to perform I/O on common image files.",
       "requirements": [
-        "pillow"
+        "pillow",
+        {
+          "name": "ghostscript",
+          "method": "conda"
+        }
       ]
     },
     "seq": {

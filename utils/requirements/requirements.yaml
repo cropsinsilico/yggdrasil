@@ -275,6 +275,8 @@ extras:
     description: Dependencies required to perform I/O on common image files.
     requirements:
     - pillow
+    - name: ghostscript
+      method: conda
   seq:
     description: Dependencies required to handle sequence (nucleotide/protein) I/O
     requirements:

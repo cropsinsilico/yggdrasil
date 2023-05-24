@@ -838,8 +838,10 @@ definitions:
       - $ref: '#/definitions/file-subtype-ascii'
       - $ref: '#/definitions/file-subtype-map'
       - $ref: '#/definitions/file-subtype-table'
+      - $ref: '#/definitions/file-subtype-bam'
       - $ref: '#/definitions/file-subtype-bmp'
       - $ref: '#/definitions/file-subtype-cabo'
+      - $ref: '#/definitions/file-subtype-cram'
       - $ref: '#/definitions/file-subtype-eps'
       - $ref: '#/definitions/file-subtype-excel'
       - $ref: '#/definitions/file-subtype-fasta'
@@ -854,6 +856,7 @@ definitions:
       - $ref: '#/definitions/file-subtype-pandas'
       - $ref: '#/definitions/file-subtype-pickle'
       - $ref: '#/definitions/file-subtype-ply'
+      - $ref: '#/definitions/file-subtype-sam'
       - $ref: '#/definitions/file-subtype-tiff'
       - $ref: '#/definitions/file-subtype-yaml'
     description: Schema for file components.
@@ -901,6 +904,59 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.AsciiFileComm.AsciiFileComm
+    type: object
+  file-subtype-bam:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['bam'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: bam
+        description: bam sequence I/O
+        enum:
+        - bam
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.BAMFileComm
     type: object
   file-subtype-base:
     additionalProperties: false
@@ -1016,9 +1072,11 @@ definitions:
         description: The type of file that will be read from or written to.
         enum:
         - ascii
+        - bam
         - binary
         - bmp
         - cabo
+        - cram
         - eps
         - excel
         - fasta
@@ -1034,6 +1092,7 @@ definitions:
         - pickle
         - ply
         - png
+        - sam
         - table
         - tiff
         - yaml
@@ -1042,6 +1101,10 @@ definitions:
         $ref: '#/definitions/filter'
         description: Filter that will be used to determine when messages should be
           sent/received. Ignored if not provided.
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
       for_service:
         default: false
         description: If True, this comm bridges the gap to an integration running
@@ -1051,6 +1114,10 @@ definitions:
         description: String that should be used to format/parse messages. Default
           to None.
         type: string
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing.
+        type: object
       in_temp:
         default: false
         description: If True, the path will be considered relative to the platform
@@ -1063,6 +1130,10 @@ definitions:
         type:
         - string
         - int
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention.
+        type: string
       is_series:
         default: false
         description: If True, input/output will be done to a series of files. If reading,
@@ -1120,6 +1191,22 @@ definitions:
         type: string
       record_ids:
         description: IDs of records to read/write. Other records will be ignored.
+        type: array
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
         type: array
       serializer:
         allOf:
@@ -1344,6 +1431,59 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.CABOFileComm.CABOFileComm
+    type: object
+  file-subtype-cram:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['cram'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: cram
+        description: cram sequence I/O
+        enum:
+        - cram
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.CRAMFileComm
     type: object
   file-subtype-eps:
     additionalProperties: true
@@ -1977,6 +2117,59 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.ImageFileBase.PNGFileComm
+    type: object
+  file-subtype-sam:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['sam'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: sam
+        description: sam sequence I/O
+        enum:
+        - sam
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.SAMFileComm
     type: object
   file-subtype-table:
     additionalProperties: true

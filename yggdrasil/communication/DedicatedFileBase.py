@@ -10,11 +10,13 @@ class DedicatedFileBase(FileComm):
     _default_serializer = False
     _deprecated_drivers = []
     _stores_fd = False
+    _requires_refresh = False
 
     def __init__(self, *args, **kwargs):
         self._external_fd = None
         kwargs['read_meth'] = 'read'
         self._last_size = 0
+        self._last_file_size = 0
         return super(DedicatedFileBase, self).__init__(*args, **kwargs)
 
     @property
@@ -29,7 +31,17 @@ class DedicatedFileBase(FileComm):
         if self._stores_fd:
             return super(DedicatedFileBase, self).is_open
         return bool(self._external_fd)
-        
+
+    @property
+    def requires_refresh(self):
+        r"""bool: True if a refresh is necessary."""
+        return (
+            self.is_open
+            and ((self._external_fd is None)
+                 or (self.append
+                     or (self._requires_refresh
+                         and self._last_file_size < self.file_size))))
+    
     def serialize(self, obj, **kwargs):
         r"""Don't serialize for dedicated comms since using a serializer
         is inefficient."""
@@ -81,17 +93,19 @@ class DedicatedFileBase(FileComm):
                 self._external_fd.flush()
                 self._external_fd.sync()
 
-    def _file_open(self, address, mode):
+    def _file_open(self, address, mode, **kwargs):
         self._last_size = 0
         if ((((not os.path.isfile(address)) or (os.stat(address).st_size == 0))
              and (mode == 'r') and self._stores_fd)):
             # Cannot open an empty file for read
             return super(DedicatedFileBase, self)._file_open(address, mode)
-        return self._dedicated_open(address, mode)
+        out = self._dedicated_open(address, mode, **kwargs)
+        self._last_file_size = self.file_size
+        return out
 
-    def _file_close(self):
+    def _file_close(self, **kwargs):
         if self._external_fd is not None:
-            self._dedicated_close()
+            self._dedicated_close(**kwargs)
         super(DedicatedFileBase, self)._file_close()
 
     def _file_refresh(self):
@@ -110,7 +124,7 @@ class DedicatedFileBase(FileComm):
         return self.file_size
 
     def _file_recv(self):
-        if self.is_open and ((self._external_fd is None) or self.append):
+        if self.requires_refresh:
             self._file_refresh()
         if self.file_size > self._last_size:
             out = self._dedicated_recv()
@@ -122,7 +136,7 @@ class DedicatedFileBase(FileComm):
     @property
     def remaining_bytes(self):
         r"""int: Remaining bytes in the file."""
-        if self.is_open and ((self._external_fd is None) or self.append):
+        if self.requires_refresh:
             self._file_refresh()
         return super(DedicatedFileBase, self).remaining_bytes
 

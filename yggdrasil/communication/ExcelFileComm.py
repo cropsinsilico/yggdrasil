@@ -179,10 +179,11 @@ class ExcelFileComm(DedicatedFileBase):
     def file_seek(self, *args, **kwargs):
         r"""Move in the file to the specified position."""
         super(ExcelFileComm, self).file_seek(*args, **kwargs)
-        if self.direction == 'recv':
+        if ((self.direction == 'recv'
+             and self._last_size != len(self._processed_sheets))):
             allsheets = self._processed_sheets + self._remaining_sheets
-            allsheets[:self._last_size]
-            allsheets[self._last_size:]
+            self._processed_sheets = allsheets[:self._last_size]
+            self._remaining_sheets = allsheets[self._last_size:]
         
     def _dedicated_open(self, address, mode):
         self._external_fd = address

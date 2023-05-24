@@ -47,6 +47,7 @@ class TestFileOutputDriver(base_class):
         finally:
             if os.path.isfile(out):
                 os.remove(out)
+                ocomm_python_class.remove_companion_files(out)
 
     @pytest.fixture
     def recv_comm(self):
@@ -94,7 +95,7 @@ class TestFileOutputDriver(base_class):
         r"""str: Contents that should be read to the file."""
         if not testing_options.get('contents', None):
             contents = ocomm_python_class.get_test_contents(
-                testing_options['send'])
+                testing_options['send'], **testing_options['kwargs'])
             if testing_options.get('contents', False) is None:
                 return contents
             print(contents)

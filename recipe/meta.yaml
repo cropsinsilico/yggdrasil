@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.9.1" %}
+{% set version = "1.10.0" %}
 {% set PY_VER_MAJOR = PY_VER.split('.')[0] %}
 {% set PY_VER_MINOR = PY_VER.split('.')[1] %}
 
@@ -197,6 +197,7 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ghostscript
         - pillow
   - name: yggdrasil.seq
     build:

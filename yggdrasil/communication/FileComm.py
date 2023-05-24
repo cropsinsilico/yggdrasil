@@ -255,7 +255,7 @@ class FileComm(CommBase.CommBase):
         cls._commtype = cls._filetype
 
     @classmethod
-    def get_test_contents(cls, data):  # pragma: debug
+    def get_test_contents(cls, data, **kwargs):  # pragma: debug
         r"""Method for returning the serialized form of a set of test
         data.
 
@@ -269,7 +269,7 @@ class FileComm(CommBase.CommBase):
         fname = f'contents_{cls._filetype}{cls._extensions[0]}'
         assert not os.path.isfile(fname)
         try:
-            x = cls(fname, direction='send', append=True)
+            x = cls(fname, direction='send', append=True, **kwargs)
             for msg in data:
                 x.send(msg)
             x.close()
@@ -278,6 +278,7 @@ class FileComm(CommBase.CommBase):
         finally:
             if os.path.isfile(fname):
                 os.remove(fname)
+                cls.remove_companion_files(fname)
         return out
 
     @classmethod
@@ -462,6 +463,10 @@ class FileComm(CommBase.CommBase):
             self.file_seek(0, 0)
             self.file_seek(prev_pos)
         return out
+
+    def series_file_size(self, fname):
+        r"""int: Size of file in series."""
+        return os.path.getsize(fname)
 
     def file_tell(self):
         r"""int: Current position in the file."""
@@ -675,10 +680,23 @@ class FileComm(CommBase.CommBase):
                 if not os.path.isfile(address):
                     break
                 os.remove(address)
+                self.remove_companion_files(address)
                 i += 1
         else:
             if os.path.isfile(self.address):
                 os.remove(self.address)
+                self.remove_companion_files(self.address)
+
+    @classmethod
+    def remove_companion_files(cls, address):
+        r"""Remove companion files that are created when writing to a
+        file
+
+        Args:
+            address (str): Address for the filename.
+
+        """
+        pass
 
     @property
     def is_open(self):
@@ -719,7 +737,7 @@ class FileComm(CommBase.CommBase):
                     fname = self.get_series_address(i)
                     if not os.path.isfile(fname):
                         break
-                    out += os.path.getsize(fname)
+                    out += self.series_file_size(fname)
                     i += 1
             self.change_position(*pos)
         return out
@@ -845,7 +863,7 @@ class FileComm(CommBase.CommBase):
         except BaseException as e:  # pragma: debug
             # Use this to catch case where close called during receive.
             # In the future this should be handled via a lock.
-            self.info(f"Error during file receive: {type(e)}({e})")
+            self.debug(f"Error during file receive: {type(e)}({e})")
             out = ''
         if len(out) == 0:
             if self.advance_in_series():
