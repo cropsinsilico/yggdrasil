@@ -193,7 +193,7 @@ class SerializeBase(tools.YggClass):
     @classmethod
     def get_testing_options(cls, table_example=False, array_columns=False,
                             include_oldkws=False, table_string_type='bytes',
-                            no_names=False, no_units=False):
+                            no_names=False, no_units=False, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Arguments:

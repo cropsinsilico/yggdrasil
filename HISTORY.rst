@@ -8,6 +8,7 @@ History
 * Added support for running trained PyTorch models as part of integrations
 * Added support for connecting integrations to sequence files in FASTA and FASTQ formats via BioPython
 * Added support for connecting integrations to sequence files in SAM, BAM and CRAM formats via pysam
+* Added support for connecting integrations to sequence files in BCF and VCF formats via pysam
 * Added support for connecting integrations to JPEG, PNG, EPS, BMP, GIF and TIFF formats via Pillow
 * Added support for connecting integrations to Excel files via Pandas
 * Refactor serialization in preparation of moving communication into C++

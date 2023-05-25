@@ -154,7 +154,7 @@ class DedicatedFileBase(FileComm):
         raise NotImplementedError("Must be overriden by the base class.")
 
     @classmethod
-    def get_testing_options(cls):  # pragma: debug
+    def get_testing_options(cls, **kwargs):  # pragma: debug
         r"""Method to return a dictionary of testing options for this
         class.
 

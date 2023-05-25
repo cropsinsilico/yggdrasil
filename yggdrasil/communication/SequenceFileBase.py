@@ -198,7 +198,7 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
         return out
 
     @classmethod
-    def get_testing_options(cls, piecemeal=False):
+    def get_testing_options(cls, piecemeal=False, **kwargs):
         r"""Method to return a dictionary of testing options for this
         class.
 
@@ -270,7 +270,8 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         'header': {
             'type': 'object',
             'description': ('Header defining sequence identifiers. A '
-                            'header is required for writing.')
+                            'header is required for writing SAM, BAM, '
+                            'and CRAM files.')
         },
         'flush_on_write': {
             'type': 'boolean', 'default': False,
@@ -296,21 +297,28 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         'index': {
             'type': 'string',
             'description': ('Path to file containing index if different '
-                            'from the standard naming convention.')
+                            'from the standard naming convention for '
+                            'BAM and CRAM files.')
         }
     }
     _sequence_types = {
         'sam': '.sam',
         'bam': '.bam',
         'cram': '.cram',
-        # 'bcf': '.bcf',
-        # 'vcf': '.vcf',
+        'bcf': '.bcf',
+        'vcf': '.vcf',
     }
-    _data_fields = [
+    _sam_header_fields = []
+    _vcf_header_fields = [
+        'version', 'contigs', 'filters', 'formats', 'info', 'samples']
+    _sam_data_fields = [
         'query_name', 'query_sequence', 'flag', 'reference_id',
         'reference_start', 'mapping_quality', 'cigar',
         'next_reference_id', 'next_reference_start', 'template_length',
         'query_qualities', 'tags']
+    _vcf_data_fields = [
+        'contig', 'start', 'stop', 'alleles', 'id', 'qual', 'filter',
+        'info', 'samples']
     _stores_fd = False
     _requires_refresh = True
     concats_as_str = True
@@ -439,6 +447,10 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         return (cls._filetype in ['bam', 'cram'])
 
     @classmethod
+    def _is_sam_based(cls):
+        return (cls._filetype in ['sam', 'bam', 'cram'])
+
+    @classmethod
     def index_filename(cls, address):
         r"""Get the name of the index file."""
         if cls._filetype == 'bam':
@@ -483,7 +495,7 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         fname = address
         cls = self._file_class()
         if self.direction == 'send':
-            kws['header'] = self.header
+            kws['header'] = self.dict2header(self.header)
             if self.flush_on_write:
                 self._temp_address = os.path.join(
                     os.path.split(address)[0],
@@ -512,7 +524,8 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
                 self.current_region
             self._last_size = self.header_size
         else:
-            if self._has_index() and not in_flush:
+            if ((self._filetype in ['bam', 'cram', 'vcf', 'bcf']
+                 and not in_flush)):
                 self._flush_send()
             elif self.flush_on_write and not os.path.isfile(address):
                 shutil.copy2(self._temp_address, address)
@@ -521,11 +534,16 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
     @property
     def header_size(self):
         if self._header_size is None:
-            fname = 'head_'.join(os.path.split(self.current_address))
+            parts = os.path.split(self.current_address)
+            fname = os.path.join(parts[0], 'head_' + parts[1])
             try:
                 cls = self._file_class()
-                fd = cls(fname, self.open_mode.replace('r', 'w'),
-                         template=self._external_fd)
+                kws = {}
+                if self._is_sam_based():
+                    kws['template'] = self._external_fd
+                else:
+                    kws['header'] = self._external_fd.header
+                fd = cls(fname, self.open_mode.replace('r', 'w'), **kws)
                 fd.close()
                 self._header_size = os.stat(fname).st_size
             finally:
@@ -549,7 +567,7 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
             os.remove(self._temp_address)
 
     def _dedicated_send(self, msg):
-        msg = self.dict2region(msg)
+        msg = self.dict2region(msg, header=self._external_fd.header)
         self._external_fd.write(msg)
         if self.flush_on_write:
             self._flush_send()
@@ -559,54 +577,149 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         return self.region2dict(msg)
 
     @classmethod
+    def _data_fields(cls):
+        if cls._is_sam_based():
+            return cls._sam_data_fields
+        else:
+            return cls._vcf_data_fields
+
+    @classmethod
+    def _header_fields(cls):
+        if cls._is_sam_based():
+            return cls._sam_header_fields
+        else:
+            return cls._vcf_header_fields
+
+    @classmethod
+    def meta2dict(cls, x):
+        out = {}
+        for k in ['name', 'description', 'id', 'number', 'type']:
+            out[k] = getattr(x, k)
+        return out
+
+    @classmethod
     def region2dict(cls, x):
         out = {}
-        for k in cls._data_fields:
+        for k in cls._data_fields():
             out[k] = getattr(x, k)
-        out['query_qualities'] = pysam.array_to_qualitystring(
-            out['query_qualities'])
-        for k in ['cigar', 'tags']:
-            out[k] = [list(xx) for xx in out[k]]
+            if k in ['cigar', 'tags']:
+                out[k] = [list(xx) for xx in out[k]]
+            elif k in ['alleles']:
+                out[k] = list(out[k])
+            elif k in ['filter', 'info']:
+                out[k] = [kk for kk in out[k].keys()]
+            elif k in ['samples']:
+                out[k] = [{kkk: list(vvv) for kkk, vvv in vv.items()}
+                          for vv in out[k].values()]
+            if not out[k] and isinstance(out[k], (list, dict, tuple)):
+                del out[k]
+        if 'query_qualities' in out:
+            out['query_qualities'] = pysam.array_to_qualitystring(
+                out['query_qualities'])
         return out
 
     @classmethod
-    def dict2region(cls, x):
-        out = pysam.AlignedSegment()
-        for k in cls._data_fields:
-            if k in x:
-                if k == 'query_qualities':
-                    setattr(out, k, pysam.qualitystring_to_array(x[k]))
-                elif k in ['cigar', 'tags']:
-                    setattr(out, k, tuple(tuple(xx) for xx in x[k]))
-                else:
-                    setattr(out, k, x[k])
+    def dict2region(cls, x, header=None):
+        if cls._is_sam_based():
+            out = pysam.AlignedSegment()
+            for k in cls._data_fields():
+                if k in x:
+                    if k == 'query_qualities':
+                        setattr(out, k, pysam.qualitystring_to_array(x[k]))
+                    elif k in ['cigar', 'tags']:
+                        setattr(out, k, tuple(tuple(xx) for xx in x[k]))
+                    else:
+                        setattr(out, k, x[k])
+        else:
+            assert header is not None
+            out = header.new_record(**copy.deepcopy(x))
         return out
 
     @classmethod
-    def get_testing_options(cls):
+    def record2dict(cls, x):
+        out = dict(x)
+        out.pop('IDX', None)
+        if 'Description' in out:
+            out['Description'] = out['Description'].strip('"')
+        for k in ['length', 'assembly']:
+            out.pop(k, None)
+        return out
+
+    @classmethod
+    def header2dict(cls, x):
+        out = {}
+        if isinstance(x, dict):
+            return x
+        for k in cls._header_fields():
+            if k in ['version']:
+                out[k] = getattr(x, k)
+            elif k in ['contigs']:
+                out[k[:-1]] = {
+                    kk: cls.record2dict(vv.header_record)
+                    for kk, vv in getattr(x, k).items()}
+            elif k in ['filters', 'formats']:
+                out[k[:-1].upper()] = {
+                    kk: cls.record2dict(vv.record)
+                    for kk, vv in getattr(x, k).items()}
+            elif k in ['info']:
+                out[k.upper()] = {
+                    kk: cls.record2dict(vv.record)
+                    for kk, vv in getattr(x, k).items()}
+            elif k in ['samples']:
+                out[k] = list(getattr(x, k))
+            else:
+                out[k] = getattr(x, k)
+        return out
+
+    @classmethod
+    def dict2header(cls, x):
+        if cls._is_sam_based():
+            return x
+        out = pysam.VariantHeader()
+        for k, v in x.items():
+            if k in ['version']:
+                continue
+            elif k in ['samples']:
+                out.add_samples(*x[k])
+                continue
+            elif k in ['contig', 'FILTER', 'FORMAT', 'INFO']:
+                for kk, vv in v.items():
+                    out.add_meta(key=k, items=vv.items())
+        return out
+
+    @classmethod
+    def get_testing_options(cls, test_dir=None, **kwargs):
         r"""Method to return a dictionary of testing options for this
         class."""
-        a = pysam.AlignedSegment()
-        a.query_name = "read_28833_29006_6945"
-        a.query_sequence = "AGCTTAGCTAGCTACCTATATCTTGGTCTTGGCCG"
-        a.flag = 99
-        a.reference_id = 0
-        a.reference_start = 0  # 32
-        a.mapping_quality = 20
-        a.cigar = ((0, 10), (2, 1), (0, 25))
-        a.next_reference_id = -1
-        a.next_reference_start = -1
-        a.template_length = 167
-        a.query_qualities = pysam.qualitystring_to_array(
-            "<<<<<<<<<<<<<<<<<<<<<:<9/,&,22;;<<<")
-        a.tags = (("NM", 1),
-                  ("RG", "L1"))
+        if cls._is_sam_based():
+            a = pysam.AlignedSegment()
+            a.query_name = "read_28833_29006_6945"
+            a.query_sequence = "AGCTTAGCTAGCTACCTATATCTTGGTCTTGGCCG"
+            a.flag = 99
+            a.reference_id = 0
+            a.reference_start = 0  # 32
+            a.mapping_quality = 20
+            a.cigar = ((0, 10), (2, 1), (0, 25))
+            a.next_reference_id = -1
+            a.next_reference_start = -1
+            a.template_length = 167
+            a.query_qualities = pysam.qualitystring_to_array(
+                "<<<<<<<<<<<<<<<<<<<<<:<9/,&,22;;<<<")
+            a.tags = (("NM", 1),
+                      ("RG", "L1"))
+            header = {'HD': {'VN': '1.0'},
+                      'SQ': [{'LN': 1575, 'SN': 'chr1'},
+                             {'LN': 1584, 'SN': 'chr2'}],
+                      'RG': [{"ID": "L1",
+                              }]}
+        else:
+            assert test_dir is not None
+            fname = os.path.join(test_dir, 'data', 'example.vcf')
+            with pysam.VariantFile(fname, 'r') as fd:
+                a = next(fd.fetch())
+                header = a.header
+        header = cls.header2dict(header)
         data = cls.region2dict(a)
-        header = {'HD': {'VN': '1.0'},
-                  'SQ': [{'LN': 1575, 'SN': 'chr1'},
-                         {'LN': 1584, 'SN': 'chr2'}],
-                  'RG': [{"ID": "L1",
-                          }]}
         out = {
             'kwargs': {'header': header, 'flush_on_write': True},
             'exact_contents': False,

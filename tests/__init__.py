@@ -280,12 +280,18 @@ class TestComponentBase(TestClassBase):
     def options(self):
         r"""Arguments that should be provided when getting testing options."""
         return {}
-
+    
     @pytest.fixture(scope="class")
-    def testing_options(self, python_class, options):
+    def testdir(self):
+        r"""Test directory."""
+        return os.path.abspath(os.path.dirname(__file__))
+    
+    @pytest.fixture(scope="class")
+    def testing_options(self, python_class, options, testdir):
         r"""Testing options."""
         if 'explicit_testing_options' in options:
             return copy.deepcopy(options['explicit_testing_options'])
+        options['test_dir'] = testdir
         return python_class.get_testing_options(**options)
 
     @pytest.fixture

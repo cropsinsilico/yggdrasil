@@ -45,7 +45,7 @@ class StatementFilter(FilterBase):
             return safe_eval(self.statement, x=x.value)
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the filter class.
 
         Returns:

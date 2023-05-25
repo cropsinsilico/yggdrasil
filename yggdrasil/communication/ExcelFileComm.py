@@ -241,7 +241,7 @@ class ExcelFileComm(DedicatedFileBase):
         return out
 
     @classmethod
-    def get_testing_options(cls, sheets=None, columns=None):
+    def get_testing_options(cls, sheets=None, columns=None, **kwargs):
         r"""Method to return a dictionary of testing options for this
         class.
 

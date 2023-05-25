@@ -197,7 +197,7 @@ class ObjSerialize(PlySerialize):
         return ObjDict(super(PlySerialize, self).normalize(args))
         
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:

@@ -93,10 +93,12 @@ class TestConnectionDriver(base_class):
 
     @pytest.fixture(scope="class")
     def testing_options(self, python_class, options, is_output,
-                        icomm_python_class, ocomm_python_class):
+                        icomm_python_class, ocomm_python_class,
+                        testdir):
         r"""Testing options."""
         if 'explicit_testing_options' in options:
             return copy.deepcopy(options['explicit_testing_options'])
+        options['test_dir'] = testdir
         if is_output:
             out = ocomm_python_class.get_testing_options(**options)
         else:

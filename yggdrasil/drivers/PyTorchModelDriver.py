@@ -133,7 +133,7 @@ class PyTorchModelDriver(DSLModelDriver):
                     raise RuntimeError(f"Error sending to {k}")
                 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:

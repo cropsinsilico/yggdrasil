@@ -37,7 +37,7 @@ class FunctionFilter(FilterBase):
             return self.function(x.value)
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the filter class.
 
         Returns:

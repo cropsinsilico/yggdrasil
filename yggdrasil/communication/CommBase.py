@@ -858,7 +858,8 @@ class CommBase(tools.YggClass):
             self.filter = create_component('filter', **filter_kws)
 
     @classmethod
-    def get_testing_options(cls, serializer=None, **kwargs):
+    def get_testing_options(cls, serializer=None, test_dir=None,
+                            **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Args:

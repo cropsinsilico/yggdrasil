@@ -839,6 +839,7 @@ definitions:
       - $ref: '#/definitions/file-subtype-map'
       - $ref: '#/definitions/file-subtype-table'
       - $ref: '#/definitions/file-subtype-bam'
+      - $ref: '#/definitions/file-subtype-bcf'
       - $ref: '#/definitions/file-subtype-bmp'
       - $ref: '#/definitions/file-subtype-cabo'
       - $ref: '#/definitions/file-subtype-cram'
@@ -858,6 +859,7 @@ definitions:
       - $ref: '#/definitions/file-subtype-ply'
       - $ref: '#/definitions/file-subtype-sam'
       - $ref: '#/definitions/file-subtype-tiff'
+      - $ref: '#/definitions/file-subtype-vcf'
       - $ref: '#/definitions/file-subtype-yaml'
     description: Schema for file components.
     title: complete-file-filetype
@@ -928,11 +930,11 @@ definitions:
         type: boolean
       header:
         description: Header defining sequence identifiers. A header is required for
-          writing.
+          writing SAM, BAM, and CRAM files.
         type: object
       index:
         description: Path to file containing index if different from the standard
-          naming convention.
+          naming convention for BAM and CRAM files.
         type: string
       name:
         description: Name used for component in log messages.
@@ -1073,6 +1075,7 @@ definitions:
         enum:
         - ascii
         - bam
+        - bcf
         - binary
         - bmp
         - cabo
@@ -1095,6 +1098,7 @@ definitions:
         - sam
         - table
         - tiff
+        - vcf
         - yaml
         type: string
       filter:
@@ -1116,7 +1120,7 @@ definitions:
         type: string
       header:
         description: Header defining sequence identifiers. A header is required for
-          writing.
+          writing SAM, BAM, and CRAM files.
         type: object
       in_temp:
         default: false
@@ -1132,7 +1136,7 @@ definitions:
         - int
       index:
         description: Path to file containing index if different from the standard
-          naming convention.
+          naming convention for BAM and CRAM files.
         type: string
       is_series:
         default: false
@@ -1311,6 +1315,59 @@ definitions:
     - working_dir
     title: file_base
     type: object
+  file-subtype-bcf:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['bcf'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: bcf
+        description: bcf sequence I/O
+        enum:
+        - bcf
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.BCFFileComm
+    type: object
   file-subtype-binary:
     additionalProperties: true
     allowSingular: name
@@ -1455,11 +1512,11 @@ definitions:
         type: boolean
       header:
         description: Header defining sequence identifiers. A header is required for
-          writing.
+          writing SAM, BAM, and CRAM files.
         type: object
       index:
         description: Path to file containing index if different from the standard
-          naming convention.
+          naming convention for BAM and CRAM files.
         type: string
       name:
         description: Name used for component in log messages.
@@ -2141,11 +2198,11 @@ definitions:
         type: boolean
       header:
         description: Header defining sequence identifiers. A header is required for
-          writing.
+          writing SAM, BAM, and CRAM files.
         type: object
       index:
         description: Path to file containing index if different from the standard
-          naming convention.
+          naming convention for BAM and CRAM files.
         type: string
       name:
         description: Name used for component in log messages.
@@ -2257,6 +2314,59 @@ definitions:
     required:
     - filetype
     title: yggdrasil.communication.ImageFileBase.TIFFFileComm
+    type: object
+  file-subtype-vcf:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['vcf'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: vcf
+        description: vcf sequence I/O
+        enum:
+        - vcf
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.VCFFileComm
     type: object
   file-subtype-yaml:
     additionalProperties: true
