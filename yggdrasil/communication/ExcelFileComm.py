@@ -81,8 +81,6 @@ class ExcelFileComm(DedicatedFileBase):
             self.sheet_template = 'Sheet%d'
         self.transform.append(import_component('transform', transform)())
         self._remaining_sheets = copy.deepcopy(self.sheets)
-        if self._remaining_sheets is None:
-            self._remaining_sheets = []
         if self.sheet_template and self.direction == 'send':
             self._remaining_sheets.append(self.sheet_template)
         self._processed_sheets = []

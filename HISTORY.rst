@@ -2,7 +2,7 @@
 History
 =======
 
-1.10.0 (2023-05-25) Added support for PyTorch models, sequence files, image files, and Excel files
+1.10.0 (2023-05-31) Added support for PyTorch models, sequence files, image files, and Excel files
 -------------------
 
 * Added support for running trained PyTorch models as part of integrations

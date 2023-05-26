@@ -8,7 +8,7 @@ try:
     from Bio import SeqIO, SeqFeature
     from Bio.SeqRecord import SeqRecord
     from Bio.Seq import Seq
-except ImportError:  # pragma: no seq
+except ImportError:  # pragma: debug
     SeqIO = None
     SeqFeature = None
     SeqRecord = None
@@ -17,13 +17,13 @@ except ImportError:  # pragma: no seq
                   "able to read some sequence data types")
 try:
     import pysam
-except ImportError:  # pragma: no seq
+except ImportError:  # pragma: debug
     pysam = None
     warnings.warn("pysam is not installed so yggdrasil will not be "
                   "able to read some sequence data types")
 
 
-class SequenceFileBase(DedicatedFileBase):  # pragma: seq
+class SequenceFileBase(DedicatedFileBase):
     r"""Base class for nucleotide/protein sequence I/O."""
     
     _stores_fd = True
@@ -39,7 +39,7 @@ class SequenceFileBase(DedicatedFileBase):  # pragma: seq
         cls._schema_subtype_description = f'{cls._filetype} sequence I/O'
 
 
-class BioPythonFileBase(SequenceFileBase):  # pragma: seq
+class BioPythonFileBase(SequenceFileBase):
     r"""Base class for nucleotide/protein sequence I/O using biopython."""
 
     _schema_properties = {
@@ -263,7 +263,7 @@ class BioPythonFileBase(SequenceFileBase):  # pragma: seq
         return out
 
 
-class PySamFileBase(SequenceFileBase):  # pragma: seq
+class PySamFileBase(SequenceFileBase):
     r"""Base class for nucleotide/protein sequence I/O using pysam."""
 
     _schema_properties = {
@@ -328,7 +328,7 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         class, but before the comm is opened."""
         out = super(PySamFileBase, self)._init_before_open(**kwargs)
         if self.direction == 'recv' and not self.regions:
-            self.regions = []
+            self.regions = [{}]
         elif self.direction == 'send':
             self.regions = []
         self._remaining_regions = copy.deepcopy(self.regions)
@@ -453,26 +453,27 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
     @classmethod
     def index_filename(cls, address):
         r"""Get the name of the index file."""
+        out = None
         if cls._filetype == 'bam':
-            return address + '.bai'
+            out = address + '.bai'
         elif cls._filetype == 'cram':
-            return address + '.crai'
-        return None
+            out = address + '.crai'
+        return out
 
     def create_index(self, address, overwrite=False):
         r"""Create an index file to accompany the file begin written/read
         if one is required."""
         index = self.index_filename(address)
-        if not (index and os.path.isfile(address)):
-            return
-        index = address + '.bai'
-        if overwrite or self._index_created or not os.path.isfile(index):
-            pysam.index(address)
-            self._index_created = True
-            if os.path.isfile(index):
-                shutil.copystat(address, index)
-            else:
-                return None
+        if index and os.path.isfile(address):
+            index = address + '.bai'
+            if ((overwrite or self._index_created
+                 or not os.path.isfile(index))):
+                pysam.index(address)
+                self._index_created = True
+                if os.path.isfile(index):
+                    shutil.copystat(address, index)
+                else:
+                    return None
         return index
 
     @classmethod
@@ -512,11 +513,7 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         self._external_fd = cls(fname, mode, **kws)
         if self.direction == 'recv':
             processed_iters = self._processed_iters
-            allsheets = []
-            if self.regions:
-                allsheets = self.regions
-            else:
-                allsheets = [{}]
+            allsheets = copy.deepcopy(self.regions)
             self._processed_iters = 0
             self._remaining_regions = [
                 k for k in allsheets if k not in self._processed_regions]
@@ -585,17 +582,8 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
 
     @classmethod
     def _header_fields(cls):
-        if cls._is_sam_based():
-            return cls._sam_header_fields
-        else:
-            return cls._vcf_header_fields
-
-    @classmethod
-    def meta2dict(cls, x):
-        out = {}
-        for k in ['name', 'description', 'id', 'number', 'type']:
-            out[k] = getattr(x, k)
-        return out
+        assert not cls._is_sam_based()
+        return cls._vcf_header_fields
 
     @classmethod
     def region2dict(cls, x):
@@ -651,24 +639,21 @@ class PySamFileBase(SequenceFileBase):  # pragma: seq
         if isinstance(x, dict):
             return x
         for k in cls._header_fields():
-            if k in ['version']:
-                out[k] = getattr(x, k)
-            elif k in ['contigs']:
+            out[k] = getattr(x, k)
+            if k in ['contigs']:
                 out[k[:-1]] = {
                     kk: cls.record2dict(vv.header_record)
-                    for kk, vv in getattr(x, k).items()}
+                    for kk, vv in out[k].items()}
             elif k in ['filters', 'formats']:
                 out[k[:-1].upper()] = {
                     kk: cls.record2dict(vv.record)
-                    for kk, vv in getattr(x, k).items()}
+                    for kk, vv in out[k].items()}
             elif k in ['info']:
                 out[k.upper()] = {
                     kk: cls.record2dict(vv.record)
-                    for kk, vv in getattr(x, k).items()}
+                    for kk, vv in out[k].items()}
             elif k in ['samples']:
-                out[k] = list(getattr(x, k))
-            else:
-                out[k] = getattr(x, k)
+                out[k] = list(out[k])
         return out
 
     @classmethod
