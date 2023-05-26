@@ -46,6 +46,7 @@ include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux
 include yggdrasil/tests/scripts/Makefile_windows
+include yggdrasil/tests/data/example.vcf
 graft docs
 include versioneer.py
 include yggdrasil/_version.py
