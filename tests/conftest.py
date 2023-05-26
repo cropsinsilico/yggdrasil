@@ -622,10 +622,16 @@ def languages():
 
 
 @pytest.fixture(scope="session")
-def scripts():
+def testdir():
+    r"""Test directory."""
+    return os.path.dirname(__file__)
+
+
+@pytest.fixture(scope="session")
+def scripts(test_dir):
     r"""Dictionary of test scripts for each language."""
     from yggdrasil import tools
-    script_dir = os.path.join(os.path.dirname(__file__), 'scripts')
+    script_dir = os.path.join(test_dir, 'scripts')
     script_list = [
         ('c', ['gcc_model.c', 'hellofunc.c']),
         ('c++', ['gcc_model.cpp', 'hellofunc.c']),
@@ -666,9 +672,9 @@ def scripts():
 
 
 @pytest.fixture(scope="session")
-def yamls():
+def yamls(test_dir):
     r"""Dictionary of test YAMLs for each language."""
-    yaml_dir = os.path.join(os.path.dirname(__file__), 'yamls')
+    yaml_dir = os.path.join(test_dir, 'yamls')
     yaml_list = [
         ('c', 'gcc_model.yml'),
         ('cpp', 'gpp_model.yml'),
