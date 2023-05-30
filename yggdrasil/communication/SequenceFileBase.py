@@ -643,15 +643,15 @@ class PySamFileBase(SequenceFileBase):
             if k in ['contigs']:
                 out[k[:-1]] = {
                     kk: cls.record2dict(vv.header_record)
-                    for kk, vv in out[k].items()}
+                    for kk, vv in out.pop(k).items()}
             elif k in ['filters', 'formats']:
                 out[k[:-1].upper()] = {
                     kk: cls.record2dict(vv.record)
-                    for kk, vv in out[k].items()}
+                    for kk, vv in out.pop(k).items()}
             elif k in ['info']:
                 out[k.upper()] = {
                     kk: cls.record2dict(vv.record)
-                    for kk, vv in out[k].items()}
+                    for kk, vv in out.pop(k).items()}
             elif k in ['samples']:
                 out[k] = list(out[k])
         return out
