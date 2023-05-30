@@ -3,7 +3,7 @@ import copy
 import tempfile
 from yggdrasil import platform, tools, constants, serialize
 from yggdrasil.communication import CommBase, AddressError
-from yggdrasil.components import import_component
+from yggdrasil.components import import_component, create_component
 
 
 def is_file_like(x):
@@ -19,7 +19,8 @@ def is_file_like(x):
     return hasattr(x, 'read') and hasattr(x, 'write')
 
 
-def convert_file(src, dst, src_type=None, dst_type=None):
+def convert_file(src, dst, src_type=None, dst_type=None,
+                 src_kwargs=None, dst_kwargs=None, transform=None):
     r"""Convert from one file type to another.
 
     Args:
@@ -31,12 +32,18 @@ def convert_file(src, dst, src_type=None, dst_type=None):
         dst_type (str, dict, optional): Name of destination file type. If
             not provided, an attempt will be made to identify the file
             type from the extension.
+        transform (dict, optional): Transform parameters for transforming
+            messages between the soruce and destination file.
 
     Raises:
         IOError: If the source file does not exist.
         IOError: If the destination file exists.
 
     """
+    if src_kwargs is None:
+        src_kwargs = {}
+    if dst_kwargs is None:
+        dst_kwargs = {}
     # Check files
     if not os.path.isfile(src):
         raise IOError(f"Source file does not exist: {src}")
@@ -48,11 +55,18 @@ def convert_file(src, dst, src_type=None, dst_type=None):
     if dst_type is None:
         dst_type = constants.EXT2FILE[os.path.splitext(dst)[1]]
     # Load
-    fsrc = import_component('file', src_type)(src, direction='recv')
+    fsrc = import_component('file', src_type)(src, direction='recv',
+                                              **src_kwargs)
     msg = fsrc.load(return_message_object=True)
     fsrc.close()
+    # Transform
+    if transform:
+        if isinstance(transform, dict):
+            transform = create_component('transform', **transform)
+        msg.args = transform(msg.args)
     # Dump
-    fdst = import_component('file', dst_type)(dst, direction='send')
+    fdst = import_component('file', dst_type)(dst, direction='send',
+                                              **dst_kwargs)
     fdst.update_serializer_from_message(msg)
     fdst.dump(msg)
     fdst.close()

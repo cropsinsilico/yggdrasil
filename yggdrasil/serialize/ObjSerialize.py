@@ -193,7 +193,8 @@ class ObjSerialize(PlySerialize):
         if isinstance(args, ObjDict):
             return args
         elif self.is_mesh(args):
-            return ObjDict.from_mesh(args, prune_duplicates=True)
+            return ObjDict.from_mesh(
+                args, prune_duplicates=self.prune_duplicates)
         return ObjDict(super(PlySerialize, self).normalize(args))
         
     @classmethod

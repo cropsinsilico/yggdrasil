@@ -1654,7 +1654,22 @@ class file_converter(SubCommand):
         (('--to', '--dst-type'),
          {'dest': 'dst_type',
           'default': None,
-          'help': "Destination file type"})
+          'help': "Destination file type"}),
+        (('--src-kwargs', ),
+         {'dest': 'src_kwargs',
+          'type': str,
+          'help': ("Keyword arguments for source file communicator "
+                   "in JSON format")}),
+        (('--dst-kwargs', ),
+         {'dest': 'dst_kwargs',
+          'type': str,
+          'help': ("Keyword arguments for destination file communicator "
+                   "in JSON format")}),
+        (('--transform', ),
+         {'type': str,
+          'help': ("Transform keyword arguments for transforming "
+                   "messages between source and destination in JSON "
+                   "format")}),
     ]
 
     @classmethod
@@ -1671,9 +1686,17 @@ class file_converter(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.communication.FileComm import convert_file
+        from yggdrasil import rapidjson
+        if args.src_kwargs is not None:
+            args.src_kwargs = rapidjson.loads(args.src_kwargs)
+        if args.dst_kwargs is not None:
+            args.dst_kwargs = rapidjson.loads(args.dst_kwargs)
+        if args.transform is not None:
+            args.transform = rapidjson.loads(args.transform)
         convert_file(args.src, args.dst,
-                     src_type=args.src_type,
-                     dst_type=args.dst_type)
+                     src_type=args.src_type, src_kwargs=args.src_kwargs,
+                     dst_type=args.dst_type, dst_kwargs=args.dst_kwargs,
+                     transform=args.transform)
 
 
 class generate_gha_workflow(SubCommand):

@@ -53,7 +53,8 @@ class SerializeBase(tools.YggClass):
                     'default': constants.DEFAULT_NEWLINE_STR},
         'comment': {'type': 'string',
                     'default': constants.DEFAULT_COMMENT_STR},
-        'datatype': {'type': 'schema'}}
+        'datatype': {'type': 'schema'},
+    }
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
     default_datatype = constants.DEFAULT_DATATYPE
@@ -449,20 +450,23 @@ class SerializeBase(tools.YggClass):
         """
         if self.datatype['type'] != 'array':
             return None
+        out = None
         if getattr(self, 'field_units', None) is not None:
             out = [str(units.Units(x)) for x in self.field_units]
-        elif isinstance(self.datatype['items'], dict):  # pragma: debug
-            raise Exception("Variable number of items not yet supported.")
-        elif isinstance(self.datatype['items'], list):
-            out = []
-            any_units = False
-            for i, x in enumerate(self.datatype['items']):
-                out.append(x.get('units', ''))
-                if len(x.get('units', '')) > 0:
-                    any_units = True
-            # Don't use field units if they are all defaults
-            if not any_units:
-                out = None
+        elif 'items' in self.datatype:
+            if isinstance(self.datatype['items'], dict):  # pragma: debug
+                raise Exception("Variable number of items not yet "
+                                "supported.")
+            elif isinstance(self.datatype['items'], list):
+                out = []
+                any_units = False
+                for i, x in enumerate(self.datatype['items']):
+                    out.append(x.get('units', ''))
+                    if len(x.get('units', '')) > 0:
+                        any_units = True
+                # Don't use field units if they are all defaults
+                if not any_units:
+                    out = None
         if (out is not None):
             if as_bytes:
                 out = tools.str2bytes(out, recurse=True)
@@ -671,13 +675,18 @@ class SerializeBase(tools.YggClass):
                 if isinstance(typedef.get('items', []), dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
-                if (((len(v) != len(typedef.get('items', [])))
-                     and (len(v) == 1)
-                     and (len(v[0].split(',')) == len(typedef.get('items', []))))):
-                    valt = v[0].split(',')
-                    v[0] = valt[0]
-                    for vv in valt[1:]:
-                        v.append(vv)
+                if len(v) != len(typedef.get('items', [])):
+                    if len(typedef.get('items', [])) == 1:
+                        typedef['items'] = [
+                            copy.deepcopy(typedef['items'][0])
+                            for _ in range(len(v))]
+                    elif (((len(v) == 1)
+                           and (len(v[0].split(',')) == len(typedef.get(
+                               'items', []))))):
+                        valt = v[0].split(',')
+                        v[0] = valt[0]
+                        for vv in valt[1:]:
+                            v.append(vv)
                 assert len(v) == len(typedef.get('items', []))
                 # if len(v) != len(typedef.get('items', [])):
                 #     warnings.warn('%d %ss provided, but only %d items in typedef.'

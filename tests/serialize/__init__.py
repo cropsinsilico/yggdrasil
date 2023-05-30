@@ -60,9 +60,11 @@ class TestSerializeBase(base_class):
         return empty_head_w
 
     @pytest.fixture(scope="class")
-    def map_sent2recv(self, nested_approx):
+    def map_sent2recv(self, nested_approx, testing_options):
         r"""Factory for method to convert sent messages to received."""
         def wrapped_map_sent2recv(obj):
+            if testing_options.get('map_sent2recv', None):
+                obj = testing_options['map_sent2recv'](obj)
             return nested_approx(obj)
         return wrapped_map_sent2recv
 

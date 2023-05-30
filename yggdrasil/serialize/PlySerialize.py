@@ -26,6 +26,8 @@ class GeometryBase:
             mesh = np.asarray(mesh)
         elif isinstance(mesh, (str, io.IOBase)):
             mesh = np.loadtxt(mesh, **kwargs)
+        if len(mesh.dtype) > 1:
+            mesh = np.vstack([mesh[k] for k in mesh.dtype.names]).T
         verts_per_face = mesh.shape[1] // 3
         nfaces = mesh.shape[0]
         nverts = verts_per_face * nfaces
@@ -303,6 +305,10 @@ class PlySerialize(SerializeBase):
             serialized output. Defaults to True.
         newline (str, optional): String that should be used for new lines.
             Defaults to '\n'.
+        prune_duplicates (bool, optional): If True, serialized meshes in
+            array format will be pruned of duplicates when being
+            normalized into a Ply object. If False, duplicates will not
+            be pruned. Defaults to True.
 
     Attributes:
         write_header (bool): If True, headers will be added to serialized
@@ -319,7 +325,9 @@ class PlySerialize(SerializeBase):
         '<http://paulbourke.net/dataformats/ply/>`_.')
     _schema_properties = {
         'newline': {'type': 'string',
-                    'default': constants.DEFAULT_NEWLINE_STR}}
+                    'default': constants.DEFAULT_NEWLINE_STR},
+        'prune_duplicates': {'type': 'boolean',
+                             'default': True}}
     default_datatype = {'type': 'ply'}
     file_extensions = ['.ply']
     concats_as_str = False
@@ -373,9 +381,13 @@ class PlySerialize(SerializeBase):
         """
         if isinstance(args, list):
             args = np.asarray(args)
-        return (isinstance(args, np.ndarray) and args.ndim == 2
-                and (args.shape[1] // 3) > 0
-                and (args.shape[1] % 3) == 0)
+        return (isinstance(args, np.ndarray)
+                and ((args.ndim == 2
+                      and (args.shape[1] // 3) > 0
+                      and (args.shape[1] % 3) == 0)
+                     or (args.ndim == 1
+                         and (len(args.dtype) // 3) > 0
+                         and (len(args.dtype) % 3) == 0)))
 
     def normalize(self, args):
         r"""Normalize a message to conform to the expected datatype.
@@ -390,7 +402,8 @@ class PlySerialize(SerializeBase):
         if isinstance(args, PlyDict):
             return args
         elif self.is_mesh(args):
-            return PlyDict.from_mesh(args, prune_duplicates=True)
+            return PlyDict.from_mesh(
+                args, prune_duplicates=self.prune_duplicates)
         return PlyDict(super(PlySerialize, self).normalize(args))
         
     @classmethod

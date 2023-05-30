@@ -1180,6 +1180,12 @@ definitions:
         description: If possible read the the file incrementally in multiple messages.
           This should be used for large files that cannot be loaded into memory.
         type: boolean
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       read_attributes:
         default: false
         description: If True, the attributes are read in as well as the variables.
@@ -1988,6 +1994,12 @@ definitions:
           '
         description: One or more characters indicating a newline. Defaults to '\n'.
         type: string
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
     required:
     - filetype
     title: yggdrasil.communication.ObjFileComm.ObjFileComm
@@ -2142,6 +2154,12 @@ definitions:
           '
         description: One or more characters indicating a newline. Defaults to '\n'.
         type: string
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
     required:
     - filetype
     title: yggdrasil.communication.PlyFileComm.PlyFileComm
@@ -4629,6 +4647,12 @@ definitions:
         description: If True, headers will not be read or serialized from/to tables.
           Defaults to False.
         type: boolean
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       seritype:
         default: default
         description: Serializer type.
@@ -4806,6 +4830,12 @@ definitions:
     additionalProperties: true
     description: Schema for serializer component ['obj'] subtype.
     properties:
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       seritype:
         default: obj
         description: Serialize 3D structures using Obj format.
@@ -4892,6 +4922,12 @@ definitions:
     additionalProperties: true
     description: Schema for serializer component ['ply'] subtype.
     properties:
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       seritype:
         default: ply
         description: Serialize 3D structures using `Ply format <http://paulbourke.net/dataformats/ply/>`_.
@@ -5068,7 +5104,9 @@ definitions:
       selected:
         description: A list of fields that should be selected.
         items:
-          type: string
+          type:
+          - string
+          - integer
         type: array
       single_as_scalar:
         description: If True and only a single field is selected, the transformed
@@ -5216,7 +5254,9 @@ definitions:
       selected:
         description: A list of fields that should be selected.
         items:
-          type: string
+          type:
+          - string
+          - integer
         type: array
       single_as_scalar:
         description: If True and only a single field is selected, the transformed
