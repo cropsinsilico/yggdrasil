@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -107,56 +107,88 @@
 <tbody>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘ply’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘ply’, ‘pickle’, ‘mat’, ‘map’, ‘obj’, ‘binary’, ‘pandas’, ‘table’]</p></td>
 <td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
-<tr class="row-odd"><td><p>comment</p></td>
+<tr class="row-odd"><td><p>columns</p></td>
+<td><p>array</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Names of columns to read/write.</p></td>
+</tr>
+<tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
 </tr>
-<tr class="row-even"><td><p>datatype</p></td>
+<tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
 </tr>
-<tr class="row-odd"><td><p>default_flow_style</p></td>
+<tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘yaml’]</p></td>
 <td><p>If True, nested collections will be serialized in the block style. If False,
 they will always be serialized in the flow style. See <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>delimiter</p></td>
+<tr class="row-odd"><td><p>delimiter</p></td>
 <td><p>string</p></td>
-<td><p>[‘table’, ‘wofost’, ‘pandas’, ‘map’]</p></td>
+<td><p>[‘pandas’, ‘cabo’, ‘map’, ‘table’]</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
 </tr>
-<tr class="row-odd"><td><p>driver</p></td>
+<tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
+<td><p>[‘excel’, ‘yaml’, ‘cram’, ‘bcf’, ‘cabo’, ‘sam’, ‘tiff’, ‘bam’, ‘eps’, ‘bmp’, ‘fasta’, ‘pickle’, ‘obj’, ‘ply’, ‘vcf’, ‘png’, ‘jpeg’, ‘ascii’, ‘fastq’, ‘mat’, ‘map’, ‘json’, ‘netcdf’, ‘gif’, ‘binary’, ‘pandas’, ‘table’]</p></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>encoding</p></td>
+<tr class="row-odd"><td><p>encoding</p></td>
 <td><p>string</p></td>
 <td><p>[‘yaml’]</p></td>
 <td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
 </tr>
-<tr class="row-odd"><td><p>indent</p></td>
+<tr class="row-even"><td><p>endcol</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Column to stop read at (non-inclusive).</p></td>
+</tr>
+<tr class="row-odd"><td><p>endrow</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Row to stop read at (non-inclusive).</p></td>
+</tr>
+<tr class="row-even"><td><p>flush_on_write</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>If true, the file will be flushed when written to.</p></td>
+</tr>
+<tr class="row-odd"><td><p>header</p></td>
+<td><p>object</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>Header defining sequence identifiers. A header is required for writing SAM, BAM,
+and CRAM files.</p></td>
+</tr>
+<tr class="row-even"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
-<td><p>[‘yaml’, ‘json’]</p></td>
+<td><p>[‘json’, ‘yaml’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
 </tr>
+<tr class="row-odd"><td><p>index</p></td>
+<td><p>string</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>Path to file containing index if different from the standard naming convention
+for BAM and CRAM files.</p></td>
+</tr>
 <tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
+<td><p>[‘excel’, ‘yaml’, ‘cram’, ‘bcf’, ‘cabo’, ‘sam’, ‘tiff’, ‘bam’, ‘eps’, ‘bmp’, ‘fasta’, ‘pickle’, ‘obj’, ‘ply’, ‘vcf’, ‘png’, ‘jpeg’, ‘ascii’, ‘fastq’, ‘mat’, ‘map’, ‘json’, ‘netcdf’, ‘gif’, ‘binary’, ‘pandas’, ‘table’]</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
 <tr class="row-odd"><td><p>newline</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
 </tr>
 <tr class="row-even"><td><p>no_header</p></td>
@@ -165,47 +197,98 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <td><p>If True, headers will not be read or serialized from/to tables. Defaults to
 False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>read_attributes</p></td>
+<tr class="row-odd"><td><p>params</p></td>
+<td><p>object</p></td>
+<td><p>[‘png’, ‘jpeg’, ‘tiff’, ‘eps’, ‘bmp’, ‘gif’]</p></td>
+<td><p>Parameters that should be based to the PIL.Image save/open command</p></td>
+</tr>
+<tr class="row-even"><td><p>piecemeal</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘fastq’, ‘fasta’]</p></td>
+<td><p>If possible read the the file incrementally in multiple messages. This should be
+used for large files that cannot be loaded into memory.</p></td>
+</tr>
+<tr class="row-odd"><td><p>prune_duplicates</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘obj’, ‘ply’]</p></td>
+<td><p>If True, serialized meshes in array format will be pruned of duplicates when
+being normalized into a Ply object. If False, duplicates will not be pruned.
+Defaults to True.</p></td>
+</tr>
+<tr class="row-even"><td><p>read_attributes</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘netcdf’]</p></td>
 <td><p>If True, the attributes are read in as well as the variables. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>read_meth</p></td>
+<tr class="row-odd"><td><p>read_meth</p></td>
 <td><p>string</p></td>
 <td><p>[‘binary’]</p></td>
 <td><p>Method that should be used to read data from the file. Defaults to ‘read’.
 Ignored if direction is ‘send’.</p></td>
 </tr>
-<tr class="row-odd"><td><p>serializer</p></td>
+<tr class="row-even"><td><p>record_ids</p></td>
+<td><p>array</p></td>
+<td><p>[‘fastq’, ‘fasta’]</p></td>
+<td><p>IDs of records to read/write. Other records will be ignored.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regions</p></td>
+<td><p>array</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>Region parameters (reference name, start, and end) defining the regions that
+should be read. If not provided, all regions will be read.</p></td>
+</tr>
+<tr class="row-even"><td><p>serializer</p></td>
 <td></td>
 <td><p>[‘binary’]</p></td>
 <td><p>Class with serialize and deserialize methods that should be used to process sent
 and received messages or a dictionary describing a serializer that obeys the
 serializer schema.</p></td>
 </tr>
-<tr class="row-even"><td><p>sort_keys</p></td>
+<tr class="row-odd"><td><p>sheet_template</p></td>
+<td><p>string</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Format string that can be completed with % operator to generate names for each
+subsequent sheet when writing.</p></td>
+</tr>
+<tr class="row-even"><td><p>sheets</p></td>
+<td><p>array</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Name(s) of one more more sheets that should be read/written. If not provided
+during read, all sheets will be read.</p></td>
+</tr>
+<tr class="row-odd"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘json’]</p></td>
 <td><p>If True, the serialization of dictionaries will be in key sorted order. Defaults
 to True.</p></td>
 </tr>
-<tr class="row-odd"><td><p>str_as_bytes</p></td>
-<td><p>boolean</p></td>
-<td><p>[‘pandas’]</p></td>
-<td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
+<tr class="row-even"><td><p>startcol</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Column to start read/write at.</p></td>
 </tr>
-<tr class="row-even"><td><p>use_astropy</p></td>
+<tr class="row-odd"><td><p>startrow</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Row to start read/write at.</p></td>
+</tr>
+<tr class="row-even"><td><p>str_as_bytes</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘excel’, ‘pandas’]</p></td>
+<td><p>If true, strings in columns are read as bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>use_astropy</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>variables</p></td>
+<tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>
 <td><p>[‘netcdf’]</p></td>
 <td><p>List of variables to read in. If not provided, all variables will be read.</p></td>
 </tr>
-<tr class="row-even"><td><p>version</p></td>
+<tr class="row-odd"><td><p>version</p></td>
 <td><p>integer</p></td>
 <td><p>[‘netcdf’]</p></td>
 <td><p>Version of netCDF format that should be used. Defaults to 1. Options are 1

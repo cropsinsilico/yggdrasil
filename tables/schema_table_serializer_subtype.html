@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -103,44 +103,44 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>default</p></td>
+<tr class="row-even"><td><p>cabo</p></td>
+<td><p>Serialization of mapping between keys and scalar or array values as used in the
+CABO parameter files.</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
 <td><p>[DEFAULT] Default serializer that uses yggdrasil’s extended JSON serialization
 based on a provided type definition (See discussion <a class="reference internal" href="../advanced/serialization.html#serialization-rst"><span class="std std-ref">here</span></a>).</p></td>
 </tr>
-<tr class="row-odd"><td><p>direct</p></td>
+<tr class="row-even"><td><p>direct</p></td>
 <td><p>Direct serialization of bytes.</p></td>
 </tr>
-<tr class="row-even"><td><p>functional</p></td>
+<tr class="row-odd"><td><p>functional</p></td>
 <td><p>Serializer that uses provied function to serialize messages.</p></td>
 </tr>
-<tr class="row-odd"><td><p>json</p></td>
+<tr class="row-even"><td><p>json</p></td>
 <td><p>Serializes Python objects using the JSON standard.</p></td>
 </tr>
-<tr class="row-even"><td><p>map</p></td>
+<tr class="row-odd"><td><p>map</p></td>
 <td><p>Serialzation of mapping between key/value pairs with one pair per line and using
 a character delimiter to separate keys and values.</p></td>
 </tr>
-<tr class="row-odd"><td><p>mat</p></td>
+<tr class="row-even"><td><p>mat</p></td>
 <td><p>Serializes objects using the Matlab .mat format.</p></td>
 </tr>
-<tr class="row-even"><td><p>obj</p></td>
+<tr class="row-odd"><td><p>obj</p></td>
 <td><p>Serialize 3D structures using Obj format.</p></td>
 </tr>
-<tr class="row-odd"><td><p>pandas</p></td>
+<tr class="row-even"><td><p>pandas</p></td>
 <td><p>Serializes tables using the pandas package.</p></td>
 </tr>
-<tr class="row-even"><td><p>pickle</p></td>
+<tr class="row-odd"><td><p>pickle</p></td>
 <td><p>Serialize any Python object using a Python pickle.</p></td>
 </tr>
-<tr class="row-odd"><td><p>ply</p></td>
-<td><p>Serialize 3D structures using Ply format.</p></td>
+<tr class="row-even"><td><p>ply</p></td>
+<td><p>Serialize 3D structures using <a class="reference external" href="http://paulbourke.net/dataformats/ply/">Ply format</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>table</p></td>
+<tr class="row-odd"><td><p>table</p></td>
 <td><p>ASCII tab (or otherwise) delimited table.</p></td>
-</tr>
-<tr class="row-odd"><td><p>wofost</p></td>
-<td><p>Serialization of mapping between keys and scalar or array values as used in the
-WOFOST parameter files.</p></td>
 </tr>
 <tr class="row-even"><td><p>yaml</p></td>
 <td><p>Serializes Python objects using the YAML standard.</p></td>

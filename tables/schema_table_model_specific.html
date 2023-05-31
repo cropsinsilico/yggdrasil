@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -117,7 +117,7 @@
 </tr>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>array</p></td>
-<td><p>[‘cpp’, ‘c’, ‘mpi’, ‘make’, ‘python’, ‘timesync’, ‘R’, ‘cmake’, ‘executable’, ‘julia’, ‘fortran’, ‘r’, ‘osr’, ‘lpy’, ‘dummy’, ‘c++’, ‘sbml’, ‘cxx’, ‘matlab’]</p></td>
+<td><p>[‘fortran’, ‘cpp’, ‘cmake’, ‘dummy’, ‘pytorch’, ‘lpy’, ‘make’, ‘julia’, ‘c++’, ‘python’, ‘mpi’, ‘cxx’, ‘r’, ‘osr’, ‘timesync’, ‘matlab’, ‘executable’, ‘c’, ‘R’, ‘sbml’]</p></td>
 <td><p>The path to the file containing the model program that will be run by the driver
 for the model’s language and/or a list of arguments that should be passed as
 input to the model program or language executable (e.g. source code or
@@ -136,7 +136,7 @@ be relative to working_dir or absolute.</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler</p></td>
 <td><p>string</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Command or path to executable that should be used to compile the model. If not
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
@@ -144,7 +144,7 @@ current operating system.</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Flags that should be passed to the compiler during compilation. If nto provided,
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
@@ -165,12 +165,12 @@ relative. Defaults to False.</p></td>
 </tr>
 <tr class="row-odd"><td><p>disable_python_c_api</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘osr’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘osr’, ‘cmake’, ‘c’]</p></td>
 <td><p>If True, the Python C API will be disabled. Defaults to False.</p></td>
 </tr>
 <tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>[‘cpp’, ‘c’, ‘mpi’, ‘make’, ‘python’, ‘timesync’, ‘R’, ‘cmake’, ‘executable’, ‘julia’, ‘fortran’, ‘r’, ‘osr’, ‘lpy’, ‘dummy’, ‘c++’, ‘sbml’, ‘cxx’, ‘matlab’]</p></td>
+<td><p>[‘fortran’, ‘cpp’, ‘cmake’, ‘dummy’, ‘pytorch’, ‘lpy’, ‘make’, ‘julia’, ‘c++’, ‘python’, ‘mpi’, ‘cxx’, ‘r’, ‘osr’, ‘timesync’, ‘matlab’, ‘executable’, ‘c’, ‘R’, ‘sbml’]</p></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_compiler</p></td>
@@ -201,69 +201,83 @@ driver.</p></td>
 required to link against the yggdrasil interface). If not provided, this will
 be determined by the target language driver.</p></td>
 </tr>
-<tr class="row-odd"><td><p>integrator</p></td>
+<tr class="row-odd"><td><p>input_transform</p></td>
+<td><p>function</p></td>
+<td><p>[‘pytorch’]</p></td>
+<td><p>Transformation that should be applied to input to get it into the format
+expected by the model (including transformation to pytorch tensors as
+necessary). This function should return a tuple of arguments for the model.</p></td>
+</tr>
+<tr class="row-even"><td><p>integrator</p></td>
 <td><p>string</p></td>
 <td><p>[‘sbml’]</p></td>
 <td><p>Name of integrator that should be used. Valid options include [‘cvode’,
 ‘gillespie’, ‘rk4’, ‘rk45’]. Defaults to ‘cvode’.</p></td>
 </tr>
-<tr class="row-even"><td><p>integrator_settings</p></td>
+<tr class="row-odd"><td><p>integrator_settings</p></td>
 <td><p>object</p></td>
 <td><p>[‘sbml’]</p></td>
 <td><p>Settings for the integrator. Defaults to empty dict.</p></td>
 </tr>
-<tr class="row-odd"><td><p>interpolation</p></td>
+<tr class="row-even"><td><p>interpolation</p></td>
 <td></td>
 <td><p>[‘timesync’]</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>interpreter</p></td>
+<tr class="row-odd"><td><p>interpreter</p></td>
 <td><p>string</p></td>
-<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
+<td><p>[‘lpy’, ‘julia’, ‘r’, ‘sbml’, ‘python’, ‘timesync’, ‘matlab’, ‘dummy’, ‘R’, ‘pytorch’]</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
 </tr>
-<tr class="row-odd"><td><p>interpreter_flags</p></td>
+<tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
+<td><p>[‘lpy’, ‘julia’, ‘r’, ‘sbml’, ‘python’, ‘timesync’, ‘matlab’, ‘dummy’, ‘R’, ‘pytorch’]</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
 </tr>
-<tr class="row-even"><td><p>linker</p></td>
+<tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Command or path to executable that should be used to link the model. If not
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
 </tr>
-<tr class="row-odd"><td><p>linker_flags</p></td>
+<tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Flags that should be passed to the linker during compilation. If not provided,
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
 </tr>
-<tr class="row-even"><td><p>makedir</p></td>
+<tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
 <td><p>[‘make’]</p></td>
 <td><p>Directory where make should be invoked from if it is not the same as the
 directory containing the makefile. Defaults to directory containing makefile if
 provided, otherwise working_dir.</p></td>
 </tr>
-<tr class="row-odd"><td><p>makefile</p></td>
+<tr class="row-even"><td><p>makefile</p></td>
 <td><p>string</p></td>
 <td><p>[‘make’]</p></td>
 <td><p>Path to make file either absolute, relative to makedir (if provided), or
 relative to working_dir. Defaults to Makefile.</p></td>
 </tr>
-<tr class="row-even"><td><p>only_output_final_step</p></td>
+<tr class="row-odd"><td><p>only_output_final_step</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘sbml’]</p></td>
 <td><p>If True, only the final timestep is output. Defaults to False.</p></td>
+</tr>
+<tr class="row-even"><td><p>output_transform</p></td>
+<td><p>function</p></td>
+<td><p>[‘pytorch’]</p></td>
+<td><p>Transformation that should be applied to model output to get it into a format
+that can be serialized by yggdrasil (i.e. not a pytorch Tensor or model
+sepecific type).</p></td>
 </tr>
 <tr class="row-odd"><td><p>reset</p></td>
 <td><p>boolean</p></td>
@@ -279,7 +293,7 @@ selections will be returned.</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_interpreter</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
+<td><p>[‘lpy’, ‘julia’, ‘r’, ‘sbml’, ‘python’, ‘timesync’, ‘matlab’, ‘dummy’, ‘R’, ‘pytorch’]</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
@@ -292,7 +306,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 </tr>
 <tr class="row-odd"><td><p>source_files</p></td>
 <td><p>array</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
@@ -390,9 +404,14 @@ extrapolated.</p></td>
 <td><p>If True, input/output variables with units will be represented in Matlab using
 symunit. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_asan</p></td>
+<tr class="row-odd"><td><p>weights</p></td>
+<td><p>string</p></td>
+<td><p>[‘pytorch’]</p></td>
+<td><p>Path to file where model weights are saved</p></td>
+</tr>
+<tr class="row-even"><td><p>with_asan</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘osr’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘osr’, ‘cmake’, ‘c’]</p></td>
 <td><p>If True, the model will be compiled and linked with the address sanitizer
 enabled (if there is one available for the selected compiler).</p></td>
 </tr>

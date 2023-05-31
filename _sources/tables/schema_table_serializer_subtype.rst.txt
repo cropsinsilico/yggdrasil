@@ -3,6 +3,8 @@
 ==========   ================================================================================
 Seritype     Description                                                                     
 ==========   ================================================================================
+cabo         Serialization of mapping between keys and scalar or array values as used in the 
+             CABO parameter files.                                                           
 default      [DEFAULT] Default serializer that uses |yggdrasil|'s extended JSON serialization
              based on a provided type definition (See discussion :ref:`here                  
              <serialization_rst>`).                                                          
@@ -15,9 +17,8 @@ mat          Serializes objects using the Matlab .mat format.
 obj          Serialize 3D structures using Obj format.                                       
 pandas       Serializes tables using the pandas package.                                     
 pickle       Serialize any Python object using a Python pickle.                              
-ply          Serialize 3D structures using Ply format.                                       
+ply          Serialize 3D structures using `Ply format                                       
+             <http://paulbourke.net/dataformats/ply/>`_.                                     
 table        ASCII tab (or otherwise) delimited table.                                       
-wofost       Serialization of mapping between keys and scalar or array values as used in the 
-             WOFOST parameter files.                                                         
 yaml         Serializes Python objects using the YAML standard.                              
 ==========   ================================================================================

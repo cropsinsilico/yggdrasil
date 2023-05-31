@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yggdrasil.communication.SequenceFileBase &mdash; yggdrasil v1.10.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            yggdrasil
+          </a>
+              <div class="version">
+                v1.10.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Docker Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.SequenceFileBase</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for yggdrasil.communication.SequenceFileBase</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.DedicatedFileBase</span> <span class="kn">import</span> <span class="n">DedicatedFileBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">create_component_class</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">Bio</span> <span class="kn">import</span> <span class="n">SeqIO</span><span class="p">,</span> <span class="n">SeqFeature</span>
+    <span class="kn">from</span> <span class="nn">Bio.SeqRecord</span> <span class="kn">import</span> <span class="n">SeqRecord</span>
+    <span class="kn">from</span> <span class="nn">Bio.Seq</span> <span class="kn">import</span> <span class="n">Seq</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">SeqIO</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">SeqFeature</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">SeqRecord</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">Seq</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;biopython not installed so yggdrasil will not be &quot;</span>
+                  <span class="s2">&quot;able to read some sequence data types&quot;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pysam</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">pysam</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;pysam is not installed so yggdrasil will not be &quot;</span>
+                  <span class="s2">&quot;able to read some sequence data types&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SequenceFileBase"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.SequenceFileBase">[docs]</a><span class="k">class</span> <span class="nc">SequenceFileBase</span><span class="p">(</span><span class="n">DedicatedFileBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for nucleotide/protein sequence I/O.&quot;&quot;&quot;</span>
+    
+    <span class="n">_stores_fd</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_sequence_types</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_test_parameters</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="SequenceFileBase.before_registration"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.SequenceFileBase.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration.&quot;&quot;&quot;</span>
+        <span class="n">DedicatedFileBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_sequence_types</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span><span class="p">]]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span><span class="si">}</span><span class="s1"> sequence I/O&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="BioPythonFileBase"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.BioPythonFileBase">[docs]</a><span class="k">class</span> <span class="nc">BioPythonFileBase</span><span class="p">(</span><span class="n">SequenceFileBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for nucleotide/protein sequence I/O using biopython.&quot;&quot;&quot;</span>
+
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;piecemeal&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;If possible read the the file &#39;</span>
+                            <span class="s1">&#39;incrementally in multiple &#39;</span>
+                            <span class="s1">&#39;messages. This should be used for &#39;</span>
+                            <span class="s1">&#39;large files that cannot be loaded &#39;</span>
+                            <span class="s1">&#39;into memory.&#39;</span><span class="p">)},</span>
+        <span class="s1">&#39;record_ids&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;IDs of records to read/write. Other records &#39;</span>
+                            <span class="s1">&#39;will be ignored.&#39;</span><span class="p">)}</span>
+    <span class="p">}</span>
+    <span class="n">_stores_fd</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_sequence_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;fasta&#39;</span><span class="p">:</span> <span class="s1">&#39;.fasta&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fastq&#39;</span><span class="p">:</span> <span class="s1">&#39;.fastq&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">_valid_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;dbxrefs&#39;</span><span class="p">]</span>
+    <span class="n">_has_annotations</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_has_separate_name</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_records_iterator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BioPythonFileBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BioPythonFileBase.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.BioPythonFileBase.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
+<span class="sd">        communication class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            language (str, optional): Specific language that should be checked</span>
+<span class="sd">                for compatibility. Defaults to None and all languages supported</span>
+<span class="sd">                on the current platform will be checked. If set to &#39;any&#39;, the</span>
+<span class="sd">                result will be True if this comm is installed for any of the</span>
+<span class="sd">                supported languages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Is the comm installed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">SeqIO</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">records_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;iterator: SeqRecord iterator.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_records_iterator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_ids</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_records_iterator</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">index</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_ids</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_records_iterator</span> <span class="o">=</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span>
+                                                     <span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_records_iterator</span>
+
+    <span class="c1"># def ref2dict(self, x):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Convert a Reference object to a dictionary.&quot;&quot;&quot;</span>
+    <span class="c1">#     out = {}</span>
+    <span class="c1">#     for k in [&#39;authors&#39;, &#39;title&#39;, &#39;journal&#39;, &#39;medline_id&#39;,</span>
+    <span class="c1">#               &#39;pubmed_id&#39;, &#39;comment&#39;]:</span>
+    <span class="c1">#         out[k] = getattr(x, k)</span>
+    <span class="c1">#     out[&#39;location&#39;] = [self.loc2dict(y) for y in x.location]</span>
+    <span class="c1">#     return out</span>
+
+    <span class="c1"># def dict2ref(self, x):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Convert a dictionary to a Reference object.&quot;&quot;&quot;</span>
+    <span class="c1">#     x[&#39;location&#39;] = [self.dict2loc(y) for y in x.get(&#39;location&#39;, [])]</span>
+    <span class="c1">#     out = SeqFeature.Reference()</span>
+    <span class="c1">#     for k, v in x.items():</span>
+    <span class="c1">#         setattr(out, k, v)</span>
+    <span class="c1">#     return out</span>
+
+    <span class="c1"># def loc2dict(self, x):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Convert a FeatureLocation object to a dictionary.&quot;&quot;&quot;</span>
+    <span class="c1">#     out = {}</span>
+    <span class="c1">#     for k in [&#39;start&#39;, &#39;end&#39;, &#39;strand&#39;, &#39;ref&#39;, &#39;ref_db&#39;]:</span>
+    <span class="c1">#         out[k] = getattr(x, k)</span>
+    <span class="c1">#     return out</span>
+
+    <span class="c1"># def dict2loc(self, x):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Convert a dictionary to a FeatureLocation.&quot;&quot;&quot;</span>
+    <span class="c1">#     return SeqFeature.FeatureLocation(**x)</span>
+
+    <span class="c1"># def feature2dict(self, x):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Convert a Feature to a dictionary.&quot;&quot;&quot;</span>
+    <span class="c1">#     out = {&#39;location&#39;: self.loc2dict(x.location)}</span>
+    <span class="c1">#     for k in [&#39;type&#39;, &#39;location_operator&#39;, &#39;id&#39;, &#39;qualifiers&#39;]:</span>
+    <span class="c1">#         out[k] = getattr(x, k)</span>
+    <span class="c1">#     return out</span>
+
+    <span class="c1"># def dict2feature(self, x):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Convert a dictionary to a Feature.&quot;&quot;&quot;</span>
+    <span class="c1">#     if x.get(&#39;location&#39;, False):</span>
+    <span class="c1">#         x[&#39;location&#39;] = self.dict2loc(x[&#39;location&#39;])</span>
+    <span class="c1">#     return SeqFeature.SeqFeature(**x)</span>
+
+<div class="viewcode-block" id="BioPythonFileBase.record2dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.BioPythonFileBase.record2dict">[docs]</a>    <span class="k">def</span> <span class="nf">record2dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a SeqRecord to a dictionary.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;seq&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">seq</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="c1"># if &#39;references&#39; in out.get(&#39;annotations&#39;, {}):</span>
+        <span class="c1">#     out[&#39;annotations&#39;][&#39;references&#39;] = [</span>
+        <span class="c1">#         self.ref2dict(ref) for ref in</span>
+        <span class="c1">#         out[&#39;annotations&#39;][&#39;references&#39;]]</span>
+        <span class="c1"># if &#39;features&#39; in out:</span>
+        <span class="c1">#     out[&#39;features&#39;] = [self.feature2dict(y) for</span>
+        <span class="c1">#                        y in out[&#39;features&#39;]]</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="BioPythonFileBase.dict2record"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.BioPythonFileBase.dict2record">[docs]</a>    <span class="k">def</span> <span class="nf">dict2record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Covert a dictionary to a SeqRecord.&quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;seq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Seq</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;seq&#39;</span><span class="p">])</span>
+        <span class="c1"># y = x.get(&#39;annotations&#39;, {})</span>
+        <span class="c1"># if &#39;references&#39; in y:</span>
+        <span class="c1">#     y[&#39;references&#39;] = [self.dict2ref(ref) for</span>
+        <span class="c1">#                        ref in y[&#39;references&#39;]]</span>
+        <span class="c1"># if &#39;features&#39; in x:</span>
+        <span class="c1">#     x[&#39;features&#39;] = [self.dict2feature(y) for y in x[&#39;features&#39;]]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">SeqRecord</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
+    <span class="k">def</span> <span class="nf">_file_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DedicatedFileBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_file_open</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_file_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_records_iterator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DedicatedFileBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_file_close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_dedicated_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dict2record</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dict2record</span><span class="p">(</span><span class="n">msg</span><span class="p">)]</span>
+        <span class="n">SeqIO</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_dedicated_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">piecemeal</span><span class="p">:</span>
+            <span class="c1"># record = next(self.records_iterator)</span>
+            <span class="c1"># print(record)</span>
+            <span class="c1"># out = self.record2dict(record)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record2dict</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records_iterator</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># record = list(self.records_iterator)</span>
+            <span class="c1"># print(record[0].annotations)</span>
+            <span class="c1"># out = [self.record2dict(x) for x in record]</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">record2dict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records_iterator</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="BioPythonFileBase.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.BioPythonFileBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">piecemeal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this</span>
+<span class="sd">        class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            piecemeal (bool, optional): If True, the test data will be</span>
+<span class="sd">                piecemeal.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing. Items:</span>
+<span class="sd">                kwargs (dict): Keyword arguments for comms tested with</span>
+<span class="sd">                    the provided content.</span>
+<span class="sd">                send (list): List of objects to send to test file.</span>
+<span class="sd">                recv (list): List of objects that will be received from a</span>
+<span class="sd">                    test file that was sent the messages in &#39;send&#39;.</span>
+<span class="sd">                contents (bytes): Bytes contents of test file created by</span>
+<span class="sd">                    sending the messages in &#39;send&#39;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;seq&#39;</span><span class="p">:</span> <span class="s1">&#39;MKQHKAMIVALIVICITAVVAALVTRKDLCEVHIRTGQTEVAVF&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;YP_025292.1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;YP_025292.1 toxic membrane protein, small&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># if &#39;name&#39; in cls._valid_fields:</span>
+        <span class="c1">#     data[&#39;name&#39;] = &#39;HokC&#39;</span>
+        <span class="c1"># if &#39;annotations&#39; in cls._valid_fields:</span>
+        <span class="c1">#     data[&#39;annotations&#39;] = {</span>
+        <span class="c1">#         &#39;source&#39;: &#39;Paphiopedilum barbatum&#39;,</span>
+        <span class="c1">#         &#39;references&#39;: [</span>
+        <span class="c1">#             {&#39;title&#39;: &#39;Fake article&#39;,</span>
+        <span class="c1">#              &#39;authors&#39;: &#39;Doe, Jane&#39;,</span>
+        <span class="c1">#              &#39;locations&#39;: [</span>
+        <span class="c1">#                  {&#39;start&#39;: 0,</span>
+        <span class="c1">#                   &#39;end&#39;: 5}</span>
+        <span class="c1">#              ]}</span>
+        <span class="c1">#         ]</span>
+        <span class="c1">#     }</span>
+        <span class="c1"># if &#39;features&#39; in cls._valid_fields:</span>
+        <span class="c1">#     data[&#39;features&#39;] = [{</span>
+        <span class="c1">#         &#39;location&#39;: {&#39;start&#39;: 20, &#39;end&#39;: 21},</span>
+        <span class="c1">#         &#39;type&#39;: &#39;Site&#39;</span>
+        <span class="c1">#     }]</span>
+        <span class="k">if</span> <span class="s1">&#39;letter_annotations&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_valid_fields</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;letter_annotations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;phred_quality&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;seq&#39;</span><span class="p">])))</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">piecemeal</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
+               <span class="s1">&#39;exact_contents&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+               <span class="s1">&#39;dict&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+               <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+               <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+               <span class="s1">&#39;recv_partial&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">data</span><span class="p">]]}</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_parameters</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_test_parameters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">piecemeal</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;piecemeal&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                                  <span class="s1">&#39;record_ids&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;YP_025292.1&#39;</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<div class="viewcode-block" id="PySamFileBase"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase">[docs]</a><span class="k">class</span> <span class="nc">PySamFileBase</span><span class="p">(</span><span class="n">SequenceFileBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for nucleotide/protein sequence I/O using pysam.&quot;&quot;&quot;</span>
+
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Header defining sequence identifiers. A &#39;</span>
+                            <span class="s1">&#39;header is required for writing SAM, BAM, &#39;</span>
+                            <span class="s1">&#39;and CRAM files.&#39;</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;flush_on_write&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;If true, the file will be flushed when &#39;</span>
+                            <span class="s1">&#39;written to.&#39;</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;regions&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                    <span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">},</span>
+                    <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Region parameters (reference name, start, &#39;</span>
+                            <span class="s1">&#39;and end) defining the regions that should &#39;</span>
+                            <span class="s1">&#39;be read. If not provided, all regions will &#39;</span>
+                            <span class="s1">&#39;be read.&#39;</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Path to file containing index if different &#39;</span>
+                            <span class="s1">&#39;from the standard naming convention for &#39;</span>
+                            <span class="s1">&#39;BAM and CRAM files.&#39;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">_sequence_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;sam&#39;</span><span class="p">:</span> <span class="s1">&#39;.sam&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bam&#39;</span><span class="p">:</span> <span class="s1">&#39;.bam&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cram&#39;</span><span class="p">:</span> <span class="s1">&#39;.cram&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bcf&#39;</span><span class="p">:</span> <span class="s1">&#39;.bcf&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;vcf&#39;</span><span class="p">:</span> <span class="s1">&#39;.vcf&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">_sam_header_fields</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_vcf_header_fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;contigs&#39;</span><span class="p">,</span> <span class="s1">&#39;filters&#39;</span><span class="p">,</span> <span class="s1">&#39;formats&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="s1">&#39;samples&#39;</span><span class="p">]</span>
+    <span class="n">_sam_data_fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;query_name&#39;</span><span class="p">,</span> <span class="s1">&#39;query_sequence&#39;</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="s1">&#39;reference_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;reference_start&#39;</span><span class="p">,</span> <span class="s1">&#39;mapping_quality&#39;</span><span class="p">,</span> <span class="s1">&#39;cigar&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;next_reference_id&#39;</span><span class="p">,</span> <span class="s1">&#39;next_reference_start&#39;</span><span class="p">,</span> <span class="s1">&#39;template_length&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;query_qualities&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">]</span>
+    <span class="n">_vcf_data_fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;contig&#39;</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="s1">&#39;alleles&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;qual&#39;</span><span class="p">,</span> <span class="s1">&#39;filter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="s1">&#39;samples&#39;</span><span class="p">]</span>
+    <span class="n">_stores_fd</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_requires_refresh</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">concats_as_str</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialization steps that should be performed after base</span>
+<span class="sd">        class, but before the comm is opened.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PySamFileBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[{}]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remaining_regions</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processed_regions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processed_iters</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region_iterator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header_size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_region</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index_created</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flush_on_write</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="PySamFileBase.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
+<span class="sd">        communication class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            language (str, optional): Specific language that should be checked</span>
+<span class="sd">                for compatibility. Defaults to None and all languages supported</span>
+<span class="sd">                on the current platform will be checked. If set to &#39;any&#39;, the</span>
+<span class="sd">                result will be True if this comm is installed for any of the</span>
+<span class="sd">                supported languages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Is the comm installed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pysam</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">open_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Mode that should be used to open the file.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PySamFileBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open_mode</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bam&#39;</span><span class="p">,</span> <span class="s1">&#39;bcf&#39;</span><span class="p">]:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;b&#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span> <span class="o">==</span> <span class="s1">&#39;cram&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;c&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Current region.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_iterator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remaining_regions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_region_iterator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processed_iters</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_region</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processed_iters</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next_region</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region_iterator</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processed_regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_remaining_regions</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remaining_regions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_region_iterator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_region</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="PySamFileBase.advance_in_series"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.advance_in_series">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to a certain file in a series.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            series_index (int, optional): Index of file in the series that</span>
+<span class="sd">                should be moved to. Defaults to None and call will advance to</span>
+<span class="sd">                the next file in the series.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the file was advanced in the series, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processed_regions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processed_iters</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">advanced</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PySamFileBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">advance_in_series</span><span class="p">(</span>
+            <span class="n">series_index</span><span class="o">=</span><span class="n">series_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">advanced</span></div>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_file_size_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current size of file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_remaining_regions</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PySamFileBase.series_file_size"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.series_file_size">[docs]</a>    <span class="k">def</span> <span class="nf">series_file_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Size of file in series.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">PySamFileBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">series_file_size</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_size</span><span class="p">)</span></div>
+        
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_file_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bcf&#39;</span><span class="p">,</span> <span class="s1">&#39;vcf&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">pysam</span><span class="o">.</span><span class="n">VariantFile</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span>
+
+    <span class="k">def</span> <span class="nf">_flush_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_close</span><span class="p">(</span><span class="n">in_flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span><span class="p">,</span>
+                        <span class="n">in_flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_class</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fd</span><span class="o">.</span><span class="n">fetch</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_has_index</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bam&#39;</span><span class="p">,</span> <span class="s1">&#39;cram&#39;</span><span class="p">])</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_is_sam_based</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;sam&#39;</span><span class="p">,</span> <span class="s1">&#39;bam&#39;</span><span class="p">,</span> <span class="s1">&#39;cram&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="PySamFileBase.index_filename"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.index_filename">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">index_filename</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the name of the index file.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span> <span class="o">==</span> <span class="s1">&#39;bam&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">address</span> <span class="o">+</span> <span class="s1">&#39;.bai&#39;</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span> <span class="o">==</span> <span class="s1">&#39;cram&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">address</span> <span class="o">+</span> <span class="s1">&#39;.crai&#39;</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PySamFileBase.create_index"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.create_index">[docs]</a>    <span class="k">def</span> <span class="nf">create_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an index file to accompany the file begin written/read</span>
+<span class="sd">        if one is required.&quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_filename</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">address</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">address</span> <span class="o">+</span> <span class="s1">&#39;.bai&#39;</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">overwrite</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_created</span>
+                 <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">index</span><span class="p">))):</span>
+                <span class="n">pysam</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_index_created</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copystat</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">index</span></div>
+
+<div class="viewcode-block" id="PySamFileBase.remove_companion_files"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.remove_companion_files">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">remove_companion_files</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove companion files that are created when writing to a</span>
+<span class="sd">        file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            address (str): Address for the filename.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_has_index</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">index_address</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">index_filename</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">index_address</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">index_address</span><span class="p">)</span></div>
+        
+    <span class="k">def</span> <span class="nf">_dedicated_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">in_flush</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">kws</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_class</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict2header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flush_on_write</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">address</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="s1">&#39;tmp_&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">address</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_index</span><span class="p">():</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;index_filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">in_flush</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_flush_send</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
+            <span class="n">processed_iters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processed_iters</span>
+            <span class="n">allsheets</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processed_iters</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remaining_regions</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">allsheets</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processed_regions</span><span class="p">]</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processed_iters</span> <span class="o">!=</span> <span class="n">processed_iters</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_region</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_size</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bam&#39;</span><span class="p">,</span> <span class="s1">&#39;cram&#39;</span><span class="p">,</span> <span class="s1">&#39;vcf&#39;</span><span class="p">,</span> <span class="s1">&#39;bcf&#39;</span><span class="p">]</span>
+                 <span class="ow">and</span> <span class="ow">not</span> <span class="n">in_flush</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_flush_send</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">flush_on_write</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">address</span><span class="p">):</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span><span class="p">,</span> <span class="n">address</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">header_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">)</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;head_&#39;</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_class</span><span class="p">()</span>
+                <span class="n">kws</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sam_based</span><span class="p">():</span>
+                    <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;template&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="o">.</span><span class="n">header</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">),</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+                <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_header_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header_size</span>
+    
+    <span class="k">def</span> <span class="nf">_dedicated_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_flush</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region_iterator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_region</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_index</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span><span class="p">),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">index_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_address</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_dedicated_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict2region</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flush_on_write</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_flush_send</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_dedicated_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_region</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region2dict</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_data_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_is_sam_based</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sam_data_fields</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_vcf_data_fields</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_header_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_is_sam_based</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_vcf_header_fields</span>
+
+<div class="viewcode-block" id="PySamFileBase.region2dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.region2dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">region2dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_data_fields</span><span class="p">():</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cigar&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;alleles&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kk</span> <span class="k">for</span> <span class="n">kk</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="n">kkk</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">vvv</span><span class="p">)</span> <span class="k">for</span> <span class="n">kkk</span><span class="p">,</span> <span class="n">vvv</span> <span class="ow">in</span> <span class="n">vv</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                          <span class="k">for</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;query_qualities&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;query_qualities&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">array_to_qualitystring</span><span class="p">(</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;query_qualities&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PySamFileBase.dict2region"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.dict2region">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">dict2region</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_is_sam_based</span><span class="p">():</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignedSegment</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_data_fields</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;query_qualities&#39;</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">pysam</span><span class="o">.</span><span class="n">qualitystring_to_array</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                    <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cigar&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">]:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">new_record</span><span class="p">(</span><span class="o">**</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PySamFileBase.record2dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.record2dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">record2dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;IDX&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;Description&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;assembly&#39;</span><span class="p">]:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PySamFileBase.header2dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.header2dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">header2dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_header_fields</span><span class="p">():</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;contigs&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">kk</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">record2dict</span><span class="p">(</span><span class="n">vv</span><span class="o">.</span><span class="n">header_record</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">,</span> <span class="s1">&#39;formats&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">kk</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">record2dict</span><span class="p">(</span><span class="n">vv</span><span class="o">.</span><span class="n">record</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">kk</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">record2dict</span><span class="p">(</span><span class="n">vv</span><span class="o">.</span><span class="n">record</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PySamFileBase.dict2header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.dict2header">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">dict2header</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_is_sam_based</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">VariantHeader</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;samples&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">add_samples</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;contig&#39;</span><span class="p">,</span> <span class="s1">&#39;FILTER&#39;</span><span class="p">,</span> <span class="s1">&#39;FORMAT&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">add_meta</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="n">vv</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PySamFileBase.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.SequenceFileBase.PySamFileBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">test_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this</span>
+<span class="sd">        class.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_is_sam_based</span><span class="p">():</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignedSegment</span><span class="p">()</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">query_name</span> <span class="o">=</span> <span class="s2">&quot;read_28833_29006_6945&quot;</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">query_sequence</span> <span class="o">=</span> <span class="s2">&quot;AGCTTAGCTAGCTACCTATATCTTGGTCTTGGCCG&quot;</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="mi">99</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">reference_id</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">reference_start</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># 32</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">mapping_quality</span> <span class="o">=</span> <span class="mi">20</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">cigar</span> <span class="o">=</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">next_reference_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">next_reference_start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">template_length</span> <span class="o">=</span> <span class="mi">167</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">query_qualities</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">qualitystring_to_array</span><span class="p">(</span>
+                <span class="s2">&quot;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;:&lt;9/,&amp;,22;;&lt;&lt;&lt;&quot;</span><span class="p">)</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;NM&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                      <span class="p">(</span><span class="s2">&quot;RG&quot;</span><span class="p">,</span> <span class="s2">&quot;L1&quot;</span><span class="p">))</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;HD&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;VN&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0&#39;</span><span class="p">},</span>
+                      <span class="s1">&#39;SQ&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;LN&#39;</span><span class="p">:</span> <span class="mi">1575</span><span class="p">,</span> <span class="s1">&#39;SN&#39;</span><span class="p">:</span> <span class="s1">&#39;chr1&#39;</span><span class="p">},</span>
+                             <span class="p">{</span><span class="s1">&#39;LN&#39;</span><span class="p">:</span> <span class="mi">1584</span><span class="p">,</span> <span class="s1">&#39;SN&#39;</span><span class="p">:</span> <span class="s1">&#39;chr2&#39;</span><span class="p">}],</span>
+                      <span class="s1">&#39;RG&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;ID&quot;</span><span class="p">:</span> <span class="s2">&quot;L1&quot;</span><span class="p">,</span>
+                              <span class="p">}]}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">test_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;example.vcf&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">pysam</span><span class="o">.</span><span class="n">VariantFile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">fetch</span><span class="p">())</span>
+                <span class="n">header</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">header</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">header2dict</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">region2dict</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="n">header</span><span class="p">,</span> <span class="s1">&#39;flush_on_write&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="s1">&#39;exact_contents&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+            <span class="s1">&#39;dict&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+            <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+            <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+            <span class="s1">&#39;recv_partial&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">data</span><span class="p">]],</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;driver_send_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="n">header</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<span class="n">_biopython_classes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;FASTA&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;_filetype&#39;</span><span class="p">:</span> <span class="s1">&#39;fasta&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;&gt;YP_025292.1 toxic membrane protein, small</span><span class="se">\n</span><span class="s1">MKQHKAMI&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;VALIVICITAVVAALVTRKDLCEVHIRTGQTEVAVF</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+        <span class="p">},</span>
+    <span class="p">}),</span>
+    <span class="p">(</span><span class="s1">&#39;FASTQ&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;_filetype&#39;</span><span class="p">:</span> <span class="s1">&#39;fastq&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;_valid_fields&#39;</span><span class="p">:</span> <span class="n">BioPythonFileBase</span><span class="o">.</span><span class="n">_valid_fields</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="s1">&#39;letter_annotations&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;@YP_025292.1 toxic membrane protein, small</span><span class="se">\n</span><span class="s1">MKQHKAMI&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;VALIVICITAVVAALVTRKDLCEVHIRTGQTEVAVF</span><span class="se">\n</span><span class="s1">+</span><span class="se">\n</span><span class="s1">!&quot;#$%&amp;</span><span class="se">\&#39;</span><span class="s1">()*&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKL</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_biopython_classes</span><span class="p">:</span>
+    <span class="n">create_component_class</span><span class="p">(</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">BioPythonFileBase</span><span class="p">,</span>
+                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">FileComm&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">PySamFileBase</span><span class="o">.</span><span class="n">_sequence_types</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">create_component_class</span><span class="p">(</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">PySamFileBase</span><span class="p">,</span>
+                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">FileComm&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;_filetype&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

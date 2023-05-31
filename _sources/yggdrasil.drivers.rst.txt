@@ -196,6 +196,14 @@ yggdrasil.drivers.OutputDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.PyTorchModelDriver module
+-------------------------------------------
+
+.. automodule:: yggdrasil.drivers.PyTorchModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.PythonModelDriver module
 ------------------------------------------
 

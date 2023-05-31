@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C/C++ Datatypes API &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>C/C++ Datatypes API &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -126,22 +126,6 @@
 <h1>C/C++ Datatypes API<a class="headerlink" href="#c-c-datatypes-api" title="Permalink to this heading">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.MSG_HEAD_SEP">
-<span class="target" id="datatypes_8h_1a7fdf73755873cf9289f0f4171bd0ebfc"></span><span class="sig-name descname"><span class="n"><span class="pre">MSG_HEAD_SEP</span></span></span><a class="headerlink" href="#c.MSG_HEAD_SEP" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.COMMBUFFSIZ">
-<span class="target" id="datatypes_8h_1a4eefb568b178b65c8a7decb3aa234be2"></span><span class="sig-name descname"><span class="n"><span class="pre">COMMBUFFSIZ</span></span></span><a class="headerlink" href="#c.COMMBUFFSIZ" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Size of COMM buffer. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.FMT_LEN">
-<span class="target" id="datatypes_8h_1a1bd3cdb7e51b850ce251f02c38c7739a"></span><span class="sig-name descname"><span class="n"><span class="pre">FMT_LEN</span></span></span><a class="headerlink" href="#c.FMT_LEN" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.call_python">
 <span class="target" id="datatypes_8h_1a65508c6d94af36793a3c6716fe19714d"></span><span class="sig-name descname"><span class="n"><span class="pre">call_python</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">x</span></span>, <span class="n"><span class="pre">format</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.call_python" title="Permalink to this definition">¶</a><br /></dt>
@@ -1193,8 +1177,8 @@ Destroy a generic object. </p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv419create_dtype_pyinstPKcPK7dtype_tPK7dtype_tKb">
-<span id="_CPPv319create_dtype_pyinstPKcPK7dtype_tPK7dtype_tKb"></span><span id="_CPPv219create_dtype_pyinstPKcPK7dtype_tPK7dtype_tKb"></span><span id="create_dtype_pyinst__cCP.dtype_tCP.dtype_tCP.bC"></span><span class="target" id="datatypes_8h_1a079b466a38c57ac89e76fd3ef0d27452"></span><a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_pyinst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">class_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">args_dtype</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">kwargs_dtype</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_pyinstPKcPK7dtype_tPK7dtype_tKb" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv419create_dtype_pyinstPKcP7dtype_tP7dtype_tKb">
+<span id="_CPPv319create_dtype_pyinstPKcP7dtype_tP7dtype_tKb"></span><span id="_CPPv219create_dtype_pyinstPKcP7dtype_tP7dtype_tKb"></span><span id="create_dtype_pyinst__cCP.dtype_tP.dtype_tP.bC"></span><span class="target" id="datatypes_8h_1a7bbecedeb9443ae3de8984fe7417a472"></span><a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">create_dtype_pyinst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">class_name</span></span>, <a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">args_dtype</span></span>, <a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">kwargs_dtype</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_generic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_pyinstPKcP7dtype_tP7dtype_tKb" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Construct a type object for Python object instances. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1279,8 +1263,8 @@ Destroy a generic object. </p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv418create_send_headerP7dtype_t">
-<span id="_CPPv318create_send_headerP7dtype_t"></span><span id="_CPPv218create_send_headerP7dtype_t"></span><span id="create_send_header__dtype_tP"></span><span class="target" id="datatypes_8h_1a82e61468b173bdff629126c90038f466"></span><a class="reference internal" href="#_CPPv411comm_head_t" title="comm_head_t"><span class="n"><span class="pre">comm_head_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_send_header</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">datatype</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418create_send_headerP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv418create_send_headerP7dtype_tPKcK6size_t">
+<span id="_CPPv318create_send_headerP7dtype_tPKcK6size_t"></span><span id="_CPPv218create_send_headerP7dtype_tPKcK6size_t"></span><span id="create_send_header__dtype_tP.cCP.sC"></span><span class="target" id="datatypes_8h_1abd82a7cebd6ab3de6514f83e0b777deb"></span><a class="reference internal" href="#_CPPv411comm_head_t" title="comm_head_t"><span class="n"><span class="pre">comm_head_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create_send_header</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t"><span class="n"><span class="pre">dtype_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">datatype</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msg</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418create_send_headerP7dtype_tPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Create a header for sending messages. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1898,12 +1882,6 @@ Destroy a generic object. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N7dtype_t6schemaE">
-<span id="_CPPv3N7dtype_t6schemaE"></span><span id="_CPPv2N7dtype_t6schemaE"></span><span id="dtype_t::schema__voidP"></span><span class="target" id="structdtype__t_1a6a8c35d7584567c824a2d1713b387ab4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">schema</span></span></span><a class="headerlink" href="#_CPPv4N7dtype_t6schemaE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Pointer to rapidjson::Value for validation. </p>
-</dd></dl>
-
-<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7dtype_t8metadataE">
 <span id="_CPPv3N7dtype_t8metadataE"></span><span id="_CPPv2N7dtype_t8metadataE"></span><span id="dtype_t::metadata__voidP"></span><span class="target" id="structdtype__t_1a55bd7e032c73205e808716b65253ae0a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">metadata</span></span></span><a class="headerlink" href="#_CPPv4N7dtype_t8metadataE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Pointer ot rapidjson::Document containing additional metadata. </p>
@@ -2030,14 +2008,34 @@ Destroy a generic object. </p>
 <dt class="sig sig-object cpp">
 <span class="target" id="structobj__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">obj_t</span></span></span><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;ObjSerialize.h&gt;</em></div>
+<em>#include &lt;datatypes.h&gt;</em></div>
+<p>Obj structure. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t3objE">
+<span id="_CPPv3N5obj_t3objE"></span><span id="_CPPv2N5obj_t3objE"></span><span id="obj_t::obj__voidP"></span><span class="target" id="structobj__t_1a9be7d0c156cc689aff06237e4a988931"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">obj</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t3objE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Pointer to rapidjson::ObjWavefront instance. </p>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp">
 <span class="target" id="structply__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ply_t</span></span></span><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;PlySerialize.h&gt;</em></div>
+<em>#include &lt;datatypes.h&gt;</em></div>
+<p>Ply structure. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5ply_t3objE">
+<span id="_CPPv3N5ply_t3objE"></span><span id="_CPPv2N5ply_t3objE"></span><span id="ply_t::obj__voidP"></span><span class="target" id="structply__t_1a0fae7a50496ecc026e4daffb4edc09a0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">obj</span></span></span><a class="headerlink" href="#_CPPv4N5ply_t3objE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Pointer to rapidjson::Ply instance. </p>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 <div class="admonition warning">

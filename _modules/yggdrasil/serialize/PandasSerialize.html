@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.PandasSerialize &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.serialize.PandasSerialize &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -273,10 +273,7 @@
                             <span class="sa">f</span><span class="s2">&quot; of &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39; provided.&quot;</span><span class="p">)</span>
         <span class="n">fd</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
         <span class="c1"># For Python 3 and higher, bytes need to be encoded</span>
-        <span class="n">args_</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
-                <span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">args_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_bytes2unicode</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="n">args_</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="c1"># Not in pandas &lt;0.24</span>
                      <span class="c1"># line_terminator=self.newline.decode(&quot;utf-8&quot;),</span>
@@ -328,10 +325,7 @@
         <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
         <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_as_bytes</span><span class="p">:</span>
-            <span class="c1"># Make sure strings are bytes</span>
-            <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">dtypes</span><span class="p">):</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="nb">object</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="c1"># On windows, long != longlong and longlong requires special cformat</span>
         <span class="c1"># For now, long will be used to preserve the use of %ld to match long</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
@@ -356,6 +350,40 @@
         <span class="k">if</span> <span class="n">field_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_names</span>
         <span class="k">return</span> <span class="n">PandasTransform</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PandasSerialize.normalize_unicode2bytes"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.normalize_unicode2bytes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize_unicode2bytes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert columns that are unicode to bytes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (pd.DataFrame): Pandas dataframe to convert columns for.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: Version of args without unicode in columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dtypes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="nb">object</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">args</span></div>
+
+<div class="viewcode-block" id="PandasSerialize.normalize_bytes2unicode"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.normalize_bytes2unicode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize_bytes2unicode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert columns that are bytes to unicode.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (pd.DataFrame): Pandas dataframe to convert columns for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: Version of args without bytes in columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># For Python 3 and higher, bytes need to be encoded</span>
+        <span class="n">args_</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">args_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">args_</span></div>
 
 <div class="viewcode-block" id="PandasSerialize.dict2object"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PandasSerialize.PandasSerialize.dict2object">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">dict2object</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">field_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

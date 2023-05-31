@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.command_line &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.command_line &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -303,8 +303,17 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;type(x) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span></div>
 
+<div class="viewcode-block" id="SubCommand.runtime_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.SubCommand.runtime_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">runtime_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
 <div class="viewcode-block" id="SubCommand.add_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.SubCommand.add_arguments">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">new_param</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">runtime_arguments</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">old_param</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">new_param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">old_param</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">old_param</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">add_argument_to_parser</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SubCommand.add_subparser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.SubCommand.add_subparser">[docs]</a>    <span class="nd">@classmethod</span>
@@ -1221,6 +1230,7 @@
             <span class="k">if</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;ipcs&#39;</span><span class="p">]:</span>
                 <span class="kn">from</span> <span class="nn">yggdrasil.communication.IPCComm</span> <span class="kn">import</span> <span class="n">ipcrm_queues</span>
                 <span class="n">ipcrm_queues</span><span class="p">()</span>
+                <span class="n">ipcrm_queues</span><span class="p">(</span><span class="n">by_id</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">(</span>
                     <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div></div>
@@ -1724,6 +1734,69 @@
                           <span class="n">setup_cfg</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">setup_cfg</span><span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="file_converter"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.file_converter">[docs]</a><span class="k">class</span> <span class="nc">file_converter</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert between compatible file types.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;fconvert&quot;</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Convert a file of one type into another compatible type.&quot;</span><span class="p">)</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">((</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Name of file to convert&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;dst&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Name of destination file&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--from&#39;</span><span class="p">,</span> <span class="s1">&#39;--src-type&#39;</span><span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;src_type&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Source file type&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--to&#39;</span><span class="p">,</span> <span class="s1">&#39;--dst-type&#39;</span><span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;dst_type&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s2">&quot;Destination file type&quot;</span><span class="p">}),</span>
+        <span class="p">((</span><span class="s1">&#39;--src-kwargs&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;src_kwargs&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Keyword arguments for source file communicator &quot;</span>
+                   <span class="s2">&quot;in JSON format&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--dst-kwargs&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;dst_kwargs&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Keyword arguments for destination file communicator &quot;</span>
+                   <span class="s2">&quot;in JSON format&quot;</span><span class="p">)}),</span>
+        <span class="p">((</span><span class="s1">&#39;--transform&#39;</span><span class="p">,</span> <span class="p">),</span>
+         <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Transform keyword arguments for transforming &quot;</span>
+                   <span class="s2">&quot;messages between source and destination in JSON &quot;</span>
+                   <span class="s2">&quot;format&quot;</span><span class="p">)}),</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="file_converter.runtime_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.file_converter.runtime_arguments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">runtime_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">((</span><span class="s1">&#39;--from&#39;</span><span class="p">,</span> <span class="s1">&#39;--src-type&#39;</span><span class="p">),</span>
+             <span class="p">{</span><span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">COMPONENT_REGISTRY</span><span class="p">[</span>
+                 <span class="s1">&#39;file&#39;</span><span class="p">][</span><span class="s1">&#39;subtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())}),</span>
+            <span class="p">((</span><span class="s1">&#39;--to&#39;</span><span class="p">,</span> <span class="s1">&#39;--dst-type&#39;</span><span class="p">),</span>
+             <span class="p">{</span><span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">COMPONENT_REGISTRY</span><span class="p">[</span>
+                 <span class="s1">&#39;file&#39;</span><span class="p">][</span><span class="s1">&#39;subtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())}),</span>
+        <span class="p">]</span></div>
+    
+<div class="viewcode-block" id="file_converter.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.file_converter.func">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.communication.FileComm</span> <span class="kn">import</span> <span class="n">convert_file</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">rapidjson</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">src_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">src_kwargs</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">src_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dst_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">dst_kwargs</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dst_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">rapidjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
+        <span class="n">convert_file</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">src</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dst</span><span class="p">,</span>
+                     <span class="n">src_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">src_type</span><span class="p">,</span> <span class="n">src_kwargs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">src_kwargs</span><span class="p">,</span>
+                     <span class="n">dst_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dst_type</span><span class="p">,</span> <span class="n">dst_kwargs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dst_kwargs</span><span class="p">,</span>
+                     <span class="n">transform</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="generate_gha_workflow"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.generate_gha_workflow">[docs]</a><span class="k">class</span> <span class="nc">generate_gha_workflow</span><span class="p">(</span><span class="n">SubCommand</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Re-generate the Github actions workflow yaml.&quot;&quot;&quot;</span>
 
@@ -1827,7 +1900,8 @@
                    <span class="n">ygginstall</span><span class="p">,</span> <span class="n">update_config</span><span class="p">,</span> <span class="n">regen_schema</span><span class="p">,</span>
                    <span class="n">yggmodelform</span><span class="p">,</span> <span class="n">yggdevup</span><span class="p">,</span>
                    <span class="n">timing_plots</span><span class="p">,</span> <span class="n">generate_gha_workflow</span><span class="p">,</span>
-                   <span class="n">integration_service_manager</span><span class="p">,</span> <span class="n">coveragerc</span><span class="p">]</span>
+                   <span class="n">integration_service_manager</span><span class="p">,</span> <span class="n">coveragerc</span><span class="p">,</span>
+                   <span class="n">file_converter</span><span class="p">]</span>
 
 <div class="viewcode-block" id="main.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

@@ -19,6 +19,7 @@ mpi          Model is being run on another MPI process and this driver is used a
              to monitor it on the root process.                                                               
 osr          Model is an OSR model.                                                                           
 python       Model is written in Python.                                                                      
+pytorch      Model is a PyTorch model                                                                         
 sbml         Model is an SBML model.                                                                          
 timesync     Model is dedicated to synchronizing timesteps between other models.                              
 ==========   ================================================================================   ==============

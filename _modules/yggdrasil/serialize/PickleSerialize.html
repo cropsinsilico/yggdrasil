@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.PickleSerialize &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.serialize.PickleSerialize &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -107,9 +107,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_seritype</span> <span class="o">=</span> <span class="s1">&#39;pickle&#39;</span>
-    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Serialize any Python object using a Python &#39;</span>
-                                   <span class="s1">&#39;pickle.&#39;</span><span class="p">)</span>
-    <span class="n">_default_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;Serialize any Python object using a Python pickle.&#39;</span><span class="p">)</span>
+    <span class="n">file_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.pkl&#39;</span><span class="p">]</span>
     <span class="n">is_framed</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="PickleSerialize.func_serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PickleSerialize.PickleSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>

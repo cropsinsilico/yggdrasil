@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.components &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.components &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -281,16 +281,25 @@
         <span class="n">subtype</span> <span class="o">=</span> <span class="s1">&#39;DefaultComm&#39;</span>
     <span class="k">if</span> <span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">subtype</span> <span class="o">=</span> <span class="n">registry</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span>
+    <span class="n">rev_subtypes</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">[</span><span class="s2">&quot;subtypes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">[</span><span class="s2">&quot;subtypes&quot;</span><span class="p">]:</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="n">registry</span><span class="p">[</span><span class="s2">&quot;subtypes&quot;</span><span class="p">][</span><span class="n">subtype</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">rev_subtypes</span><span class="p">:</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">subtype</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">rev_subtypes</span><span class="p">[</span><span class="n">subtype</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="n">subtype</span>
+    <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subtype_modules&quot;</span><span class="p">,</span> <span class="p">{}):</span>
+        <span class="n">module_name</span> <span class="o">=</span> <span class="n">registry</span><span class="p">[</span><span class="s2">&quot;subtype_modules&quot;</span><span class="p">][</span><span class="n">subtype</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">module_name</span> <span class="o">=</span> <span class="n">class_name</span>
     <span class="c1"># Check registered components to prevent importing multiple times</span>
     <span class="k">if</span> <span class="n">class_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;classes&quot;</span><span class="p">,</span> <span class="p">{}):</span>
         <span class="n">registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;classes&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">registry</span><span class="p">[</span><span class="s2">&quot;classes&quot;</span><span class="p">][</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
-                <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">registry</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">registry</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+                                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
                 <span class="n">class_name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">comptype</span> <span class="o">==</span> <span class="s1">&#39;comm&#39;</span><span class="p">:</span>
@@ -509,12 +518,15 @@
                     <span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">default_subtype</span><span class="p">),</span>
                     <span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_base_class</span><span class="p">),</span>
                     <span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s2">&quot;subtypes&quot;</span><span class="p">,</span> <span class="p">{})])</span>
+                    <span class="p">(</span><span class="s2">&quot;subtypes&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+                    <span class="p">(</span><span class="s2">&quot;subtype_modules&quot;</span><span class="p">,</span> <span class="p">{})])</span>
             <span class="k">elif</span> <span class="n">default_subtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">][</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">default_subtype</span>
             <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">][</span><span class="s2">&quot;classes&quot;</span><span class="p">]:</span>
                 <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">][</span><span class="s2">&quot;classes&quot;</span><span class="p">][</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
                 <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">][</span><span class="s2">&quot;subtypes&quot;</span><span class="p">][</span><span class="n">subtype</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">][</span><span class="s2">&quot;subtype_modules&quot;</span><span class="p">][</span><span class="n">subtype</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">registration_in_progress</span><span class="p">():</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
@@ -746,6 +758,24 @@
 <span class="sd">        These actions will not be performed if the environment variable</span>
 <span class="sd">        YGGDRASIL_REGISTRATION_IN_PROGRESS is set.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="create_component_class"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.create_component_class">[docs]</a><span class="k">def</span> <span class="nf">create_component_class</span><span class="p">(</span><span class="n">globals_dict</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new component class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        globals_dict (dict): Globals dictionary that new class should be</span>
+<span class="sd">            added to.</span>
+<span class="sd">        base (type): Base class for new class. The new class will have</span>
+<span class="sd">            the same module as base.</span>
+<span class="sd">        name (str): Name for the new class.</span>
+<span class="sd">        attr (dict): Attributes that should be added to the new class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">attr</span><span class="p">[</span><span class="s1">&#39;__module__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="vm">__module__</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="p">),</span> <span class="n">attr</span><span class="p">)</span>
+    <span class="n">globals_dict</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
+    <span class="k">del</span> <span class="bp">cls</span></div>
 </pre></div>
 
            </div>

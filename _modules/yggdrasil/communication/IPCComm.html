@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -183,7 +183,7 @@
         <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
 
 
-<div class="viewcode-block" id="ipc_queues"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipc_queues">[docs]</a><span class="k">def</span> <span class="nf">ipc_queues</span><span class="p">():</span>
+<div class="viewcode-block" id="ipc_queues"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipc_queues">[docs]</a><span class="k">def</span> <span class="nf">ipc_queues</span><span class="p">(</span><span class="n">by_id</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of active IPC queues.</span>
 
 <span class="sd">    Returns:</span>
@@ -211,9 +211,15 @@
                     <span class="k">break</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
-                <span class="n">key_col</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">by_id</span><span class="p">:</span>
+                    <span class="n">key_col</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">key_col</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
-                <span class="n">key_col</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="n">by_id</span><span class="p">:</span>
+                    <span class="n">key_col</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">key_col</span> <span class="o">=</span> <span class="mi">2</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unsure what column the queue key &quot;</span>
                                           <span class="o">+</span> <span class="s2">&quot;is in on this platform &quot;</span>
@@ -245,7 +251,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;IPC not installed. ipcrm cannot be run.&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">(</span><span class="n">queue_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">(</span><span class="n">queue_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">by_id</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete existing IPC queues.</span>
 
 <span class="sd">    Args:</span>
@@ -255,11 +261,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_ipc_installed</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">queue_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">queue_keys</span> <span class="o">=</span> <span class="n">ipc_queues</span><span class="p">()</span>
+            <span class="n">queue_keys</span> <span class="o">=</span> <span class="n">ipc_queues</span><span class="p">(</span><span class="n">by_id</span><span class="o">=</span><span class="n">by_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">queue_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">queue_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">queue_keys</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">by_id</span><span class="p">:</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="s1">&#39;-q&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="s1">&#39;-Q&#39;</span>
         <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queue_keys</span><span class="p">:</span>
-            <span class="n">ipcrm</span><span class="p">([</span><span class="s2">&quot;-Q </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">q</span><span class="p">])</span>
+            <span class="n">ipcrm</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flags</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;IPC not installed. ipcrm cannot be run.&quot;</span><span class="p">)</span></div>
 

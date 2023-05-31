@@ -19,6 +19,9 @@ lpy        yggdrasil.lpy        n/a                   Dependencies required to r
                                                       as part of |yggdrasil| integrations     
 mpi        yggdrasil.mpi        yggdrasil[mpi]        Dependencies required to run            
                                                       integrations as MPI parallel jobs       
+pytorch    yggdrasil.pytorch    yggdrasil[pytorch]    Dependencies required to run PyTorch    
+                                                      models as part of |yggdrasil|           
+                                                      integrations                            
 sbml       yggdrasil.sbml       yggdrasil[sbml]       Dependencies required to run SBML models
                                                       as part of |yggdrasil| integrations     
 zmq        yggdrasil.zmq        n/a                   Dependencies required to run models     
@@ -28,6 +31,12 @@ omp        yggdrasil.omp        n/a                   Dependencies required to r
                                                       integrations that use OpenMP            
 rmq        yggdrasil.rmq        yggdrasil[rmq]        Dependencies required to run            
                                                       integrations with RabbitMQ communication
+images     yggdrasil.images     yggdrasil[images]     Dependencies required to perform I/O on 
+                                                      common image files.                     
+seq        yggdrasil.seq        yggdrasil[seq]        Dependencies required to handle sequence
+                                                      (nucleotide/protein) I/O                
+excel      yggdrasil.excel      yggdrasil[excel]      Dependencies required to read/write     
+                                                      excel files                             
 testing    yggdrasil.testing    yggdrasil[testing]    Dependencies required to run |yggdrasil|
                                                       tests                                   
 docs       yggdrasil.docs       yggdrasil[docs]       Dependencies required to build          

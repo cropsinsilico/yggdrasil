@@ -6,27 +6,6 @@
         "comm": {
             "additionalProperties": false,
             "properties": {
-                "default_file": {
-                    "$ref": "#/definitions/file",
-                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
-                },
-                "outside_loop": {
-                    "default": false,
-                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
-                },
-                "format_str": {
-                    "description": "String that should be used to format/parse messages. Default to None.",
-                    "type": "string"
-                },
                 "default_value": {
                     "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
                     "type": [
@@ -38,9 +17,33 @@
                         "null"
                     ]
                 },
+                "outside_loop": {
+                    "default": false,
+                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
                 "working_dir": {
                     "description": "Working directory. If not provided, the current working directory is used.",
                     "type": "string"
+                },
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
+                    "type": "string"
+                },
+                "transform": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/transform"
+                    },
+                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
+                },
+                "default_file": {
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
                 },
                 "vars": {
                     "allowSingular": true,
@@ -59,18 +62,15 @@
                     },
                     "type": "array"
                 },
-                "transform": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/transform"
-                    },
-                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
-                },
                 "name": {
                     "description": "Name used for component in log messages.",
                     "pattern": "^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
                     "type": "string",
                     "propertyOrder": 0
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
                 },
                 "count": {
                     "default": 1,
@@ -100,15 +100,16 @@
             "allowSingular": "name",
             "description": "Base schema for all subtypes of comm components.",
             "properties": {
-                "default_file": {
-                    "$ref": "#/definitions/file",
-                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
-                },
-                "for_service": {
-                    "default": false,
-                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
+                "default_value": {
+                    "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
+                    "type": [
+                        "number",
+                        "string",
+                        "boolean",
+                        "object",
+                        "array",
+                        "null"
+                    ]
                 },
                 "outside_loop": {
                     "default": false,
@@ -116,21 +117,8 @@
                     "type": "boolean",
                     "format": "checkbox"
                 },
-                "is_default": {
-                    "default": false,
-                    "description": "If True, this comm was created to handle all input/output variables to/from a model. Defaults to False. This variable is used internally and should not be set explicitly in the YAML.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
-                },
-                "format_str": {
-                    "description": "String that should be used to format/parse messages. Default to None.",
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
                     "type": "string"
                 },
                 "commtype": {
@@ -149,47 +137,20 @@
                     ],
                     "type": "string"
                 },
-                "dont_copy": {
-                    "default": false,
-                    "description": "If True, the comm will not be duplicated in the even a model is duplicated via the 'copies' parameter. Defaults to False except for in the case that a model is wrapped and the comm is inside the loop or that a model is a RPC input to a model server.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "default_value": {
-                    "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
-                    "type": [
-                        "number",
-                        "string",
-                        "boolean",
-                        "object",
-                        "array",
-                        "null"
-                    ]
-                },
                 "address": {
                     "description": "Communication info. Default to None and address is taken from the environment variable.",
                     "type": "string"
                 },
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
                     "type": "string"
                 },
-                "vars": {
-                    "allowSingular": true,
-                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
-                    "items": {
-                        "allowSingular": "name",
-                        "properties": {
-                            "datatype": {
-                                "$ref": "#/definitions/schema"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object"
+                "length_map": {
+                    "additionalProperties": {
+                        "type": "string"
                     },
-                    "type": "array"
+                    "description": "Map from pointer variable names to the names of variables where their length will be stored. Defaults to {}.",
+                    "type": "object"
                 },
                 "transform": {
                     "aliases": [
@@ -213,21 +174,60 @@
                     },
                     "type": "array"
                 },
+                "dont_copy": {
+                    "default": false,
+                    "description": "If True, the comm will not be duplicated in the even a model is duplicated via the 'copies' parameter. Defaults to False except for in the case that a model is wrapped and the comm is inside the loop or that a model is a RPC input to a model server.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "is_default": {
+                    "default": false,
+                    "description": "If True, this comm was created to handle all input/output variables to/from a model. Defaults to False. This variable is used internally and should not be set explicitly in the YAML.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
                 "serializer": {
                     "$ref": "#/definitions/serializer",
                     "description": "Class with serialize and deserialize methods that should be used to process sent and received messages or a dictionary describing a serializer that obeys the serializer schema."
+                },
+                "default_file": {
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
+                },
+                "vars": {
+                    "allowSingular": true,
+                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
+                    "items": {
+                        "allowSingular": "name",
+                        "properties": {
+                            "datatype": {
+                                "$ref": "#/definitions/schema"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
                 },
                 "name": {
                     "description": "Name used for component in log messages.",
                     "pattern": "^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
                     "type": "string"
                 },
-                "length_map": {
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "description": "Map from pointer variable names to the names of variables where their length will be stored. Defaults to {}.",
-                    "type": "object"
+                "for_service": {
+                    "default": false,
+                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
                 },
                 "client_id": {
                     "type": "string"
@@ -509,16 +509,7 @@
             "additionalProperties": false,
             "description": "Base schema for all subtypes of connection components.",
             "properties": {
-                "input_pattern": {
-                    "default": "cycle",
-                    "description": "The communication pattern that should be used to handle incoming messages when there is more than one input communicators present. Defaults to 'cycle'. Options include: 'cycle': Receive from the next available input communicator. 'gather': Receive lists of messages with one element from each communicator where a message is only returned when there is a message from each.",
-                    "enum": [
-                        "cycle",
-                        "gather"
-                    ],
-                    "type": "string"
-                },
-                "read_meth": {
+                "write_meth": {
                     "deprecated": true,
                     "enum": [
                         "all",
@@ -538,6 +529,53 @@
                         "wofost",
                         "yaml"
                     ],
+                    "type": "string"
+                },
+                "output_pattern": {
+                    "default": "broadcast",
+                    "description": "The communication pattern that should be used to handling outgoing messages when there is more than one output communicator present. Defaults to 'broadcast'. Options include: 'cycle': Rotate through output comms, sending one message to each. 'broadcast': Send the same message to each comm. 'scatter': Send part of message (must be a list) to each comm.",
+                    "enum": [
+                        "cycle",
+                        "broadcast",
+                        "scatter"
+                    ],
+                    "type": "string"
+                },
+                "transform": {
+                    "aliases": [
+                        "transforms",
+                        "translator",
+                        "translators"
+                    ],
+                    "allowSingular": true,
+                    "description": "Function or string specifying function that should be used to translate messages from the input communicator before passing them to the output communicator. If a string, the format should be \"<package.module>:<function>\" so that <function> can be imported from <package>. Defaults to None and messages are passed directly. This can also be a list of functions/strings that will be called on the messages in the order they are provided.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/transform"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "type": "array"
+                },
+                "input_pattern": {
+                    "default": "cycle",
+                    "description": "The communication pattern that should be used to handle incoming messages when there is more than one input communicators present. Defaults to 'cycle'. Options include: 'cycle': Receive from the next available input communicator. 'gather': Receive lists of messages with one element from each communicator where a message is only returned when there is a message from each.",
+                    "enum": [
+                        "cycle",
+                        "gather"
+                    ],
+                    "type": "string"
+                },
+                "onexit": {
+                    "description": "Class method that should be called when a model that the connection interacts with exits, but before the connection driver is shut down. Defaults to None.",
+                    "type": "string"
+                },
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
                     "type": "string"
                 },
                 "outputs": {
@@ -562,10 +600,6 @@
                     "minItems": 1,
                     "type": "array"
                 },
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
-                    "type": "string"
-                },
                 "inputs": {
                     "aliases": [
                         "input",
@@ -588,21 +622,20 @@
                     "minItems": 1,
                     "type": "array"
                 },
-                "onexit": {
-                    "description": "Class method that should be called when a model that the connection interacts with exits, but before the connection driver is shut down. Defaults to None.",
-                    "type": "string"
-                },
-                "output_pattern": {
-                    "default": "broadcast",
-                    "description": "The communication pattern that should be used to handling outgoing messages when there is more than one output communicator present. Defaults to 'broadcast'. Options include: 'cycle': Rotate through output comms, sending one message to each. 'broadcast': Send the same message to each comm. 'scatter': Send part of message (must be a list) to each comm.",
+                "connection_type": {
+                    "description": "Connection between one or more comms/files and one or more comms/files.",
                     "enum": [
-                        "cycle",
-                        "broadcast",
-                        "scatter"
+                        "connection",
+                        "file_input",
+                        "file_output",
+                        "input",
+                        "output",
+                        "rpc_request",
+                        "rpc_response"
                     ],
                     "type": "string"
                 },
-                "write_meth": {
+                "read_meth": {
                     "deprecated": true,
                     "enum": [
                         "all",
@@ -623,39 +656,6 @@
                         "yaml"
                     ],
                     "type": "string"
-                },
-                "connection_type": {
-                    "description": "Connection between one or more comms/files and one or more comms/files.",
-                    "enum": [
-                        "connection",
-                        "file_input",
-                        "file_output",
-                        "input",
-                        "output",
-                        "rpc_request",
-                        "rpc_response"
-                    ],
-                    "type": "string"
-                },
-                "transform": {
-                    "aliases": [
-                        "transforms",
-                        "translator",
-                        "translators"
-                    ],
-                    "allowSingular": true,
-                    "description": "Function or string specifying function that should be used to translate messages from the input communicator before passing them to the output communicator. If a string, the format should be \"<package.module>:<function>\" so that <function> can be imported from <package>. Defaults to None and messages are passed directly. This can also be a list of functions/strings that will be called on the messages in the order they are provided.",
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/definitions/transform"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "type": "array"
                 }
             },
             "type": "object",
@@ -793,56 +793,9 @@
         "file": {
             "additionalProperties": false,
             "properties": {
-                "filetype": {
-                    "default": "binary",
-                    "description": "The type of file that will be read from or written to.",
-                    "enum": [
-                        "ascii",
-                        "binary",
-                        "json",
-                        "map",
-                        "mat",
-                        "netcdf",
-                        "obj",
-                        "pandas",
-                        "pickle",
-                        "ply",
-                        "table",
-                        "wofost",
-                        "yaml"
-                    ],
-                    "type": "string"
-                },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
-                },
                 "format_str": {
                     "description": "String that should be used to format/parse messages. Default to None.",
                     "type": "string"
-                },
-                "append": {
-                    "default": false,
-                    "description": "If True and writing, file is openned in append mode. If True and reading, file is kept open even if the end of the file is reached to allow for another process to write to the file in append mode. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "vars": {
-                    "allowSingular": true,
-                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
-                    "items": {
-                        "allowSingular": "name",
-                        "properties": {
-                            "datatype": {
-                                "$ref": "#/definitions/schema"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "type": "array"
                 },
                 "transform": {
                     "aliases": [
@@ -866,16 +819,77 @@
                     },
                     "type": "array"
                 },
+                "filetype": {
+                    "default": "binary",
+                    "description": "The type of file that will be read from or written to.",
+                    "enum": [
+                        "ascii",
+                        "bam",
+                        "bcf",
+                        "binary",
+                        "bmp",
+                        "cabo",
+                        "cram",
+                        "eps",
+                        "excel",
+                        "fasta",
+                        "fastq",
+                        "gif",
+                        "jpeg",
+                        "json",
+                        "map",
+                        "mat",
+                        "netcdf",
+                        "obj",
+                        "pandas",
+                        "pickle",
+                        "ply",
+                        "png",
+                        "sam",
+                        "table",
+                        "tiff",
+                        "vcf",
+                        "yaml"
+                    ],
+                    "type": "string"
+                },
+                "vars": {
+                    "allowSingular": true,
+                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
+                    "items": {
+                        "allowSingular": "name",
+                        "properties": {
+                            "datatype": {
+                                "$ref": "#/definitions/schema"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Path to a file in the model repository",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "append": {
+                    "default": false,
+                    "description": "If True and writing, file is openned in append mode. If True and reading, file is kept open even if the end of the file is reached to allow for another process to write to the file in append mode. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
                 "is_series": {
                     "default": false,
                     "description": "If True, input/output will be done to a series of files. If reading, each file will be processed until the end is reached. If writing, each output will be to a new file in the series. The addressed is assumed to contain a format for the index of the file. Defaults to False.",
                     "type": "boolean",
                     "format": "checkbox"
                 },
-                "name": {
-                    "description": "Path to a file in the model repository",
-                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
-                    "type": "string"
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
                 },
                 "comment": {
                     "default": "# ",
@@ -887,14 +901,13 @@
                                 "ascii",
                                 "map",
                                 "table",
+                                "cabo",
                                 "json",
                                 "mat",
-                                "netcdf",
                                 "obj",
                                 "pandas",
                                 "pickle",
                                 "ply",
-                                "wofost",
                                 "yaml"
                             ]
                         }
@@ -910,14 +923,13 @@
                                 "ascii",
                                 "map",
                                 "table",
+                                "cabo",
                                 "json",
                                 "mat",
-                                "netcdf",
                                 "obj",
                                 "pandas",
                                 "pickle",
                                 "ply",
-                                "wofost",
                                 "yaml"
                             ]
                         }
@@ -932,8 +944,8 @@
                             "filetype": [
                                 "map",
                                 "table",
-                                "pandas",
-                                "wofost"
+                                "cabo",
+                                "pandas"
                             ]
                         }
                     }
@@ -951,6 +963,216 @@
                         }
                     },
                     "format": "checkbox"
+                },
+                "flush_on_write": {
+                    "default": false,
+                    "description": "If true, the file will be flushed when written to.",
+                    "type": "boolean",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "bam",
+                                "bcf",
+                                "cram",
+                                "sam",
+                                "vcf"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
+                },
+                "header": {
+                    "description": "Header defining sequence identifiers. A header is required for writing SAM, BAM, and CRAM files.",
+                    "type": "object",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "bam",
+                                "bcf",
+                                "cram",
+                                "sam",
+                                "vcf"
+                            ]
+                        }
+                    }
+                },
+                "index": {
+                    "description": "Path to file containing index if different from the standard naming convention for BAM and CRAM files.",
+                    "type": "string",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "bam",
+                                "bcf",
+                                "cram",
+                                "sam",
+                                "vcf"
+                            ]
+                        }
+                    }
+                },
+                "regions": {
+                    "default": [],
+                    "description": "Region parameters (reference name, start, and end) defining the regions that should be read. If not provided, all regions will be read.",
+                    "items": {
+                        "properties": {
+                            "end": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "bam",
+                                "bcf",
+                                "cram",
+                                "sam",
+                                "vcf"
+                            ]
+                        }
+                    }
+                },
+                "columns": {
+                    "description": "Names of columns to read/write.",
+                    "items": {
+                        "type": [
+                            "string",
+                            "integer"
+                        ]
+                    },
+                    "type": "array",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel"
+                            ]
+                        }
+                    }
+                },
+                "endcol": {
+                    "description": "Column to stop read at (non-inclusive).",
+                    "type": "integer",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel"
+                            ]
+                        }
+                    }
+                },
+                "endrow": {
+                    "description": "Row to stop read at (non-inclusive).",
+                    "type": "integer",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel"
+                            ]
+                        }
+                    }
+                },
+                "sheet_template": {
+                    "description": "Format string that can be completed with % operator to generate names for each subsequent sheet when writing.",
+                    "type": "string",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel"
+                            ]
+                        }
+                    }
+                },
+                "sheets": {
+                    "allowSingular": true,
+                    "default": [],
+                    "description": "Name(s) of one more more sheets that should be read/written. If not provided during read, all sheets will be read.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel"
+                            ]
+                        }
+                    }
+                },
+                "startcol": {
+                    "default": 0,
+                    "description": "Column to start read/write at.",
+                    "type": "integer",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel"
+                            ]
+                        }
+                    }
+                },
+                "startrow": {
+                    "default": 0,
+                    "description": "Row to start read/write at.",
+                    "type": "integer",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel"
+                            ]
+                        }
+                    }
+                },
+                "str_as_bytes": {
+                    "default": false,
+                    "description": "If true, strings in columns are read as bytes",
+                    "type": "boolean",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "excel",
+                                "pandas"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
+                },
+                "piecemeal": {
+                    "default": false,
+                    "description": "If possible read the the file incrementally in multiple messages. This should be used for large files that cannot be loaded into memory.",
+                    "type": "boolean",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "fasta",
+                                "fastq"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
+                },
+                "record_ids": {
+                    "description": "IDs of records to read/write. Other records will be ignored.",
+                    "type": "array",
+                    "options": {
+                        "dependencies": {
+                            "filetype": [
+                                "fasta",
+                                "fastq"
+                            ]
+                        }
+                    }
                 },
                 "indent": {
                     "default": "\t",
@@ -1024,22 +1246,23 @@
                         }
                     }
                 },
-                "no_header": {
-                    "default": false,
-                    "description": "If True, headers will not be read or serialized from/to tables. Defaults to False.",
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
                     "type": "boolean",
                     "options": {
                         "dependencies": {
                             "filetype": [
-                                "pandas"
+                                "obj",
+                                "ply"
                             ]
                         }
                     },
                     "format": "checkbox"
                 },
-                "str_as_bytes": {
+                "no_header": {
                     "default": false,
-                    "description": "If True, strings in columns are read as bytes. Defaults to False.",
+                    "description": "If True, headers will not be read or serialized from/to tables. Defaults to False.",
                     "type": "boolean",
                     "options": {
                         "dependencies": {
@@ -1095,81 +1318,29 @@
             "allowSingular": "name",
             "description": "Base schema for all subtypes of file components.",
             "properties": {
-                "for_service": {
-                    "default": false,
-                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "filetype": {
-                    "default": "binary",
-                    "description": "The type of file that will be read from or written to.",
-                    "enum": [
-                        "ascii",
-                        "binary",
-                        "json",
-                        "map",
-                        "mat",
-                        "netcdf",
-                        "obj",
-                        "pandas",
-                        "pickle",
-                        "ply",
-                        "table",
-                        "wofost",
-                        "yaml"
-                    ],
-                    "type": "string"
-                },
-                "in_temp": {
-                    "default": false,
-                    "description": "If True, the path will be considered relative to the platform temporary directory. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
-                },
-                "format_str": {
-                    "description": "String that should be used to format/parse messages. Default to None.",
-                    "type": "string"
-                },
-                "append": {
-                    "default": false,
-                    "description": "If True and writing, file is openned in append mode. If True and reading, file is kept open even if the end of the file is reached to allow for another process to write to the file in append mode. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
                 "wait_for_creation": {
                     "default": 0.0,
                     "description": "Time (in seconds) that should be waited before opening for the file to be created if it dosn't exist. Defaults to 0 s and file will attempt to be opened immediately.",
                     "type": "number"
                 },
-                "address": {
-                    "description": "Communication info. Default to None and address is taken from the environment variable.",
-                    "type": "string"
-                },
                 "working_dir": {
                     "description": "Working directory. If not provided, the current working directory is used.",
                     "type": "string"
                 },
-                "vars": {
-                    "allowSingular": true,
-                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
-                    "items": {
-                        "allowSingular": "name",
-                        "properties": {
-                            "datatype": {
-                                "$ref": "#/definitions/schema"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object"
+                "address": {
+                    "description": "Communication info. Default to None and address is taken from the environment variable.",
+                    "type": "string"
+                },
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
+                    "type": "string"
+                },
+                "length_map": {
+                    "additionalProperties": {
+                        "type": "string"
                     },
-                    "type": "array"
+                    "description": "Map from pointer variable names to the names of variables where their length will be stored. Defaults to {}.",
+                    "type": "object"
                 },
                 "transform": {
                     "aliases": [
@@ -1193,26 +1364,91 @@
                     },
                     "type": "array"
                 },
-                "is_series": {
+                "in_temp": {
                     "default": false,
-                    "description": "If True, input/output will be done to a series of files. If reading, each file will be processed until the end is reached. If writing, each output will be to a new file in the series. The addressed is assumed to contain a format for the index of the file. Defaults to False.",
+                    "description": "If True, the path will be considered relative to the platform temporary directory. Defaults to False.",
                     "type": "boolean",
                     "format": "checkbox"
+                },
+                "filetype": {
+                    "default": "binary",
+                    "description": "The type of file that will be read from or written to.",
+                    "enum": [
+                        "ascii",
+                        "bam",
+                        "bcf",
+                        "binary",
+                        "bmp",
+                        "cabo",
+                        "cram",
+                        "eps",
+                        "excel",
+                        "fasta",
+                        "fastq",
+                        "gif",
+                        "jpeg",
+                        "json",
+                        "map",
+                        "mat",
+                        "netcdf",
+                        "obj",
+                        "pandas",
+                        "pickle",
+                        "ply",
+                        "png",
+                        "sam",
+                        "table",
+                        "tiff",
+                        "vcf",
+                        "yaml"
+                    ],
+                    "type": "string"
+                },
+                "vars": {
+                    "allowSingular": true,
+                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
+                    "items": {
+                        "allowSingular": "name",
+                        "properties": {
+                            "datatype": {
+                                "$ref": "#/definitions/schema"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
                 },
                 "name": {
                     "description": "Name used for component in log messages.",
                     "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
                     "type": "string"
                 },
-                "length_map": {
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "description": "Map from pointer variable names to the names of variables where their length will be stored. Defaults to {}.",
-                    "type": "object"
+                "append": {
+                    "default": false,
+                    "description": "If True and writing, file is openned in append mode. If True and reading, file is kept open even if the end of the file is reached to allow for another process to write to the file in append mode. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "for_service": {
+                    "default": false,
+                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "is_series": {
+                    "default": false,
+                    "description": "If True, input/output will be done to a series of files. If reading, each file will be processed until the end is reached. If writing, each output will be to a new file in the series. The addressed is assumed to contain a format for the index of the file. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
                 },
                 "read_meth": {
-                    "default": "read",
                     "deprecated": true,
                     "description": "Method that should be used to read data from the file. Defaults to 'read'. Ignored if direction is 'send'.",
                     "enum": [
@@ -1256,6 +1492,104 @@
                     "type": "boolean",
                     "format": "checkbox"
                 },
+                "flush_on_write": {
+                    "default": false,
+                    "description": "If true, the file will be flushed when written to.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "header": {
+                    "description": "Header defining sequence identifiers. A header is required for writing SAM, BAM, and CRAM files.",
+                    "type": "object"
+                },
+                "index": {
+                    "description": "Path to file containing index if different from the standard naming convention for BAM and CRAM files.",
+                    "type": "string"
+                },
+                "regions": {
+                    "default": [],
+                    "description": "Region parameters (reference name, start, and end) defining the regions that should be read. If not provided, all regions will be read.",
+                    "items": {
+                        "properties": {
+                            "end": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "params": {
+                    "default": {},
+                    "description": "Parameters that should be based to the PIL.Image save/open command",
+                    "type": "object"
+                },
+                "columns": {
+                    "description": "Names of columns to read/write.",
+                    "items": {
+                        "type": [
+                            "string",
+                            "integer"
+                        ]
+                    },
+                    "type": "array"
+                },
+                "endcol": {
+                    "description": "Column to stop read at (non-inclusive).",
+                    "type": "integer"
+                },
+                "endrow": {
+                    "description": "Row to stop read at (non-inclusive).",
+                    "type": "integer"
+                },
+                "sheet_template": {
+                    "description": "Format string that can be completed with % operator to generate names for each subsequent sheet when writing.",
+                    "type": "string"
+                },
+                "sheets": {
+                    "allowSingular": true,
+                    "default": [],
+                    "description": "Name(s) of one more more sheets that should be read/written. If not provided during read, all sheets will be read.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "startcol": {
+                    "default": 0,
+                    "description": "Column to start read/write at.",
+                    "type": "integer"
+                },
+                "startrow": {
+                    "default": 0,
+                    "description": "Row to start read/write at.",
+                    "type": "integer"
+                },
+                "str_as_bytes": {
+                    "default": false,
+                    "description": "If true, strings in columns are read as bytes",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "piecemeal": {
+                    "default": false,
+                    "description": "If possible read the the file incrementally in multiple messages. This should be used for large files that cannot be loaded into memory.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "record_ids": {
+                    "description": "IDs of records to read/write. Other records will be ignored.",
+                    "type": "array"
+                },
                 "indent": {
                     "default": "\t",
                     "description": "String or number of spaces that should be used to indent each level within the seiralized structure. Defaults to '\\t'.",
@@ -1292,15 +1626,15 @@
                     ],
                     "type": "integer"
                 },
-                "no_header": {
-                    "default": false,
-                    "description": "If True, headers will not be read or serialized from/to tables. Defaults to False.",
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
                     "type": "boolean",
                     "format": "checkbox"
                 },
-                "str_as_bytes": {
+                "no_header": {
                     "default": false,
-                    "description": "If True, strings in columns are read as bytes. Defaults to False.",
+                    "description": "If True, headers will not be read or serialized from/to tables. Defaults to False.",
                     "type": "boolean",
                     "format": "checkbox"
                 },
@@ -1345,7 +1679,6 @@
                     "type": "string"
                 },
                 "read_meth": {
-                    "default": "read",
                     "deprecated": true,
                     "description": "Method that should be used to read data from the file. Defaults to 'read'. Ignored if direction is 'send'.",
                     "enum": [
@@ -1505,6 +1838,483 @@
             ],
             "type": "object"
         },
+        "file-subtype-bam": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['bam'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "bam",
+                    "description": "bam sequence I/O",
+                    "enum": [
+                        "bam"
+                    ],
+                    "type": "string"
+                },
+                "flush_on_write": {
+                    "default": false,
+                    "description": "If true, the file will be flushed when written to.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "header": {
+                    "description": "Header defining sequence identifiers. A header is required for writing SAM, BAM, and CRAM files.",
+                    "type": "object"
+                },
+                "index": {
+                    "description": "Path to file containing index if different from the standard naming convention for BAM and CRAM files.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "regions": {
+                    "default": [],
+                    "description": "Region parameters (reference name, start, and end) defining the regions that should be read. If not provided, all regions will be read.",
+                    "items": {
+                        "properties": {
+                            "end": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-bcf": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['bcf'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "bcf",
+                    "description": "bcf sequence I/O",
+                    "enum": [
+                        "bcf"
+                    ],
+                    "type": "string"
+                },
+                "flush_on_write": {
+                    "default": false,
+                    "description": "If true, the file will be flushed when written to.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "header": {
+                    "description": "Header defining sequence identifiers. A header is required for writing SAM, BAM, and CRAM files.",
+                    "type": "object"
+                },
+                "index": {
+                    "description": "Path to file containing index if different from the standard naming convention for BAM and CRAM files.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "regions": {
+                    "default": [],
+                    "description": "Region parameters (reference name, start, and end) defining the regions that should be read. If not provided, all regions will be read.",
+                    "items": {
+                        "properties": {
+                            "end": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-bmp": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['bmp'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "bmp",
+                    "description": "bmp image I/O",
+                    "enum": [
+                        "bmp"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "params": {
+                    "default": {},
+                    "description": "Parameters that should be based to the PIL.Image save/open command",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-cabo": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['cabo'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "cabo",
+                    "description": "The file is a CABO parameter file.",
+                    "enum": [
+                        "cabo"
+                    ],
+                    "type": "string"
+                },
+                "comment": {
+                    "default": "# ",
+                    "description": "One or more characters indicating a comment. Defaults to '# '.",
+                    "type": "string"
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
+                },
+                "delimiter": {
+                    "default": " = ",
+                    "description": "Delimiter that should be used to separate name/value pairs in the map. Defaults to \\t.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "newline": {
+                    "default": "\n",
+                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-cram": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['cram'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "cram",
+                    "description": "cram sequence I/O",
+                    "enum": [
+                        "cram"
+                    ],
+                    "type": "string"
+                },
+                "flush_on_write": {
+                    "default": false,
+                    "description": "If true, the file will be flushed when written to.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "header": {
+                    "description": "Header defining sequence identifiers. A header is required for writing SAM, BAM, and CRAM files.",
+                    "type": "object"
+                },
+                "index": {
+                    "description": "Path to file containing index if different from the standard naming convention for BAM and CRAM files.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "regions": {
+                    "default": [],
+                    "description": "Region parameters (reference name, start, and end) defining the regions that should be read. If not provided, all regions will be read.",
+                    "items": {
+                        "properties": {
+                            "end": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-eps": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['eps'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "eps",
+                    "description": "eps image I/O",
+                    "enum": [
+                        "eps"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "params": {
+                    "default": {},
+                    "description": "Parameters that should be based to the PIL.Image save/open command",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-excel": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['excel'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "excel",
+                    "description": "The file is read/written as Excel",
+                    "enum": [
+                        "excel"
+                    ],
+                    "type": "string"
+                },
+                "columns": {
+                    "description": "Names of columns to read/write.",
+                    "items": {
+                        "type": [
+                            "string",
+                            "integer"
+                        ]
+                    },
+                    "type": "array"
+                },
+                "endcol": {
+                    "description": "Column to stop read at (non-inclusive).",
+                    "type": "integer"
+                },
+                "endrow": {
+                    "description": "Row to stop read at (non-inclusive).",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "sheet_template": {
+                    "description": "Format string that can be completed with % operator to generate names for each subsequent sheet when writing.",
+                    "type": "string"
+                },
+                "sheets": {
+                    "allowSingular": true,
+                    "default": [],
+                    "description": "Name(s) of one more more sheets that should be read/written. If not provided during read, all sheets will be read.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "startcol": {
+                    "default": 0,
+                    "description": "Column to start read/write at.",
+                    "type": "integer"
+                },
+                "startrow": {
+                    "default": 0,
+                    "description": "Row to start read/write at.",
+                    "type": "integer"
+                },
+                "str_as_bytes": {
+                    "default": false,
+                    "description": "If true, strings in columns are read as bytes",
+                    "type": "boolean",
+                    "format": "checkbox"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-fasta": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['fasta'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "fasta",
+                    "description": "fasta sequence I/O",
+                    "enum": [
+                        "fasta"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "piecemeal": {
+                    "default": false,
+                    "description": "If possible read the the file incrementally in multiple messages. This should be used for large files that cannot be loaded into memory.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "record_ids": {
+                    "description": "IDs of records to read/write. Other records will be ignored.",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-fastq": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['fastq'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "fastq",
+                    "description": "fastq sequence I/O",
+                    "enum": [
+                        "fastq"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "piecemeal": {
+                    "default": false,
+                    "description": "If possible read the the file incrementally in multiple messages. This should be used for large files that cannot be loaded into memory.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "record_ids": {
+                    "description": "IDs of records to read/write. Other records will be ignored.",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-gif": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['gif'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "gif",
+                    "description": "gif image I/O",
+                    "enum": [
+                        "gif"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "params": {
+                    "default": {},
+                    "description": "Parameters that should be based to the PIL.Image save/open command",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-jpeg": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['jpeg'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "jpeg",
+                    "description": "jpeg image I/O",
+                    "enum": [
+                        "jpeg"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "params": {
+                    "default": {},
+                    "description": "Parameters that should be based to the PIL.Image save/open command",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
         "file-subtype-json": {
             "additionalProperties": true,
             "allowSingular": "name",
@@ -1606,22 +2416,9 @@
                     ],
                     "type": "string"
                 },
-                "comment": {
-                    "default": "# ",
-                    "description": "One or more characters indicating a comment. Defaults to '# '.",
-                    "type": "string"
-                },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
                 "name": {
                     "description": "Name used for component in log messages.",
                     "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
-                    "type": "string"
-                },
-                "newline": {
-                    "default": "\n",
-                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
                     "type": "string"
                 },
                 "read_attributes": {
@@ -1682,6 +2479,41 @@
                     "default": "\n",
                     "description": "One or more characters indicating a newline. Defaults to '\\n'.",
                     "type": "string"
+                },
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-png": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['png'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "png",
+                    "description": "png image I/O",
+                    "enum": [
+                        "png"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "params": {
+                    "default": {},
+                    "description": "Parameters that should be based to the PIL.Image save/open command",
+                    "type": "object"
                 }
             },
             "required": [
@@ -1819,6 +2651,12 @@
                     "default": "\n",
                     "description": "One or more characters indicating a newline. Defaults to '\\n'.",
                     "type": "string"
+                },
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
+                    "type": "boolean",
+                    "format": "checkbox"
                 }
             },
             "required": [
@@ -1826,30 +2664,31 @@
             ],
             "type": "object"
         },
-        "file-subtype-wofost": {
+        "file-subtype-sam": {
             "additionalProperties": true,
             "allowSingular": "name",
-            "description": "Schema for file component ['wofost'] subtype.",
+            "description": "Schema for file component ['sam'] subtype.",
             "properties": {
                 "filetype": {
-                    "default": "wofost",
-                    "description": "The file is a WOFOST parameter file.",
+                    "default": "sam",
+                    "description": "sam sequence I/O",
                     "enum": [
-                        "wofost"
+                        "sam"
                     ],
                     "type": "string"
                 },
-                "comment": {
-                    "default": "# ",
-                    "description": "One or more characters indicating a comment. Defaults to '# '.",
-                    "type": "string"
+                "flush_on_write": {
+                    "default": false,
+                    "description": "If true, the file will be flushed when written to.",
+                    "type": "boolean",
+                    "format": "checkbox"
                 },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
+                "header": {
+                    "description": "Header defining sequence identifiers. A header is required for writing SAM, BAM, and CRAM files.",
+                    "type": "object"
                 },
-                "delimiter": {
-                    "default": " = ",
-                    "description": "Delimiter that should be used to separate name/value pairs in the map. Defaults to \\t.",
+                "index": {
+                    "description": "Path to file containing index if different from the standard naming convention for BAM and CRAM files.",
                     "type": "string"
                 },
                 "name": {
@@ -1857,10 +2696,116 @@
                     "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
                     "type": "string"
                 },
-                "newline": {
-                    "default": "\n",
-                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
+                "regions": {
+                    "default": [],
+                    "description": "Region parameters (reference name, start, and end) defining the regions that should be read. If not provided, all regions will be read.",
+                    "items": {
+                        "properties": {
+                            "end": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-tiff": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['tiff'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "tiff",
+                    "description": "tiff image I/O",
+                    "enum": [
+                        "tiff"
+                    ],
                     "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "params": {
+                    "default": {},
+                    "description": "Parameters that should be based to the PIL.Image save/open command",
+                    "type": "object"
+                }
+            },
+            "required": [
+                "filetype"
+            ],
+            "type": "object"
+        },
+        "file-subtype-vcf": {
+            "additionalProperties": true,
+            "allowSingular": "name",
+            "description": "Schema for file component ['vcf'] subtype.",
+            "properties": {
+                "filetype": {
+                    "default": "vcf",
+                    "description": "vcf sequence I/O",
+                    "enum": [
+                        "vcf"
+                    ],
+                    "type": "string"
+                },
+                "flush_on_write": {
+                    "default": false,
+                    "description": "If true, the file will be flushed when written to.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "header": {
+                    "description": "Header defining sequence identifiers. A header is required for writing SAM, BAM, and CRAM files.",
+                    "type": "object"
+                },
+                "index": {
+                    "description": "Path to file containing index if different from the standard naming convention for BAM and CRAM files.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "regions": {
+                    "default": [],
+                    "description": "Region parameters (reference name, start, and end) defining the regions that should be read. If not provided, all regions will be read.",
+                    "items": {
+                        "properties": {
+                            "end": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
                 }
             },
             "required": [
@@ -2049,8 +2994,32 @@
             "additionalProperties": false,
             "description": "Base schema for all subtypes of model components.",
             "properties": {
-                "with_debugger": {
-                    "description": "Debugger tool that should be used to run models. This string should include the tool executable and any flags that should be passed to it.",
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
+                    "type": "string"
+                },
+                "outputs_in_inputs": {
+                    "description": "If True, outputs from wrapped model functions are passed by pointer as inputs for modification and the return value will be a flag. If False, outputs are limited to return values. Defaults to the value of the class attribute outputs_in_inputs.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "validation_command": {
+                    "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
+                    "type": "string"
+                },
+                "with_valgrind": {
+                    "default": false,
+                    "description": "If True, the command is run with valgrind. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "logging_level": {
+                    "default": "",
+                    "description": "The level of logging messages that should be displayed by the model. Defaults to the logging level as determined by the configuration file and environment variables.",
+                    "type": "string"
+                },
+                "repository_commit": {
+                    "description": "Commit that should be checked out in the model repository specified by repository_url. If not provided, the most recent commit on the default branch will be used.",
                     "type": "string"
                 },
                 "dependencies": {
@@ -2082,19 +3051,43 @@
                     },
                     "type": "array"
                 },
-                "iter_function_over": {
-                    "default": [],
-                    "description": "Variable(s) that should be received or sent as an array, but iterated over. Defaults to an empty array and is ignored.",
-                    "items": {
-                        "type": "string"
+                "additional_dependencies": {
+                    "additionalProperties": {
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "arguments": {
+                                            "type": "string"
+                                        },
+                                        "package": {
+                                            "type": "string"
+                                        },
+                                        "package_manager": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "package"
+                                    ],
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "type": "array"
                     },
-                    "type": "array"
+                    "description": "A mapping between languages and lists of packages in those languages that are required by the model.",
+                    "type": "object"
                 },
-                "copies": {
-                    "default": 1,
-                    "description": "The number of copies of the model that should be created. Defaults to 1.",
-                    "minimum": 1,
-                    "type": "integer"
+                "with_strace": {
+                    "default": false,
+                    "description": "If True, the command is run with strace (on Linux) or dtrace (on MacOS). Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
                 },
                 "args": {
                     "allowSingular": true,
@@ -2107,10 +3100,23 @@
                     },
                     "type": "array"
                 },
-                "allow_threading": {
-                    "description": "If True, comm connections will be set up so that the model-side comms can be used by more than one thread. Defaults to False.",
+                "overwrite": {
+                    "description": "If True, any existing model products (compilation products, wrapper scripts, etc.) are removed prior to the run. If False, the products are not removed. Defaults to True. Setting this to False can improve the performance, particularly for models that take a long time to compile, but this should only be done once the model has been fully debugged to ensure that each run is tested on a clean copy of the model. The value of this keyword also determines whether or not products are removed after a run.",
                     "type": "boolean",
                     "format": "checkbox"
+                },
+                "client_of": {
+                    "allowSingular": true,
+                    "default": [],
+                    "description": "The names of one or more models that this model will call as a server. If there are more than one, this should be specified as a sequence collection (list). The corresponding channel(s) that should be passed to the yggdrasil API will be the name of the server model joined with the name of the client model with an underscore `<server_model>_<client_model>`. There will be one channel created for each server the model is a client of. Defaults to empty list. Use of `client_of` with `function` is not currently supported.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "function": {
+                    "description": "If provided, an integrated model is created by wrapping the function named here. The function must be located within the file specified by the source file listed in the first argument. If not provided, the model must contain it's own calls to the |yggdrasil| interface.",
+                    "type": "string"
                 },
                 "strace_flags": {
                     "default": [
@@ -2122,6 +3128,36 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "copies": {
+                    "default": 1,
+                    "description": "The number of copies of the model that should be created. Defaults to 1.",
+                    "minimum": 1,
+                    "type": "integer"
+                },
+                "products": {
+                    "default": [],
+                    "description": "Paths to files created by the model that should be cleaned up when the model exits. Entries can be absolute paths or paths relative to the working directory. Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "contact_email": {
+                    "description": "Email address that should be used to contact the maintainer of the model. This parameter is only used in the model repository.",
+                    "type": "string"
+                },
+                "env": {
+                    "additional_properties": {
+                        "type": "string"
+                    },
+                    "default": {},
+                    "description": "Dictionary of environment variables that should be set when the driver starts. Defaults to {}.",
+                    "type": "object"
+                },
+                "with_debugger": {
+                    "description": "Debugger tool that should be used to run models. This string should include the tool executable and any flags that should be passed to it.",
+                    "type": "string"
                 },
                 "timesync": {
                     "allowSingular": true,
@@ -2173,142 +3209,13 @@
                     },
                     "type": "array"
                 },
-                "preserve_cache": {
-                    "default": false,
-                    "description": "If True model products will be kept following the run, otherwise all products will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "repository_url": {
-                    "description": "URL for the git repository containing the model source code. If provided, relative paths in the model YAML definition will be considered relative to the repository root directory.",
-                    "type": "string"
-                },
-                "source_products": {
+                "iter_function_over": {
                     "default": [],
-                    "description": "Files created by running the model that are source files. These files will be removed without checking their extension so users should avoid adding files to this list unless they are sure they should be deleted. Defaults to [].",
+                    "description": "Variable(s) that should be received or sent as an array, but iterated over. Defaults to an empty array and is ignored.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
-                },
-                "contact_email": {
-                    "description": "Email address that should be used to contact the maintainer of the model. This parameter is only used in the model repository.",
-                    "type": "string"
-                },
-                "validation_command": {
-                    "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
-                    "type": "string"
-                },
-                "overwrite": {
-                    "description": "If True, any existing model products (compilation products, wrapper scripts, etc.) are removed prior to the run. If False, the products are not removed. Defaults to True. Setting this to False can improve the performance, particularly for models that take a long time to compile, but this should only be done once the model has been fully debugged to ensure that each run is tested on a clean copy of the model. The value of this keyword also determines whether or not products are removed after a run.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "valgrind_flags": {
-                    "default": [
-                        "--leak-check=full",
-                        "--show-leak-kinds=all"
-                    ],
-                    "description": "Flags to pass to valgrind. Defaults to [].",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "repository_commit": {
-                    "description": "Commit that should be checked out in the model repository specified by repository_url. If not provided, the most recent commit on the default branch will be used.",
-                    "type": "string"
-                },
-                "inputs": {
-                    "aliases": [
-                        "input",
-                        "input_file",
-                        "input_files"
-                    ],
-                    "allowSingular": true,
-                    "default": [
-                        {
-                            "commtype": "default",
-                            "datatype": {
-                                "type": "string"
-                            },
-                            "is_default": true,
-                            "name": "input"
-                        }
-                    ],
-                    "description": "Zero or more channels carrying input to the model. A full description of channel entries and the options available for channels can be found :ref:`here<yaml_comm_options>`.",
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/definitions/comm"
-                            },
-                            {
-                                "$ref": "#/definitions/comm_driver"
-                            },
-                            {
-                                "$ref": "#/definitions/file_driver"
-                            }
-                        ]
-                    },
-                    "type": "array"
-                },
-                "is_server": {
-                    "anyOf": [
-                        {
-                            "type": "boolean"
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {
-                                "input": {
-                                    "type": "string"
-                                },
-                                "output": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    ],
-                    "default": false,
-                    "description": "If `True`, the model is assumed to be a server for one or more client models and an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The corresponding channel that should be passed to the yggdrasil API will be the name of the model. If is_server is a dictionary, it should contain an 'input' key and an 'output' key. These are required to be the names of existing input and output channels in the model that will be co-opted by the server. (Note: This requires that the co-opted output channel's send method is called once for each time the co-opted input channel's recv method is called. If used with the `function` parameter, `is_server` must be a dictionary. Defaults to False."
-                },
-                "logging_level": {
-                    "default": "",
-                    "description": "The level of logging messages that should be displayed by the model. Defaults to the logging level as determined by the configuration file and environment variables.",
-                    "type": "string"
-                },
-                "additional_dependencies": {
-                    "additionalProperties": {
-                        "items": {
-                            "oneOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "additionalProperties": false,
-                                    "properties": {
-                                        "arguments": {
-                                            "type": "string"
-                                        },
-                                        "package": {
-                                            "type": "string"
-                                        },
-                                        "package_manager": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "package"
-                                    ],
-                                    "type": "object"
-                                }
-                            ]
-                        },
-                        "type": "array"
-                    },
-                    "description": "A mapping between languages and lists of packages in those languages that are required by the model.",
-                    "type": "object"
                 },
                 "language": {
                     "default": "executable",
@@ -2330,17 +3237,20 @@
                         "mpi",
                         "osr",
                         "python",
+                        "pytorch",
                         "r",
                         "sbml",
                         "timesync"
                     ],
                     "type": "string"
                 },
-                "with_valgrind": {
-                    "default": false,
-                    "description": "If True, the command is run with valgrind. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
+                "source_products": {
+                    "default": [],
+                    "description": "Files created by running the model that are source files. These files will be removed without checking their extension so users should avoid adding files to this list unless they are sure they should be deleted. Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "outputs": {
                     "aliases": [
@@ -2375,56 +3285,92 @@
                     },
                     "type": "array"
                 },
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
-                    "type": "string"
-                },
-                "products": {
-                    "default": [],
-                    "description": "Paths to files created by the model that should be cleaned up when the model exits. Entries can be absolute paths or paths relative to the working directory. Defaults to [].",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "name": {
-                    "description": "Name used for component in log messages.",
-                    "type": "string"
-                },
-                "with_strace": {
-                    "default": false,
-                    "description": "If True, the command is run with strace (on Linux) or dtrace (on MacOS). Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "outputs_in_inputs": {
-                    "description": "If True, outputs from wrapped model functions are passed by pointer as inputs for modification and the return value will be a flag. If False, outputs are limited to return values. Defaults to the value of the class attribute outputs_in_inputs.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "env": {
-                    "additional_properties": {
-                        "type": "string"
-                    },
-                    "default": {},
-                    "description": "Dictionary of environment variables that should be set when the driver starts. Defaults to {}.",
-                    "type": "object"
-                },
-                "client_of": {
+                "inputs": {
+                    "aliases": [
+                        "input",
+                        "input_file",
+                        "input_files"
+                    ],
                     "allowSingular": true,
-                    "default": [],
-                    "description": "The names of one or more models that this model will call as a server. If there are more than one, this should be specified as a sequence collection (list). The corresponding channel(s) that should be passed to the yggdrasil API will be the name of the server model joined with the name of the client model with an underscore `<server_model>_<client_model>`. There will be one channel created for each server the model is a client of. Defaults to empty list. Use of `client_of` with `function` is not currently supported.",
+                    "default": [
+                        {
+                            "commtype": "default",
+                            "datatype": {
+                                "type": "string"
+                            },
+                            "is_default": true,
+                            "name": "input"
+                        }
+                    ],
+                    "description": "Zero or more channels carrying input to the model. A full description of channel entries and the options available for channels can be found :ref:`here<yaml_comm_options>`.",
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/comm"
+                            },
+                            {
+                                "$ref": "#/definitions/comm_driver"
+                            },
+                            {
+                                "$ref": "#/definitions/file_driver"
+                            }
+                        ]
                     },
                     "type": "array"
-                },
-                "function": {
-                    "description": "If provided, an integrated model is created by wrapping the function named here. The function must be located within the file specified by the source file listed in the first argument. If not provided, the model must contain it's own calls to the |yggdrasil| interface.",
-                    "type": "string"
                 },
                 "description": {
                     "description": "Description of the model. This parameter is only used in the model repository or when providing the model as a service.",
+                    "type": "string"
+                },
+                "valgrind_flags": {
+                    "default": [
+                        "--leak-check=full",
+                        "--show-leak-kinds=all"
+                    ],
+                    "description": "Flags to pass to valgrind. Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "preserve_cache": {
+                    "default": false,
+                    "description": "If True model products will be kept following the run, otherwise all products will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "repository_url": {
+                    "description": "URL for the git repository containing the model source code. If provided, relative paths in the model YAML definition will be considered relative to the repository root directory.",
+                    "type": "string"
+                },
+                "allow_threading": {
+                    "description": "If True, comm connections will be set up so that the model-side comms can be used by more than one thread. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "is_server": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {
+                                "input": {
+                                    "type": "string"
+                                },
+                                "output": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    ],
+                    "default": false,
+                    "description": "If `True`, the model is assumed to be a server for one or more client models and an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The corresponding channel that should be passed to the yggdrasil API will be the name of the model. If is_server is a dictionary, it should contain an 'input' key and an 'output' key. These are required to be the names of existing input and output channels in the model that will be co-opted by the server. (Note: This requires that the co-opted output channel's send method is called once for each time the co-opted input channel's recv method is called. If used with the `function` parameter, `is_server` must be a dictionary. Defaults to False."
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
                     "type": "string"
                 },
                 "builddir": {
@@ -2604,6 +3550,18 @@
                     },
                     "description": "Max simulation interval at which synchronization should occur (in days). Defaults to 1.0 if not provided. If the XML input file loads additional export modules that output at a shorter rate, the existing table of values will be extrapolated.",
                     "type": "object"
+                },
+                "input_transform": {
+                    "description": "Transformation that should be applied to input to get it into the format expected by the model (including transformation to pytorch tensors as necessary). This function should return a tuple of arguments for the model.",
+                    "type": "string"
+                },
+                "output_transform": {
+                    "description": "Transformation that should be applied to model output to get it into a format that can be serialized by yggdrasil (i.e. not a pytorch Tensor or model sepecific type).",
+                    "type": "string"
+                },
+                "weights": {
+                    "description": "Path to file where model weights are saved",
+                    "type": "string"
                 },
                 "integrator": {
                     "default": "cvode",
@@ -3624,6 +4582,67 @@
             ],
             "type": "object"
         },
+        "model-subtype-pytorch": {
+            "additionalProperties": true,
+            "description": "Schema for model component ['pytorch'] subtype.",
+            "properties": {
+                "language": {
+                    "default": "pytorch",
+                    "description": "Model is a PyTorch model",
+                    "enum": [
+                        "pytorch"
+                    ],
+                    "type": "string"
+                },
+                "args": {
+                    "allowSingular": true,
+                    "description": "The path to the file containing the model program that will be run by the driver for the model's language and/or a list of arguments that should be passed as input to the model program or language executable (e.g. source code or configuration file for a domain specific language).",
+                    "items": {
+                        "type": [
+                            "string",
+                            "number"
+                        ]
+                    },
+                    "type": "array"
+                },
+                "input_transform": {
+                    "description": "Transformation that should be applied to input to get it into the format expected by the model (including transformation to pytorch tensors as necessary). This function should return a tuple of arguments for the model.",
+                    "type": "string"
+                },
+                "interpreter": {
+                    "description": "Name or path of interpreter executable that should be used to run the model. If not provided, the interpreter will be determined based on configuration options for the language (if present) and the default_interpreter class attribute.",
+                    "type": "string"
+                },
+                "interpreter_flags": {
+                    "default": [],
+                    "description": "Flags that should be passed to the interpreter when running the model. If not provided, the flags are determined based on configuration options for the language (if present) and the default_interpreter_flags class attribute.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "output_transform": {
+                    "description": "Transformation that should be applied to model output to get it into a format that can be serialized by yggdrasil (i.e. not a pytorch Tensor or model sepecific type).",
+                    "type": "string"
+                },
+                "skip_interpreter": {
+                    "default": false,
+                    "description": "If True, no interpreter will be added to the arguments. This should only be used for subclasses that will not be invoking the model via the command line. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "weights": {
+                    "description": "Path to file where model weights are saved",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "args",
+                "language",
+                "weights"
+            ],
+            "type": "object"
+        },
         "model-subtype-python": {
             "additionalProperties": true,
             "description": "Schema for model component ['python'] subtype.",
@@ -3991,23 +5010,11 @@
             "description": "Base schema for all subtypes of serializer components.",
             "additionalProperties": false,
             "properties": {
-                "newline": {
-                    "default": "\n",
-                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
-                    "type": "string"
-                },
-                "comment": {
-                    "default": "# ",
-                    "description": "One or more characters indicating a comment. Defaults to '# '.",
-                    "type": "string"
-                },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
                 "seritype": {
                     "default": "default",
                     "description": "Serializer type.",
                     "enum": [
+                        "cabo",
                         "default",
                         "direct",
                         "functional",
@@ -4019,10 +5026,22 @@
                         "pickle",
                         "ply",
                         "table",
-                        "wofost",
                         "yaml"
                     ],
                     "type": "string"
+                },
+                "comment": {
+                    "default": "# ",
+                    "description": "One or more characters indicating a comment. Defaults to '# '.",
+                    "type": "string"
+                },
+                "newline": {
+                    "default": "\n",
+                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
+                    "type": "string"
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
                 },
                 "delimiter": {
                     "default": "\t",
@@ -4033,8 +5052,8 @@
                             "seritype": [
                                 "map",
                                 "table",
-                                "pandas",
-                                "wofost"
+                                "cabo",
+                                "pandas"
                             ]
                         }
                     }
@@ -4170,6 +5189,20 @@
                     },
                     "format": "checkbox"
                 },
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
+                    "type": "boolean",
+                    "options": {
+                        "dependencies": {
+                            "seritype": [
+                                "obj",
+                                "ply"
+                            ]
+                        }
+                    },
+                    "format": "checkbox"
+                },
                 "no_header": {
                     "default": false,
                     "description": "If True, headers will not be read or serialized from/to tables. Defaults to False.",
@@ -4231,23 +5264,11 @@
             "additionalProperties": false,
             "description": "Base schema for all subtypes of serializer components.",
             "properties": {
-                "newline": {
-                    "default": "\n",
-                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
-                    "type": "string"
-                },
-                "comment": {
-                    "default": "# ",
-                    "description": "One or more characters indicating a comment. Defaults to '# '.",
-                    "type": "string"
-                },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
                 "seritype": {
                     "default": "default",
                     "description": "Serializer type.",
                     "enum": [
+                        "cabo",
                         "default",
                         "direct",
                         "functional",
@@ -4259,10 +5280,22 @@
                         "pickle",
                         "ply",
                         "table",
-                        "wofost",
                         "yaml"
                     ],
                     "type": "string"
+                },
+                "comment": {
+                    "default": "# ",
+                    "description": "One or more characters indicating a comment. Defaults to '# '.",
+                    "type": "string"
+                },
+                "newline": {
+                    "default": "\n",
+                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
+                    "type": "string"
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
                 },
                 "delimiter": {
                     "default": "\t",
@@ -4329,6 +5362,12 @@
                 "sort_keys": {
                     "default": true,
                     "description": "If True, the serialization of dictionaries will be in key sorted order. Defaults to True.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
                     "type": "boolean",
                     "format": "checkbox"
                 },
@@ -4463,6 +5502,29 @@
             ],
             "type": "object"
         },
+        "serializer-subtype-cabo": {
+            "additionalProperties": true,
+            "description": "Schema for serializer component ['cabo'] subtype.",
+            "properties": {
+                "seritype": {
+                    "default": "cabo",
+                    "description": "Serialization of mapping between keys and scalar or array values as used in the CABO parameter files.",
+                    "enum": [
+                        "cabo"
+                    ],
+                    "type": "string"
+                },
+                "delimiter": {
+                    "default": " = ",
+                    "description": "Delimiter that should be used to separate name/value pairs in the map. Defaults to \\t.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "seritype"
+            ],
+            "type": "object"
+        },
         "serializer-subtype-direct": {
             "additionalProperties": true,
             "description": "Schema for serializer component ['direct'] subtype.",
@@ -4571,6 +5633,12 @@
                         "obj"
                     ],
                     "type": "string"
+                },
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
+                    "type": "boolean",
+                    "format": "checkbox"
                 }
             },
             "required": [
@@ -4672,34 +5740,17 @@
             "properties": {
                 "seritype": {
                     "default": "ply",
-                    "description": "Serialize 3D structures using Ply format.",
+                    "description": "Serialize 3D structures using `Ply format <http://paulbourke.net/dataformats/ply/>`_.",
                     "enum": [
                         "ply"
                     ],
                     "type": "string"
-                }
-            },
-            "required": [
-                "seritype"
-            ],
-            "type": "object"
-        },
-        "serializer-subtype-wofost": {
-            "additionalProperties": true,
-            "description": "Schema for serializer component ['wofost'] subtype.",
-            "properties": {
-                "seritype": {
-                    "default": "wofost",
-                    "description": "Serialization of mapping between keys and scalar or array values as used in the WOFOST parameter files.",
-                    "enum": [
-                        "wofost"
-                    ],
-                    "type": "string"
                 },
-                "delimiter": {
-                    "default": " = ",
-                    "description": "Delimiter that should be used to separate name/value pairs in the map. Defaults to \\t.",
-                    "type": "string"
+                "prune_duplicates": {
+                    "default": true,
+                    "description": "If True, serialized meshes in array format will be pruned of duplicates when being normalized into a Ply object. If False, duplicates will not be pruned. Defaults to True.",
+                    "type": "boolean",
+                    "format": "checkbox"
                 }
             },
             "required": [
@@ -4837,7 +5888,10 @@
                 "selected": {
                     "description": "A list of fields that should be selected.",
                     "items": {
-                        "type": "string"
+                        "type": [
+                            "string",
+                            "integer"
+                        ]
                     },
                     "type": "array",
                     "options": {
@@ -4945,7 +5999,10 @@
                 "selected": {
                     "description": "A list of fields that should be selected.",
                     "items": {
-                        "type": "string"
+                        "type": [
+                            "string",
+                            "integer"
+                        ]
                     },
                     "type": "array"
                 },
@@ -5142,7 +6199,10 @@
                 "selected": {
                     "description": "A list of fields that should be selected.",
                     "items": {
-                        "type": "string"
+                        "type": [
+                            "string",
+                            "integer"
+                        ]
                     },
                     "type": "array"
                 },
@@ -5344,27 +6404,6 @@
         "icomm": {
             "additionalProperties": false,
             "properties": {
-                "default_file": {
-                    "$ref": "#/definitions/file",
-                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
-                },
-                "outside_loop": {
-                    "default": false,
-                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
-                    "type": "boolean",
-                    "format": "checkbox"
-                },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
-                },
-                "format_str": {
-                    "description": "String that should be used to format/parse messages. Default to None.",
-                    "type": "string"
-                },
                 "default_value": {
                     "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
                     "type": [
@@ -5376,9 +6415,33 @@
                         "null"
                     ]
                 },
+                "outside_loop": {
+                    "default": false,
+                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
+                    "type": "boolean",
+                    "format": "checkbox"
+                },
                 "working_dir": {
                     "description": "Working directory. If not provided, the current working directory is used.",
                     "type": "string"
+                },
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
+                    "type": "string"
+                },
+                "transform": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/transform"
+                    },
+                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
+                },
+                "default_file": {
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
                 },
                 "vars": {
                     "allowSingular": true,
@@ -5397,18 +6460,15 @@
                     },
                     "type": "array"
                 },
-                "transform": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/transform"
-                    },
-                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
-                },
                 "name": {
                     "description": "Name used for component in log messages.",
                     "pattern": "^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
                     "type": "string",
                     "propertyOrder": 0
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
                 },
                 "count": {
                     "default": 1,
@@ -5460,30 +6520,33 @@
         "ocomm": {
             "additionalProperties": false,
             "properties": {
-                "default_file": {
-                    "$ref": "#/definitions/file",
-                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
-                },
                 "outside_loop": {
                     "default": false,
                     "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
                     "type": "boolean",
                     "format": "checkbox"
                 },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
+                    "type": "string"
                 },
                 "format_str": {
                     "description": "String that should be used to format/parse messages. Default to None.",
                     "type": "string"
                 },
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
-                    "type": "string"
+                "transform": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/transform"
+                    },
+                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
+                },
+                "default_file": {
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
                 },
                 "vars": {
                     "allowSingular": true,
@@ -5502,18 +6565,15 @@
                     },
                     "type": "array"
                 },
-                "transform": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/transform"
-                    },
-                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided."
-                },
                 "name": {
                     "description": "Name used for component in log messages.",
                     "pattern": "^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
                     "type": "string",
                     "propertyOrder": 0
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
                 },
                 "count": {
                     "default": 1,
@@ -5551,6 +6611,20 @@
     ],
     "additionalProperties": false,
     "properties": {
+        "outputs_in_inputs": {
+            "description": "If True, outputs from wrapped model functions are passed by pointer as inputs for modification and the return value will be a flag. If False, outputs are limited to return values. Defaults to the value of the class attribute outputs_in_inputs.",
+            "type": "boolean",
+            "format": "checkbox"
+        },
+        "validation_command": {
+            "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
+            "type": "string"
+        },
+        "repository_commit": {
+            "description": "Commit that should be checked out from the model repository.",
+            "type": "string",
+            "propertyOrder": 2
+        },
         "dependencies": {
             "description": "A list of packages required by the model that are written in the same language as the model. If the package requires dependencies outside the language of the model. use the additional_dependencies parameter to provide them. If you need a version of the package from a specific package manager, a mapping with 'package' and 'package_manager' fields can be provided instead of just the name of the package.",
             "items": {
@@ -5579,86 +6653,6 @@
                 ]
             },
             "type": "array"
-        },
-        "iter_function_over": {
-            "default": [],
-            "description": "Variable(s) that should be received or sent as an array, but iterated over. Defaults to an empty array and is ignored.",
-            "items": {
-                "type": "string"
-            },
-            "type": "array"
-        },
-        "args": {
-            "allowSingular": true,
-            "description": "The path to the file containing the model program that will be run by the driver for the model's language and/or a list of arguments that should be passed as input to the model program or language executable (e.g. source code or configuration file for a domain specific language).",
-            "items": {
-                "type": [
-                    "string",
-                    "number"
-                ]
-            },
-            "type": "array",
-            "minItems": 1,
-            "propertyOrder": 6
-        },
-        "allow_threading": {
-            "description": "If True, comm connections will be set up so that the model-side comms can be used by more than one thread. Defaults to False.",
-            "type": "boolean",
-            "format": "checkbox"
-        },
-        "strace_flags": {
-            "default": [
-                "-e",
-                "trace=memory"
-            ],
-            "description": "Flags to pass to strace (or dtrace). Defaults to [].",
-            "items": {
-                "type": "string"
-            },
-            "type": "array"
-        },
-        "repository_url": {
-            "description": "URL for the git repository containing the model source code. If provided, relative paths in the model YAML definition will be considered relative to the repository root directory.",
-            "type": "string",
-            "propertyOrder": 1
-        },
-        "contact_email": {
-            "description": "Email address that should be used to contact the maintainer of the model. This parameter is only used in the model repository.",
-            "type": "string",
-            "propertyOrder": 3
-        },
-        "validation_command": {
-            "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
-            "type": "string"
-        },
-        "repository_commit": {
-            "description": "Commit that should be checked out from the model repository.",
-            "type": "string",
-            "propertyOrder": 2
-        },
-        "inputs": {
-            "aliases": [
-                "input",
-                "input_file",
-                "input_files"
-            ],
-            "allowSingular": true,
-            "default": [
-                {
-                    "commtype": "default",
-                    "datatype": {
-                        "type": "string"
-                    },
-                    "is_default": true,
-                    "name": "input"
-                }
-            ],
-            "description": "Zero or more channels carrying input to the model",
-            "items": {
-                "$ref": "#/definitions/icomm"
-            },
-            "type": "array",
-            "propertyOrder": 7
         },
         "additional_dependencies": {
             "additionalProperties": {
@@ -5692,6 +6686,55 @@
             "description": "A mapping between languages and lists of packages in those languages that are required by the model.",
             "type": "object"
         },
+        "args": {
+            "allowSingular": true,
+            "description": "The path to the file containing the model program that will be run by the driver for the model's language and/or a list of arguments that should be passed as input to the model program or language executable (e.g. source code or configuration file for a domain specific language).",
+            "items": {
+                "type": [
+                    "string",
+                    "number"
+                ]
+            },
+            "type": "array",
+            "minItems": 1,
+            "propertyOrder": 6
+        },
+        "function": {
+            "description": "If provided, an integrated model is created by wrapping the function named here. The function must be located within the file specified by the source file listed in the first argument. If not provided, the model must contain it's own calls to the |yggdrasil| interface.",
+            "type": "string"
+        },
+        "strace_flags": {
+            "default": [
+                "-e",
+                "trace=memory"
+            ],
+            "description": "Flags to pass to strace (or dtrace). Defaults to [].",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "contact_email": {
+            "description": "Email address that should be used to contact the maintainer of the model. This parameter is only used in the model repository.",
+            "type": "string",
+            "propertyOrder": 3
+        },
+        "env": {
+            "additional_properties": {
+                "type": "string"
+            },
+            "default": {},
+            "description": "Dictionary of environment variables that should be set when the driver starts. Defaults to {}.",
+            "type": "object"
+        },
+        "iter_function_over": {
+            "default": [],
+            "description": "Variable(s) that should be received or sent as an array, but iterated over. Defaults to an empty array and is ignored.",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
         "language": {
             "default": "executable",
             "description": "The programming language that the model is written in. A list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.",
@@ -5712,6 +6755,7 @@
                 "mpi",
                 "osr",
                 "python",
+                "pytorch",
                 "r",
                 "sbml",
                 "timesync"
@@ -5743,32 +6787,49 @@
             "type": "array",
             "propertyOrder": 8
         },
-        "name": {
-            "description": "Name used for component in log messages.",
-            "type": "string",
-            "propertyOrder": 0
-        },
-        "outputs_in_inputs": {
-            "description": "If True, outputs from wrapped model functions are passed by pointer as inputs for modification and the return value will be a flag. If False, outputs are limited to return values. Defaults to the value of the class attribute outputs_in_inputs.",
-            "type": "boolean",
-            "format": "checkbox"
-        },
-        "env": {
-            "additional_properties": {
-                "type": "string"
+        "inputs": {
+            "aliases": [
+                "input",
+                "input_file",
+                "input_files"
+            ],
+            "allowSingular": true,
+            "default": [
+                {
+                    "commtype": "default",
+                    "datatype": {
+                        "type": "string"
+                    },
+                    "is_default": true,
+                    "name": "input"
+                }
+            ],
+            "description": "Zero or more channels carrying input to the model",
+            "items": {
+                "$ref": "#/definitions/icomm"
             },
-            "default": {},
-            "description": "Dictionary of environment variables that should be set when the driver starts. Defaults to {}.",
-            "type": "object"
-        },
-        "function": {
-            "description": "If provided, an integrated model is created by wrapping the function named here. The function must be located within the file specified by the source file listed in the first argument. If not provided, the model must contain it's own calls to the |yggdrasil| interface.",
-            "type": "string"
+            "type": "array",
+            "propertyOrder": 7
         },
         "description": {
             "description": "Description of the model. This parameter is only used in the model repository or when providing the model as a service.",
             "type": "string",
             "propertyOrder": 5
+        },
+        "repository_url": {
+            "description": "URL for the git repository containing the model source code. If provided, relative paths in the model YAML definition will be considered relative to the repository root directory.",
+            "type": "string",
+            "propertyOrder": 1
+        },
+        "allow_threading": {
+            "description": "If True, comm connections will be set up so that the model-side comms can be used by more than one thread. Defaults to False.",
+            "type": "boolean",
+            "format": "checkbox"
+        },
+        "name": {
+            "description": "Name used for component in log messages.",
+            "type": "string",
+            "propertyOrder": 0
         },
         "builddir": {
             "description": "Directory where the build should be saved. Defaults to <sourcedir>/build. It can be relative to working_dir or absolute.",
@@ -6087,6 +7148,7 @@
                         "julia",
                         "lpy",
                         "matlab",
+                        "pytorch",
                         "python",
                         "R",
                         "r",
@@ -6110,6 +7172,7 @@
                         "julia",
                         "lpy",
                         "matlab",
+                        "pytorch",
                         "python",
                         "R",
                         "r",
@@ -6227,6 +7290,39 @@
                 "dependencies": {
                     "language": [
                         "osr"
+                    ]
+                }
+            }
+        },
+        "input_transform": {
+            "description": "Transformation that should be applied to input to get it into the format expected by the model (including transformation to pytorch tensors as necessary). This function should return a tuple of arguments for the model.",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "pytorch"
+                    ]
+                }
+            }
+        },
+        "output_transform": {
+            "description": "Transformation that should be applied to model output to get it into a format that can be serialized by yggdrasil (i.e. not a pytorch Tensor or model sepecific type).",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "pytorch"
+                    ]
+                }
+            }
+        },
+        "weights": {
+            "description": "Path to file where model weights are saved",
+            "type": "string",
+            "options": {
+                "dependencies": {
+                    "language": [
+                        "pytorch"
                     ]
                 }
             }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.WOFOSTParamFileComm &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.communication.CABOFileComm &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -87,7 +87,7 @@
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../communication.html">yggdrasil.communication</a></li>
-      <li class="breadcrumb-item active">yggdrasil.communication.WOFOSTParamFileComm</li>
+      <li class="breadcrumb-item active">yggdrasil.communication.CABOFileComm</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -96,16 +96,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for yggdrasil.communication.WOFOSTParamFileComm</h1><div class="highlight"><pre>
+  <h1>Source code for yggdrasil.communication.CABOFileComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">FileComm</span>
 
 
-<div class="viewcode-block" id="WOFOSTParamFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.WOFOSTParamFileComm.WOFOSTParamFileComm">[docs]</a><span class="k">class</span> <span class="nc">WOFOSTParamFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="o">.</span><span class="n">FileComm</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a WOFOST parameter file on disk.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CABOFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CABOFileComm.CABOFileComm">[docs]</a><span class="k">class</span> <span class="nc">CABOFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="o">.</span><span class="n">FileComm</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a CABO parameter file on disk.&quot;&quot;&quot;</span>
 
-    <span class="n">_filetype</span> <span class="o">=</span> <span class="s1">&#39;wofost&#39;</span>
-    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="s1">&#39;The file is a WOFOST parameter file.&#39;</span>
-    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="s1">&#39;wofost&#39;</span>
+    <span class="n">_filetype</span> <span class="o">=</span> <span class="s1">&#39;cabo&#39;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="s1">&#39;The file is a CABO parameter file.&#39;</span>
+    <span class="n">_default_serializer</span> <span class="o">=</span> <span class="s1">&#39;cabo&#39;</span>
     <span class="n">_deprecated_drivers</span> <span class="o">=</span> <span class="p">[]</span></div>
 </pre></div>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.AsciiTableSerialize &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.serialize.AsciiTableSerialize &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -159,14 +159,15 @@
     <span class="n">has_header</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">default_read_meth</span> <span class="o">=</span> <span class="s1">&#39;readline&#39;</span>  <span class="c1"># because default for as_array is False</span>
     <span class="n">default_datatype</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">}</span>
+    <span class="n">file_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.txt&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_delimiter</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;delimiter&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTableSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AsciiTableSerialize.update_serializer"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="s1">&#39;delimiter&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_delimiter</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># if &#39;delimiter&#39; in kwargs:</span>
+        <span class="c1">#     self._explicit_delimiter = True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_delimiter</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;format_str&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
             <span class="n">info</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format2table</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">])</span>
             <span class="n">info</span><span class="p">[</span><span class="s1">&#39;delimiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span>

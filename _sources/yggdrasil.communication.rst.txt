@@ -53,6 +53,14 @@ yggdrasil.communication.BufferComm module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.CABOFileComm module
+-------------------------------------------
+
+.. automodule:: yggdrasil.communication.CABOFileComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.ClientComm module
 -----------------------------------------
 
@@ -69,10 +77,26 @@ yggdrasil.communication.CommBase module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.DedicatedFileBase module
+------------------------------------------------
+
+.. automodule:: yggdrasil.communication.DedicatedFileBase
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.DefaultComm module
 ------------------------------------------
 
 .. automodule:: yggdrasil.communication.DefaultComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.ExcelFileComm module
+--------------------------------------------
+
+.. automodule:: yggdrasil.communication.ExcelFileComm
    :members:
    :undoc-members:
    :show-inheritance:
@@ -97,6 +121,14 @@ yggdrasil.communication.IPCComm module
 --------------------------------------
 
 .. automodule:: yggdrasil.communication.IPCComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.ImageFileBase module
+--------------------------------------------
+
+.. automodule:: yggdrasil.communication.ImageFileBase
    :members:
    :undoc-members:
    :show-inheritance:
@@ -189,6 +221,14 @@ yggdrasil.communication.RMQComm module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.SequenceFileBase module
+-----------------------------------------------
+
+.. automodule:: yggdrasil.communication.SequenceFileBase
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.ServerComm module
 -----------------------------------------
 
@@ -201,14 +241,6 @@ yggdrasil.communication.ValueComm module
 ----------------------------------------
 
 .. automodule:: yggdrasil.communication.ValueComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.communication.WOFOSTParamFileComm module
---------------------------------------------------
-
-.. automodule:: yggdrasil.communication.WOFOSTParamFileComm
    :members:
    :undoc-members:
    :show-inheritance:

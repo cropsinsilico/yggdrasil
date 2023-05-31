@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Code &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>Code &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -168,6 +168,10 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize"><code class="docutils literal notranslate"><span class="pre">AsciiTableSerialize</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.serialize.CABOSerialize">yggdrasil.serialize.CABOSerialize module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.serialize.CABOSerialize.CABOSerialize"><code class="docutils literal notranslate"><span class="pre">CABOSerialize</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.serialize.DefaultSerialize">yggdrasil.serialize.DefaultSerialize module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.serialize.DefaultSerialize.DefaultSerialize"><code class="docutils literal notranslate"><span class="pre">DefaultSerialize</span></code></a></li>
 </ul>
@@ -212,10 +216,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.serialize.SerializeBase">yggdrasil.serialize.SerializeBase module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.serialize.SerializeBase.SerializeBase"><code class="docutils literal notranslate"><span class="pre">SerializeBase</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.serialize.WOFOSTParamSerialize">yggdrasil.serialize.WOFOSTParamSerialize module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize"><code class="docutils literal notranslate"><span class="pre">WOFOSTParamSerialize</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.serialize.YAMLSerialize">yggdrasil.serialize.YAMLSerialize module</a><ul>
@@ -379,6 +379,10 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.OutputDriver.OutputDriver"><code class="docutils literal notranslate"><span class="pre">OutputDriver</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.drivers.PyTorchModelDriver">yggdrasil.drivers.PyTorchModelDriver module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.PyTorchModelDriver.PyTorchModelDriver"><code class="docutils literal notranslate"><span class="pre">PyTorchModelDriver</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.drivers.PythonModelDriver">yggdrasil.drivers.PythonModelDriver module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver"><code class="docutils literal notranslate"><span class="pre">PythonModelDriver</span></code></a></li>
 </ul>
@@ -435,6 +439,10 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.BufferComm.LockedBuffer"><code class="docutils literal notranslate"><span class="pre">LockedBuffer</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.CABOFileComm">yggdrasil.communication.CABOFileComm module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.CABOFileComm.CABOFileComm"><code class="docutils literal notranslate"><span class="pre">CABOFileComm</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.ClientComm">yggdrasil.communication.ClientComm module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ClientComm.ClientComm"><code class="docutils literal notranslate"><span class="pre">ClientComm</span></code></a></li>
 </ul>
@@ -453,12 +461,22 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.CommBase.unregister_comm"><code class="docutils literal notranslate"><span class="pre">unregister_comm()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.DedicatedFileBase">yggdrasil.communication.DedicatedFileBase module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.DedicatedFileBase.DedicatedFileBase"><code class="docutils literal notranslate"><span class="pre">DedicatedFileBase</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.DefaultComm">yggdrasil.communication.DefaultComm module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.DefaultComm.DefaultComm"><code class="docutils literal notranslate"><span class="pre">DefaultComm</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.ExcelFileComm">yggdrasil.communication.ExcelFileComm module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ExcelFileComm.ExcelFileComm"><code class="docutils literal notranslate"><span class="pre">ExcelFileComm</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.FileComm">yggdrasil.communication.FileComm module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.FileComm.FileComm"><code class="docutils literal notranslate"><span class="pre">FileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.FileComm.convert_file"><code class="docutils literal notranslate"><span class="pre">convert_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.FileComm.is_file_like"><code class="docutils literal notranslate"><span class="pre">is_file_like()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.ForkComm">yggdrasil.communication.ForkComm module</a><ul>
@@ -476,6 +494,16 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.IPCComm.ipcrm_queues"><code class="docutils literal notranslate"><span class="pre">ipcrm_queues()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.IPCComm.ipcs"><code class="docutils literal notranslate"><span class="pre">ipcs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.IPCComm.remove_queue"><code class="docutils literal notranslate"><span class="pre">remove_queue()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.ImageFileBase">yggdrasil.communication.ImageFileBase module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ImageFileBase.BMPFileComm"><code class="docutils literal notranslate"><span class="pre">BMPFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ImageFileBase.EPSFileComm"><code class="docutils literal notranslate"><span class="pre">EPSFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ImageFileBase.GIFFileComm"><code class="docutils literal notranslate"><span class="pre">GIFFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ImageFileBase.JPEGFileComm"><code class="docutils literal notranslate"><span class="pre">JPEGFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ImageFileBase.PILFileBase"><code class="docutils literal notranslate"><span class="pre">PILFileBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ImageFileBase.PNGFileComm"><code class="docutils literal notranslate"><span class="pre">PNGFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ImageFileBase.TIFFFileComm"><code class="docutils literal notranslate"><span class="pre">TIFFFileComm</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.JSONFileComm">yggdrasil.communication.JSONFileComm module</a><ul>
@@ -530,6 +558,19 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.RMQComm.get_rmq_parameters"><code class="docutils literal notranslate"><span class="pre">get_rmq_parameters()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.SequenceFileBase">yggdrasil.communication.SequenceFileBase module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.BAMFileComm"><code class="docutils literal notranslate"><span class="pre">BAMFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.BCFFileComm"><code class="docutils literal notranslate"><span class="pre">BCFFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.BioPythonFileBase"><code class="docutils literal notranslate"><span class="pre">BioPythonFileBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.CRAMFileComm"><code class="docutils literal notranslate"><span class="pre">CRAMFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.FASTAFileComm"><code class="docutils literal notranslate"><span class="pre">FASTAFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.FASTQFileComm"><code class="docutils literal notranslate"><span class="pre">FASTQFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.PySamFileBase"><code class="docutils literal notranslate"><span class="pre">PySamFileBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.SAMFileComm"><code class="docutils literal notranslate"><span class="pre">SAMFileComm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.SequenceFileBase"><code class="docutils literal notranslate"><span class="pre">SequenceFileBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.SequenceFileBase.VCFFileComm"><code class="docutils literal notranslate"><span class="pre">VCFFileComm</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.ServerComm">yggdrasil.communication.ServerComm module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ServerComm.Request"><code class="docutils literal notranslate"><span class="pre">Request</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ServerComm.ServerComm"><code class="docutils literal notranslate"><span class="pre">ServerComm</span></code></a></li>
@@ -537,10 +578,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.ValueComm">yggdrasil.communication.ValueComm module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.ValueComm.ValueComm"><code class="docutils literal notranslate"><span class="pre">ValueComm</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.WOFOSTParamFileComm">yggdrasil.communication.WOFOSTParamFileComm module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="yggdrasil_code.html#yggdrasil.communication.WOFOSTParamFileComm.WOFOSTParamFileComm"><code class="docutils literal notranslate"><span class="pre">WOFOSTParamFileComm</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="yggdrasil_code.html#module-yggdrasil.communication.YAMLFileComm">yggdrasil.communication.YAMLFileComm module</a><ul>
@@ -593,6 +630,7 @@
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.SubCommand.help"><code class="docutils literal notranslate"><span class="pre">SubCommand.help</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.SubCommand.name"><code class="docutils literal notranslate"><span class="pre">SubCommand.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.SubCommand.parse_args"><code class="docutils literal notranslate"><span class="pre">SubCommand.parse_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.SubCommand.runtime_arguments"><code class="docutils literal notranslate"><span class="pre">SubCommand.runtime_arguments()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.command_line.SubCommandMeta"><code class="docutils literal notranslate"><span class="pre">SubCommandMeta</span></code></a></li>
@@ -616,6 +654,14 @@
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.coveragerc.func"><code class="docutils literal notranslate"><span class="pre">coveragerc.func()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.coveragerc.help"><code class="docutils literal notranslate"><span class="pre">coveragerc.help</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.coveragerc.name"><code class="docutils literal notranslate"><span class="pre">coveragerc.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.command_line.file_converter"><code class="docutils literal notranslate"><span class="pre">file_converter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.file_converter.arguments"><code class="docutils literal notranslate"><span class="pre">file_converter.arguments</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.file_converter.func"><code class="docutils literal notranslate"><span class="pre">file_converter.func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.file_converter.help"><code class="docutils literal notranslate"><span class="pre">file_converter.help</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.file_converter.name"><code class="docutils literal notranslate"><span class="pre">file_converter.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.command_line.file_converter.runtime_arguments"><code class="docutils literal notranslate"><span class="pre">file_converter.runtime_arguments()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.command_line.generate_gha_workflow"><code class="docutils literal notranslate"><span class="pre">generate_gha_workflow</span></code></a><ul>
@@ -768,6 +814,7 @@
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.components.ComponentError"><code class="docutils literal notranslate"><span class="pre">ComponentError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.components.ComponentMeta"><code class="docutils literal notranslate"><span class="pre">ComponentMeta</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.components.create_component"><code class="docutils literal notranslate"><span class="pre">create_component()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.components.create_component_class"><code class="docutils literal notranslate"><span class="pre">create_component_class()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.components.get_component_base_class"><code class="docutils literal notranslate"><span class="pre">get_component_base_class()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.components.get_registry"><code class="docutils literal notranslate"><span class="pre">get_registry()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#yggdrasil.components.import_component"><code class="docutils literal notranslate"><span class="pre">import_component()</span></code></a></li>
@@ -1225,6 +1272,7 @@
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.schema.ComponentSchema.get_subtype_schema"><code class="docutils literal notranslate"><span class="pre">ComponentSchema.get_subtype_schema()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.schema.ComponentSchema.identify_subtype"><code class="docutils literal notranslate"><span class="pre">ComponentSchema.identify_subtype()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.schema.ComponentSchema.subtype2class"><code class="docutils literal notranslate"><span class="pre">ComponentSchema.subtype2class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.schema.ComponentSchema.subtype2module"><code class="docutils literal notranslate"><span class="pre">ComponentSchema.subtype2module</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="code_python.html#yggdrasil.schema.ComponentSchema.subtypes"><code class="docutils literal notranslate"><span class="pre">ComponentSchema.subtypes</span></code></a></li>
 </ul>
 </li>

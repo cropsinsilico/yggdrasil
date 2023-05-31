@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TODO &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>TODO &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -141,6 +141,7 @@
 <li><p>Split drivers into separate directories for model drivers and connection drivers</p></li>
 <li><p>Change how CLI arguments are added to the arg parser for the language installer to use subparsers</p></li>
 <li><p>Use doxygen linter/parser for parsing functions</p></li>
+<li><p>Add parameter to files/serializers to allow incremental or complete read on file types where that is valid</p></li>
 </ul>
 </section>
 <section id="new-feature-example">
@@ -155,8 +156,9 @@
 <li><p>Assign meanings to error codes and implement across languages (e.g. missing comm class)</p></li>
 <li><p>Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters</p></li>
 <li><p>Allow users to select from list of multiple possiblities when locating libraries to avoid conflict</p></li>
-<li><p>Write C/C++ as extension to rapidjson and wrap in Python</p></li>
 <li><p>Add ‘shell’ option for executable models on Windows to allow calling different shell types.</p></li>
+<li><p>Move communication to C++</p></li>
+<li><p>Allow models to be embedded natively</p></li>
 </ul>
 </section>
 <section id="testing">

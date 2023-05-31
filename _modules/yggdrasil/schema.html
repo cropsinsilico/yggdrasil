@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.schema &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.schema &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -354,7 +354,18 @@
             <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">default_subtype</span><span class="p">,</span>
             <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">base_subtype_class_name</span><span class="p">,</span>
             <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">,</span>
-            <span class="s1">&#39;subtypes&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">subtype2class</span><span class="p">}</span>
+            <span class="s1">&#39;subtypes&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">subtype2class</span><span class="p">,</span>
+            <span class="s1">&#39;subtype_modules&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">subtype2module</span><span class="p">}</span>
+    <span class="c1"># File information</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">component_registry</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">][</span><span class="s1">&#39;subtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">file2ext</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ext2file</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;.txt&#39;</span><span class="p">:</span> <span class="s1">&#39;ascii&#39;</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">file2ext</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">_extensions</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">_extensions</span><span class="p">:</span>
+            <span class="n">ext2file</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
     <span class="c1"># Language driver information</span>
     <span class="n">drivers</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">component_registry</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;subtypes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -413,6 +424,10 @@
         <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;# Component registry&quot;</span><span class="p">,</span>
         <span class="sa">f</span><span class="s2">&quot;COMPONENT_REGISTRY = </span><span class="si">{</span><span class="n">as_lines</span><span class="p">(</span><span class="n">component_registry</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
     <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;# File constants&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FILE2EXT = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">file2ext</span><span class="p">),</span>
+        <span class="s2">&quot;EXT2FILE = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">ext2file</span><span class="p">)]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
         <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;# Language driver constants&quot;</span><span class="p">,</span>
         <span class="s2">&quot;LANG2EXT = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">as_lines</span><span class="p">(</span><span class="n">lang2ext</span><span class="p">),</span>
         <span class="s2">&quot;EXT2LANG = {v: k for k, v in LANG2EXT.items()}&quot;</span><span class="p">,</span>
@@ -463,11 +478,13 @@
 <span class="sd">            subtypes of this component.</span>
 <span class="sd">        schema_subtypes (dict): Mapping between component class names and the</span>
 <span class="sd">            associated values of the subtype_key property for this component.</span>
+<span class="sd">        schema_modules (dict): Mapping between component class names and</span>
+<span class="sd">            the modules that they are in.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype_key</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_subtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_subtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_modules</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="n">SchemaDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_base_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_base_kwargs</span> <span class="o">=</span> <span class="kc">None</span>
@@ -481,6 +498,9 @@
         <span class="k">if</span> <span class="n">schema_subtypes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">schema_subtypes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span> <span class="o">=</span> <span class="n">schema_subtypes</span>
+        <span class="k">if</span> <span class="n">schema_modules</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">schema_modules</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema_modules</span> <span class="o">=</span> <span class="n">schema_modules</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_subtype</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">module</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ComponentSchema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -999,7 +1019,7 @@
                        <span class="p">[</span><span class="s1">&#39;pushProperties&#39;</span><span class="p">,</span> <span class="s1">&#39;pullProperties&#39;</span><span class="p">]</span>
                        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">subt_base</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">subt_schema</span><span class="p">:</span>
-            <span class="n">v_class_name</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">v_module_name</span><span class="p">,</span> <span class="n">v_class_name</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
             <span class="n">v_new</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="n">v_new</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span>
                 <span class="nb">set</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[]))</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">subt_base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[]))))</span>
@@ -1018,6 +1038,7 @@
                               <span class="n">kwargs_no_inherit</span><span class="o">=</span><span class="n">kwargs_no_inherit</span><span class="p">)</span>
             <span class="n">subtypes</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">out</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]</span>
             <span class="n">out</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v_class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtypes</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">schema_modules</span><span class="p">[</span><span class="n">v_class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_module_name</span>
             <span class="n">v_module</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">v_module</span>
@@ -1049,8 +1070,14 @@
             <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">schema_subtypes</span><span class="p">:</span>
                 <span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">schema_modules</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype_modules&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">schema_modules</span><span class="p">:</span>
+                <span class="n">schema_modules</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">schema_modules</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="n">registry</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">],</span>
-                      <span class="n">schema_subtypes</span><span class="o">=</span><span class="n">schema_subtypes</span><span class="p">)</span>
+                      <span class="n">schema_subtypes</span><span class="o">=</span><span class="n">schema_subtypes</span><span class="p">,</span>
+                      <span class="n">schema_modules</span><span class="o">=</span><span class="n">schema_modules</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">registry</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append_class</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1085,6 +1112,15 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">subtype2module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from subtype to module.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">iv</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_modules</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
@@ -1250,6 +1286,7 @@
         <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s1">&#39;Driver&#39;</span><span class="p">,</span> <span class="s1">&#39;Model&#39;</span><span class="p">)):</span>
             <span class="n">driver_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtype_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema_modules</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">subtype_module</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span>
         <span class="c1"># Create new schema for subtype</span>
         <span class="n">new_schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">fullname</span><span class="p">,</span>

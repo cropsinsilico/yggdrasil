@@ -4,7 +4,18 @@
 Filetype   Description                                                                     
 ========   ================================================================================
 ascii      This file is read/written as encoded text one line at a time.                   
+bam        bam sequence I/O                                                                
+bcf        bcf sequence I/O                                                                
 binary     [DEFAULT] The entire file is read/written all at once as bytes.                 
+bmp        bmp image I/O                                                                   
+cabo       The file is a CABO parameter file.                                              
+cram       cram sequence I/O                                                               
+eps        eps image I/O                                                                   
+excel      The file is read/written as Excel                                               
+fasta      fasta sequence I/O                                                              
+fastq      fastq sequence I/O                                                              
+gif        gif image I/O                                                                   
+jpeg       jpeg image I/O                                                                  
 json       The file contains a JSON serialized object.                                     
 map        The file contains a key/value mapping with one key/value pair per line and      
            separated by some delimiter.                                                    
@@ -17,8 +28,11 @@ pandas     The file is a Pandas frame output as a table.
 pickle     The file contains one or more pickled Python objects.                           
 ply        The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_ data format  
            for 3D structures.                                                              
+png        png image I/O                                                                   
+sam        sam sequence I/O                                                                
 table      The file is an ASCII table that will be read/written one row at a time. If      
            ``as_array`` is ``True``, the table will be read/written all at once.           
-wofost     The file is a WOFOST parameter file.                                            
+tiff       tiff image I/O                                                                  
+vcf        vcf sequence I/O                                                                
 yaml       The file contains a YAML serialized object.                                     
 ========   ================================================================================

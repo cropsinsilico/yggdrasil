@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YAML Files &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>YAML Files &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -574,11 +574,15 @@ to monitor it on the root process.</p></td>
 <td><p>Model is written in Python.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>sbml</p></td>
+<tr class="row-even"><td><p>pytorch</p></td>
+<td><p>Model is a PyTorch model</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>sbml</p></td>
 <td><p>Model is an SBML model.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>timesync</p></td>
+<tr class="row-even"><td><p>timesync</p></td>
 <td><p>Model is dedicated to synchronizing timesteps between other models.</p></td>
 <td></td>
 </tr>
@@ -608,7 +612,7 @@ to monitor it on the root process.</p></td>
 </tr>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>array</p></td>
-<td><p>[‘cpp’, ‘c’, ‘mpi’, ‘make’, ‘python’, ‘timesync’, ‘R’, ‘cmake’, ‘executable’, ‘julia’, ‘fortran’, ‘r’, ‘osr’, ‘lpy’, ‘dummy’, ‘c++’, ‘sbml’, ‘cxx’, ‘matlab’]</p></td>
+<td><p>[‘fortran’, ‘cpp’, ‘cmake’, ‘dummy’, ‘pytorch’, ‘lpy’, ‘make’, ‘julia’, ‘c++’, ‘python’, ‘mpi’, ‘cxx’, ‘r’, ‘osr’, ‘timesync’, ‘matlab’, ‘executable’, ‘c’, ‘R’, ‘sbml’]</p></td>
 <td><p>The path to the file containing the model program that will be run by the driver
 for the model’s language and/or a list of arguments that should be passed as
 input to the model program or language executable (e.g. source code or
@@ -627,7 +631,7 @@ be relative to working_dir or absolute.</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler</p></td>
 <td><p>string</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Command or path to executable that should be used to compile the model. If not
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
@@ -635,7 +639,7 @@ current operating system.</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Flags that should be passed to the compiler during compilation. If nto provided,
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
@@ -656,12 +660,12 @@ relative. Defaults to False.</p></td>
 </tr>
 <tr class="row-odd"><td><p>disable_python_c_api</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘osr’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘osr’, ‘cmake’, ‘c’]</p></td>
 <td><p>If True, the Python C API will be disabled. Defaults to False.</p></td>
 </tr>
 <tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>[‘cpp’, ‘c’, ‘mpi’, ‘make’, ‘python’, ‘timesync’, ‘R’, ‘cmake’, ‘executable’, ‘julia’, ‘fortran’, ‘r’, ‘osr’, ‘lpy’, ‘dummy’, ‘c++’, ‘sbml’, ‘cxx’, ‘matlab’]</p></td>
+<td><p>[‘fortran’, ‘cpp’, ‘cmake’, ‘dummy’, ‘pytorch’, ‘lpy’, ‘make’, ‘julia’, ‘c++’, ‘python’, ‘mpi’, ‘cxx’, ‘r’, ‘osr’, ‘timesync’, ‘matlab’, ‘executable’, ‘c’, ‘R’, ‘sbml’]</p></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_compiler</p></td>
@@ -692,69 +696,83 @@ driver.</p></td>
 required to link against the yggdrasil interface). If not provided, this will
 be determined by the target language driver.</p></td>
 </tr>
-<tr class="row-odd"><td><p>integrator</p></td>
+<tr class="row-odd"><td><p>input_transform</p></td>
+<td><p>function</p></td>
+<td><p>[‘pytorch’]</p></td>
+<td><p>Transformation that should be applied to input to get it into the format
+expected by the model (including transformation to pytorch tensors as
+necessary). This function should return a tuple of arguments for the model.</p></td>
+</tr>
+<tr class="row-even"><td><p>integrator</p></td>
 <td><p>string</p></td>
 <td><p>[‘sbml’]</p></td>
 <td><p>Name of integrator that should be used. Valid options include [‘cvode’,
 ‘gillespie’, ‘rk4’, ‘rk45’]. Defaults to ‘cvode’.</p></td>
 </tr>
-<tr class="row-even"><td><p>integrator_settings</p></td>
+<tr class="row-odd"><td><p>integrator_settings</p></td>
 <td><p>object</p></td>
 <td><p>[‘sbml’]</p></td>
 <td><p>Settings for the integrator. Defaults to empty dict.</p></td>
 </tr>
-<tr class="row-odd"><td><p>interpolation</p></td>
+<tr class="row-even"><td><p>interpolation</p></td>
 <td></td>
 <td><p>[‘timesync’]</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>interpreter</p></td>
+<tr class="row-odd"><td><p>interpreter</p></td>
 <td><p>string</p></td>
-<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
+<td><p>[‘lpy’, ‘julia’, ‘r’, ‘sbml’, ‘python’, ‘timesync’, ‘matlab’, ‘dummy’, ‘R’, ‘pytorch’]</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
 </tr>
-<tr class="row-odd"><td><p>interpreter_flags</p></td>
+<tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
+<td><p>[‘lpy’, ‘julia’, ‘r’, ‘sbml’, ‘python’, ‘timesync’, ‘matlab’, ‘dummy’, ‘R’, ‘pytorch’]</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
 </tr>
-<tr class="row-even"><td><p>linker</p></td>
+<tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Command or path to executable that should be used to link the model. If not
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
 </tr>
-<tr class="row-odd"><td><p>linker_flags</p></td>
+<tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Flags that should be passed to the linker during compilation. If not provided,
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
 </tr>
-<tr class="row-even"><td><p>makedir</p></td>
+<tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
 <td><p>[‘make’]</p></td>
 <td><p>Directory where make should be invoked from if it is not the same as the
 directory containing the makefile. Defaults to directory containing makefile if
 provided, otherwise working_dir.</p></td>
 </tr>
-<tr class="row-odd"><td><p>makefile</p></td>
+<tr class="row-even"><td><p>makefile</p></td>
 <td><p>string</p></td>
 <td><p>[‘make’]</p></td>
 <td><p>Path to make file either absolute, relative to makedir (if provided), or
 relative to working_dir. Defaults to Makefile.</p></td>
 </tr>
-<tr class="row-even"><td><p>only_output_final_step</p></td>
+<tr class="row-odd"><td><p>only_output_final_step</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘sbml’]</p></td>
 <td><p>If True, only the final timestep is output. Defaults to False.</p></td>
+</tr>
+<tr class="row-even"><td><p>output_transform</p></td>
+<td><p>function</p></td>
+<td><p>[‘pytorch’]</p></td>
+<td><p>Transformation that should be applied to model output to get it into a format
+that can be serialized by yggdrasil (i.e. not a pytorch Tensor or model
+sepecific type).</p></td>
 </tr>
 <tr class="row-odd"><td><p>reset</p></td>
 <td><p>boolean</p></td>
@@ -770,7 +788,7 @@ selections will be returned.</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_interpreter</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘sbml’, ‘python’, ‘julia’, ‘matlab’, ‘r’, ‘timesync’, ‘lpy’, ‘R’, ‘dummy’]</p></td>
+<td><p>[‘lpy’, ‘julia’, ‘r’, ‘sbml’, ‘python’, ‘timesync’, ‘matlab’, ‘dummy’, ‘R’, ‘pytorch’]</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
@@ -783,7 +801,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 </tr>
 <tr class="row-odd"><td><p>source_files</p></td>
 <td><p>array</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘cmake’, ‘c’]</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
@@ -881,9 +899,14 @@ extrapolated.</p></td>
 <td><p>If True, input/output variables with units will be represented in Matlab using
 symunit. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_asan</p></td>
+<tr class="row-odd"><td><p>weights</p></td>
+<td><p>string</p></td>
+<td><p>[‘pytorch’]</p></td>
+<td><p>Path to file where model weights are saved</p></td>
+</tr>
+<tr class="row-even"><td><p>with_asan</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘c++’, ‘cpp’, ‘c’, ‘make’, ‘cxx’, ‘fortran’, ‘osr’, ‘cmake’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘cpp’, ‘cxx’, ‘c++’, ‘osr’, ‘cmake’, ‘c’]</p></td>
 <td><p>If True, the model will be compiled and linked with the address sanitizer
 enabled (if there is one available for the selected compiler).</p></td>
 </tr>
@@ -1218,43 +1241,85 @@ immediately.</p></td>
 <tr class="row-even"><td><p>ascii</p></td>
 <td><p>This file is read/written as encoded text one line at a time.</p></td>
 </tr>
+<tr class="row-odd"><td><p>bam</p></td>
+<td><p>bam sequence I/O</p></td>
+</tr>
+<tr class="row-even"><td><p>bcf</p></td>
+<td><p>bcf sequence I/O</p></td>
+</tr>
 <tr class="row-odd"><td><p>binary</p></td>
 <td><p>[DEFAULT] The entire file is read/written all at once as bytes.</p></td>
 </tr>
-<tr class="row-even"><td><p>json</p></td>
+<tr class="row-even"><td><p>bmp</p></td>
+<td><p>bmp image I/O</p></td>
+</tr>
+<tr class="row-odd"><td><p>cabo</p></td>
+<td><p>The file is a CABO parameter file.</p></td>
+</tr>
+<tr class="row-even"><td><p>cram</p></td>
+<td><p>cram sequence I/O</p></td>
+</tr>
+<tr class="row-odd"><td><p>eps</p></td>
+<td><p>eps image I/O</p></td>
+</tr>
+<tr class="row-even"><td><p>excel</p></td>
+<td><p>The file is read/written as Excel</p></td>
+</tr>
+<tr class="row-odd"><td><p>fasta</p></td>
+<td><p>fasta sequence I/O</p></td>
+</tr>
+<tr class="row-even"><td><p>fastq</p></td>
+<td><p>fastq sequence I/O</p></td>
+</tr>
+<tr class="row-odd"><td><p>gif</p></td>
+<td><p>gif image I/O</p></td>
+</tr>
+<tr class="row-even"><td><p>jpeg</p></td>
+<td><p>jpeg image I/O</p></td>
+</tr>
+<tr class="row-odd"><td><p>json</p></td>
 <td><p>The file contains a JSON serialized object.</p></td>
 </tr>
-<tr class="row-odd"><td><p>map</p></td>
+<tr class="row-even"><td><p>map</p></td>
 <td><p>The file contains a key/value mapping with one key/value pair per line and
 separated by some delimiter.</p></td>
 </tr>
-<tr class="row-even"><td><p>mat</p></td>
+<tr class="row-odd"><td><p>mat</p></td>
 <td><p>The file is a Matlab .mat file containing one or more serialized Matlab
 variables.</p></td>
 </tr>
-<tr class="row-odd"><td><p>netcdf</p></td>
+<tr class="row-even"><td><p>netcdf</p></td>
 <td><p>The file is read/written as netCDF.</p></td>
 </tr>
-<tr class="row-even"><td><p>obj</p></td>
+<tr class="row-odd"><td><p>obj</p></td>
 <td><p>The file is in the <a class="reference external" href="http://paulbourke.net/dataformats/obj/">Obj</a> data format
 for 3D structures.</p></td>
 </tr>
-<tr class="row-odd"><td><p>pandas</p></td>
+<tr class="row-even"><td><p>pandas</p></td>
 <td><p>The file is a Pandas frame output as a table.</p></td>
 </tr>
-<tr class="row-even"><td><p>pickle</p></td>
+<tr class="row-odd"><td><p>pickle</p></td>
 <td><p>The file contains one or more pickled Python objects.</p></td>
 </tr>
-<tr class="row-odd"><td><p>ply</p></td>
+<tr class="row-even"><td><p>ply</p></td>
 <td><p>The file is in the <a class="reference external" href="http://paulbourke.net/dataformats/ply/">Ply</a> data format
 for 3D structures.</p></td>
 </tr>
-<tr class="row-even"><td><p>table</p></td>
+<tr class="row-odd"><td><p>png</p></td>
+<td><p>png image I/O</p></td>
+</tr>
+<tr class="row-even"><td><p>sam</p></td>
+<td><p>sam sequence I/O</p></td>
+</tr>
+<tr class="row-odd"><td><p>table</p></td>
 <td><p>The file is an ASCII table that will be read/written one row at a time. If
 <code class="docutils literal notranslate"><span class="pre">as_array</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the table will be read/written all at once.</p></td>
 </tr>
-<tr class="row-odd"><td><p>wofost</p></td>
-<td><p>The file is a WOFOST parameter file.</p></td>
+<tr class="row-even"><td><p>tiff</p></td>
+<td><p>tiff image I/O</p></td>
+</tr>
+<tr class="row-odd"><td><p>vcf</p></td>
+<td><p>vcf sequence I/O</p></td>
 </tr>
 <tr class="row-even"><td><p>yaml</p></td>
 <td><p>The file contains a YAML serialized object.</p></td>
@@ -1275,56 +1340,88 @@ for 3D structures.</p></td>
 <tbody>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘ply’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘ply’, ‘pickle’, ‘mat’, ‘map’, ‘obj’, ‘binary’, ‘pandas’, ‘table’]</p></td>
 <td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
-<tr class="row-odd"><td><p>comment</p></td>
+<tr class="row-odd"><td><p>columns</p></td>
+<td><p>array</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Names of columns to read/write.</p></td>
+</tr>
+<tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
 </tr>
-<tr class="row-even"><td><p>datatype</p></td>
+<tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
 </tr>
-<tr class="row-odd"><td><p>default_flow_style</p></td>
+<tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘yaml’]</p></td>
 <td><p>If True, nested collections will be serialized in the block style. If False,
 they will always be serialized in the flow style. See <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>delimiter</p></td>
+<tr class="row-odd"><td><p>delimiter</p></td>
 <td><p>string</p></td>
-<td><p>[‘table’, ‘wofost’, ‘pandas’, ‘map’]</p></td>
+<td><p>[‘pandas’, ‘cabo’, ‘map’, ‘table’]</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
 </tr>
-<tr class="row-odd"><td><p>driver</p></td>
+<tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
+<td><p>[‘excel’, ‘yaml’, ‘cram’, ‘bcf’, ‘cabo’, ‘sam’, ‘tiff’, ‘bam’, ‘eps’, ‘bmp’, ‘fasta’, ‘pickle’, ‘obj’, ‘ply’, ‘vcf’, ‘png’, ‘jpeg’, ‘ascii’, ‘fastq’, ‘mat’, ‘map’, ‘json’, ‘netcdf’, ‘gif’, ‘binary’, ‘pandas’, ‘table’]</p></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>encoding</p></td>
+<tr class="row-odd"><td><p>encoding</p></td>
 <td><p>string</p></td>
 <td><p>[‘yaml’]</p></td>
 <td><p>Encoding that should be used to serialize the object. Defaults to ‘utf-8’.</p></td>
 </tr>
-<tr class="row-odd"><td><p>indent</p></td>
+<tr class="row-even"><td><p>endcol</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Column to stop read at (non-inclusive).</p></td>
+</tr>
+<tr class="row-odd"><td><p>endrow</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Row to stop read at (non-inclusive).</p></td>
+</tr>
+<tr class="row-even"><td><p>flush_on_write</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>If true, the file will be flushed when written to.</p></td>
+</tr>
+<tr class="row-odd"><td><p>header</p></td>
+<td><p>object</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>Header defining sequence identifiers. A header is required for writing SAM, BAM,
+and CRAM files.</p></td>
+</tr>
+<tr class="row-even"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
-<td><p>[‘yaml’, ‘json’]</p></td>
+<td><p>[‘json’, ‘yaml’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
 </tr>
+<tr class="row-odd"><td><p>index</p></td>
+<td><p>string</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>Path to file containing index if different from the standard naming convention
+for BAM and CRAM files.</p></td>
+</tr>
 <tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘binary’, ‘mat’]</p></td>
+<td><p>[‘excel’, ‘yaml’, ‘cram’, ‘bcf’, ‘cabo’, ‘sam’, ‘tiff’, ‘bam’, ‘eps’, ‘bmp’, ‘fasta’, ‘pickle’, ‘obj’, ‘ply’, ‘vcf’, ‘png’, ‘jpeg’, ‘ascii’, ‘fastq’, ‘mat’, ‘map’, ‘json’, ‘netcdf’, ‘gif’, ‘binary’, ‘pandas’, ‘table’]</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
 <tr class="row-odd"><td><p>newline</p></td>
 <td><p>string</p></td>
-<td><p>[‘pickle’, ‘netcdf’, ‘ply’, ‘yaml’, ‘wofost’, ‘json’, ‘map’, ‘ascii’, ‘obj’, ‘pandas’, ‘table’, ‘mat’]</p></td>
+<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
 </tr>
 <tr class="row-even"><td><p>no_header</p></td>
@@ -1333,47 +1430,98 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <td><p>If True, headers will not be read or serialized from/to tables. Defaults to
 False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>read_attributes</p></td>
+<tr class="row-odd"><td><p>params</p></td>
+<td><p>object</p></td>
+<td><p>[‘png’, ‘jpeg’, ‘tiff’, ‘eps’, ‘bmp’, ‘gif’]</p></td>
+<td><p>Parameters that should be based to the PIL.Image save/open command</p></td>
+</tr>
+<tr class="row-even"><td><p>piecemeal</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘fastq’, ‘fasta’]</p></td>
+<td><p>If possible read the the file incrementally in multiple messages. This should be
+used for large files that cannot be loaded into memory.</p></td>
+</tr>
+<tr class="row-odd"><td><p>prune_duplicates</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘obj’, ‘ply’]</p></td>
+<td><p>If True, serialized meshes in array format will be pruned of duplicates when
+being normalized into a Ply object. If False, duplicates will not be pruned.
+Defaults to True.</p></td>
+</tr>
+<tr class="row-even"><td><p>read_attributes</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘netcdf’]</p></td>
 <td><p>If True, the attributes are read in as well as the variables. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>read_meth</p></td>
+<tr class="row-odd"><td><p>read_meth</p></td>
 <td><p>string</p></td>
 <td><p>[‘binary’]</p></td>
 <td><p>Method that should be used to read data from the file. Defaults to ‘read’.
 Ignored if direction is ‘send’.</p></td>
 </tr>
-<tr class="row-odd"><td><p>serializer</p></td>
+<tr class="row-even"><td><p>record_ids</p></td>
+<td><p>array</p></td>
+<td><p>[‘fastq’, ‘fasta’]</p></td>
+<td><p>IDs of records to read/write. Other records will be ignored.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regions</p></td>
+<td><p>array</p></td>
+<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>Region parameters (reference name, start, and end) defining the regions that
+should be read. If not provided, all regions will be read.</p></td>
+</tr>
+<tr class="row-even"><td><p>serializer</p></td>
 <td></td>
 <td><p>[‘binary’]</p></td>
 <td><p>Class with serialize and deserialize methods that should be used to process sent
 and received messages or a dictionary describing a serializer that obeys the
 serializer schema.</p></td>
 </tr>
-<tr class="row-even"><td><p>sort_keys</p></td>
+<tr class="row-odd"><td><p>sheet_template</p></td>
+<td><p>string</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Format string that can be completed with % operator to generate names for each
+subsequent sheet when writing.</p></td>
+</tr>
+<tr class="row-even"><td><p>sheets</p></td>
+<td><p>array</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Name(s) of one more more sheets that should be read/written. If not provided
+during read, all sheets will be read.</p></td>
+</tr>
+<tr class="row-odd"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
 <td><p>[‘json’]</p></td>
 <td><p>If True, the serialization of dictionaries will be in key sorted order. Defaults
 to True.</p></td>
 </tr>
-<tr class="row-odd"><td><p>str_as_bytes</p></td>
-<td><p>boolean</p></td>
-<td><p>[‘pandas’]</p></td>
-<td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
+<tr class="row-even"><td><p>startcol</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Column to start read/write at.</p></td>
 </tr>
-<tr class="row-even"><td><p>use_astropy</p></td>
+<tr class="row-odd"><td><p>startrow</p></td>
+<td><p>integer</p></td>
+<td><p>[‘excel’]</p></td>
+<td><p>Row to start read/write at.</p></td>
+</tr>
+<tr class="row-even"><td><p>str_as_bytes</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘excel’, ‘pandas’]</p></td>
+<td><p>If true, strings in columns are read as bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>use_astropy</p></td>
+<td><p>boolean</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>variables</p></td>
+<tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>
 <td><p>[‘netcdf’]</p></td>
 <td><p>List of variables to read in. If not provided, all variables will be read.</p></td>
 </tr>
-<tr class="row-even"><td><p>version</p></td>
+<tr class="row-odd"><td><p>version</p></td>
 <td><p>integer</p></td>
 <td><p>[‘netcdf’]</p></td>
 <td><p>Version of netCDF format that should be used. Defaults to 1. Options are 1

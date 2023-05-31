@@ -20,6 +20,14 @@ yggdrasil.serialize.AsciiTableSerialize module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.serialize.CABOSerialize module
+----------------------------------------
+
+.. automodule:: yggdrasil.serialize.CABOSerialize
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.serialize.DefaultSerialize module
 -------------------------------------------
 
@@ -96,14 +104,6 @@ yggdrasil.serialize.SerializeBase module
 ----------------------------------------
 
 .. automodule:: yggdrasil.serialize.SerializeBase
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.serialize.WOFOSTParamSerialize module
------------------------------------------------
-
-.. automodule:: yggdrasil.serialize.WOFOSTParamSerialize
    :members:
    :undoc-members:
    :show-inheritance:

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.FunctionalSerialize &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.serialize.FunctionalSerialize &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -96,7 +96,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for yggdrasil.serialize.FunctionalSerialize</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
 
 
 <div class="viewcode-block" id="FunctionalSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize">[docs]</a><span class="k">class</span> <span class="nc">FunctionalSerialize</span><span class="p">(</span><span class="n">SerializeBase</span><span class="p">):</span>
@@ -143,8 +144,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serializer_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Serializer info.&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot define serializer information for user &quot;</span>
-                           <span class="o">+</span> <span class="s2">&quot;supplied functions.&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">)}</span></div>
 </pre></div>
 
            </div>

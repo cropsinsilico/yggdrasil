@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.WOFOSTParamSerialize &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.serialize.CABOSerialize &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -86,7 +86,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">yggdrasil.serialize.WOFOSTParamSerialize</li>
+      <li class="breadcrumb-item active">yggdrasil.serialize.CABOSerialize</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -95,29 +95,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for yggdrasil.serialize.WOFOSTParamSerialize</h1><div class="highlight"><pre>
+  <h1>Source code for yggdrasil.serialize.CABOSerialize</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">rapidjson</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize.AsciiMapSerialize</span> <span class="kn">import</span> <span class="n">AsciiMapSerialize</span>
 
 
-<div class="viewcode-block" id="WOFOSTParamSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize">[docs]</a><span class="k">class</span> <span class="nc">WOFOSTParamSerialize</span><span class="p">(</span><span class="n">AsciiMapSerialize</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing WOFOST parameter files.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CABOSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.CABOSerialize.CABOSerialize">[docs]</a><span class="k">class</span> <span class="nc">CABOSerialize</span><span class="p">(</span><span class="n">AsciiMapSerialize</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing CABO parameter files.&quot;&quot;&quot;</span>
 
-    <span class="n">_seritype</span> <span class="o">=</span> <span class="s1">&#39;wofost&#39;</span>
+    <span class="n">_seritype</span> <span class="o">=</span> <span class="s1">&#39;cabo&#39;</span>
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Serialization of mapping between &#39;</span>
                                    <span class="s1">&#39;keys and scalar or array values &#39;</span>
-                                   <span class="s1">&#39;as used in the WOFOST parameter files.&#39;</span><span class="p">)</span>
+                                   <span class="s1">&#39;as used in the CABO parameter files.&#39;</span><span class="p">)</span>
     <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;delimiter&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39; = &#39;</span><span class="p">}}</span>
     <span class="n">default_datatype</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">}</span>
+    <span class="n">file_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.cab&#39;</span><span class="p">]</span>
     <span class="n">concats_as_str</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_delimiter</span> <span class="o">=</span> <span class="s1">&#39; = &#39;</span>
     <span class="n">_array_fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%5.5f</span><span class="s1">, </span><span class="si">%5.5f</span><span class="s1">&#39;</span>
 
-<div class="viewcode-block" id="WOFOSTParamSerialize.func_serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="CABOSerialize.func_serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.CABOSerialize.CABOSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
@@ -155,7 +156,7 @@
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iline</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="WOFOSTParamSerialize.parse_units"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.parse_units">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CABOSerialize.parse_units"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.CABOSerialize.CABOSerialize.parse_units">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parse_units</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse units.</span>
 
@@ -178,7 +179,7 @@
             <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">return</span> <span class="n">x</span></div>
             
-<div class="viewcode-block" id="WOFOSTParamSerialize.func_deserialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="CABOSerialize.func_deserialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.CABOSerialize.CABOSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
@@ -264,7 +265,7 @@
             <span class="n">finalize_element</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="WOFOSTParamSerialize.concatenate"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.concatenate">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CABOSerialize.concatenate"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.CABOSerialize.CABOSerialize.concatenate">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concatenate objects to get object that would be recieved if</span>
 <span class="sd">        the concatenated serialization were deserialized.</span>
@@ -282,15 +283,15 @@
             <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">total</span><span class="p">]</span></div>
         
-<div class="viewcode-block" id="WOFOSTParamSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<div class="viewcode-block" id="CABOSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.CABOSerialize.CABOSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">WOFOSTParamSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CABOSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;CRPNAM&#39;</span><span class="p">:</span> <span class="s1">&#39;Grain maize CSA practicals&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;TBASEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="s1">&#39;degC&#39;</span><span class="p">),</span>

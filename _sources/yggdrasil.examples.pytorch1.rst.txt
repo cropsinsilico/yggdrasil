@@ -1,0 +1,10 @@
+yggdrasil.examples.pytorch1 package
+===================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.pytorch1
+   :members:
+   :undoc-members:
+   :show-inheritance:

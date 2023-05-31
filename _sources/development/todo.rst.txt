@@ -28,6 +28,7 @@ Refactor
 * Split drivers into separate directories for model drivers and connection drivers
 * Change how CLI arguments are added to the arg parser for the language installer to use subparsers
 * Use doxygen linter/parser for parsing functions
+* Add parameter to files/serializers to allow incremental or complete read on file types where that is valid
 
 New feature/example
 -------------------
@@ -41,8 +42,9 @@ New feature/example
 * Assign meanings to error codes and implement across languages (e.g. missing comm class)
 * Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters
 * Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
-* Write C/C++ as extension to rapidjson and wrap in Python
 * Add 'shell' option for executable models on Windows to allow calling different shell types.
+* Move communication to C++
+* Allow models to be embedded natively
 
 Testing
 -------

@@ -28,6 +28,7 @@ Subpackages
    yggdrasil.examples.model_function
    yggdrasil.examples.model_function2
    yggdrasil.examples.osr
+   yggdrasil.examples.pytorch1
    yggdrasil.examples.root_to_shoot
    yggdrasil.examples.rpc_lesson3
    yggdrasil.examples.rpc_lesson3b

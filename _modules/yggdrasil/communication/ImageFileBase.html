@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yggdrasil.communication.ImageFileBase &mdash; yggdrasil v1.10.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            yggdrasil
+          </a>
+              <div class="version">
+                v1.10.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hpc.html">High Performance Computing (HPC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../remote.html">Running Integrations as Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docker.html">Docker Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../communication.html">yggdrasil.communication</a></li>
+      <li class="breadcrumb-item active">yggdrasil.communication.ImageFileBase</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for yggdrasil.communication.ImageFileBase</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">create_component_class</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.DedicatedFileBase</span> <span class="kn">import</span> <span class="n">DedicatedFileBase</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">Image</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Pillow not installed. I/O of image files will be &quot;</span>
+                  <span class="s2">&quot;disabled.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PILFileBase"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ImageFileBase.PILFileBase">[docs]</a><span class="k">class</span> <span class="nc">PILFileBase</span><span class="p">(</span><span class="n">DedicatedFileBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a JPEG file.&quot;&quot;&quot;</span>
+
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The file is read/written as JPEG.&#39;</span><span class="p">)</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Parameters that should be based to the &#39;</span>
+                            <span class="s1">&#39;PIL.Image save/open command&#39;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">_image_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;jpeg&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;.jfif&#39;</span><span class="p">,</span> <span class="s1">&#39;.jpe&#39;</span><span class="p">,</span> <span class="s1">&#39;.jpeg&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;bmp&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.bmp&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.eps&#39;</span><span class="p">,</span> <span class="s1">&#39;.ps&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;gif&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.gif&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;png&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;.apng&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;tiff&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.tiff&#39;</span><span class="p">,</span> <span class="s1">&#39;.tif&#39;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">_test_parameters</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_greyscale</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="PILFileBase.before_registration"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ImageFileBase.PILFileBase.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration.&quot;&quot;&quot;</span>
+        <span class="n">DedicatedFileBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_extensions</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_image_types</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span><span class="si">}</span><span class="s1"> image I/O&#39;</span></div>
+        
+<div class="viewcode-block" id="PILFileBase.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ImageFileBase.PILFileBase.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
+<span class="sd">        communication class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            language (str, optional): Specific language that should be checked</span>
+<span class="sd">                for compatibility. Defaults to None and all languages supported</span>
+<span class="sd">                on the current platform will be checked. If set to &#39;any&#39;, the</span>
+<span class="sd">                result will be True if this comm is installed for any of the</span>
+<span class="sd">                supported languages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Is the comm installed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">shutil</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span> <span class="o">==</span> <span class="s1">&#39;eps&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;gs&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">Image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_dedicated_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span>
+
+    <span class="k">def</span> <span class="nf">_dedicated_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_dedicated_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;File address not set&quot;</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_dedicated_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;File address not set&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_external_fd</span><span class="p">,</span> <span class="n">formats</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_filetype</span><span class="p">],</span>
+                        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span> <span class="k">as</span> <span class="n">im</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_dedicated_recv: Before asarray </span><span class="si">{</span><span class="n">im</span><span class="o">.</span><span class="n">getdata</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">SystemError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">getdata</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="n">im</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_dedicated_recv: After asarray </span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="PILFileBase.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ImageFileBase.PILFileBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this</span>
+<span class="sd">        class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing. Items:</span>
+<span class="sd">                kwargs (dict): Keyword arguments for comms tested with</span>
+<span class="sd">                    the provided content.</span>
+<span class="sd">                send (list): List of objects to send to test file.</span>
+<span class="sd">                recv (list): List of objects that will be received from a</span>
+<span class="sd">                    test file that was sent the messages in &#39;send&#39;.</span>
+<span class="sd">                contents (bytes): Bytes contents of test file created by</span>
+<span class="sd">                    sending the messages in &#39;send&#39;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_greyscale</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">layer</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="n">layer</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s1">&#39;exact_contents&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+            <span class="s1">&#39;dict&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+            <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+            <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">],</span>
+            <span class="s1">&#39;recv_partial&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">data</span><span class="p">]],</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_parameters</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_test_parameters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<span class="n">_pil_class_attr</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;bmp&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;BMv</span><span class="se">\x01\x00\x00\x00\x00\x00\x00</span><span class="s1">6</span><span class="se">\x00\x00\x00</span><span class="s1">(</span><span class="se">\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\n\x00\x00\x00\n\x00\x00\x00\x01\x00\x18\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00</span><span class="s1">@</span><span class="se">\x01\x00\x00\xc4\x0e\x00\x00\xc4\x0e\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">ZZZ[[[</span><span class="se">\\\\\\</span><span class="s1">]]]&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;^^^___```aaabbbccc</span><span class="se">\x00\x00</span><span class="s1">PPPQQQRRRSSSTTTUUUVVVWWWXXX&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;YYY</span><span class="se">\x00\x00</span><span class="s1">FFFGGGHHHIIIJJJKKKLLLMMMNNNOOO</span><span class="se">\x00\x00</span><span class="s1">&lt;&lt;&lt;===&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;&gt;&gt;&gt;???@@@AAABBBCCCDDDEEE</span><span class="se">\x00\x00</span><span class="s1">22233344455566677788899&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;9:::;;;</span><span class="se">\x00\x00</span><span class="s1">((()))***+++,,,---...///000111</span><span class="se">\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1e\x1e\x1e\x1f\x1f\x1f</span><span class="s1">   !!!&quot;&quot;&quot;###$$$</span><span class="si">%%</span><span class="s1">%&amp;&amp;&amp;</span><span class="se">\&#39;\&#39;\&#39;</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x14\x14\x14\x15\x15\x15\x16\x16\x16\x17\x17</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x17\x18\x18\x18\x19\x19\x19\x1a\x1a\x1a\x1b\x1b\x1b</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1c\x1c\x1c\x1d\x1d\x1d\x00\x00\n\n\n\x0b\x0b\x0b\x0c</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x0c\x0c\r\r\r\x0e\x0e\x0e\x0f\x0f\x0f\x10\x10\x10\x11</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x11\x11\x12\x12\x12\x13\x13\x13\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x02\x02\x02\x03\x03\x03\x04\x04\x04\x05</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x05\x05\x06\x06\x06\x07\x07\x07\x08\x08\x08\t\t\t\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;%!PS-Adobe-3.0 EPSF-3.0</span><span class="se">\n</span><span class="si">%%</span><span class="s1">Creator: PIL 0.1 EpsEncode</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%%</span><span class="s1">BoundingBox: 0 0 10 10</span><span class="se">\n</span><span class="si">%%</span><span class="s1">Pages: 1</span><span class="se">\n</span><span class="si">%%</span><span class="s1">EndComments</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%%</span><span class="s1">Page: 1 1</span><span class="se">\n</span><span class="s1">%ImageData: 10 10 8 3 0 1 1 &quot;false 3 &#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;colorimage&quot;</span><span class="se">\n</span><span class="s1">gsave</span><span class="se">\n</span><span class="s1">10 dict begin</span><span class="se">\n</span><span class="s1">/buf 30 string &#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;def</span><span class="se">\n</span><span class="s1">10 10 scale</span><span class="se">\n</span><span class="s1">10 10 8</span><span class="se">\n</span><span class="s1">[10 0 0 -10 0 10]</span><span class="se">\n</span><span class="s1">{ &#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;currentfile buf readhexstring pop } bind</span><span class="se">\n</span><span class="s1">false 3 &#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;colorimage</span><span class="se">\n</span><span class="s1">000000010101020202030303040404050505060&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;6060707070808080909090a0a0a0b0b0b0c0c0c</span><span class="se">\n</span><span class="s1">0d0d0d0e0e0&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;e0f0f0f101010111111121212131313141414151515161616171&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;717181818191919</span><span class="se">\n</span><span class="s1">1a1a1a1b1b1b1c1c1c1d1d1d1e1e1e1f1f1&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;f202020212121222222232323242424252525262626</span><span class="se">\n</span><span class="s1">2727272&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;828282929292a2a2a2b2b2b2c2c2c2d2d2d2e2e2e2f2f2f30303&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;0313131323232333333</span><span class="se">\n</span><span class="s1">3434343535353636363737373838383&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;939393a3a3a3b3b3b3c3c3c3d3d3d3e3e3e3f3f3f404040</span><span class="se">\n</span><span class="s1">414&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;1414242424343434444444545454646464747474848484949494&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;a4a4a4b4b4b4c4c4c4d4d4d</span><span class="se">\n</span><span class="s1">4e4e4e4f4f4f505050515151525&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;2525353535454545555555656565757575858585959595a5a5a</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;5b5b5b5c5c5c5d5d5d5e5e5e5f5f5f6060606161616262626363&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;63</span><span class="se">\n</span><span class="si">%%%%</span><span class="s1">EndBinary</span><span class="se">\n</span><span class="s1">grestore end</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;gif&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;_greyscale&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;GIF87a</span><span class="se">\n\x00\n\x00\x86\x00\x00\x00\x00\x00\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x02\x02\x02\x03\x03\x03\x04\x04\x04\x05\x05\x05\x06</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x06\x06\x07\x07\x07\x08\x08\x08\t\t\t\n\n\n\x0b\x0b</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x0b\x0c\x0c\x0c\r\r\r\x0e\x0e\x0e\x0f\x0f\x0f\x10</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x10\x10\x11\x11\x11\x12\x12\x12\x13\x13\x13\x14\x14</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x14\x15\x15\x15\x16\x16\x16\x17\x17\x17\x18\x18\x18</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x19\x19\x19\x1a\x1a\x1a\x1b\x1b\x1b\x1c\x1c\x1c\x1d</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1d\x1d\x1e\x1e\x1e\x1f\x1f\x1f</span><span class="s1">   !!!&quot;&quot;&quot;###$$$</span><span class="si">%%</span><span class="s1">%&amp;&amp;&amp;&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\&#39;\&#39;\&#39;</span><span class="s1">((()))***+++,,,---...///000111222333444555666777&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;888999:::;;;&lt;&lt;&lt;===&gt;&gt;&gt;???@@@AAABBBCCCDDDEEEFFFGGGHHHIII&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;JJJKKKLLLMMMNNNOOOPPPQQQRRRSSSTTTUUUVVVWWWXXXYYYZZZ[[[&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\\\\\\</span><span class="s1">]]]^^^___```aaabbbccc</span><span class="se">\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;,</span><span class="se">\x00\x00\x00\x00\n\x00\n\x00\x00\x08</span><span class="s1">s</span><span class="se">\x00\x01\x04</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x10</span><span class="s1">0</span><span class="se">\x80</span><span class="s1">@</span><span class="se">\x01\x03\x07\x10</span><span class="s1">$P</span><span class="se">\xb0\x80</span><span class="s1">A</span><span class="se">\x03\x07\x0f</span><span class="s1"> &#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;D</span><span class="se">\x90</span><span class="s1">0</span><span class="se">\x81</span><span class="s1">B</span><span class="se">\x05\x0b\x17</span><span class="s1">0d</span><span class="se">\xd0\xb0\x81</span><span class="s1">C</span><span class="se">\x07\x0f\x1f</span><span class="s1">@&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x84\x10</span><span class="s1">1</span><span class="se">\x82</span><span class="s1">D</span><span class="se">\t\x13\&#39;</span><span class="s1">P</span><span class="se">\xa4</span><span class="s1">P</span><span class="se">\xb1\x82</span><span class="s1">E</span><span class="se">\x0b\x17</span><span class="s1">/`</span><span class="se">\xc4</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x90</span><span class="s1">1</span><span class="se">\x83</span><span class="s1">F</span><span class="se">\r\x1b</span><span class="s1">7p</span><span class="se">\xe4\xd0\xb1\x83</span><span class="s1">G</span><span class="se">\x0f\x1f</span><span class="s1">?</span><span class="se">\x80\x04</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x11</span><span class="s1">2</span><span class="se">\x84</span><span class="s1">H</span><span class="se">\x11</span><span class="s1">#G</span><span class="se">\x90</span><span class="s1">$Q</span><span class="se">\xb2\x84</span><span class="s1">I</span><span class="se">\x13\&#39;</span><span class="s1">O</span><span class="se">\xa0</span><span class="s1">D</span><span class="se">\x91</span><span class="s1">2</span><span class="se">\x85</span><span class="s1">J&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x15</span><span class="s1">+W</span><span class="se">\xb0</span><span class="s1">d</span><span class="se">\xd1\xb2\x85</span><span class="s1">K</span><span class="se">\x17</span><span class="s1">/_</span><span class="se">\xc0\x84\x11</span><span class="s1">3&amp; </span><span class="se">\x00</span><span class="s1">;&#39;</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;png&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x89</span><span class="s1">PNG</span><span class="se">\r\n\x1a\n\x00\x00\x00\r</span><span class="s1">IHDR</span><span class="se">\x00\x00\x00\n\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\n\x08\x02\x00\x00\x00\x02</span><span class="s1">PX</span><span class="se">\xea\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x17</span><span class="s1">IDATx</span><span class="se">\x9c</span><span class="s1">cd```</span><span class="se">\xc4\x03\xb8\xb8\xb8\xf0\xc8\xb2</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x8c</span><span class="s1">Pi</span><span class="se">\x00</span><span class="s1">XE</span><span class="se">\x02</span><span class="s1">?</span><span class="se">\x04\x14</span><span class="s1">2</span><span class="se">\x84\x00\x00\x00\x00</span><span class="s1">IEND&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xae</span><span class="s1">B`</span><span class="se">\x82</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;tiff&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;II*</span><span class="se">\x00\x08\x00\x00\x00\n\x00\x00\x01\x04\x00\x01\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\n\x00\x00\x00\x01\x01\x04\x00\x01\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n\x00\x00\x00\x02\x01\x03\x00\x03\x00\x00\x00\x86\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x03\x01\x03\x00\x01\x00\x00\x00\x01\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x06\x01\x03\x00\x01\x00\x00\x00\x02\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x11\x01\x04\x00\x01\x00\x00\x00\x8c\x00\x00\x00\x15</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x03\x00\x01\x00\x00\x00\x03\x00\x00\x00\x16\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x04\x00\x01\x00\x00\x00\n\x00\x00\x00\x17\x01\x04\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x00\x00\x00</span><span class="s1">,</span><span class="se">\x01\x00\x00\x1c\x01\x03\x00\x01\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x08\x00\x08</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x08\x00\x00\x00\x00\x01\x01\x01\x02\x02\x02\x03</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x03\x03\x04\x04\x04\x05\x05\x05\x06\x06\x06\x07\x07</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x07\x08\x08\x08\t\t\t\n\n\n\x0b\x0b\x0b\x0c\x0c\x0c</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\r\r\r\x0e\x0e\x0e\x0f\x0f\x0f\x10\x10\x10\x11\x11\x11</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x12\x12\x12\x13\x13\x13\x14\x14\x14\x15\x15\x15\x16</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x16\x16\x17\x17\x17\x18\x18\x18\x19\x19\x19\x1a\x1a</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1a\x1b\x1b\x1b\x1c\x1c\x1c\x1d\x1d\x1d\x1e\x1e\x1e</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1f\x1f\x1f</span><span class="s1">   !!!&quot;&quot;&quot;###$$$</span><span class="si">%%</span><span class="s1">%&amp;&amp;&amp;</span><span class="se">\&#39;\&#39;\&#39;</span><span class="s1">((()))***+++,,,&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;---...///000111222333444555666777888999:::;;;&lt;&lt;&lt;===&gt;&gt;&gt;&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;???@@@AAABBBCCCDDDEEEFFFGGGHHHIIIJJJKKKLLLMMMNNNOOOPPP&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;QQQRRRSSSTTTUUUVVVWWWXXXYYYZZZ[[[</span><span class="se">\\\\\\</span><span class="s1">]]]^^^___```aaa&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;bbbccc&#39;</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;jpeg&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;_test_parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;send_kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;quality&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">}},</span>
+            <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xff\xd8\xff\xe0\x00\x10</span><span class="s1">JFIF</span><span class="se">\x00\x01\x01\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x00\x01\x00\x00\xff\xdb\x00</span><span class="s1">C</span><span class="se">\x00\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\xff\xdb\x00</span><span class="s1">C</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x01\x01\x01\x01\xff\xc0\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x11\x08\x00\n\x00\n\x03\x01</span><span class="s1">&quot;</span><span class="se">\x00\x02\x11\x01\x03</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x11\x01\xff\xc4\x00\x1f\x00\x00\x01\x05\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\xff\xc4</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\xb5\x10\x00\x02\x01\x03\x03\x02\x04\x03\x05</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x05\x04\x04\x00\x00\x01</span><span class="s1">}</span><span class="se">\x01\x02\x03\x00\x04\x11</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x05\x12</span><span class="s1">!1A</span><span class="se">\x06\x13</span><span class="s1">Qa</span><span class="se">\x07</span><span class="s1">&quot;q</span><span class="se">\x14</span><span class="s1">2</span><span class="se">\x81\x91\xa1\x08</span><span class="s1">#B&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xb1\xc1\x15</span><span class="s1">R</span><span class="se">\xd1\xf0</span><span class="s1">$3br</span><span class="se">\x82\t\n\x16\x17\x18\x19</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1a</span><span class="s1">%&amp;</span><span class="se">\&#39;</span><span class="s1">()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xa9\xaa\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xc2</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xd6\xd7\xd8\xd9\xda\xe1\xe2\xe3\xe4\xe5\xe6\xe7</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xe8\xe9\xea\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xfa\xff\xc4\x00\x1f\x01\x00\x03\x01\x01\x01\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\xff\xc4\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xb5\x11\x00\x02\x01\x02\x04\x04\x03\x04\x07\x05</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x04\x04\x00\x01\x02</span><span class="s1">w</span><span class="se">\x00\x01\x02\x03\x11\x04\x05</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;!1</span><span class="se">\x06\x12</span><span class="s1">AQ</span><span class="se">\x07</span><span class="s1">aq</span><span class="se">\x13</span><span class="s1">&quot;2</span><span class="se">\x81\x08\x14</span><span class="s1">B</span><span class="se">\x91\xa1\xb1</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xc1\t</span><span class="s1">#3R</span><span class="se">\xf0\x15</span><span class="s1">br</span><span class="se">\xd1\n\x16</span><span class="s1">$4</span><span class="se">\xe1</span><span class="s1">%</span><span class="se">\xf1\x17\x18</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x19\x1a</span><span class="s1">&amp;</span><span class="se">\&#39;</span><span class="s1">()*56789:CDEFGHIJSTUVWXYZcdefghijstuvw&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;xyz</span><span class="se">\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x94\x95\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xd4\xd5\xd6\xd7\xd8\xd9\xda\xe2\xe3\xe4\xe5\xe6</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xe7\xe8\xe9\xea\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xfa\xff\xda\x00\x0c\x03\x01\x00\x02\x11\x03\x11</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">?</span><span class="se">\x00\xfe</span><span class="s1">L</span><span class="se">\xf4\xdf\xd9\&#39;\xee\xff\x00\xc4\xb3</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xd3\xfe</span><span class="s1">X</span><span class="se">\xff\x00\xf5\xab\xab</span><span class="s1">_</span><span class="se">\xd9\&#39;\x81\xff\x00</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x12\xce\xc3\xfe</span><span class="s1">X</span><span class="se">\xfb</span><span class="s1">}+</span><span class="se">\xf6\x0f</span><span class="s1">M</span><span class="se">\xb1\xb2\xf9\x7f</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xd0\xed</span><span class="s1">{</span><span class="se">\x7f\xcb\xbc</span><span class="s1">_</span><span class="se">\xfc</span><span class="s1">Eukce</span><span class="se">\x81\xfe\x87</span><span class="s1">k</span><span class="se">\xd0</span><span class="s1">&#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x7f\xcb\xbc</span><span class="s1">^</span><span class="se">\x9f\xee</span><span class="s1">P</span><span class="se">\x07\xff\xd9</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="p">}}</span>
+<span class="p">}</span>
+<span class="n">_pil_classes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_pil_class_attr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">_filetype</span><span class="o">=</span><span class="n">x</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">PILFileBase</span><span class="o">.</span><span class="n">_image_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">_pil_classes</span><span class="p">:</span>
+    <span class="n">create_component_class</span><span class="p">(</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">PILFileBase</span><span class="p">,</span>
+                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">FileComm&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Meagan Lang, David Raila.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

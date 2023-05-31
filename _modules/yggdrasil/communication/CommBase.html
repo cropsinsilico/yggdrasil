@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -109,7 +109,7 @@
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">multitasking</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">rapidjson</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">determine_suffix</span><span class="p">,</span> <span class="n">TemporaryCommunicationError</span><span class="p">,</span>
-    <span class="n">import_comm</span><span class="p">,</span> <span class="n">check_env_for_address</span><span class="p">)</span>
+    <span class="n">import_comm</span><span class="p">,</span> <span class="n">check_env_for_address</span><span class="p">,</span> <span class="n">AddressError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">import_component</span><span class="p">,</span> <span class="n">create_component</span><span class="p">,</span> <span class="n">ComponentError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.datatypes</span> <span class="kn">import</span> <span class="n">DataTypeError</span><span class="p">,</span> <span class="n">type2numpy</span>
@@ -611,8 +611,8 @@
 
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: If the comm class is not installed.</span>
-<span class="sd">        RuntimeError: If there is not an environment variable with the specified</span>
-<span class="sd">            name.</span>
+<span class="sd">        AddressError: If there is not an environment variable with the</span>
+<span class="sd">            specified name.</span>
 <span class="sd">        ValueError: If directions is not &#39;send&#39; or &#39;recv&#39;.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -725,18 +725,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">name_base</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="n">suffix</span>
-        <span class="k">if</span> <span class="n">address</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">check_env_for_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-                <span class="n">model_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span>
-                <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">model_name</span>
-                <span class="k">if</span> <span class="n">model_name</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">check_env_for_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_address</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">is_interface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">is_interface</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># tools.is_subprocess()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_interface</span> <span class="o">=</span> <span class="n">is_interface</span>
@@ -866,7 +856,10 @@
                                         <span class="n">partial_datatype</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(((</span><span class="s1">&#39;serializer&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">)</span>
              <span class="ow">and</span> <span class="n">serializer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
-            <span class="n">serializer</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">:</span>
+                <span class="n">serializer</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">serializer</span> <span class="o">=</span> <span class="s1">&#39;direct&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">serializer</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">seri_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="n">serializer</span><span class="p">)</span>
             <span class="n">serializer</span> <span class="o">=</span> <span class="kc">None</span>
@@ -882,6 +875,25 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">serializer</span>
 
+    <span class="k">def</span> <span class="nf">_update_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the address based on the provided name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            address (str): Provided address.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">address</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">address</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">check_env_for_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">AddressError</span><span class="p">:</span>
+            <span class="n">model_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">model_name</span>
+            <span class="k">if</span> <span class="n">model_name</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">check_env_for_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialization steps that should be performed after base</span>
 <span class="sd">        class, but before the comm is opened.&quot;&quot;&quot;</span>
@@ -889,7 +901,10 @@
         <span class="n">seri_kws</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seri_kws</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="c1"># Get serializer class</span>
-            <span class="n">seri_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">:</span>
+                <span class="n">seri_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_serializer</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">seri_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="s1">&#39;direct&#39;</span><span class="p">)</span>
             <span class="n">seri_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">,</span>
                                         <span class="n">subtype</span><span class="o">=</span><span class="n">seri_kws</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">])</span>
             <span class="c1"># Recover keyword arguments for serializer passed to comm class</span>
@@ -942,7 +957,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span> <span class="n">create_component</span><span class="p">(</span><span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">filter_kws</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommBase.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">serializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">serializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
@@ -1582,7 +1598,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">msg_in</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying transformations to message being </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying transformations to message during </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="c1"># If receiving, update the expected datatypes to use information</span>
         <span class="c1"># about the received datatype that was recorded by the serializer</span>
         <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">initialized</span>
@@ -1641,7 +1657,8 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">empty_obj_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Empty message object.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">,</span> <span class="n">for_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">,</span>
+                                    <span class="n">for_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommBase.is_empty"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that a message matches an empty message object.</span>
@@ -2442,6 +2459,8 @@
                 <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform_to_type</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">)</span>
                 <span class="n">msg</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">FLAG_EMPTY</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_obj_recv</span>
             <span class="c1"># 2. Filter</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">FLAG_SUCCESS</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_filter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">)):</span>
                 <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">FLAG_SKIP</span>

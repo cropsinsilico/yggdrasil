@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.DefaultSerialize &mdash; yggdrasil v1.9.0 documentation</title>
+  <title>yggdrasil.serialize.DefaultSerialize &mdash; yggdrasil v1.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -115,6 +115,7 @@
                                    <span class="s1">&#39;extended JSON serialization based on a &#39;</span>
                                    <span class="s1">&#39;provided type definition (See discussion &#39;</span>
                                    <span class="s1">&#39;:ref:`here &lt;serialization_rst&gt;`).&#39;</span><span class="p">)</span>
+    <span class="n">file_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.ygg&#39;</span><span class="p">]</span>
     
 <div class="viewcode-block" id="DefaultSerialize.func_serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
@@ -186,6 +187,10 @@
         <span class="k">if</span> <span class="n">field_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="ow">not</span> <span class="n">as_array</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">object2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">field_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">field_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">obj</span><span class="p">}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">list2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">field_names</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.object2array"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.DefaultSerialize.DefaultSerialize.object2array">[docs]</a>    <span class="nd">@classmethod</span>
@@ -207,7 +212,7 @@
 <span class="sd">            np.array: Array version of the provided object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">as_array</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">assert</span> <span class="n">field_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">list2numpy</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">field_names</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">object2array</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>

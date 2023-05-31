@@ -1,0 +1,8 @@
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/yggdrasil/examples/pytorch1/src/model.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/pytorch1.html>`__)
