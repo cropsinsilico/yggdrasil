@@ -1058,7 +1058,7 @@ comm_t* yggAsciiArrayInput(const char *name) {
 static inline
 comm_t* yggPlyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply(false));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1131,7 +1131,7 @@ comm_t* yggPlyInput(const char *name) {
 static inline
 comm_t* yggObjOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj(false));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1261,7 +1261,7 @@ comm_t* yggGenericInput(const char *name) {
 static inline
 comm_t* yggAnyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_any(true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1275,7 +1275,7 @@ comm_t* yggAnyOutput(const char *name) {
 static inline
 comm_t* yggAnyInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_any(true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1332,7 +1332,7 @@ comm_t* yggAnyInput(const char *name) {
 static inline
 comm_t* yggJSONArrayOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1346,7 +1346,7 @@ comm_t* yggJSONArrayOutput(const char *name) {
 static inline
 comm_t* yggJSONArrayInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1408,7 +1408,7 @@ comm_t* yggJSONArrayInput(const char *name) {
 static inline
 comm_t* yggJSONObjectOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1422,7 +1422,7 @@ comm_t* yggJSONObjectOutput(const char *name) {
 static inline
 comm_t* yggJSONObjectInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->schema == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;

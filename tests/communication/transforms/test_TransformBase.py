@@ -44,10 +44,10 @@ class TestTransformBase(base_class):
 
         def iterator_equality_w(a, b):
             if isinstance(a, Iterator) and isinstance(b, Iterator):
-                assert(nested_approx(list(copy.deepcopy(b)))
-                       == list(copy.deepcopy(a)))
+                assert (nested_approx(list(copy.deepcopy(b)))
+                        == list(copy.deepcopy(a)))
             else:
-                assert(nested_approx(b) == a)
+                assert nested_approx(b) == a
         return iterator_equality_w
 
     def test_transform(self, python_class, testing_options,
@@ -78,11 +78,11 @@ class TestTransformBase(base_class):
                 else:
                     inst.validate_datatype(typ_in)
                     typ_out = inst.transform_datatype(typ_in)
-                    assert(typ_out == typ_exp)
+                    assert typ_out == typ_exp
 
     def test_transform_empty(self, instance):
         r"""Test transform of empty bytes message."""
-        assert(instance(b'', no_init=True) == b'')
+        assert instance(b'', no_init=True) == b''
 
     def test_send_comm(self, class_name, python_class, testing_options,
                        timeout, nested_approx):
@@ -107,19 +107,19 @@ class TestTransformBase(base_class):
             try:
                 for imsg_out in msg_out_list:
                     flag = send_comm.send(msg_in, timeout=timeout)
-                    assert(flag)
+                    assert flag
                     if class_name in ['IterateTransform']:
                         for iimsg_out in imsg_out:
                             flag, msg_recv = recv_comm.recv(timeout=timeout)
-                            assert(flag)
-                            assert(nested_approx(iimsg_out) == msg_recv)
+                            assert flag
+                            assert nested_approx(iimsg_out) == msg_recv
                         msg_recv = imsg_out
                     elif ((class_name in ['FilterTransform'])
                           and isinstance(imsg_out, collections.abc.Iterator)):
-                        assert(recv_comm.n_msg_recv == 0)
+                        assert recv_comm.n_msg_recv == 0
                         flag, msg_recv = recv_comm.recv(timeout=0.0)
-                        assert(flag)
-                        assert(msg_recv == b'')
+                        assert flag
+                        assert msg_recv == b''
                         msg_recv = imsg_out
                     elif ((class_name in ['MapFieldsTransform',
                                           'SelectFieldsTransform'])
@@ -127,8 +127,8 @@ class TestTransformBase(base_class):
                         flag, msg_recv = recv_comm.recv_array(timeout=timeout)
                     else:
                         flag, msg_recv = recv_comm.recv(timeout=timeout)
-                    assert(flag)
-                    assert(nested_approx(imsg_out) == msg_recv)
+                    assert flag
+                    assert nested_approx(imsg_out) == msg_recv
             finally:
                 send_comm.close(linger=True)
                 recv_comm.close(linger=True)
@@ -148,9 +148,9 @@ class TestTransformBase(base_class):
             msg_in, msg_out = x['in/out'][0]
             send_comm = new_comm('test_send', reverse_names=True,
                                  direction='send', use_async=False)
-            recv_comm = new_comm('test_recv',
-                                 transform=[python_class(**x.get('kwargs', {}))],
-                                 **send_comm.opp_comm_kwargs())
+            recv_kwargs = send_comm.opp_comm_kwargs()
+            recv_kwargs['transform'] = [python_class(**x.get('kwargs', {}))]
+            recv_comm = new_comm('test_recv', **recv_kwargs)
             if isinstance(msg_in, collections.abc.Iterator):
                 msg_out_list = list(msg_out)
                 msg_out = iter(msg_out_list)
@@ -158,7 +158,7 @@ class TestTransformBase(base_class):
                 msg_out_list = [msg_out]
             try:
                 flag = send_comm.send(msg_in, timeout=timeout)
-                assert(flag)
+                assert flag
                 for imsg_out in msg_out_list:
                     if (((class_name in ['MapFieldsTransform',
                                          'SelectFieldsTransform'])
@@ -166,7 +166,7 @@ class TestTransformBase(base_class):
                         flag, msg_recv = recv_comm.recv_array(timeout=timeout)
                     else:
                         flag, msg_recv = recv_comm.recv(timeout=timeout)
-                    assert(flag)
+                    assert flag
                     assert_iterator_equality(msg_recv, imsg_out)
             finally:
                 send_comm.close(linger=True)

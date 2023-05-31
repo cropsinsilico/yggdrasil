@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.9.1" %}
+{% set version = "1.10.0" %}
 {% set PY_VER_MAJOR = PY_VER.split('.')[0] %}
 {% set PY_VER_MINOR = PY_VER.split('.')[1] %}
 
@@ -187,6 +187,53 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - pika >=1.0.0
+  - name: yggdrasil.images
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.images') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ghostscript
+        - pillow
+  - name: yggdrasil.seq
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.seq') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - biopython
+  - name: yggdrasil.pytorch
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.pytorch') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - pytorch  # [not win]
+        - torchvision  # [not win]
+  - name: yggdrasil.excel
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.excel') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - openpyxl
+        - pandas
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

@@ -479,6 +479,75 @@
         }
       ]
     },
+    "images": {
+      "description": "Dependencies required to perform I/O on common image files.",
+      "requirements": [
+        "pillow",
+        {
+          "name": "ghostscript",
+          "method": "conda"
+        }
+      ]
+    },
+    "seq": {
+      "description": "Dependencies required to handle sequence (nucleotide/protein) I/O",
+      "requirements": [
+        "biopython",
+        {
+          "name": "pysam",
+          "method": "pip",
+          "os": "unix"
+        }
+      ]
+    },
+    "pytorch": {
+      "description": "Dependencies required to run PyTorch models as part of yggdrasil integrations",
+      "requirements": [
+        {
+          "name": "torchvision",
+          "options": [
+            {
+              "name": "torchvision",
+              "method": "pip"
+            },
+            {
+              "name": "torchvision",
+              "method": "conda",
+              "os": "unix"
+            },
+            {
+              "method": "conda_skip",
+              "os": "win"
+            }
+          ]
+        },
+        {
+          "name": "pytorch",
+          "options": [
+            {
+              "name": "torch",
+              "method": "pip"
+            },
+            {
+              "name": "pytorch",
+              "method": "conda",
+              "os": "unix"
+            },
+            {
+              "method": "conda_skip",
+              "os": "win"
+            }
+          ]
+        }
+      ]
+    },
+    "excel": {
+      "description": "Dependencies required to read/write excel files",
+      "requirements": [
+        "pandas",
+        "openpyxl"
+      ]
+    },
     "testing": {
       "description": "Dependencies required to run yggdrasil tests",
       "requirements": [

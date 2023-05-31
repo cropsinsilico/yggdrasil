@@ -5,19 +5,12 @@
 
 #include "../tools.h"
 
-#define MSG_HEAD_SEP "YGG_MSG_HEAD"
-/*! @brief Size of COMM buffer. */
-#define COMMBUFFSIZ 2000
-#define FMT_LEN 100
-
-
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
 
 /*! @brief C-friendly definition of rapidjson::Document. */
 typedef struct dtype_t {
-  void *schema; //!< Pointer to rapidjson::Value for validation.
   void *metadata; //!< Pointer ot rapidjson::Document containing additional metadata.
 } dtype_t;
 
@@ -720,8 +713,8 @@ dtype_t* create_dtype_pyobj(const char* type, const bool use_generic);
   @returns dtype_t* Type structure/class.
  */
 dtype_t* create_dtype_pyinst(const char* class_name,
-			     const dtype_t* args_dtype,
-			     const dtype_t* kwargs_dtype,
+			     dtype_t* args_dtype,
+			     dtype_t* kwargs_dtype,
 			     const bool use_generic);
 
   
@@ -770,7 +763,7 @@ comm_head_t init_header();
   @param[in] datatype Datatype for messages that will be sent.
   @returns initialized header.
 */
-comm_head_t create_send_header(dtype_t *datatype);
+comm_head_t create_send_header(dtype_t *datatype, const char* msg, const size_t len);
 			       
 
 /*!

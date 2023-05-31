@@ -175,10 +175,7 @@ class PandasSerialize(AsciiTableSerialize):
                             f" of '{type(args)}' provided.")
         fd = sio.StringIO()
         # For Python 3 and higher, bytes need to be encoded
-        args_ = copy.deepcopy(args)
-        for c in args.columns:
-            if isinstance(args_[c][0], bytes):
-                args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
+        args_ = self.normalize_bytes2unicode(args)
         args_.to_csv(fd, index=False,
                      # Not in pandas <0.24
                      # line_terminator=self.newline.decode("utf-8"),
@@ -230,10 +227,7 @@ class PandasSerialize(AsciiTableSerialize):
         out = out.dropna(axis='columns', how='all')
         fd.close()
         if self.str_as_bytes:
-            # Make sure strings are bytes
-            for c, d in zip(out.columns, out.dtypes):
-                if (d == object) and isinstance(out[c][0], str):
-                    out[c] = out[c].apply(lambda s: s.encode('utf-8'))
+            out = self.normalize_unicode2bytes(out)
         # On windows, long != longlong and longlong requires special cformat
         # For now, long will be used to preserve the use of %ld to match long
         if platform._is_win:  # pragma: windows
@@ -258,6 +252,40 @@ class PandasSerialize(AsciiTableSerialize):
         if field_names is not None:
             kws['field_names'] = field_names
         return PandasTransform(**kws)
+
+    @classmethod
+    def normalize_unicode2bytes(cls, args):
+        r"""Convert columns that are unicode to bytes.
+
+        Args:
+            args (pd.DataFrame): Pandas dataframe to convert columns for.
+        
+        Returns:
+            pd.DataFrame: Version of args without unicode in columns.
+
+        """
+        for c, d in zip(args.columns, args.dtypes):
+            if (d == object) and isinstance(args[c][0], str):
+                args[c] = args[c].apply(lambda s: s.encode('utf-8'))
+        return args
+
+    @classmethod
+    def normalize_bytes2unicode(cls, args):
+        r"""Convert columns that are bytes to unicode.
+
+        Args:
+            args (pd.DataFrame): Pandas dataframe to convert columns for.
+
+        Returns:
+            pd.DataFrame: Version of args without bytes in columns.
+
+        """
+        # For Python 3 and higher, bytes need to be encoded
+        args_ = copy.deepcopy(args)
+        for c in args.columns:
+            if isinstance(args_[c][0], bytes):
+                args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
+        return args_
 
     @classmethod
     def dict2object(cls, obj, field_names=None, **kwargs):

@@ -16,5 +16,4 @@ class ObjFileComm(PlyFileComm):
         'The file is in the `Obj <http://paulbourke.net/dataformats/obj/>`_ '
         'data format for 3D structures.')
     _default_serializer = 'obj'
-    _default_extension = '.obj'
     _deprecated_drivers = ['ObjFileInputDriver', 'ObjFileOutputDriver']

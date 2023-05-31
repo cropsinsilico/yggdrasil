@@ -152,6 +152,7 @@ class ObjSerialize(PlySerialize):
     _seritype = 'obj'
     _schema_subtype_description = ('Serialize 3D structures using Obj format.')
     default_datatype = {'type': 'obj'}
+    file_extensions = ['.obj']
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -191,10 +192,13 @@ class ObjSerialize(PlySerialize):
         """
         if isinstance(args, ObjDict):
             return args
+        elif self.is_mesh(args):
+            return ObjDict.from_mesh(
+                args, prune_duplicates=self.prune_duplicates)
         return ObjDict(super(PlySerialize, self).normalize(args))
         
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:

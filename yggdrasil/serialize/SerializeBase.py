@@ -53,10 +53,12 @@ class SerializeBase(tools.YggClass):
                     'default': constants.DEFAULT_NEWLINE_STR},
         'comment': {'type': 'string',
                     'default': constants.DEFAULT_COMMENT_STR},
-        'datatype': {'type': 'schema'}}
+        'datatype': {'type': 'schema'},
+    }
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     _attr_conv = ['newline', 'comment']
     default_datatype = constants.DEFAULT_DATATYPE
+    file_extensions = ['.txt']
     has_header = False
     default_read_meth = 'read'
     is_framed = False
@@ -192,7 +194,7 @@ class SerializeBase(tools.YggClass):
     @classmethod
     def get_testing_options(cls, table_example=False, array_columns=False,
                             include_oldkws=False, table_string_type='bytes',
-                            no_names=False):
+                            no_names=False, no_units=False, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Arguments:
@@ -210,6 +212,8 @@ class SerializeBase(tools.YggClass):
                 for the string column in the table. Defaults to 'bytes'.
             no_names (bool, optional): If True, an example is returned where the
                 names are not provided to the deserializer. Defaults to False.
+            no_units (bool, optional): If True, units will not be added to
+                the returned array if table_example is True.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -259,18 +263,21 @@ class SerializeBase(tools.YggClass):
                           'subtype': 'string',
                           'encoding': 'UCS4'}
             umol = b'\xce\xbcmol'.decode('utf-8')
+            if no_units:
+                units_line = b''
+            else:
+                units_line = b'# \t\xce\xbcmol\tcm\n'
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
-                   'datatype': {'type': 'array',
-                                'items': [dtype1,
-                                          {'type': 'scalar',
-                                           'subtype': 'int', 'precision': 4,
-                                           'units': umol},
-                                          {'type': 'scalar',
-                                           'subtype': 'float', 'precision': 8,
-                                           'units': 'cm'}]},
+                   'datatype': {
+                       'type': 'array',
+                       'items': [dtype1,
+                                 {'type': 'scalar',
+                                  'subtype': 'int', 'precision': 4},
+                                 {'type': 'scalar',
+                                  'subtype': 'float', 'precision': 8}]},
                    'contents': (b'# name\tcount\tsize\n'
-                                + b'# \t\xce\xbcmol\tcm\n'
+                                + units_line
                                 + b'# '
                                 + table_string_fmt.encode('utf8')
                                 + b'\t%d\t%f\n'
@@ -282,20 +289,26 @@ class SerializeBase(tools.YggClass):
                                 + b'three\t3\t3.000000\n'),
                    'objects': 2 * rows,
                    'field_units': ['', umol, 'cm']}
+            if not no_units:
+                out['field_units'] = ['', umol, 'cm']
+                out['datatype']['items'][1]['units'] = umol
+                out['datatype']['items'][2]['units'] = 'cm'
             if not no_names:
                 out['field_names'] = field_names
                 for x, n in zip(out['datatype']['items'], field_names):
                     x['title'] = n
             if include_oldkws:
-                out['kwargs'].update({'format_str': table_string_fmt + '\t%d\t%f\n',
-                                      'field_units': ['', umol, 'cm']})
+                out['kwargs'].update(
+                    format_str=(table_string_fmt + '\t%d\t%f\n'))
+                if not no_units:
+                    out['kwargs']['field_units'] = ['', umol, 'cm']
+                    out['objects'] = [
+                        [units.add_units(x, u) for x, u in
+                         zip(row, out['kwargs']['field_units'])]
+                        for row in out['objects']]
                 if not no_names:
                     out['kwargs']['field_names'] = field_names
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
-                out['objects'] = [
-                    [units.add_units(x, u) for x, u in
-                     zip(row, out['kwargs']['field_units'])]
-                    for row in out['objects']]
                 if 'format_str' in cls._attr_conv:
                     out['extra_kwargs']['format_str'] = tools.str2bytes(
                         out['extra_kwargs']['format_str'])
@@ -437,20 +450,23 @@ class SerializeBase(tools.YggClass):
         """
         if self.datatype['type'] != 'array':
             return None
+        out = None
         if getattr(self, 'field_units', None) is not None:
             out = [str(units.Units(x)) for x in self.field_units]
-        elif isinstance(self.datatype['items'], dict):  # pragma: debug
-            raise Exception("Variable number of items not yet supported.")
-        elif isinstance(self.datatype['items'], list):
-            out = []
-            any_units = False
-            for i, x in enumerate(self.datatype['items']):
-                out.append(x.get('units', ''))
-                if len(x.get('units', '')) > 0:
-                    any_units = True
-            # Don't use field units if they are all defaults
-            if not any_units:
-                out = None
+        elif 'items' in self.datatype:
+            if isinstance(self.datatype['items'], dict):  # pragma: debug
+                raise Exception("Variable number of items not yet "
+                                "supported.")
+            elif isinstance(self.datatype['items'], list):
+                out = []
+                any_units = False
+                for i, x in enumerate(self.datatype['items']):
+                    out.append(x.get('units', ''))
+                    if len(x.get('units', '')) > 0:
+                        any_units = True
+                # Don't use field units if they are all defaults
+                if not any_units:
+                    out = None
         if (out is not None):
             if as_bytes:
                 out = tools.str2bytes(out, recurse=True)
@@ -659,9 +675,10 @@ class SerializeBase(tools.YggClass):
                 if isinstance(typedef.get('items', []), dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
-                if (((len(v) != len(typedef.get('items', [])))
+                if ((len(v) != len(typedef.get('items', []))
                      and (len(v) == 1)
-                     and (len(v[0].split(',')) == len(typedef.get('items', []))))):
+                     and (len(v[0].split(',')) == len(typedef.get(
+                         'items', []))))):
                     valt = v[0].split(',')
                     v[0] = valt[0]
                     for vv in valt[1:]:
@@ -920,6 +937,45 @@ class SerializeBase(tools.YggClass):
         if no_data:
             return metadata
         return data, metadata
+
+    def load(self, fd, **kwargs):
+        r"""Deserialize from a file.
+
+        Args:
+            fd (str, file): Filename or file-like object to load from.
+            **kwargs: Additional keyword arguments are passed to the
+                created FileComm used for reading.
+
+        Returns:
+            object: The deserialized data object or a list of
+                deserialized data objects if there is more than one.
+
+        """
+        from yggdrasil.communication.FileComm import FileComm
+        kwargs.setdefault("serializer", self)
+        comm = FileComm(fd, direction="recv", **kwargs)
+        try:
+            out = comm.load()
+        finally:
+            comm.close()
+        return out
+
+    def dump(self, fd, obj, **kwargs):
+        r"""Serialize to a file.
+
+        Args:
+            fd (str, file): Filename or file-like object to load from.
+            **kwargs: Additional keyword arguments are passed to the
+                created FileComm used for reading.
+
+        """
+        from yggdrasil.communication.FileComm import FileComm
+        kwargs.setdefault("serializer", self)
+        comm = FileComm(fd, direction="send", **kwargs)
+        try:
+            comm.dump(obj)
+        finally:
+            comm.close()
 
     def enable_file_header(self):  # pragma: no cover
         r"""Set serializer attributes to enable file headers to be included in

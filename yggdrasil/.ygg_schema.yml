@@ -838,14 +838,28 @@ definitions:
       - $ref: '#/definitions/file-subtype-ascii'
       - $ref: '#/definitions/file-subtype-map'
       - $ref: '#/definitions/file-subtype-table'
+      - $ref: '#/definitions/file-subtype-bam'
+      - $ref: '#/definitions/file-subtype-bcf'
+      - $ref: '#/definitions/file-subtype-bmp'
+      - $ref: '#/definitions/file-subtype-cabo'
+      - $ref: '#/definitions/file-subtype-cram'
+      - $ref: '#/definitions/file-subtype-eps'
+      - $ref: '#/definitions/file-subtype-excel'
+      - $ref: '#/definitions/file-subtype-fasta'
+      - $ref: '#/definitions/file-subtype-fastq'
+      - $ref: '#/definitions/file-subtype-gif'
+      - $ref: '#/definitions/file-subtype-jpeg'
       - $ref: '#/definitions/file-subtype-json'
       - $ref: '#/definitions/file-subtype-mat'
       - $ref: '#/definitions/file-subtype-netcdf'
       - $ref: '#/definitions/file-subtype-obj'
+      - $ref: '#/definitions/file-subtype-png'
       - $ref: '#/definitions/file-subtype-pandas'
       - $ref: '#/definitions/file-subtype-pickle'
       - $ref: '#/definitions/file-subtype-ply'
-      - $ref: '#/definitions/file-subtype-wofost'
+      - $ref: '#/definitions/file-subtype-sam'
+      - $ref: '#/definitions/file-subtype-tiff'
+      - $ref: '#/definitions/file-subtype-vcf'
       - $ref: '#/definitions/file-subtype-yaml'
     description: Schema for file components.
     title: complete-file-filetype
@@ -893,6 +907,59 @@ definitions:
     - filetype
     title: yggdrasil.communication.AsciiFileComm.AsciiFileComm
     type: object
+  file-subtype-bam:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['bam'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: bam
+        description: bam sequence I/O
+        enum:
+        - bam
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.BAMFileComm
+    type: object
   file-subtype-base:
     additionalProperties: false
     allowSingular: name
@@ -922,6 +989,13 @@ definitions:
           are sent/recieved with either columns rather than row by row. Defaults to
           False.'
         type: boolean
+      columns:
+        description: Names of columns to read/write.
+        items:
+          type:
+          - string
+          - integer
+        type: array
       comment:
         default: '# '
         description: One or more characters indicating a comment. Defaults to '# '.
@@ -969,6 +1043,12 @@ definitions:
         description: Encoding that should be used to serialize the object. Defaults
           to 'utf-8'.
         type: string
+      endcol:
+        description: Column to stop read at (non-inclusive).
+        type: integer
+      endrow:
+        description: Row to stop read at (non-inclusive).
+        type: integer
       field_names:
         aliases:
         - column_names
@@ -994,7 +1074,18 @@ definitions:
         description: The type of file that will be read from or written to.
         enum:
         - ascii
+        - bam
+        - bcf
         - binary
+        - bmp
+        - cabo
+        - cram
+        - eps
+        - excel
+        - fasta
+        - fastq
+        - gif
+        - jpeg
         - json
         - map
         - mat
@@ -1003,14 +1094,21 @@ definitions:
         - pandas
         - pickle
         - ply
+        - png
+        - sam
         - table
-        - wofost
+        - tiff
+        - vcf
         - yaml
         type: string
       filter:
         $ref: '#/definitions/filter'
         description: Filter that will be used to determine when messages should be
           sent/received. Ignored if not provided.
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
       for_service:
         default: false
         description: If True, this comm bridges the gap to an integration running
@@ -1020,6 +1118,10 @@ definitions:
         description: String that should be used to format/parse messages. Default
           to None.
         type: string
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
       in_temp:
         default: false
         description: If True, the path will be considered relative to the platform
@@ -1032,6 +1134,10 @@ definitions:
         type:
         - string
         - int
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
       is_series:
         default: false
         description: If True, input/output will be done to a series of files. If reading,
@@ -1065,13 +1171,27 @@ definitions:
         description: '[DEPRECATED] Method of input/output driver to call when the
           connection closes'
         type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+      piecemeal:
+        default: false
+        description: If possible read the the file incrementally in multiple messages.
+          This should be used for large files that cannot be loaded into memory.
+        type: boolean
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       read_attributes:
         default: false
         description: If True, the attributes are read in as well as the variables.
           Defaults to False.
         type: boolean
       read_meth:
-        default: read
         deprecated: true
         description: Method that should be used to read data from the file. Defaults
           to 'read'. Ignored if direction is 'send'.
@@ -1079,6 +1199,25 @@ definitions:
         - read
         - readline
         type: string
+      record_ids:
+        description: IDs of records to read/write. Other records will be ignored.
+        type: array
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
       serializer:
         allOf:
         - default: {}
@@ -1086,14 +1225,34 @@ definitions:
         description: Class with serialize and deserialize methods that should be used
           to process sent and received messages or a dictionary describing a serializer
           that obeys the serializer schema.
+      sheet_template:
+        description: Format string that can be completed with % operator to generate
+          names for each subsequent sheet when writing.
+        type: string
+      sheets:
+        allowSingular: true
+        default: []
+        description: Name(s) of one more more sheets that should be read/written.
+          If not provided during read, all sheets will be read.
+        items:
+          type: string
+        type: array
       sort_keys:
         default: true
         description: If True, the serialization of dictionaries will be in key sorted
           order. Defaults to True.
         type: boolean
+      startcol:
+        default: 0
+        description: Column to start read/write at.
+        type: integer
+      startrow:
+        default: 0
+        description: Row to start read/write at.
+        type: integer
       str_as_bytes:
         default: false
-        description: If True, strings in columns are read as bytes. Defaults to False.
+        description: If true, strings in columns are read as bytes
         type: boolean
       transform:
         aliases:
@@ -1162,6 +1321,59 @@ definitions:
     - working_dir
     title: file_base
     type: object
+  file-subtype-bcf:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['bcf'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: bcf
+        description: bcf sequence I/O
+        enum:
+        - bcf
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.BCFFileComm
+    type: object
   file-subtype-binary:
     additionalProperties: true
     allowSingular: name
@@ -1189,7 +1401,6 @@ definitions:
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
         type: string
       read_meth:
-        default: read
         deprecated: true
         description: Method that should be used to read data from the file. Defaults
           to 'read'. Ignored if direction is 'send'.
@@ -1210,6 +1421,347 @@ definitions:
     - filetype
     - serializer
     title: yggdrasil.communication.FileComm.FileComm
+    type: object
+  file-subtype-bmp:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['bmp'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: bmp
+        description: bmp image I/O
+        enum:
+        - bmp
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.BMPFileComm
+    type: object
+  file-subtype-cabo:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['cabo'] subtype.
+    properties:
+      comment:
+        default: '# '
+        description: One or more characters indicating a comment. Defaults to '# '.
+        type: string
+      datatype:
+        description: JSON schema defining the type of object that the serializer will
+          be used to serialize/deserialize. Defaults to default_datatype.
+        type: schema
+      delimiter:
+        default: ' = '
+        description: Delimiter that should be used to separate name/value pairs in
+          the map. Defaults to \t.
+        type: string
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: cabo
+        description: The file is a CABO parameter file.
+        enum:
+        - cabo
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      newline:
+        default: '
+
+          '
+        description: One or more characters indicating a newline. Defaults to '\n'.
+        type: string
+    required:
+    - filetype
+    title: yggdrasil.communication.CABOFileComm.CABOFileComm
+    type: object
+  file-subtype-cram:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['cram'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: cram
+        description: cram sequence I/O
+        enum:
+        - cram
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.CRAMFileComm
+    type: object
+  file-subtype-eps:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['eps'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: eps
+        description: eps image I/O
+        enum:
+        - eps
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.EPSFileComm
+    type: object
+  file-subtype-excel:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['excel'] subtype.
+    properties:
+      columns:
+        description: Names of columns to read/write.
+        items:
+          type:
+          - string
+          - integer
+        type: array
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      endcol:
+        description: Column to stop read at (non-inclusive).
+        type: integer
+      endrow:
+        description: Row to stop read at (non-inclusive).
+        type: integer
+      filetype:
+        default: excel
+        description: The file is read/written as Excel
+        enum:
+        - excel
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      sheet_template:
+        description: Format string that can be completed with % operator to generate
+          names for each subsequent sheet when writing.
+        type: string
+      sheets:
+        allowSingular: true
+        default: []
+        description: Name(s) of one more more sheets that should be read/written.
+          If not provided during read, all sheets will be read.
+        items:
+          type: string
+        type: array
+      startcol:
+        default: 0
+        description: Column to start read/write at.
+        type: integer
+      startrow:
+        default: 0
+        description: Row to start read/write at.
+        type: integer
+      str_as_bytes:
+        default: false
+        description: If true, strings in columns are read as bytes
+        type: boolean
+    required:
+    - filetype
+    title: yggdrasil.communication.ExcelFileComm.ExcelFileComm
+    type: object
+  file-subtype-fasta:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['fasta'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: fasta
+        description: fasta sequence I/O
+        enum:
+        - fasta
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      piecemeal:
+        default: false
+        description: If possible read the the file incrementally in multiple messages.
+          This should be used for large files that cannot be loaded into memory.
+        type: boolean
+      record_ids:
+        description: IDs of records to read/write. Other records will be ignored.
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.FASTAFileComm
+    type: object
+  file-subtype-fastq:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['fastq'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: fastq
+        description: fastq sequence I/O
+        enum:
+        - fastq
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      piecemeal:
+        default: false
+        description: If possible read the the file incrementally in multiple messages.
+          This should be used for large files that cannot be loaded into memory.
+        type: boolean
+      record_ids:
+        description: IDs of records to read/write. Other records will be ignored.
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.FASTQFileComm
+    type: object
+  file-subtype-gif:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['gif'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: gif
+        description: gif image I/O
+        enum:
+        - gif
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.GIFFileComm
+    type: object
+  file-subtype-jpeg:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['jpeg'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: jpeg
+        description: jpeg image I/O
+        enum:
+        - jpeg
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.JPEGFileComm
     type: object
   file-subtype-json:
     additionalProperties: true
@@ -1362,14 +1914,6 @@ definitions:
     allowSingular: name
     description: Schema for file component ['netcdf'] subtype.
     properties:
-      comment:
-        default: '# '
-        description: One or more characters indicating a comment. Defaults to '# '.
-        type: string
-      datatype:
-        description: JSON schema defining the type of object that the serializer will
-          be used to serialize/deserialize. Defaults to default_datatype.
-        type: schema
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -1385,12 +1929,6 @@ definitions:
       name:
         description: Name used for component in log messages.
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
-        type: string
-      newline:
-        default: '
-
-          '
-        description: One or more characters indicating a newline. Defaults to '\n'.
         type: string
       read_attributes:
         default: false
@@ -1456,6 +1994,12 @@ definitions:
           '
         description: One or more characters indicating a newline. Defaults to '\n'.
         type: string
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
     required:
     - filetype
     title: yggdrasil.communication.ObjFileComm.ObjFileComm
@@ -1610,9 +2154,97 @@ definitions:
           '
         description: One or more characters indicating a newline. Defaults to '\n'.
         type: string
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
     required:
     - filetype
     title: yggdrasil.communication.PlyFileComm.PlyFileComm
+    type: object
+  file-subtype-png:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['png'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: png
+        description: png image I/O
+        enum:
+        - png
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
+    required:
+    - filetype
+    title: yggdrasil.communication.ImageFileBase.PNGFileComm
+    type: object
+  file-subtype-sam:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['sam'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: sam
+        description: sam sequence I/O
+        enum:
+        - sam
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.SAMFileComm
     type: object
   file-subtype-table:
     additionalProperties: true
@@ -1672,24 +2304,11 @@ definitions:
     - filetype
     title: yggdrasil.communication.AsciiTableComm.AsciiTableComm
     type: object
-  file-subtype-wofost:
+  file-subtype-tiff:
     additionalProperties: true
     allowSingular: name
-    description: Schema for file component ['wofost'] subtype.
+    description: Schema for file component ['tiff'] subtype.
     properties:
-      comment:
-        default: '# '
-        description: One or more characters indicating a comment. Defaults to '# '.
-        type: string
-      datatype:
-        description: JSON schema defining the type of object that the serializer will
-          be used to serialize/deserialize. Defaults to default_datatype.
-        type: schema
-      delimiter:
-        default: ' = '
-        description: Delimiter that should be used to separate name/value pairs in
-          the map. Defaults to \t.
-        type: string
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -1697,24 +2316,75 @@ definitions:
         - ''
         type: string
       filetype:
-        default: wofost
-        description: The file is a WOFOST parameter file.
+        default: tiff
+        description: tiff image I/O
         enum:
-        - wofost
+        - tiff
         type: string
       name:
         description: Name used for component in log messages.
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
         type: string
-      newline:
-        default: '
-
-          '
-        description: One or more characters indicating a newline. Defaults to '\n'.
-        type: string
+      params:
+        default: {}
+        description: Parameters that should be based to the PIL.Image save/open command
+        type: object
     required:
     - filetype
-    title: yggdrasil.communication.WOFOSTParamFileComm.WOFOSTParamFileComm
+    title: yggdrasil.communication.ImageFileBase.TIFFFileComm
+    type: object
+  file-subtype-vcf:
+    additionalProperties: true
+    allowSingular: name
+    description: Schema for file component ['vcf'] subtype.
+    properties:
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - ''
+        type: string
+      filetype:
+        default: vcf
+        description: vcf sequence I/O
+        enum:
+        - vcf
+        type: string
+      flush_on_write:
+        default: false
+        description: If true, the file will be flushed when written to.
+        type: boolean
+      header:
+        description: Header defining sequence identifiers. A header is required for
+          writing SAM, BAM, and CRAM files.
+        type: object
+      index:
+        description: Path to file containing index if different from the standard
+          naming convention for BAM and CRAM files.
+        type: string
+      name:
+        description: Name used for component in log messages.
+        pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
+        type: string
+      regions:
+        default: []
+        description: Region parameters (reference name, start, and end) defining the
+          regions that should be read. If not provided, all regions will be read.
+        items:
+          properties:
+            end:
+              type: integer
+            name:
+              type: string
+            start:
+              type: integer
+          required:
+          - name
+          type: object
+        type: array
+    required:
+    - filetype
+    title: yggdrasil.communication.SequenceFileBase.VCFFileComm
     type: object
   file-subtype-yaml:
     additionalProperties: true
@@ -1901,6 +2571,7 @@ definitions:
       - $ref: '#/definitions/model-subtype-make'
       - $ref: '#/definitions/model-subtype-matlab'
       - $ref: '#/definitions/model-subtype-osr'
+      - $ref: '#/definitions/model-subtype-pytorch'
       - $ref: '#/definitions/model-subtype-python'
       - $ref: '#/definitions/model-subtype-R'
       - $ref: '#/definitions/model-subtype-sbml'
@@ -2122,6 +2793,7 @@ definitions:
         - MakeModelDriver
         - MatlabModelDriver
         - OSRModelDriver
+        - PyTorchModelDriver
         - PythonModelDriver
         - RModelDriver
         - SBMLModelDriver
@@ -2160,6 +2832,12 @@ definitions:
           source file listed in the first argument. If not provided, the model must
           contain it's own calls to the |yggdrasil| interface.
         type: string
+      input_transform:
+        description: Transformation that should be applied to input to get it into
+          the format expected by the model (including transformation to pytorch tensors
+          as necessary). This function should return a tuple of arguments for the
+          model.
+        type: function
       inputs:
         aliases:
         - input
@@ -2279,6 +2957,7 @@ definitions:
         - mpi
         - osr
         - python
+        - pytorch
         - r
         - sbml
         - timesync
@@ -2321,6 +3000,11 @@ definitions:
         default: false
         description: If True, only the final timestep is output. Defaults to False.
         type: boolean
+      output_transform:
+        description: Transformation that should be applied to model output to get
+          it into a format that can be serialized by yggdrasil (i.e. not a pytorch
+          Tensor or model sepecific type).
+        type: function
       outputs:
         aliases:
         - output
@@ -2586,6 +3270,9 @@ definitions:
       validation_command:
         description: Path to a validation command that can be used to verify that
           the model ran as expected. A non-zero return code is taken to indicate failure.
+        type: string
+      weights:
+        description: Path to file where model weights are saved
         type: string
       with_asan:
         description: If True, the model will be compiled and linked with the address
@@ -3549,6 +4236,74 @@ definitions:
     - language
     title: yggdrasil.drivers.PythonModelDriver.PythonModelDriver
     type: object
+  model-subtype-pytorch:
+    additionalProperties: true
+    description: Schema for model component ['pytorch'] subtype.
+    properties:
+      args:
+        allowSingular: true
+        description: The path to the file containing the model program that will be
+          run by the driver for the model's language and/or a list of arguments that
+          should be passed as input to the model program or language executable (e.g.
+          source code or configuration file for a domain specific language).
+        items:
+          type:
+          - string
+          - number
+        type: array
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - PyTorchModelDriver
+        type: string
+      input_transform:
+        description: Transformation that should be applied to input to get it into
+          the format expected by the model (including transformation to pytorch tensors
+          as necessary). This function should return a tuple of arguments for the
+          model.
+        type: function
+      interpreter:
+        description: Name or path of interpreter executable that should be used to
+          run the model. If not provided, the interpreter will be determined based
+          on configuration options for the language (if present) and the default_interpreter
+          class attribute.
+        type: string
+      interpreter_flags:
+        default: []
+        description: Flags that should be passed to the interpreter when running the
+          model. If not provided, the flags are determined based on configuration
+          options for the language (if present) and the default_interpreter_flags
+          class attribute.
+        items:
+          type: string
+        type: array
+      language:
+        default: pytorch
+        description: Model is a PyTorch model
+        enum:
+        - pytorch
+        type: string
+      output_transform:
+        description: Transformation that should be applied to model output to get
+          it into a format that can be serialized by yggdrasil (i.e. not a pytorch
+          Tensor or model sepecific type).
+        type: function
+      skip_interpreter:
+        default: false
+        description: If True, no interpreter will be added to the arguments. This
+          should only be used for subclasses that will not be invoking the model via
+          the command line. Defaults to False.
+        type: boolean
+      weights:
+        description: Path to file where model weights are saved
+        type: string
+    required:
+    - args
+    - language
+    - weights
+    title: yggdrasil.drivers.PyTorchModelDriver.PyTorchModelDriver
+    type: object
   model-subtype-sbml:
     additionalProperties: true
     description: Schema for model component ['sbml'] subtype.
@@ -3789,6 +4544,7 @@ definitions:
       - $ref: '#/definitions/serializer-subtype-default'
       - $ref: '#/definitions/serializer-subtype-map'
       - $ref: '#/definitions/serializer-subtype-table'
+      - $ref: '#/definitions/serializer-subtype-cabo'
       - $ref: '#/definitions/serializer-subtype-direct'
       - $ref: '#/definitions/serializer-subtype-functional'
       - $ref: '#/definitions/serializer-subtype-json'
@@ -3797,7 +4553,6 @@ definitions:
       - $ref: '#/definitions/serializer-subtype-pandas'
       - $ref: '#/definitions/serializer-subtype-pickle'
       - $ref: '#/definitions/serializer-subtype-ply'
-      - $ref: '#/definitions/serializer-subtype-wofost'
       - $ref: '#/definitions/serializer-subtype-yaml'
     description: Schema for serializer components.
     title: complete-serializer-seritype
@@ -3892,10 +4647,17 @@ definitions:
         description: If True, headers will not be read or serialized from/to tables.
           Defaults to False.
         type: boolean
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       seritype:
         default: default
         description: Serializer type.
         enum:
+        - cabo
         - default
         - direct
         - functional
@@ -3907,7 +4669,6 @@ definitions:
         - pickle
         - ply
         - table
-        - wofost
         - yaml
         type: string
       sort_keys:
@@ -3925,6 +4686,26 @@ definitions:
           table. Defaults to False.
         type: boolean
     title: serializer_base
+    type: object
+  serializer-subtype-cabo:
+    additionalProperties: true
+    description: Schema for serializer component ['cabo'] subtype.
+    properties:
+      delimiter:
+        default: ' = '
+        description: Delimiter that should be used to separate name/value pairs in
+          the map. Defaults to \t.
+        type: string
+      seritype:
+        default: cabo
+        description: Serialization of mapping between keys and scalar or array values
+          as used in the CABO parameter files.
+        enum:
+        - cabo
+        type: string
+    required:
+    - seritype
+    title: yggdrasil.serialize.CABOSerialize.CABOSerialize
     type: object
   serializer-subtype-default:
     additionalProperties: true
@@ -4049,6 +4830,12 @@ definitions:
     additionalProperties: true
     description: Schema for serializer component ['obj'] subtype.
     properties:
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       seritype:
         default: obj
         description: Serialize 3D structures using Obj format.
@@ -4135,9 +4922,15 @@ definitions:
     additionalProperties: true
     description: Schema for serializer component ['ply'] subtype.
     properties:
+      prune_duplicates:
+        default: true
+        description: If True, serialized meshes in array format will be pruned of
+          duplicates when being normalized into a Ply object. If False, duplicates
+          will not be pruned. Defaults to True.
+        type: boolean
       seritype:
         default: ply
-        description: Serialize 3D structures using Ply format.
+        description: Serialize 3D structures using `Ply format <http://paulbourke.net/dataformats/ply/>`_.
         enum:
         - ply
         type: string
@@ -4199,26 +4992,6 @@ definitions:
     required:
     - seritype
     title: yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize
-    type: object
-  serializer-subtype-wofost:
-    additionalProperties: true
-    description: Schema for serializer component ['wofost'] subtype.
-    properties:
-      delimiter:
-        default: ' = '
-        description: Delimiter that should be used to separate name/value pairs in
-          the map. Defaults to \t.
-        type: string
-      seritype:
-        default: wofost
-        description: Serialization of mapping between keys and scalar or array values
-          as used in the WOFOST parameter files.
-        enum:
-        - wofost
-        type: string
-    required:
-    - seritype
-    title: yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize
     type: object
   serializer-subtype-yaml:
     additionalProperties: true
@@ -4331,7 +5104,9 @@ definitions:
       selected:
         description: A list of fields that should be selected.
         items:
-          type: string
+          type:
+          - string
+          - integer
         type: array
       single_as_scalar:
         description: If True and only a single field is selected, the transformed
@@ -4479,7 +5254,9 @@ definitions:
       selected:
         description: A list of fields that should be selected.
         items:
-          type: string
+          type:
+          - string
+          - integer
         type: array
       single_as_scalar:
         description: If True and only a single field is selected, the transformed

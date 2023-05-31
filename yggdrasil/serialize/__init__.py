@@ -780,6 +780,11 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         arr = np.genfromtxt(fd, **np_kws)
         if dtype is not None:
             arr = arr.astype(dtype)
+        elif arr.ndim == 2 and arr.dtype.names is None:
+            dtype_named = {
+                'names': [f'f{i}' for i in range(arr.shape[1])],
+                'formats': [dtype for i in range(arr.shape[1])]}
+            arr = arr.astype(dtype_named)
     fd.close()
     return arr
 
@@ -984,9 +989,11 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
     header_lines = []
     header_size = 0
     prev_pos = fd.tell()
+    last_line = None
     for line in fd:
         sline = line.replace(platform._newline, newline)
         if not sline.startswith(comment):
+            last_line = sline
             break
         header_size += len(line)
         header_lines.append(sline)
@@ -1002,8 +1009,24 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
         if v is not None:
             header[k] = v
     header.setdefault('format_str', None)
-    if (delimiter is None) or ('format_str' in header):
-        delimiter = header['delimiter']
+    delimiter = header['delimiter']
+    # Handle case where no header is found
+    if ((not header_lines)
+        and ((not delimiter)
+             or (delimiter == constants.DEFAULT_DELIMITER
+                 and not header['format_str']
+                 and delimiter not in last_line))):
+        for item in [b',', b';']:
+            if item in last_line:
+                p1, p2 = last_line.split(item, maxsplit=1)
+                p1 = p1.rstrip()
+                p2 = p2.lstrip()
+                break
+        else:
+            p1, p2 = last_line.split(maxsplit=1)
+        delimiter = last_line[
+            (last_line.index(p1) + len(p1)):last_line.index(p2)]
+        header['delimiter'] = delimiter
     # Try to determine format from array without header
     str_fmt = b'%s'
     if ((header['format_str'] is None) or (str_fmt in header['format_str'])):
@@ -1023,15 +1046,17 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
         # Get format from array
         if header['format_str'] is None:
             header['format_str'] = table2format(
-                arr.dtype, delimiter=delimiter,
-                comment=b'',
+                arr.dtype, delimiter=delimiter, comment=b'',
                 newline=header['newline'])
         # Determine maximum size of string field
         while str_fmt in header['format_str']:
             field_formats = extract_formats(header['format_str'])
             ifld = tools.bytes2str(
                 header['field_names'][field_formats.index(str_fmt)])
-            max_len = len(max(arr[ifld], key=len))
+            if arr.ndim == 0:
+                max_len = len(arr[ifld].tolist())
+            else:
+                max_len = len(max(arr[ifld], key=len))
             new_str_fmt = b'%%%ds' % max_len
             header['format_str'] = header['format_str'].replace(
                 str_fmt, new_str_fmt, 1)

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <regex>
 #include <cstdint>
 #include "regex_win32.h"

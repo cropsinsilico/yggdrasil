@@ -79,7 +79,8 @@ R2python <- function(robj, not_bytes=FALSE) {
     }
   } else if (is.null(robj)) {
     out <- reticulate::r_to_py(NULL)
-  } else if ((!is.vector(robj) || (length(robj) == 1)) && is.na(robj)) {
+  } else if (is.vector(robj) && (length(robj) == 1) &&
+             (length(is.na(robj)) == 1) && all(is.na(robj))) {
     out <- reticulate::r_to_py(NULL)
   } else {
     # print("Default handling for class:")

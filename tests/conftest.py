@@ -10,6 +10,7 @@ import logging
 import argparse
 import subprocess
 import contextlib
+import numpy as np
 from yggdrasil import platform, constants, rapidjson
 from yggdrasil.serialize.ObjSerialize import ObjDict
 from yggdrasil.serialize.PlySerialize import PlyDict
@@ -621,10 +622,16 @@ def languages():
 
 
 @pytest.fixture(scope="session")
-def scripts():
+def testdir():
+    r"""Test directory."""
+    return os.path.dirname(__file__)
+
+
+@pytest.fixture(scope="session")
+def scripts(testdir):
     r"""Dictionary of test scripts for each language."""
     from yggdrasil import tools
-    script_dir = os.path.join(os.path.dirname(__file__), 'scripts')
+    script_dir = os.path.join(testdir, 'scripts')
     script_list = [
         ('c', ['gcc_model.c', 'hellofunc.c']),
         ('c++', ['gcc_model.cpp', 'hellofunc.c']),
@@ -639,7 +646,8 @@ def scripts():
         ('fortran', ['hellofunc.f90', 'fortran_model.f90']),
         ('sbml', 'sbml_model.xml'),
         ('osr', 'osr_model.xml'),
-        ('julia', 'julia_model.jl')]
+        ('julia', 'julia_model.jl'),
+        ('pytorch', 'pytorch_model.py')]
     scripts = {}
     for k, v in script_list:
         if isinstance(v, list):
@@ -664,9 +672,9 @@ def scripts():
 
 
 @pytest.fixture(scope="session")
-def yamls():
+def yamls(testdir):
     r"""Dictionary of test YAMLs for each language."""
-    yaml_dir = os.path.join(os.path.dirname(__file__), 'yamls')
+    yaml_dir = os.path.join(testdir, 'yamls')
     yaml_list = [
         ('c', 'gcc_model.yml'),
         ('cpp', 'gpp_model.yml'),
@@ -988,7 +996,14 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
             return (not flag)
         wait_on_function(recv_element, timeout=timeout)
         if expected_result is not None:
-            assert nested_approx(expected_result) == msg_list
+            try:
+                assert nested_approx(expected_result) == msg_list
+            except BaseException:
+                print("EXPECTED:")
+                print(expected_result)
+                print("ACTUAL:")
+                print(msg_list)
+                raise
         return msg_list
     return wrapped_recv_message_list
 
@@ -1602,3 +1617,14 @@ def display_diff():
         print('\n'.join(diff))
 
     return wrapped
+
+
+@pytest.fixture
+def geom_dict():
+    return {
+        'vertices': np.array([[0, 0, 0, 0, 1, 1, 1, 1],
+                              [0, 0, 1, 1, 0, 0, 1, 1],
+                              [0, 1, 1, 0, 0, 1, 1, 0]], 'float32').T,
+        'faces': np.array([[0, 0, 7, 0, 1, 2, 3],
+                           [1, 2, 6, 4, 5, 6, 7],
+                           [2, 3, 5, 5, 6, 7, 4]], 'int32').T}

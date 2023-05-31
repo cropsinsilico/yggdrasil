@@ -16,5 +16,4 @@ class PlyFileComm(FileComm):
         'The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_ '
         'data format for 3D structures.')
     _default_serializer = 'ply'
-    _default_extension = '.ply'
     _deprecated_drivers = ['PlyFileInputDriver', 'PlyFileOutputDriver']

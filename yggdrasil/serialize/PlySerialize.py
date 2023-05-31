@@ -1,11 +1,51 @@
 import copy
 import numpy as np
+import io
 from yggdrasil import constants, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
 class GeometryBase:
     r"""Base class for extening rapidjson geometry classes."""
+
+    @classmethod
+    def from_mesh(cls, mesh, prune_duplicates=False, **kwargs):
+        r"""Create a geometry dictionary from a mesh which specifies
+        the vertices (x, y, z) for each face in the geometry.
+
+        Args:
+            mesh (np.ndarray): 3D mesh or a file/filename containing
+                the mesh in a tab or comma delimited file.
+            prune_duplicates (bool, optional): If True, only unique
+                vertices will be included. Defaults to False.
+            **kwargs: Additional keyword arguments will be passed to
+                numpy.loadtxt in the case that mesh is a file or filename.
+
+        """
+        if isinstance(mesh, list):
+            mesh = np.asarray(mesh)
+        elif isinstance(mesh, (str, io.IOBase)):
+            mesh = np.loadtxt(mesh, **kwargs)
+        if len(mesh.dtype) > 1:
+            mesh = np.vstack([mesh[k] for k in mesh.dtype.names]).T
+        verts_per_face = mesh.shape[1] // 3
+        nfaces = mesh.shape[0]
+        nverts = verts_per_face * nfaces
+        verts = mesh.reshape((nverts, 3))
+        faces = np.arange(nverts, dtype='int32').reshape(
+            (nfaces, verts_per_face))
+        if prune_duplicates:
+            rm_verts = []
+            for idx1 in range(nverts):
+                for idx2 in range(idx1):
+                    if np.array_equal(verts[idx1], verts[idx2]):
+                        faces[faces == idx1] = idx2
+                        rm_verts.append(idx1)
+                        break
+            verts = np.delete(verts, rm_verts, axis=0)
+            for idx in reversed(rm_verts):
+                faces[faces > idx] -= 1
+        return cls(cls.from_dict({"vertex": verts, "face": faces}))
 
     @classmethod
     def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
@@ -265,6 +305,10 @@ class PlySerialize(SerializeBase):
             serialized output. Defaults to True.
         newline (str, optional): String that should be used for new lines.
             Defaults to '\n'.
+        prune_duplicates (bool, optional): If True, serialized meshes in
+            array format will be pruned of duplicates when being
+            normalized into a Ply object. If False, duplicates will not
+            be pruned. Defaults to True.
 
     Attributes:
         write_header (bool): If True, headers will be added to serialized
@@ -276,11 +320,16 @@ class PlySerialize(SerializeBase):
     """
     
     _seritype = 'ply'
-    _schema_subtype_description = ('Serialize 3D structures using Ply format.')
+    _schema_subtype_description = (
+        'Serialize 3D structures using `Ply format '
+        '<http://paulbourke.net/dataformats/ply/>`_.')
     _schema_properties = {
         'newline': {'type': 'string',
-                    'default': constants.DEFAULT_NEWLINE_STR}}
+                    'default': constants.DEFAULT_NEWLINE_STR},
+        'prune_duplicates': {'type': 'boolean',
+                             'default': True}}
     default_datatype = {'type': 'ply'}
+    file_extensions = ['.ply']
     concats_as_str = False
 
     def __init__(self, *args, **kwargs):
@@ -318,6 +367,28 @@ class PlySerialize(SerializeBase):
         """
         return PlyDict(msg)
 
+    @classmethod
+    def is_mesh(cls, args):
+        r"""Check if an object is a 3D mesh with x, y, z for vertices
+        in each face in rows.
+
+        Args:
+            args (object): Object to check.
+
+        Returns:
+            bool: True if object is a mesh, false otherwise.
+
+        """
+        if isinstance(args, list):
+            args = np.asarray(args)
+        return (isinstance(args, np.ndarray)
+                and ((args.ndim == 2
+                      and (args.shape[1] // 3) > 0
+                      and (args.shape[1] % 3) == 0)
+                     or (args.ndim == 1
+                         and (len(args.dtype) // 3) > 0
+                         and (len(args.dtype) % 3) == 0)))
+
     def normalize(self, args):
         r"""Normalize a message to conform to the expected datatype.
 
@@ -330,6 +401,9 @@ class PlySerialize(SerializeBase):
         """
         if isinstance(args, PlyDict):
             return args
+        elif self.is_mesh(args):
+            return PlyDict.from_mesh(
+                args, prune_duplicates=self.prune_duplicates)
         return PlyDict(super(PlySerialize, self).normalize(args))
         
     @classmethod
@@ -352,7 +426,7 @@ class PlySerialize(SerializeBase):
         return [out]
         
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -373,6 +447,7 @@ class PlySerialize(SerializeBase):
              'comments': ["author ygg_auto", "File generated by yggdrasil"]})
         out.update(objects=[obj, obj],
                    empty={},
+                   invalid='hello',
                    contents=(b'ply\n'
                              + b'format ascii 1.0\n'
                              + b'comment author ygg_auto\n'

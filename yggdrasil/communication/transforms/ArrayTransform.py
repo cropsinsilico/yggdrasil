@@ -322,7 +322,9 @@ class ArrayTransform(TransformBase):
         out = x
         np_dtype = type2numpy(self.transformed_datatype)
         if isinstance(x, pandas.DataFrame):
-            out = pandas2numpy(x).astype(np_dtype, copy=True)
+            out = pandas2numpy(x)
+            if np_dtype:
+                out = out.astype(np_dtype, copy=True)
         elif isinstance(x, np.ndarray):
             out = x.astype(np_dtype, copy=True)
         elif np_dtype and isinstance(x, (list, tuple, dict,
@@ -342,7 +344,7 @@ class ArrayTransform(TransformBase):
         return out
     
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the transform class.
 
         Returns:

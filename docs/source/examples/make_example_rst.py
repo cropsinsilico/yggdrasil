@@ -20,8 +20,10 @@ lang2print = {'python': 'Python',
               'sbml': 'SBML',
               'osr': 'OpenSimRoot',
               'dummy': 'Dummy',
-              'timesync': 'Timesync'}
-_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab', 'sbml']
+              'timesync': 'Timesync',
+              'pytorch': 'PyTorch'}
+_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab',
+                 'sbml', 'pytorch']
 
 
 def get_file(fname, local=False):

@@ -9,9 +9,9 @@ class PickleSerialize(DefaultSerialize):
     """
 
     _seritype = 'pickle'
-    _schema_subtype_description = ('Serialize any Python object using a Python '
-                                   'pickle.')
-    _default_type = {'type': 'bytes'}
+    _schema_subtype_description = (
+        'Serialize any Python object using a Python pickle.')
+    file_extensions = ['.pkl']
     is_framed = True
 
     def func_serialize(self, args):

@@ -641,7 +641,7 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
   } else {
     datatype = x->datatype;
   }
-  comm_head_t head = create_send_header(datatype);
+  comm_head_t head = create_send_header(datatype, data, len);
   const comm_t *x0;
   if (x->type == SERVER_COMM) {
     if (!(is_eof(data))) {
@@ -968,7 +968,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
     void* head_schema = header_schema(head);
     if (head_schema != NULL) {
       ygglog_debug("comm_recv_multipart(%s): Updating existing datatype to '%s' from '%s'",
-		   x->name, schema2name_c(head_schema), schema2name_c(updtype->schema));
+		   x->name, schema2name_c(head_schema), dtype2name(updtype));
       ret = update_dtype(updtype, head_schema);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);

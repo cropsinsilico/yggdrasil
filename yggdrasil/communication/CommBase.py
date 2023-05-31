@@ -10,7 +10,7 @@ import numpy as np
 from yggdrasil import tools, multitasking, constants, rapidjson
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
-    import_comm, check_env_for_address)
+    import_comm, check_env_for_address, AddressError)
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
 from yggdrasil.datatypes import DataTypeError, type2numpy
@@ -512,8 +512,8 @@ class CommBase(tools.YggClass):
 
     Raises:
         RuntimeError: If the comm class is not installed.
-        RuntimeError: If there is not an environment variable with the specified
-            name.
+        AddressError: If there is not an environment variable with the
+            specified name.
         ValueError: If directions is not 'send' or 'recv'.
 
     """
@@ -626,18 +626,8 @@ class CommBase(tools.YggClass):
         self.name_base = name
         self.suffix = suffix
         self._name = name + suffix
-        if address is None:
-            try:
-                self.address = check_env_for_address(self.env, self.name)
-            except RuntimeError:
-                model_name = self.model_name
-                prefix = '%s:' % model_name
-                if model_name and (not self.name.startswith(prefix)):
-                    self._name = prefix + self.name
-                self.address = check_env_for_address(self.env, self.name)
-        else:
-            self.address = address
         self.direction = direction
+        self._update_address(address)
         if is_interface is None:
             is_interface = False  # tools.is_subprocess()
         self.is_interface = is_interface
@@ -767,7 +757,10 @@ class CommBase(tools.YggClass):
                                         partial_datatype)
         if ((('serializer' not in cls._schema_properties)
              and serializer is None)):
-            serializer = cls._default_serializer
+            if cls._default_serializer:
+                serializer = cls._default_serializer
+            else:
+                serializer = 'direct'
         if isinstance(serializer, str):
             seri_kws.setdefault('seritype', serializer)
             serializer = None
@@ -783,6 +776,25 @@ class CommBase(tools.YggClass):
         else:
             return serializer
 
+    def _update_address(self, address):
+        r"""Set the address based on the provided name.
+
+        Args:
+            address (str): Provided address.
+
+        """
+        if address is not None:
+            self.address = address
+            return
+        try:
+            self.address = check_env_for_address(self.env, self.name)
+        except AddressError:
+            model_name = self.model_name
+            prefix = '%s:' % model_name
+            if model_name and (not self.name.startswith(prefix)):
+                self._name = prefix + self.name
+            self.address = check_env_for_address(self.env, self.name)
+
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base
         class, but before the comm is opened."""
@@ -790,7 +802,10 @@ class CommBase(tools.YggClass):
         seri_kws = getattr(self, 'serializer', {})
         if isinstance(seri_kws, dict):
             # Get serializer class
-            seri_kws.setdefault('seritype', self._default_serializer)
+            if self._default_serializer:
+                seri_kws.setdefault('seritype', self._default_serializer)
+            else:
+                seri_kws.setdefault('seritype', 'direct')
             seri_cls = import_component('serializer',
                                         subtype=seri_kws['seritype'])
             # Recover keyword arguments for serializer passed to comm class
@@ -843,7 +858,8 @@ class CommBase(tools.YggClass):
             self.filter = create_component('filter', **filter_kws)
 
     @classmethod
-    def get_testing_options(cls, serializer=None, **kwargs):
+    def get_testing_options(cls, serializer=None, test_dir=None,
+                            **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Args:
@@ -1483,7 +1499,7 @@ class CommBase(tools.YggClass):
         """
         if not self.transform:
             return msg_in
-        self.debug(f"Applying transformations to message being {self.direction}.")
+        self.debug(f"Applying transformations to message during {self.direction}.")
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
         if (((self.direction == 'recv') and self.serializer.initialized
@@ -1542,7 +1558,8 @@ class CommBase(tools.YggClass):
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        return self.apply_transform(self.serializer.empty_msg, for_empty=True)
+        return self.apply_transform(self.serializer.empty_msg,
+                                    for_empty=True)
 
     def is_empty(self, msg, emsg):
         r"""Check that a message matches an empty message object.
@@ -2343,6 +2360,8 @@ class CommBase(tools.YggClass):
                 if msg.stype is not None:
                     msg.stype = self.apply_transform_to_type(msg.stype)
                 msg.args = self.apply_transform(msg.args)
+            elif msg.flag == FLAG_EMPTY:
+                msg.args = self.empty_obj_recv
             # 2. Filter
             if (msg.flag == FLAG_SUCCESS) and (not self.evaluate_filter(msg.args)):
                 msg.flag = FLAG_SKIP

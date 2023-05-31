@@ -1,9 +1,73 @@
 import os
 import copy
 import tempfile
-from yggdrasil import platform, tools
-from yggdrasil.communication import CommBase
+from yggdrasil import platform, tools, constants, serialize
+from yggdrasil.communication import CommBase, AddressError
 from yggdrasil.components import import_component
+
+
+def is_file_like(x):
+    r"""Check if an object is file-like via duck typing.
+
+    Args:
+        x (object): Object to check.
+
+    Returns:
+        bool: True if file-like, False otherwise.
+
+    """
+    return hasattr(x, 'read') and hasattr(x, 'write')
+
+
+def convert_file(src, dst, src_type=None, dst_type=None,
+                 src_kwargs=None, dst_kwargs=None, transform=None):
+    r"""Convert from one file type to another.
+
+    Args:
+        src (str): Path to source file to convert.
+        dst (str): Path to destination file that should be created.
+        src_type (str, dict, optional): Name of source file type. If not
+            provided, an attempt will be made to identify the file type
+            from the extension.
+        dst_type (str, dict, optional): Name of destination file type. If
+            not provided, an attempt will be made to identify the file
+            type from the extension.
+        transform (dict, optional): Transform parameters for transforming
+            messages between the soruce and destination file.
+
+    Raises:
+        IOError: If the source file does not exist.
+        IOError: If the destination file exists.
+
+    """
+    if src_kwargs is None:
+        src_kwargs = {}
+    if dst_kwargs is None:
+        dst_kwargs = {}
+    # Check files
+    if not os.path.isfile(src):
+        raise IOError(f"Source file does not exist: {src}")
+    if os.path.isfile(dst):
+        raise IOError(f"Destination file already exists: {dst}")
+    # Determine file types
+    if src_type is None:
+        src_type = constants.EXT2FILE[os.path.splitext(src)[1]]
+    if dst_type is None:
+        dst_type = constants.EXT2FILE[os.path.splitext(dst)[1]]
+    # Load
+    fsrc = import_component('file', src_type)(src, direction='recv',
+                                              **src_kwargs)
+    msg = fsrc.load(return_message_object=True)
+    fsrc.close()
+    # Transform
+    if transform:
+        dst_kwargs['transform'] = transform
+    # Dump
+    fdst = import_component('file', dst_type)(dst, direction='send',
+                                              **dst_kwargs)
+    fdst.update_serializer_from_message(msg)
+    fdst.dump(msg)
+    fdst.close()
 
 
 class FileComm(CommBase.CommBase):
@@ -72,7 +136,7 @@ class FileComm(CommBase.CommBase):
         'filetype': {'type': 'string', 'default': _filetype,
                      'description': ('The type of file that will be read from '
                                      'or written to.')},
-        'read_meth': {'type': 'string', 'default': 'read',
+        'read_meth': {'type': 'string',
                       'enum': ['read', 'readline'],
                       'deprecated': True},
         'append': {'type': 'boolean', 'default': False},
@@ -90,17 +154,26 @@ class FileComm(CommBase.CommBase):
     _schema_additional_kwargs_no_inherit = {
         'pushProperties': {'$properties/serializer': True}}
     _default_serializer = 'direct'
-    _default_extension = '.txt'
     is_file = True
     _maxMsgSize = 0
     _mode_as_bytes = True
     _synchronous_read = False
     _deprecated_drivers = ['FileInputDriver', 'FileOutputDriver']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name, address=None, direction='send', **kwargs):
+        self._external_fd = None
+        if is_file_like(name):
+            self._external_fd = name
+            name = str(self._external_fd)
+            if address is None:
+                address = name
+        elif is_file_like(address):
+            self._external_fd = address
+            address = str(self._external_fd)
         kwargs.setdefault('close_on_eof_send', True)
         kwargs['partner_language'] = None  # Files don't have partner comms
-        return super(FileComm, self).__init__(*args, **kwargs)
+        return super(FileComm, self).__init__(
+            name, address=address, direction=direction, **kwargs)
 
     @classmethod
     def _update_serializer_kwargs(cls, kwargs):
@@ -112,11 +185,29 @@ class FileComm(CommBase.CommBase):
 
         """
         out = super(FileComm, cls)._update_serializer_kwargs(kwargs)
-        if ((cls._default_serializer != 'direct'
+        if ((cls._default_serializer
+             and cls._default_serializer != 'direct'
              and isinstance(out, dict)
              and out.get('seritype', 'direct') in ['default', 'direct'])):
             out['seritype'] = cls._default_serializer
         return out
+        
+    def _update_address(self, address):
+        r"""Set the address based on the provided name.
+
+        Args:
+            address (str): Provided address.
+
+        """
+        try:
+            super(FileComm, self)._update_address(address)
+        except AddressError:
+            if (((not self.wait_for_creation)
+                 and self.direction == 'recv'
+                 and not os.path.isfile(self.name_base))):
+                raise AddressError(
+                    f"File does not exist: '{self.name_base}'")
+            self.address = self.name_base
         
     def _init_before_open(self, **kwargs):
         r"""Get absolute path and set attributes."""
@@ -133,7 +224,7 @@ class FileComm(CommBase.CommBase):
         self._series_index = 0
         if self.append and os.path.isfile(self.current_address):
             self.disable_header()
-        if 'read_meth' not in self._schema_properties:
+        if getattr(self, 'read_meth', None) is None:
             self.read_meth = self.serializer.read_meth
         assert self.read_meth in ['read', 'readline']
         # Force overwrite for concatenation in append mode
@@ -146,6 +237,9 @@ class FileComm(CommBase.CommBase):
         if not self.concats_as_str:
             assert self.read_meth == 'read'
             assert not self.serializer.is_framed
+        # Disable features not allowed when fd provided
+        if self._external_fd:
+            assert not self.is_series
 
     @property
     def concats_as_str(self):
@@ -155,38 +249,52 @@ class FileComm(CommBase.CommBase):
             
     @staticmethod
     def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
+        r"""Operations that should be performed to modify class
+        attributes prior to registration."""
         CommBase.CommBase.before_registration(cls)
+        seri = None
+        if cls._default_serializer:
+            seri = import_component('serializer', cls._default_serializer)
+            cls._extensions = seri.file_extensions
         # Add serializer properties to schema
         if cls._filetype != 'binary':
-            # from yggdrasil.schema import ComponentSchema
-            # if cls._default_serializer != 'direct':
-            #     seri_key = ComponentSchema._subtype_defkey(
-            #         'serializer', cls._default_serializer)
-            #     base_key = ComponentSchema._subtype_defkey(
-            #         'serializer', 'base')
-            #     cls._schema_properties['serializer'] = {
-            #         'allOf': [
-            #             {"$ref": f"#/definitions/{seri_key}"},
-            #             {"$ref": f"#/definitions/{base_key}"}
-            #         ]}
             assert 'serializer' not in cls._schema_properties
-            # if registration_in_progress():
-            seri = import_component('serializer', cls._default_serializer)
-            new = seri._schema_properties
-            # else:
-            #     from yggdrasil.schema import get_schema
-            #     schema = get_schema()
-            #     new = schema['file'].get_subtype_schema(
-            #         cls._default_serializer)['properties']
-            cls._schema_properties.update(new)
+            if seri:
+                new = seri._schema_properties
+                cls._schema_properties.update(new)
             for k in ['driver', 'args', 'seritype']:
                 cls._schema_properties.pop(k, None)
         cls._commtype = cls._filetype
 
     @classmethod
-    def get_testing_options(cls, read_meth=None, **kwargs):
+    def get_test_contents(cls, data, **kwargs):  # pragma: debug
+        r"""Method for returning the serialized form of a set of test
+        data.
+
+        Args:
+            data (list): List of test data objects to serialize.
+
+        Returns:
+            bytes: Serialized test data.
+
+        """
+        fname = f'contents_{cls._filetype}{cls._extensions[0]}'
+        assert not os.path.isfile(fname)
+        try:
+            x = cls(fname, direction='send', append=True, **kwargs)
+            for msg in data:
+                x.send(msg)
+            x.close()
+            with open(fname, 'rb') as fd:
+                out = fd.read()
+        finally:
+            if os.path.isfile(fname):
+                os.remove(fname)
+                cls.remove_companion_files(fname)
+        return out
+
+    @classmethod
+    def get_testing_options(cls, read_meth=None, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Args:
@@ -208,14 +316,17 @@ class FileComm(CommBase.CommBase):
                     the messages in 'send'.
 
         """
-        out = super(FileComm, cls).get_testing_options(**kwargs)
+        if serializer is None:
+            serializer = cls._default_serializer
+        out = super(FileComm, cls).get_testing_options(
+            serializer=serializer, **kwargs)
         if 'read_meth' in cls._schema_properties:
             if read_meth is None:
-                read_meth = cls._schema_properties['read_meth']['default']
+                read_meth = 'read'
             out['kwargs']['read_meth'] = read_meth
         if read_meth == 'readline':
             out['recv_partial'] = [[x] for x in out['recv']]
-            if cls._default_serializer == 'direct':
+            if serializer == 'direct':
                 comment = tools.str2bytes(
                     cls._schema_properties['comment']['default']
                     + 'Comment\n')
@@ -223,15 +334,17 @@ class FileComm(CommBase.CommBase):
                 out['contents'] += comment
                 out['recv_partial'].append([])
         else:
-            seri_cls = import_component('serializer', cls._default_serializer)
+            seri_cls = import_component('serializer', serializer)
             if seri_cls.concats_as_str:
                 out['recv_partial'] = [[x] for x in out['recv']]
-                out['recv'] = seri_cls.concatenate(out['recv'], **out['kwargs'])
+                out['recv'] = seri_cls.concatenate(
+                    out['recv'], **out['kwargs'])
             else:
                 out['recv_partial'] = [[out['recv'][0]]]
                 for i in range(1, len(out['recv'])):
                     out['recv_partial'].append(seri_cls.concatenate(
-                        out['recv_partial'][-1] + [out['recv'][i]], **out['kwargs']))
+                        out['recv_partial'][-1] + [out['recv'][i]],
+                        **out['kwargs']))
                 out['recv'] = copy.deepcopy(out['recv_partial'][-1])
         return out
         
@@ -272,7 +385,7 @@ class FileComm(CommBase.CommBase):
     @classmethod
     def new_comm_kwargs(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
-        kwargs.setdefault('address', 'file%s' % cls._default_extension)
+        kwargs.setdefault('address', 'file%s' % cls._extensions[0])
         return args, kwargs
 
     @property
@@ -362,6 +475,10 @@ class FileComm(CommBase.CommBase):
             self.file_seek(0, 0)
             self.file_seek(prev_pos)
         return out
+
+    def series_file_size(self, fname):
+        r"""int: Size of file in series."""
+        return os.path.getsize(fname)
 
     def file_tell(self):
         r"""int: Current position in the file."""
@@ -529,6 +646,8 @@ class FileComm(CommBase.CommBase):
                     raise
 
     def _file_close(self):
+        if self._external_fd:
+            self._external_fd = None
         if self.is_open:
             try:
                 self.file_flush()
@@ -546,7 +665,8 @@ class FileComm(CommBase.CommBase):
         r"""Open the file."""
         super(FileComm, self).open()
         self._open()
-        self.register_comm(self.registry_key, self.fd)
+        if not self._external_fd:
+            self.register_comm(self.registry_key, self.fd)
 
     def _close(self, *args, **kwargs):
         r"""Close the file."""
@@ -558,7 +678,8 @@ class FileComm(CommBase.CommBase):
                 os.remove(self.current_address)
             except PermissionError:  # pragma: no cover
                 pass
-        self.unregister_comm(self.registry_key)
+        if not self._external_fd:
+            self.unregister_comm(self.registry_key)
         super(FileComm, self)._close(*args, **kwargs)
 
     def remove_file(self):
@@ -571,10 +692,23 @@ class FileComm(CommBase.CommBase):
                 if not os.path.isfile(address):
                     break
                 os.remove(address)
+                self.remove_companion_files(address)
                 i += 1
         else:
             if os.path.isfile(self.address):
                 os.remove(self.address)
+                self.remove_companion_files(self.address)
+
+    @classmethod
+    def remove_companion_files(cls, address):
+        r"""Remove companion files that are created when writing to a
+        file
+
+        Args:
+            address (str): Address for the filename.
+
+        """
+        pass
 
     @property
     def is_open(self):
@@ -589,6 +723,8 @@ class FileComm(CommBase.CommBase):
     @property
     def fd(self):
         r"""Associated file identifier."""
+        if self._external_fd:
+            return self._external_fd
         return self._fd
 
     @property
@@ -613,7 +749,7 @@ class FileComm(CommBase.CommBase):
                     fname = self.get_series_address(i)
                     if not os.path.isfile(fname):
                         break
-                    out += os.path.getsize(fname)
+                    out += self.series_file_size(fname)
                     i += 1
             self.change_position(*pos)
         return out
@@ -736,9 +872,10 @@ class FileComm(CommBase.CommBase):
             self.read_header()
             prev_pos = self.file_tell()
             out = self._file_recv()
-        except BaseException:  # pragma: debug
+        except BaseException as e:  # pragma: debug
             # Use this to catch case where close called during receive.
             # In the future this should be handled via a lock.
+            self.debug(f"Error during file receive: {type(e)}({e})")
             out = ''
         if len(out) == 0:
             if self.advance_in_series():
@@ -754,6 +891,7 @@ class FileComm(CommBase.CommBase):
                 out = out.replace(self.platform_newline, self.serializer.newline)
             if flag and (not self.is_eof(out)):
                 if (((self.read_meth == 'readline')
+                     and isinstance(out, bytes)
                      and out.startswith(self.serializer.comment))):
                     # Exclude comments
                     flag, out = self._recv()
@@ -781,3 +919,56 @@ class FileComm(CommBase.CommBase):
             except (AttributeError, ValueError):  # pragma: debug
                 if self.is_open:
                     raise
+
+    def load(self, return_message_object=False, **kwargs):
+        r"""Deserialize all contents from a file.
+
+        Args:
+            **kwargs: Keyword arguments are passed to recv calls.
+
+        Returns:
+            object: The deserialized data object or a list of
+                deserialized data objects if there is more than one.
+
+        Raises:
+            SerializationError: If the first recv call fails.
+
+        """
+        from yggdrasil import rapidjson
+        msg = self.recv(return_message_object=True, **kwargs)
+        if not msg.flag:
+            raise serialize.SerializationError(
+                "Error deserializing from file")
+        out = [msg]
+        while msg.flag:
+            msg = self.recv(return_message_object=True, **kwargs)
+            if msg.flag:
+                out.append(msg)
+        if len(out) > 1:
+            out[0].args = self.serializer.concatenate(
+                [x.args for x in out])
+            out[0].sinfo['datatype'] = rapidjson.encode_schema(
+                out[0].args, minimal=True)
+            out[0].stype = out[0].sinfo['datatype']
+            for k in ['format_str', 'field_names', 'field_units']:
+                if k in out[0].sinfo:
+                    out[0].stype[k] = out[0].sinfo[k]
+        out = out[0]
+        if not return_message_object:
+            out = out.args
+        return out
+
+    def dump(self, obj, **kwargs):
+        r"""Serialize to a file.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the send call.
+
+        Raises:
+            SerializationError: If the send call fails.
+
+        """
+        flag = self.send(obj, **kwargs)
+        if not flag:
+            raise serialize.SerializationError(
+                "Error serializing to file")

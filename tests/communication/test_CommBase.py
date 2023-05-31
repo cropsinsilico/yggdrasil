@@ -3,7 +3,7 @@ import uuid
 import copy
 import pytest
 from yggdrasil import platform
-from yggdrasil.communication import new_comm, get_comm
+from yggdrasil.communication import new_comm, get_comm, AddressError
 from yggdrasil.tools import get_supported_comm
 from tests import TestComponentBase
 
@@ -78,6 +78,7 @@ class BaseComm(TestComponentBase):
         kws = dict(commtype=commtype, reverse_names=True,
                    direction='send', use_async=use_async)
         kws.update(testing_options['kwargs'])
+        kws.update(testing_options.get('send_kwargs', {}))
         kws.update(kwargs)
         return kws
 
@@ -176,7 +177,14 @@ class BaseComm(TestComponentBase):
                     recv_comm, recv_params.get('method', 'recv'))(
                         **recv_params.get('kwargs', {'timeout': 0}))
                 assert flag == recv_params.get('flag', True)
-                assert nested_approx(recv_params['message']) == msg
+                try:
+                    assert nested_approx(recv_params['message']) == msg
+                except BaseException:
+                    print("EXPECTED:")
+                    print(recv_params['message'])
+                    print("ACTUAL:")
+                    print(msg)
+                    raise
             if not send_params.get('skip_wait', False):
                 wait_on_function(
                     lambda: send_comm.is_closed or (send_comm.n_msg_send == 0))
@@ -354,7 +362,7 @@ class TestComm(BaseComm):
 
     def test_error_name(self, python_class):
         r"""Test error on missing address."""
-        with pytest.raises(RuntimeError):
+        with pytest.raises(AddressError):
             python_class('test%s' % uuid.uuid4())
 
     def test_error_send(self, monkeypatch, send_comm, testing_options,

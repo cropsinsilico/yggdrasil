@@ -1,5 +1,7 @@
 import pytest
 import copy
+import tempfile
+import os
 from yggdrasil import constants, schema
 from yggdrasil.components import import_component
 from yggdrasil.serialize import SerializeBase, SerializationError
@@ -58,9 +60,11 @@ class TestSerializeBase(base_class):
         return empty_head_w
 
     @pytest.fixture(scope="class")
-    def map_sent2recv(self, nested_approx):
+    def map_sent2recv(self, nested_approx, testing_options):
         r"""Factory for method to convert sent messages to received."""
         def wrapped_map_sent2recv(obj):
+            if testing_options.get('map_sent2recv', None):
+                obj = testing_options['map_sent2recv'](obj)
             return nested_approx(obj)
         return wrapped_map_sent2recv
 
@@ -103,6 +107,66 @@ class TestSerializeBase(base_class):
         if ((('contents' in testing_options)
              and (class_name not in ['SerializeBase', 'DefaultSerialize']))):
             instance.deserialize(testing_options['contents'])
+
+    def test_dump_load_error(self, instance, testing_options):
+        r"""Test error when dumping invalid message."""
+        import io
+        
+        class TempFileError(io.BytesIO):
+
+            def write(self, *args, **kwargs):
+                raise AttributeError("Test write error")
+            
+            def read(self, *args, **kwargs):
+                raise AttributeError("Test read error")
+        
+        ftemp = TempFileError()
+        try:
+            for x in testing_options.get("objects", []):
+                with pytest.raises(SerializationError):
+                    instance.dump(ftemp, x)
+                with pytest.raises(SerializationError):
+                    instance.load(ftemp)
+        finally:
+            ftemp.close()
+
+    def test_dump_load(self, instance, map_sent2recv, testing_options,
+                       class_name):
+        r"""Test dumping/loading to/from a file."""
+        ftemp = tempfile.NamedTemporaryFile(delete=False)
+        ftemp.close()
+        fname = ftemp.name
+
+        def cleanup_fname():
+            if os.path.isfile(fname):
+                os.remove(fname)
+        
+        try:
+            for iobj in testing_options['objects']:
+                # File name
+                instance.dump(fname, iobj)
+                assert os.path.isfile(fname)
+                iout = instance.load(fname)
+                assert map_sent2recv(iobj) == iout
+                cleanup_fname()
+                # File object
+                with open(fname, 'wb') as fd:
+                    instance.dump(fd, iobj)
+                assert os.path.isfile(fname)
+                with open(fname, 'rb') as fd:
+                    iout = instance.load('tempfile', address=fd)
+                assert map_sent2recv(iobj) == iout
+                cleanup_fname()
+            # From file with contents
+            if ((('contents' in testing_options)
+                 and (class_name not in ['SerializeBase',
+                                         'DefaultSerialize']))):
+                with open(fname, 'wb') as fd:
+                    fd.write(testing_options['contents'])
+                instance.load(fname)
+                cleanup_fname()
+        finally:
+            cleanup_fname()
 
     def test_serialize_no_metadata(self, instance, map_sent2recv,
                                    testing_options, component_subtype,

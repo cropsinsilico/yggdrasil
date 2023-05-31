@@ -183,16 +183,25 @@ def import_component(comptype, subtype=None, **kwargs):
         subtype = 'DefaultComm'
     if subtype is None:
         subtype = registry["default"]
+    rev_subtypes = {v: k for k, v in registry["subtypes"].items()}
     if subtype in registry["subtypes"]:
         class_name = registry["subtypes"][subtype]
+    elif subtype in rev_subtypes:
+        class_name = subtype
+        subtype = rev_subtypes[subtype]
     else:
         class_name = subtype
+    if subtype in registry.get("subtype_modules", {}):
+        module_name = registry["subtype_modules"][subtype]
+    else:
+        module_name = class_name
     # Check registered components to prevent importing multiple times
     if class_name not in registry.get("classes", {}):
         registry.setdefault("classes", {})
         try:
             registry["classes"][class_name] = getattr(
-                importlib.import_module(f"{registry['module']}.{class_name}"),
+                importlib.import_module(f"{registry['module']}."
+                                        f"{module_name}"),
                 class_name)
         except ImportError:
             if comptype == 'comm':
@@ -411,12 +420,15 @@ class ComponentMeta(type):
                     ("default", default_subtype),
                     ("base", cls._schema_base_class),
                     ("key", cls._schema_subtype_key),
-                    ("subtypes", {})])
+                    ("subtypes", {}),
+                    ("subtype_modules", {})])
             elif default_subtype is not None:
                 assert _registry[yaml_typ]["default"] == default_subtype
             if cls.__name__ not in _registry[yaml_typ]["classes"]:
                 _registry[yaml_typ]["classes"][cls.__name__] = cls
                 _registry[yaml_typ]["subtypes"][subtype] = cls.__name__
+                _registry[yaml_typ]["subtype_modules"][subtype] = (
+                    cls.__module__.split('.')[-1])
             if not registration_in_progress():
                 cls.after_registration(cls)
                 cls.finalize_registration(cls)
@@ -648,3 +660,21 @@ class ComponentBase(ComponentBaseUnregistered):
         These actions will not be performed if the environment variable
         YGGDRASIL_REGISTRATION_IN_PROGRESS is set."""
         pass
+
+
+def create_component_class(globals_dict, base, name, attr):
+    r"""Create a new component class.
+
+    Args:
+        globals_dict (dict): Globals dictionary that new class should be
+            added to.
+        base (type): Base class for new class. The new class will have
+            the same module as base.
+        name (str): Name for the new class.
+        attr (dict): Attributes that should be added to the new class.
+
+    """
+    attr['__module__'] = base.__module__
+    cls = type(name, (base, ), attr)
+    globals_dict[cls.__name__] = cls
+    del cls

@@ -206,7 +206,16 @@ class SubCommand(metaclass=SubCommandMeta):
             raise NotImplementedError("type(x) = %s" % type(x))
 
     @classmethod
+    def runtime_arguments(cls):
+        return []
+
+    @classmethod
     def add_arguments(cls, parser, args=None):
+        args = copy.deepcopy(cls.arguments)
+        for new_param in cls.runtime_arguments():
+            for old_param in args:
+                if new_param[0] == old_param[0]:
+                    old_param[1].update(new_param[1])
         cls.add_argument_to_parser(parser, cls.arguments)
 
     @classmethod
@@ -1123,6 +1132,7 @@ class yggclean(SubCommand):
             if lang in ['ipc', 'ipcs']:
                 from yggdrasil.communication.IPCComm import ipcrm_queues
                 ipcrm_queues()
+                ipcrm_queues(by_id=True)
             else:
                 import_component('model', lang).cleanup_dependencies(
                     verbose=verbose)
@@ -1626,6 +1636,69 @@ class coveragerc(SubCommand):
                           setup_cfg=args.setup_cfg)
 
 
+class file_converter(SubCommand):
+    r"""Convert between compatible file types."""
+
+    name = "fconvert"
+    help = (
+        "Convert a file of one type into another compatible type.")
+    arguments = [
+        (('src', ),
+         {'help': "Name of file to convert"}),
+        (('dst', ),
+         {'help': "Name of destination file"}),
+        (('--from', '--src-type'),
+         {'dest': 'src_type',
+          'default': None,
+          'help': "Source file type"}),
+        (('--to', '--dst-type'),
+         {'dest': 'dst_type',
+          'default': None,
+          'help': "Destination file type"}),
+        (('--src-kwargs', ),
+         {'dest': 'src_kwargs',
+          'type': str,
+          'help': ("Keyword arguments for source file communicator "
+                   "in JSON format")}),
+        (('--dst-kwargs', ),
+         {'dest': 'dst_kwargs',
+          'type': str,
+          'help': ("Keyword arguments for destination file communicator "
+                   "in JSON format")}),
+        (('--transform', ),
+         {'type': str,
+          'help': ("Transform keyword arguments for transforming "
+                   "messages between source and destination in JSON "
+                   "format")}),
+    ]
+
+    @classmethod
+    def runtime_arguments(cls):
+        return [
+            (('--from', '--src-type'),
+             {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+                 'file']['subtypes'].keys())}),
+            (('--to', '--dst-type'),
+             {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+                 'file']['subtypes'].keys())}),
+        ]
+    
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.communication.FileComm import convert_file
+        from yggdrasil import rapidjson
+        if args.src_kwargs is not None:
+            args.src_kwargs = rapidjson.loads(args.src_kwargs)
+        if args.dst_kwargs is not None:
+            args.dst_kwargs = rapidjson.loads(args.dst_kwargs)
+        if args.transform is not None:
+            args.transform = rapidjson.loads(args.transform)
+        convert_file(args.src, args.dst,
+                     src_type=args.src_type, src_kwargs=args.src_kwargs,
+                     dst_type=args.dst_type, dst_kwargs=args.dst_kwargs,
+                     transform=args.transform)
+
+
 class generate_gha_workflow(SubCommand):
     r"""Re-generate the Github actions workflow yaml."""
 
@@ -1729,7 +1802,8 @@ class main(SubCommand):
                    ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,
                    timing_plots, generate_gha_workflow,
-                   integration_service_manager, coveragerc]
+                   integration_service_manager, coveragerc,
+                   file_converter]
 
     @classmethod
     def get_parser(cls, **kwargs):

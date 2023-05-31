@@ -12,9 +12,6 @@
 #include "rapidjson/va_list.h"
 
 
-#define STRLEN_RJ(var)				\
-  static_cast<rapidjson::SizeType>(strlen(var))
-
 #define CSafe(x)  \
   try		  \
     {		  \
@@ -41,9 +38,7 @@ rapidjson::Document::AllocatorType& generic_ref_allocator(generic_ref_t& x) {
 rapidjson::Document::AllocatorType& dtype_allocator(dtype_t& x) {
   rapidjson::Document* s = NULL;
   if (x.metadata != NULL)
-    s = (rapidjson::Document*)(x.metadata);
-  else if (x.schema != NULL)
-    s = (rapidjson::Document*)(x.schema);
+    return ((Metadata*)x.metadata)->GetAllocator();
   else
     ygglog_throw_error("dtype_allocator: Not initialized");
   return s->GetAllocator();
@@ -79,80 +74,6 @@ rapidjson::Document::AllocatorType& dtype_allocator(dtype_t& x) {
 // };
 
 
-bool add_dtype(rapidjson::Document* d,
-	       const char* type, const char* subtype,
-	       const size_t precision,
-	       const size_t ndim=0, const size_t* shape=NULL,
-	       const char* units=NULL) {
-  size_t N = 0;
-  if (!d->StartObject())
-    return false;
-  // type
-  if (!d->Key("type", 4, true))
-    return false;
-  if (!d->String(type, STRLEN_RJ(type), true))
-    return false;
-  N++;
-  // subtype
-  if (!d->Key("subtype", 7, true))
-    return false;
-  if (strcmp(subtype, "bytes") == 0) {
-    if (!d->String("string", 6, true))
-      return false;
-  } else if (strcmp(subtype, "unicode") == 0) {
-    if (!d->String("string", 6, true))
-      return false;
-    if (!d->Key("encoding", 8, true))
-      return false;
-    if (!d->String("UTF8", 4, true))
-      return false;
-    N++;
-  } else {
-    if (!d->String(subtype, STRLEN_RJ(subtype), true))
-      return false;
-  }
-  N++;
-  // precision
-  if (precision > 0) {
-    if (!d->Key("precision", 9, true))
-      return false;
-    if (!d->Uint(precision))
-      return false;
-    N++;
-  }
-  // shape
-  if (ndim > 0) {
-    if (shape != NULL) {
-      if (!d->Key("shape", 5, true))
-	return false;
-      if (!d->StartArray())
-	return false;
-      for (size_t i = 0; i < ndim; i++) {
-	if (!d->Uint(shape[i]))
-	  return false;
-      }
-      if (!d->EndArray(ndim))
-	return false;
-    } else {
-      if (!d->Key("ndim", 4, true))
-	return false;
-      if (!d->Uint(ndim))
-	return false;
-    }
-    N++;
-  }
-  // units
-  if (units && strlen(units) > 0) {
-    if (!d->Key("units", 5, true))
-      return false;
-    if (!d->String(units, STRLEN_RJ(units), true))
-      return false;
-    N++;
-  }
-  // end
-  return d->EndObject(N);
-}
-
 rapidjson::Document* copy_document(rapidjson::Value* rhs) {
   rapidjson::Document* out = NULL;
   if (rhs != NULL) {
@@ -175,144 +96,6 @@ void display_document(rapidjson::Value* rhs, const char* indent="") {
   std::string s = document2string(*rhs, indent);
   printf("%s\n", s.c_str());
 }
-
-rapidjson::Document* create_dtype_format_class(const char *format_str,
-					       const int as_array = 0) {
-  rapidjson::Document* out = new rapidjson::Document;
-  out->StartObject();
-  out->Key("serializer", 10, true);
-  out->StartObject();
-  out->Key("format_str", 10, true);
-  out->String(format_str, STRLEN_RJ(format_str), true);
-  out->Key("datatype", 8, true);
-  out->StartObject();
-  int nDtype = 0;
-  nDtype++;
-  out->Key("type", 4, true);
-  out->String("array", 5, true);
-  nDtype++;
-  out->Key("items", 5, true);
-  out->StartArray();
-  // Loop over string
-  int mres;
-  size_t sind, eind, beg = 0, end;
-  char ifmt[FMT_LEN + 1];
-  char re_fmt[FMT_LEN + 1];
-  char re_fmt_eof[FMT_LEN + 1];
-  snprintf(re_fmt, FMT_LEN, "%%[^%s%s ]+[%s%s ]", "\t", "\n", "\t", "\n");
-  snprintf(re_fmt_eof, FMT_LEN, "%%[^%s%s ]+", "\t", "\n");
-  size_t iprecision = 0;
-  size_t nOuter = 0;
-  const char* element_type;
-  if (as_array)
-    element_type = "ndarray";
-  else
-    element_type = "scalar";
-  while (beg < strlen(format_str)) {
-    char isubtype[FMT_LEN] = "";
-    mres = find_match(re_fmt, format_str + beg, &sind, &eind);
-    if (mres < 0) {
-      ygglog_throw_error("create_dtype_format_class: find_match returned %d", mres);
-    } else if (mres == 0) {
-      // Make sure its not just a format string with no newline
-      mres = find_match(re_fmt_eof, format_str + beg, &sind, &eind);
-      if (mres <= 0) {
-	beg++;
-	continue;
-      }
-    }
-    beg += sind;
-    end = beg + (eind - sind);
-    strncpy(ifmt, format_str + beg, end-beg);
-    ifmt[end-beg] = '\0';
-    // String
-    if (find_match("%.*s", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "string", FMT_LEN); // or unicode
-      mres = regex_replace_sub(ifmt, FMT_LEN,
-			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
-      iprecision = atoi(ifmt);
-      // Complex
-#ifdef _WIN32
-    } else if (find_match("(%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
-#else
-    } else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
-#endif
-      strncpy(isubtype, "complex", FMT_LEN);
-      iprecision = 2 * sizeof(double);
-    }
-    // Floats
-    else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "float", FMT_LEN);
-      iprecision = sizeof(double);
-    }
-    // Integers
-    else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(char);
-    } else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(short);
-    } else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(long long);
-    } else if (find_match("%.*l64[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(long long);
-    } else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(long);
-    } else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "int", FMT_LEN);
-      iprecision = sizeof(int);
-    }
-    // Unsigned integers
-    else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned char);
-    } else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned short);
-    } else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned long long);
-    } else if (find_match("%.*l64[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned long long);
-    } else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned long);
-    } else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
-      strncpy(isubtype, "uint", FMT_LEN);
-      iprecision = sizeof(unsigned int);
-    } else {
-      ygglog_throw_error("create_dtype_format_class: Could not parse format string: %s", ifmt);
-    }
-    ygglog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
-		 isubtype, iprecision, ifmt);
-    if (!add_dtype(out, element_type, isubtype, iprecision)) {
-      ygglog_throw_error("create_dtype_format_class: Error in add_dtype");
-    }
-    nOuter++;
-    beg = end;
-  }
-  out->EndArray(nOuter);
-  if (nOuter == 1) {
-    nDtype++;
-    out->Key("allowSingular", 13, true);
-    out->Bool(true);
-  }
-  out->EndObject(nDtype);
-  out->EndObject(2);
-  out->EndObject(1);
-  out->FinalizeFromStack();
-  // if (nOuter == 1) {
-  //   typename rapidjson::Document::ValueType tmp;
-  //   (*out)["serializer"]["datatype"].Swap(tmp);
-  //   (*out)["serializer"]["datatype"].Swap(tmp["items"][0]);
-  //   (*out)["serializer"].RemoveMember("format_str");
-  // }
-  return out;
-};
 
 rapidjson::Document* encode_schema(rapidjson::Value* document) {
   rapidjson::SchemaEncoder encoder(true);
@@ -371,20 +154,14 @@ dtype_t* create_dtype(rapidjson::Document* document=NULL,
 		      bool encode=false, bool is_metadata=false) {
   dtype_t* out = NULL;
   out = (dtype_t*)malloc(sizeof(dtype_t));
-  typename rapidjson::Document::AllocatorType* allocator = NULL;
   if (out == NULL) {
     ygglog_throw_error("create_dtype: Failed to malloc for datatype.");
   }
-  out->schema = NULL;
-  out->metadata = NULL;
-  if (use_generic && document == NULL && !encode) {
-    document = new rapidjson::Document(rapidjson::kObjectType);
-    is_metadata = false;
-  }
+  Metadata* metadata = new Metadata();
+  out->metadata = (void*)metadata;
   if (document != NULL) {
     if (encode) {
-      out->schema = (void*)(encode_schema(document));
-      allocator = &(((rapidjson::Document*)(out->schema))->GetAllocator());
+      metadata->fromEncode(*document);
     } else {
       rapidjson::Document s;
       dtype_schema(s, s.GetAllocator(), is_metadata);
@@ -395,24 +172,13 @@ dtype_t* create_dtype(rapidjson::Document* document=NULL,
 			   document2string(*document).c_str(),
 			   sb.GetString());
       }
-      allocator = &(document->GetAllocator());
-      if (is_metadata) {
-	out->metadata = (void*)document;
-	if (document->HasMember("serializer") &&
-	    (*document)["serializer"].IsObject() &&
-	    (*document)["serializer"].HasMember("datatype") &&
-	    (*document)["serializer"]["datatype"].IsObject()) {
-	  out->schema = (void*)(&((*document)["serializer"]["datatype"]));
-	}
-      } else {
-	out->schema = (void*)document;
-      }
+      metadata->fromSchema(*document, is_metadata);
     }
     if (use_generic) {
-      ((rapidjson::Value*)out->schema)->AddMember(rapidjson::Value("use_generic", 11, *allocator).Move(),
-						  rapidjson::Value(true).Move(),
-						  *allocator);
+      metadata->setGeneric();
     }
+  } else if (use_generic && !encode) {
+    metadata->setGeneric();
   }
   return out;
 };
@@ -778,10 +544,14 @@ extern "C" {
 
   int is_dtype_format_array(dtype_t* type_struct) {
     try {
-      if (type_struct->schema == NULL) {
+      if (type_struct->metadata == NULL) {
 	return -1;
       }
-      if (!is_schema_format_array((rapidjson::Value*)(type_struct->schema)))
+      rapidjson::Value* schema = ((Metadata*)(type_struct->metadata))->schema;
+      if (schema == NULL) {
+	return -1;
+      }
+      if (!is_schema_format_array(schema))
 	return 0;
       // TODO: Check for format string
     } catch(...) {
@@ -796,9 +566,9 @@ extern "C" {
   }
 
   const char* dtype2name(dtype_t* type_struct) {
-    if (type_struct == NULL || type_struct->schema == NULL)
+    if (type_struct == NULL || type_struct->metadata == NULL)
       return "";
-    return schema2name((rapidjson::Document*)(type_struct->schema));
+    return ((Metadata*)(type_struct->metadata))->typeName();
   }
   
   generic_t init_generic() {
@@ -1977,30 +1747,24 @@ extern "C" {
   }
 
   int skip_va_elements(const dtype_t* dtype, va_list_t *ap, bool set) {
-    if (dtype == NULL) {
+    if (dtype == NULL || dtype->metadata == NULL) {
       return 0;
     }
-    if (dtype->schema == NULL) {
+    rapidjson::Value* schema = ((Metadata*)(dtype->metadata))->schema;
+    if (schema == NULL) {
       return 0;
     }
     rapidjson::Document tmp;
-    return (int)tmp.SkipVarArgs(((rapidjson::Value*)(dtype->schema))[0],
+    return (int)tmp.SkipVarArgs(schema[0],
 				((rapidjson::VarArgList*)(ap->va))[0],
 				set);
   }
   
   int is_empty_dtype(const dtype_t* dtype) {
-    if (dtype == NULL) {
+    if (dtype == NULL || dtype->metadata == NULL) {
       return 1;
     }
-    if (dtype->schema == NULL) {
-      return 1;
-    }
-    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
-    if (!s->HasMember("type")) {
-      return 1;
-    }
-    return 0;
+    return (int)(!((Metadata*)(dtype->metadata))->hasType());
   }
   
   const char* dtype_name(const dtype_t* type_struct) {
@@ -2008,24 +1772,15 @@ extern "C" {
       ygglog_error("dtype_name: Empty dtype.");
       return "";
     }
-    rapidjson::Value* s = (rapidjson::Value*)(type_struct->schema);
-    if (!(s->IsObject() && s->HasMember("type"))) {
-      ygglog_error("dtype_name: type information not in schema");
-      return "";
-    }
-    return (*s)["type"].GetString();
+    return ((Metadata*)(type_struct->metadata))->typeName();
   }
 
   const char* dtype_subtype(const dtype_t* type_struct) {
     try {
       if (strcmp(dtype_name(type_struct), "scalar") != 0) {
-	ygglog_throw_error("dtype_subtype: Only scalars have subtype.");
+	ygglog_throw_error("dtype_precision: Only scalars have subtype");
       }
-      rapidjson::Value* s = (rapidjson::Value*)(type_struct->schema);
-      if (!(s->IsObject() && s->HasMember("subtype"))) {
-	ygglog_throw_error("dtype_subtype: No subtype in schema.");
-      }
-      return (*s)["subtype"].GetString();
+      return ((Metadata*)(type_struct->metadata))->GetSchemaString("subtype");
     } catch(...) {
       ygglog_error("dtype_subtype: C++ exception thrown.");
       return "";
@@ -2037,11 +1792,7 @@ extern "C" {
       if (strcmp(dtype_name(type_struct), "scalar") != 0) {
 	ygglog_throw_error("dtype_precision: Only scalars have precision.");
       }
-      rapidjson::Value* s = (rapidjson::Value*)(type_struct->schema);
-      if (!(s->IsObject() && s->HasMember("precision"))) {
-	ygglog_throw_error("dtype_precision: No precision in schema.");
-      }
-      return (size_t)((*s)["precision"].GetUint());
+      return (size_t)(((Metadata*)(type_struct->metadata))->GetSchemaInt("precision"));
     } catch(...) {
       ygglog_error("dtype_precision: C++ exception thrown.");
       return 0;
@@ -2049,18 +1800,18 @@ extern "C" {
   };
 
   int set_dtype_name(dtype_t *dtype, const char* name) {
-    if (dtype == NULL || dtype->schema == NULL) {
-      ygglog_error("set_dtype_name: data type structure is NULL.");
+    try {
+      if (dtype == NULL || dtype->metadata == NULL) {
+	ygglog_error("set_dtype_name: data type structure is NULL.");
+	return -1;
+      }
+      if (!((Metadata*)(dtype->metadata))->SetSchemaString("type", name))
+	return -1;
+      return 0;
+    } catch (...) {
+      ygglog_error("set_dtype_name: C++ exception thrown.");
       return -1;
     }
-    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
-    if (s->IsObject() && s->HasMember("type")) {
-      (*s)["type"].SetString(name, STRLEN_RJ(name), dtype_allocator(*dtype));
-    } else {
-      rapidjson::Value v(name, STRLEN_RJ(name), dtype_allocator(*dtype));
-      s->AddMember(rapidjson::Document::GetTypeString(), v, dtype_allocator(*dtype));
-    }
-    return 0;
   }
 
   dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic) {
@@ -2088,16 +1839,10 @@ extern "C" {
     int ret = 0;
     if (dtype != NULL) {
       if (dtype[0] != NULL) {
-	rapidjson::Document* s = NULL;
 	if ((dtype[0])->metadata != NULL) {
-	  s = (rapidjson::Document*)((dtype[0])->metadata);
-	} else if ((dtype[0])->schema != NULL) {
-	  s = (rapidjson::Document*)((dtype[0])->schema);
-	}
-	if (s != NULL) {
+	  Metadata* metadata = (Metadata*)(dtype[0]->metadata);
 	  try {
-	    delete s;
-	    dtype[0]->schema = NULL;
+	    delete metadata;
 	    dtype[0]->metadata = NULL;
 	  } catch (...) {
 	    ygglog_error("destroy_dtype: C++ exception thrown in dtype2class.");
@@ -2113,27 +1858,18 @@ extern "C" {
 
   dtype_t* create_dtype_from_schema(const char* schema,
 				    const bool use_generic) {
-    rapidjson::Document* obj = NULL;
+    dtype_t* out = NULL;
     try {
-      obj = new rapidjson::Document();
-      obj->Parse(schema);
-      if (obj->HasParseError()) {
-	ygglog_throw_error("create_dtype_from_schema: Error parsing schema");
-      }
-      typename rapidjson::Value::MemberIterator it = obj->FindMember(rapidjson::Document::GetTypeString());
-      if (it != obj->MemberEnd() &&
-	  (it->value == rapidjson::Document::GetObjectString() ||
-	   it->value == rapidjson::Document::GetSchemaString() ||
-	   it->value == rapidjson::Document::GetPythonInstanceString() ||
-	   it->value == rapidjson::Document::GetAnyString() ||
-	   (it->value == rapidjson::Document::GetArrayString() &&
-	    !obj->HasMember(rapidjson::Document::GetItemsString()))))
-	return create_dtype(obj, true);
-      return create_dtype(obj, use_generic);
+      out = create_dtype();
+      ((Metadata*)(out->metadata))->fromSchema(schema, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_from_schema: C++ exception thrown.");
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
 
   dtype_t* create_dtype_empty(const bool use_generic) {
@@ -2148,6 +1884,7 @@ extern "C" {
   dtype_t* create_dtype_python(PyObject* pyobj, const bool use_generic) {
     rapidjson::Document* obj = NULL;
     try {
+      // TODO
       obj = type_from_pyobj(pyobj);
       return create_dtype(obj, use_generic);
     } catch(...) {
@@ -2161,93 +1898,95 @@ extern "C" {
   }
 
   dtype_t* create_dtype_default(const char* type, const bool use_generic) {
-    rapidjson::Document* obj = NULL;
+    dtype_t* out = NULL;
     try {
-      obj = new rapidjson::Document();
-      obj->StartObject();
-      obj->Key("type", 4, true);
-      obj->String(type, STRLEN_RJ(type), true);
-      obj->EndObject(1);
-      obj->FinalizeFromStack();
-      return create_dtype(obj, use_generic);
+      out = create_dtype();
+      ((Metadata*)(out->metadata))->fromType(type, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_default: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
 
   dtype_t* create_dtype_scalar(const char* subtype, const size_t precision,
 			       const char* units, const bool use_generic) {
-    rapidjson::Document* obj = NULL;
+    dtype_t* out = NULL;
     try {
-      obj = new rapidjson::Document();
-      if (!add_dtype(obj, "scalar", subtype, precision, 0, NULL, units)) {
-	ygglog_throw_error("create_dtype_scalar: Error in add_dtype");
-      }
-      obj->FinalizeFromStack();
-      return create_dtype(obj, use_generic);
+      out = create_dtype();
+      Metadata* metadata = (Metadata*)(out->metadata);
+      metadata->fromScalar(subtype, precision, units, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_scalar: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
 
   dtype_t* create_dtype_format(const char *format_str,
 			       const int as_array = 0,
 			       const bool use_generic = false) {
-    rapidjson::Document* obj = NULL;
+    dtype_t* out = NULL;
     try {
-      obj = create_dtype_format_class(format_str, as_array);
-      return create_dtype(obj, use_generic, false, true);
+      out = create_dtype();
+      Metadata* metadata = (Metadata*)(out->metadata);
+      metadata->fromFormat(format_str, as_array, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_format: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
 
   dtype_t* create_dtype_1darray(const char* subtype, const size_t precision,
 				const size_t length, const char* units,
 				const bool use_generic) {
-    rapidjson::Document* obj = new rapidjson::Document;
+    dtype_t* out = NULL;
     size_t ndim = 1;
     const size_t* shape = &length;
     if (length == 0)
       shape = NULL;
-    if (!add_dtype(obj, "ndarray", subtype, precision, ndim, shape, units)) {
-      ygglog_error("create_dtype_1darray: Error in add_dtype");
-      CSafe(delete obj);
-      return NULL;
-    }
-    obj->FinalizeFromStack();
     try {
-      return create_dtype(obj, use_generic);
+      out = create_dtype();
+      Metadata* metadata = (Metadata*)(out->metadata);
+      metadata->fromNDArray(subtype, precision, ndim, shape,
+			    units, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_1darray: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
 
   dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
 				const size_t ndim, const size_t* shape,
 				const char* units, const bool use_generic) {
-    rapidjson::Document* obj = new rapidjson::Document;
-    if (!add_dtype(obj, "ndarray", subtype, precision, ndim, shape, units)) {
-      ygglog_error("create_dtype_ndarray: Error in add_dtype");
-      CSafe(delete obj);
-      return NULL;
-    }
-    obj->FinalizeFromStack();
+    dtype_t* out = NULL;
     try {
-      return create_dtype(obj, use_generic);
+      out = create_dtype();
+      Metadata* metadata = (Metadata*)(out->metadata);
+      metadata->fromNDArray(subtype, precision, ndim, shape,
+			    units, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_ndarray: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
   dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
 				    const size_t ndim, const int64_t shape[],
@@ -2267,75 +2006,65 @@ extern "C" {
   }
   dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,
 				   const bool use_generic=true){
-    rapidjson::Document* obj = NULL;
+    dtype_t* out = NULL;
     try {
-      size_t i;
       if ((nitems > 0) && (items == NULL)) {
 	ygglog_throw_error("create_dtype_json_array: %d items expected, but the items parameter is NULL.", nitems);
       }
-      obj = new rapidjson::Document();
-      size_t nprops = 1;
-      obj->StartObject();
-      obj->Key("type", 4, true);
-      obj->String("array", 5, true);
+      out = create_dtype();
+      Metadata* metadata = (Metadata*)(out->metadata);
+      metadata->fromType("array", (use_generic || nitems == 0));
       if (nitems > 0) {
-	nprops++;
-	obj->Key("items", 5, true);
-	obj->StartArray();
-	for (i = 0; i < nitems; i++) {
-	  rapidjson::Document* iSchema = (rapidjson::Document*)(items[i]->schema);
-	  if (!iSchema->Accept(*obj)) {
-	    ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
+	metadata->SetSchemaValue(
+	  "items", rapidjson::Value(rapidjson::kArrayType).Move());
+	for (size_t i = 0; i < nitems; i++) {
+	  if (items[i]->metadata == NULL) {
+	    ygglog_throw_error("create_dtype_json_array: Item metadata %d is NULL", i);
 	  }
+	  metadata->addItem(*((Metadata*)(items[i]->metadata)));
 	  destroy_dtype(&(items[i]));
 	}
-	obj->EndArray(nitems);
       }
-      obj->EndObject(nprops);
-      obj->FinalizeFromStack();
-      return create_dtype(obj, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_json_array: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
   dtype_t* create_dtype_json_object(const size_t nitems, char** keys,
 				    dtype_t** values,
 				    const bool use_generic=true) {
-    rapidjson::Document* obj = NULL;
+    dtype_t* out = NULL;
     try {
-      size_t i;
       if ((nitems > 0) && ((keys == NULL) || (values == NULL))) {
 	ygglog_throw_error("create_dtype_json_object: %d items expected, but the keys and/or values parameter is NULL.", nitems);
       }
-      obj = new rapidjson::Document();
-      size_t nprops = 1;
-      obj->StartObject();
-      obj->Key("type", 4, true);
-      obj->String("object", 6, true);
+      out = create_dtype();
+      Metadata* metadata = (Metadata*)(out->metadata);
+      metadata->fromType("object", use_generic);
       if (nitems > 0) {
-	nprops++;
-	obj->Key("properties", 10, true);
-	obj->StartObject();
-	for (i = 0; i < nitems; i++) {
-	  obj->Key(keys[i], STRLEN_RJ(keys[i]), true);
-	  rapidjson::Document* iSchema = (rapidjson::Document*)(values[i]->schema);
-	  if (!iSchema->Accept(*obj)) {
-	    ygglog_throw_error("create_dtype_json_array: Error adding element %d.", i);
+	metadata->SetSchemaValue(
+	  "properties", rapidjson::Value(rapidjson::kObjectType).Move());
+	for (size_t i = 0; i < nitems; i++) {
+	  if (values[i]->metadata == NULL) {
+	    ygglog_throw_error("create_dtype_json_array: Value metadata %d is NULL", i);
 	  }
+	  metadata->addMember(keys[i],
+			      *((Metadata*)(values[i]->metadata)));
 	  destroy_dtype(&(values[i]));
 	}
-	obj->EndObject(nitems);
       }
-      obj->EndObject(nprops);
-      obj->FinalizeFromStack();
-      return create_dtype(obj, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_json_object: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
   dtype_t* create_dtype_ply(const bool use_generic) {
     return create_dtype_default("ply", use_generic);
@@ -2351,43 +2080,38 @@ extern "C" {
     return create_dtype_default(type, use_generic);
   }
   dtype_t* create_dtype_pyinst(const char* class_name,
-			       const dtype_t* args_dtype,
-			       const dtype_t* kwargs_dtype,
+			       dtype_t* args_dtype,
+			       dtype_t* kwargs_dtype,
 			       const bool use_generic) {
-    rapidjson::Document* obj = NULL;
-    rapidjson::Document* args_type = NULL;
-    rapidjson::Document* kwargs_type = NULL;
+    dtype_t* out = NULL;
     try {
-      size_t N = 0;
-      obj = new rapidjson::Document();
-      obj->StartObject();
-      obj->Key("type", 4, true);
-      obj->String("instance", 8, true);
-      N++;
+      out = create_dtype();
+      Metadata* metadata = (Metadata*)(out->metadata);
+      metadata->fromType("instance", use_generic);
       if (args_dtype != NULL) {
-	args_type = (rapidjson::Document*)(args_dtype->schema);
-	obj->Key("args", 4, true);
-	if (!args_type->Accept(*obj)) {
-	  ygglog_throw_error("create_dtype_pyinst: Error adding args");
+	if (args_dtype->metadata == NULL) {
+	  ygglog_throw_error("create_dtype_pyinst: Args metadata is NULL");
 	}
-	N++;
+	metadata->SetSchemaMetadata("args",
+				    *((Metadata*)(args_dtype->metadata)));
+	destroy_dtype(&args_dtype);
       }
       if (kwargs_dtype != NULL) {
-	kwargs_type = (rapidjson::Document*)(kwargs_dtype->schema);
-	obj->Key("kwargs", 6, true);
-	if (!kwargs_type->Accept(*obj)) {
-	  ygglog_throw_error("create_dtype_pyinst: Error adding kwargs");
+	if (kwargs_dtype->metadata == NULL) {
+	  ygglog_throw_error("create_dtype_pyinst: Kwargs metadata is NULL");
 	}
-	N++;
+	metadata->SetSchemaMetadata("kwargs",
+				    *((Metadata*)(kwargs_dtype->metadata)));
+	destroy_dtype(&kwargs_dtype);
       }
-      obj->EndObject(N);
-      obj->FinalizeFromStack();
-      return create_dtype(obj, use_generic);
     } catch(...) {
       ygglog_error("create_dtype_pyinst: C++ exception thrown.");
-      CSafe(delete obj);
-      return NULL;
+      if (out != NULL) {
+	destroy_dtype(&out);
+	out = NULL;
+      }
     }
+    return out;
   }
   dtype_t* create_dtype_schema(const bool use_generic) {
     return create_dtype_default("schema", use_generic);
@@ -2450,8 +2174,14 @@ extern "C" {
       Header* head_ = (Header*)(head->head);
       int ret = static_cast<int>(head_->format(buf, buf_siz,
 					       max_size, (bool)no_type));
-      headbuf[0] = head_->data_;
-      ygglog_debug("format_comm_header: Message = '%100s...'", *headbuf);
+      if (ret > 0) {
+	headbuf[0] = head_->data_;
+	ygglog_debug("format_comm_header: Message = '%100s...'", *headbuf);
+      } else if (ret == 0) {
+	ygglog_debug("format_comm_header: Empty header");
+      } else {
+	ygglog_error("format_comm_header: Error in Header::format");
+      }
       return ret;
     } catch(...) {
       ygglog_error("format_comm_header: C++ exception thrown.");
@@ -2478,21 +2208,20 @@ extern "C" {
       out.size_buff = &(head->size_buff);
       out.metadata = &(head->metadata);
     } catch(...) {
-      ygglog_error("create_send_header: C++ exception thrown.");
+      ygglog_error("init_header: C++ exception thrown.");
       invalidate_header(&out);
     }
     return out;
   }
 
-  comm_head_t create_send_header(dtype_t *datatype) {
-				 
+  comm_head_t create_send_header(dtype_t *datatype,
+				 const char* msg, const size_t len) {
     comm_head_t out = init_header();
     if (header_is_valid(out)) {
       try {
 	Header* head = (Header*)(out.head);
-	rapidjson::Document* metadata = (rapidjson::Document*)(datatype->metadata);
-	rapidjson::Value* schema = (rapidjson::Value*)(datatype->schema);
-	head->for_send(metadata, schema);
+	Metadata* metadata = (Metadata*)(datatype->metadata);
+	head->for_send(metadata, msg, len);
       } catch(...) {
 	ygglog_error("create_send_header: C++ exception thrown.");
 	invalidate_header(&out);
@@ -2581,7 +2310,7 @@ extern "C" {
     }
     dtype_t* out = NULL;
     try {
-      rapidjson::Value* s_old = (rapidjson::Value*)(dtype->schema);
+      rapidjson::Value* s_old = ((Metadata*)(dtype->metadata))->schema;
       rapidjson::Document* s_new = copy_document(s_old);
       return create_dtype(s_new, false);
     } catch (...) {
@@ -2594,15 +2323,7 @@ extern "C" {
   int dtype_uses_generic(dtype_t* dtype) {
     if (dtype == NULL)
       return 0;
-    rapidjson::Value* schema = (rapidjson::Value*)(dtype->schema);
-    if (schema == NULL)
-      return 0;
-    if (schema->HasMember("use_generic") &&
-	(*schema)["use_generic"].IsBool() &&
-	(*schema)["use_generic"].GetBool()) {
-      return 1;
-    }
-    return 0;
+    return (int)(((Metadata*)(dtype->metadata))->isGeneric());
   }
 
   int update_dtype(dtype_t* dtype1, void* schema2) {
@@ -2611,39 +2332,10 @@ extern "C" {
 	ygglog_throw_error("update_dtype: Could not recover type to update from.");
       } else if (dtype1 == NULL) {
 	ygglog_throw_error("update_dtype: Could not recover type for update.");
-      } else if (is_empty_dtype(dtype1)) {
-	bool use_generic = false;
-	if (dtype1->schema != NULL) {
-	  // TODO: preserve metadata
-	  use_generic = dtype_uses_generic(dtype1);
-	  rapidjson::Document* s_old = NULL;
-	  if (dtype1->metadata != NULL)
-	    s_old = (rapidjson::Document*)(dtype1->metadata);
-	  else
-	    s_old = (rapidjson::Document*)(dtype1->schema);
-	  delete s_old;
-	  dtype1->schema = NULL;
-	  dtype1->metadata = NULL;
-	}
-	rapidjson::Document* s_new = copy_document((rapidjson::Value*)(schema2));
-	if (use_generic) {
-	  s_new->AddMember(rapidjson::Value("use_generic", 11, s_new->GetAllocator()).Move(),
-			   rapidjson::Value(true).Move(),
-			   s_new->GetAllocator());
-	}
-	dtype1->schema = (void*)s_new;
       } else {
-	rapidjson::Document* s_old = (rapidjson::Document*)(dtype1->schema);
-	rapidjson::Document* s_new = (rapidjson::Document*)(schema2);
-	rapidjson::SchemaDocument sd_old(*s_old);
-	rapidjson::SchemaNormalizer n(sd_old);
-	if (!n.Compare(*s_new)) {
-	  std::string s_old_str = document2string(*s_old);
-	  std::string s_new_str = document2string(*s_new);
-	  std::cerr << "old:" << std::endl << s_old_str << std::endl <<
-	    "new:" << std::endl << s_new_str << std::endl;
-	  throw_validator_error("update_dtype", n);
-	}
+	if (dtype1->metadata == NULL)
+	  dtype1->metadata = (void*)(new Metadata());
+	((Metadata*)(dtype1->metadata))->fromSchema(*((rapidjson::Value*)(schema2)));
       }
     } catch (...) {
       ygglog_error("update_dtype: C++ exception thrown.");
@@ -2665,16 +2357,15 @@ extern "C" {
       if (!(is_generic_init(gen_arg))) {
 	ygglog_throw_error("update_dtype_from_generic_ap: Type expects generic object, but provided object is not generic.");
       } else {
-	dtype_t dtype2;
 	if (gen_arg.obj == NULL) {
 	  ygglog_throw_error("update_dtype_from_generic_ap: Type in generic class is NULL.");
 	}
-	rapidjson::Document* type_class = encode_schema((rapidjson::Value*)(gen_arg.obj));
-	dtype2.schema = (void*)(type_class);
-	if (update_dtype(dtype1, dtype2.schema) < 0) {
-	  return -1;
+	Metadata* metadata = (Metadata*)(dtype1->metadata);
+	if (metadata == NULL) {
+	  metadata = new Metadata();
+	  dtype1->metadata = (void*)metadata;
 	}
-	delete type_class;
+	metadata->fromEncode(*((rapidjson::Value*)(gen_arg.obj)));
       }
     } catch (...) {
       ygglog_error("update_dtype_from_generic_ap: C++ exception thrown.");
@@ -2685,7 +2376,11 @@ extern "C" {
   
   int update_precision_dtype(dtype_t* dtype,
 			     const size_t new_precision) {
-    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
+    if (dtype->metadata == NULL) {
+      ygglog_error("update_precision_dtype: No datatype metdata.");
+      return -1;
+    }
+    rapidjson::Value* s = ((Metadata*)(dtype->metadata))->schema;
     if (s == NULL || !s->IsObject()) {
       ygglog_error("update_precision_dtype: No datatype schema.");
       return -1;
@@ -2713,12 +2408,11 @@ extern "C" {
 			const size_t buf_siz, va_list_t ap) {
     try {
       rapidjson::VarArgList* va = (rapidjson::VarArgList*)(ap.va);
-      if (dtype->schema == NULL) {
-	ygglog_throw_error("deserialize_dtype: Empty schema.");
+      if (dtype->metadata == NULL) {
+	ygglog_throw_error("deserialize_dtype: Empty metadata.");
 	return -1;
       }
-      rapidjson::Value* schema = (rapidjson::Value*)(dtype->schema);
-      return deserialize_args(buf, buf_siz, *schema, *va);
+      return ((Metadata*)(dtype->metadata))->deserialize(buf, *va);
     } catch (...) {
       ygglog_error("deserialize_dtype: C++ exception thrown.");
       return -1;
@@ -2729,12 +2423,11 @@ extern "C" {
 		      const int allow_realloc, va_list_t ap) {
     try {
       rapidjson::VarArgList* va = (rapidjson::VarArgList*)(ap.va);
-      if (dtype->schema == NULL) {
-	ygglog_throw_error("deserialize_dtype: Empty schema.");
+      if (dtype->metadata == NULL) {
+	ygglog_throw_error("deserialize_dtype: Empty metadata.");
 	return -1;
       }
-      rapidjson::Value* schema = (rapidjson::Value*)(dtype->schema);
-      return serialize_args(buf, buf_siz, *schema, *va);
+      return ((Metadata*)(dtype->metadata))->serialize(buf, buf_siz, *va);
     } catch(...) {
       ygglog_error("serialize_dtype: C++ exception thrown.");
       return -1;
@@ -2742,12 +2435,16 @@ extern "C" {
   }
 
   void display_dtype(const dtype_t *dtype, const char* indent="") {
-    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
-    display_document(s, indent);
+    if (dtype->metadata == NULL) {
+      ygglog_error("deserialize_dtype: Empty metadata.");
+    }
+    ((Metadata*)(dtype->metadata))->Display(indent);
   }
 
   size_t nargs_exp_dtype(const dtype_t *dtype, const int for_fortran_recv) {
-    rapidjson::Value* s = (rapidjson::Value*)(dtype->schema);
+    if (dtype->metadata == NULL)
+      return 0;
+    rapidjson::Value* s = ((Metadata*)(dtype->metadata))->schema;
     if (s == NULL)
       return 0;
     size_t count = 0;

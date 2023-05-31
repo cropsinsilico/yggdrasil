@@ -90,6 +90,7 @@ class JSONSerialize(SerializeBase):
         'indent': {'type': ['string', 'int'], 'default': '\t'},
         'sort_keys': {'type': 'boolean', 'default': True}}
     default_datatype = {'type': 'object'}
+    file_extensions = ['.json']
     concats_as_str = False
 
     def func_serialize(self, args):

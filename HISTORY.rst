@@ -2,6 +2,20 @@
 History
 =======
 
+1.10.0 (2023-05-31) Added support for PyTorch models, sequence files, image files, and Excel files
+-------------------
+
+* Added support for running trained PyTorch models as part of integrations
+* Added support for connecting integrations to sequence files in FASTA and FASTQ formats via BioPython
+* Added support for connecting integrations to sequence files in SAM, BAM and CRAM formats via pysam
+* Added support for connecting integrations to sequence files in BCF and VCF formats via pysam
+* Added support for connecting integrations to JPEG, PNG, EPS, BMP, GIF and TIFF formats via Pillow
+* Added support for connecting integrations to Excel files via Pandas
+* Refactor serialization in preparation of moving communication into C++
+* Added CLI for converting files between compatible formats
+* Added support for creating Ply and ObjWavefront objects from explicit meshes
+* Fix bug in R interface
+
 1.9.0 (2023-04-14) Migrate to using extended version of rapidjson/python-rapidjson for serialization and add support for models written in Julia
 ------------------
 

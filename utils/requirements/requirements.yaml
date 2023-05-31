@@ -271,6 +271,62 @@ extras:
         install_flags: [-c, openalea]
         not_in_recipe: true
         not_in_txt: true
+  images:
+    description: Dependencies required to perform I/O on common image files.
+    requirements:
+    - pillow
+    - name: ghostscript
+      method: conda
+  seq:
+    description: Dependencies required to handle sequence (nucleotide/protein) I/O
+    requirements:
+    - biopython
+    # pysam only currently available on bioconda and not for osx arm64
+    - name: pysam
+      method: pip
+      os: unix
+  pytorch:
+    description: Dependencies required to run PyTorch models as part of yggdrasil integrations
+    requirements:
+    - name: torchvision
+      options:
+      - name: torchvision
+        method: pip
+      - name: torchvision
+        method: conda
+        os: unix
+      - method: conda_skip
+        os: win
+      # - name: torchvision
+      #   method: conda
+      #   os: win
+      #   flags:
+      #     install_flags: [-c, pytorch]
+      #     not_in_recipe: true
+      #     not_in_txt: true
+      #     method_validate: conda_supp
+    - name: pytorch
+      options:
+      - name: torch
+        method: pip
+      - name: pytorch
+        method: conda
+        os: unix
+      - method: conda_skip
+        os: win
+      # - name: pytorch
+      #   method: conda
+      #   os: win
+      #   flags:
+      #     install_flags: [-c, pytorch]
+      #     not_in_recipe: true
+      #     not_in_txt: true
+      #     method_validate: conda_supp
+  excel:
+    description: Dependencies required to read/write excel files
+    requirements:
+    - pandas
+    - openpyxl
   testing:
     description: Dependencies required to run yggdrasil tests
     requirements:

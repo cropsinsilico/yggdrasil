@@ -8,6 +8,21 @@
   "sbml": [
     "libroadrunner"
   ],
+  "images": [
+    "pillow"
+  ],
+  "seq": [
+    "biopython",
+    "pysam; platform_system != 'Windows'"
+  ],
+  "pytorch": [
+    "torch",
+    "torchvision"
+  ],
+  "excel": [
+    "openpyxl",
+    "pandas"
+  ],
   "testing": [
     "coverage",
     "flake8",

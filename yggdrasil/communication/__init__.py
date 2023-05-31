@@ -9,6 +9,10 @@ from yggdrasil.components import import_component
 _temp_error_registry = {}
 
 
+class AddressError(Exception):
+    r"""An exception class for errors in establishing a comm address."""
+
+
 class TemporaryCommunicationError(Exception):
     r"""Raised when the comm is open, but send/recv is temporarily disabled.
 
@@ -68,7 +72,7 @@ def check_env_for_address(env, name):
         str: The value stored in the environment variable for the channel.
 
     Raises:
-        RuntimeError: If the channel cannot be located.
+        AddressError: If the channel cannot be located.
 
     """
     check_names = [name, name.replace(':', '__COLON__')]
@@ -76,8 +80,8 @@ def check_env_for_address(env, name):
     for x in check_names:
         if x in env:
             return env[x]
-    raise RuntimeError('Cannot see %s in env. Env:\n%s'
-                       % (name, pprint.pformat(env)))
+    raise AddressError(f'Cannot see {name} in env. '
+                       f'Env:\n{pprint.pformat(env)}')
 
 
 def import_comm(commtype=None):

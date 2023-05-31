@@ -120,6 +120,7 @@ class YAMLSerialize(JSONSerialize):
         'encoding': {'type': 'string', 'default': 'utf-8'},
         'default_flow_style': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_inherit = ['sort_keys']
+    file_extensions = ['.yaml', '.yml']
 
     def func_serialize(self, args):
         r"""Serialize a message.

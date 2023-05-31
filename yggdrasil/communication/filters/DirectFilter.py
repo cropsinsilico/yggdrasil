@@ -20,7 +20,7 @@ class DirectFilter(FilterBase):
         return True
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the filter class.
 
         Returns:

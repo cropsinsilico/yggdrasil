@@ -658,7 +658,6 @@ class YggRequirementsList(UserList):
                     ])
                 ])
             if self.requires_extras:
-                print('HERE', self, self.requires_extras)
                 req_old = req
                 req = []
                 for x in self.requires_extras:

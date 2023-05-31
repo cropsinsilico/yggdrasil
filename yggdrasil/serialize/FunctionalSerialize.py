@@ -1,3 +1,4 @@
+import copy
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -45,5 +46,4 @@ class FunctionalSerialize(SerializeBase):
     @property
     def serializer_info(self):
         r"""dict: Serializer info."""
-        raise RuntimeError("Cannot define serializer information for user "
-                           + "supplied functions.")
+        return {'datatype': copy.deepcopy(self.datatype)}

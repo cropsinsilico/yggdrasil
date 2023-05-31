@@ -256,7 +256,18 @@ def update_constants(schema=None):
             'default': v.default_subtype,
             'base': v.base_subtype_class_name,
             'key': v.subtype_key,
-            'subtypes': v.subtype2class}
+            'subtypes': v.subtype2class,
+            'subtype_modules': v.subtype2module}
+    # File information
+    files = {
+        k: import_component('file', v)
+        for k, v in component_registry['file']['subtypes'].items()}
+    file2ext = {}
+    ext2file = {'.txt': 'ascii'}
+    for k, f in files.items():
+        file2ext.setdefault(k, f._extensions[0])
+        for ext in f._extensions:
+            ext2file.setdefault(ext, k)
     # Language driver information
     drivers = {k: import_component('model', v)
                for k, v in component_registry['model']['subtypes'].items()}
@@ -315,6 +326,10 @@ def update_constants(schema=None):
         "", "# Component registry",
         f"COMPONENT_REGISTRY = {as_lines(component_registry)}"]
     lines += [
+        "", "# File constants",
+        "FILE2EXT = %s" % as_lines(file2ext),
+        "EXT2FILE = %s" % as_lines(ext2file)]
+    lines += [
         "", "# Language driver constants",
         "LANG2EXT = %s" % as_lines(lang2ext),
         "EXT2LANG = {v: k for k, v in LANG2EXT.items()}",
@@ -365,11 +380,13 @@ class ComponentSchema(object):
             subtypes of this component.
         schema_subtypes (dict): Mapping between component class names and the
             associated values of the subtype_key property for this component.
+        schema_modules (dict): Mapping between component class names and
+            the modules that they are in.
 
     """
 
     def __init__(self, schema_type, subtype_key, schema_registry=None,
-                 module=None, schema_subtypes=None):
+                 module=None, schema_subtypes=None, schema_modules=None):
         self._storage = SchemaDict()
         self._base_name = None
         self._base_kwargs = None
@@ -383,6 +400,9 @@ class ComponentSchema(object):
         if schema_subtypes is None:
             schema_subtypes = {}
         self.schema_subtypes = schema_subtypes
+        if schema_modules is None:
+            schema_modules = {}
+        self.schema_modules = schema_modules
         self.default_subtype = None
         self.module = module
         super(ComponentSchema, self).__init__()
@@ -901,7 +921,7 @@ class ComponentSchema(object):
                        ['pushProperties', 'pullProperties']
                        if k in subt_base}
         for v in subt_schema:
-            v_class_name = v['title'].split('.')[-1]
+            v_module_name, v_class_name = v['title'].split('.')[-2:]
             v_new = copy.deepcopy(v)
             v_new['required'] = sorted(list(
                 set(v.get('required', [])) | set(subt_base.get('required', []))))
@@ -920,6 +940,7 @@ class ComponentSchema(object):
                               kwargs_no_inherit=kwargs_no_inherit)
             subtypes = v['properties'][out.subtype_key]['enum']
             out.schema_subtypes[v_class_name] = subtypes
+            out.schema_modules[v_class_name] = v_module_name
             v_module = '.'.join(v['title'].split('.')[:-2])
             if out.module is None:
                 out.module = v_module
@@ -951,8 +972,14 @@ class ComponentSchema(object):
             if v not in schema_subtypes:
                 schema_subtypes[v] = []
             schema_subtypes[v].append(k)
+        schema_modules = {}
+        for k, v in registry.get('subtype_modules', {}).items():
+            if v not in schema_modules:
+                schema_modules[v] = []
+            schema_modules[v].append(k)
         kwargs.update(module=registry['module'],
-                      schema_subtypes=schema_subtypes)
+                      schema_subtypes=schema_subtypes,
+                      schema_modules=schema_modules)
         out = cls(schema_type, registry['key'], **kwargs)
         for x in registry['classes'].values():
             out.append_class(x, verify=True)
@@ -987,6 +1014,15 @@ class ComponentSchema(object):
         for k, v in self.schema_subtypes.items():
             for iv in v:
                 out[iv] = k
+        return out
+
+    @property
+    def subtype2module(self):
+        r"""dict: Mapping from subtype to module."""
+        out = {}
+        for k, v in self.schema_subtypes.items():
+            for iv in v:
+                out[iv] = self.schema_modules[k]
         return out
 
     @property
@@ -1152,6 +1188,7 @@ class ComponentSchema(object):
         if name.endswith(('Driver', 'Model')):
             driver_list.append(name)
         self.schema_subtypes[name] = subtype_list
+        self.schema_modules[name] = comp_cls.__module__.split('.')[-1]
         assert subtype_module == self.module
         # Create new schema for subtype
         new_schema = {'title': fullname,

@@ -23,7 +23,7 @@ class DirectTransform(TransformBase):
         return x
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the transform class.
 
         Returns:

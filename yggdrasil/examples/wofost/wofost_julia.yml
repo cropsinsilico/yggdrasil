@@ -6,7 +6,7 @@ models:
 connections:
   - input: ./Input/input.txt  # Connection between file and model input
     output: julia_model:input
-    filetype: wofost
+    filetype: cabo
   - input: julia_model:output  # Connection between model output and file
     output: ./output.txt
-    filetype: wofost
+    filetype: cabo

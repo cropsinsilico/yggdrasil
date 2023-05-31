@@ -22,6 +22,8 @@ recursive-include yggdrasil *.xml
 recursive-include yggdrasil *.jl
 recursive-include yggdrasil/examples *.py
 recursive-include yggdrasil/examples *.rst
+recursive-include yggdrasil/examples *.png
+recursive-include yggdrasil/examples *.pth
 recursive-include yggdrasil/demos *.py
 recursive-include yggdrasil/tests/scripts *.py
 recursive-include yggdrasil/examples Makefile_linux
@@ -44,6 +46,7 @@ include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux
 include yggdrasil/tests/scripts/Makefile_windows
+include yggdrasil/tests/data/example.vcf
 graft docs
 include versioneer.py
 include yggdrasil/_version.py
