@@ -3,7 +3,7 @@ import copy
 import tempfile
 from yggdrasil import platform, tools, constants, serialize
 from yggdrasil.communication import CommBase, AddressError
-from yggdrasil.components import import_component, create_component
+from yggdrasil.components import import_component
 
 
 def is_file_like(x):
@@ -61,9 +61,7 @@ def convert_file(src, dst, src_type=None, dst_type=None,
     fsrc.close()
     # Transform
     if transform:
-        if isinstance(transform, dict):
-            transform = create_component('transform', **transform)
-        msg.args = transform(msg.args)
+        dst_kwargs['transform'] = transform
     # Dump
     fdst = import_component('file', dst_type)(dst, direction='send',
                                               **dst_kwargs)

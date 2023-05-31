@@ -675,18 +675,14 @@ class SerializeBase(tools.YggClass):
                 if isinstance(typedef.get('items', []), dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
-                if len(v) != len(typedef.get('items', [])):
-                    if len(typedef.get('items', [])) == 1:
-                        typedef['items'] = [
-                            copy.deepcopy(typedef['items'][0])
-                            for _ in range(len(v))]
-                    elif (((len(v) == 1)
-                           and (len(v[0].split(',')) == len(typedef.get(
-                               'items', []))))):
-                        valt = v[0].split(',')
-                        v[0] = valt[0]
-                        for vv in valt[1:]:
-                            v.append(vv)
+                if ((len(v) != len(typedef.get('items', []))
+                     and (len(v) == 1)
+                     and (len(v[0].split(',')) == len(typedef.get(
+                         'items', []))))):
+                    valt = v[0].split(',')
+                    v[0] = valt[0]
+                    for vv in valt[1:]:
+                        v.append(vv)
                 assert len(v) == len(typedef.get('items', []))
                 # if len(v) != len(typedef.get('items', [])):
                 #     warnings.warn('%d %ss provided, but only %d items in typedef.'

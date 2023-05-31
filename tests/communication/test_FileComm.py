@@ -292,7 +292,7 @@ class TestExcelFile_sheets(TestFileComm):
 
 
 @pytest.mark.parametrize(
-    'src_type,src_ext,src_contents,dst_type,dst_ext,dst_contents', [
+    'src_type,src_ext,src_contents,dst_type,dst_ext,dst_contents,tform', [
         ('table', '',
          (b'# name\tcount\tsize\n'
           b'# %5s\t%d\t%f\n'
@@ -303,7 +303,21 @@ class TestExcelFile_sheets(TestFileComm):
          (b'name\tcount\tsize\n'
           b'one\t1\t1.0\n'
           b'two\t2\t2.0\n'
-          b'three\t3\t3.0\n')),
+          b'three\t3\t3.0\n'),
+         None),
+        ('table', '',
+         (b'# name\tcount\tsize\n'
+          b'# %5s\t%d\t%f\n'
+          b'  one\t1\t1.000000\n'
+          b'  two\t2\t2.000000\n'
+          b'three\t3\t3.000000\n'),
+         'pandas', '',
+         (b'name\tcount\n'
+          b'one\t1\n'
+          b'two\t2\n'
+          b'three\t3\n'),
+         {'transformtype': 'select_fields',
+          'selected': ['name', 'count']}),
         ('table', '',
          (b'# name\tcount\tsize\n'
           b'# %5s\t%d\t%f\n'
@@ -327,7 +341,8 @@ class TestExcelFile_sheets(TestFileComm):
           b'        3,\n'
           b'        3.0\n'
           b'    ]\n'
-          b']')),
+          b']'),
+         None),
         ('table', '',
          (b'# name\tcount\tsize\n'
           b'# %5s\t%d\t%f\n'
@@ -343,7 +358,8 @@ class TestExcelFile_sheets(TestFileComm):
           b'    - 2.0\n'
           b'-   - three\n'
           b'    - 3\n'
-          b'    - 3.0\n')),
+          b'    - 3.0\n'),
+         None),
         ('yaml', '.yml',
          (b'-   - one\n'
           b'    - 1\n'
@@ -371,7 +387,8 @@ class TestExcelFile_sheets(TestFileComm):
           b'        3,\n'
           b'        3.0\n'
           b'    ]\n'
-          b']')),
+          b']'),
+         None),
         ('table', '',
          (b'0.0 0.0 0.0 0.0 0.0 1.0 0.0 1.0 1.0\n'
           b'0.0 0.0 0.0 0.0 1.0 1.0 0.0 1.0 0.0\n'
@@ -395,7 +412,8 @@ class TestExcelFile_sheets(TestFileComm):
           b'f 1 8 7\n'
           b'f 2 7 6\n'
           b'f 3 6 5\n'
-          b'f 4 5 8')),
+          b'f 4 5 8'),
+         None),
         ('table', '',
          (b'0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0\n'
           b'0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0\n'
@@ -419,10 +437,11 @@ class TestExcelFile_sheets(TestFileComm):
           b'f 1 8 7\n'
           b'f 2 7 6\n'
           b'f 3 6 5\n'
-          b'f 4 5 8')),
+          b'f 4 5 8'),
+         None),
     ])
 def test_convert_file(src_type, src_ext, src_contents,
-                      dst_type, dst_ext, dst_contents):
+                      dst_type, dst_ext, dst_contents, tform):
     r"""Test file conversion."""
     from yggdrasil.communication.FileComm import convert_file
     src_ftemp = tempfile.NamedTemporaryFile(delete=False, suffix=src_ext)
@@ -433,11 +452,13 @@ def test_convert_file(src_type, src_ext, src_contents,
     dst_fname = dst_ftemp.name
     dst_ftemp.close()
     try:
-        kwargs = {}
+        kwargs = {'transform': tform}
         if not src_ext:
             kwargs['src_type'] = src_type
         if not dst_ext:
             kwargs['dst_type'] = dst_type
+        if tform and src_type == 'table':
+            kwargs['src_kwargs'] = {"as_array": True}
         assert not os.path.isfile(dst_fname)
         convert_file(src_fname, dst_fname, **kwargs)
         assert os.path.isfile(dst_fname)

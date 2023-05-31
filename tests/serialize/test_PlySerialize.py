@@ -26,6 +26,25 @@ class TestPlyDict:
         assert x.nvert == z.nvert
         assert x.nface == z.nface
 
+    def test_mesh_structured(self, geom_cls, geom_dict):
+        r"""Test construction from a numpy structured array."""
+        from numpy.lib.recfunctions import unstructured_to_structured
+        x = geom_cls(geom_dict)
+        field_names = ['x1', 'y1', 'z1',
+                       'x2', 'y2', 'z2',
+                       'x3', 'y3', 'z3']
+        formats = ['f8' for _ in field_names]
+        dtype = np.dtype(dict(names=field_names, formats=formats))
+        mesh = unstructured_to_structured(np.array(x.mesh), dtype=dtype)
+        y = geom_cls.from_mesh(mesh)
+        assert x.mesh == y.mesh
+        assert x.nvert != y.nvert
+        assert x.nface == y.nface
+        z = geom_cls.from_mesh(mesh, prune_duplicates=True)
+        assert x.mesh == z.mesh
+        assert x.nvert == z.nvert
+        assert x.nface == z.nface
+
     def test_mesh_file(self, geom_cls, geom_dict):
         r"""Test construciton from a mesh file."""
         x = geom_cls(geom_dict)
