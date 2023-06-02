@@ -155,7 +155,7 @@ jobs:
           python-version: 3.8
       - name: Build sdist
         run: |
-          python setup.py sdist
+          python setup.py sdist --force-clean-version
       - name: Install sdist
         run: |
           python -m pip install dist/*.gz
