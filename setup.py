@@ -10,10 +10,7 @@ PYRJ_PATH = os.path.join(ROOT_PATH, '_vendor', 'python_rapidjson')
 sys.path.insert(0, ROOT_PATH)
 import versioneer  # noqa: E402
 ygg_ver = versioneer.get_version()
-
-print(f"In setup.py: sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
-logging.critical(
-    f"In setup.py: sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
+kwargs = {'cmdclass': versioneer.get_cmdclass()}
 
 
 # Clean up version
@@ -21,6 +18,12 @@ if '--force-clean-version' in sys.argv:
     sys.argv.remove('--force-clean-version')
     if '+' in ygg_ver:
         ygg_ver = ygg_ver.split('+')[0]
+    kwargs.pop('cmdclass')
+
+
+print(f"In setup.py: ver={ygg_ver}, sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
+logging.critical(
+    f"In setup.py: ver={ygg_ver}, sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
 
 
 # Get extension options for the vendored python-rapidjson
@@ -87,7 +90,6 @@ setup(
         exclude=["_vendor", "_vendor.*"]),
     include_package_data=True,
     version=ygg_ver,
-    cmdclass=versioneer.get_cmdclass(),
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,
@@ -125,4 +127,5 @@ setup(
     },
     license="BSD",
     python_requires='>=3.6',
+    **kwargs
 )
