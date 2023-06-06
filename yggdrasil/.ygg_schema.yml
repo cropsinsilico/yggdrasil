@@ -5035,6 +5035,7 @@ definitions:
       - $ref: '#/definitions/transform-subtype-function'
       - $ref: '#/definitions/transform-subtype-iterate'
       - $ref: '#/definitions/transform-subtype-map_fields'
+      - $ref: '#/definitions/transform-subtype-map'
       - $ref: '#/definitions/transform-subtype-pandas'
       - $ref: '#/definitions/transform-subtype-select_fields'
       - $ref: '#/definitions/transform-subtype-select_scalar'
@@ -5127,6 +5128,7 @@ definitions:
         - filter
         - function
         - iterate
+        - map
         - map_fields
         - pandas
         - select_fields
@@ -5201,6 +5203,25 @@ definitions:
         - iterate
         type: string
     title: yggdrasil.communication.transforms.IterateTransform.IterateTransform
+    type: object
+  transform-subtype-map:
+    additionalProperties: true
+    allowSingular: transformtype
+    description: Schema for transform component ['map'] subtype.
+    properties:
+      field_names:
+        description: A list of field names that should be used for array object. If
+          not provided, names will be generated according to 'f0', 'f1', 'f2', etc.
+        items:
+          type: string
+        type: array
+      transformtype:
+        default: map
+        description: Convert an object into a dictionary.
+        enum:
+        - map
+        type: string
+    title: yggdrasil.communication.transforms.MapTransform.MapTransform
     type: object
   transform-subtype-map_fields:
     additionalProperties: true
