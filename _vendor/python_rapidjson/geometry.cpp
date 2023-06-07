@@ -39,14 +39,17 @@ static PyObject* ply_add_elements(PyObject* self, PyObject* args, PyObject* kwar
 static PyObject* ply_as_trimesh(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_from_trimesh(PyObject* cls, PyObject* args, PyObject* kwargs);
 static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
-static PyObject* ply_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_from_dict(PyObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* ply_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
-static PyObject* ply_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_from_array_dict(PyObject* type, PyObject* args, PyObject* kwargs);
+static PyObject* ply_as_mesh(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* ply_from_mesh(PyObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* ply_count_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_append(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_merge(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* ply_bounds_get(PyObject* self, void*);
 static PyObject* ply_mesh_get(PyObject* self, void*);
+static PyObject* ply_areas_get(PyObject* self, void*);
 static PyObject* ply_nvert(PyObject* self, void*);
 static PyObject* ply_nface(PyObject* self, void*);
 static PyObject* ply_str(PyObject* self);
@@ -73,16 +76,19 @@ static PyObject* objwavefront_add_elements(PyObject* self, PyObject* args, PyObj
 static PyObject* objwavefront_as_trimesh(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_from_trimesh(PyObject* cls, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_dict(PyObject* self, PyObject* args, PyObject* kwargs);
-static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_from_dict(PyObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
-static PyObject* objwavefront_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_from_array_dict(PyObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_as_list(PyObject* self, PyObject* args, PyObject* kwargs);
-static PyObject* objwavefront_from_list(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_from_list(PyObject* type, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_as_mesh(PyObject* self, PyObject* args, PyObject* kwargs);
+static PyObject* objwavefront_from_mesh(PyObject* type, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_count_elements(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_append(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_merge(PyObject* self, PyObject* args, PyObject* kwargs);
 static PyObject* objwavefront_bounds_get(PyObject* self, void*);
 static PyObject* objwavefront_mesh_get(PyObject* self, void*);
+static PyObject* objwavefront_areas_get(PyObject* self, void*);
 static PyObject* objwavefront_nvert(PyObject* self, void*);
 static PyObject* objwavefront_nface(PyObject* self, void*);
 static PyObject* objwavefront_str(PyObject* self);
@@ -376,6 +382,12 @@ static PyMethodDef ply_methods[] = {
     {"from_array_dict", (PyCFunction) ply_from_array_dict,
      METH_VARARGS | METH_CLASS,
      "Create a Ply instance from a dictionary of element arrays."},
+    {"as_mesh", (PyCFunction) ply_as_mesh,
+     METH_NOARGS,
+     "Get the structure as a mesh with explicit vertices for each face."},
+    {"from_mesh", (PyCFunction) ply_from_mesh,
+     METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+     "Create a Ply instance from a mesh with explicit vertices for each face."},
     {"count_elements", (PyCFunction) ply_count_elements,
      METH_VARARGS,
      "Get the number of elements of a given type in the structure."},
@@ -409,6 +421,8 @@ static PyGetSetDef ply_properties[] = {
      "The minimum & maximum bounds for the structure in x, y, & z.", NULL},
     {"mesh", ply_mesh_get, NULL,
      "The 3D mesh representing the faces in the structure.", NULL},
+    {"areas", ply_areas_get, NULL,
+     "The areas of faces in structure.", NULL},
     {"nvert", ply_nvert, NULL,
      "The number of vertices in the structure.", NULL},
     {"nface", ply_nface, NULL,
@@ -524,6 +538,12 @@ static PyMethodDef objwavefront_methods[] = {
     {"from_list", (PyCFunction) objwavefront_from_list,
      METH_VARARGS | METH_CLASS,
      "Create a ObjWavefront instance from a list of elements."},
+    {"as_mesh", (PyCFunction) objwavefront_as_mesh,
+     METH_NOARGS,
+     "Get the structure as a mesh with explicit vertices for each face."},
+    {"from_mesh", (PyCFunction) objwavefront_from_mesh,
+     METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+     "Create a ObjWavefront instance from a mesh with explicit vertices for each face."},
     {"count_elements", (PyCFunction) objwavefront_count_elements,
      METH_VARARGS,
      "Get the number of elements of a given type in the structure."},
@@ -557,6 +577,8 @@ static PyGetSetDef objwavefront_properties[] = {
      "The minimum & maximum bounds for the structure in x, y, & z.", NULL},
     {"mesh", objwavefront_mesh_get, NULL,
      "The 3D mesh representing the faces in the structure.", NULL},
+    {"areas", objwavefront_areas_get, NULL,
+     "The areas of faces in structure.", NULL},
     {"nvert", objwavefront_nvert, NULL,
      "The number of vertices in the structure.", NULL},
     {"nface", objwavefront_nface, NULL,
@@ -643,6 +665,11 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 	return NULL;
     if (kwargs && !PyArg_ValidateKeywordArguments(kwargs))
 	return NULL;
+    if (type == NULL) {
+	type = &Ply_Type;
+	// PyErr_SetString(PyExc_TypeError, "Type is not defined");
+	// return NULL;
+    }
 
     PlyObject* v = (PlyObject*) type->tp_alloc(type, 0);
     if (v == NULL)
@@ -1385,7 +1412,7 @@ static PyObject* ply_as_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
 }
 
 
-static PyObject* ply_from_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+static PyObject* ply_from_dict(PyObject* type, PyObject* args, PyObject* kwargs) {
     PyObject* inDict = NULL;
     
     if (!PyArg_ParseTuple(args, "O:", &inDict))
@@ -1398,7 +1425,7 @@ static PyObject* ply_from_dict(PyObject* self, PyObject* args, PyObject* kwargs)
 
     PyObject* emptyArgs = PyTuple_New(0);
 
-    PyObject* out = ply_new(&Ply_Type, emptyArgs, inDict);
+    PyObject* out = ply_new((PyTypeObject*)type, emptyArgs, inDict);
     
     Py_DECREF(emptyArgs);
     
@@ -1424,7 +1451,7 @@ cleanup:
 	Py_DECREF(kwargs);
     return out;
 }
-static PyObject* ply_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+static PyObject* ply_from_array_dict(PyObject* type, PyObject* args, PyObject* kwargs) {
     bool dec_kwargs = false;
     PyObject* out = NULL;
     if (kwargs == NULL) {
@@ -1436,7 +1463,7 @@ static PyObject* ply_from_array_dict(PyObject* self, PyObject* args, PyObject* k
     if (PyDict_SetItemString(kwargs, "as_array", Py_True) < 0) {
 	goto cleanup;
     }
-    out = ply_from_dict(self, args, kwargs);
+    out = ply_from_dict(type, args, kwargs);
 cleanup:
     if (dec_kwargs)
 	Py_DECREF(kwargs);
@@ -1463,14 +1490,111 @@ cleanup:
 	}								\
 	return out;							\
     }
+#define LIST2VECTOR_(T, check, meth)					\
+    template<>								\
+    bool list2vector(PyObject* x, std::vector<T>& out) {		\
+	if (!(PyList_Check(x) || PyTuple_Check(x))) {			\
+	    PyErr_SetString(PyExc_TypeError, "Object is not a list or tuple");	\
+	    return false;						\
+	}								\
+	for (Py_ssize_t i = 0; i < PySequence_Size(x); i++) {		\
+	    PyObject* item = PySequence_GetItem(x, i);			\
+	    if (item == NULL) return false;				\
+	    if (!check(item)) {						\
+		PyErr_SetString(PyExc_TypeError, "Element is not the expected type"); \
+		return false;						\
+	    }								\
+	    out.push_back(meth(item));					\
+	}								\
+	return true;							\
+    }
+
 template<typename T>
 PyObject* vector2list(const std::vector<T>&) {
     PyErr_SetString(PyExc_TypeError, "Unsupported type in vector2list");
     return NULL;
 }
+template<typename T>
+bool list2vector(PyObject* x, std::vector<T>& out) {
+    PyErr_SetString(PyExc_TypeError, "Unsupported type in list2vector");
+    return false;
+}
 VECTOR2LIST_(double, PyFloat_FromDouble, (*it))
 VECTOR2LIST_(int, PyLong_FromLong, (*it))
+LIST2VECTOR_(double, PyFloat_Check, PyFloat_AsDouble)
+LIST2VECTOR_(int, PyLong_Check, PyLong_AsLong)
 
+
+static PyObject* ply_from_mesh(PyObject* type, PyObject* args, PyObject* kwargs) {
+    PyObject* meshObj = NULL;
+    int pruneDuplicates = 0;
+    static char const* kwlist[] = {
+	"mesh",
+	"prune_duplicates",
+	NULL
+    };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|p:", (char**) kwlist,
+				     &meshObj, &pruneDuplicates))
+	return NULL;
+
+    std::vector<std::vector<double> > mesh;
+    PyObject* meshList = NULL;
+    if (PyArray_Check(meshObj)) {
+	meshList = PyArray_ToList((PyArrayObject*)meshObj);
+    } else if (PyList_Check(meshObj)) {
+	Py_INCREF(meshObj);
+	meshList = meshObj;
+    }
+    if (meshList == NULL) {
+	PyErr_SetString(PyExc_TypeError, "Mesh must be a list, array, or the path to a file containing the mesh");
+	return NULL;
+    }
+    for (Py_ssize_t i = 0; i < PyList_Size(meshList); i++) {
+	PyObject* item = PyList_GetItem(meshList, i);
+	if (item == NULL) {
+	    Py_DECREF(meshList);
+	    return NULL;
+	}
+	std::vector<double> iface;
+	if (!list2vector(item, iface)) {
+	    Py_DECREF(meshList);
+	    return NULL;
+	}
+	mesh.push_back(iface);
+    }
+    Py_DECREF(meshList);
+
+    PyObject* emptyArgs = PyTuple_New(0);
+    PyObject* out = ply_new((PyTypeObject*)type, emptyArgs, NULL);
+    Py_DECREF(emptyArgs);
+    if (out != NULL) {
+	PlyObject* v = (PlyObject*) out;
+	v->ply->add_mesh(mesh, pruneDuplicates);
+    }
+    
+    return out;
+}
+static PyObject* ply_as_mesh(PyObject* self, PyObject*, PyObject*) {
+    PlyObject* v = (PlyObject*) self;
+    std::vector<std::vector<double>> mesh = v->ply->mesh();
+    PyObject* out = PyList_New(mesh.size());
+    if (out == NULL) return NULL;
+    Py_ssize_t i = 0;
+    for (std::vector<std::vector<double>>::const_iterator it = mesh.begin();
+	 it != mesh.end(); it++, i++) {
+	PyObject* item = vector2list(*it);
+	if (item == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	if (PyList_SetItem(out, i, item) < 0) {
+	    Py_DECREF(item);
+	    Py_DECREF(out);
+	    return NULL;
+	}
+    }
+    return out;
+}
 
 static PyObject* ply_count_elements(PyObject* self, PyObject* args, PyObject* kwargs) {
     const char* elementType0 = 0;
@@ -1661,24 +1785,14 @@ static PyObject* ply_bounds_get(PyObject* self, void*) {
 
 
 static PyObject* ply_mesh_get(PyObject* self, void*) {
+    return ply_as_mesh(self, NULL, NULL);
+}
+
+static PyObject* ply_areas_get(PyObject* self, void*) {
     PlyObject* v = (PlyObject*) self;
-    std::vector<std::vector<double>> mesh = v->ply->mesh();
-    PyObject* out = PyList_New(mesh.size());
+    std::vector<double> areas = v->ply->areas();
+    PyObject* out = vector2list(areas);
     if (out == NULL) return NULL;
-    Py_ssize_t i = 0;
-    for (std::vector<std::vector<double>>::const_iterator it = mesh.begin();
-	 it != mesh.end(); it++, i++) {
-	PyObject* item = vector2list(*it);
-	if (item == NULL) {
-	    Py_DECREF(out);
-	    return NULL;
-	}
-	if (PyList_SetItem(out, i, item) < 0) {
-	    Py_DECREF(item);
-	    Py_DECREF(out);
-	    return NULL;
-	}
-    }
     return out;
 }
 
@@ -2014,6 +2128,9 @@ static PyObject* objwavefront_new(PyTypeObject* type, PyObject* args, PyObject* 
 	return NULL;
     if (kwargs && !PyArg_ValidateKeywordArguments(kwargs))
 	return NULL;
+    if (type == NULL) {
+	type = &ObjWavefront_Type;
+    }
 
     ObjWavefrontObject* v = (ObjWavefrontObject*) type->tp_alloc(type, 0);
     if (v == NULL)
@@ -2822,7 +2939,7 @@ static PyObject* objwavefront_as_dict(PyObject* self, PyObject* args, PyObject* 
 }
 
 
-static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+static PyObject* objwavefront_from_dict(PyObject* type, PyObject* args, PyObject* kwargs) {
     PyObject* inDict = NULL;
     
     if (!PyArg_ParseTuple(args, "O:", &inDict))
@@ -2835,7 +2952,7 @@ static PyObject* objwavefront_from_dict(PyObject* self, PyObject* args, PyObject
 
     PyObject* emptyArgs = PyTuple_New(0);
 
-    PyObject* out = objwavefront_new(&ObjWavefront_Type, emptyArgs, inDict);
+    PyObject* out = objwavefront_new((PyTypeObject*)type, emptyArgs, inDict);
     
     Py_DECREF(emptyArgs);
     
@@ -2861,7 +2978,7 @@ cleanup:
 	Py_DECREF(kwargs);
     return out;
 }
-static PyObject* objwavefront_from_array_dict(PyObject* self, PyObject* args, PyObject* kwargs) {
+static PyObject* objwavefront_from_array_dict(PyObject* type, PyObject* args, PyObject* kwargs) {
     bool dec_kwargs = false;
     PyObject* out = NULL;
     if (kwargs == NULL) {
@@ -2873,7 +2990,7 @@ static PyObject* objwavefront_from_array_dict(PyObject* self, PyObject* args, Py
     if (PyDict_SetItemString(kwargs, "as_array", Py_True) < 0) {
 	goto cleanup;
     }
-    out = objwavefront_from_dict(self, args, kwargs);
+    out = objwavefront_from_dict(type, args, kwargs);
 cleanup:
     if (dec_kwargs)
 	Py_DECREF(kwargs);
@@ -2901,14 +3018,15 @@ static PyObject* objwavefront_as_list(PyObject* self, PyObject*, PyObject*) {
     return out;
 }
 
-static PyObject* objwavefront_from_list(PyObject* self, PyObject* args, PyObject* kwargs) {
+static PyObject* objwavefront_from_list(PyObject* type, PyObject* args, PyObject* kwargs) {
     PyObject* inList = NULL;
     
     if (!PyArg_ParseTuple(args, "O:", &inList))
 	return NULL;
 
     PyObject* emptyArgs = PyTuple_New(0);
-    PyObject* out = objwavefront_new(&ObjWavefront_Type, emptyArgs, NULL);
+    PyObject* out = objwavefront_new((PyTypeObject*)type,
+				     emptyArgs, NULL);
     Py_DECREF(emptyArgs);
     if (out == NULL)
 	return NULL;
@@ -2919,6 +3037,77 @@ static PyObject* objwavefront_from_list(PyObject* self, PyObject* args, PyObject
     return out;
 }
 
+static PyObject* objwavefront_from_mesh(PyObject* type, PyObject* args, PyObject* kwargs) {
+    PyObject* meshObj = NULL;
+    int pruneDuplicates = 0;
+    static char const* kwlist[] = {
+	"mesh",
+	"prune_duplicates",
+	NULL
+    };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|p:", (char**) kwlist,
+				     &meshObj, &pruneDuplicates))
+	return NULL;
+
+    std::vector<std::vector<double> > mesh;
+    PyObject* meshList = NULL;
+    if (PyArray_Check(meshObj)) {
+	meshList = PyArray_ToList((PyArrayObject*)meshObj);
+    } else if (PyList_Check(meshObj)) {
+	Py_INCREF(meshObj);
+	meshList = meshObj;
+    }
+    if (meshList == NULL) {
+	PyErr_SetString(PyExc_TypeError, "Mesh must be a list, array, or the path to a file containing the mesh");
+	return NULL;
+    }
+    for (Py_ssize_t i = 0; i < PyList_Size(meshList); i++) {
+	PyObject* item = PyList_GetItem(meshList, i);
+	if (item == NULL) {
+	    Py_DECREF(meshList);
+	    return NULL;
+	}
+	std::vector<double> iface;
+	if (!list2vector(item, iface)) {
+	    Py_DECREF(meshList);
+	    return NULL;
+	}
+	mesh.push_back(iface);
+    }
+    Py_DECREF(meshList);
+
+    PyObject* emptyArgs = PyTuple_New(0);
+    PyObject* out = objwavefront_new((PyTypeObject*)type,
+				     emptyArgs, NULL);
+    Py_DECREF(emptyArgs);
+    if (out != NULL) {
+	ObjWavefrontObject* v = (ObjWavefrontObject*) out;
+	v->obj->add_mesh(mesh, pruneDuplicates);
+    }
+    
+    return out;
+}
+static PyObject* objwavefront_as_mesh(PyObject* self, PyObject*, PyObject*) {
+    ObjWavefrontObject* v = (ObjWavefrontObject*) self;
+    std::vector<std::vector<double>> mesh = v->obj->mesh();
+    PyObject* out = PyList_New(mesh.size());
+    if (out == NULL) return NULL;
+    Py_ssize_t i = 0;
+    for (std::vector<std::vector<double>>::const_iterator it = mesh.begin();
+	 it != mesh.end(); it++, i++) {
+	PyObject* item = vector2list(*it);
+	if (item == NULL) {
+	    Py_DECREF(out);
+	    return NULL;
+	}
+	if (PyList_SetItem(out, i, item) < 0) {
+	    Py_DECREF(item);
+	    Py_DECREF(out);
+	    return NULL;
+	}
+    }
+    return out;
+}
 
 static PyObject* objwavefront_count_elements(PyObject* self, PyObject* args, PyObject* kwargs) {
     const char* elementType0 = 0;
@@ -3104,26 +3293,15 @@ static PyObject* objwavefront_bounds_get(PyObject* self, void*) {
     return out;
 }
 
-
 static PyObject* objwavefront_mesh_get(PyObject* self, void*) {
+    return objwavefront_as_mesh(self, NULL, NULL);
+}
+
+static PyObject* objwavefront_areas_get(PyObject* self, void*) {
     ObjWavefrontObject* v = (ObjWavefrontObject*) self;
-    std::vector<std::vector<double>> mesh = v->obj->mesh();
-    PyObject* out = PyList_New(mesh.size());
+    std::vector<double> areas = v->obj->areas();
+    PyObject* out = vector2list(areas);
     if (out == NULL) return NULL;
-    Py_ssize_t i = 0;
-    for (std::vector<std::vector<double>>::const_iterator it = mesh.begin();
-	 it != mesh.end(); it++, i++) {
-	PyObject* item = vector2list(*it);
-	if (item == NULL) {
-	    Py_DECREF(out);
-	    return NULL;
-	}
-	if (PyList_SetItem(out, i, item) < 0) {
-	    Py_DECREF(item);
-	    Py_DECREF(out);
-	    return NULL;
-	}
-    }
     return out;
 }
 

@@ -1098,6 +1098,69 @@ class CModelDriver(CompiledModelDriver):
         return out
         
     @classmethod
+    def add_extra_vars(cls, direction, x):
+        r"""Add extra variables required for communication.
+        
+        Args:
+            direction (str): Direction of channel ('input' or 'output').
+            x (dict): Dictionary describing the variable.
+        
+        """
+        super(CModelDriver, cls).add_extra_vars(direction, x)
+        if ((cls.requires_length_var(x)
+             and (not x.get('length_var', False)))):
+            if direction == 'input':
+                x['length_var'] = {
+                    'name': x['name'] + '_length',
+                    'datatype': {
+                        'type': 'uint',
+                        'precision': rapidjson.SIZE_OF_SIZE_T},
+                    'is_length_var': True}
+                x.setdefault('extra_vars', {})
+                x['extra_vars']['length'] = x['length_var']
+            elif direction == 'output':
+                if x['datatype']['type'] in ['1darray', 'ndarray']:
+                    if 'iter_datatype' not in x:  # pragma: debug
+                        raise RuntimeError("Length must be defined for "
+                                           "arrays.")
+                else:
+                    subtype = x['datatype'].get('subtype', x['datatype']['type'])
+                    assert subtype in ['bytes', 'string', 'unicode']
+                    # if subtype == 'unicode':
+                    #     x['datatype'].setdefault('encoding', "UCS4")
+                    encoding_size = constants.FIXED_ENCODING_SIZES.get(
+                        x['datatype'].get('encoding', 'ASCII'), 4)
+                    if encoding_size == 1:
+                        x['length_var'] = 'strlen(%s)' % x['name']
+                    else:
+                        x['length_var'] = f"strlen{encoding_size}({x['name']})"
+        elif (cls.requires_shape_var(x)
+              and not (x.get('ndim_var', False)
+                       and x.get('shape_var', False))):  # pragma: debug
+            raise RuntimeError("Uncomment logic that follows "
+                               "and only raise error for output.")
+            # if direction == 'input':
+            #     if not x.get('ndim_var', False):
+            #         x['ndim_var'] = {
+            #             'name': x['name'] + '_ndim',
+            #             'datatype': {
+            #                 'type': 'uint',
+            #                 'precision': rapidjson.SIZE_OF_SIZE_T},
+            #             'is_length_var': True}
+            #         x.setdefault('extra_vars', {})
+            #         x['extra_vars']['ndim'] = x['ndim_var']
+            #     if not x.get('shape_var', False):
+            #         x['shape_var'] = {
+            #             'name': x['name'] + '_ndim',
+            #             'datatype': {
+            #                 'type': '1darray',
+            #                 'subtype': 'uint',
+            #                 'precision': rapidjson.SIZE_OF_SIZE_T},
+            #             'is_length_var': True}
+            #         x.setdefault('extra_vars', {})
+            #         x['extra_vars']['shape'] = x['shape_var']
+        
+    @classmethod
     def finalize_function_io(cls, direction, x):
         r"""Finalize info for an input/output channel following function
         parsing.
@@ -1109,37 +1172,6 @@ class CModelDriver(CompiledModelDriver):
         """
         super(CModelDriver, cls).finalize_function_io(direction, x)
         if direction == 'input':
-            # Add length_vars if missing for use by yggdrasil
-            for v in x['vars']:
-                if cls.requires_length_var(v) and (not v.get('length_var', False)):
-                    v['length_var'] = {
-                        'name': v['name'] + '_length',
-                        'datatype': {
-                            'type': 'uint',
-                            'precision': rapidjson.SIZE_OF_SIZE_T},
-                        'is_length_var': True,
-                        'dependent': True}
-                elif cls.requires_shape_var(v):
-                    if not (v.get('ndim_var', False)
-                            and v.get('shape_var', False)):  # pragma: debug
-                        raise RuntimeError("Uncomment logic that follows.")
-                    # if not v.get('ndim_var', False):
-                    #     v['ndim_var'] = {
-                    #         'name': v['name'] + '_ndim',
-                    #         'datatype': {
-                    #             'type': 'uint',
-                    #             'precision': rapidjson.SIZE_OF_SIZE_T},
-                    #         'is_length_var': True,
-                    #         'dependent': True}
-                    # if not v.get('shape_var', False):
-                    #     v['shape_var'] = {
-                    #         'name': v['name'] + '_ndim',
-                    #         'datatype': {
-                    #             'type': '1darray',
-                    #             'subtype': 'uint',
-                    #             'precision': rapidjson.SIZE_OF_SIZE_T},
-                    #         'is_length_var': True,
-                    #         'dependent': True}
             # Flag input variables for reallocation
             allows_realloc = [cls.allows_realloc(v) for v in x['vars']]
             if all(allows_realloc):
@@ -1155,29 +1187,6 @@ class CModelDriver(CompiledModelDriver):
                          and (cls.function_param['recv_function']
                               == cls.function_param['recv_heap']))):
                         v['allow_realloc'] = True
-        elif direction == 'output':
-            # Add length_vars if missing for use by yggdrasil
-            for v in x['vars']:
-                if cls.requires_length_var(v) and (not v.get('length_var', False)):
-                    if v['datatype']['type'] in ['1darray', 'ndarray']:
-                        if 'iter_datatype' not in v:  # pragma: debug
-                            raise RuntimeError("Length must be defined for "
-                                               "arrays.")
-                    else:
-                        subtype = v['datatype'].get('subtype', v['datatype']['type'])
-                        assert subtype in ['bytes', 'string', 'unicode']
-                        # if subtype == 'unicode':
-                        #     v['datatype'].setdefault('encoding', "UCS4")
-                        encoding_size = constants.FIXED_ENCODING_SIZES.get(
-                            v['datatype'].get('encoding', 'ASCII'), 4)
-                        if encoding_size == 1:
-                            v['length_var'] = 'strlen(%s)' % v['name']
-                        else:
-                            v['length_var'] = f"strlen{encoding_size}({v['name']})"
-                elif (cls.requires_shape_var(v)
-                      and not (v.get('ndim_var', False)
-                               and v.get('shape_var', False))):  # pragma: debug
-                    raise RuntimeError("Shape must be defined for ND arrays.")
         if x['datatype']['type'] == 'array':
             nvars_items = len(x['datatype'].get('items', []))
             nvars = sum([(not ix.get('is_length_var', False))
@@ -1545,12 +1554,7 @@ class CModelDriver(CompiledModelDriver):
             kwargs.setdefault('value', 'NULL')
         elif var.get('is_length_var', False):
             kwargs.setdefault('value', '0')
-        out = super(CModelDriver, cls).write_declaration(var, **kwargs)
-        for k in ['length', 'ndim', 'shape']:
-            if ((isinstance(var.get(k + '_var', None), dict)
-                 and var[k + '_var'].get('dependent', False))):
-                out += cls.write_declaration(var[k + '_var'])
-        return out
+        return super(CModelDriver, cls).write_declaration(var, **kwargs)
 
     @classmethod
     def get_name_declare(cls, var):

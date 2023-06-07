@@ -1000,6 +1000,11 @@ definitions:
         default: '# '
         description: One or more characters indicating a comment. Defaults to '# '.
         type: string
+      count:
+        default: 0
+        description: When reading a file, read the file this many of times. Defaults
+          to 0.
+        type: integer
       datatype:
         description: JSON schema defining the type of object that the serializer will
           be used to serialize/deserialize. Defaults to default_datatype.

@@ -1,51 +1,11 @@
 import copy
 import numpy as np
-import io
 from yggdrasil import constants, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
 class GeometryBase:
     r"""Base class for extening rapidjson geometry classes."""
-
-    @classmethod
-    def from_mesh(cls, mesh, prune_duplicates=False, **kwargs):
-        r"""Create a geometry dictionary from a mesh which specifies
-        the vertices (x, y, z) for each face in the geometry.
-
-        Args:
-            mesh (np.ndarray): 3D mesh or a file/filename containing
-                the mesh in a tab or comma delimited file.
-            prune_duplicates (bool, optional): If True, only unique
-                vertices will be included. Defaults to False.
-            **kwargs: Additional keyword arguments will be passed to
-                numpy.loadtxt in the case that mesh is a file or filename.
-
-        """
-        if isinstance(mesh, list):
-            mesh = np.asarray(mesh)
-        elif isinstance(mesh, (str, io.IOBase)):
-            mesh = np.loadtxt(mesh, **kwargs)
-        if len(mesh.dtype) > 1:
-            mesh = np.vstack([mesh[k] for k in mesh.dtype.names]).T
-        verts_per_face = mesh.shape[1] // 3
-        nfaces = mesh.shape[0]
-        nverts = verts_per_face * nfaces
-        verts = mesh.reshape((nverts, 3))
-        faces = np.arange(nverts, dtype='int32').reshape(
-            (nfaces, verts_per_face))
-        if prune_duplicates:
-            rm_verts = []
-            for idx1 in range(nverts):
-                for idx2 in range(idx1):
-                    if np.array_equal(verts[idx1], verts[idx2]):
-                        faces[faces == idx1] = idx2
-                        rm_verts.append(idx1)
-                        break
-            verts = np.delete(verts, rm_verts, axis=0)
-            for idx in reversed(rm_verts):
-                faces[faces > idx] -= 1
-        return cls(cls.from_dict({"vertex": verts, "face": faces}))
 
     @classmethod
     def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
@@ -233,21 +193,8 @@ class GeometryBase:
         from matplotlib import colors as mpl_colors
         # Scale by area
         if scale_by_area:
-            scalar_arr = copy.deepcopy(scalar_arr)
-            for i, f in enumerate(self.get('faces', [])):
-                fv = f['vertex_index']
-                if len(fv) > 3:
-                    raise NotImplementedError("Area calc not implemented "
-                                              + "for faces above triangle.")
-                v0 = np.array([self['vertices'][fv[0]][k] for k in 'xyz'])
-                v1 = np.array([self['vertices'][fv[1]][k] for k in 'xyz'])
-                v2 = np.array([self['vertices'][fv[2]][k] for k in 'xyz'])
-                a = np.sqrt(np.sum((v0 - v1)**2))
-                b = np.sqrt(np.sum((v1 - v2)**2))
-                c = np.sqrt(np.sum((v2 - v0)**2))
-                s = (a + b + c) / 2.0
-                area = np.sqrt(s * (s - a) * (s - b) * (s - c))
-                scalar_arr[i] = area * scalar_arr[i]
+            areas = np.array(self.areas)
+            scalar_arr = scalar_arr * areas
         # Map vertices onto faces
         vertex_scalar = [[] for x in self['vertices']]
         for i in range(len(self.get('faces', []))):

@@ -2,6 +2,12 @@
 History
 =======
 
+1.10.1 (XXXX-XX-XX) Misc
+-------------------
+
+* Added map transformation for converting arrays into map types
+* Added support for automatted wrapping of C++ model functions that have arguments with types of std::string, std::vector, or std::map.
+
 1.10.0 (2023-05-31) Added support for PyTorch models, sequence files, image files, and Excel files
 -------------------
 
