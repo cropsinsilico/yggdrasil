@@ -2,11 +2,16 @@
 History
 =======
 
-1.10.1 (XXXX-XX-XX) Misc
+1.10.1 (2023-06-20) New map transformation, composite function wrapping example, and various refactoring of internal methods
 -------------------
 
 * Added map transformation for converting arrays into map types
 * Added support for automatted wrapping of C++ model functions that have arguments with types of std::string, std::vector, or std::map.
+* Added composite_function example of wrapping multiple inputs of different types to a function as separate channels
+* Added 'count' FileComm parameter to specify the number of times a file should be read
+* Refactor geometry serialization classes to use rapidjson methods
+* Refactor how additional variables created during function wrapping are handled
+* Updated C++ interface to use updated rapidjson that requires allocators for yggdrasil types
 
 1.10.0 (2023-05-31) Added support for PyTorch models, sequence files, image files, and Excel files
 -------------------
