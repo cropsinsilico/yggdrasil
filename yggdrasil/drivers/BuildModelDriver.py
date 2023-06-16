@@ -458,6 +458,9 @@ class BuildModelDriver(CompiledModelDriver):
                 target_linker=self.target_linker,
                 target_linker_flags=self.target_linker_flags,
                 logging_level=self.numeric_logging_level)
+            if self.with_asan:
+                kws['compiler_flag_kwargs'] = {'with_asan': self.with_asan}
+                kws['linker_flag_kwargs'] = {'with_asan': self.with_asan}
             for x in ['compiler', 'linker']:
                 if getattr(self, 'env_%s' % x):
                     kws['%s_env' % x] = (

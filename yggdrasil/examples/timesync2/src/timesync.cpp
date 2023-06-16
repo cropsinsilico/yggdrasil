@@ -10,11 +10,11 @@ void timestep_calc(rapidjson::units::Quantity<double>& t,
   rapidjson::units::Quantity<double> y_period(5.0, "days");
   rapidjson::units::Quantity<double> z_period(10.0, "days");
   rapidjson::units::Quantity<double> o_period(2.5, "days");
-#define SET_(key, val)				\
-  if (!state.HasMember(key))			\
-    state.AddMember(key, rapidjson::Value(val).Move(),	\
-		    state.GetAllocator());		\
-  else							\
+#define SET_(key, val)							\
+  if (!state.HasMember(key))						\
+    state.AddMember(key,rapidjson::Value(val).Move(),			\
+		    state.GetAllocator());				\
+  else									\
     state[key].SetDouble(val)
   if (model == "A") {
     SET_("x", sin(2.0 * M_PI * (t / x_period).value()));
@@ -68,7 +68,9 @@ int main(int argc, char *argv[]) {
   // Send initial state to output
   rapidjson::Document msg;
   msg.CopyFrom(state_recv, msg.GetAllocator());
-  msg.AddMember("time", rapidjson::Value(t).Move(), msg.GetAllocator());
+  msg.AddMember("time",
+		rapidjson::Value(t, msg.GetAllocator()).Move(),
+		msg.GetAllocator());
   ret = out.send(1, &msg);
   if (ret < 0) {
     std::cerr << "timesync(C++): Failed to send initial output for t=" <<
@@ -98,7 +100,9 @@ int main(int argc, char *argv[]) {
 
     // Send output
     msg.CopyFrom(state_recv, msg.GetAllocator());
-    msg.AddMember("time", rapidjson::Value(t).Move(), msg.GetAllocator());
+    msg.AddMember("time",
+		  rapidjson::Value(t, msg.GetAllocator()).Move(),
+		  msg.GetAllocator());
     ret = out.send(1, &msg);
     if (ret < 0) {
       std::cerr << "timesync(C++): Failed to send output for t=" << t << std::endl;
