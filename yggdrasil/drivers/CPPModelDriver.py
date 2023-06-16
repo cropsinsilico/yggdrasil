@@ -243,7 +243,7 @@ class CPPModelDriver(CModelDriver):
             r'\s*(?:const\s+)?(?P<native_type>(?:[^\s\&\<\*])+'
             r'(?:\<(?P<subtypes>\s*.+?(?:\s*,\s*.+?)*\s*)\>)?(\s+)?'
             r'(?P<ptr>\*+)?)(?:\s*\&)?'
-            r'(?(ptr)(?(2)(?:\s*)|(?:\s+)))'
+            r'(?(ptr)(?(3)(?:\s*)|(?:\s+)))'
             r'(\((?P<name_ptr>\*+)?)?(?P<name>[^\&\>\*]+?)(?(5)(?:\)))'
             r'(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'),
         outputs_def_regex=(

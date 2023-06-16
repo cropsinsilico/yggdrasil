@@ -88,23 +88,6 @@ size_t find_match_raise(const char *regex_text, const char *to_match,
   return (size_t)out;
 };
 
-/*!
-  @brief String comparison structure.
- */
-struct strcomp : public std::binary_function<const char*, const char*, bool> 
-{
-  /*!
-    @brief Comparison operator.
-    @param[in] a char const * First string for comparison.
-    @param[in] b char const * Second string for comparison.
-    @returns bool true if the strings are equivalent, false otherwise.
-   */
-  bool operator()(const char *a, const char *b) const
-  {
-    return std::strcmp(a, b) < 0;
-  }
-};
-
 #endif /*DATATYPES_UTILS_H_*/
 // Local Variables:
 // mode: c++

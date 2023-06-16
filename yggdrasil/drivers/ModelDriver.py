@@ -2071,7 +2071,7 @@ class ModelDriver(Driver):
             if match is not None:
                 value = match.group(1)
         new_val = []
-        io_re = cls.format_function_param(f'{io}_def_regex')
+        io_re = r'^' + cls.format_function_param(f'{io}_def_regex') + r'$'
         for i, ivar in enumerate(cls.split_variables(value)):
             igrp = {'name': ivar}
             x = re.search(io_re, ivar)

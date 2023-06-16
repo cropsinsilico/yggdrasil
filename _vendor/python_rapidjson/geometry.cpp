@@ -667,8 +667,6 @@ static PyObject* ply_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 	return NULL;
     if (type == NULL) {
 	type = &Ply_Type;
-	// PyErr_SetString(PyExc_TypeError, "Type is not defined");
-	// return NULL;
     }
 
     PlyObject* v = (PlyObject*) type->tp_alloc(type, 0);
