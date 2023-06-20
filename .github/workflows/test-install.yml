@@ -309,11 +309,16 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && matrix.python-version != 3.7
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -642,11 +647,16 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && matrix.python-version != 3.7
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -967,11 +977,16 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && matrix.python-version != 3.7
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -1275,11 +1290,16 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && matrix.python-version != 3.7
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -1582,11 +1602,16 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && matrix.python-version != 3.7
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
