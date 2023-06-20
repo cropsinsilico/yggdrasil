@@ -165,16 +165,21 @@ class TestCMakeModelDriver(base_class):
     def dont_verify_fds(self, verify_count_fds, disable_verify_count_fds):
         r"""Turn off verification, fds linger on windows."""
         yield
+
+    @pytest.fixture
+    def with_asan(self):
+        r"""Compile with asan."""
+        return (not platform._is_win)
     
     @pytest.fixture
     def instance_kwargs(self, testing_options, timeout, sourcedir,
-                        polling_interval, namespace, source):
+                        polling_interval, namespace, source, with_asan):
         r"""Keyword arguments for a new instance of the tested class."""
         return dict(testing_options.get('kwargs', {}),
                     yml={'working_dir': sourcedir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, env_compiler='CXX',
-                    with_asan=True,
+                    with_asan=with_asan,
                     env_compiler_flags='CXXFLAGS')
 
     @pytest.mark.skipif(not platform._is_win, reason="Windows only.")
