@@ -122,7 +122,11 @@ class MapTransform(TransformBase):
                       {'type': 'object',
                        'properties': {
                            x: {'type': 'int', 'title': x}
-                           for x in 'abc'}})]},
+                           for x in 'abc'}}),
+                     ({'type': 'array',
+                       'items': {'type': 'int'}},
+                      {'type': 'object',
+                       'additionalProperties': {'type': 'int'}})]},
                 {'kwargs': {},
                  'in/out': [(1, {'f0': 1})],
                  'in/out_t': [

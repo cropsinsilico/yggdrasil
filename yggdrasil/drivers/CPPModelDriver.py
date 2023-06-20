@@ -355,7 +355,7 @@ class CPPModelDriver(CModelDriver):
         if cls.is_std_class(x):
             x['extra_vars']['std'] = {
                 'name': f'std_{direction}',
-                'datatype': copy.deepcopy(x['datatype']),
+                'datatype': {'type': 'any'},
                 'use_generic': True}
             
     @classmethod
@@ -502,17 +502,18 @@ class CPPModelDriver(CModelDriver):
                 generated.
 
         """
-        out = [f"{std['name']}.SetArray();", "{"]
+        out = [f"{std['name']}.SetArray();"]
         for v in var_list:
             if v.get('is_length_var', False):
                 continue
             v_str = cls.prepare_input_variables([v], for_yggdrasil=True)
             out += [
-                "rapidjson::Value tmp;",
-                f"tmp.Set({v_str}, {std['name']}.GetAllocator());",
-                f"{std['name']}.PushBack(tmp, {std['name']}.GetAllocator());"
+                "{",
+                "  rapidjson::Value tmp;",
+                f"  tmp.Set({v_str}, {std['name']}.GetAllocator());",
+                f"  {std['name']}.PushBack(tmp, {std['name']}.GetAllocator());",
+                "}"
             ]
-        out += ["}"]
         return out
 
     @classmethod

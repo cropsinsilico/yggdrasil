@@ -493,8 +493,9 @@ class BuildModelDriver(CompiledModelDriver):
         r"""Compile dependencies specifically for this instance."""
         if (((self.target_language_driver is not None)
              and (not kwargs.get('dry_run', False)))):
+            suffix_kws = self.select_suffix_kwargs(kwargs)
             self.target_language_driver.compile_dependencies(
-                toolname=self.target_compiler)
+                toolname=self.target_compiler, **suffix_kws)
         
     def compile_model(self, **kwargs):
         r"""Compile model executable(s).

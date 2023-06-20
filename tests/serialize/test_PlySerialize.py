@@ -33,15 +33,17 @@ class TestPlySerialize(base_class):
     def test_apply_scalar_map(self, class_name, testing_options):
         r"""Test applying a scalar colormap."""
         for x in testing_options['objects']:
-            scalar_arr = 10 * np.arange(x.count_elements('faces')).astype(
-                'float')
-            odict = x.as_dict()
-            for scale in ['linear', 'log']:
-                ox = type(x)(odict)
-                o2 = type(x)(odict)
-                o1 = ox.apply_scalar_map(scalar_arr, scaling=scale,
-                                         scale_by_area=True)
-                o2.apply_scalar_map(scalar_arr, scaling=scale,
-                                    scale_by_area=True, no_copy=True)
-                assert o1 == o2
-                assert o1 != ox
+            for scalar_arr in [
+                    10 * np.arange(x.count_elements('faces')),
+                    np.zeros(x.count_elements('faces'))]:
+                scalar_arr = scalar_arr.astype('float')
+                odict = x.as_dict()
+                for scale in ['linear', 'log']:
+                    ox = type(x)(odict)
+                    o2 = type(x)(odict)
+                    o1 = ox.apply_scalar_map(scalar_arr, scaling=scale,
+                                             scale_by_area=True)
+                    o2.apply_scalar_map(scalar_arr, scaling=scale,
+                                        scale_by_area=True, no_copy=True)
+                    assert o1 == o2
+                    assert o1 != ox

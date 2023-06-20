@@ -174,6 +174,7 @@ class TestCMakeModelDriver(base_class):
                     yml={'working_dir': sourcedir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, env_compiler='CXX',
+                    with_asan=True,
                     env_compiler_flags='CXXFLAGS')
 
     @pytest.mark.skipif(not platform._is_win, reason="Windows only.")

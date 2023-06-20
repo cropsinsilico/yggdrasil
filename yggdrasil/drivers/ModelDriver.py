@@ -2828,62 +2828,62 @@ class ModelDriver(Driver):
         out = []
         if name_base is None:
             name_base = name
-        if datatype['type'] == 'array':
-            if 'items' in datatype:
-                assert isinstance(datatype['items'], list)
-                out += cls.write_declaration(
-                    {'name': '%s_items' % name_base,
-                     'datatype': {
-                         'type': '1darray', 'subtype': 'dtype',
-                         'length': len(datatype['items'])}},
-                    definitions=definitions,
-                    requires_freeing=requires_freeing)
-                for i, x in enumerate(datatype['items']):
-                    # Prevent recusion
-                    x_copy = copy.deepcopy(x)
-                    x_copy.pop('items', None)
-                    x_copy.pop('properties', None)
-                    out += cls.write_type_decl(
-                        None, x_copy,
-                        name_base=('%s_item%d' % (name_base, i)),
-                        definitions=definitions,
-                        requires_freeing=requires_freeing,
-                        no_decl=True)
-        elif datatype['type'] == 'object':
-            if 'properties' in datatype:
-                assert isinstance(datatype['properties'], dict)
-                precision = 0
-                if datatype['properties']:
-                    precision = max([len(k) for k in
-                                     datatype['properties'].keys()])
-                precision = max(80, precision)
-                out += cls.write_declaration(
-                    {'name': '%s_keys' % name_base,
-                     'datatype': {
-                         'type': '1darray', 'subtype': 'string',
-                         'length': len(datatype['properties']),
-                         'precision': precision}},
-                    definitions=definitions,
-                    requires_freeing=requires_freeing)
-                out += cls.write_declaration(
-                    {'name': '%s_vals' % name_base,
-                     'datatype': {
-                         'type': '1darray', 'subtype': 'dtype',
-                         'length': len(datatype['properties'])}},
-                    definitions=definitions,
-                    requires_freeing=requires_freeing)
-                for i, (k, v) in enumerate(datatype['properties'].items()):
-                    # Prevent recusion
-                    v_copy = copy.deepcopy(v)
-                    v_copy.pop('items', None)
-                    v_copy.pop('properties', None)
-                    out += cls.write_type_decl(
-                        None, v_copy,
-                        name_base=('%s_prop%d' % (name_base, i)),
-                        requires_freeing=requires_freeing,
-                        definitions=definitions,
-                        no_decl=True)
-        elif datatype['type'] == 'ndarray':
+        # if datatype['type'] == 'array':
+        #     if 'items' in datatype:
+        #         assert isinstance(datatype['items'], list)
+        #         out += cls.write_declaration(
+        #             {'name': '%s_items' % name_base,
+        #              'datatype': {
+        #                  'type': '1darray', 'subtype': 'dtype',
+        #                  'length': len(datatype['items'])}},
+        #             definitions=definitions,
+        #             requires_freeing=requires_freeing)
+        #         for i, x in enumerate(datatype['items']):
+        #             # Prevent recusion
+        #             x_copy = copy.deepcopy(x)
+        #             x_copy.pop('items', None)
+        #             x_copy.pop('properties', None)
+        #             out += cls.write_type_decl(
+        #                 None, x_copy,
+        #                 name_base=('%s_item%d' % (name_base, i)),
+        #                 definitions=definitions,
+        #                 requires_freeing=requires_freeing,
+        #                 no_decl=True)
+        # elif datatype['type'] == 'object':
+        #     if 'properties' in datatype:
+        #         assert isinstance(datatype['properties'], dict)
+        #         precision = 0
+        #         if datatype['properties']:
+        #             precision = max([len(k) for k in
+        #                              datatype['properties'].keys()])
+        #         precision = max(80, precision)
+        #         out += cls.write_declaration(
+        #             {'name': '%s_keys' % name_base,
+        #              'datatype': {
+        #                  'type': '1darray', 'subtype': 'string',
+        #                  'length': len(datatype['properties']),
+        #                  'precision': precision}},
+        #             definitions=definitions,
+        #             requires_freeing=requires_freeing)
+        #         out += cls.write_declaration(
+        #             {'name': '%s_vals' % name_base,
+        #              'datatype': {
+        #                  'type': '1darray', 'subtype': 'dtype',
+        #                  'length': len(datatype['properties'])}},
+        #             definitions=definitions,
+        #             requires_freeing=requires_freeing)
+        #         for i, (k, v) in enumerate(datatype['properties'].items()):
+        #             # Prevent recusion
+        #             v_copy = copy.deepcopy(v)
+        #             v_copy.pop('items', None)
+        #             v_copy.pop('properties', None)
+        #             out += cls.write_type_decl(
+        #                 None, v_copy,
+        #                 name_base=('%s_prop%d' % (name_base, i)),
+        #                 requires_freeing=requires_freeing,
+        #                 definitions=definitions,
+        #                 no_decl=True)
+        if datatype['type'] == 'ndarray':
             if 'shape' in datatype:
                 out += cls.write_declaration(
                     {'name': '%s_shape' % name_base,
@@ -2895,8 +2895,9 @@ class ModelDriver(Driver):
                     requires_freeing=requires_freeing)
         elif datatype['type'] in (['ply', 'obj', '1darray', 'scalar',
                                    'boolean', 'null', 'number', 'integer',
-                                   'string', 'class', 'function', 'instance',
-                                   'schema', 'any']
+                                   'string', 'class', 'function',
+                                   'instance', 'schema', 'any',
+                                   'array', 'object']
                                   + list(constants.VALID_TYPES.keys())):
             pass
         else:  # pragma: debug

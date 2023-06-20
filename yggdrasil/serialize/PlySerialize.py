@@ -386,6 +386,7 @@ class PlySerialize(SerializeBase):
                 {'x': float(0), 'y': float(0), 'z': float(0)},
                 {'x': float(0), 'y': float(0), 'z': float(1)},
                 {'x': float(0), 'y': float(1), 'z': float(1)},
+                {'x': float(1), 'y': float(1), 'z': float(2)},
                 {'x': float(1), 'y': float(1), 'z': float(1)}],
              'faces': [
                  {'vertex_index': [int(0), int(1), int(2)]},
