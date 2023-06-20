@@ -309,8 +309,8 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: (matrix.install-method == 'pip' && matrix.python-version != 3.7) || runner.os
-        != 'macOS'
+    - if: (matrix.install-method == 'pip' && (matrix.python-version != 3.7) || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
@@ -649,8 +649,8 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: (matrix.install-method == 'pip' && matrix.python-version != 3.7) || runner.os
-        != 'macOS'
+    - if: (matrix.install-method == 'pip' && (matrix.python-version != 3.7) || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
@@ -981,8 +981,8 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: (matrix.install-method == 'pip' && matrix.python-version != 3.7) || runner.os
-        != 'macOS'
+    - if: (matrix.install-method == 'pip' && (matrix.python-version != 3.7) || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
@@ -1296,8 +1296,8 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: (matrix.install-method == 'pip' && matrix.python-version != 3.7) || runner.os
-        != 'macOS'
+    - if: (matrix.install-method == 'pip' && (matrix.python-version != 3.7) || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
@@ -1610,8 +1610,8 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: (matrix.install-method == 'pip' && matrix.python-version != 3.7) || runner.os
-        != 'macOS'
+    - if: (matrix.install-method == 'pip' && (matrix.python-version != 3.7) || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
