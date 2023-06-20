@@ -138,12 +138,12 @@ jobs:
           ${{ runner.os }}-pip-
     - name: (PIP) Set up Python
       uses: actions/setup-python@v4
-      if: matrix.install-method == 'pip' && matrix.python-version != 3.7
+      if: (matrix.install-method == 'pip' && matrix.python-version != 3.7) || runner.os != 'macOS'
       with:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Python 3.7
       uses: actions/setup-python@v4
-      if: matrix.install-method == 'pip' && matrix.python-version == 3.7
+      if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os == 'macOS'
       with:
         python-version: 3.7.16
     - name: (PIP) Set up Julia
