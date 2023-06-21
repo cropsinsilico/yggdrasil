@@ -613,4 +613,6 @@ class BuildModelDriver(CompiledModelDriver):
             kwargs['existing'] = out
             if hasattr(self.target_language_driver, 'set_env_class'):
                 out = self.target_language_driver.set_env_class(**kwargs)
+            if self.with_asan:
+                self.target_language_info['compiler'].init_asan_env(out)
         return out
