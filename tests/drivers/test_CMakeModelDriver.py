@@ -167,19 +167,13 @@ class TestCMakeModelDriver(base_class):
         yield
 
     @pytest.fixture
-    def with_asan(self):
-        r"""Compile with asan."""
-        return (not platform._is_win)
-    
-    @pytest.fixture
     def instance_kwargs(self, testing_options, timeout, sourcedir,
-                        polling_interval, namespace, source, with_asan):
+                        polling_interval, namespace, source):
         r"""Keyword arguments for a new instance of the tested class."""
         return dict(testing_options.get('kwargs', {}),
                     yml={'working_dir': sourcedir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, env_compiler='CXX',
-                    with_asan=with_asan,
                     env_compiler_flags='CXXFLAGS')
 
     @pytest.mark.skipif(not platform._is_win, reason="Windows only.")

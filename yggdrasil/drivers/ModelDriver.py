@@ -545,6 +545,9 @@ class ModelDriver(Driver):
             self.with_debugger += ' --leak-check=full --show-leak-kinds=all'
         elif self.with_debugger == 'strace':
             self.with_debugger += ' -e trace=memory'
+        elif self.with_debugger == 'asan':
+            self.with_asan = True
+            self.with_debugger = None
         if self.with_strace:
             # TODO: deprecate with_strace, strace_flags
             assert not (self.with_debugger or self.with_valgrind)

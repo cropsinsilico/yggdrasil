@@ -229,6 +229,14 @@ class TestModelDriver(base_class):
         if testing_options.get('requires_partner', False):
             pytest.skip("requires partner model to run")
         run_model_instance(with_debugger='strace')
+
+    @pytest.mark.skipif(platform._is_win,
+                        reason="No ASAN for Windows MSVC")
+    def test_asan_debugger(self, run_model_instance, testing_options):
+        r"""Test running with ASAN."""
+        if testing_options.get('requires_partner', False):
+            pytest.skip("requires partner model to run")
+        run_model_instance(with_debugger='asan')
         
     # Tests for code generation
     def test_invalid_function_param(self, python_class, instance_kwargs,
