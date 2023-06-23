@@ -479,13 +479,13 @@ class CPPModelDriver(CModelDriver):
                                     "variables"))])
         i = 0
         for v in var_list:
-            if v.get('is_length_var', False):
-                continue
-            v_str = cls.prepare_input_variables([v], for_yggdrasil=True)
-            out += [
-                f"{std['name']}[{i}].Get({v_str});"
-            ]
-            i += 1
+            if not v.get('is_length_var', False):
+                v_str = cls.prepare_input_variables(
+                    [v], for_yggdrasil=True)
+                out += [
+                    f"{std['name']}[{i}].Get({v_str});"
+                ]
+                i += 1
         return out
 
     @classmethod
@@ -504,16 +504,16 @@ class CPPModelDriver(CModelDriver):
         """
         out = [f"{std['name']}.SetArray();"]
         for v in var_list:
-            if v.get('is_length_var', False):
-                continue
-            v_str = cls.prepare_input_variables([v], for_yggdrasil=True)
-            out += [
-                "{",
-                "  rapidjson::Value tmp;",
-                f"  tmp.Set({v_str}, {std['name']}.GetAllocator());",
-                f"  {std['name']}.PushBack(tmp, {std['name']}.GetAllocator());",
-                "}"
-            ]
+            if not v.get('is_length_var', False):
+                v_str = cls.prepare_input_variables([v], for_yggdrasil=True)
+                out += [
+                    "{",
+                    "  rapidjson::Value tmp;",
+                    f"  tmp.Set({v_str}, {std['name']}.GetAllocator());",
+                    f"  {std['name']}.PushBack(tmp,"
+                    f" {std['name']}.GetAllocator());",
+                    "}"
+                ]
         return out
 
     @classmethod
@@ -656,12 +656,9 @@ class CPPModelDriver(CModelDriver):
             if base == 'std::vector':
                 assert len(subtypes) == 1
                 items = cls.get_json_type(subtypes[0])
-                if items['type'] == 'scalar':
-                    out = items
-                    out['type'] = '1darray'
-                else:
-                    out = {'type': 'array',
-                           'items': items}
+                assert items['type'] == 'scalar'
+                out = items
+                out['type'] = '1darray'
             elif base == 'std::map':
                 assert len(subtypes) == 2
                 items = [cls.get_json_type(x) for x in subtypes]
