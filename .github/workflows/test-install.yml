@@ -268,7 +268,7 @@ jobs:
       shell: bash -l {0}
     - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
-      run: 'echo "TEST_FLAGS1_SUFFIX=''--skip-languages python r julia''" >> $GITHUB_ENV
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python r julia" >> $GITHUB_ENV
 
         '
       shell: bash -l {0}
@@ -615,7 +615,7 @@ jobs:
       shell: bash -l {0}
     - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
-      run: 'echo "TEST_FLAGS1_SUFFIX=''--skip-languages python r julia''" >> $GITHUB_ENV
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python r julia" >> $GITHUB_ENV
 
         '
       shell: bash -l {0}
@@ -954,7 +954,7 @@ jobs:
       shell: bash -l {0}
     - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
-      run: 'echo "TEST_FLAGS1_SUFFIX=''--skip-languages python r julia''" >> $GITHUB_ENV
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python r julia" >> $GITHUB_ENV
 
         '
       shell: bash -l {0}
@@ -1276,7 +1276,7 @@ jobs:
       shell: bash -l {0}
     - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
-      run: 'echo "TEST_FLAGS1_SUFFIX=''--skip-languages python r julia''" >> $GITHUB_ENV
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python r julia" >> $GITHUB_ENV
 
         '
       shell: bash -l {0}
@@ -1597,7 +1597,7 @@ jobs:
       shell: bash -l {0}
     - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
-      run: 'echo "TEST_FLAGS1_SUFFIX=''--skip-languages python r julia''" >> $GITHUB_ENV
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python r julia" >> $GITHUB_ENV
 
         '
       shell: bash -l {0}

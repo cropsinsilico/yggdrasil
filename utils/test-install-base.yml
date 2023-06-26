@@ -97,7 +97,7 @@ jobs:
     - name: (WINDOWS) Disable interpreted language example on Windows for speed
       if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
       run: |
-        echo "TEST_FLAGS1_SUFFIX='--skip-languages python r julia'" >> $GITHUB_ENV
+        echo "TEST_FLAGS1_SUFFIX=--skip-languages python r julia" >> $GITHUB_ENV
       shell: bash -l {0}
 
     # ========================================================
