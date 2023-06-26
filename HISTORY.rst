@@ -2,7 +2,7 @@
 History
 =======
 
-1.10.1 (2023-06-24) New map transformation, composite function wrapping example, and various refactoring of internal methods
+1.10.1 (2023-06-27) New map transformation, composite function wrapping example, and various refactoring of internal methods
 -------------------
 
 * Added map transformation for converting arrays into map types

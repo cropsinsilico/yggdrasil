@@ -94,6 +94,11 @@ jobs:
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
       shell: bash -l {0}
+    - name: (WINDOWS) Disable interpreted language example on Windows for speed
+      if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+      run: |
+        echo "TEST_FLAGS1_SUFFIX='--skip-languages python r julia'" >> $GITHUB_ENV
+      shell: bash -l {0}
 
     # ========================================================
     # Pip specific installation steps
@@ -269,12 +274,12 @@ jobs:
     - name: Run tests (1st)
       timeout-minutes: 120
       id: test1
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1 }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       timeout-minutes: 120
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all --second-attempt
 
     - name: Run generated test script (1st)
       timeout-minutes: 120
