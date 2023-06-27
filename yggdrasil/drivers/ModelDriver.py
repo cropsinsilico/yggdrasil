@@ -545,6 +545,9 @@ class ModelDriver(Driver):
             self.with_debugger += ' --leak-check=full --show-leak-kinds=all'
         elif self.with_debugger == 'strace':
             self.with_debugger += ' -e trace=memory'
+        elif self.with_debugger == 'asan':
+            self.with_asan = True
+            self.with_debugger = None
         if self.with_strace:
             # TODO: deprecate with_strace, strace_flags
             assert not (self.with_debugger or self.with_valgrind)
@@ -2071,7 +2074,7 @@ class ModelDriver(Driver):
             if match is not None:
                 value = match.group(1)
         new_val = []
-        io_re = cls.format_function_param(f'{io}_def_regex')
+        io_re = r'^' + cls.format_function_param(f'{io}_def_regex') + r'$'
         for i, ivar in enumerate(cls.split_variables(value)):
             igrp = {'name': ivar}
             x = re.search(io_re, ivar)
@@ -2507,15 +2510,29 @@ class ModelDriver(Driver):
         return flag_var
 
     @classmethod
+    def add_extra_vars(cls, direction, x):
+        r"""Add extra variables required for communication.
+        
+        Args:
+            direction (str): Direction of channel ('input' or 'output')
+            x (dict): Dictionary describing the variable.
+        
+        """
+        x.setdefault('extra_vars', {})
+
+    @classmethod
     def finalize_function_io(cls, direction, x):
         r"""Finalize info for an input/output channel following function
         parsing.
 
         Args:
             direction (str): Direction of channel ('input' or 'output')
+            x (dict): Channel info.
 
         """
         assert direction in ['input', 'output']
+        for v in x['vars']:
+            cls.add_extra_vars(direction, v)
 
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
@@ -2814,62 +2831,62 @@ class ModelDriver(Driver):
         out = []
         if name_base is None:
             name_base = name
-        if datatype['type'] == 'array':
-            if 'items' in datatype:
-                assert isinstance(datatype['items'], list)
-                out += cls.write_declaration(
-                    {'name': '%s_items' % name_base,
-                     'datatype': {
-                         'type': '1darray', 'subtype': 'dtype',
-                         'length': len(datatype['items'])}},
-                    definitions=definitions,
-                    requires_freeing=requires_freeing)
-                for i, x in enumerate(datatype['items']):
-                    # Prevent recusion
-                    x_copy = copy.deepcopy(x)
-                    x_copy.pop('items', None)
-                    x_copy.pop('properties', None)
-                    out += cls.write_type_decl(
-                        None, x_copy,
-                        name_base=('%s_item%d' % (name_base, i)),
-                        definitions=definitions,
-                        requires_freeing=requires_freeing,
-                        no_decl=True)
-        elif datatype['type'] == 'object':
-            if 'properties' in datatype:
-                assert isinstance(datatype['properties'], dict)
-                precision = 0
-                if datatype['properties']:
-                    precision = max([len(k) for k in
-                                     datatype['properties'].keys()])
-                precision = max(80, precision)
-                out += cls.write_declaration(
-                    {'name': '%s_keys' % name_base,
-                     'datatype': {
-                         'type': '1darray', 'subtype': 'string',
-                         'length': len(datatype['properties']),
-                         'precision': precision}},
-                    definitions=definitions,
-                    requires_freeing=requires_freeing)
-                out += cls.write_declaration(
-                    {'name': '%s_vals' % name_base,
-                     'datatype': {
-                         'type': '1darray', 'subtype': 'dtype',
-                         'length': len(datatype['properties'])}},
-                    definitions=definitions,
-                    requires_freeing=requires_freeing)
-                for i, (k, v) in enumerate(datatype['properties'].items()):
-                    # Prevent recusion
-                    v_copy = copy.deepcopy(v)
-                    v_copy.pop('items', None)
-                    v_copy.pop('properties', None)
-                    out += cls.write_type_decl(
-                        None, v_copy,
-                        name_base=('%s_prop%d' % (name_base, i)),
-                        requires_freeing=requires_freeing,
-                        definitions=definitions,
-                        no_decl=True)
-        elif datatype['type'] == 'ndarray':
+        # if datatype['type'] == 'array':
+        #     if 'items' in datatype:
+        #         assert isinstance(datatype['items'], list)
+        #         out += cls.write_declaration(
+        #             {'name': '%s_items' % name_base,
+        #              'datatype': {
+        #                  'type': '1darray', 'subtype': 'dtype',
+        #                  'length': len(datatype['items'])}},
+        #             definitions=definitions,
+        #             requires_freeing=requires_freeing)
+        #         for i, x in enumerate(datatype['items']):
+        #             # Prevent recusion
+        #             x_copy = copy.deepcopy(x)
+        #             x_copy.pop('items', None)
+        #             x_copy.pop('properties', None)
+        #             out += cls.write_type_decl(
+        #                 None, x_copy,
+        #                 name_base=('%s_item%d' % (name_base, i)),
+        #                 definitions=definitions,
+        #                 requires_freeing=requires_freeing,
+        #                 no_decl=True)
+        # elif datatype['type'] == 'object':
+        #     if 'properties' in datatype:
+        #         assert isinstance(datatype['properties'], dict)
+        #         precision = 0
+        #         if datatype['properties']:
+        #             precision = max([len(k) for k in
+        #                              datatype['properties'].keys()])
+        #         precision = max(80, precision)
+        #         out += cls.write_declaration(
+        #             {'name': '%s_keys' % name_base,
+        #              'datatype': {
+        #                  'type': '1darray', 'subtype': 'string',
+        #                  'length': len(datatype['properties']),
+        #                  'precision': precision}},
+        #             definitions=definitions,
+        #             requires_freeing=requires_freeing)
+        #         out += cls.write_declaration(
+        #             {'name': '%s_vals' % name_base,
+        #              'datatype': {
+        #                  'type': '1darray', 'subtype': 'dtype',
+        #                  'length': len(datatype['properties'])}},
+        #             definitions=definitions,
+        #             requires_freeing=requires_freeing)
+        #         for i, (k, v) in enumerate(datatype['properties'].items()):
+        #             # Prevent recusion
+        #             v_copy = copy.deepcopy(v)
+        #             v_copy.pop('items', None)
+        #             v_copy.pop('properties', None)
+        #             out += cls.write_type_decl(
+        #                 None, v_copy,
+        #                 name_base=('%s_prop%d' % (name_base, i)),
+        #                 requires_freeing=requires_freeing,
+        #                 definitions=definitions,
+        #                 no_decl=True)
+        if datatype['type'] == 'ndarray':
             if 'shape' in datatype:
                 out += cls.write_declaration(
                     {'name': '%s_shape' % name_base,
@@ -2881,8 +2898,9 @@ class ModelDriver(Driver):
                     requires_freeing=requires_freeing)
         elif datatype['type'] in (['ply', 'obj', '1darray', 'scalar',
                                    'boolean', 'null', 'number', 'integer',
-                                   'string', 'class', 'function', 'instance',
-                                   'schema', 'any']
+                                   'string', 'class', 'function',
+                                   'instance', 'schema', 'any',
+                                   'array', 'object']
                                   + list(constants.VALID_TYPES.keys())):
             pass
         else:  # pragma: debug
@@ -3078,7 +3096,7 @@ class ModelDriver(Driver):
     @classmethod
     def write_model_recv(cls, channel, recv_var, flag_var='flag',
                          iter_var=None, allow_failure=False,
-                         alt_recv_function=None):
+                         alt_recv_function=None, include_arg_count=None):
         r"""Write a model receive call include checking the return flag.
 
         Args:
@@ -3097,6 +3115,10 @@ class ModelDriver(Driver):
                 lines will issue an error. Defaults to False.
             alt_recv_function (str, optional): Alternate receive function
                 format string. Defaults to None and is ignored.
+            include_arg_count (bool, optional): If True, the arguments to
+                the receive call will be proceeded with an argument count.
+                If not provided, the class attribute of the same name
+                will be used.
 
         Returns:
             list: Lines required to carry out a receive call in this language.
@@ -3105,6 +3127,8 @@ class ModelDriver(Driver):
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
+        if include_arg_count is None:
+            include_arg_count = cls.include_arg_count
         recv_var_str = recv_var
         if not isinstance(recv_var, str):
             recv_var_par = cls.channels2vars(recv_var)
@@ -3133,7 +3157,8 @@ class ModelDriver(Driver):
         lines = cls.write_function_call(
             cls.format_function_param('recv_function', channel=channel,
                                       replacement=alt_recv_function),
-            inputs=inputs, outputs=outputs, include_arg_count=cls.include_arg_count)
+            inputs=inputs, outputs=outputs,
+            include_arg_count=include_arg_count)
         if 'not_flag_cond' in cls.function_param:
             flag_cond = cls.format_function_param('not_flag_cond',
                                                   flag_var=flag_var)
@@ -3178,7 +3203,8 @@ class ModelDriver(Driver):
     
     @classmethod
     def write_model_send(cls, channel, send_var, flag_var='flag',
-                         allow_failure=False):
+                         allow_failure=False, alt_send_function=None,
+                         include_arg_count=None):
         r"""Write a model send call include checking the return flag.
 
         Args:
@@ -3191,6 +3217,12 @@ class ModelDriver(Driver):
             allow_failure (bool, optional): If True, the returned lines will
                 call a break if the flag is False. Otherwise, the returned
                 lines will issue an error. Defaults to False.
+            alt_send_function (str, optional): Alternate send function
+                format string. Defaults to None and is ignored.
+            include_arg_count (bool, optional): If True, the arguments to
+                the send call will be proceeded with an argument count.
+                If not provided, the class attribute of the same name
+                will be used.
 
         Returns:
             list: Lines required to carry out a send call in this language.
@@ -3199,6 +3231,8 @@ class ModelDriver(Driver):
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
+        if include_arg_count is None:
+            include_arg_count = cls.include_arg_count
         send_var_str = send_var
         if not isinstance(send_var_str, str):
             send_var_par = cls.channels2vars(send_var)
@@ -3209,9 +3243,10 @@ class ModelDriver(Driver):
         if cls.include_channel_obj:
             send_var_str = [channel, send_var_str]
         lines = cls.write_function_call(
-            cls.format_function_param('send_function', channel=channel),
+            cls.format_function_param('send_function', channel=channel,
+                                      replacement=alt_send_function),
             inputs=send_var_str,
-            outputs=flag_var, include_arg_count=cls.include_arg_count)
+            outputs=flag_var, include_arg_count=include_arg_count)
         flag_cond = '%s (%s)' % (
             cls.function_param['not'],
             cls.format_function_param('flag_cond', default='{flag_var}',
@@ -3503,7 +3538,8 @@ class ModelDriver(Driver):
                 outputs.append(flag_var)
         kwargs.setdefault('input_var', cls.prepare_input_variables(inputs))
         kwargs.setdefault('output_var', cls.prepare_output_variables(outputs))
-        nout = len(cls.split_variables(kwargs['output_var']))
+        nout = max(len(outputs),
+                   len(cls.split_variables(kwargs['output_var'])))
         if include_arg_count:
             narg = len(cls.split_variables(kwargs['input_var']))
             kwargs['input_var'] = cls.prepare_input_variables(
@@ -3753,12 +3789,10 @@ class ModelDriver(Driver):
         r"""Get the native type.
 
         Args:
-            type (str, optional): Name of |yggdrasil| extended JSON
-                type or JSONSchema dictionary defining a datatype.
             return_json (bool, optional): If True, the returned value will
                 also include the JSON datatype.
-            **kwargs: Additional keyword arguments may be used in determining
-                the precise declaration that should be used.
+            **kwargs: Additional keyword arguments may be used in
+                determining the precise declaration that should be used.
 
         Returns:
             str: The native type.
@@ -3937,15 +3971,20 @@ class ModelDriver(Driver):
         if isinstance(var, str):  # pragma: no cover
             var = {'name': var}
         type_name = cls.get_native_type(**var)
-        out = [cls.format_function_param('declare',
-                                         type_name=type_name,
-                                         variable=cls.get_name_declare(var))]
+        out = [cls.format_function_param(
+            'declare', type_name=type_name,
+            variable=cls.get_name_declare(var))]
+        if var.get('extra_vars', {}):
+            for v in var['extra_vars'].values():
+                out += cls.write_declaration(
+                    v, requires_freeing=requires_freeing,
+                    definitions=definitions, is_argument=is_argument)
         if is_argument:
             return out
         if definitions is None:
             definitions = out
-        definitions += cls.write_initialize(var, value=value,
-                                            requires_freeing=requires_freeing)
+        definitions += cls.write_initialize(
+            var, value=value, requires_freeing=requires_freeing)
         return out
 
     @classmethod
@@ -4094,24 +4133,22 @@ class ModelDriver(Driver):
         """
         out = []
         if var_str:
-            pairs = [(r'\[', r'\]'),
-                     (r'\(', r'\)'),
-                     (r'\{', r'\}'),
-                     (r"'", r"'"),
-                     (r'"', r'"')]
-            regex_ele = r''
-            present = False
-            for p in pairs:
-                if not any([(str(ip)[-1] in var_str) for ip in p]):
-                    continue
-                present = True
-                regex_ele += (r'(?:%s[.\n]*?%s)|' % p)
-            if present:
-                regex_ele += '(?:.+?)'
-                regex_ele = r'\s*(%s)\s*(?:,|$)' % regex_ele
-                out = [x.group(1) for x in re.finditer(regex_ele, var_str)]
-            else:
-                out = [x.strip() for x in var_str.split(',')]
+            pairs = [('[', ']'),
+                     ('(', ')'),
+                     ('{', '}'),
+                     ('<', '>'),
+                     ("'", "'"),
+                     ('"', '"')]
+            out = [x.strip() for x in var_str.split(',')]
+            i = 0
+            while i < len(out):
+                for p in pairs:
+                    if out[i].count(p[0]) != out[i].count(p[1]):
+                        out[i] += ", " + out[i + 1]
+                        del out[i + 1]
+                        break
+                else:
+                    i += 1
         return out
 
     @classmethod

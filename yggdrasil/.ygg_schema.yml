@@ -1000,6 +1000,11 @@ definitions:
         default: '# '
         description: One or more characters indicating a comment. Defaults to '# '.
         type: string
+      count:
+        default: 0
+        description: When reading a file, read the file this many of times. Defaults
+          to 0.
+        type: integer
       datatype:
         description: JSON schema defining the type of object that the serializer will
           be used to serialize/deserialize. Defaults to default_datatype.
@@ -5035,6 +5040,7 @@ definitions:
       - $ref: '#/definitions/transform-subtype-function'
       - $ref: '#/definitions/transform-subtype-iterate'
       - $ref: '#/definitions/transform-subtype-map_fields'
+      - $ref: '#/definitions/transform-subtype-map'
       - $ref: '#/definitions/transform-subtype-pandas'
       - $ref: '#/definitions/transform-subtype-select_fields'
       - $ref: '#/definitions/transform-subtype-select_scalar'
@@ -5127,6 +5133,7 @@ definitions:
         - filter
         - function
         - iterate
+        - map
         - map_fields
         - pandas
         - select_fields
@@ -5201,6 +5208,25 @@ definitions:
         - iterate
         type: string
     title: yggdrasil.communication.transforms.IterateTransform.IterateTransform
+    type: object
+  transform-subtype-map:
+    additionalProperties: true
+    allowSingular: transformtype
+    description: Schema for transform component ['map'] subtype.
+    properties:
+      field_names:
+        description: A list of field names that should be used for array object. If
+          not provided, names will be generated according to 'f0', 'f1', 'f2', etc.
+        items:
+          type: string
+        type: array
+      transformtype:
+        default: map
+        description: Convert an object into a dictionary.
+        enum:
+        - map
+        type: string
+    title: yggdrasil.communication.transforms.MapTransform.MapTransform
     type: object
   transform-subtype-map_fields:
     additionalProperties: true

@@ -165,7 +165,7 @@ class TestCMakeModelDriver(base_class):
     def dont_verify_fds(self, verify_count_fds, disable_verify_count_fds):
         r"""Turn off verification, fds linger on windows."""
         yield
-    
+
     @pytest.fixture
     def instance_kwargs(self, testing_options, timeout, sourcedir,
                         polling_interval, namespace, source):

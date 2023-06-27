@@ -1,0 +1,17 @@
+models:
+  - name: c_model
+    language: c
+    args: ./src/model_function.c
+    function: model_function
+    inputs:
+      - name: input
+        vars: [a, b, c]
+        default_file:
+          name: ./Input/input.json
+          filetype: json
+    outputs:
+      - name: output
+        vars: [d, e, f, f_length]
+        default_file:
+          name: ./output.json
+          filetype: json

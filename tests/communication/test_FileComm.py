@@ -13,8 +13,9 @@ def test_wait_for_creation():
     name = 'temp_file_create.txt'
     kwargs = {'in_temp': True, 'commtype': 'binary', 'dont_open': True}
     # kwargs = {'wait_for_creation': 5, 'in_temp': True, commtype='binary'}
+    count = 2
     send_instance = new_comm(name, direction='send', **kwargs)
-    recv_instance = new_comm(name, direction='recv',
+    recv_instance = new_comm(name, direction='recv', count=count,
                              wait_for_creation=5.0, **kwargs)
     if os.path.isfile(send_instance.address):
         os.remove(send_instance.address)
@@ -32,9 +33,11 @@ def test_wait_for_creation():
         recv_instance.sleep()
     recv_instance.stop_timeout()
     assert send_instance.sched_out
-    flag, msg_recv = recv_instance.recv()
-    assert flag
-    assert msg_recv == msg_send
+    for i in range(count):
+        flag, msg_recv = recv_instance.recv()
+        assert flag
+        assert msg_recv == msg_send
+    assert recv_instance.n_msg_recv == 0
     send_instance.close()
     recv_instance.close()
     recv_instance.remove_file()

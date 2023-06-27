@@ -1,0 +1,21 @@
+models:
+  - name: cpp_model
+    language: c++
+    args: ./src/model_function.cpp
+    function: model_function
+    inputs:
+      - name: a
+        default_value: true
+      - name: b
+        default_value: 5.0
+      - name: c
+        default_file:
+          name: ./Input/input.txt
+          filetype: map
+    outputs:
+      - name: output
+        default_file:
+          name: ./output.txt
+          filetype: table
+          as_array: true
+          field_names: x

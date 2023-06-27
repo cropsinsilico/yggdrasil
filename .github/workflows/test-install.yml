@@ -266,6 +266,12 @@ jobs:
 
         '
       shell: bash -l {0}
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+      name: (WINDOWS) Disable interpreted language example on Windows for speed
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
@@ -309,11 +315,18 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        == 'macOS'
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -431,12 +444,13 @@ jobs:
       id: test1
       name: Run tests (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
+        }} ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 120
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 120
     - continue-on-error: true
       id: test1_script
@@ -599,6 +613,12 @@ jobs:
 
         '
       shell: bash -l {0}
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+      name: (WINDOWS) Disable interpreted language example on Windows for speed
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
@@ -642,11 +662,18 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        == 'macOS'
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -764,12 +791,13 @@ jobs:
       id: test1
       name: Run tests (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
+        }} ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 120
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 120
     - continue-on-error: true
       id: test1_script
@@ -924,6 +952,12 @@ jobs:
 
         '
       shell: bash -l {0}
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+      name: (WINDOWS) Disable interpreted language example on Windows for speed
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
@@ -967,11 +1001,18 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        == 'macOS'
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -1089,12 +1130,13 @@ jobs:
       id: test1
       name: Run tests (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
+        }} ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 120
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 120
     - continue-on-error: true
       id: test1_script
@@ -1232,6 +1274,12 @@ jobs:
 
         '
       shell: bash -l {0}
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+      name: (WINDOWS) Disable interpreted language example on Windows for speed
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
@@ -1275,11 +1323,18 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        == 'macOS'
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -1397,12 +1452,13 @@ jobs:
       id: test1
       name: Run tests (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
+        }} ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 120
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 120
     - continue-on-error: true
       id: test1_script
@@ -1539,6 +1595,12 @@ jobs:
 
         '
       shell: bash -l {0}
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+      name: (WINDOWS) Disable interpreted language example on Windows for speed
+      run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
@@ -1582,11 +1644,18 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip'
+    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+        != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        == 'macOS'
+      name: (PIP) Set up Python 3.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
       name: (PIP) Set up Julia
       uses: julia-actions/setup-julia@v1
@@ -1704,12 +1773,13 @@ jobs:
       id: test1
       name: Run tests (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }}
+        }} ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 120
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
       run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 120
     - continue-on-error: true
       id: test1_script

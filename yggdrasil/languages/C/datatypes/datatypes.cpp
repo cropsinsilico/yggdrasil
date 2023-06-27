@@ -185,7 +185,8 @@ dtype_t* create_dtype(rapidjson::Document* document=NULL,
 
 
 rapidjson::Document* type_from_pyobj(PyObject* pyobj) {
-  rapidjson::Value d(pyobj);
+  rapidjson::Value::AllocatorType allocator;
+  rapidjson::Value d(pyobj, allocator);
   return encode_schema(&d);
 };
 
@@ -729,7 +730,7 @@ extern "C" {
 #define GEOMETRY_(name, rjtype)					\
       if (typeS == std::string(#name)) {			\
 	rapidjson::rjtype* tmp = (rapidjson::rjtype*)value;	\
-	x_obj->Set ## rjtype(*tmp);				\
+	x_obj->Set ## rjtype(*tmp, generic_allocator(x));	\
       }
       CASE_(null, SetNull())
       else CASE_(boolean, SetBool(((bool*)value)[0]))
@@ -1443,7 +1444,7 @@ extern "C" {
 #define STD_UNITS_(name, type, method, defV)				\
   STD_UNITS_BASE_(name, type, d->Is ## method(), out = d->Get ## method(), d->Set ## method(value), defV)
 #define GEOMETRY_(name, rjtype)						\
-  STD_JSON_BASE_(name, name ## _t, d->Is ## rjtype(), rapidjson::rjtype* tmp = new rapidjson::rjtype(); d->Get ## rjtype(*tmp); out = rjtype ## 2 ## name(*tmp); delete tmp, d->Set ## rjtype(name ## 2 ## rjtype(value)), init_ ## name())
+  STD_JSON_BASE_(name, name ## _t, d->Is ## rjtype(), rapidjson::rjtype* tmp = new rapidjson::rjtype(); d->Get ## rjtype(*tmp); out = rjtype ## 2 ## name(*tmp); delete tmp, d->Set ## rjtype(name ## 2 ## rjtype(value), generic_allocator(x)), init_ ## name())
 #define ARRAY_(name, type, rjtype)					\
   size_t generic_ref_get_1darray_ ## name(generic_ref_t x, type** data) {	\
     if (x.obj == NULL || data == NULL) {				\
@@ -1492,8 +1493,9 @@ extern "C" {
       ygglog_error("Generic object is not initialized");		\
       return GENERIC_ERROR_;						\
     }									\
-    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
-    d->Set1DArray((rjtype*)value, (rapidjson::SizeType)length, units);	\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);			\
+    d->Set1DArray((rjtype*)value, (rapidjson::SizeType)length, units,	\
+		  generic_allocator(x));				\
     return GENERIC_SUCCESS_;						\
   }									\
   int generic_set_ndarray_ ## name(generic_t x, type* value, const size_t ndim, const size_t* shape, const char* units) { \
@@ -1506,7 +1508,8 @@ extern "C" {
     for (size_t i = 0; i < ndim; i++) {					\
       rjshape[i] = (rapidjson::SizeType)(shape[i]);			\
     }									\
-    d->SetNDArray((rjtype*)value, rjshape, (rapidjson::SizeType)ndim, units); \
+    d->SetNDArray((rjtype*)value, rjshape, (rapidjson::SizeType)ndim,	\
+		  units, generic_allocator(x));				\
     generic_allocator(x).Free(rjshape);					\
     return GENERIC_SUCCESS_;						\
   }									\
@@ -1515,10 +1518,10 @@ extern "C" {
   NESTED_SET_(1darray_ ## name, (value, length, units), type* value, const size_t length, const char* units) \
   NESTED_SET_(ndarray_ ## name, (data, ndim, shape, units), type* data, const size_t ndim, const size_t* shape, const char* units)
 #define SCALAR_(name, type, defV)		\
-  STD_UNITS_BASE_(name, type, d->IsScalar<type>(), out = (type)(d->GetScalar<type>()), d->SetScalar(value, units), defV) \
+  STD_UNITS_BASE_(name, type, d->IsScalar<type>(), out = (type)(d->GetScalar<type>()), d->SetScalar(value, units, generic_allocator(x)), defV) \
   ARRAY_(name, type, type)
 #define COMPLEX_(name, type, subtype, defV)				\
-  STD_UNITS_BASE_(name, type, d->IsScalar<std::complex<subtype>>(), std::complex<subtype> tmp = d->GetScalar<std::complex<subtype>>(); out.re = tmp.real(); out.im = tmp.imag(), d->SetScalar(std::complex<subtype>(value.re, value.im), units), type({defV, defV})) \
+  STD_UNITS_BASE_(name, type, d->IsScalar<std::complex<subtype>>(), std::complex<subtype> tmp = d->GetScalar<std::complex<subtype>>(); out.re = tmp.real(); out.im = tmp.imag(), d->SetScalar(std::complex<subtype>(value.re, value.im), units, generic_allocator(x)), type({defV, defV})) \
   ARRAY_(name, type, std::complex<subtype>)
 #define __COMPLEX_(name, type, subtype, defV)				\
   type generic_ref_get_ ## name(generic_ref_t x) {			\
@@ -1548,16 +1551,16 @@ extern "C" {
       ygglog_error("Generic object is not initialized");		\
       return GENERIC_ERROR_;						\
     }									\
-    rapidjson::Value* d = (rapidjson::Value*)(x.obj);		\
+    rapidjson::Value* d = (rapidjson::Value*)(x.obj);			\
     std::complex<subtype> tmp(value.re, value.im);			\
-    d->SetScalar(tmp, units);						\
+    d->SetScalar(tmp, units, generic_allocator(x));			\
     return GENERIC_SUCCESS_;						\
   }									\
   NESTED_GET_NOARGS_(name, type, {defV, defV})				\
   NESTED_SET_(name, (value, units), type value, const char* units)	\
   ARRAY_(name, type, std::complex<subtype>)
 #define PYTHON_(name, method)						\
-  STD_JSON_BASE_(name, python_t, d->Is ## method(), out.obj = d->GetPythonObjectRaw(), d->SetPythonObjectRaw(value.obj), init_python())
+  STD_JSON_BASE_(name, python_t, d->Is ## method(), out.obj = d->GetPythonObjectRaw(), d->SetPythonObjectRaw(value.obj, generic_allocator(x)), init_python())
   
   STD_JSON_(bool, bool, Bool, false);
   STD_JSON_(integer, int, Int, 0);

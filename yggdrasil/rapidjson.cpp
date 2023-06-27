@@ -3262,7 +3262,7 @@ PythonAccept(
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	QuantityArrayObject* v = (QuantityArrayObject*) object;
 	Value* x = new Value();
-	bool ret = x->SetPythonObjectRaw(object);
+	bool ret = x->SetPythonObjectRaw(object, allocator);
 	if (ret) {
 	    std::string unitsS = v->units->units->str();
 	    ret = x->SetUnits(unitsS.c_str(), unitsS.length());
@@ -3280,7 +3280,7 @@ PythonAccept(
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	PlyObject* v = (PlyObject*) object;
 	Value* x = new Value();
-	x->SetPlyRaw(*v->ply, &allocator);
+	x->SetPlyRaw(*v->ply, allocator);
 	bool ret = x->Accept(*handler);
 	delete x;
 	if (!ret)
@@ -3290,7 +3290,7 @@ PythonAccept(
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	ObjWavefrontObject* v = (ObjWavefrontObject*) object;
 	Value* x = new Value();
-	x->SetObj(*v->obj, &allocator);
+	x->SetObj(*v->obj, allocator);
 	bool ret = x->Accept(*handler);
 	delete x;
 	if (!ret)
@@ -3331,7 +3331,7 @@ PythonAccept(
 		return false;
 	    }
 	    Value x;
-	    x.SetPlyRaw(*(object_ply->ply), &allocator);
+	    x.SetPlyRaw(*(object_ply->ply), allocator);
 	    Py_DECREF((PyObject*)object_ply);
 	    bool ret = x.Accept(*handler);
 	    if (!ret)
@@ -3341,7 +3341,7 @@ PythonAccept(
 	// PythonAccept
 	RAPIDJSON_DEFAULT_ALLOCATOR allocator;
 	Value* x = new Value();
-	bool ret = x->SetPythonObjectRaw(object, &allocator, false,
+	bool ret = x->SetPythonObjectRaw(object, allocator, false,
 					 (yggdrasilMode & YM_PICKLE));
 	if (ret)
 	    ret = x->Accept(*handler);
