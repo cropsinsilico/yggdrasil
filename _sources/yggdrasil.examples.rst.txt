@@ -8,6 +8,8 @@ Subpackages
    :maxdepth: 4
 
    yggdrasil.examples.backwards
+   yggdrasil.examples.composite_function
+   yggdrasil.examples.composite_function2
    yggdrasil.examples.conditional_io
    yggdrasil.examples.fakeplant
    yggdrasil.examples.formatted_io1

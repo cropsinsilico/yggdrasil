@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -120,7 +120,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 </tr>
 <tr class="row-even"><td><p>delimiter</p></td>
 <td><p>string</p></td>
-<td><p>[‘pandas’, ‘cabo’, ‘map’, ‘table’]</p></td>
+<td><p>[‘map’, ‘table’, ‘cabo’, ‘pandas’]</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
 </tr>
@@ -139,19 +139,19 @@ in order to serialize non-bytes objects.</p></td>
 </tr>
 <tr class="row-odd"><td><p>field_names</p></td>
 <td><p>array</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>The names of fields in the format string. If not provided, names are set based
 on the order of the fields in the format string.</p></td>
 </tr>
 <tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>The units of fields in the format string. If not provided, all fields are
 assumed to be dimensionless.</p></td>
 </tr>
 <tr class="row-odd"><td><p>format_str</p></td>
 <td><p>string</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>If provided, this string will be used to format messages from a list of
 arguments and parse messages to get a list of arguments in C printf/scanf style.
 Defaults to None and messages are assumed to already be bytes.</p></td>
@@ -172,7 +172,7 @@ serialization for encoded_datatype will be used.</p></td>
 </tr>
 <tr class="row-even"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
 </tr>
@@ -202,7 +202,7 @@ to True.</p></td>
 </tr>
 <tr class="row-odd"><td><p>use_astropy</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
 </tr>

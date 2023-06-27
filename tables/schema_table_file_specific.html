@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -107,7 +107,7 @@
 <tbody>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
-<td><p>[‘ascii’, ‘ply’, ‘pickle’, ‘mat’, ‘map’, ‘obj’, ‘binary’, ‘pandas’, ‘table’]</p></td>
+<td><p>[‘ply’, ‘mat’, ‘pickle’, ‘obj’, ‘map’, ‘ascii’, ‘binary’, ‘table’, ‘pandas’]</p></td>
 <td><p>[DEPRECATED] Arguments that should be provided to the driver.</p></td>
 </tr>
 <tr class="row-odd"><td><p>columns</p></td>
@@ -117,12 +117,12 @@
 </tr>
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
-<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
+<td><p>[‘ply’, ‘cabo’, ‘mat’, ‘pickle’, ‘obj’, ‘yaml’, ‘map’, ‘ascii’, ‘json’, ‘table’, ‘pandas’]</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
-<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
+<td><p>[‘ply’, ‘cabo’, ‘mat’, ‘pickle’, ‘obj’, ‘yaml’, ‘map’, ‘ascii’, ‘json’, ‘table’, ‘pandas’]</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
 </tr>
@@ -134,13 +134,13 @@ they will always be serialized in the flow style. See <a class="reference extern
 </tr>
 <tr class="row-odd"><td><p>delimiter</p></td>
 <td><p>string</p></td>
-<td><p>[‘pandas’, ‘cabo’, ‘map’, ‘table’]</p></td>
+<td><p>[‘map’, ‘table’, ‘cabo’, ‘pandas’]</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
 </tr>
 <tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
-<td><p>[‘excel’, ‘yaml’, ‘cram’, ‘bcf’, ‘cabo’, ‘sam’, ‘tiff’, ‘bam’, ‘eps’, ‘bmp’, ‘fasta’, ‘pickle’, ‘obj’, ‘ply’, ‘vcf’, ‘png’, ‘jpeg’, ‘ascii’, ‘fastq’, ‘mat’, ‘map’, ‘json’, ‘netcdf’, ‘gif’, ‘binary’, ‘pandas’, ‘table’]</p></td>
+<td><p>[‘netcdf’, ‘gif’, ‘mat’, ‘bcf’, ‘obj’, ‘sam’, ‘fastq’, ‘binary’, ‘png’, ‘ply’, ‘excel’, ‘jpeg’, ‘ascii’, ‘json’, ‘yaml’, ‘tiff’, ‘cabo’, ‘cram’, ‘pickle’, ‘map’, ‘eps’, ‘bmp’, ‘bam’, ‘vcf’, ‘table’, ‘pandas’, ‘fasta’]</p></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
 <tr class="row-odd"><td><p>encoding</p></td>
@@ -160,35 +160,35 @@ to t.</p></td>
 </tr>
 <tr class="row-even"><td><p>flush_on_write</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>[‘bam’, ‘cram’, ‘bcf’, ‘vcf’, ‘sam’]</p></td>
 <td><p>If true, the file will be flushed when written to.</p></td>
 </tr>
 <tr class="row-odd"><td><p>header</p></td>
 <td><p>object</p></td>
-<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>[‘bam’, ‘cram’, ‘bcf’, ‘vcf’, ‘sam’]</p></td>
 <td><p>Header defining sequence identifiers. A header is required for writing SAM, BAM,
 and CRAM files.</p></td>
 </tr>
 <tr class="row-even"><td><p>indent</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
 </tr>
 <tr class="row-odd"><td><p>index</p></td>
 <td><p>string</p></td>
-<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>[‘bam’, ‘cram’, ‘bcf’, ‘vcf’, ‘sam’]</p></td>
 <td><p>Path to file containing index if different from the standard naming convention
 for BAM and CRAM files.</p></td>
 </tr>
 <tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
-<td><p>[‘excel’, ‘yaml’, ‘cram’, ‘bcf’, ‘cabo’, ‘sam’, ‘tiff’, ‘bam’, ‘eps’, ‘bmp’, ‘fasta’, ‘pickle’, ‘obj’, ‘ply’, ‘vcf’, ‘png’, ‘jpeg’, ‘ascii’, ‘fastq’, ‘mat’, ‘map’, ‘json’, ‘netcdf’, ‘gif’, ‘binary’, ‘pandas’, ‘table’]</p></td>
+<td><p>[‘netcdf’, ‘gif’, ‘mat’, ‘bcf’, ‘obj’, ‘sam’, ‘fastq’, ‘binary’, ‘png’, ‘ply’, ‘excel’, ‘jpeg’, ‘ascii’, ‘json’, ‘yaml’, ‘tiff’, ‘cabo’, ‘cram’, ‘pickle’, ‘map’, ‘eps’, ‘bmp’, ‘bam’, ‘vcf’, ‘table’, ‘pandas’, ‘fasta’]</p></td>
 <td><p>Name used for component in log messages.</p></td>
 </tr>
 <tr class="row-odd"><td><p>newline</p></td>
 <td><p>string</p></td>
-<td><p>[‘ascii’, ‘yaml’, ‘ply’, ‘pickle’, ‘mat’, ‘json’, ‘map’, ‘obj’, ‘cabo’, ‘pandas’, ‘table’]</p></td>
+<td><p>[‘ply’, ‘cabo’, ‘mat’, ‘pickle’, ‘obj’, ‘yaml’, ‘map’, ‘ascii’, ‘json’, ‘table’, ‘pandas’]</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
 </tr>
 <tr class="row-even"><td><p>no_header</p></td>
@@ -199,7 +199,7 @@ False.</p></td>
 </tr>
 <tr class="row-odd"><td><p>params</p></td>
 <td><p>object</p></td>
-<td><p>[‘png’, ‘jpeg’, ‘tiff’, ‘eps’, ‘bmp’, ‘gif’]</p></td>
+<td><p>[‘gif’, ‘jpeg’, ‘eps’, ‘png’, ‘tiff’, ‘bmp’]</p></td>
 <td><p>Parameters that should be based to the PIL.Image save/open command</p></td>
 </tr>
 <tr class="row-even"><td><p>piecemeal</p></td>
@@ -233,7 +233,7 @@ Ignored if direction is ‘send’.</p></td>
 </tr>
 <tr class="row-odd"><td><p>regions</p></td>
 <td><p>array</p></td>
-<td><p>[‘vcf’, ‘bam’, ‘cram’, ‘bcf’, ‘sam’]</p></td>
+<td><p>[‘bam’, ‘cram’, ‘bcf’, ‘vcf’, ‘sam’]</p></td>
 <td><p>Region parameters (reference name, start, and end) defining the regions that
 should be read. If not provided, all regions will be read.</p></td>
 </tr>
@@ -279,7 +279,7 @@ to True.</p></td>
 </tr>
 <tr class="row-odd"><td><p>use_astropy</p></td>
 <td><p>boolean</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
 </tr>

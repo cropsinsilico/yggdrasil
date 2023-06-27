@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -134,54 +134,59 @@ to write to the file in append mode. Defaults to False.</p></td>
 <td><p>[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved
 with either columns rather than row by row. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>driver</p></td>
+<tr class="row-odd"><td><p>count</p></td>
+<td><p>integer</p></td>
+<td></td>
+<td><p>When reading a file, read the file this many of times. Defaults to 0.</p></td>
+</tr>
+<tr class="row-even"><td><p>driver</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>field_names</p></td>
+<tr class="row-odd"><td><p>field_names</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field names that should be used to label fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 field names are created based on the field order.</p></td>
 </tr>
-<tr class="row-odd"><td><p>field_units</p></td>
+<tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>[DEPRECATED] Field units that should be used to convert fields in sent/received
 tables. This keyword is only valid for table-like datatypes. If not provided,
 all fields are assumed to be unitless.</p></td>
 </tr>
-<tr class="row-even"><td><p>filetype</p></td>
+<tr class="row-odd"><td><p>filetype</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>The type of file that will be read from or written to. (Options described
 <a class="reference internal" href="../yaml.html#schema-table-file-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
 </tr>
-<tr class="row-odd"><td><p>filter</p></td>
+<tr class="row-even"><td><p>filter</p></td>
 <td><p>object</p></td>
 <td></td>
 <td><p>Schema for filter components.</p></td>
 </tr>
-<tr class="row-even"><td><p>for_service</p></td>
+<tr class="row-odd"><td><p>for_service</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, this comm bridges the gap to an integration running as a service,
 possibly on a remote machine. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>format_str</p></td>
+<tr class="row-even"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>String that should be used to format/parse messages. Default to None.</p></td>
 </tr>
-<tr class="row-even"><td><p>in_temp</p></td>
+<tr class="row-odd"><td><p>in_temp</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, the path will be considered relative to the platform temporary
 directory. Defaults to False.</p></td>
 </tr>
-<tr class="row-odd"><td><p>is_series</p></td>
+<tr class="row-even"><td><p>is_series</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, input/output will be done to a series of files. If reading, each file
@@ -189,29 +194,29 @@ will be processed until the end is reached. If writing, each output will be to a
 new file in the series. The addressed is assumed to contain a format for the
 index of the file. Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>length_map</p></td>
+<tr class="row-odd"><td><p>length_map</p></td>
 <td><p>object</p></td>
 <td></td>
 <td><p>Map from pointer variable names to the names of variables where their length
 will be stored. Defaults to {}.</p></td>
 </tr>
-<tr class="row-odd"><td><p>onexit</p></td>
+<tr class="row-even"><td><p>onexit</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>[DEPRECATED] Method of input/output driver to call when the connection closes</p></td>
 </tr>
-<tr class="row-even"><td><p>transform</p></td>
+<tr class="row-odd"><td><p>transform</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>One or more transformations that will be applied to messages that are
 sent/received. Ignored if not provided.</p></td>
 </tr>
-<tr class="row-odd"><td><p>vars</p></td>
+<tr class="row-even"><td><p>vars</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Names of variables to be sent/received by this comm. Defaults to [].</p></td>
 </tr>
-<tr class="row-even"><td><p>wait_for_creation</p></td>
+<tr class="row-odd"><td><p>wait_for_creation</p></td>
 <td><p>number</p></td>
 <td></td>
 <td><p>Time (in seconds) that should be waited before opening for the file to be

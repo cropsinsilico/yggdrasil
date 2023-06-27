@@ -52,6 +52,14 @@ yggdrasil.communication.transforms.MapFieldsTransform module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.transforms.MapTransform module
+------------------------------------------------------
+
+.. automodule:: yggdrasil.communication.transforms.MapTransform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.transforms.PandasTransform module
 ---------------------------------------------------------
 

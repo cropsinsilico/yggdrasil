@@ -8,6 +8,7 @@ direct          Pass the message through unchanged
 filter          Pass only some messages based on a filter                                       
 function        Transform messages using a function.                                            
 iterate         Split messages up into their iterable components                                
+map             Convert an object into a dictionary.                                            
 map_fields      Change the names of fields in a message                                         
 pandas          Convert messages into Pandas data frames                                        
 select_fields   Select a subset of fields from a message                                        

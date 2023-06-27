@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -198,6 +198,8 @@
 <span class="sd">            the end is reached. If writing, each output will be to a new</span>
 <span class="sd">            file in the series. The addressed is assumed to contain a format</span>
 <span class="sd">            for the index of the file. Defaults to False.</span>
+<span class="sd">        count (int, optional): When reading a file, read the file this</span>
+<span class="sd">            many of times. Defaults to 0.</span>
 <span class="sd">        wait_for_creation (float, optional): Time (in seconds) that should be</span>
 <span class="sd">            waited before opening for the file to be created if it dosn&#39;t exist.</span>
 <span class="sd">            Defaults to 0 s and file will attempt to be opened immediately.</span>
@@ -241,6 +243,7 @@
         <span class="s1">&#39;append&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;in_temp&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="s1">&#39;is_series&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+        <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
         <span class="s1">&#39;wait_for_creation&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
         <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;allOf&#39;</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{}},</span>
@@ -519,7 +522,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">(</span><span class="n">for_yaml</span><span class="o">=</span><span class="n">for_yaml</span><span class="p">)</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;is_series&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">is_series</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">,</span>
+                      <span class="n">count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">kwargs</span></div>
 
     <span class="nd">@property</span>
@@ -679,11 +683,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">series_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">series_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span> <span class="o">!=</span> <span class="n">series_index</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span>
                      <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_series_address</span><span class="p">(</span><span class="n">series_index</span><span class="p">)))):</span>
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_file_close</span><span class="p">()</span>
@@ -691,6 +695,8 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Advanced to </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">series_index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">False</span>

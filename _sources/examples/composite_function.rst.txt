@@ -1,0 +1,137 @@
+.. _composite_function_rst:
+
+composite_function
+===============================================
+
+One model receives input from 3 different source, 2 being value constants and one being a file. The model is automatically wrapped by yggdrasil with the appropriate interface call.
+
+
+
+.. contents:: :local:
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/src/model_function.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/composite_function_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/src/model_function.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/composite_function_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/src/model_function.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/composite_function_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Julia Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/src/model_function.jl
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/composite_function_julia.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/src/model_function.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/composite_function_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/src/model_function.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/composite_function_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/src/model_function.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/yggdrasil/examples/composite_function/composite_function_r.yml
+   :language: yaml
+   :linenos:
+
+
+

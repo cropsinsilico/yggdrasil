@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C Serialize API &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>C Serialize API &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -324,7 +324,83 @@
 <dt class="sig sig-object cpp">
 <span class="target" id="structobj__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">obj_t</span></span></span><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;datatypes.h&gt;</em></div>
+<em>#include &lt;ObjSerialize.h&gt;</em></div>
+<p>Obj structure. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t5nvertE">
+<span id="_CPPv3N5obj_t5nvertE"></span><span id="_CPPv2N5obj_t5nvertE"></span><span id="obj_t::nvert__i"></span><span class="target" id="structobj__t_1aa08e8272f5b5f143afac1cab58d30518"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nvert</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t5nvertE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t5nfaceE">
+<span id="_CPPv3N5obj_t5nfaceE"></span><span id="_CPPv2N5obj_t5nfaceE"></span><span id="obj_t::nface__i"></span><span class="target" id="structobj__t_1a28c4194c71f1cd6c719f43c70ee14df6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nface</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t5nfaceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number faces. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t8verticesE">
+<span id="_CPPv3N5obj_t8verticesE"></span><span id="_CPPv2N5obj_t8verticesE"></span><span id="obj_t::vertices__floatPP"></span><span class="target" id="structobj__t_1a57882cfdbfe09ad7b4a5fcede3681b6b"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">vertices</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t8verticesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>X, Y, Z positions of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t5facesE">
+<span id="_CPPv3N5obj_t5facesE"></span><span id="_CPPv2N5obj_t5facesE"></span><span id="obj_t::faces__iPP"></span><span class="target" id="structobj__t_1a450705239dad767420e27d4bb2b1a7cb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">faces</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t5facesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Indices of the vertices composing each face. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t13vertex_colorsE">
+<span id="_CPPv3N5obj_t13vertex_colorsE"></span><span id="_CPPv2N5obj_t13vertex_colorsE"></span><span id="obj_t::vertex_colors__iPP"></span><span class="target" id="structobj__t_1a26c45b63e6ff01ff6f9f1d5f25bb7d0b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">vertex_colors</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t13vertex_colorsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>RGB colors of each vertex. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t8materialE">
+<span id="_CPPv3N5obj_t8materialE"></span><span id="_CPPv2N5obj_t8materialE"></span><span id="obj_t::material__cA"></span><span class="target" id="structobj__t_1ac8ff1d64bfbec1df635bf72ba7fd5486"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">material</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">100</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N5obj_t8materialE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Material that should be used for faces. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t5ntexcE">
+<span id="_CPPv3N5obj_t5ntexcE"></span><span id="_CPPv2N5obj_t5ntexcE"></span><span id="obj_t::ntexc__i"></span><span class="target" id="structobj__t_1aaa36aa6eda039139d79a807b591d1a1a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ntexc</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t5ntexcE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of texture coordinates. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t5nnormE">
+<span id="_CPPv3N5obj_t5nnormE"></span><span id="_CPPv2N5obj_t5nnormE"></span><span id="obj_t::nnorm__i"></span><span class="target" id="structobj__t_1aeaae61787b92ea57ef185bdd9e996b02"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nnorm</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t5nnormE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of normals. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t9texcoordsE">
+<span id="_CPPv3N5obj_t9texcoordsE"></span><span id="_CPPv2N5obj_t9texcoordsE"></span><span id="obj_t::texcoords__floatPP"></span><span class="target" id="structobj__t_1a9477aca6c3d6977280f1082410576438"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">texcoords</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t9texcoordsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Texture coordinates. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t7normalsE">
+<span id="_CPPv3N5obj_t7normalsE"></span><span id="_CPPv2N5obj_t7normalsE"></span><span id="obj_t::normals__floatPP"></span><span class="target" id="structobj__t_1ac61278759dc377f187ce6ae7c8b3c668"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">normals</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t7normalsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>X, Y, Z direction of normals. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t14face_texcoordsE">
+<span id="_CPPv3N5obj_t14face_texcoordsE"></span><span id="_CPPv2N5obj_t14face_texcoordsE"></span><span id="obj_t::face_texcoords__iPP"></span><span class="target" id="structobj__t_1a06e3e2f89a4bd511413240569bd3f98e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">face_texcoords</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t14face_texcoordsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Indices of texcoords for each face. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5obj_t12face_normalsE">
+<span id="_CPPv3N5obj_t12face_normalsE"></span><span id="_CPPv2N5obj_t12face_normalsE"></span><span id="obj_t::face_normals__iPP"></span><span class="target" id="structobj__t_1ae48ff9d93e071669d7b6edccb7aaf642"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">face_normals</span></span></span><a class="headerlink" href="#_CPPv4N5obj_t12face_normalsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Indices of normals for each face. </p>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 <div class="breathe-sectiondef docutils container">
@@ -420,7 +496,47 @@
 <dt class="sig sig-object cpp">
 <span class="target" id="structply__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ply_t</span></span></span><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;datatypes.h&gt;</em></div>
+<em>#include &lt;PlySerialize.h&gt;</em></div>
+<p>Ply structure. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5ply_t5nvertE">
+<span id="_CPPv3N5ply_t5nvertE"></span><span id="_CPPv2N5ply_t5nvertE"></span><span id="ply_t::nvert__i"></span><span class="target" id="structply__t_1a8958bfc57c4354ce663eb39972efb08f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nvert</span></span></span><a class="headerlink" href="#_CPPv4N5ply_t5nvertE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5ply_t5nfaceE">
+<span id="_CPPv3N5ply_t5nfaceE"></span><span id="_CPPv2N5ply_t5nfaceE"></span><span id="ply_t::nface__i"></span><span class="target" id="structply__t_1a193a6563568843d5c9b21fc9b6f729ce"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nface</span></span></span><a class="headerlink" href="#_CPPv4N5ply_t5nfaceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number faces. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5ply_t8verticesE">
+<span id="_CPPv3N5ply_t8verticesE"></span><span id="_CPPv2N5ply_t8verticesE"></span><span id="ply_t::vertices__floatPP"></span><span class="target" id="structply__t_1ae369adb99bfa7d4ce6c0de17375ceca5"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">vertices</span></span></span><a class="headerlink" href="#_CPPv4N5ply_t8verticesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>X, Y, Z positions of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5ply_t5facesE">
+<span id="_CPPv3N5ply_t5facesE"></span><span id="_CPPv2N5ply_t5facesE"></span><span id="ply_t::faces__iPP"></span><span class="target" id="structply__t_1af1d30fca2604f6db56811f4708fe2e4f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">faces</span></span></span><a class="headerlink" href="#_CPPv4N5ply_t5facesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Indices of the vertices composing each face. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5ply_t13vertex_colorsE">
+<span id="_CPPv3N5ply_t13vertex_colorsE"></span><span id="_CPPv2N5ply_t13vertex_colorsE"></span><span id="ply_t::vertex_colors__iPP"></span><span class="target" id="structply__t_1a8070ee061d8bc3ae6067aaa52310c0fa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">vertex_colors</span></span></span><a class="headerlink" href="#_CPPv4N5ply_t13vertex_colorsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>RGB colors of each vertex. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5ply_t13nvert_in_faceE">
+<span id="_CPPv3N5ply_t13nvert_in_faceE"></span><span id="_CPPv2N5ply_t13nvert_in_faceE"></span><span id="ply_t::nvert_in_face__iP"></span><span class="target" id="structply__t_1acb3aaad9679629140b24855a262d5cf8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nvert_in_face</span></span></span><a class="headerlink" href="#_CPPv4N5ply_t13nvert_in_faceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of vertices in each face. </p>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 <div class="breathe-sectiondef docutils container">

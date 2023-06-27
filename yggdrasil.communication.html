@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication package &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>yggdrasil.communication package &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -199,6 +199,15 @@
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform.evaluate_transform"><code class="docutils literal notranslate"><span class="pre">MapFieldsTransform.evaluate_transform()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform.get_testing_options"><code class="docutils literal notranslate"><span class="pre">MapFieldsTransform.get_testing_options()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform.transform_datatype"><code class="docutils literal notranslate"><span class="pre">MapFieldsTransform.transform_datatype()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="yggdrasil.communication.transforms.html#module-yggdrasil.communication.transforms.MapTransform">yggdrasil.communication.transforms.MapTransform module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.MapTransform.MapTransform"><code class="docutils literal notranslate"><span class="pre">MapTransform</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.MapTransform.MapTransform.evaluate_transform"><code class="docutils literal notranslate"><span class="pre">MapTransform.evaluate_transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.MapTransform.MapTransform.get_testing_options"><code class="docutils literal notranslate"><span class="pre">MapTransform.get_testing_options()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.MapTransform.MapTransform.transform_datatype"><code class="docutils literal notranslate"><span class="pre">MapTransform.transform_datatype()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -3920,6 +3929,8 @@ a series of files. If reading, each file will be processed until
 the end is reached. If writing, each output will be to a new
 file in the series. The addressed is assumed to contain a format
 for the index of the file. Defaults to False.</p></li>
+<li><p><strong>count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – When reading a file, read the file this
+many of times. Defaults to 0.</p></li>
 <li><p><strong>wait_for_creation</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
 waited before opening for the file to be created if it dosn’t exist.
 Defaults to 0 s and file will attempt to be opened immediately.</p></li>

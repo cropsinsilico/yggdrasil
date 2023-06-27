@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize.PlySerialize &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>yggdrasil.serialize.PlySerialize &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -98,52 +98,12 @@
   <h1>Source code for yggdrasil.serialize.PlySerialize</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">rapidjson</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
 
 
 <div class="viewcode-block" id="GeometryBase"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PlySerialize.GeometryBase">[docs]</a><span class="k">class</span> <span class="nc">GeometryBase</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for extening rapidjson geometry classes.&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="GeometryBase.from_mesh"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PlySerialize.GeometryBase.from_mesh">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_mesh</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">prune_duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a geometry dictionary from a mesh which specifies</span>
-<span class="sd">        the vertices (x, y, z) for each face in the geometry.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            mesh (np.ndarray): 3D mesh or a file/filename containing</span>
-<span class="sd">                the mesh in a tab or comma delimited file.</span>
-<span class="sd">            prune_duplicates (bool, optional): If True, only unique</span>
-<span class="sd">                vertices will be included. Defaults to False.</span>
-<span class="sd">            **kwargs: Additional keyword arguments will be passed to</span>
-<span class="sd">                numpy.loadtxt in the case that mesh is a file or filename.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">IOBase</span><span class="p">)):</span>
-            <span class="n">mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mesh</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">verts_per_face</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">3</span>
-        <span class="n">nfaces</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">nverts</span> <span class="o">=</span> <span class="n">verts_per_face</span> <span class="o">*</span> <span class="n">nfaces</span>
-        <span class="n">verts</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nverts</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-        <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nverts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">nfaces</span><span class="p">,</span> <span class="n">verts_per_face</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">prune_duplicates</span><span class="p">:</span>
-            <span class="n">rm_verts</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">idx1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nverts</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">idx2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx1</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">verts</span><span class="p">[</span><span class="n">idx1</span><span class="p">],</span> <span class="n">verts</span><span class="p">[</span><span class="n">idx2</span><span class="p">]):</span>
-                        <span class="n">faces</span><span class="p">[</span><span class="n">faces</span> <span class="o">==</span> <span class="n">idx1</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx2</span>
-                        <span class="n">rm_verts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx1</span><span class="p">)</span>
-                        <span class="k">break</span>
-            <span class="n">verts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">rm_verts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">rm_verts</span><span class="p">):</span>
-                <span class="n">faces</span><span class="p">[</span><span class="n">faces</span> <span class="o">&gt;</span> <span class="n">idx</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;vertex&quot;</span><span class="p">:</span> <span class="n">verts</span><span class="p">,</span> <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="n">faces</span><span class="p">}))</span></div>
 
 <div class="viewcode-block" id="GeometryBase.from_shape"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.PlySerialize.GeometryBase.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">_as_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
@@ -331,21 +291,8 @@
         <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span> <span class="k">as</span> <span class="n">mpl_colors</span>
         <span class="c1"># Scale by area</span>
         <span class="k">if</span> <span class="n">scale_by_area</span><span class="p">:</span>
-            <span class="n">scalar_arr</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">scalar_arr</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">,</span> <span class="p">[])):</span>
-                <span class="n">fv</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Area calc not implemented &quot;</span>
-                                              <span class="o">+</span> <span class="s2">&quot;for faces above triangle.&quot;</span><span class="p">)</span>
-                <span class="n">v0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="n">fv</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s1">&#39;xyz&#39;</span><span class="p">])</span>
-                <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="n">fv</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s1">&#39;xyz&#39;</span><span class="p">])</span>
-                <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="n">fv</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s1">&#39;xyz&#39;</span><span class="p">])</span>
-                <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">v0</span> <span class="o">-</span> <span class="n">v1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-                <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">v1</span> <span class="o">-</span> <span class="n">v2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-                <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">v2</span> <span class="o">-</span> <span class="n">v0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
-                <span class="n">area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">c</span><span class="p">))</span>
-                <span class="n">scalar_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="n">scalar_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">areas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">areas</span><span class="p">)</span>
+            <span class="n">scalar_arr</span> <span class="o">=</span> <span class="n">scalar_arr</span> <span class="o">*</span> <span class="n">areas</span>
         <span class="c1"># Map vertices onto faces</span>
         <span class="n">vertex_scalar</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">,</span> <span class="p">[]))):</span>
@@ -537,6 +484,7 @@
                 <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">)},</span>
                 <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
                 <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">2</span><span class="p">)},</span>
                 <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)}],</span>
              <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[</span>
                  <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)]},</span>
@@ -550,7 +498,7 @@
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;format ascii 1.0</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;comment author ygg_auto</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;comment File generated by yggdrasil</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;element vertex 8</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;element vertex 10</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;property double x</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;property double y</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;property double z</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -559,17 +507,19 @@
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;0 0 0</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;0 0 1</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;0 1 1</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;1 1 2</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;1 1 1</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;0 0 0</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;0 0 1</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;0 1 1</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;1 1 2</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;1 1 1</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;3 0 1 2</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;3 1 2 3</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;4 0 1 2 3</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;3 4 5 6</span><span class="se">\n</span><span class="s1">&#39;</span>
                              <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;3 5 6 7</span><span class="se">\n</span><span class="s1">&#39;</span>
-                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;4 4 5 6 7</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;3 6 7 8</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;4 5 6 7 8</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;concatenate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[([],</span> <span class="p">[])]</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>

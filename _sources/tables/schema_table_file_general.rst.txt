@@ -12,6 +12,7 @@ append              boolean              If True and writing, file is openned in
                                          to write to the file in append mode. Defaults to False.                         
 as_array            boolean              [DEPRECATED] If True and the datatype is table-like, tables are sent/recieved   
                                          with either columns rather than row by row. Defaults to False.                  
+count               integer              When reading a file, read the file this many of times. Defaults to 0.           
 driver              string               [DEPRECATED] Name of driver class that should be used.                          
 field_names         array                [DEPRECATED] Field names that should be used to label fields in sent/received   
                                          tables. This keyword is only valid for table-like datatypes. If not provided,   

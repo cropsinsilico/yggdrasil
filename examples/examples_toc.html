@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Examples &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>Examples &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -115,6 +115,12 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="backwards.html#backwards-rst"><span class="std std-ref">backwards</span></a></p></td>
 <td><p>A single model using the deprecated “Cis” versions of the interface.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="composite_function2.html#composite-function2-rst"><span class="std std-ref">composite_function2</span></a></p></td>
+<td><p>One model receives inputs from one source and sends outputs to one destination. One component of the input and the output each are composite types. The model is automatically wrapped by yggdrasil with the appropriate interface call.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="composite_function.html#composite-function-rst"><span class="std std-ref">composite_function</span></a></p></td>
+<td><p>One model receives input from 3 different source, 2 being value constants and one being a file. The model is automatically wrapped by yggdrasil with the appropriate interface call.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="conditional_io.html#conditional-io-rst"><span class="std std-ref">conditional_io</span></a></p></td>
 <td><p>Three models, A, B1, &amp; B2, that conditionally pass messages. Model A receives input from a tab delimited table and sends output to both models B1 &amp; B2. The outputs to models B1 &amp; B2 only succeed if the data satisfies conditions described in the YAML. Output from both models B1 &amp; B2 are sent to a tab delimited table.</p></td>

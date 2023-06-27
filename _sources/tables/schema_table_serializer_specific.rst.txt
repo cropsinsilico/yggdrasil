@@ -9,18 +9,18 @@ as_array             boolean             ['table']                            If
 default_flow_style   boolean             ['yaml']                             If True, nested collections will be serialized in the block style. If False,    
                                                                               they will always be serialized in the flow style. See `PyYAML Documentation     
                                                                               <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.                                
-delimiter            string              ['pandas', 'cabo', 'map', 'table']   Delimiter that should be used to separate name/value pairs in the map. Defaults 
+delimiter            string              ['map', 'table', 'cabo', 'pandas']   Delimiter that should be used to separate name/value pairs in the map. Defaults 
                                                                               to \t.                                                                          
 encoded_datatype     schema              ['functional']                       JSON schema describing the type that serialized objects should conform to.      
                                                                               Defaults to the class attribute default_encoded_datatype. If either             
                                                                               func_serialize or func_deserialize are not provided, this needs to be specified 
                                                                               in order to serialize non-bytes objects.                                        
 encoding             string              ['yaml']                             Encoding that should be used to serialize the object. Defaults to 'utf-8'.      
-field_names          array               ['pandas', 'table']                  The names of fields in the format string. If not provided, names are set based  
+field_names          array               ['table', 'pandas']                  The names of fields in the format string. If not provided, names are set based  
                                                                               on the order of the fields in the format string.                                
-field_units          array               ['pandas', 'table']                  The units of fields in the format string. If not provided, all fields are       
+field_units          array               ['table', 'pandas']                  The units of fields in the format string. If not provided, all fields are       
                                                                               assumed to be dimensionless.                                                    
-format_str           string              ['pandas', 'table']                  If provided, this string will be used to format messages from a list of         
+format_str           string              ['table', 'pandas']                  If provided, this string will be used to format messages from a list of         
                                                                               arguments and parse messages to get a list of arguments in C printf/scanf style.
                                                                               Defaults to None and messages are assumed to already be bytes.                  
 func_deserialize     function            ['functional']                       Callable object that takes objects of a type that conforms to encoded_datatype  
@@ -29,7 +29,7 @@ func_deserialize     function            ['functional']                       Ca
 func_serialize       function            ['functional']                       Callable object that takes Python objects as input and returns a representation 
                                                                               that conforms to encoded_datatype. Defaults to None and the default             
                                                                               serialization for encoded_datatype will be used.                                
-indent               ['string', 'int']   ['json', 'yaml']                     String or number of spaces that should be used to indent each level within the  
+indent               ['string', 'int']   ['yaml', 'json']                     String or number of spaces that should be used to indent each level within the  
                                                                               seiralized structure. Defaults to '\t'.                                         
 no_header            boolean             ['pandas']                           If True, headers will not be read or serialized from/to tables. Defaults to     
                                                                               False.                                                                          
@@ -39,6 +39,6 @@ prune_duplicates     boolean             ['obj', 'ply']                       If
 sort_keys            boolean             ['json']                             If True, the serialization of dictionaries will be in key sorted order. Defaults
                                                                               to True.                                                                        
 str_as_bytes         boolean             ['pandas']                           If True, strings in columns are read as bytes. Defaults to False.               
-use_astropy          boolean             ['pandas', 'table']                  If True, the astropy package will be used to serialize/deserialize table.       
+use_astropy          boolean             ['table', 'pandas']                  If True, the astropy package will be used to serialize/deserialize table.       
                                                                               Defaults to False.                                                              
 ==================   =================   ==================================   ================================================================================

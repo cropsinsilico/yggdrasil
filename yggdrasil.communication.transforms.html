@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.communication.transforms package &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>yggdrasil.communication.transforms package &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -668,6 +668,82 @@ keywords.</p>
 <span class="sig-name descname"><span class="pre">transform_datatype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/MapFieldsTransform.html#MapFieldsTransform.transform_datatype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform.transform_datatype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the datatype that will result from applying the transform
 to the supplied datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>datatype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Datatype to transform.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed datatype.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-yggdrasil.communication.transforms.MapTransform">
+<span id="yggdrasil-communication-transforms-maptransform-module"></span><h2>yggdrasil.communication.transforms.MapTransform module<a class="headerlink" href="#module-yggdrasil.communication.transforms.MapTransform" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.MapTransform.MapTransform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.transforms.MapTransform.</span></span><span class="sig-name descname"><span class="pre">MapTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/MapTransform.html#MapTransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.MapTransform.MapTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.transforms.TransformBase.TransformBase" title="yggdrasil.communication.transforms.TransformBase.TransformBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformBase</span></code></a></p>
+<p>Class for transforming an object into a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – A list of field names that should
+be used for array object. If not provided, names will be
+generated according to ‘f0’, ‘f1’, ‘f2’, etc.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.MapTransform.MapTransform.evaluate_transform">
+<span class="sig-name descname"><span class="pre">evaluate_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/MapTransform.html#MapTransform.evaluate_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.MapTransform.MapTransform.evaluate_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call transform on the provided message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – Message object to transform.</p></li>
+<li><p><strong>no_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the transformation occurs in
+place. Otherwise a copy is created and transformed. Defaults
+to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.MapTransform.MapTransform.get_testing_options">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_testing_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/MapTransform.html#MapTransform.get_testing_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.MapTransform.MapTransform.get_testing_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get testing options for the transform class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Multiple dictionaries of keywords and messages before/after</dt><dd><p>pairs that will result from the transform created by the provided
+keywords.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.transforms.MapTransform.MapTransform.transform_datatype">
+<span class="sig-name descname"><span class="pre">transform_datatype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datatype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/transforms/MapTransform.html#MapTransform.transform_datatype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.transforms.MapTransform.MapTransform.transform_datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the datatype that will result from applying the
+transform to the supplied datatype.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>datatype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Datatype to transform.</p>

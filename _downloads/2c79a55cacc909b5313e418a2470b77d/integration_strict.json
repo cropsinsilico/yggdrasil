@@ -48,62 +48,13 @@
             "allowSingular": "name",
             "description": "Base schema for all subtypes of comm components.",
             "properties": {
-                "default_value": {
-                    "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
-                    "type": [
-                        "number",
-                        "string",
-                        "boolean",
-                        "object",
-                        "array",
-                        "null"
-                    ]
-                },
-                "outside_loop": {
+                "dont_copy": {
                     "default": false,
-                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
+                    "description": "If True, the comm will not be duplicated in the even a model is duplicated via the 'copies' parameter. Defaults to False except for in the case that a model is wrapped and the comm is inside the loop or that a model is a RPC input to a model server.",
                     "type": "boolean"
                 },
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
-                    "type": "string"
-                },
-                "driver": {
-                    "deprecated": true,
-                    "description": "[DEPRECATED] Name of driver class that should be used.",
-                    "enum": [
-                        "IPCInputDriver",
-                        "IPCOutputDriver",
-                        "InputDriver",
-                        "OutputDriver",
-                        "RMQAsyncInputDriver",
-                        "RMQAsyncOutputDriver",
-                        "RMQInputDriver",
-                        "RMQOutputDriver",
-                        "ZMQInputDriver",
-                        "ZMQOutputDriver"
-                    ],
-                    "type": "string"
-                },
-                "commtype": {
-                    "default": "default",
-                    "description": "Communication mechanism that should be used.",
-                    "enum": [
-                        "buffer",
-                        "default",
-                        "ipc",
-                        "mpi",
-                        "rest",
-                        "rmq",
-                        "rmq_async",
-                        "value",
-                        "zmq"
-                    ],
-                    "type": "string"
-                },
-                "address": {
-                    "description": "Communication info. Default to None and address is taken from the environment variable.",
-                    "type": "string"
+                "datatype": {
+                    "$ref": "#/definitions/schema"
                 },
                 "field_names": {
                     "aliases": [
@@ -116,9 +67,48 @@
                     },
                     "type": "array"
                 },
-                "format_str": {
-                    "description": "String that should be used to format/parse messages. Default to None.",
-                    "type": "string"
+                "field_units": {
+                    "aliases": [
+                        "column_units"
+                    ],
+                    "allowSingular": true,
+                    "description": "[DEPRECATED] Field units that should be used to convert fields in sent/received tables. This keyword is only valid for table-like datatypes. If not provided, all fields are assumed to be unitless.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "is_default": {
+                    "default": false,
+                    "description": "If True, this comm was created to handle all input/output variables to/from a model. Defaults to False. This variable is used internally and should not be set explicitly in the YAML.",
+                    "type": "boolean"
+                },
+                "for_service": {
+                    "default": false,
+                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
+                    "type": "boolean"
+                },
+                "as_array": {
+                    "default": false,
+                    "description": "[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved with either columns rather than row by row. Defaults to False.",
+                    "type": "boolean"
+                },
+                "vars": {
+                    "allowSingular": true,
+                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
+                    "items": {
+                        "allowSingular": "name",
+                        "properties": {
+                            "datatype": {
+                                "$ref": "#/definitions/schema"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
                 },
                 "length_map": {
                     "additionalProperties": {
@@ -126,6 +116,19 @@
                     },
                     "description": "Map from pointer variable names to the names of variables where their length will be stored. Defaults to {}.",
                     "type": "object"
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
+                },
+                "address": {
+                    "description": "Communication info. Default to None and address is taken from the environment variable.",
+                    "type": "string"
+                },
+                "outside_loop": {
+                    "default": false,
+                    "description": "If True, and the comm is an input/outputs to/from a model being wrapped. The receive/send calls for this comm will be outside the loop for the model. Defaults to False.",
+                    "type": "boolean"
                 },
                 "transform": {
                     "aliases": [
@@ -149,78 +152,75 @@
                     },
                     "type": "array"
                 },
-                "dont_copy": {
-                    "default": false,
-                    "description": "If True, the comm will not be duplicated in the even a model is duplicated via the 'copies' parameter. Defaults to False except for in the case that a model is wrapped and the comm is inside the loop or that a model is a RPC input to a model server.",
-                    "type": "boolean"
-                },
-                "is_default": {
-                    "default": false,
-                    "description": "If True, this comm was created to handle all input/output variables to/from a model. Defaults to False. This variable is used internally and should not be set explicitly in the YAML.",
-                    "type": "boolean"
-                },
-                "field_units": {
-                    "aliases": [
-                        "column_units"
-                    ],
-                    "allowSingular": true,
-                    "description": "[DEPRECATED] Field units that should be used to convert fields in sent/received tables. This keyword is only valid for table-like datatypes. If not provided, all fields are assumed to be unitless.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
+                "default_file": {
+                    "$ref": "#/definitions/file",
+                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
                 },
                 "serializer": {
                     "$ref": "#/definitions/serializer",
                     "description": "Class with serialize and deserialize methods that should be used to process sent and received messages or a dictionary describing a serializer that obeys the serializer schema."
                 },
-                "default_file": {
-                    "$ref": "#/definitions/file",
-                    "description": "Comm information for a file that input should be drawn from (for input comms) or that output should be sent to (for output comms) in the event that a yaml does not pair the comm with another model comm or a file."
+                "default_value": {
+                    "description": "Value that should be returned in the event that a yaml does not pair the comm with another model comm or a file.",
+                    "type": [
+                        "number",
+                        "string",
+                        "boolean",
+                        "object",
+                        "array",
+                        "null"
+                    ]
                 },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
-                },
-                "onexit": {
-                    "deprecated": true,
-                    "description": "[DEPRECATED] Method of input/output driver to call when the connection closes",
+                "commtype": {
+                    "default": "default",
+                    "description": "Communication mechanism that should be used.",
+                    "enum": [
+                        "buffer",
+                        "default",
+                        "ipc",
+                        "mpi",
+                        "rest",
+                        "rmq",
+                        "rmq_async",
+                        "value",
+                        "zmq"
+                    ],
                     "type": "string"
-                },
-                "vars": {
-                    "allowSingular": true,
-                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
-                    "items": {
-                        "allowSingular": "name",
-                        "properties": {
-                            "datatype": {
-                                "$ref": "#/definitions/schema"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "type": "array"
                 },
                 "name": {
                     "description": "Name used for component in log messages.",
                     "pattern": "^([A-Za-z0-9-_]+:)?[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
                     "type": "string"
                 },
-                "as_array": {
-                    "default": false,
-                    "description": "[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved with either columns rather than row by row. Defaults to False.",
-                    "type": "boolean"
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
+                    "type": "string"
                 },
-                "for_service": {
-                    "default": false,
-                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
-                    "type": "boolean"
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
+                    "type": "string"
                 },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
+                "driver": {
+                    "deprecated": true,
+                    "description": "[DEPRECATED] Name of driver class that should be used.",
+                    "enum": [
+                        "IPCInputDriver",
+                        "IPCOutputDriver",
+                        "InputDriver",
+                        "OutputDriver",
+                        "RMQAsyncInputDriver",
+                        "RMQAsyncOutputDriver",
+                        "RMQInputDriver",
+                        "RMQOutputDriver",
+                        "ZMQInputDriver",
+                        "ZMQOutputDriver"
+                    ],
+                    "type": "string"
+                },
+                "onexit": {
+                    "deprecated": true,
+                    "description": "[DEPRECATED] Method of input/output driver to call when the connection closes",
+                    "type": "string"
                 },
                 "args": {
                     "deprecated": true,
@@ -678,91 +678,12 @@
             "additionalProperties": false,
             "description": "Base schema for all subtypes of connection components.",
             "properties": {
-                "args": {
-                    "deprecated": true,
-                    "description": "[DEPRECATED] Arguments that should be provided to the driver.",
-                    "type": "string"
-                },
-                "write_meth": {
-                    "deprecated": true,
-                    "enum": [
-                        "all",
-                        "line",
-                        "table_array",
-                        "ascii",
-                        "binary",
-                        "json",
-                        "map",
-                        "mat",
-                        "netcdf",
-                        "obj",
-                        "pandas",
-                        "pickle",
-                        "ply",
-                        "table",
-                        "wofost",
-                        "yaml"
-                    ],
-                    "type": "string"
-                },
-                "output_pattern": {
-                    "default": "broadcast",
-                    "description": "The communication pattern that should be used to handling outgoing messages when there is more than one output communicator present. Defaults to 'broadcast'. Options include: 'cycle': Rotate through output comms, sending one message to each. 'broadcast': Send the same message to each comm. 'scatter': Send part of message (must be a list) to each comm.",
-                    "enum": [
-                        "cycle",
-                        "broadcast",
-                        "scatter"
-                    ],
-                    "type": "string"
-                },
-                "transform": {
-                    "aliases": [
-                        "transforms",
-                        "translator",
-                        "translators"
-                    ],
-                    "allowSingular": true,
-                    "description": "Function or string specifying function that should be used to translate messages from the input communicator before passing them to the output communicator. If a string, the format should be \"<package.module>:<function>\" so that <function> can be imported from <package>. Defaults to None and messages are passed directly. This can also be a list of functions/strings that will be called on the messages in the order they are provided.",
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/definitions/transform"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "type": "array"
-                },
                 "input_pattern": {
                     "default": "cycle",
                     "description": "The communication pattern that should be used to handle incoming messages when there is more than one input communicators present. Defaults to 'cycle'. Options include: 'cycle': Receive from the next available input communicator. 'gather': Receive lists of messages with one element from each communicator where a message is only returned when there is a message from each.",
                     "enum": [
                         "cycle",
                         "gather"
-                    ],
-                    "type": "string"
-                },
-                "onexit": {
-                    "description": "Class method that should be called when a model that the connection interacts with exits, but before the connection driver is shut down. Defaults to None.",
-                    "type": "string"
-                },
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
-                    "type": "string"
-                },
-                "driver": {
-                    "deprecated": true,
-                    "description": "[DEPRECATED] Name of driver class that should be used.",
-                    "enum": [
-                        "ConnectionDriver",
-                        "FileInputDriver",
-                        "FileOutputDriver",
-                        "InputDriver",
-                        "OutputDriver",
-                        "RPCRequestDriver",
-                        "RPCResponseDriver"
                     ],
                     "type": "string"
                 },
@@ -810,6 +731,44 @@
                     "minItems": 1,
                     "type": "array"
                 },
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
+                    "type": "string"
+                },
+                "driver": {
+                    "deprecated": true,
+                    "description": "[DEPRECATED] Name of driver class that should be used.",
+                    "enum": [
+                        "ConnectionDriver",
+                        "FileInputDriver",
+                        "FileOutputDriver",
+                        "InputDriver",
+                        "OutputDriver",
+                        "RPCRequestDriver",
+                        "RPCResponseDriver"
+                    ],
+                    "type": "string"
+                },
+                "transform": {
+                    "aliases": [
+                        "transforms",
+                        "translator",
+                        "translators"
+                    ],
+                    "allowSingular": true,
+                    "description": "Function or string specifying function that should be used to translate messages from the input communicator before passing them to the output communicator. If a string, the format should be \"<package.module>:<function>\" so that <function> can be imported from <package>. Defaults to None and messages are passed directly. This can also be a list of functions/strings that will be called on the messages in the order they are provided.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/transform"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "type": "array"
+                },
                 "connection_type": {
                     "description": "Connection between one or more comms/files and one or more comms/files.",
                     "enum": [
@@ -820,6 +779,47 @@
                         "output",
                         "rpc_request",
                         "rpc_response"
+                    ],
+                    "type": "string"
+                },
+                "args": {
+                    "deprecated": true,
+                    "description": "[DEPRECATED] Arguments that should be provided to the driver.",
+                    "type": "string"
+                },
+                "write_meth": {
+                    "deprecated": true,
+                    "enum": [
+                        "all",
+                        "line",
+                        "table_array",
+                        "ascii",
+                        "binary",
+                        "json",
+                        "map",
+                        "mat",
+                        "netcdf",
+                        "obj",
+                        "pandas",
+                        "pickle",
+                        "ply",
+                        "table",
+                        "wofost",
+                        "yaml"
+                    ],
+                    "type": "string"
+                },
+                "onexit": {
+                    "description": "Class method that should be called when a model that the connection interacts with exits, but before the connection driver is shut down. Defaults to None.",
+                    "type": "string"
+                },
+                "output_pattern": {
+                    "default": "broadcast",
+                    "description": "The communication pattern that should be used to handling outgoing messages when there is more than one output communicator present. Defaults to 'broadcast'. Options include: 'cycle': Rotate through output comms, sending one message to each. 'broadcast': Send the same message to each comm. 'scatter': Send part of message (must be a list) to each comm.",
+                    "enum": [
+                        "cycle",
+                        "broadcast",
+                        "scatter"
                     ],
                     "type": "string"
                 },
@@ -1166,93 +1166,6 @@
             "allowSingular": "name",
             "description": "Base schema for all subtypes of file components.",
             "properties": {
-                "wait_for_creation": {
-                    "default": 0.0,
-                    "description": "Time (in seconds) that should be waited before opening for the file to be created if it dosn't exist. Defaults to 0 s and file will attempt to be opened immediately.",
-                    "type": "number"
-                },
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
-                    "type": "string"
-                },
-                "driver": {
-                    "deprecated": true,
-                    "description": "[DEPRECATED] Name of driver class that should be used.",
-                    "enum": [
-                        "AsciiFileInputDriver",
-                        "AsciiFileOutputDriver",
-                        "AsciiMapInputDriver",
-                        "AsciiMapOutputDriver",
-                        "AsciiTableInputDriver",
-                        "AsciiTableOutputDriver",
-                        "FileInputDriver",
-                        "FileOutputDriver",
-                        "MatInputDriver",
-                        "MatOutputDriver",
-                        "ObjFileInputDriver",
-                        "ObjFileOutputDriver",
-                        "PandasFileInputDriver",
-                        "PandasFileOutputDriver",
-                        "PickleFileInputDriver",
-                        "PickleFileOutputDriver",
-                        "PlyFileInputDriver",
-                        "PlyFileOutputDriver"
-                    ],
-                    "type": "string"
-                },
-                "address": {
-                    "description": "Communication info. Default to None and address is taken from the environment variable.",
-                    "type": "string"
-                },
-                "field_names": {
-                    "aliases": [
-                        "column_names"
-                    ],
-                    "allowSingular": true,
-                    "description": "[DEPRECATED] Field names that should be used to label fields in sent/received tables. This keyword is only valid for table-like datatypes. If not provided, field names are created based on the field order.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "format_str": {
-                    "description": "String that should be used to format/parse messages. Default to None.",
-                    "type": "string"
-                },
-                "length_map": {
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "description": "Map from pointer variable names to the names of variables where their length will be stored. Defaults to {}.",
-                    "type": "object"
-                },
-                "transform": {
-                    "aliases": [
-                        "recv_converter",
-                        "send_converter",
-                        "transforms",
-                        "translator",
-                        "translators"
-                    ],
-                    "allowSingular": true,
-                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided.",
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/definitions/transform"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "type": "array"
-                },
-                "in_temp": {
-                    "default": false,
-                    "description": "If True, the path will be considered relative to the platform temporary directory. Defaults to False.",
-                    "type": "boolean"
-                },
                 "field_units": {
                     "aliases": [
                         "column_units"
@@ -1263,6 +1176,64 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "wait_for_creation": {
+                    "default": 0.0,
+                    "description": "Time (in seconds) that should be waited before opening for the file to be created if it dosn't exist. Defaults to 0 s and file will attempt to be opened immediately.",
+                    "type": "number"
+                },
+                "onexit": {
+                    "deprecated": true,
+                    "description": "[DEPRECATED] Method of input/output driver to call when the connection closes",
+                    "type": "string"
+                },
+                "count": {
+                    "default": 0,
+                    "description": "When reading a file, read the file this many of times. Defaults to 0.",
+                    "type": "integer"
+                },
+                "for_service": {
+                    "default": false,
+                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
+                    "type": "boolean"
+                },
+                "as_array": {
+                    "default": false,
+                    "description": "[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved with either columns rather than row by row. Defaults to False.",
+                    "type": "boolean"
+                },
+                "vars": {
+                    "allowSingular": true,
+                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
+                    "items": {
+                        "allowSingular": "name",
+                        "properties": {
+                            "datatype": {
+                                "$ref": "#/definitions/schema"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "length_map": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Map from pointer variable names to the names of variables where their length will be stored. Defaults to {}.",
+                    "type": "object"
+                },
+                "in_temp": {
+                    "default": false,
+                    "description": "If True, the path will be considered relative to the platform temporary directory. Defaults to False.",
+                    "type": "boolean"
+                },
+                "filter": {
+                    "$ref": "#/definitions/filter",
+                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
                 },
                 "filetype": {
                     "default": "binary",
@@ -1298,56 +1269,90 @@
                     ],
                     "type": "string"
                 },
-                "onexit": {
-                    "deprecated": true,
-                    "description": "[DEPRECATED] Method of input/output driver to call when the connection closes",
-                    "type": "string"
-                },
-                "vars": {
-                    "allowSingular": true,
-                    "description": "Names of variables to be sent/received by this comm. Defaults to [].",
-                    "items": {
-                        "allowSingular": "name",
-                        "properties": {
-                            "datatype": {
-                                "$ref": "#/definitions/schema"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "type": "array"
-                },
-                "name": {
-                    "description": "Name used for component in log messages.",
-                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
-                    "type": "string"
-                },
                 "append": {
                     "default": false,
                     "description": "If True and writing, file is openned in append mode. If True and reading, file is kept open even if the end of the file is reached to allow for another process to write to the file in append mode. Defaults to False.",
                     "type": "boolean"
                 },
-                "as_array": {
-                    "default": false,
-                    "description": "[DEPRECATED] If True and the datatype is table-like, tables are sent/recieved with either columns rather than row by row. Defaults to False.",
-                    "type": "boolean"
+                "address": {
+                    "description": "Communication info. Default to None and address is taken from the environment variable.",
+                    "type": "string"
                 },
-                "for_service": {
-                    "default": false,
-                    "description": "If True, this comm bridges the gap to an integration running as a service, possibly on a remote machine. Defaults to False.",
-                    "type": "boolean"
+                "transform": {
+                    "aliases": [
+                        "recv_converter",
+                        "send_converter",
+                        "transforms",
+                        "translator",
+                        "translators"
+                    ],
+                    "allowSingular": true,
+                    "description": "One or more transformations that will be applied to messages that are sent/received. Ignored if not provided.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/transform"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "type": "array"
                 },
                 "is_series": {
                     "default": false,
                     "description": "If True, input/output will be done to a series of files. If reading, each file will be processed until the end is reached. If writing, each output will be to a new file in the series. The addressed is assumed to contain a format for the index of the file. Defaults to False.",
                     "type": "boolean"
                 },
-                "filter": {
-                    "$ref": "#/definitions/filter",
-                    "description": "Filter that will be used to determine when messages should be sent/received. Ignored if not provided."
+                "name": {
+                    "description": "Name used for component in log messages.",
+                    "pattern": "^([A-Za-z0-9-_]+:)?\\.?[A-Za-z0-9-_\\\\\\/]+\\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$",
+                    "type": "string"
+                },
+                "format_str": {
+                    "description": "String that should be used to format/parse messages. Default to None.",
+                    "type": "string"
+                },
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
+                    "type": "string"
+                },
+                "driver": {
+                    "deprecated": true,
+                    "description": "[DEPRECATED] Name of driver class that should be used.",
+                    "enum": [
+                        "AsciiFileInputDriver",
+                        "AsciiFileOutputDriver",
+                        "AsciiMapInputDriver",
+                        "AsciiMapOutputDriver",
+                        "AsciiTableInputDriver",
+                        "AsciiTableOutputDriver",
+                        "FileInputDriver",
+                        "FileOutputDriver",
+                        "MatInputDriver",
+                        "MatOutputDriver",
+                        "ObjFileInputDriver",
+                        "ObjFileOutputDriver",
+                        "PandasFileInputDriver",
+                        "PandasFileOutputDriver",
+                        "PickleFileInputDriver",
+                        "PickleFileOutputDriver",
+                        "PlyFileInputDriver",
+                        "PlyFileOutputDriver"
+                    ],
+                    "type": "string"
+                },
+                "field_names": {
+                    "aliases": [
+                        "column_names"
+                    ],
+                    "allowSingular": true,
+                    "description": "[DEPRECATED] Field names that should be used to label fields in sent/received tables. This keyword is only valid for table-like datatypes. If not provided, field names are created based on the field order.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "args": {
                     "deprecated": true,
@@ -3254,57 +3259,6 @@
             "additionalProperties": false,
             "description": "Base schema for all subtypes of model components.",
             "properties": {
-                "working_dir": {
-                    "description": "Working directory. If not provided, the current working directory is used.",
-                    "type": "string"
-                },
-                "outputs_in_inputs": {
-                    "description": "If True, outputs from wrapped model functions are passed by pointer as inputs for modification and the return value will be a flag. If False, outputs are limited to return values. Defaults to the value of the class attribute outputs_in_inputs.",
-                    "type": "boolean"
-                },
-                "driver": {
-                    "deprecated": true,
-                    "description": "[DEPRECATED] Name of driver class that should be used.",
-                    "enum": [
-                        "CMakeModelDriver",
-                        "CModelDriver",
-                        "CPPModelDriver",
-                        "DummyModelDriver",
-                        "ExecutableModelDriver",
-                        "FortranModelDriver",
-                        "GCCModelDriver",
-                        "JuliaModelDriver",
-                        "LPyModelDriver",
-                        "MPIPartnerModel",
-                        "MakeModelDriver",
-                        "MatlabModelDriver",
-                        "OSRModelDriver",
-                        "PyTorchModelDriver",
-                        "PythonModelDriver",
-                        "RModelDriver",
-                        "SBMLModelDriver",
-                        "TimeSyncModelDriver"
-                    ],
-                    "type": "string"
-                },
-                "validation_command": {
-                    "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
-                    "type": "string"
-                },
-                "with_valgrind": {
-                    "default": false,
-                    "description": "If True, the command is run with valgrind. Defaults to False.",
-                    "type": "boolean"
-                },
-                "logging_level": {
-                    "default": "",
-                    "description": "The level of logging messages that should be displayed by the model. Defaults to the logging level as determined by the configuration file and environment variables.",
-                    "type": "string"
-                },
-                "repository_commit": {
-                    "description": "Commit that should be checked out in the model repository specified by repository_url. If not provided, the most recent commit on the default branch will be used.",
-                    "type": "string"
-                },
                 "dependencies": {
                     "description": "A list of packages required by the model that are written in the same language as the model. If the package requires dependencies outside the language of the model. use the additional_dependencies parameter to provide them. If you need a version of the package from a specific package manager, a mapping with 'package' and 'package_manager' fields can be provided instead of just the name of the package.",
                     "items": {
@@ -3333,6 +3287,37 @@
                         ]
                     },
                     "type": "array"
+                },
+                "with_debugger": {
+                    "description": "Debugger tool that should be used to run models. This string should include the tool executable and any flags that should be passed to it.",
+                    "type": "string"
+                },
+                "valgrind_flags": {
+                    "default": [
+                        "--leak-check=full",
+                        "--show-leak-kinds=all"
+                    ],
+                    "description": "Flags to pass to valgrind. Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "args": {
+                    "allowSingular": true,
+                    "description": "The path to the file containing the model program that will be run by the driver for the model's language and/or a list of arguments that should be passed as input to the model program or language executable (e.g. source code or configuration file for a domain specific language).",
+                    "items": {
+                        "type": [
+                            "string",
+                            "number"
+                        ]
+                    },
+                    "type": "array"
+                },
+                "preserve_cache": {
+                    "default": false,
+                    "description": "If True model products will be kept following the run, otherwise all products will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.",
+                    "type": "boolean"
                 },
                 "additional_dependencies": {
                     "additionalProperties": {
@@ -3366,25 +3351,151 @@
                     "description": "A mapping between languages and lists of packages in those languages that are required by the model.",
                     "type": "object"
                 },
+                "products": {
+                    "default": [],
+                    "description": "Paths to files created by the model that should be cleaned up when the model exits. Entries can be absolute paths or paths relative to the working directory. Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "iter_function_over": {
+                    "default": [],
+                    "description": "Variable(s) that should be received or sent as an array, but iterated over. Defaults to an empty array and is ignored.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "with_valgrind": {
+                    "default": false,
+                    "description": "If True, the command is run with valgrind. Defaults to False.",
+                    "type": "boolean"
+                },
+                "env": {
+                    "additional_properties": {
+                        "type": "string"
+                    },
+                    "default": {},
+                    "description": "Dictionary of environment variables that should be set when the driver starts. Defaults to {}.",
+                    "type": "object"
+                },
+                "copies": {
+                    "default": 1,
+                    "description": "The number of copies of the model that should be created. Defaults to 1.",
+                    "minimum": 1,
+                    "type": "integer"
+                },
                 "with_strace": {
                     "default": false,
                     "description": "If True, the command is run with strace (on Linux) or dtrace (on MacOS). Defaults to False.",
                     "type": "boolean"
                 },
-                "args": {
+                "logging_level": {
+                    "default": "",
+                    "description": "The level of logging messages that should be displayed by the model. Defaults to the logging level as determined by the configuration file and environment variables.",
+                    "type": "string"
+                },
+                "is_server": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {
+                                "input": {
+                                    "type": "string"
+                                },
+                                "output": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    ],
+                    "default": false,
+                    "description": "If `True`, the model is assumed to be a server for one or more client models and an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The corresponding channel that should be passed to the yggdrasil API will be the name of the model. If is_server is a dictionary, it should contain an 'input' key and an 'output' key. These are required to be the names of existing input and output channels in the model that will be co-opted by the server. (Note: This requires that the co-opted output channel's send method is called once for each time the co-opted input channel's recv method is called. If used with the `function` parameter, `is_server` must be a dictionary. Defaults to False."
+                },
+                "repository_commit": {
+                    "description": "Commit that should be checked out in the model repository specified by repository_url. If not provided, the most recent commit on the default branch will be used.",
+                    "type": "string"
+                },
+                "inputs": {
+                    "aliases": [
+                        "input",
+                        "input_file",
+                        "input_files"
+                    ],
                     "allowSingular": true,
-                    "description": "The path to the file containing the model program that will be run by the driver for the model's language and/or a list of arguments that should be passed as input to the model program or language executable (e.g. source code or configuration file for a domain specific language).",
+                    "default": [
+                        {
+                            "commtype": "default",
+                            "datatype": {
+                                "type": "string"
+                            },
+                            "is_default": true,
+                            "name": "input"
+                        }
+                    ],
+                    "description": "Zero or more channels carrying input to the model. A full description of channel entries and the options available for channels can be found :ref:`here<yaml_comm_options>`.",
                     "items": {
-                        "type": [
-                            "string",
-                            "number"
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/comm"
+                            },
+                            {
+                                "$ref": "#/definitions/comm_driver"
+                            },
+                            {
+                                "$ref": "#/definitions/file_driver"
+                            }
                         ]
+                    },
+                    "type": "array"
+                },
+                "source_products": {
+                    "default": [],
+                    "description": "Files created by running the model that are source files. These files will be removed without checking their extension so users should avoid adding files to this list unless they are sure they should be deleted. Defaults to [].",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 },
                 "overwrite": {
                     "description": "If True, any existing model products (compilation products, wrapper scripts, etc.) are removed prior to the run. If False, the products are not removed. Defaults to True. Setting this to False can improve the performance, particularly for models that take a long time to compile, but this should only be done once the model has been fully debugged to ensure that each run is tested on a clean copy of the model. The value of this keyword also determines whether or not products are removed after a run.",
                     "type": "boolean"
+                },
+                "language": {
+                    "default": "executable",
+                    "description": "The programming language that the model is written in. A list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.",
+                    "enum": [
+                        "R",
+                        "c",
+                        "c++",
+                        "cmake",
+                        "cpp",
+                        "cxx",
+                        "dummy",
+                        "executable",
+                        "fortran",
+                        "julia",
+                        "lpy",
+                        "make",
+                        "matlab",
+                        "mpi",
+                        "osr",
+                        "python",
+                        "pytorch",
+                        "r",
+                        "sbml",
+                        "timesync"
+                    ],
+                    "type": "string"
+                },
+                "function": {
+                    "description": "If provided, an integrated model is created by wrapping the function named here. The function must be located within the file specified by the source file listed in the first argument. If not provided, the model must contain it's own calls to the |yggdrasil| interface.",
+                    "type": "string"
                 },
                 "client_of": {
                     "allowSingular": true,
@@ -3395,49 +3506,49 @@
                     },
                     "type": "array"
                 },
-                "function": {
-                    "description": "If provided, an integrated model is created by wrapping the function named here. The function must be located within the file specified by the source file listed in the first argument. If not provided, the model must contain it's own calls to the |yggdrasil| interface.",
+                "outputs_in_inputs": {
+                    "description": "If True, outputs from wrapped model functions are passed by pointer as inputs for modification and the return value will be a flag. If False, outputs are limited to return values. Defaults to the value of the class attribute outputs_in_inputs.",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "Name used for component in log messages.",
                     "type": "string"
                 },
-                "strace_flags": {
-                    "default": [
-                        "-e",
-                        "trace=memory"
+                "outputs": {
+                    "aliases": [
+                        "output",
+                        "output_file",
+                        "output_files"
                     ],
-                    "description": "Flags to pass to strace (or dtrace). Defaults to [].",
+                    "allowSingular": true,
+                    "default": [
+                        {
+                            "commtype": "default",
+                            "datatype": {
+                                "type": "string"
+                            },
+                            "is_default": true,
+                            "name": "output"
+                        }
+                    ],
+                    "description": "Zero or more channels carrying output from the model. A full description of channel entries and the options available for channels can be found :ref:`here<yaml_comm_options>`.",
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/definitions/comm"
+                            },
+                            {
+                                "$ref": "#/definitions/comm_driver"
+                            },
+                            {
+                                "$ref": "#/definitions/file_driver"
+                            }
+                        ]
                     },
                     "type": "array"
                 },
-                "copies": {
-                    "default": 1,
-                    "description": "The number of copies of the model that should be created. Defaults to 1.",
-                    "minimum": 1,
-                    "type": "integer"
-                },
-                "products": {
-                    "default": [],
-                    "description": "Paths to files created by the model that should be cleaned up when the model exits. Entries can be absolute paths or paths relative to the working directory. Defaults to [].",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "contact_email": {
-                    "description": "Email address that should be used to contact the maintainer of the model. This parameter is only used in the model repository.",
-                    "type": "string"
-                },
-                "env": {
-                    "additional_properties": {
-                        "type": "string"
-                    },
-                    "default": {},
-                    "description": "Dictionary of environment variables that should be set when the driver starts. Defaults to {}.",
-                    "type": "object"
-                },
-                "with_debugger": {
-                    "description": "Debugger tool that should be used to run models. This string should include the tool executable and any flags that should be passed to it.",
+                "repository_url": {
+                    "description": "URL for the git repository containing the model source code. If provided, relative paths in the model YAML definition will be considered relative to the repository root directory.",
                     "type": "string"
                 },
                 "timesync": {
@@ -3490,166 +3601,60 @@
                     },
                     "type": "array"
                 },
-                "iter_function_over": {
-                    "default": [],
-                    "description": "Variable(s) that should be received or sent as an array, but iterated over. Defaults to an empty array and is ignored.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "language": {
-                    "default": "executable",
-                    "description": "The programming language that the model is written in. A list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.",
-                    "enum": [
-                        "R",
-                        "c",
-                        "c++",
-                        "cmake",
-                        "cpp",
-                        "cxx",
-                        "dummy",
-                        "executable",
-                        "fortran",
-                        "julia",
-                        "lpy",
-                        "make",
-                        "matlab",
-                        "mpi",
-                        "osr",
-                        "python",
-                        "pytorch",
-                        "r",
-                        "sbml",
-                        "timesync"
-                    ],
+                "working_dir": {
+                    "description": "Working directory. If not provided, the current working directory is used.",
                     "type": "string"
                 },
-                "source_products": {
-                    "default": [],
-                    "description": "Files created by running the model that are source files. These files will be removed without checking their extension so users should avoid adding files to this list unless they are sure they should be deleted. Defaults to [].",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "outputs": {
-                    "aliases": [
-                        "output",
-                        "output_file",
-                        "output_files"
+                "driver": {
+                    "deprecated": true,
+                    "description": "[DEPRECATED] Name of driver class that should be used.",
+                    "enum": [
+                        "CMakeModelDriver",
+                        "CModelDriver",
+                        "CPPModelDriver",
+                        "DummyModelDriver",
+                        "ExecutableModelDriver",
+                        "FortranModelDriver",
+                        "GCCModelDriver",
+                        "JuliaModelDriver",
+                        "LPyModelDriver",
+                        "MPIPartnerModel",
+                        "MakeModelDriver",
+                        "MatlabModelDriver",
+                        "OSRModelDriver",
+                        "PyTorchModelDriver",
+                        "PythonModelDriver",
+                        "RModelDriver",
+                        "SBMLModelDriver",
+                        "TimeSyncModelDriver"
                     ],
-                    "allowSingular": true,
-                    "default": [
-                        {
-                            "commtype": "default",
-                            "datatype": {
-                                "type": "string"
-                            },
-                            "is_default": true,
-                            "name": "output"
-                        }
-                    ],
-                    "description": "Zero or more channels carrying output from the model. A full description of channel entries and the options available for channels can be found :ref:`here<yaml_comm_options>`.",
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/definitions/comm"
-                            },
-                            {
-                                "$ref": "#/definitions/comm_driver"
-                            },
-                            {
-                                "$ref": "#/definitions/file_driver"
-                            }
-                        ]
-                    },
-                    "type": "array"
-                },
-                "inputs": {
-                    "aliases": [
-                        "input",
-                        "input_file",
-                        "input_files"
-                    ],
-                    "allowSingular": true,
-                    "default": [
-                        {
-                            "commtype": "default",
-                            "datatype": {
-                                "type": "string"
-                            },
-                            "is_default": true,
-                            "name": "input"
-                        }
-                    ],
-                    "description": "Zero or more channels carrying input to the model. A full description of channel entries and the options available for channels can be found :ref:`here<yaml_comm_options>`.",
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/definitions/comm"
-                            },
-                            {
-                                "$ref": "#/definitions/comm_driver"
-                            },
-                            {
-                                "$ref": "#/definitions/file_driver"
-                            }
-                        ]
-                    },
-                    "type": "array"
+                    "type": "string"
                 },
                 "description": {
                     "description": "Description of the model. This parameter is only used in the model repository or when providing the model as a service.",
-                    "type": "string"
-                },
-                "valgrind_flags": {
-                    "default": [
-                        "--leak-check=full",
-                        "--show-leak-kinds=all"
-                    ],
-                    "description": "Flags to pass to valgrind. Defaults to [].",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "preserve_cache": {
-                    "default": false,
-                    "description": "If True model products will be kept following the run, otherwise all products will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.",
-                    "type": "boolean"
-                },
-                "repository_url": {
-                    "description": "URL for the git repository containing the model source code. If provided, relative paths in the model YAML definition will be considered relative to the repository root directory.",
                     "type": "string"
                 },
                 "allow_threading": {
                     "description": "If True, comm connections will be set up so that the model-side comms can be used by more than one thread. Defaults to False.",
                     "type": "boolean"
                 },
-                "is_server": {
-                    "anyOf": [
-                        {
-                            "type": "boolean"
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {
-                                "input": {
-                                    "type": "string"
-                                },
-                                "output": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    ],
-                    "default": false,
-                    "description": "If `True`, the model is assumed to be a server for one or more client models and an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The corresponding channel that should be passed to the yggdrasil API will be the name of the model. If is_server is a dictionary, it should contain an 'input' key and an 'output' key. These are required to be the names of existing input and output channels in the model that will be co-opted by the server. (Note: This requires that the co-opted output channel's send method is called once for each time the co-opted input channel's recv method is called. If used with the `function` parameter, `is_server` must be a dictionary. Defaults to False."
+                "validation_command": {
+                    "description": "Path to a validation command that can be used to verify that the model ran as expected. A non-zero return code is taken to indicate failure.",
+                    "type": "string"
                 },
-                "name": {
-                    "description": "Name used for component in log messages.",
+                "strace_flags": {
+                    "default": [
+                        "-e",
+                        "trace=memory"
+                    ],
+                    "description": "Flags to pass to strace (or dtrace). Defaults to [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "contact_email": {
+                    "description": "Email address that should be used to contact the maintainer of the model. This parameter is only used in the model repository.",
                     "type": "string"
                 },
                 "builddir": {
@@ -5489,6 +5494,19 @@
             "additionalProperties": false,
             "description": "Base schema for all subtypes of serializer components.",
             "properties": {
+                "newline": {
+                    "default": "\n",
+                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
+                    "type": "string"
+                },
+                "datatype": {
+                    "$ref": "#/definitions/schema"
+                },
+                "comment": {
+                    "default": "# ",
+                    "description": "One or more characters indicating a comment. Defaults to '# '.",
+                    "type": "string"
+                },
                 "seritype": {
                     "default": "default",
                     "description": "Serializer type.",
@@ -5508,19 +5526,6 @@
                         "yaml"
                     ],
                     "type": "string"
-                },
-                "comment": {
-                    "default": "# ",
-                    "description": "One or more characters indicating a comment. Defaults to '# '.",
-                    "type": "string"
-                },
-                "newline": {
-                    "default": "\n",
-                    "description": "One or more characters indicating a newline. Defaults to '\\n'.",
-                    "type": "string"
-                },
-                "datatype": {
-                    "$ref": "#/definitions/schema"
                 },
                 "delimiter": {
                     "default": "\t",
@@ -6046,6 +6051,9 @@
                             "$ref": "#/definitions/transform-subtype-map_fields"
                         },
                         {
+                            "$ref": "#/definitions/transform-subtype-map"
+                        },
+                        {
                             "$ref": "#/definitions/transform-subtype-pandas"
                         },
                         {
@@ -6066,9 +6074,6 @@
             "allowSingular": "transformtype",
             "description": "Base schema for all subtypes of transform components.",
             "properties": {
-                "original_datatype": {
-                    "$ref": "#/definitions/schema"
-                },
                 "transformtype": {
                     "description": "Consolidate values into an array",
                     "enum": [
@@ -6077,6 +6082,7 @@
                         "filter",
                         "function",
                         "iterate",
+                        "map",
                         "map_fields",
                         "pandas",
                         "select_fields",
@@ -6084,6 +6090,9 @@
                         "statement"
                     ],
                     "type": "string"
+                },
+                "original_datatype": {
+                    "$ref": "#/definitions/schema"
                 },
                 "field_names": {
                     "description": "Names of fields in the array.",
@@ -6275,6 +6284,30 @@
                 "map"
             ],
             "title": "yggdrasil.communication.transforms.MapFieldsTransform.MapFieldsTransform",
+            "type": "object"
+        },
+        "transform-subtype-map": {
+            "additionalProperties": true,
+            "allowSingular": "transformtype",
+            "description": "Schema for transform component ['map'] subtype.",
+            "properties": {
+                "transformtype": {
+                    "default": "map",
+                    "description": "Convert an object into a dictionary.",
+                    "enum": [
+                        "map"
+                    ],
+                    "type": "string"
+                },
+                "field_names": {
+                    "description": "A list of field names that should be used for array object. If not provided, names will be generated according to 'f0', 'f1', 'f2', etc.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "title": "yggdrasil.communication.transforms.MapTransform.MapTransform",
             "type": "object"
         },
         "transform-subtype-pandas": {

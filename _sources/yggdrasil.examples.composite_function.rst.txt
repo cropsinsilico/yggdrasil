@@ -1,0 +1,10 @@
+yggdrasil.examples.composite\_function package
+==============================================
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples.composite_function
+   :members:
+   :undoc-members:
+   :show-inheritance:

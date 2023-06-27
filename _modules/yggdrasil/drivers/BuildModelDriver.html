@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.drivers.BuildModelDriver &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>yggdrasil.drivers.BuildModelDriver &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -557,6 +557,9 @@
                 <span class="n">target_linker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_linker</span><span class="p">,</span>
                 <span class="n">target_linker_flags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_linker_flags</span><span class="p">,</span>
                 <span class="n">logging_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numeric_logging_level</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_asan</span><span class="p">:</span>
+                <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;compiler_flag_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;with_asan&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_asan</span><span class="p">}</span>
+                <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;linker_flag_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;with_asan&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_asan</span><span class="p">}</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;env_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">):</span>
                     <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_env&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -589,8 +592,9 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile dependencies specifically for this instance.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dry_run&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))):</span>
+            <span class="n">suffix_kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_suffix_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span>
-                <span class="n">toolname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_compiler</span><span class="p">)</span></div>
+                <span class="n">toolname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">suffix_kws</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="BuildModelDriver.compile_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.BuildModelDriver.BuildModelDriver.compile_model">[docs]</a>    <span class="k">def</span> <span class="nf">compile_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile model executable(s).</span>
@@ -708,6 +712,8 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;existing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="p">,</span> <span class="s1">&#39;set_env_class&#39;</span><span class="p">):</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="o">.</span><span class="n">set_env_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_asan</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">target_language_info</span><span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">init_asan_env</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

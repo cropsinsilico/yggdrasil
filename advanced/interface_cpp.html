@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C++ Interface &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>C++ Interface &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -33,7 +33,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -247,6 +247,28 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8YggInput7recvVarEiR1T">
+<span id="_CPPv3I0EN8YggInput7recvVarER1T"></span><span id="_CPPv2I0EN8YggInput7recvVarER1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="class_ygg_input_1a9550fc9b3b4bec0e4128edcbdd2653cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recvVar</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8YggInput7recvVarEiR1T" title="YggInput::recvVar::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8YggInput7recvVarEiR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a message into a single variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – Expected data type to be received. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – <strong>[in]</strong> Variable to received message into. </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8YggInput7recvVarERN9rapidjson8DocumentE">
+<span id="_CPPv3N8YggInput7recvVarERN9rapidjson8DocumentE"></span><span id="_CPPv2N8YggInput7recvVarERN9rapidjson8DocumentE"></span><span id="YggInput::recvVar__rapidjson::DocumentR"></span><span class="target" id="class_ygg_input_1ade515e244bf039aa3e0e99b9baac9266"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recvVar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rapidjson</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Document</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput7recvVarERN9rapidjson8DocumentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N8YggInput4recvEPcK6size_t">
 <span id="_CPPv3N8YggInput4recvEPcK6size_t"></span><span id="_CPPv2N8YggInput4recvEPcK6size_t"></span><span id="YggInput::recv__cP.sC"></span><span class="target" id="class_ygg_input_1a730e7c5e58c5ef5cf2b7e0c9660db18e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recv</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput4recvEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message shorter than YGG_MSG_MAX from the input queue. See ygg_recv in YggInterface.h for additional details. </p>
@@ -452,6 +474,28 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9YggOutput7sendVarEiRK1T">
+<span id="_CPPv3I0EN9YggOutput7sendVarERK1T"></span><span id="_CPPv2I0EN9YggOutput7sendVarERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="class_ygg_output_1abcf80c9fa5cd03479be225172de3a016"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sendVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN9YggOutput7sendVarEiRK1T" title="YggOutput::sendVar::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN9YggOutput7sendVarEiRK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a single variable as a message. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – Type of variable to send. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – <strong>[in]</strong> Variable to send as a message. </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int 0 if send succesfull, -1 if send unsuccessful. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9YggOutput7sendVarERKN9rapidjson8DocumentE">
+<span id="_CPPv3N9YggOutput7sendVarERKN9rapidjson8DocumentE"></span><span id="_CPPv2N9YggOutput7sendVarERKN9rapidjson8DocumentE"></span><span id="YggOutput::sendVar__rapidjson::DocumentCR"></span><span class="target" id="class_ygg_output_1a7c8c9c518c2a8df683c6d9f54aaa3172"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sendVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">rapidjson</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Document</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput7sendVarERKN9rapidjson8DocumentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N9YggOutput4sendEPKcK6size_t">
 <span id="_CPPv3N9YggOutput4sendEPKcK6size_t"></span><span id="_CPPv2N9YggOutput4sendEPKcK6size_t"></span><span id="YggOutput::send__cCP.sC"></span><span class="target" id="class_ygg_output_1a9896b233529d284c9d2d9ea6b818c903"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">send</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput4sendEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a message smaller than YGG_MSG_MAX to the output queue. If the message is larger than YGG_MSG_MAX an error code will be returned. See ygg_send in YggInterface.h for details. </p>
@@ -622,6 +666,50 @@
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6YggRpc7sendVarEiRK1T">
+<span id="_CPPv3I0EN6YggRpc7sendVarERK1T"></span><span id="_CPPv2I0EN6YggRpc7sendVarERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="class_ygg_rpc_1a0011d4aac368ac6def5240aee8651e7f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sendVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN6YggRpc7sendVarEiRK1T" title="YggRpc::sendVar::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6YggRpc7sendVarEiRK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a single variable as a message. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – Type of variable to send. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – <strong>[in]</strong> Variable to send as a message. </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int 0 if send succesfull, -1 if send unsuccessful. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6YggRpc7sendVarERKN9rapidjson8DocumentE">
+<span id="_CPPv3N6YggRpc7sendVarERKN9rapidjson8DocumentE"></span><span id="_CPPv2N6YggRpc7sendVarERKN9rapidjson8DocumentE"></span><span id="YggRpc::sendVar__rapidjson::DocumentCR"></span><span class="target" id="class_ygg_rpc_1a83b52245bfbed923a0a1bd1c51c5447c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sendVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">rapidjson</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Document</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6YggRpc7sendVarERKN9rapidjson8DocumentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6YggRpc7recvVarEiR1T">
+<span id="_CPPv3I0EN6YggRpc7recvVarER1T"></span><span id="_CPPv2I0EN6YggRpc7recvVarER1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="class_ygg_rpc_1aff1225e1ceb3a0eedec322a7d3d618b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recvVar</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN6YggRpc7recvVarEiR1T" title="YggRpc::recvVar::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6YggRpc7recvVarEiR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a message into a single variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – Expected data type to be received. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – <strong>[in]</strong> Variable to received message into. </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6YggRpc7recvVarERN9rapidjson8DocumentE">
+<span id="_CPPv3N6YggRpc7recvVarERN9rapidjson8DocumentE"></span><span id="_CPPv2N6YggRpc7recvVarERN9rapidjson8DocumentE"></span><span id="YggRpc::recvVar__rapidjson::DocumentR"></span><span class="target" id="class_ygg_rpc_1a654dd06ba5217ff9507726fd5413f130"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recvVar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rapidjson</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Document</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6YggRpc7recvVarERN9rapidjson8DocumentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
 
 </div>
 </dd></dl>

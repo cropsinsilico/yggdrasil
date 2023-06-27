@@ -3,5 +3,5 @@
 ======   ======   =============================================================================================   ================================================================================
 Option   Type     Valid For 'Connection_Type' Of                                                                  Description                                                                     
 ======   ======   =============================================================================================   ================================================================================
-driver   string   ['file_output', 'output', 'rpc_response', 'file_input', 'connection', 'input', 'rpc_request']   [DEPRECATED] Name of driver class that should be used.                          
+driver   string   ['file_input', 'rpc_response', 'connection', 'output', 'input', 'file_output', 'rpc_request']   [DEPRECATED] Name of driver class that should be used.                          
 ======   ======   =============================================================================================   ================================================================================

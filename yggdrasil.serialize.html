@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yggdrasil.serialize package &mdash; yggdrasil v1.10.0 documentation</title>
+  <title>yggdrasil.serialize package &mdash; yggdrasil v1.10.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             yggdrasil
           </a>
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -1877,25 +1877,6 @@ copy. Defaults to False.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.serialize.PlySerialize.GeometryBase.from_mesh">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PlySerialize.html#GeometryBase.from_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.serialize.PlySerialize.GeometryBase.from_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a geometry dictionary from a mesh which specifies
-the vertices (x, y, z) for each face in the geometry.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mesh</strong> (<em>np.ndarray</em>) – 3D mesh or a file/filename containing
-the mesh in a tab or comma delimited file.</p></li>
-<li><p><strong>prune_duplicates</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, only unique
-vertices will be included. Defaults to False.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments will be passed to
-numpy.loadtxt in the case that mesh is a file or filename.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
