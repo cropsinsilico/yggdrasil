@@ -160,6 +160,7 @@ jobs:
       - name: Update tag
         if: needs.params.outputs.releasetag != ''
         run: |
+          git config user.name "Meagan Lang"
           git tag -fa ${{ env.RELEASETAG }}
       - name: Build sdist
         run: |

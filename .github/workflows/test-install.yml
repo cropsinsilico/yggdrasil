@@ -47,7 +47,9 @@ jobs:
         python-version: 3.8
     - if: needs.params.outputs.releasetag != ''
       name: Update tag
-      run: 'git tag -fa ${{ env.RELEASETAG }}
+      run: 'git config user.name "Meagan Lang"
+
+        git tag -fa ${{ env.RELEASETAG }}
 
         '
     - name: Build sdist
