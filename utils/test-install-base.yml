@@ -34,6 +34,7 @@ env:
   BUILDSCHEMA: 0
   YGG_GHA_JOB_ID_SUFFIX:
   TMPDIR: /tmp/
+  RELEASETAG: v1.10.1
 
 jobs:
   params:
@@ -45,6 +46,7 @@ jobs:
       buildsource: ${{ steps.set-flags.outputs.buildsource }}
       builddocker: ${{ steps.set-flags.outputs.builddocker }}
       buildschema: ${{ steps.set-flags.outputs.buildschema }}
+      releasetag: ${{ steps.set-flags.outputs.releasetag }}
     steps:
       - id: set-flags
         run: |
@@ -53,6 +55,7 @@ jobs:
           echo "buildsource=${{ env.BUILDSOURCE }}" >> $GITHUB_OUTPUT
           echo "builddocker=${{ env.BUILDDOCKER }}" >> $GITHUB_OUTPUT
           echo "buildschema=${{ env.BUILDSCHEMA }}" >> $GITHUB_OUTPUT
+          echo "releasetag=${{ env.RELEASETAG }}" >> $GITHUB_OUTPUT
   docs:
     name: Build the Docs
     needs: params
@@ -154,9 +157,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
+      - name: Update tag
+        if: needs.params.outputs.releasetag != ''
+        run: |
+          git tag -fa ${{ env.RELEASETAG }}
       - name: Build sdist
         run: |
-          python setup.py sdist --force-clean-version
+          python setup.py sdist  # --force-clean-version
       - name: Install sdist
         run: |
           python -m pip install dist/*.gz
@@ -186,7 +193,7 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.pypi }}
-        skip_existing: true
+        # skip_existing: true
 
   upload_sdist:
     name: Upload sdist
@@ -203,7 +210,7 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.pypi }}
-        skip_existing: true
+        # skip_existing: true
 
   docker:
     name: Build and Publish Docker images

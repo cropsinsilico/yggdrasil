@@ -25,6 +25,7 @@ env:
   INSTALLTRIMESH: 1
   INSTALLZMQ: 1
   NUMPY: numpy
+  RELEASETAG: v1.10.1
   TMPDIR: /tmp/
   USEVIRTUALENV: 0
   YGG_GHA_JOB_ID_SUFFIX: null
@@ -44,8 +45,13 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: 3.8
+    - if: needs.params.outputs.releasetag != ''
+      name: Update tag
+      run: 'git tag -fa ${{ env.RELEASETAG }}
+
+        '
     - name: Build sdist
-      run: 'python setup.py sdist --force-clean-version
+      run: 'python setup.py sdist  # --force-clean-version
 
         '
     - name: Install sdist
@@ -181,6 +187,7 @@ jobs:
       buildschema: ${{ steps.set-flags.outputs.buildschema }}
       buildsource: ${{ steps.set-flags.outputs.buildsource }}
       buildwheels: ${{ steps.set-flags.outputs.buildwheels }}
+      releasetag: ${{ steps.set-flags.outputs.releasetag }}
     runs-on: ubuntu-latest
     steps:
     - id: set-flags
@@ -193,6 +200,8 @@ jobs:
         echo "builddocker=${{ env.BUILDDOCKER }}" >> $GITHUB_OUTPUT
 
         echo "buildschema=${{ env.BUILDSCHEMA }}" >> $GITHUB_OUTPUT
+
+        echo "releasetag=${{ env.RELEASETAG }}" >> $GITHUB_OUTPUT
 
         '
   schema:
@@ -235,7 +244,6 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.pypi }}
-        skip_existing: true
         user: __token__
   upload_wheels:
     if: github.event_name == 'push' && needs.params.outputs.buildwheels == '1'
@@ -253,7 +261,6 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.pypi }}
-        skip_existing: true
         user: __token__
 name: Test of package installation & execution
 'on':
