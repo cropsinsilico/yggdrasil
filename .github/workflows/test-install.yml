@@ -25,7 +25,7 @@ env:
   INSTALLTRIMESH: 1
   INSTALLZMQ: 1
   NUMPY: numpy
-  RELEASETAG: v1.10.1
+  RELEASETAG: v1.10.1.post1
   TMPDIR: /tmp/
   USEVIRTUALENV: 0
   YGG_GHA_JOB_ID_SUFFIX: null
@@ -246,6 +246,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.pypi }}
+        skip_existing: true
         user: __token__
   upload_wheels:
     if: github.event_name == 'push' && needs.params.outputs.buildwheels == '1'
@@ -263,6 +264,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.pypi }}
+        skip_existing: true
         user: __token__
 name: Test of package installation & execution
 'on':
