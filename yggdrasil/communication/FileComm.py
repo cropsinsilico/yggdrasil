@@ -99,6 +99,8 @@ class FileComm(CommBase.CommBase):
             the end is reached. If writing, each output will be to a new
             file in the series. The addressed is assumed to contain a format
             for the index of the file. Defaults to False.
+        count (int, optional): When reading a file, read the file this
+            many of times. Defaults to 0.
         wait_for_creation (float, optional): Time (in seconds) that should be
             waited before opening for the file to be created if it dosn't exist.
             Defaults to 0 s and file will attempt to be opened immediately.
@@ -142,6 +144,7 @@ class FileComm(CommBase.CommBase):
         'append': {'type': 'boolean', 'default': False},
         'in_temp': {'type': 'boolean', 'default': False},
         'is_series': {'type': 'boolean', 'default': False},
+        'count': {'type': 'integer', 'default': 0},
         'wait_for_creation': {'type': 'number', 'default': 0.0},
         'serializer': {'allOf': [
             {'default': {}},
@@ -420,7 +423,8 @@ class FileComm(CommBase.CommBase):
 
         """
         kwargs = super(FileComm, self).opp_comm_kwargs(for_yaml=for_yaml)
-        kwargs['is_series'] = self.is_series
+        kwargs.update(is_series=self.is_series,
+                      count=self.count)
         return kwargs
 
     @property
@@ -580,11 +584,11 @@ class FileComm(CommBase.CommBase):
 
         """
         out = False
-        if self.is_series:
+        if self.is_series or self.count:
             if series_index is None:
                 series_index = self._series_index + 1
             if self._series_index != series_index:
-                if (((self.direction == 'send')
+                if (((self.direction == 'send') or self.count
                      or os.path.isfile(self.get_series_address(series_index)))):
                     with self._closing_thread.lock:
                         self._file_close()
@@ -592,6 +596,8 @@ class FileComm(CommBase.CommBase):
                         self._open()
                     out = True
                     self.debug("Advanced to %d", series_index)
+                if self.count:
+                    self.count -= 1
         if out:
             self.header_was_read = False
             self.header_was_written = False

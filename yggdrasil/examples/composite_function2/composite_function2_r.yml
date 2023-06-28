@@ -1,0 +1,17 @@
+models:
+  - name: r_model
+    language: r
+    args: ./src/model_function.R
+    function: model_function
+    inputs:
+      - name: input
+        vars: [a, b, c]
+        default_file:
+          name: ./Input/input.json
+          filetype: json
+    outputs:
+      - name: output
+        vars: [d, e, f]
+        default_file:
+          name: ./output.json
+          filetype: json

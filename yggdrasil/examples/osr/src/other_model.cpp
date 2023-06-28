@@ -12,7 +12,7 @@ void timestep_calc(rapidjson::units::Quantity<double>& t,
 		    rapidjson::Value(val),				\
 		    state.GetAllocator());				\
   } else {								\
-    state[key].SetScalar(val);						\
+    state[key].SetScalar(val, state.GetAllocator());			\
   }
   // TODO: Update timesync/OSR to convert units
   // rapidjson::units::Quantity<double> x(10.0, "g");
@@ -57,7 +57,9 @@ int main(int argc, char *argv[]) {
   // Send initial state to output
   rapidjson::Document msg;
   msg.CopyFrom(state_recv, msg.GetAllocator());
-  msg.AddMember("time", rapidjson::Value(t).Move(), msg.GetAllocator());
+  msg.AddMember("time",
+		rapidjson::Value(t, msg.GetAllocator()).Move(),
+		msg.GetAllocator());
   ret = out.send(1, &msg);
   if (ret < 0) {
     std::cerr << "other_model(C++): Failed to send initial output for t=" <<
@@ -87,7 +89,9 @@ int main(int argc, char *argv[]) {
 
     // Send output
     msg.CopyFrom(state_recv, msg.GetAllocator());
-    msg.AddMember("time", rapidjson::Value(t).Move(), msg.GetAllocator());
+    msg.AddMember("time",
+		  rapidjson::Value(t, msg.GetAllocator()).Move(),
+		  msg.GetAllocator());
     ret = out.send(1, &msg);
     if (ret < 0) {
       std::cerr << "other_model(C++): Failed to send output for t=" << t << std::endl;

@@ -1,0 +1,21 @@
+models:
+  - name: python_model
+    language: python
+    args: ./src/model_function.py
+    function: model_function
+    inputs:
+      - name: a
+        default_value: true
+      - name: b
+        default_value: 5.0
+      - name: c
+        default_file:
+          name: ./Input/input.txt
+          filetype: map
+    outputs:
+      - name: output
+        default_file:
+          name: ./output.txt
+          filetype: table
+          as_array: true
+          field_names: x
