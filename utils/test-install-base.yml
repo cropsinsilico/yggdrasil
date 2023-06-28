@@ -161,7 +161,7 @@ jobs:
         if: needs.params.outputs.releasetag != ''
         run: |
           git config user.name "Meagan Lang"
-          git tag -fa ${{ env.RELEASETAG }}
+          git tag -fa ${{ env.RELEASETAG }} -m "Release override"
       - name: Build sdist
         run: |
           python setup.py sdist  # --force-clean-version

@@ -49,7 +49,7 @@ jobs:
       name: Update tag
       run: 'git config user.name "Meagan Lang"
 
-        git tag -fa ${{ env.RELEASETAG }}
+        git tag -fa ${{ env.RELEASETAG }} -m "Release override"
 
         '
     - name: Build sdist
