@@ -241,6 +241,17 @@ class TestCompiledModelDriver(model_base_class):
         to run_model_instance"""
         return {'skip_compile': False}
         
+    @pytest.mark.skipif(platform._is_win,
+                        reason="No ASAN for Windows MSVC")
+    def test_asan_debugger(self, run_model_instance, testing_options,
+                           asan_installed):
+        r"""Test running with ASAN."""
+        if testing_options.get('requires_partner', False):
+            pytest.skip("requires partner model to run")
+        if not asan_installed:
+            pytest.skip("ASAN not installed")
+        run_model_instance(with_debugger='asan')
+        
     def test_build(self, python_class):
         r"""Test building libraries as a shared/static library or object files."""
         # Finish on the default libtype
