@@ -116,6 +116,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
+      - name: Update tag
+        if: needs.params.outputs.releasetag != ''
+        run: |
+          git config user.name "Meagan Lang"
+          git tag -fa ${{ env.RELEASETAG }} -m "Release override"
 
       - uses: docker/setup-qemu-action@v1
         if: runner.os == 'Linux'
