@@ -119,6 +119,7 @@ jobs:
       - name: Update tag
         if: needs.params.outputs.releasetag != ''
         run: |
+          git config user.email "cfh5058@gmail.com"
           git config user.name "Meagan Lang"
           git tag -fa ${{ env.RELEASETAG }} -m "Release override"
 
@@ -165,6 +166,7 @@ jobs:
       - name: Update tag
         if: needs.params.outputs.releasetag != ''
         run: |
+          git config user.email "cfh5058@gmail.com"
           git config user.name "Meagan Lang"
           git tag -fa ${{ env.RELEASETAG }} -m "Release override"
       - name: Build sdist
