@@ -519,7 +519,23 @@ class SetupParam(object):
                 parser.add_argument(
                     '--install-%s' % k, action='store_true',
                     help=("Install %s" % k))
-            
+
+
+def prune_windows_path():
+    to_remove = [
+        'C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn',
+        'C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn',
+        'C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn']
+    print(f"PRUNING PATH: {os.environ['PATH']}")
+    path_list = os.environ['PATH'].split(os.pathsep)
+    for x in to_remove:
+        if x in path_list:
+            path_list.remove(x)
+    new_path = os.pathsep.join(path_list)
+    print(f"PRUNED PATH: {new_path}")
+    cmds = [f"set \"PATH={new_path}\""]
+    return cmds
+    
 
 def get_summary_commands(param=None, conda_env=None,
                          allow_missing_python=False, **kwargs):
@@ -1132,6 +1148,8 @@ def build_conda_recipe(recipe='recipe', param=None,
     # https://github.com/conda/conda/issues/7758#issuecomment-660328841
     assert conda_env == 'base' or param.dry_run
     assert conda_idx
+    if _is_win and _on_gha:
+        cmds += prune_windows_path()
     # Might invalidate cache
     cmds += [f"{CONDA_CMD} clean --all {param.conda_flags_general}"]
     cmds += setup_conda(param=param, conda_env=conda_env,
