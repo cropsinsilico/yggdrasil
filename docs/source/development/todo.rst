@@ -19,6 +19,7 @@ Documentation
 * Refernce metaschema on website in $id or $schema?
 * Expand development section into contributing guide
 * Go through and update/prune interface documentation
+* Docs on default_file/default_value
   
 Refactor
 --------
@@ -45,6 +46,7 @@ New feature/example
 * Add 'shell' option for executable models on Windows to allow calling different shell types.
 * Move communication to C++
 * Allow models to be embedded natively
+* More specific YAML parsing errors (e.g. IncompleteConnection for input/output without connection)
 
 Testing
 -------
