@@ -39,6 +39,8 @@ def update_argparser(parser=None):
     parser.add_argument('--update-r-requirements', '--update_r_requirements',
                         action='store_true',
                         help='Update the requirements.')
+    parser.add_argument('--r-interpreter', type=str,
+                        help='R executable to use during installation.')
     return parser
 
 
@@ -220,11 +222,13 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
     return True
 
             
-def call_R(R_cmd, **kwargs):
+def call_R(R_cmd, R_exe=None, **kwargs):
     r"""Call R commands, checking output.
 
     Args:
         R_cmd (list): List of R commands to run.
+        R_exe (str, optional): Rscript executable that should be used to
+            call the script.
         **kwargs: Additional keyword arguments are passed to make_call.
 
     Returns:
@@ -237,10 +241,11 @@ def call_R(R_cmd, **kwargs):
         fd.write('\n'.join(R_cmd))
         logger.info('Running:\n    ' + '\n    '.join(R_cmd))
     try:
-        Rexe = shutil.which('Rscript')
-        if not Rexe:
-            Rexe = 'Rscript'
-        out = make_call([Rexe, R_script], **kwargs)
+        if R_exe is None:
+            R_exe = shutil.which('Rscript')
+            if not R_exe:
+                R_exe = 'Rscript'
+        out = make_call([R_exe, R_script], **kwargs)
     finally:
         os.remove(R_script)
     return out
@@ -295,7 +300,7 @@ def requirements_from_description(fname=None):
     in_section = False
     if fname is None:
         fname = desc_file
-    assert(os.path.isfile(fname))
+    assert os.path.isfile(fname)
     with open(fname, 'r') as fd:
         for x in fd.readlines():
             if x.startswith(('Imports:', 'Depends:')):
@@ -311,7 +316,7 @@ def requirements_from_description(fname=None):
 
 
 def install(args=None, with_sudo=None, skip_requirements=None,
-            update_requirements=None):
+            update_requirements=None, R_exe=None):
     r"""Attempt to install the R interface.
 
     Args:
@@ -327,6 +332,8 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         update_requirements (bool, optional): If True, the requirements will be
             updated. Defaults to False. Setting this to True, sets
             skip_requirements to False.
+        R_exe (str, optional): Rscript executable that should be used to
+            call the script.
 
     Returns:
         bool: True if install succeded, False otherwise.
@@ -346,10 +353,14 @@ def install(args=None, with_sudo=None, skip_requirements=None,
     if update_requirements:
         skip_requirements = False
     # Set platform dependent things
-    if sys.platform in ['win32', 'cygwin']:
-        R_exe = 'R.exe'
-    else:
-        R_exe = 'R'
+    if R_exe is None:
+        R_exe = args.r_interpreter
+    if R_exe is None:
+        if sys.platform in ['win32', 'cygwin']:
+            R_exe = 'R.exe'
+        else:
+            R_exe = 'R'
+    Rscript_exe = os.path.join(os.path.dirname(R_exe), "Rscript")
     kwargs = {'cwd': lang_dir, 'with_sudo': with_sudo}
     # Write Makevars for conda installation
     makevars = None
@@ -361,14 +372,16 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         if not skip_requirements:
             # TEMP FIX FOR RCPP
             # if not install_packages(['Rcpp'], update=update_requirements,
-            #                         repos="https://rcppcore.github.io/drat", **kwargs):
+            #                         repos="https://rcppcore.github.io/drat",
+            #                         R_exe=Rscript_exe, **kwargs):
             #     logger.error("Failed to install Rcpp dependency")
             #     restore_makevars(makevars, old_makevars)
             #     return False
             requirements = requirements_from_description()
             if os.environ.get('BUILDDOCS', '') == '1':
                 requirements += ['roxygen2', 'Rd2md']
-            if not install_packages(requirements, update=update_requirements, **kwargs):
+            if not install_packages(requirements, update=update_requirements,
+                                    R_exe=Rscript_exe, **kwargs):
                 logger.error("Failed to install dependencies")
                 restore_makevars(makevars, old_makevars)
                 return False
@@ -386,7 +399,7 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         R_call = ("install.packages(\"%s\", verbose=TRUE,"
                   "INSTALL_opts=c(\"--no-multiarch\"),"
                   "repos=NULL, type=\"source\")") % package_name
-        if not call_R([R_call], **kwargs):
+        if not call_R([R_call], R_exe=Rscript_exe, **kwargs):
             logger.error("Error installing R interface from the built package.")
             restore_makevars(makevars, old_makevars)
             return False

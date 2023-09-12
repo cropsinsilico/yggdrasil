@@ -9,14 +9,14 @@ int main(int argc, char *argv[]) {
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
-  generic_t obj = init_generic();
+  rapidjson::Document obj;
+  rapidjson::CrtAllocator allocator;
   double* amaxtb_x = NULL;
   double* amaxtb_y = NULL;
   char** keys = NULL;
   size_t nkeys, i;
   double co2;
-  generic_t amaxtb;
-  size_t n_amaxtb;
+  rapidjson::SizeType n_amaxtb;
 
   // Loop until there is no longer input or the queues are closed
   while (flag >= 0) {
@@ -31,49 +31,32 @@ int main(int argc, char *argv[]) {
     }
 
     // Print received message
-    printf("C++ Model:\n");
-    display_generic(obj);
-
-    // Print keys
-    nkeys = generic_map_get_keys(obj, &keys);
-    printf("C++ Model: keys = ");
-    for (i = 0; i < nkeys; i++) {
-      printf("%s ", keys[i]);
-    }
-    printf("\n");
+    std::cout << "C++ Model:" << std::endl <<
+      document2string(obj) << std::endl;
 
     // Get double precision floating point element
-    co2 = generic_map_get_double(obj, "CO2");
-    printf("C++ Model: CO2 = %lf\n", co2);
+    co2 = obj["CO2"].GetDouble();
+    std::cout << "C++ Model: CO2 = " << co2 << std::endl;
 
     // Get array element
-    amaxtb = generic_map_get_array(obj, "AMAXTB");
-    n_amaxtb = generic_array_get_1darray_double(amaxtb, 0, &amaxtb_x);
-    generic_array_get_1darray_double(amaxtb, 1, &amaxtb_y);
-    printf("C++ Model: AMAXTB = \n");
+    const rapidjson::Value& amaxtb = obj["AMAXTB"];
+    amaxtb[0].Get1DArray(amaxtb_x, n_amaxtb, obj.GetAllocator());
+    amaxtb[1].Get1DArray(amaxtb_y, n_amaxtb, obj.GetAllocator());
+    std::cout << "C++ Model: AMAXTB = " << std::endl;
     for (i = 0; i < n_amaxtb; i++) {
-      printf("\t%lf\t%lf\n", amaxtb_x[i], amaxtb_y[i]);
+      std::cout << "\t" << amaxtb_x[i] << "\t" << amaxtb_y[i] << std::endl;
     }
 
     // Send output to output channel
     // If there is an error, the flag will be negative
-    flag = out_channel.send(1, obj);
+    flag = out_channel.send(1, &obj);
     if (flag < 0) {
       std::cout << "C++ Model: Error sending output." << std::endl;
       break;
     }
 
-    // Free dynamically allocated variables for this loop
-    free_generic(&amaxtb);
-
   }
 
-  // Free dynamically allocated obj structure
-  free_generic(&obj);
-  free(amaxtb_x);
-  free(amaxtb_y);
-  free(keys);
-  
   return 0;
 }
 

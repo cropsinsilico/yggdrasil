@@ -14,4 +14,4 @@ class MatFileComm(FileComm.FileComm):
     _schema_subtype_description = ('The file is a Matlab .mat file containing '
                                    'one or more serialized Matlab variables.')
     _default_serializer = 'mat'
-    _default_extension = '.mat'
+    _deprecated_drivers = ['MatInputDriver', 'MatOutputDriver']

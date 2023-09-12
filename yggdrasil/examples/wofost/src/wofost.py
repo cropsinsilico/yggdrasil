@@ -1,5 +1,7 @@
 # Import classes for input/output channels
 from yggdrasil.interface.YggInterface import YggInput, YggOutput
+# Import method for printing Unicode on Windows
+from yggdrasil.tools import print_encoded
 
 # Initialize input/output channels
 in_channel = YggInput('input')
@@ -16,7 +18,7 @@ while True:
         break
 
     # Print received message
-    print('Python Model: %s' % str(obj))
+    print_encoded('Python Model: %s' % str(obj))
 
     # Print keys
     print('Python Model: keys = %s' % str(obj.keys()))

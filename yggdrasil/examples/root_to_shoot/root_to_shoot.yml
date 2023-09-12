@@ -18,12 +18,15 @@ connections:
   - input: ./Input/shoot_growth_rate.txt
     output: shoot_growth_rate
     filetype: table
+    transform: select_scalar
   - input: ./Input/init_shoot_mass.txt
     output: init_shoot_mass
     filetype: table
+    transform: select_scalar
   - input: ./Input/timesteps.txt
     output: shoot_time_step
     filetype: table
+    transform: select_scalar
 
   # Shoot output connection
   - input: next_shoot_mass

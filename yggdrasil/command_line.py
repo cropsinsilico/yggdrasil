@@ -7,6 +7,7 @@ import subprocess
 import argparse
 import pprint
 import shutil
+import sysconfig
 from yggdrasil import constants
 LANGUAGES = getattr(constants, 'LANGUAGES', {})
 LANGUAGES_WITH_ALIASES = getattr(constants, 'LANGUAGES_WITH_ALIASES', {})
@@ -19,14 +20,16 @@ package_dir = os.path.dirname(os.path.abspath(__file__))
 def githook():
     r"""Git hook to determine if the Github workflow need to be
     re-generated."""
-    try:
-        files = subprocess.check_output(
-            ["git", "diff-index", "--cached", "--name-only",
-             "--diff-filter=ACMRTUXB", "HEAD"],
-            stderr=subprocess.PIPE).decode('utf-8').splitlines()
-    except subprocess.CalledProcessError:
-        return 1
-    regen = (os.path.join('utils', 'test-install-base.yml') in files)
+    # This check is not required when using pre-commit package
+    # try:
+    #     files = subprocess.check_output(
+    #         ["git", "diff-index", "--cached", "--name-only",
+    #          "--diff-filter=ACMRTUXB", "HEAD"],
+    #         stderr=subprocess.PIPE).decode('utf-8').splitlines()
+    # except subprocess.CalledProcessError:
+    #     return 1
+    # regen = (os.path.join('utils', 'test-install-base.yml') in files)
+    regen = True
     if regen:
         try:
             gitdir = subprocess.check_output(
@@ -176,7 +179,7 @@ class SubCommand(metaclass=SubCommandMeta):
                 cls.add_argument_to_parser(parser, xx)
         elif isinstance(x, (tuple, ArgumentTuple,
                             ConditionalArgumentTuple)):
-            assert(len(x) == 2)
+            assert len(x) == 2
             args, kwargs = x[:]
             try:
                 parser.add_argument(*args, **kwargs)
@@ -203,7 +206,16 @@ class SubCommand(metaclass=SubCommandMeta):
             raise NotImplementedError("type(x) = %s" % type(x))
 
     @classmethod
+    def runtime_arguments(cls):
+        return []
+
+    @classmethod
     def add_arguments(cls, parser, args=None):
+        args = copy.deepcopy(cls.arguments)
+        for new_param in cls.runtime_arguments():
+            for old_param in args:
+                if new_param[0] == old_param[0]:
+                    old_param[1].update(new_param[1])
         cls.add_argument_to_parser(parser, cls.arguments)
 
     @classmethod
@@ -232,9 +244,32 @@ class yggrun(SubCommand):
          {'action': 'store_true',
           'help': ('Validate the run via model validation commands on '
                    'completion.')}),
+        (('--with-debugger', ),
+         {'type': str,
+          'help': ('Run all models with a specific debuggin tool. If '
+                   'quoted, this can also include flags for the tool.')}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': 'Compile models with the address sanitizer enabled.'}),
+        (('--as-service', ),
+         {'action': 'store_true',
+          'help': 'Run the provided YAMLs as a service.'}),
+        (('--partial-commtype', ),
+         {'type': str, 'default': 'rest',
+          'help': ('Type of communicator to use for partial comms when '
+                   '--as-service is passed')}),
+        (('--client-id', ),
+         {'type': str,
+          'help': ('ID associated with the client requesting a service. '
+                   '(This should only be passed when running with '
+                   '--as-service)')}),
         (('--yaml-encoding', ),
          {'type': str,
-          'help': 'Encoding of the YAML specification files.'})]
+          'help': 'Encoding of the YAML specification files.'}),
+    ]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -259,11 +294,27 @@ class yggrun(SubCommand):
         from yggdrasil import runner, config
         prog = sys.argv[0].split(os.path.sep)[-1]
         with config.parser_config(args):
-            runner.run(args.yamlfile, ygg_debug_prefix=prog,
-                       production_run=args.production_run,
-                       mpi_tag_start=args.mpi_tag_start,
-                       validate=args.validate,
-                       yaml_encoding=args.yaml_encoding)
+            kwargs = dict(
+                ygg_debug_prefix=prog,
+                production_run=args.production_run,
+                mpi_tag_start=args.mpi_tag_start,
+                validate=args.validate,
+                with_debugger=args.with_debugger,
+                disable_python_c_api=args.disable_python_c_api,
+                with_asan=args.with_asan,
+                as_service=args.as_service,
+                yaml_encoding=args.yaml_encoding)
+            if args.as_service:
+                kwargs['complete_partial'] = True
+                if not args.partial_commtype:
+                    args.partial_commtype = 'rest'
+            if args.partial_commtype:
+                kwargs['partial_commtype'] = {
+                    'commtype': args.partial_commtype}
+                if args.as_service and args.partial_commtype == 'rest':
+                    assert args.client_id
+                    kwargs['partial_commtype']['client_id'] = args.client_id
+            runner.run(args.yamlfile, **kwargs)
 
 
 class integration_service_manager(SubCommand):
@@ -345,6 +396,10 @@ class integration_service_manager(SubCommand):
                           'help': ('URL for a directory in a Git repository '
                                    'containing models that should be loaded '
                                    'into the service manager registry.')}),
+                        (('--track-memory', ),
+                         {'action': 'store_true',
+                          'help': ('Track the memory used by the '
+                                   'service manager.')}),
                         (('--log-level', ),
                          {'type': int,
                           'help': ('Level of logging that should be '
@@ -429,7 +484,8 @@ class integration_service_manager(SubCommand):
                         with_coverage=getattr(args, 'with_coverage', False),
                         model_repository=getattr(args, 'model_repository',
                                                  None),
-                        log_level=getattr(args, 'log_level', None))
+                        log_level=getattr(args, 'log_level', None),
+                        track_memory=getattr(args, 'track_memory', False))
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,
@@ -488,7 +544,14 @@ class ygginfo(SubCommand):
                            ' pass to the tool when it is called.')}),
                 (('--fullpath', ),
                  {'action': 'store_true',
-                  'help': 'Get the full path to the tool exectuable.'})],
+                  'help': 'Get the full path to the tool exectuable.'}),
+                (('--disable-python-c-api', ),
+                 {'action': 'store_true',
+                  'help': 'Disable access to the Python C API from yggdrasil.'}),
+                (('--with-asan', ),
+                 {'action': 'store_true',
+                  'help': "Compile with Clang ASAN if available."}),
+            ],
             parsers=[
                 ArgumentParser(
                     name='compiler',
@@ -514,7 +577,9 @@ class ygginfo(SubCommand):
                 if args.tool == 'compiler':
                     flags = drv.get_compiler_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True, dont_link=True)
+                        dry_run=True, dont_link=True,
+                        disable_python_c_api=args.disable_python_c_api,
+                        with_asan=args.with_asan)
                     if '/link' in flags:  # pragma: windows
                         flags = flags[:flags.index('/link')]
                     for k in ['-c']:
@@ -529,7 +594,9 @@ class ygginfo(SubCommand):
                         libtype = 'object'
                     flags = drv.get_linker_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True, libtype=libtype)
+                        dry_run=True, libtype=libtype,
+                        disable_python_c_api=args.disable_python_c_api,
+                        with_asan=args.with_asan)
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
                     out = out.replace('/', '-')
@@ -628,8 +695,11 @@ class ygginfo(SubCommand):
                                     drv.is_comm_installed()))
                     vardict.append((curr_prefix + "Configured",
                                     drv.is_configured()))
-                    vardict.append((curr_prefix + "Disabled",
-                                    drv.is_disabled()))
+                    if not vardict[-1][1]:
+                        curr_prefix += prefix
+                        for k, v in drv.configuration_steps().items():
+                            vardict.append((curr_prefix + k, v))
+                        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                     curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Add comm information
@@ -688,7 +758,11 @@ class ygginfo(SubCommand):
                 # Environment variabless
                 env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT', 'CC',
                             'CXX', 'FC', 'GFORTRAN', 'DISPLAY', 'CL',
-                            '_CL_']
+                            '_CL_', 'LD', 'CFLAGS', 'CXXFLAGS',
+                            'LDFLAGS', 'CONDA_JL_HOME',
+                            'CONDA_JL_CONDA_EXE', 'JULIA_DEPOT_PATH',
+                            'JULIA_LOAD_PATH', 'JULIA_PROJECT',
+                            'JULIA_SSL_CA_ROOTS_PATH']
                 if platform._is_win:  # pragma: windows
                     env_vars += ['VCPKG_ROOT']
                 vardict.append(('Environment variables:', ''))
@@ -697,6 +771,9 @@ class ygginfo(SubCommand):
                     vardict.append(
                         (curr_prefix + k, os.environ.get(k, None)))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+                # Locations of executables
+                for x in ['git', 'mpiexec', 'mpicc']:
+                    vardict.append((f'{x} Location:', shutil.which(x)))
                 # Conda info
                 if os.environ.get('CONDA_PREFIX', ''):
                     if platform._is_win:  # pragma: windows
@@ -828,6 +905,18 @@ class ygginfo(SubCommand):
                              curr_prefix + prefix,
                              ("\n" + curr_prefix + prefix).join(
                                  out.splitlines(False)))))
+                # System config vars
+                vardict.append(('Sysconfig Vars:', ''))
+                curr_prefix += prefix
+                for k, v in sysconfig.get_config_vars().items():
+                    vardict.append((curr_prefix + k, v))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+                # ASAN library
+                asan_library = None
+                Cdrv = import_component("model", "c")
+                if Cdrv.is_installed():
+                    asan_library = Cdrv.get_tool("compiler").asan_library()
+                vardict.append(("Asan Library:", asan_library))
         finally:
             # Print things
             max_len = max(len(x[0]) for x in vardict)
@@ -874,7 +963,7 @@ class validate_yaml(SubCommand):
 class yggcc(SubCommand):
     r"""Compile a program."""
 
-    name = "compile"
+    name = "compile-model"
     help = ("Compile a program from source files for use in an "
             "yggdrasil integration.")
     arguments = [
@@ -899,7 +988,13 @@ class yggcc(SubCommand):
          {'action': 'store_true', 'help': "Run compilation with ccache."}),
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
-                   "(only used if the specified language is R).")})]
+                   "(only used if the specified language is R).")}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."})]
 
     @classmethod
     def func(cls, args):
@@ -913,7 +1008,9 @@ class yggcc(SubCommand):
                 args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
         drv = import_component('model', args.language)
         kws = {'toolname': args.toolname, 'flags': args.flags,
-               'use_ccache': args.use_ccache}
+               'use_ccache': args.use_ccache,
+               'disable_python_c_api': args.disable_python_c_api,
+               'with_asan': args.with_asan}
         if (args.language in ['r', 'R']) and args.Rpkg_language:
             kws['language'] = args.Rpkg_language
         print("executable: %s" % drv.call_compiler(args.source, **kws))
@@ -922,7 +1019,7 @@ class yggcc(SubCommand):
 class yggcompile(SubCommand):
     r"""Compile interface library/libraries."""
 
-    name = "compile-deps"
+    name = "compile"
     help = ("Compile yggdrasil dependency libraries. Existing "
             "libraries are first deleted.")
     arguments = [
@@ -931,30 +1028,94 @@ class yggcompile(SubCommand):
           # 'choices': (['all'] + LANGUAGES_WITH_ALIASES.get('compiled', [])
           #             + LANGUAGES_WITH_ALIASES.get('compiled_dsl', [])),
           'help': ("One or more languages to compile dependencies "
-                   "for.")}),
+                   "for, source files to compile into an executable, "
+                   "or the directory containing an R package.")}),
         (('--toolname', ),
-         {'help': "Name of compilation tool that should be used"})]
+         {'help': "Name of compilation tool that should be used"}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+        (('--force-source', ),
+         {'action': 'store_true',
+          'help': ("Force all arguments passed to the language parameter "
+                   "to be treated as source files to be compiled.")}),
+        (('--source-language', ),
+         {'default': None,
+          # 'choices': [None] + LANGUAGES_WITH_ALIASES['all'],
+          'help': ("Language of the source code. If not provided, "
+                   "the language will be determined from the "
+                   "source extension.")}),
+        (('--flags', ),
+         {'nargs': '*',
+          'help': ("Additional flags that should be added to the "
+                   "compilation command if source files are provided.")}),
+        (('--use-ccache', ),
+         {'action': 'store_true',
+          'help': "Run source compilation with ccache."}),
+        (('--Rpkg-language', ),
+         {'help': ("Language that R package is written in "
+                   "(only used if the provided source language is R).")})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil.components import import_component
-        yggclean.func(args, verbose=False)
         error_on_missing = (not getattr(args, 'all_languages', False))
         missing = []
-        for lang in args.language:
-            import_component('model', lang).cleanup_dependencies()
+        languages = []
+        sources = []
+        for x in args.language:
+            if ((x in LANGUAGES_WITH_ALIASES['all']
+                 and not args.force_source)):
+                languages.append(x)
+            else:
+                sources.append(x)
+        if languages:
+            args.languages = languages
+            yggclean.func(args, verbose=False)
+        for lang in list(languages):
+            drv = import_component('model', lang)
+            drv.cleanup_dependencies(
+                disable_python_c_api=args.disable_python_c_api,
+                with_asan=args.with_asan)
+            # Prevent language from being recompiled more than
+            # once as a dependency
+            for base_lang in drv.base_languages:
+                if base_lang in languages:
+                    languages.remove(base_lang)
+        kwargs = {'toolname': args.toolname,
+                  'disable_python_c_api': args.disable_python_c_api,
+                  'with_asan': args.with_asan}
+        for lang in languages:
             drv = import_component('model', lang)
             if ((hasattr(drv, 'compile_dependencies')
                  and (not getattr(drv, 'is_build_tool', False)))):
                 if drv.is_installed():
-                    drv.compile_dependencies(toolname=args.toolname)
+                    drv.compile_dependencies(**kwargs)
                 else:
                     missing.append(lang)
         if error_on_missing and missing:  # pragma: debug
-            raise Exception(("One or more of the requested languages "
-                             "are not fully installed for use with "
-                             "yggdrasil: %s") % missing)
-
+            raise Exception(f"One or more of the requested languages "
+                            f"are not fully installed for use with "
+                            f"yggdrasil: {missing}")
+        if sources:
+            kwargs.update(
+                use_ccache=args.use_ccache,
+                flags=args.flags)
+            if args.source_language is None:
+                if ((len(sources) == 1 and os.path.isdir(sources[0])
+                     and os.path.isdir(os.path.join(sources[0], 'R')))):
+                    args.source_language = 'R'
+                else:
+                    args.source_language = constants.EXT2LANG[
+                        os.path.splitext(sources[0])]
+            drv = import_component('model', args.source_language)
+            if (args.source_language in ['r', 'R']) and args.Rpkg_language:
+                kwargs['language'] = args.Rpkg_language
+            print(f"executable: {drv.call_compiler(sources, **kwargs)}")
+            
 
 class yggclean(SubCommand):
     r"""Cleanup dependency files."""
@@ -975,6 +1136,7 @@ class yggclean(SubCommand):
             if lang in ['ipc', 'ipcs']:
                 from yggdrasil.communication.IPCComm import ipcrm_queues
                 ipcrm_queues()
+                ipcrm_queues(by_id=True)
             else:
                 import_component('model', lang).cleanup_dependencies(
                     verbose=verbose)
@@ -1042,7 +1204,14 @@ class cc_flags(cc_toolname):
           'help': 'Get the compilation flags used for C++ programs.'}),
         (('--toolname', ),
          {'default': None,
-          'help': 'Name of the tool that associated flags be returned for.'})]
+          'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+    ]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -1063,7 +1232,14 @@ class ld_flags(cc_toolname):
           'help': 'Get the compilation flags used for C++ programs.'}),
         (('--toolname', ),
          {'default': None,
-          'help': 'Name of the tool that associated flags be returned for.'})]
+          'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--disable-python-c-api', ),
+         {'action': 'store_true',
+          'help': 'Disable access to the Python C API from yggdrasil.'}),
+        (('--with-asan', ),
+         {'action': 'store_true',
+          'help': "Compile with Clang ASAN if available."}),
+    ]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -1078,23 +1254,45 @@ class ygginstall(SubCommand):
 
     name = "install"
     help = "Complete yggdrasil installation for one or more languages."
+    arguments = (
+        [(('languages', ),
+          {'nargs': '*',
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
+           'default': [],
+           'help': 'One or more languages that should be installed.'}),
+         (('--no-import', ),
+          {'action': 'store_true',
+           'help': ('Don\'t import the yggdrasil package in '
+                    'calling the installation script.')}),
+         (('--with-asan', ),
+          {'action': 'store_true',
+           'help': "Load ASAN library before running executables."}),
+         ]
+    )
 
     @classmethod
-    def get_parser(cls, **kwargs):
+    def add_arguments(cls, parser, **kwargs):
         from yggdrasil.languages import install_languages
-        # TODO: Migrate
-        return install_languages.update_argparser()
+        super(ygginstall, cls).add_arguments(parser, **kwargs)
+        install_languages.update_argparser(parser=parser)
 
     @classmethod
     def func(cls, args):
         from yggdrasil.languages import install_languages
-        languages = args.language
+        from yggdrasil import config
+        languages = args.languages
         if (((isinstance(languages, str) and (languages == 'all'))
              or (isinstance(languages, list) and ('all' in languages)))):
             languages = [x.lower() for x in
                          install_languages.get_language_directories()]
+        if args.with_asan:
+            assert not args.no_import
+            from yggdrasil.drivers.CModelDriver import CModelDriver
+            CModelDriver.set_asan_env(os.environ)
         for x in languages:
             install_languages.install_language(x, args=args)
+        if not os.path.isfile(config.usr_config_file):
+            config.update_language_config(verbose=True)
 
 
 class update_config(SubCommand):
@@ -1106,12 +1304,12 @@ class update_config(SubCommand):
         [(('languages', ),
           {'nargs': '*',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
-           'default': [],
+           'default': ['all'],
            'help': 'One or more languages that should be configured.'}),
          (('--languages', ),
           {'nargs': '+', 'dest': 'languages_flag',
            # 'choices': ['all'] + LANGUAGES_WITH_ALIASES.get('all', []),
-           'default': [],
+           'default': ['all'],
            'help': 'One or more languages that should be configured.'}),
          (('--show-file', ),
           {'action': 'store_true',
@@ -1236,7 +1434,7 @@ class update_config(SubCommand):
             return
         for x_true, x_false in cls.opposite_arguments:
             if getattr(args, x_false, None) is not None:
-                assert(getattr(args, x_true, None) is None)
+                assert getattr(args, x_true, None) is None
                 setattr(args, x_true, not getattr(args, x_false))
             if hasattr(args, x_false):
                 delattr(args, x_false)
@@ -1263,22 +1461,6 @@ class update_config(SubCommand):
             lang_kwargs=lang_kwargs)
 
 
-class regen_metaschema(SubCommand):
-    r"""Regenerate the yggdrasil metaschema."""
-
-    name = "metaschema"
-    help = "Regenerate the yggdrasil metaschema."
-
-    @classmethod
-    def func(cls, args):
-        from yggdrasil import metaschema
-        if os.path.isfile(metaschema._metaschema_fname):
-            os.remove(metaschema._metaschema_fname)
-        metaschema._metaschema = None
-        metaschema._validator = None
-        metaschema.get_metaschema()
-
-
 class regen_schema(SubCommand):
     r"""Regenerate the yggdrasil schema."""
 
@@ -1288,7 +1470,10 @@ class regen_schema(SubCommand):
         (('--only-constants', ),
          {'action': 'store_true',
           'help': ('Only update the constants.py file without updating '
-                   'the schema.')})]
+                   'the schema.')}),
+        (('--filename', ),
+         {'type': str,
+          'help': 'Name where schema should be saved.'})]
 
     @classmethod
     def func(cls, args):
@@ -1297,10 +1482,12 @@ class regen_schema(SubCommand):
         schema.restore_constants()
         imp.reload(constants)
         if not args.only_constants:
-            if os.path.isfile(schema._schema_fname):
-                os.remove(schema._schema_fname)
+            if args.filename is None:
+                args.filename = schema._schema_fname
+            if os.path.isfile(args.filename):
+                os.remove(args.filename)
             schema.clear_schema()
-            schema.init_schema()
+            schema.init_schema(fname=args.filename)
         else:
             schema.update_constants()
 
@@ -1398,6 +1585,127 @@ class timing_plots(SubCommand):
             timing.plot_scalings(compare=args.comparison)
 
 
+class coveragerc(SubCommand):
+    r"""Create a .coveragerc file."""
+
+    name = "coveragerc"
+    help = (
+        "Generate a coveragerc file that covers/ignores lines based on "
+        "installed languages or options.")
+    arguments = [
+        (('--method', ),
+         {'choices': ['installed', 'env', None],
+          'default': None,
+          'help': ("Method that should be used to select languages that "
+                   "should be covered. 'env' covers languages based on "
+                   "the value of environment variables of the form "
+                   "'INSTALL{language}'. 'installed' covers languages "
+                   "that yggdrasil considers installed.")}),
+        (('--cover-languages', '--cover-language', '--cover'),
+         {'nargs': '*',
+          'choices': LANGUAGES.get('all', []),
+          'help': "Language(s) to cover."}),
+        (('--dont-cover-languages', '--dont-cover-language',
+          '--dont-cover'),
+         {'nargs': '*',
+          'choices': LANGUAGES.get('all', []),
+          'help': "Language(s) to ignore in coverage."}),
+        (('--filename', ),
+         {'type': str, 'default': None,
+          'help': "File to save coveragerc to"}),
+        (('--setup-cfg', ),
+         {'type': str, 'default': None,
+          'help': "setup.cfg file containing coverage options"}),
+    ]
+
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.tools import is_lang_installed
+        from yggdrasil.config import create_coveragerc
+        covered_languages = {}
+        if args.method == 'env':
+            for k in LANGUAGES['all']:
+                v = os.environ.get(f"INSTALL{k.upper()}", None)
+                if v is not None:
+                    covered_languages[k] = (v == '1')
+        elif args.method == 'installed':
+            for k in LANGUAGES['all']:
+                covered_languages[k] = is_lang_installed(k)
+        if args.cover_languages:
+            for k in args.cover_languages:
+                covered_languages[k] = True
+        if args.dont_cover_languages:
+            for k in args.dont_cover_languages:
+                covered_languages[k] = False
+        for k in LANGUAGES['all']:
+            covered_languages.setdefault(k, True)
+        create_coveragerc(covered_languages, filename=args.filename,
+                          setup_cfg=args.setup_cfg)
+
+
+class file_converter(SubCommand):
+    r"""Convert between compatible file types."""
+
+    name = "fconvert"
+    help = (
+        "Convert a file of one type into another compatible type.")
+    arguments = [
+        (('src', ),
+         {'help': "Name of file to convert"}),
+        (('dst', ),
+         {'help': "Name of destination file"}),
+        (('--from', '--src-type'),
+         {'dest': 'src_type',
+          'default': None,
+          'help': "Source file type"}),
+        (('--to', '--dst-type'),
+         {'dest': 'dst_type',
+          'default': None,
+          'help': "Destination file type"}),
+        (('--src-kwargs', ),
+         {'dest': 'src_kwargs',
+          'type': str,
+          'help': ("Keyword arguments for source file communicator "
+                   "in JSON format")}),
+        (('--dst-kwargs', ),
+         {'dest': 'dst_kwargs',
+          'type': str,
+          'help': ("Keyword arguments for destination file communicator "
+                   "in JSON format")}),
+        (('--transform', ),
+         {'type': str,
+          'help': ("Transform keyword arguments for transforming "
+                   "messages between source and destination in JSON "
+                   "format")}),
+    ]
+
+    @classmethod
+    def runtime_arguments(cls):
+        return [
+            (('--from', '--src-type'),
+             {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+                 'file']['subtypes'].keys())}),
+            (('--to', '--dst-type'),
+             {'choices': [None] + list(constants.COMPONENT_REGISTRY[
+                 'file']['subtypes'].keys())}),
+        ]
+    
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.communication.FileComm import convert_file
+        from yggdrasil import rapidjson
+        if args.src_kwargs is not None:
+            args.src_kwargs = rapidjson.loads(args.src_kwargs)
+        if args.dst_kwargs is not None:
+            args.dst_kwargs = rapidjson.loads(args.dst_kwargs)
+        if args.transform is not None:
+            args.transform = rapidjson.loads(args.transform)
+        convert_file(args.src, args.dst,
+                     src_type=args.src_type, src_kwargs=args.src_kwargs,
+                     dst_type=args.dst_type, dst_kwargs=args.dst_kwargs,
+                     transform=args.transform)
+
+
 class generate_gha_workflow(SubCommand):
     r"""Re-generate the Github actions workflow yaml."""
 
@@ -1419,7 +1727,7 @@ class generate_gha_workflow(SubCommand):
     @classmethod
     def func(cls, args, gitdir=None):
         import yaml
-        from yggdrasil.metaschema.encoder import decode_yaml, encode_yaml
+        from yggdrasil.serialize.YAMLSerialize import decode_yaml, encode_yaml
         from collections import OrderedDict
 
         class NoAliasDumper(yaml.SafeDumper):
@@ -1498,11 +1806,11 @@ class main(SubCommand):
     arguments = []
     subcommands = [yggrun, ygginfo, validate_yaml,
                    yggcc, yggcompile, yggclean,
-                   ygginstall, update_config,
-                   regen_metaschema, regen_schema,
+                   ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,
                    timing_plots, generate_gha_workflow,
-                   integration_service_manager]
+                   integration_service_manager, coveragerc,
+                   file_converter]
 
     @classmethod
     def get_parser(cls, **kwargs):

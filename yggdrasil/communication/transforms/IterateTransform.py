@@ -6,6 +6,8 @@ from yggdrasil.communication.transforms.TransformBase import TransformBase
 class IterateTransform(TransformBase):
     r"""Class for iterating over message elements."""
     _transformtype = 'iterate'
+    _schema_subtype_description = (
+        "Split messages up into their iterable components")
 
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
@@ -17,8 +19,8 @@ class IterateTransform(TransformBase):
             AssertionError: If the datatype is not valid.
 
         """
-        assert(datatype.get('type', None) in ['array', 'object', '1darray',
-                                              'ndarray'])
+        assert datatype.get('type', None) in ['array', 'object', '1darray',
+                                              'ndarray']
 
     def get_elements(self, datatype):
         r"""Get a list of elements in the datatype for iteration.
@@ -92,7 +94,7 @@ class IterateTransform(TransformBase):
         return iter(out)
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the transform class.
 
         Returns:

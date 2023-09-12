@@ -102,17 +102,11 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
         if working_dir is not None:
             os.chdir(working_dir)
         curr_time = start_time
-        model, input_map, output_map = cls.setup_model(
+        model, input_map, output_map, selections = cls.setup_model(
             model_file, inputs=inputs, outputs=outputs,
             integrator=integrator, integrator_settings=integrator_settings,
+            selections=selections
         )
-        if not selections:
-            selections = [k for k in model.keys() if not k.startswith('init(')]
-        if 'time' not in selections:
-            selections = ['time'] + selections
-        for k, v in output_map.items():
-            if not v['vars']:
-                v['vars'] = selections
         while True:
             time = None
             flag = False
@@ -145,30 +139,53 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                 else:
                     iout = {iv: out_value[iv] for iv in v['vars']}
                     nele = steps + 1
+                kws = {'key_order': v['vars']}
                 if (nele > 1) and (not v['as_array']):
                     for i in range(nele):
                         iiout = {ik: iv[i] for ik, iv in iout.items()}
-                        flag = v['comm'].send_dict(iiout, key_order=v['vars'])
+                        flag = v['comm'].send_dict(iiout, **kws)
                         if not flag:  # pragma: debug
                             raise RuntimeError("Error sending step %d to %s" % (i, k))
                 else:
-                    flag = v['comm'].send_dict(iout, key_order=v['vars'])
+                    flag = v['comm'].send_dict(iout, **kws)
                     if not flag:  # pragma: debug
                         raise RuntimeError("Error sending to %s" % k)
 
     @classmethod
     def setup_model(cls, model_file, inputs=[], outputs=[],
-                    integrator=None, integrator_settings={}):
+                    integrator=None, integrator_settings={},
+                    selections=None):
         r"""Set up model class instance."""
         import roadrunner
+        from yggdrasil.languages.Python.YggInterface import (
+            YggInput, YggOutput)
         model = roadrunner.RoadRunner(model_file)
         if integrator is not None:
             model.setIntegrator(integrator)
         for k, v in integrator_settings.items():
             model.getIntegrator().setValue(k, v)
-        input_map, output_map = cls.setup_interface(
-            inputs=inputs, outputs=outputs)
-        return model, input_map, output_map
+        if not selections:
+            # Default to all variables not calculated
+            selections = [k for k in model.keys() if not k.endswith(')')]
+        if 'time' not in selections:
+            selections = ['time'] + selections
+        for x in outputs:
+            if not x.get('vars', []):
+                x['vars'] = [{'name': v} for v in selections]
+        input_map = {}
+        output_map = {}
+        for x in inputs:
+            input_map[x['name']] = {
+                'vars': [v['name'] for v in x.get('vars', [])],
+                'comm': YggInput(x['name'], new_process=True)}
+        for x in outputs:
+            x_vars = [v['name'] for v in x.get('vars', [])]
+            output_map[x['name']] = {
+                'as_array': x.get('as_array', False),
+                'vars': x_vars,
+                'comm': YggOutput(x['name'], new_process=True,
+                                  field_names=x_vars)}
+        return model, input_map, output_map, selections
 
     @classmethod
     def call_model(cls, model, curr_time, end_time, steps,
@@ -183,10 +200,10 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                              steps=int(steps))
         # Unsupported?
         # variableStep=variable_step)
-        # try:
-        #     out = {k: out[k] for k in out.colnames}
-        # except IndexError:
-        #     out = {k: out[:, i] for i, k in enumerate(out.colnames)}
+        try:
+            out = {k: out[k] for k in selections}
+        except IndexError:
+            out = {k: out[:, i] for i, k in enumerate(selections)}
         return end_time, out
 
     @classmethod

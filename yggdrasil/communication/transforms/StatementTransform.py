@@ -22,6 +22,7 @@ class StatementTransform(TransformBase):
     _transformtype = 'statement'
     _schema_required = ['statement']
     _schema_properties = {'statement': {'type': 'string'}}
+    _schema_subtype_description = "Transform messages according to a statement"
 
     def __init__(self, *args, **kwargs):
         super(StatementTransform, self).__init__(*args, **kwargs)
@@ -43,7 +44,7 @@ class StatementTransform(TransformBase):
         return safe_eval(self.statement, x=x)
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the transform class.
 
         Returns:

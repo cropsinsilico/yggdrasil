@@ -39,10 +39,11 @@ class TestFileInputDriver(base_class):
         return (name, filepath)
 
     @pytest.fixture
-    def send_comm_kwargs(self, instance, icomm_name):
+    def send_comm_kwargs(self, instance, icomm_name, testing_options):
         r"""dict: Keyword arguments for send comm."""
         out = instance.icomm.opp_comm_kwargs()
         out['append'] = True
+        out.update(testing_options.get('driver_send_kwargs', {}))
         return out
 
     @pytest.fixture
@@ -50,7 +51,7 @@ class TestFileInputDriver(base_class):
         r"""str: Path to the test file."""
         out = os.path.join(
             tempfile.gettempdir(),
-            f'{name}_input{icomm_python_class._default_extension}')
+            f'{name}_input{icomm_python_class._extensions[0]}')
         with open(out, 'wb') as fd:
             fd.write(contents_to_write)
         try:
@@ -58,15 +59,22 @@ class TestFileInputDriver(base_class):
         finally:
             if os.path.isfile(out):
                 os.remove(out)
+                icomm_python_class.remove_companion_files(out)
     
     @pytest.fixture(scope="class")
-    def contents_to_write(self, testing_options):
+    def contents_to_write(self, testing_options, icomm_python_class):
         r"""str: Contents that should be written to the file."""
+        if not testing_options.get('contents', None):
+            contents = icomm_python_class.get_test_contents(
+                testing_options['send'], **testing_options['kwargs'])
+            if testing_options.get('contents', False) is None:
+                return contents
+            print(contents)
         return testing_options['contents']
 
     @pytest.fixture
     def assert_before_stop(self, instance, recv_message_list,
-                           recv_comm, testing_options, unyts_equality_patch,
+                           recv_comm, testing_options,
                            pandas_equality_patch):
         r"""Assertions to make before stopping the driver instance."""
         def assert_before_stop_w():

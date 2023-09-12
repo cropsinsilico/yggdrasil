@@ -14,7 +14,7 @@ Installation
     * "Desktop development with C++" - Workload under "Windows" section
     * "MSVC v140 - VS 2015 C++ build tools (v14.00)" - Individual component under "Compilers, build tools, and runtimes" section.
 
-   If you *do not use conda* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a "VS2015 x64 Native Tools Developer Command Prompt", or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The prompt/script used must enable the Visual Studio 2015 build tools (the specific year) to be compatible with the Python C library (see the discussion `here <https://wiki.python.org/moin/WindowsCompilers>`_). The VS 2015 tools prompt/script will be installed from within Visual Studio 2019 by selecting the components indicated above. On a 64bit Windows machine (assuming you will be using 64 bit Python), the command to initialize these tools within a regular command prompt will look something like this, but the exact path will vary with your particular installation::
+   If you *do not use conda/mamba* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a "VS2015 x64 Native Tools Developer Command Prompt", or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The prompt/script used must enable the Visual Studio 2015 build tools (the specific year) to be compatible with the Python C library (see the discussion `here <https://wiki.python.org/moin/WindowsCompilers>`_). The VS 2015 tools prompt/script will be installed from within Visual Studio 2019 by selecting the components indicated above. On a 64bit Windows machine (assuming you will be using 64 bit Python), the command to initialize these tools within a regular command prompt will look something like this, but the exact path will vary with your particular installation::
 
      $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
@@ -22,11 +22,17 @@ Installation
 
    **Mac Users**
 
-   If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). `This <https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923>`_ article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda to install |yggdrasil|.
+   If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). `This <https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923>`_ article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda/mamba to install |yggdrasil|.
 
 
-Conda Installation (recommended)
---------------------------------
+Conda/Mamba Installation (recommended)
+--------------------------------------
+
+.. note::
+
+   **Mamba Installation**
+
+   Mamba is a drop in replacement for conda that is often faster and provides clearer error messages when there are conflicts. You can install mamba by following the instructions `here <https://mamba.readthedocs.io/en/latest/installation.html>`_ (including by using conda). Then you may just use ``mamba`` in place of any of the commands below.
 
 Download and install Miniconda from `here <https://docs.conda.io/en/latest/miniconda.html>`_ (or Anaconda from `here <https://www.anaconda.com/download/>`_ if you would like additional Python libraries installed by default). There are conda distributions available for |yggdrasil| from `conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_. You can install |yggdrasil| from conda-forge by calling::
 
@@ -42,6 +48,14 @@ the terminal (or Anaconda Prompt on Windows).::
 
   $ conda config --add channels conda-forge
 
+Optional dependencies for supported languages |yggdrasil| are grouped into utility "extra" subpackages. For example, to install C, C++, Fortran, and R and their dependencies, you could run the following::
+
+  $ conda install -c conda-forge yggdrasil yggdrasil.c yggdrasil.fortran yggdrasil.r
+
+There are also several additional extras subpackages containing optional dependencies for additional communication mechanisms and |yggdrasil| development. The table below describes all of the subpackages
+
+.. include:: tables/package_extras.rst
+  
 .. note::
    **Windows Users** If you see the warning::
 
@@ -54,7 +68,7 @@ the terminal (or Anaconda Prompt on Windows).::
    Then run ``yggconfig`` to finish the installation process for C and C++.
 
 .. warning::
-   If conda takes a very long time to install |yggdrasil| (>5 min spent solving the environment) or fails with an error about conflicts and you are using a version of conda older than 4.7.2, try either updating conda and/or adding the conda-forge channel (if you havn't already)::
+   If conda takes a very long time to install |yggdrasil| (>5 min spent solving the environment) or fails with an error about conflicts and you are using a version of conda older than 4.7.2, try either updating conda, using mamba (see note above), and/or adding the conda-forge channel (if you havn't already)::
 
      conda config --add channels conda-forge
 
@@ -140,6 +154,12 @@ Python commands::
   >>> import os
   >>> from distutils.sysconfig import get_python_lib
   >>> os.path.realpath(os.path.join(get_python_lib(), '..', '..', '..', 'bin'))
+
+Optional dependencies can be specified using pip "extra" syntax. For example, to install the packages required to run SBML models and enable communication using RabbitMQ, you could run the following::
+
+  $ pip install yggdrasil-framework[sbml,rmq]
+
+Additional extras for pip installation can be found :ref:`here <package_extras_rst>`.
 
 .. note::
    *Windows Users* If you used the Windows store to install Python, the above commands will not yield the correct scripts directory. It will be something along the lines of ``%userprofile%\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts``
@@ -384,3 +404,12 @@ If you would like to use OpenSimRoot, you will need to install GNU make. If you 
 * ``brew install make`` on Mac
 * ``apt-get install make`` on Linux
 * ``choco install make`` on Windows
+
+Additional Steps for Julia Models
+---------------------------------
+
+If you do not use conda/mamba to install ``julia``, or you are installing |yggdrasil| on a Windows machine or an M1/M2 Mac (there are not currently ``julia`` conda packages for these systems as of 2023/04/07, but this may change), you will need to install it yourself. Julia downloads can be found `here <https://julialang.org/downloads/>`_.
+
+Once julia is installed, you can complete the installation of the |yggdrasil| Julia interface via::
+
+  $ ygginstall julia

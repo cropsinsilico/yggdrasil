@@ -2,7 +2,108 @@
 History
 =======
 
-1.9.0 (2021-XX-XX) Add support for symbolic ODEs, migrate tests out of package & into pytest fixtures
+1.10.1 (2023-06-27) New map transformation, composite function wrapping example, and various refactoring of internal methods
+-------------------
+
+* Added map transformation for converting arrays into map types
+* Added support for automatted wrapping of C++ model functions that have arguments with types of std::string, std::vector, or std::map.
+* Added composite_function example of wrapping multiple inputs of different types to a function as separate channels and composite_function2 example of wrapping multiple inputs & outputs to a function as single channels
+* Added 'count' FileComm parameter to specify the number of times a file should be read
+* Refactor geometry serialization classes to use rapidjson methods
+* Refactor how additional variables created during function wrapping are handled
+* Updated C++ interface to use updated rapidjson that requires allocators for yggdrasil types
+* Allow use of with_asan with CMake/Make models
+
+1.10.0 (2023-05-31) Added support for PyTorch models, sequence files, image files, and Excel files
+-------------------
+
+* Added support for running trained PyTorch models as part of integrations
+* Added support for connecting integrations to sequence files in FASTA and FASTQ formats via BioPython
+* Added support for connecting integrations to sequence files in SAM, BAM and CRAM formats via pysam
+* Added support for connecting integrations to sequence files in BCF and VCF formats via pysam
+* Added support for connecting integrations to JPEG, PNG, EPS, BMP, GIF and TIFF formats via Pillow
+* Added support for connecting integrations to Excel files via Pandas
+* Refactor serialization in preparation of moving communication into C++
+* Added CLI for converting files between compatible formats
+* Added support for creating Ply and ObjWavefront objects from explicit meshes
+* Fix bug in R interface
+
+1.9.0 (2023-04-14) Migrate to using extended version of rapidjson/python-rapidjson for serialization and add support for models written in Julia
+------------------
+
+* Added Julia interface with units implemented via Unitful
+* Added Julia versions of examples
+* Dropped support for Python 3.5
+* Changed rapidjson submodule to extended version
+* Vendor python-rapidjson extension
+* Removed jsonschema requirement
+* Updated yggdrasil to use the vendored rapidjson for serialization, validation, normalization, and units
+* Removed majority of datatypes submodule. rapidjson should be used for type validation, normalization, and serialization
+* Removed C and C++ API for AsciiFile and AsciiTable
+* Changed how tables are parsed such that rows in single column tables will be read as arrays unless otherwise specified via the YAML option 'transform: select_scalar'
+* Updated utility scripts and package parameters to build extension
+* Changed native string types in languages to be used for JSON string values
+* In C, C++, and Fortran, if Python objects will be sent/received the model must initialize Python via "init_python_API()" (a subroutine in Fortran). If a model is a wrapped function, this will be added automatically.
+* Change all JSON serialization to use rapidjson, removing JSONDecoder, JSONEncoder, & JSONEncoderReadable in the process.
+* C++ interface now expects C++ classes for generic, array, object, ply, & obj types. Send methods should pass pointers to these objects. Formatted_io examples for these types have been updated to reflect these changes.
+* Unpinned libroadrunner dependency for SBML
+* Removed the 'serializer_class' and 'serializer_kwargs' from accepted communication keyword arguments. Serializer classes can be accessed via the seritype string associated with them in the schema and keyword arguments for serializer construction can be passed in a dictionary via 'serializer'.
+* Removed 'typedef' attribute from serializer class, 'datatype' should be used instead
+* Removed use of 'header_kwargs' keyword argument from serializer 'serialize' method. Use 'metadata' instead.
+
+1.8.5 (2023-03-01) Bug fixes for Mac M1 chips (arm64) and various improvements to CLI
+------------------
+* Fix bug where yggcompile was compiling some languages multiple times
+* Allow yggcompile to be called like yggcc
+* Add flag (--with-asan) and YAML option (with_asan) for compiltion with the address sanitizer turned on
+* Add flag (--disable-python-c-api) and YAML option (disable_python_c_api) for disabling the Python C API
+* Allow for 128 bit types to be absent
+* Generalize option for running with a debugging tool via the --with-debugger flag for yggrun or with_debugger YAML option
+* Modify verification of file descriptor cleanup in tests to allow for persistence of a socket file descriptor if the socket is closed
+* Fix bug in connection tracking of connected models that sometimes prevented integrations from exiting for connections receiving from more than one model
+* Update setup script, including option specifically to set up a BioCro-OSR integration environment
+* Migrate creation of coveragerc into CLI
+* Fix bug where configuration was not completed after call to install from CLI, resulting in second call to install at next import
+* Make GNU linkers explicit for simplicity of inheritance from LDLinker
+* Allow compilation flag options to be passed to OSR (requires updated version of yggdrasil-enabled OSR)
+* Always run reticulate::py_config before importing R source code to prevent segfault
+* Allow R interpreter to be specified on the command line during install CLI and use that during dev setup
+* Fix bug in Mac SDKROOT configuration where it was being overwritten and stored more than once
+* Fix bug where '=' in requirement was interpreted as separator in .ini config parser by changing to use JSON to store the extra requirements
+* Change sprintf to snprintf and fix display of bytes when there is no terminating character
+* Add CLI utility for installing packages from conda recipes
+* Handle conda bug where removing env does not remove the directory and ensure that yggdrasil always installed in a fresh environment
+* Clean up leaks in temporary variables
+* Add emacs and pre-commit to dev dependencies
+* Short cut checking for R dependencies by just checking for the interface
+* Update XML for OSR example
+* Change deprecated calls to pandas DataFrame.append to concat in TimeSyncModelDriver
+
+1.8.4 (2023-01-27) Update CI to use mamba, improve dev utilities, & various bug fixes
+------------------
+* Update utility scripts so that requirements can be maintained in a single file with pip requirements.txt file and conda recipe generated via utils/manage_requirements.py
+* Consolidate CLI utilities for creating environments
+* Add cron job to build docker images periodically to ensure that there is always one available
+* Migrate CI to use mamba instead of conda for improved performance
+* Update documents to encourage use of mamba and reflect updates to development utilities
+* Manage optional dependencies through pip extras and additional conda builds
+* Disable flaky tests by default on CI so that tests that fail in teardown are re-run in the second attempt. They can be enabled via the pytest plugin flag "--rerun-flaky"
+* Add utility for tracking memory usage of multitasking processes
+* Update remote integration tests to use render.io instance and only run on one CI job to prevent overtaxing it
+* Handle failure on CI where MPI was not being installed
+* Various updates to comply with updated PEP8 standards
+* Add option to track memory usage to integration services manager
+* Expand output of ygginfo to include python configuration variables, common executables, and environment variables as well as providing more detailed information when a language is marked as not configured
+* Limit SBML testing to single CI job
+* Use sysconfig options for compiled languages if they match selected compilation tools
+* Fix bug where loading a yaml file with "model_only=True" yielded a result with default inputs and outputs
+
+1.8.3 (2022-07-18) Minor bug fixes for the R interface and CI
+------------------
+* Fix bug in R interface resulting from calling "is.na" on vectors
+* Stop using specific installations of R from apt on linux CI
+
+1.8.2 (2022-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------
 
 * Added ODEModelDriver for 'ode' language models that integrate ordinary differential equations (ODEs) symbolically represented in the YAML file using the sympy package
@@ -15,10 +116,19 @@ History
 * Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package
 * Refactor tests to use pytest fixtures instead of the unittest setup/teardown structure
 * Remove the yggtest CLI and migrate options into pytest CLI options
-* Update the GHA workflow to use the new pytest based CLI
+* Updated the GHA workflow to use the new pytest based CLI and test parameters so that changing the image used won't change the name of the test required to merge pull requests
 * Use lock to prevent parallel compilation for all compiled languages
 * Remove 'initial_state' parameter from Transform and Filter schemas as it is unused
 * Remove unused yggdrasil.communication.cleanup_comms method
+* Updated requirements (pinned libroadrunner to < 2.0.7 and unpinned pytest)
+* Updated tests to allow comparison of class objects imported in different ways
+* Updated the connection and comm schemas to allow for inputs & vars to include datatypes, fixing a bug where turning on debugging caused the validation of connection parameters to fail
+* Updated the connections to allow the input and output patterns to be passed directly
+* Added a method for displaying information about serializers and added that information to comm info displays
+* Fixed a bug in updating the serializer from messages for ForkComms with a scatter communication pattern
+* Added the split_and_merge example of using communication patterns to split and merge messages between multiple inputs/outputs
+* Fixed a bug in pandas serializer where strings are now stored as objects by default
+* Fixed a bug in table serializer where table parameters were not being passed to the header discovery function, resulting in them being ignored in some cases
 
 TODO
 ~~~~

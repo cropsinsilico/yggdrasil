@@ -16,7 +16,7 @@ import copy
 import argparse
 from contextlib import contextmanager
 from collections import OrderedDict
-from yggdrasil import tools
+from yggdrasil import tools, platform
 env_prefixes = tools.get_env_prefixes()
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
@@ -255,7 +255,7 @@ def get_language_order(drivers):
                 new_deps[sub_d] = sub_drv
         if d in out.keys():
             dpos = list(out.keys()).index(d)
-            assert(dpos > min_dep)
+            assert dpos > min_dep
             min_dep = dpos
         else:
             new_deps[d] = drv
@@ -679,3 +679,163 @@ def temp_config(**kwargs):
         yield cfg_env
     finally:
         cfg_env.restore()
+
+
+def add_excl_rule(excl_list, new_rule):
+    r"""Add an exclusion rule to the list if its not in there.
+
+    Args:
+        excl_list (list): List of exclusion rules to update.
+        new_rule (str): New rule to add to the list if it already exists.
+
+    Returns:
+        list: Updated exclustion rules.
+
+    """
+    if new_rule not in excl_list:
+        excl_list.append(new_rule)
+    return excl_list
+
+
+def rm_excl_rule(excl_list, new_rule):
+    r"""Remove an exclusion rule from the list if its in there.
+
+    Args:
+        excl_list (list): List of exclusion rules to update.
+        new_rule (str): New rule to remove from the list if it exists.
+
+    Returns:
+        list: Updated exclustion rules.
+
+    """
+    if new_rule in excl_list:
+        excl_list.remove(new_rule)
+    return excl_list
+
+
+def create_coveragerc(installed_languages, filename=None, setup_cfg=None):
+    r"""Create the coveragerc to reflect the OS, Python version, and
+    availability of matlab. Parameters from the setup.cfg file will be
+    added. If the .coveragerc file already exists, it will be read first
+    before adding setup.cfg options.
+
+    Args:
+        installed_languages (dict): Dictionary of language/boolean
+            key/value pairs indicating optional languages and their state
+            of installation.
+        filename (str, optional): File where coveragerc should be saved.
+            Defaults to '.coveragerc' in the current directory.
+        setup_cfg (str, optional): setup.cfg file containing coverage
+            options. If not provided, the current directory will be
+            checked.
+
+    Returns:
+        bool: True if the file was created/updated successfully, False
+            otherwise.
+
+    """
+    if not filename:
+        filename = os.path.join(os.getcwd(), '.coveragerc')
+    cp = configparser.RawConfigParser("")
+    # Read from existing .coveragerc
+    if os.path.isfile(filename):
+        cp.read(filename)
+    # Read options from setup.cfg
+    if setup_cfg is None:
+        for x in ['setup.cfg',
+                  os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                               'setup.cfg')]:
+            if os.path.isfile(x):
+                setup_cfg = x
+                break
+    if setup_cfg:
+        cp_cfg = configparser.RawConfigParser("")
+        cp_cfg.read(setup_cfg)
+        # Transfer options
+        for x in cp_cfg.sections():
+            if x.startswith('coverage:'):
+                sect_cp = x.split('coverage:')[-1]
+                if not cp.has_section(sect_cp):
+                    cp.add_section(sect_cp)
+                for opt in cp_cfg.options(x):
+                    if cp.has_option(sect_cp, opt):
+                        val_old = [line.strip() for line in
+                                   cp.get(sect_cp, opt).split('\n')]
+                        val_new = [line.strip() for line in
+                                   cp_cfg.get(x, opt).split('\n')]
+                        for v in val_new:
+                            if v not in val_old:
+                                val_old.append(v)
+                        opt_new = '\n'.join(val_old)
+                    else:
+                        opt_new = cp_cfg.get(x, opt)
+                    cp.set(sect_cp, opt, opt_new)
+    # Exclude rules for all files
+    if not cp.has_section('report'):
+        cp.add_section('report')
+    if cp.has_option('report', 'exclude_lines'):
+        excl_str = cp.get('report', 'exclude_lines')
+        excl_list = excl_str.strip().split('\n')
+    else:
+        excl_list = []
+    # Operating system
+    if platform._is_win:
+        excl_list = rm_excl_rule(excl_list, 'pragma: windows')
+    else:  # pragma: no cover
+        # Unclear why this is not covered as it is run locally by
+        # test_create_coveragerc
+        excl_list = add_excl_rule(excl_list, 'pragma: windows')
+    # CI Platform
+    if os.environ.get('GITHUB_ACTIONS', False):
+        excl_list = rm_excl_rule(excl_list, 'pragma: gha')
+    else:  # pragma: no cover
+        excl_list = add_excl_rule(excl_list, 'pragma: gha')
+    if os.environ.get('TRAVIS_OS_NAME', False):
+        excl_list = rm_excl_rule(excl_list, 'pragma: travis')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: travis')
+    if os.environ.get('APPVEYOR_BUILD_FOLDER', False):
+        excl_list = rm_excl_rule(excl_list, 'pragma: appveyor')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: appveyor')
+    # Python version
+    verlist = [2, 3]
+    for v in verlist:
+        vincl = 'pragma: Python %d' % v
+        if sys.version_info[0] == v:
+            excl_list = rm_excl_rule(excl_list, vincl)
+        else:
+            excl_list = add_excl_rule(excl_list, vincl)
+    # Language specific
+    for k, v in installed_languages.items():
+        if k == 'c++':
+            k = 'cpp'
+        if v:
+            excl_list = add_excl_rule(excl_list, 'pragma: no %s' % k)
+            excl_list = rm_excl_rule(excl_list, 'pragma: %s' % k)
+        else:
+            excl_list = add_excl_rule(excl_list, 'pragma: %s' % k)
+            excl_list = rm_excl_rule(excl_list, 'pragma: no %s' % k)
+    # Add new rules
+    cp.set('report', 'exclude_lines', '\n' + '\n'.join(excl_list))
+    # Set include path so that filenames in the report are absolute
+    PACKAGE_DIR = os.path.abspath(os.path.dirname(__file__))
+    section = 'source'
+    # if section == 'include':
+    #     section_path = os.path.join(PACKAGE_DIR, '*')
+    # else:
+    section_path = PACKAGE_DIR
+    if not cp.has_section('run'):
+        cp.add_section('run')
+    incl_list = []
+    if cp.has_option('run', section):
+        incl_list = cp.get('run', section).strip().split('\n')
+    if section_path not in incl_list:
+        incl_list.append(section_path)
+    cp.set('run', section, '\n' + '\n'.join(incl_list))
+    # Write
+    with open(filename, 'w') as fd:
+        cp.write(fd)
+    with open(filename, 'r') as fd:
+        logger.info(f"Created coverage rc @ '{filename}:\n{fd.read()}")
+    return True

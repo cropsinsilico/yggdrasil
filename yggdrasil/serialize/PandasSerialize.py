@@ -4,8 +4,6 @@ import numpy as np
 import warnings
 import io as sio
 from yggdrasil import platform, serialize
-from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
-    JSONArrayMetaschemaType)
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
 from yggdrasil.communication.transforms.PandasTransform import PandasTransform
 
@@ -88,9 +86,9 @@ class PandasSerialize(AsciiTableSerialize):
             return frame
         cols = frame.columns.tolist()
         if len(field_names) != len(cols):
-            raise RuntimeError(("Number of field names (%d) doesn't match "
-                                + "number of columns in data frame (%d).")
-                               % (len(field_names), len(cols)))
+            raise RuntimeError(f"Number of field names ({len(field_names)})"
+                               f" doesn't match number of columns in data"
+                               f" frame ({len(cols)}).")
         # Check for missing fields
         fmiss = []
         for f in field_names:
@@ -99,12 +97,12 @@ class PandasSerialize(AsciiTableSerialize):
         if fmiss:
             if len(fmiss) == len(field_names):
                 warnings.warn("Assuming direct mapping of field names to columns. "
-                              + "This may not be correct.")
+                              "This may not be correct.")
                 frame.columns = field_names
             else:
                 # Partial overlap
-                raise RuntimeError("%d fields (%s) missing from frame: %s"
-                                   % (len(fmiss), str(fmiss), str(frame)))
+                raise RuntimeError(f"{len(fmiss)} fields ({fmiss})"
+                                   f" missing from frame: {frame}")
         else:
             # Reorder columns
             frame = frame[field_names]
@@ -126,6 +124,42 @@ class PandasSerialize(AsciiTableSerialize):
             out = np.dtype('U%d' % out.itemsize)
         return out
     
+    def initialize_from_message(self, msg, **kwargs):
+        r"""Initialize the serializer based on recieved message.
+
+        Args:
+            msg (object): Message that serializer should be initialized from.
+            **kwargs: Additional keyword arguments are treated as metadata that
+                may contain additional information for initializing the serializer.
+
+        """
+        if self.field_names is None and not self.no_header:
+            self.field_names = msg.columns.tolist()
+        return super(PandasSerialize, self).initialize_from_message(msg, **kwargs)
+        
+    def normalize(self, args):
+        r"""Normalize a message to conform to the expected datatype.
+
+        Args:
+            args (object): Message arguments.
+
+        Returns:
+            object: Normalized message.
+
+        """
+        from yggdrasil.serialize import numpy2pandas, list2pandas
+        args = super(PandasSerialize, self).normalize(args)
+        if isinstance(args, np.ndarray):
+            args = numpy2pandas(args)
+        elif isinstance(args, list):
+            args = list2pandas(args)
+        field_names = self.get_field_names()
+        if ((field_names is None and not self.no_header
+             and args.columns.tolist() == list(range(len(args.columns))))):
+            field_names = ['f%d' % i for i in range(len(args.columns))]
+        args = self.apply_field_names(args, field_names)
+        return args
+    
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -137,22 +171,11 @@ class PandasSerialize(AsciiTableSerialize):
 
         """
         if not isinstance(args, pandas.DataFrame):
-            raise TypeError(("Pandas DataFrame required. Invalid type "
-                             + "of '%s' provided.") % type(args))
+            raise TypeError(f"Pandas DataFrame required. Invalid type"
+                            f" of '{type(args)}' provided.")
         fd = sio.StringIO()
         # For Python 3 and higher, bytes need to be encoded
-        args_ = copy.deepcopy(args)
-        for c in args.columns:
-            if isinstance(args_[c][0], bytes):
-                args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
-        if (self.field_names is None) and (not self.no_header):
-            self.field_names = self.get_field_names()
-        args_ = self.apply_field_names(args_, self.field_names)
-        if not self.no_header:
-            cols = args_.columns.tolist()
-            if cols == list(range(len(cols))):
-                args_ = self.apply_field_names(args_, ['f%d' % i for i in
-                                                       range(len(cols))])
+        args_ = self.normalize_bytes2unicode(args)
         args_.to_csv(fd, index=False,
                      # Not in pandas <0.24
                      # line_terminator=self.newline.decode("utf-8"),
@@ -204,10 +227,7 @@ class PandasSerialize(AsciiTableSerialize):
         out = out.dropna(axis='columns', how='all')
         fd.close()
         if self.str_as_bytes:
-            # Make sure strings are bytes
-            for c, d in zip(out.columns, out.dtypes):
-                if (d == object) and isinstance(out[c][0], str):
-                    out[c] = out[c].apply(lambda s: s.encode('utf-8'))
+            out = self.normalize_unicode2bytes(out)
         # On windows, long != longlong and longlong requires special cformat
         # For now, long will be used to preserve the use of %ld to match long
         if platform._is_win:  # pragma: windows
@@ -223,11 +243,6 @@ class PandasSerialize(AsciiTableSerialize):
         out = self.apply_field_names(out, self.get_field_names())
         if dtype is not None:
             out = out.astype(dtype, copy=False)
-        if (self.field_names is None) and (not self.no_header):
-            self.field_names = out.columns.tolist()
-        if not self.initialized:
-            typedef = JSONArrayMetaschemaType.encode_type(out)
-            self.update_serializer(extract=True, **typedef)
         return out
 
     @property
@@ -238,6 +253,54 @@ class PandasSerialize(AsciiTableSerialize):
             kws['field_names'] = field_names
         return PandasTransform(**kws)
 
+    @classmethod
+    def normalize_unicode2bytes(cls, args):
+        r"""Convert columns that are unicode to bytes.
+
+        Args:
+            args (pd.DataFrame): Pandas dataframe to convert columns for.
+        
+        Returns:
+            pd.DataFrame: Version of args without unicode in columns.
+
+        """
+        for c, d in zip(args.columns, args.dtypes):
+            if (d == object) and isinstance(args[c][0], str):
+                args[c] = args[c].apply(lambda s: s.encode('utf-8'))
+        return args
+
+    @classmethod
+    def normalize_bytes2unicode(cls, args):
+        r"""Convert columns that are bytes to unicode.
+
+        Args:
+            args (pd.DataFrame): Pandas dataframe to convert columns for.
+
+        Returns:
+            pd.DataFrame: Version of args without bytes in columns.
+
+        """
+        # For Python 3 and higher, bytes need to be encoded
+        args_ = copy.deepcopy(args)
+        for c in args.columns:
+            if isinstance(args_[c][0], bytes):
+                args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
+        return args_
+
+    @classmethod
+    def dict2object(cls, obj, field_names=None, **kwargs):
+        r"""Conver a dictionary to a message object.
+
+        Args:
+            obj (dict): Dictionary to convert to serializable object.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            object: Serializable object.
+
+        """
+        return serialize.dict2pandas(obj, order=field_names)
+        
     @classmethod
     def object2dict(cls, obj, **kwargs):
         r"""Convert a message object into a dictionary.
@@ -295,9 +358,8 @@ class PandasSerialize(AsciiTableSerialize):
                 objects[i] = cls.apply_field_names(objects[i],
                                                    field_names)
             return [pandas.concat(objects, ignore_index=True)]
-        out = super(PandasSerialize, cls).concatenate(objects, as_array=True,
-                                                      **kwargs)
-        return out
+        return super(PandasSerialize, cls).concatenate(objects, as_array=True,
+                                                       **kwargs)
     
     def consolidate_array(self, out):
         r"""Consolidate message into a structure numpy array if possible.
@@ -336,6 +398,7 @@ class PandasSerialize(AsciiTableSerialize):
 
         """
         kwargs.setdefault('table_string_type', 'string')
+        kwargs.setdefault('no_names', (no_names or no_header))
         field_names = None
         out = super(PandasSerialize, cls).get_testing_options(array_columns=True,
                                                               **kwargs)
@@ -346,18 +409,10 @@ class PandasSerialize(AsciiTableSerialize):
                 del out['kwargs'][k]
         out['extra_kwargs'] = {}
         if no_names:
-            for x in [out['kwargs'], out]:
-                if 'field_names' in x:
-                    del x['field_names']
             header_line = b'f0\tf1\tf2\n'
         elif no_header:
-            for x in [out['kwargs'], out]:
-                if 'field_names' in x:
-                    del x['field_names']
             header_line = b''
             out['kwargs']['no_header'] = True
-            for x in out['typedef']['items']:
-                x.pop('title', None)
         else:
             if 'field_names' in out['kwargs']:
                 field_names = out['kwargs']['field_names']
@@ -380,10 +435,6 @@ class PandasSerialize(AsciiTableSerialize):
                 field_names = ['f0', 'f1', 'f2']
             out['objects'] = [serialize.list2pandas(x, names=field_names)
                               for x in out['objects']]
-        out['kwargs']['datatype'] = copy.deepcopy(out['typedef'])
-        if no_names:
-            for x in out['kwargs']['datatype']['items']:
-                x.pop('title', None)
         out['empty'] = pandas.DataFrame(np.zeros(0, out['dtype']))
         return out
 

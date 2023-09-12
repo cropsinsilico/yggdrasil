@@ -1,12 +1,14 @@
-FROM continuumio/miniconda3
+FROM --platform=linux/amd64 condaforge/mambaforge
 SHELL ["/bin/bash", "--login", "-c"]
 ARG version
 RUN source /opt/conda/etc/profile.d/conda.sh && \
     conda config --add channels conda-forge && \
     conda config --set channel_priority strict
 
+# RUN source /opt/conda/etc/profile.d/conda.sh && \
+#     conda install mamba -y
 RUN source /opt/conda/etc/profile.d/conda.sh && \
-    conda create -n env python=3.9 yggdrasil=$version
+    mamba create -n env python=3.9 yggdrasil=$version yggdrasil.c yggdrasil.fortran yggdrasil.r yggdrasil.zmq yggdrasil.mpi yggdrasil.rmq yggdrasil.testing yggdrasil.docs yggdrasil.dev -y
 
 # Required so that gcc & g++ are available as paths in OpenSimRoot make
 RUN source /opt/conda/etc/profile.d/conda.sh && \

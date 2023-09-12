@@ -14,7 +14,7 @@ def test_get_compatible_tool():
     r"""Test get_compatible_tool when default provided."""
     with pytest.raises(ValueError):
         CompiledModelDriver.get_compatible_tool('invalid', 'compiler', 'c')
-    assert(CompiledModelDriver.get_compatible_tool(
+    assert (CompiledModelDriver.get_compatible_tool(
         'invalid', 'compiler', 'c', default=None) is None)
 
 
@@ -50,17 +50,41 @@ def test_get_compilation_tool():
         if platform._is_win:
             vals += [toolname.upper(), toolfile.upper()]
         for v in vals:
-            assert(CompiledModelDriver.get_compilation_tool(tooltype, v) == out)
+            assert CompiledModelDriver.get_compilation_tool(tooltype, v) == out
         with pytest.raises(ValueError):
             CompiledModelDriver.get_compilation_tool('compiler', 'invalid')
     else:
         with pytest.raises(NotImplementedError):
             CModelDriver.get_tool('compiler')
-        assert(CModelDriver.get_tool(
+        assert (CModelDriver.get_tool(
             'compiler', default='invalid') == 'invalid')
-    assert(CompiledModelDriver.get_compilation_tool('compiler', 'invalid',
-                                                    default='invalid')
-           == 'invalid')
+    assert (CompiledModelDriver.get_compilation_tool('compiler', 'invalid',
+                                                     default='invalid')
+            == 'invalid')
+
+
+@pytest.mark.language('c')
+def test_locate_library_file():
+    r"""Test locate_file method for compiler."""
+    from yggdrasil.drivers.CModelDriver import CModelDriver
+    compiler = CModelDriver.get_tool('compiler').__class__
+    files = {}
+    for k in ['shared', 'static']:
+        fname = CModelDriver.external_libraries['zmq'].get(k, '')
+        if os.path.isfile(fname):
+            files[k] = fname
+    if not files:
+        pytest.skip("Test library (zmq) doesn't exist")
+    for libtype, fname in files.items():
+        assert compiler.locate_file(fname) == fname
+        assert compiler.locate_file('zmq', libtype=libtype) == fname
+        if libtype == 'static':
+            assert compiler.archiver().locate_file('zmq') == fname
+        if libtype == 'shared':
+            assert compiler.linker().locate_file('zmq') == fname
+    if platform._is_win and 'shared' in files:
+        assert (compiler.locate_file('zmq', libtype='windows_import')
+                == files['shared'])
 
 
 def test_CompilationToolBase():
@@ -104,7 +128,7 @@ class TestCompilationTool(base_class):
                      ['a', 'b', '0', '1', 'c'])]
         for (out, key, val), kws, res in kws_list:
             python_class.append_flags(out, key, val, **kws)
-            assert(out == res)
+            assert out == res
 
     def test_create_flag(self, python_class):
         r"""Test create_flag."""
@@ -113,7 +137,7 @@ class TestCompilationTool(base_class):
                      ('-set-this', False, []),
                      ('-set-this', None, [])]
         for (key, val, out) in test_args:
-            assert(python_class.create_flag(key, val) == out)
+            assert python_class.create_flag(key, val) == out
 
     def test_not_implemented(self):
         r"""Test raising of NotImplementedErrors for incomplete classes."""
@@ -121,7 +145,7 @@ class TestCompilationTool(base_class):
 
     def test_get_flags(self, python_class):
         r"""Test get_flags."""
-        assert(python_class.get_flags(flags='hello') == ['hello'])
+        assert python_class.get_flags(flags='hello') == ['hello']
 
     def test_get_search_path(self, class_name, python_class):
         r"""Test get_search_path."""
@@ -154,14 +178,14 @@ class TestDummyCompiler(TestCompilationTool):
     def test_call(self, python_class):
         r"""Test call."""
         out = 'test123'
-        assert(not shutil.which(python_class.toolname))
-        assert(not (os.path.isfile(out) or os.path.isdir(out)))
+        assert not shutil.which(python_class.toolname)
+        assert not (os.path.isfile(out) or os.path.isdir(out))
         with pytest.raises(RuntimeError):
             python_class.call('args', out=out, dont_link=True)
 
     def test_linker(self, python_class):
         r"""Test linker."""
-        assert(python_class.linker() is False)
+        assert python_class.linker() is False
 
     def test_archiver(self, python_class):
         r"""Test archiver."""
@@ -170,8 +194,11 @@ class TestDummyCompiler(TestCompilationTool):
         
     def test_get_flags(self, python_class):
         r"""Test get_flags."""
-        assert(python_class.get_flags(flags='hello', libtype='object')
-               == ['hello', '-DWITH_YGGDRASIL'])
+        from yggdrasil import __version__ as yggver
+        yggver = yggver.split('+')[0].split('v')[-1].split('.')
+        assert (python_class.get_flags(flags='hello', libtype='object')
+                == ['hello', '-DWITH_YGGDRASIL',
+                    f'-DYGGVER_MAJOR={yggver[0]}'])
         
     def test_get_executable_command(self, python_class):
         r"""Test get_executable_command."""
@@ -214,6 +241,17 @@ class TestCompiledModelDriver(model_base_class):
         to run_model_instance"""
         return {'skip_compile': False}
         
+    @pytest.mark.skipif(platform._is_win,
+                        reason="No ASAN for Windows MSVC")
+    def test_asan_debugger(self, run_model_instance, testing_options,
+                           asan_installed):
+        r"""Test running with ASAN."""
+        if testing_options.get('requires_partner', False):
+            pytest.skip("requires partner model to run")
+        if not asan_installed:
+            pytest.skip("ASAN not installed")
+        run_model_instance(with_debugger='asan')
+        
     def test_build(self, python_class):
         r"""Test building libraries as a shared/static library or object files."""
         # Finish on the default libtype
@@ -245,8 +283,8 @@ class TestCompiledModelDriver(model_base_class):
             python_class.get_dependency_info(dep, default='default')
         with pytest.raises(KeyError):
             python_class.get_dependency_info('invalid')
-        assert(python_class.get_dependency_info('invalid', default='default')
-               == 'default')
+        assert (python_class.get_dependency_info('invalid', default='default')
+                == 'default')
 
     def test_get_dependency_source(self, python_class):
         r"""Test get_dependency_source."""
@@ -258,8 +296,8 @@ class TestCompiledModelDriver(model_base_class):
             python_class.get_dependency_source(dep, default='default')
         with pytest.raises(ValueError):
             python_class.get_dependency_source('invalid')
-        assert(python_class.get_dependency_source(__file__) == __file__)
-        assert(python_class.get_dependency_source(
+        assert python_class.get_dependency_source(__file__) == __file__
+        assert (python_class.get_dependency_source(
             'invalid', default='default') == 'default')
 
     def test_get_dependency_object(self, python_class):
@@ -272,8 +310,8 @@ class TestCompiledModelDriver(model_base_class):
             python_class.get_dependency_object(dep, default='default')
         with pytest.raises(ValueError):
             python_class.get_dependency_object('invalid')
-        assert(python_class.get_dependency_object(__file__) == __file__)
-        assert(python_class.get_dependency_object(
+        assert python_class.get_dependency_object(__file__) == __file__
+        assert (python_class.get_dependency_object(
             'invalid', default='default') == 'default')
 
     def test_get_dependency_library(self, python_class):
@@ -292,17 +330,17 @@ class TestCompiledModelDriver(model_base_class):
                 python_class.get_dependency_library(dep, libtype=libtype)
         with pytest.raises(ValueError):
             python_class.get_dependency_library('invalid')
-        assert(python_class.get_dependency_library(__file__) == __file__)
-        assert(python_class.get_dependency_library(
+        assert python_class.get_dependency_library(__file__) == __file__
+        assert (python_class.get_dependency_library(
             'invalid', default='default') == 'default')
 
     def test_get_dependency_include_dirs(self, python_class):
         r"""Test get_dependency_include_dirs."""
         with pytest.raises(ValueError):
             python_class.get_dependency_include_dirs('invalid')
-        assert(python_class.get_dependency_include_dirs(__file__)
-               == [os.path.dirname(__file__)])
-        assert(python_class.get_dependency_include_dirs(
+        assert (python_class.get_dependency_include_dirs(__file__)
+                == [os.path.dirname(__file__)])
+        assert (python_class.get_dependency_include_dirs(
             'invalid', default='default') == ['default'])
 
     def test_get_dependency_order(self, python_class):
@@ -352,13 +390,14 @@ class TestCompiledModelDriver(model_base_class):
             with pytest.raises(RuntimeError):
                 python_class.executable_command(['test'], exec_type='linker')
         else:
+            python_class.executable_command(['test'], dont_link=True)
             python_class.executable_command(['test'], exec_type='linker')
 
     def test_compiler_call(self, python_class):
         r"""Test compiler call."""
         tool = python_class.get_tool('compiler')
-        assert(tool.call('args', out='test',
-                         dry_run=True, skip_flags=True) == '')
+        assert (tool.call('args', out='test',
+                          dry_run=True, skip_flags=True) == '')
         src = [x + tool.get_language_ext()[0] for x in ['args1', 'args2']]
         with pytest.raises(ValueError):
             tool.call(src, out='out1', dont_link=True)
@@ -424,10 +463,10 @@ class TestCompiledModelDriver(model_base_class):
         if not instance.is_build_tool:
             instance.compile_model(out=instance.model_file,
                                    overwrite=False)
-            assert(os.path.isfile(instance.model_file))
+            assert os.path.isfile(instance.model_file)
             instance.compile_model(out=instance.model_file,
                                    overwrite=False)
-            assert(os.path.isfile(instance.model_file))
+            assert os.path.isfile(instance.model_file)
             os.remove(instance.model_file)
 
     def test_call_linker(self, instance):
@@ -441,5 +480,5 @@ class TestCompiledModelDriver(model_base_class):
         r"""Run test to initialize driver using the executable."""
         x = os.path.splitext(instance.source_files[0])[0] + '.out'
         new_inst = python_class('test_name', [x], skip_compile=True)
-        assert(new_inst.model_file == x)
-        assert(new_inst.source_files == instance.source_files[:1])
+        assert new_inst.model_file == x
+        assert new_inst.source_files == instance.source_files[:1]

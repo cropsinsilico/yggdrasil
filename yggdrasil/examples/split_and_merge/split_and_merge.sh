@@ -7,11 +7,7 @@ yaml=
 
 # ----------------Your Commands------------------- #
 case $1 in
-    "" | -a | --all )
-	echo "Running Python, Matlab, C integration"
-	yaml='split_and_merge_all.yml'
-	;;
-    -p | --python )
+    "" | -p | --python )
 	echo "Running Python"
 	yaml='split_and_merge_python.yml'
 	;;
@@ -30,6 +26,14 @@ case $1 in
     -r | -R)
 	echo "Running R"
 	yaml='split_and_merge_r.yml'
+	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml='split_and_merge_fortran.yml'
+	;;
+    -j | --julia )
+	echo "Running Julia"
+	yaml='split_and_merge_julia.yml'
 	;;
     * )
 	echo "Running ", $1

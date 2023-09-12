@@ -65,6 +65,8 @@ tmp/
 *.lib
 *.exe
 
+yggdrasil/examples/pytorch1/Input/data/
+
 # Compiled things - not managed
 *.pyc
 *.o

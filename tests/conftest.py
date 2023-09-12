@@ -10,9 +10,13 @@ import logging
 import argparse
 import subprocess
 import contextlib
-from yggdrasil import platform, constants
+import numpy as np
+from yggdrasil import platform, constants, rapidjson
+from yggdrasil.serialize.ObjSerialize import ObjDict
+from yggdrasil.serialize.PlySerialize import PlyDict
 from yggdrasil.tools import (
-    get_supported_lang, get_supported_comm, get_supported_type)
+    get_supported_lang, get_supported_comm, get_supported_type,
+    resolve_language_aliases)
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import _on_mpi
 logger = logging.getLogger(__name__)
@@ -27,7 +31,15 @@ _markers = [
      "tests that take a long time to run", None),
     ("extra_example", "--extra-examples",
      "tests for superfluous examples", None),
-    ("production_run", "--production-run", None)
+    ("production_run", "--production-run", None),
+    ("remote_service", "--remote-service",
+     "tests that must connect to a running remote service", None),
+    ("serial", None,
+     "tests that must be run in serial", None),
+    ("subset_representative", None,
+     "tests that represent a limited subset of the total tests", None),
+    ("subset_rapidjson", None,
+     "tests that represent a limited subset of the rapidjson submodule", None)
 ]
 _params = {
     "example_name": [],
@@ -107,7 +119,7 @@ def setup_ci(args):
         package_dir = os.path.join(x, 'yggdrasil')
         if os.path.isdir(package_dir):
             break
-    assert(os.path.isdir(package_dir))
+    assert os.path.isdir(package_dir)
     args += ['-v',
              '--import-mode=importlib',
              f'--cov={package_dir}',
@@ -115,8 +127,8 @@ def setup_ci(args):
              '--cov-config=.coveragerc',
              '--ignore=yggdrasil/rapidjson/']
     # f'--rootdir={package_dir}']
-    if not any(x.startswith('--with-mpi') for x in args):
-        args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+    # if not any(x.startswith('--with-mpi') for x in args):
+    #     args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
     # Additional checks
     if not os.path.isfile('setup.cfg'):
         raise RuntimeError("The CI tests must be run from the root "
@@ -134,12 +146,12 @@ def setup_ci(args):
                            % (src_ver, dst_ver))
     subprocess.check_call(
         ["flake8", "yggdrasil", "--append-config", "setup.cfg"])
-    if os.environ.get("YGG_CONDA", None):
-        subprocess.check_call(["python", "create_coveragerc.py"])
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
-        print(fd.read())
+        contents = fd.read()
+        print(f".coveragerc (cwd={os.getcwd()}):\n{contents}")
+        assert contents
     subprocess.check_call(["yggdrasil", "info", "--verbose"])
 
 
@@ -193,7 +205,9 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         remove_option(args, 'mpi_nproc')
         run_process = True
         prefix = ['mpiexec', '-n', str(pargs.mpi_nproc)]
-        if os.environ.get('CI', False) and platform._is_linux:
+        print(mpi_flavor())
+        if ((os.environ.get('CI', False) and platform._is_linux
+             and mpi_flavor() == 'openmpi')):
             prefix.append('--oversubscribe')
         if '--with-mpi' not in args:
             args.append('--with-mpi')
@@ -225,7 +239,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
     for x in pargs.separate_tests:
         x_args = x.split()
         x_args_copy = copy.copy(args)
-        excluded = ([m[1] for m in _markers]
+        excluded = ([m[1] for m in _markers if m[1]]
                     + ['suite', 'language', 'skip_language', 'default_comm']
                     + [f'parametrize_{k}' for k in _params.keys()])
         remove_option(x_args_copy, excluded, remove_file_or_dir=True)
@@ -234,7 +248,7 @@ def pytest_cmdline_preparse(args, dont_exit=False):
         # for k in x_args_copy:
         #     if k.split('=')[0] not in x_args_keys:
         #         x_args.append(k)
-        assert(any((k.split('=', 1)[0] == '--write-script') for k in x_args))
+        assert (any((k.split('=', 1)[0] == '--write-script') for k in x_args))
         if not pargs.second_attempt:
             pytest_cmdline_preparse(x_args, dont_exit=True)
     # Run test in separate process
@@ -265,6 +279,8 @@ def pytest_addoption(parser):
 def add_options_to_parser(parser):
     languages = sorted(get_supported_lang())
     for x in _markers:
+        if not x[1]:
+            continue
         parser.addoption(x[1], action="store_true", default=False,
                          help=f"run {x[2]} tests")
     for k, v in _params.items():
@@ -318,6 +334,8 @@ def add_options_to_parser(parser):
                      help="Don't capture output or log messages from tests.")
     parser.addoption('--end-yggdrasil-opts', action="store_true",
                      help="Internal use only")
+    parser.addoption('--rerun-flaky', action="store_true",
+                     help="Re-run flaky tests.")
 
 
 def pytest_configure(config):
@@ -338,6 +356,11 @@ def pytest_configure(config):
         "markers", ("related_language(name): mark test as being related "
                     "to a language. The language may or may not be "
                     "installed, but must be enabled for the test to run."))
+    config.addinivalue_line(
+        "markers", ("flaky_optin(name,condition=None,reruns=1,"
+                    "reruns_delay=0): mark test as "
+                    "flaky without automatically re-running on "
+                    "failure unless --rerun-flaky is specified."))
 
 
 # def pytest_runtest_setup(item):
@@ -362,17 +385,34 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(config, items):
+    active_markers = config.getoption('-m')
+    compiledMarkExpr = None
+    if active_markers:
+        from _pytest.mark.expression import Expression
+        compiledMarkExpr = Expression.compile(active_markers)
+    _marker_names = [x[0] for x in _markers]
+    
+    def check_item_enabled(item, markers=None):
+        if not compiledMarkExpr:
+            return False
+        if markers is None:
+            markers = _marker_names
+        item_markers = [x.name for x in item.iter_markers()
+                        if x.name in markers]
+        return compiledMarkExpr.evaluate(lambda x: x in item_markers)
+    
     for x in _markers:
-        if config.getoption(x[1]):
+        if (not x[1]) or config.getoption(x[1]):
             continue
         skip_x = pytest.mark.skip(reason=f"need {x[1]} to run")
         for item in items:
-            if x[0] in item.keywords:
+            if x[0] in item.keywords and not check_item_enabled(item):
                 item.add_marker(skip_x)
     # Handle suite & language markers
     selected_suites = config.getoption('--suite')
     enabled = config.getoption("--language")
     disabled = config.getoption("--skip-language")
+    rerun_flaky = config.getoption("--rerun-flaky")
     for item in items:
         # Suites
         suites = [mark.args[0] for mark in item.iter_markers(name="suite")]
@@ -389,8 +429,11 @@ def pytest_collection_modifyitems(config, items):
                 suites.append('examples_part1')
             else:
                 suites.append('examples_part2')
-        suites_disabled = [mark.kwargs.get('disabled', False)
-                           for mark in item.iter_markers(name="suite")]
+        if check_item_enabled(item):
+            suites_disabled = []
+        else:
+            suites_disabled = [mark.kwargs.get('disabled', False)
+                               for mark in item.iter_markers(name="suite")]
         if suites and not any(suites_disabled):
             suites.append('top')
         skip_x = None
@@ -440,6 +483,11 @@ def pytest_collection_modifyitems(config, items):
                     pytest.mark.skip(
                         reason=(f"test requires languages {absent_langs!r} "
                                 f"NOT be installed")))
+        # Flaky markers
+        if rerun_flaky:
+            for mark in item.iter_markers(name="flaky_optin"):
+                item.add_marker(
+                    pytest.mark.flaky(*mark.args, **mark.kwargs))
 
 
 def pytest_generate_tests(metafunc):
@@ -508,6 +556,13 @@ def write_pytest_script(fname, argv):
 
 
 # Session level constants
+@pytest.fixture(scope="session",
+                params=[pytest.param(0, marks=pytest.mark.serial)])
+def serial():
+    r"""Test must be run in serial."""
+    pass
+
+
 @pytest.fixture(scope="session")
 def project_dir():
     r"""Directory in which yggdrasil is installed."""
@@ -567,10 +622,16 @@ def languages():
 
 
 @pytest.fixture(scope="session")
-def scripts():
+def testdir():
+    r"""Test directory."""
+    return os.path.dirname(__file__)
+
+
+@pytest.fixture(scope="session")
+def scripts(testdir):
     r"""Dictionary of test scripts for each language."""
     from yggdrasil import tools
-    script_dir = os.path.join(os.path.dirname(__file__), 'scripts')
+    script_dir = os.path.join(testdir, 'scripts')
     script_list = [
         ('c', ['gcc_model.c', 'hellofunc.c']),
         ('c++', ['gcc_model.cpp', 'hellofunc.c']),
@@ -584,7 +645,9 @@ def scripts():
         ('r', 'r_model.R'),
         ('fortran', ['hellofunc.f90', 'fortran_model.f90']),
         ('sbml', 'sbml_model.xml'),
-        ('osr', 'osr_model.xml')]
+        ('osr', 'osr_model.xml'),
+        ('julia', 'julia_model.jl'),
+        ('pytorch', 'pytorch_model.py')]
     scripts = {}
     for k, v in script_list:
         if isinstance(v, list):
@@ -609,9 +672,9 @@ def scripts():
 
 
 @pytest.fixture(scope="session")
-def yamls():
+def yamls(testdir):
     r"""Dictionary of test YAMLs for each language."""
-    yaml_dir = os.path.join(os.path.dirname(__file__), 'yamls')
+    yaml_dir = os.path.join(testdir, 'yamls')
     yaml_list = [
         ('c', 'gcc_model.yml'),
         ('cpp', 'gpp_model.yml'),
@@ -640,6 +703,8 @@ def config_env(pytestconfig):
     if second_attempt:
         production_run = False
         debug = True
+    if pytestconfig.getoption("--rerun-flaky"):
+        os.environ['YGGDRASIL_RERUN_FLAKY'] = '1'
     from yggdrasil import config
     with config.temp_config(production_run=production_run,
                             debug=debug, default_comm=default_comm,
@@ -708,7 +773,7 @@ def get_service_manager_skips(service_type, partial_commtype=None,
     out.append(
         (not cls.is_installed(),
          f"Service type '{service_type}' not installed."))
-    assert(not check_running)
+    assert not check_running
     # if check_running and cls.is_installed():
     #     cli = IntegrationServiceManager(service_type=service_type,
     #                                     commtype=partial_commtype,
@@ -744,7 +809,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             break
 
     @contextlib.contextmanager
-    def running_service_w(service_type, partial_commtype=None):
+    def running_service_w(service_type, partial_commtype=None,
+                          track_memory=False):
         from yggdrasil.services import (
             IntegrationServiceManager)
         if ((((service_type, partial_commtype) == ('flask', 'rmq'))
@@ -759,6 +825,8 @@ def running_service(pytestconfig, check_service_manager_settings,
             args.append(f"--commtype={partial_commtype}")
         args += ["start", f"--model-repository={model_repo}",
                  f"--log-level={log_level}"]
+        if track_memory:
+            args.append("--track-memory")
         process_kws = {}
         if with_coverage:
             script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
@@ -775,13 +843,16 @@ def running_service(pytestconfig, check_service_manager_settings,
             if partial_commtype is not None:
                 lines[-1] += f'commtype=\'{partial_commtype}\''
             lines[-1] += ')'
-            lines += ['assert(not srv.is_running)',
+            lines += ['assert not srv.is_running',
                       f'srv.start_server(with_coverage={with_coverage},',
                       f'                 log_level={log_level},'
-                      f'                 model_repository=\'{model_repo}\')']
+                      f'                 model_repository=\'{model_repo}\','
+                      f'                 track_memory={track_memory})']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))
             args = [sys.executable, script_path]
+            # args = 'ulimit -v 256000; ' + ' '.join(args)
+            # process_kws['shell'] = True
         verify_flask = (service_type == 'flask')
         if verify_flask:
             # Flask is the default, verify that it is selected
@@ -790,14 +861,14 @@ def running_service(pytestconfig, check_service_manager_settings,
                                         commtype=partial_commtype,
                                         for_request=True)
         if verify_flask:
-            assert(cli.service_type == 'flask')
-        assert(not cli.is_running)
+            assert cli.service_type == 'flask'
+        assert not cli.is_running
         p = subprocess.Popen(args, **process_kws)
         try:
             cli.wait_for_server()
             yield cli
             cli.stop_server()
-            assert(not cli.is_running)
+            assert not cli.is_running
             p.wait(10)
         finally:
             if p.returncode is None:  # pragma: debug
@@ -847,9 +918,14 @@ def pprint_diff():
 @pytest.fixture(scope="session")
 def check_required_languages(pytestconfig):
     r"""Check if a set of languages is enabled/disabled."""
+    enabled = resolve_language_aliases(
+        pytestconfig.getoption("--language"))
+    disabled = resolve_language_aliases(
+        pytestconfig.getoption("--skip-language"))
+
     def check_required_languages_w(required_languages):
-        enabled = pytestconfig.getoption("--language")
-        disabled = pytestconfig.getoption("--skip-language")
+        required_languages = resolve_language_aliases(
+            required_languages)
         if enabled and (not all(x in enabled for x in required_languages)):
             pytest.skip(f"One or more required languages "
                         f"({required_languages}) not enabled")
@@ -916,11 +992,18 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
                     return True
                 msg_list.append(msg_recv)
             else:
-                assert(msg_recv == recv_inst.eof_msg)
+                assert msg_recv == recv_inst.eof_msg
             return (not flag)
         wait_on_function(recv_element, timeout=timeout)
         if expected_result is not None:
-            assert(msg_list == nested_approx(expected_result))
+            try:
+                assert nested_approx(expected_result) == msg_list
+            except BaseException:
+                print("EXPECTED:")
+                print(expected_result)
+                print("ACTUAL:")
+                print(msg_list)
+                raise
         return msg_list
     return wrapped_recv_message_list
 
@@ -1044,29 +1127,6 @@ def pandas_equality_patch(monkeypatch, pandas_equality):
 
 
 @pytest.fixture(scope="session")
-def unyts_equality(nested_approx):
-    r"""Comparison operation for unyt quantities and arrays."""
-    import unyt
-
-    def unyts_equality_w(a, b):
-        if not isinstance(b, unyt.array.unyt_array):
-            return False
-        if a.units != b.units:
-            return False
-        return a.to_ndarray() == nested_approx(b.to_ndarray())
-    return unyts_equality_w
-
-
-@pytest.fixture
-def unyts_equality_patch(monkeypatch, unyts_equality):
-    r"""Patch unyt array so that data and units considered."""
-    import unyt
-    with monkeypatch.context() as m:
-        m.setattr(unyt.array.unyt_array, '__eq__', unyts_equality)
-        yield
-        
-
-@pytest.fixture(scope="session")
 def functions_equality():
     def functions_equality_w(a, b):
         a_str = f"{a.__module__}.{a.__name__}"
@@ -1082,7 +1142,6 @@ def nested_approx(patch_equality, pandas_equality):
     r"""Nest pytest.approx for assertion."""
     from collections import OrderedDict
     import pandas
-    import unyt
 
     def nested_approx_(x, **kwargs):
         if isinstance(x, dict):
@@ -1094,15 +1153,17 @@ def nested_approx(patch_equality, pandas_equality):
             return [nested_approx_(xx, **kwargs) for xx in x]
         elif isinstance(x, tuple):
             return tuple([nested_approx_(xx, **kwargs) for xx in x])
-        elif isinstance(x, pandas.DataFrame):
+        elif isinstance(x, (pandas.DataFrame, ObjDict, PlyDict)):
             return x
-        elif isinstance(x, (unyt.array.unyt_quantity, unyt.array.unyt_array)):
-            # from yggdrasil.units import get_ureg
-            # units = str(x.units)
-            # y = pytest.approx(x, **kwargs)
-            # dtype = x.to_ndarray().dtype
-            # return x.__class__(y, units, dtype=dtype, registry=get_ureg())
-            return x
+        elif isinstance(x, (rapidjson.units.Quantity,
+                            rapidjson.units.QuantityArray)):
+            
+            def units_equality(a, b):
+                if a.units != b.units:
+                    return False
+                return pytest.approx(a.value, **kwargs) == b.value
+            
+            return patch_equality(x, units_equality)
         return pytest.approx(x, **kwargs)
     return nested_approx_
 
@@ -1121,9 +1182,13 @@ def patch_equality():
                 return f"EqualityWrapper({self.x!r})"
             
             def __eq__(self, other):
-                if not isinstance(other, self.x.__class__):
+                if isinstance(other, EqualityWrapper):
+                    y = other.x
+                else:
+                    y = other
+                if not isinstance(y, self.x.__class__):
                     return False
-                return method(self.x, other)
+                return method(self.x, y)
         return EqualityWrapper(obj)
     return patch_equality_w
 
@@ -1132,6 +1197,7 @@ def patch_equality():
 _dont_verify_count_fds = False
 _dont_verify_count_comms = False
 _dont_verify_count_threads = False
+_fd_count = 0
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -1149,6 +1215,24 @@ def init_zmq():
         import zmq
         s = _global_context.socket(zmq.PUSH)
         s.close()
+
+
+@pytest.fixture(scope="session")
+def asan_installed():
+    r"""Determine if ASAN is available."""
+    from yggdrasil.drivers.CompiledModelDriver import (
+        find_compilation_tool, get_compilation_tool)
+    compiler = find_compilation_tool('compiler', 'c', allow_failure=True)
+    if compiler:
+        compiler = get_compilation_tool('compiler', compiler)
+    return compiler and compiler.asan_library()
+
+
+@pytest.fixture
+def requires_asan(asan_installed):
+    r"""Skip a test if it requires non-existent ASAN."""
+    if not asan_installed:
+        pytest.skip("ASAN library not available")
 
 
 # @pytest.fixture(autouse=True)
@@ -1180,7 +1264,7 @@ def close_comm():
     def close_comm_w(comm):
         comm.close()
         comm.disconnect()
-        assert(comm.is_closed)
+        assert comm.is_closed
         del comm
     return close_comm_w
 
@@ -1199,14 +1283,24 @@ def count_comms(communicator_types):
 @pytest.fixture(scope="session")
 def count_fds():
     r"""Count the number of file descriptors."""
-    def count_fds_w():
+    def count_fds_w(dont_subtract_closed=False):
         import psutil
         from yggdrasil import platform
         proc = psutil.Process()
         if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
+            conn = proc.connections()
             out = proc.num_fds()
+            if not dont_subtract_closed:
+                out -= len([x for x in conn if x.status == 'CLOSE'])
+            # from yggdrasil.tools import get_fds
+            # fd_list = get_fds(ignore_closed=(not dont_subtract_closed),
+            #                   ignore_kqueue=True, verbose=True,
+            #                   by_column=3)
+            # out_alt = len(fd_list)
+            # print(out_alt, out, len(conn))
+            # assert out_alt == out
         return out
     return count_fds_w
 
@@ -1265,8 +1359,8 @@ def disable_verify_count_comms():
     global _dont_verify_count_comms
     _dont_verify_count_comms = True
     yield
-    
-    
+
+
 @pytest.fixture
 def verify_count_threads(wait_on_function):
     r"""Assert that all threads created during a test are cleaned up."""
@@ -1306,13 +1400,30 @@ def verify_count_comms(wait_on_function, count_comms, communicator_types):
                          on_timeout=on_timeout)
 
 
+@pytest.fixture(scope="session")
+def reset_count_fds(count_fds):
+    r"""Reset the global file descriptor count."""
+
+    def wrapped(value=None):
+        if value is None:
+            value = count_fds()
+        global _fd_count
+        prev_count = _fd_count
+        _fd_count = value
+        return prev_count
+    return wrapped
+    
+    
 @pytest.fixture
 def verify_count_fds(wait_on_function, first_test, count_fds,
                      init_zmq, init_mp):
     r"""Verify that file descriptors created during a test are cleaned up."""
     global _dont_verify_count_fds
+    global _fd_count
     _dont_verify_count_fds = False
-    nfds = count_fds()
+    _fd_count = count_fds()
+    # from yggdrasil.tools import track_fds
+    # with track_fds():
     yield
     gc.collect()
     if not (first_test or _dont_verify_count_fds or platform._is_win):
@@ -1327,9 +1438,11 @@ def verify_count_fds(wait_on_function, first_test, count_fds,
                     pprint.pprint(refs)
                     print(f'FDS: {count_fds()}')
                     pdb.set_trace()
+            # warnings.warn(f"{count_fds()} file descriptors are open, "
+            #               f"but the test started with {_fd_count}.")
             raise AssertionError(f"{count_fds()} file descriptors are open, "
-                                 f"but the test started with {nfds}.")
-        wait_on_function(lambda: count_fds() <= nfds,
+                                 f"but the test started with {_fd_count}.")
+        wait_on_function(lambda: count_fds() <= _fd_count,
                          on_timeout=on_timeout)
 
 
@@ -1345,6 +1458,19 @@ def cleanup_communicators(communicator_types):
 # MPI utilities
 _global_tag = 0
 _mpi_error_exchange = None
+
+
+def mpi_flavor():
+    r"""Return the MPI flavor."""
+    if shutil.which('mpicc'):
+        result = subprocess.check_output("mpicc -v", shell=True).decode(
+            "utf-8")
+        print('mpi_flavor', result)
+        if "MPICH" in result:
+            return 'mpich'
+        # elif "Open MPI" in result:
+        return 'openmpi'
+    return None
 
 
 @pytest.fixture(scope="session")
@@ -1397,7 +1523,7 @@ def new_mpi_exchange():
 def adv_global_mpi_tag():
     def adv_global_mpi_tag_w(value=1):
         global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
+        assert _mpi_error_exchange is not None
         out = _mpi_error_exchange.global_tag
         _mpi_error_exchange.global_tag += value
         return out
@@ -1408,7 +1534,7 @@ def adv_global_mpi_tag():
 def sync_mpi_exchange():
     def sync_mpi_exchange_w(*args, **kwargs):
         global _mpi_error_exchange
-        assert(_mpi_error_exchange is not None)
+        assert _mpi_error_exchange is not None
         return _mpi_error_exchange.sync(*args, **kwargs)
     return sync_mpi_exchange_w
 
@@ -1478,3 +1604,29 @@ def finalize_mpi(request, on_mpi, mpi_comm, mpi_rank, mpi_size):
             return True
 
         plugin._is_worker = new_is_worker
+
+
+@pytest.fixture
+def display_diff():
+
+    def wrapped(a, b):
+        import pprint
+        import difflib
+        a_str = pprint.pformat(a)
+        b_str = pprint.pformat(b)
+        diff = difflib.ndiff(a_str.splitlines(),
+                             b_str.splitlines())
+        print('\n'.join(diff))
+
+    return wrapped
+
+
+@pytest.fixture
+def geom_dict():
+    return {
+        'vertices': np.array([[0, 0, 0, 0, 1, 1, 1, 1],
+                              [0, 0, 1, 1, 0, 0, 1, 1],
+                              [0, 1, 1, 0, 0, 1, 1, 0]], 'float32').T,
+        'faces': np.array([[0, 0, 7, 0, 1, 2, 3],
+                           [1, 2, 6, 4, 5, 6, 7],
+                           [2, 3, 5, 5, 6, 7, 4]], 'int32').T}

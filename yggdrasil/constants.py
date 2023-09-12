@@ -3,7 +3,6 @@ import numpy as np
 from collections import OrderedDict
 # No other yggdrasil modules should be import here
 # TODO: Move platform constants into this module?
-from yggdrasil import platform
 
 
 # Type related constants
@@ -19,6 +18,7 @@ NUMPY_STRING_TYPES = [
     'str',
 ]
 NUMPY_TYPES = NUMPY_NUMERIC_TYPES + NUMPY_STRING_TYPES
+SCALAR_TYPES = [x for x in NUMPY_TYPES if x != 'str']
 FLEXIBLE_TYPES = [
     'string',
     'bytes',
@@ -29,13 +29,19 @@ PYTHON_SCALARS = OrderedDict([
     ('int', [int]),
     ('uint', []),
     ('complex', [complex]),
+    ('string', [bytes]),
     ('bytes', [bytes]),
     ('unicode', [str]),
+    ('number', [float]),
+    ('integer', [int]),
 ])
 VALID_TYPES = OrderedDict([(k, k) for k in NUMPY_NUMERIC_TYPES])
 VALID_TYPES.update([
+    ('string', 'bytes'),
     ('bytes', 'bytes'),
     ('unicode', 'str'),
+    ('number', 'float'),
+    ('integer', 'int'),
 ])
 NUMPY_PRECISIONS = {
     'float': [16, 32, 64],
@@ -43,10 +49,41 @@ NUMPY_PRECISIONS = {
     'uint': [8, 16, 32, 64],
     'complex': [64, 128],
 }
-if not platform._is_win:
+JSON_SIMPLE_TYPES = OrderedDict([
+    ("null", ""),
+    ("boolean", "true or false"),
+    ("string", "Arrays of characters"),
+    ("integer", "Integer numbers"),
+    ("number", "Integer or decimal numbers"),
+])
+JSON_CONTAINER_TYPES = OrderedDict([
+    ("array", "Container for sequences of values"),
+    ("object", "Container for mappings of key and value pairs"),
+])
+
+YGGDRASIL_TYPES = OrderedDict([
+    ("scalar", ("Scalar quantities that can have units, variables "
+                "precision, or an encoding (for unicode scalars)")),
+    ("ndarray", ("N-dimensional arrays of memory contiguous arrays of "
+                 "scalars")),
+    ("instance", "Python class instance"),
+    ("class", "Python class"),
+    ("function", "Python function"),
+    ("obj", "ObjWavefront 3D structure"),
+    ("ply", "Ply 3D structure"),
+    ("schema", "JSON schema"),
+])
+ALL_TYPES = OrderedDict()
+for x in [JSON_SIMPLE_TYPES, JSON_CONTAINER_TYPES, YGGDRASIL_TYPES]:
+    ALL_TYPES.update(x)
+try:
     # Not available on windows
+    np.dtype('float128')
     NUMPY_PRECISIONS['float'].append(128)
+    np.dtype('complex256')
     NUMPY_PRECISIONS['complex'].append(256)
+except TypeError:
+    pass
 for T, T_NP in VALID_TYPES.items():
     PYTHON_SCALARS[T].append(np.dtype(T_NP).type)
     if T in NUMPY_PRECISIONS:
@@ -60,6 +97,11 @@ for k, v in PYTHON_SCALARS.items():
     ALL_PYTHON_SCALARS += list(v)
 ALL_PYTHON_SCALARS = tuple(set(ALL_PYTHON_SCALARS))
 ALL_PYTHON_ARRAYS = (np.ndarray,)
+FIXED_ENCODING_SIZES = {
+    "UTF32": 4,
+    "UCS4": 4,
+    "ASCII": 1
+}
 
 
 # Serialization constants
@@ -72,6 +114,7 @@ FMT_CHAR_STR = FMT_CHAR.decode("utf-8")
 DEFAULT_COMMENT_STR = DEFAULT_COMMENT.decode("utf-8")
 DEFAULT_DELIMITER_STR = DEFAULT_DELIMITER.decode("utf-8")
 DEFAULT_NEWLINE_STR = DEFAULT_NEWLINE.decode("utf-8")
+DEFAULT_DATATYPE = {'type': 'scalar', 'subtype': 'string'}
 
 
 # Communication constants
@@ -94,6 +137,17 @@ COMPONENT_REGISTRY = {
         'default': 'default',
         'key': 'commtype',
         'module': 'yggdrasil.communication',
+        'subtype_modules': {
+            'buffer': 'BufferComm',
+            'default': 'DefaultComm',
+            'ipc': 'IPCComm',
+            'mpi': 'MPIComm',
+            'rest': 'RESTComm',
+            'rmq': 'RMQComm',
+            'rmq_async': 'RMQAsyncComm',
+            'value': 'ValueComm',
+            'zmq': 'ZMQComm',
+        },
         'subtypes': {
             'buffer': 'BufferComm',
             'default': 'DefaultComm',
@@ -111,6 +165,15 @@ COMPONENT_REGISTRY = {
         'default': None,
         'key': 'connection_type',
         'module': 'yggdrasil.drivers',
+        'subtype_modules': {
+            'connection': 'ConnectionDriver',
+            'file_input': 'FileInputDriver',
+            'file_output': 'FileOutputDriver',
+            'input': 'InputDriver',
+            'output': 'OutputDriver',
+            'rpc_request': 'RPCRequestDriver',
+            'rpc_response': 'RPCResponseDriver',
+        },
         'subtypes': {
             'connection': 'ConnectionDriver',
             'file_input': 'FileInputDriver',
@@ -126,9 +189,20 @@ COMPONENT_REGISTRY = {
         'default': 'binary',
         'key': 'filetype',
         'module': 'yggdrasil.communication',
-        'subtypes': {
+        'subtype_modules': {
             'ascii': 'AsciiFileComm',
+            'bam': 'SequenceFileBase',
+            'bcf': 'SequenceFileBase',
             'binary': 'FileComm',
+            'bmp': 'ImageFileBase',
+            'cabo': 'CABOFileComm',
+            'cram': 'SequenceFileBase',
+            'eps': 'ImageFileBase',
+            'excel': 'ExcelFileComm',
+            'fasta': 'SequenceFileBase',
+            'fastq': 'SequenceFileBase',
+            'gif': 'ImageFileBase',
+            'jpeg': 'ImageFileBase',
             'json': 'JSONFileComm',
             'map': 'AsciiMapComm',
             'mat': 'MatFileComm',
@@ -137,8 +211,40 @@ COMPONENT_REGISTRY = {
             'pandas': 'PandasFileComm',
             'pickle': 'PickleFileComm',
             'ply': 'PlyFileComm',
+            'png': 'ImageFileBase',
+            'sam': 'SequenceFileBase',
             'table': 'AsciiTableComm',
-            'wofost': 'WOFOSTParamFileComm',
+            'tiff': 'ImageFileBase',
+            'vcf': 'SequenceFileBase',
+            'yaml': 'YAMLFileComm',
+        },
+        'subtypes': {
+            'ascii': 'AsciiFileComm',
+            'bam': 'BAMFileComm',
+            'bcf': 'BCFFileComm',
+            'binary': 'FileComm',
+            'bmp': 'BMPFileComm',
+            'cabo': 'CABOFileComm',
+            'cram': 'CRAMFileComm',
+            'eps': 'EPSFileComm',
+            'excel': 'ExcelFileComm',
+            'fasta': 'FASTAFileComm',
+            'fastq': 'FASTQFileComm',
+            'gif': 'GIFFileComm',
+            'jpeg': 'JPEGFileComm',
+            'json': 'JSONFileComm',
+            'map': 'AsciiMapComm',
+            'mat': 'MatFileComm',
+            'netcdf': 'NetCDFFileComm',
+            'obj': 'ObjFileComm',
+            'pandas': 'PandasFileComm',
+            'pickle': 'PickleFileComm',
+            'ply': 'PlyFileComm',
+            'png': 'PNGFileComm',
+            'sam': 'SAMFileComm',
+            'table': 'AsciiTableComm',
+            'tiff': 'TIFFFileComm',
+            'vcf': 'VCFFileComm',
             'yaml': 'YAMLFileComm',
         },
     },
@@ -147,6 +253,11 @@ COMPONENT_REGISTRY = {
         'default': None,
         'key': 'filtertype',
         'module': 'yggdrasil.communication.filters',
+        'subtype_modules': {
+            'direct': 'DirectFilter',
+            'function': 'FunctionFilter',
+            'statement': 'StatementFilter',
+        },
         'subtypes': {
             'direct': 'DirectFilter',
             'function': 'FunctionFilter',
@@ -158,6 +269,29 @@ COMPONENT_REGISTRY = {
         'default': 'executable',
         'key': 'language',
         'module': 'yggdrasil.drivers',
+        'subtype_modules': {
+            'R': 'RModelDriver',
+            'c': 'CModelDriver',
+            'c++': 'CPPModelDriver',
+            'cmake': 'CMakeModelDriver',
+            'cpp': 'CPPModelDriver',
+            'cxx': 'CPPModelDriver',
+            'dummy': 'DummyModelDriver',
+            'executable': 'ExecutableModelDriver',
+            'fortran': 'FortranModelDriver',
+            'julia': 'JuliaModelDriver',
+            'lpy': 'LPyModelDriver',
+            'make': 'MakeModelDriver',
+            'matlab': 'MatlabModelDriver',
+            'mpi': 'MPIPartnerModel',
+            'ode': 'ODEModelDriver',
+            'osr': 'OSRModelDriver',
+            'python': 'PythonModelDriver',
+            'pytorch': 'PyTorchModelDriver',
+            'r': 'RModelDriver',
+            'sbml': 'SBMLModelDriver',
+            'timesync': 'TimeSyncModelDriver',
+        },
         'subtypes': {
             'R': 'RModelDriver',
             'c': 'CModelDriver',
@@ -168,6 +302,7 @@ COMPONENT_REGISTRY = {
             'dummy': 'DummyModelDriver',
             'executable': 'ExecutableModelDriver',
             'fortran': 'FortranModelDriver',
+            'julia': 'JuliaModelDriver',
             'lpy': 'LPyModelDriver',
             'make': 'MakeModelDriver',
             'matlab': 'MatlabModelDriver',
@@ -175,6 +310,7 @@ COMPONENT_REGISTRY = {
             'ode': 'ODEModelDriver',
             'osr': 'OSRModelDriver',
             'python': 'PythonModelDriver',
+            'pytorch': 'PyTorchModelDriver',
             'r': 'RModelDriver',
             'sbml': 'SBMLModelDriver',
             'timesync': 'TimeSyncModelDriver',
@@ -185,7 +321,8 @@ COMPONENT_REGISTRY = {
         'default': 'default',
         'key': 'seritype',
         'module': 'yggdrasil.serialize',
-        'subtypes': {
+        'subtype_modules': {
+            'cabo': 'CABOSerialize',
             'default': 'DefaultSerialize',
             'direct': 'DirectSerialize',
             'functional': 'FunctionalSerialize',
@@ -197,7 +334,21 @@ COMPONENT_REGISTRY = {
             'pickle': 'PickleSerialize',
             'ply': 'PlySerialize',
             'table': 'AsciiTableSerialize',
-            'wofost': 'WOFOSTParamSerialize',
+            'yaml': 'YAMLSerialize',
+        },
+        'subtypes': {
+            'cabo': 'CABOSerialize',
+            'default': 'DefaultSerialize',
+            'direct': 'DirectSerialize',
+            'functional': 'FunctionalSerialize',
+            'json': 'JSONSerialize',
+            'map': 'AsciiMapSerialize',
+            'mat': 'MatSerialize',
+            'obj': 'ObjSerialize',
+            'pandas': 'PandasSerialize',
+            'pickle': 'PickleSerialize',
+            'ply': 'PlySerialize',
+            'table': 'AsciiTableSerialize',
             'yaml': 'YAMLSerialize',
         },
     },
@@ -206,18 +357,102 @@ COMPONENT_REGISTRY = {
         'default': None,
         'key': 'transformtype',
         'module': 'yggdrasil.communication.transforms',
+        'subtype_modules': {
+            'array': 'ArrayTransform',
+            'direct': 'DirectTransform',
+            'filter': 'FilterTransform',
+            'function': 'FunctionTransform',
+            'iterate': 'IterateTransform',
+            'map': 'MapTransform',
+            'map_fields': 'MapFieldsTransform',
+            'pandas': 'PandasTransform',
+            'select_fields': 'SelectFieldsTransform',
+            'select_scalar': 'SelectScalarTransform',
+            'statement': 'StatementTransform',
+        },
         'subtypes': {
             'array': 'ArrayTransform',
             'direct': 'DirectTransform',
             'filter': 'FilterTransform',
             'function': 'FunctionTransform',
             'iterate': 'IterateTransform',
+            'map': 'MapTransform',
             'map_fields': 'MapFieldsTransform',
             'pandas': 'PandasTransform',
             'select_fields': 'SelectFieldsTransform',
+            'select_scalar': 'SelectScalarTransform',
             'statement': 'StatementTransform',
         },
     },
+}
+
+# File constants
+FILE2EXT = {
+    'ascii': '.txt',
+    'bam': '.bam',
+    'bcf': '.bcf',
+    'binary': '.txt',
+    'bmp': '.bmp',
+    'cabo': '.cab',
+    'cram': '.cram',
+    'eps': '.eps',
+    'excel': '.xlsx',
+    'fasta': '.fasta',
+    'fastq': '.fastq',
+    'gif': '.gif',
+    'jpeg': '.jpg',
+    'json': '.json',
+    'map': '.txt',
+    'mat': '.mat',
+    'netcdf': '.nc',
+    'obj': '.obj',
+    'pandas': '.txt',
+    'pickle': '.pkl',
+    'ply': '.ply',
+    'png': '.png',
+    'sam': '.sam',
+    'table': '.txt',
+    'tiff': '.tiff',
+    'vcf': '.vcf',
+    'yaml': '.yaml',
+}
+EXT2FILE = {
+    '.apng': 'png',
+    '.bam': 'bam',
+    '.bcf': 'bcf',
+    '.bmp': 'bmp',
+    '.cab': 'cabo',
+    '.cram': 'cram',
+    '.eps': 'eps',
+    '.fasta': 'fasta',
+    '.fastq': 'fastq',
+    '.gif': 'gif',
+    '.jfif': 'jpeg',
+    '.jpe': 'jpeg',
+    '.jpeg': 'jpeg',
+    '.jpg': 'jpeg',
+    '.json': 'json',
+    '.mat': 'mat',
+    '.nc': 'netcdf',
+    '.obj': 'obj',
+    '.odf': 'excel',
+    '.ods': 'excel',
+    '.odt': 'excel',
+    '.pkl': 'pickle',
+    '.ply': 'ply',
+    '.png': 'png',
+    '.ps': 'eps',
+    '.sam': 'sam',
+    '.tif': 'tiff',
+    '.tiff': 'tiff',
+    '.txt': 'ascii',
+    '.vcf': 'vcf',
+    '.xls': 'excel',
+    '.xlsb': 'excel',
+    '.xlsm': 'excel',
+    '.xlsx': 'excel',
+    '.yaml': 'yaml',
+    '.yml': 'yaml',
 }
 
 # Language driver constants
@@ -229,10 +464,12 @@ LANG2EXT = {
     'cxx': '.cpp',
     'executable': '.exe',
     'fortran': '.f90',
+    'julia': '.jl',
     'lpy': '.lpy',
     'matlab': '.m',
     'osr': '.xml',
     'python': '.py',
+    'pytorch': '.py',
     'r': '.R',
     'sbml': '.xml',
     'yaml': '.yml',
@@ -242,11 +479,11 @@ LANGUAGES = {
     'compiled': [
         'c', 'c++', 'fortran'],
     'interpreted': [
-        'R', 'matlab', 'python'],
+        'R', 'julia', 'matlab', 'python'],
     'build': [
         'cmake', 'make'],
     'dsl': [
-        'lpy', 'ode', 'osr', 'sbml'],
+        'lpy', 'ode', 'osr', 'pytorch', 'sbml'],
     'other': [
         'dummy', 'executable', 'mpi', 'timesync'],
 }
@@ -260,11 +497,11 @@ LANGUAGES_WITH_ALIASES = {
     'compiled': [
         'c', 'c++', 'cpp', 'cxx', 'fortran'],
     'interpreted': [
-        'R', 'matlab', 'python', 'r'],
+        'R', 'julia', 'matlab', 'python', 'r'],
     'build': [
         'cmake', 'make'],
     'dsl': [
-        'lpy', 'ode', 'osr', 'sbml'],
+        'lpy', 'ode', 'osr', 'pytorch', 'sbml'],
     'other': [
         'dummy', 'executable', 'mpi', 'timesync'],
 }
@@ -392,6 +629,11 @@ LANGUAGE_PROPERTIES = {
         'full_language': True,
         'is_typed': True,
     },
+    'julia': {
+        'executable_type': 'interpreted',
+        'full_language': True,
+        'is_typed': False,
+    },
     'lpy': {
         'executable_type': 'dsl',
         'full_language': False,
@@ -425,6 +667,11 @@ LANGUAGE_PROPERTIES = {
     'python': {
         'executable_type': 'interpreted',
         'full_language': True,
+        'is_typed': False,
+    },
+    'pytorch': {
+        'executable_type': 'dsl',
+        'full_language': False,
         'is_typed': False,
     },
     'sbml': {

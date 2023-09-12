@@ -20,16 +20,21 @@ from yggdrasil import tools, runner, examples, platform, config
 from yggdrasil import platform as ygg_platform
 from yggdrasil.multitasking import wait_on_function
 from yggdrasil.drivers import MatlabModelDriver
-import matplotlib as mpl
-if os.environ.get('DISPLAY', '') == '':  # pragma: debug
-    mpl.use('Agg')
-elif ygg_platform._is_mac:  # pragma: travis
-    mpl.use('TkAgg')
-import matplotlib.pyplot as plt  # noqa: E402
+try:
+    import matplotlib as mpl
+    if os.environ.get('DISPLAY', '') == '':  # pragma: debug
+        mpl.use('Agg')
+    elif ygg_platform._is_mac:  # pragma: travis
+        mpl.use('TkAgg')
+    import matplotlib.pyplot as plt  # noqa: E402
+    mpl.rc('font', size=18)
+except ImportError:  # pragma: debug
+    warnings.warn("Plotting disabled")
+    mpl = None
+    plt = None
 logger = logging.getLogger(__name__)
 _linewidth = 2
 _legend_fontsize = 14
-mpl.rc('font', size=18)
 _pyperf_warmups = 0
 _python_version = '%d.%d' % (sys.version_info[0], sys.version_info[1])
 
@@ -108,7 +113,6 @@ def write_pyperf_script(script_file, nmsg, msg_size,
         'from yggdrasil import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
-        'warmups = %d' % _pyperf_warmups,
         'msg_size = %d' % msg_size,
         'max_errors = %d' % max_errors,
         'lang_src = "%s"' % lang_src,
@@ -119,7 +123,7 @@ def write_pyperf_script(script_file, nmsg, msg_size,
     #     tmpdir = os.environ['TMPDIR']
     #     if platform._is_win:  # pragma: windows
     #         tmpdir = repr(tmpdir)
-    #         assert(tmpdir.startswith('\'') and tmpdir.endswith('\''))
+    #         assert tmpdir.startswith('\'') and tmpdir.endswith('\'')
     #         tmpdir = tmpdir[1:-1]
     #         # tmpdir = tmpdir.replace('\\', '\\\\')
     #     lines += ['os.environ["TMPDIR"] = "%s"' % tmpdir]
@@ -127,11 +131,11 @@ def write_pyperf_script(script_file, nmsg, msg_size,
         'timer = timing.TimedRun(lang_src, lang_dst,'
         '                        comm_type=comm_type,'
         '                        matlab_running=matlab_running)',
-        'runner = pyperf.Runner(values=1, processes=nrep, warmups=warmups)',
+        'runner = pyperf.Runner(values=1, processes=nrep)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.pyperf_func,',
         '                             timer, nmsg, msg_size, max_errors)']
-    assert(not os.path.isfile(script_file))
+    assert not os.path.isfile(script_file)
     with open(script_file, 'w') as fd:
         fd.write('\n'.join(lines))
 
@@ -475,7 +479,7 @@ class TimedRun(tools.YggClass):
         wait_on_function(lambda: os.stat(fout).st_size == len(fres),
                          timeout=self.timeout, on_timeout=on_timeout)
         ocont = open(fout, 'r').read()
-        assert(ocont == fres)
+        assert ocont == fres
 
     def cleanup_output(self, fout):
         r"""Cleanup the output file.
@@ -516,7 +520,9 @@ class TimedRun(tools.YggClass):
 
         """
         out = {'models': [self.get_yaml_src(self.lang_src),
-                          self.get_yaml_dst(self.lang_dst)]}
+                          self.get_yaml_dst(self.lang_dst)],
+               'connections': [{'input': 'output_pipe',
+                                'output': 'input_pipe'}]}
         lines = yaml.dump(out, default_flow_style=False)
         with open(path, 'w') as fd:
             fd.write(lines)
@@ -532,9 +538,7 @@ class TimedRun(tools.YggClass):
                'language': lang,
                'args': [os.path.join('.', self.source_src),
                         "{{PIPE_MSG_COUNT}}", "{{PIPE_MSG_SIZE}}"],
-               'outputs': {'name': 'output_pipe',
-                           'driver': 'OutputDriver',
-                           'args': 'timed_pipe'}}
+               'outputs': {'name': 'output_pipe'}}
         return out
 
     def get_yaml_dst(self, lang):
@@ -547,13 +551,12 @@ class TimedRun(tools.YggClass):
         out = {'name': 'timed_pipe_dst',
                'language': lang,
                'args': os.path.join('.', self.source_dst),
-               'inputs': {'name': 'input_pipe',
-                          'driver': 'InputDriver',
-                          'args': 'timed_pipe'},
+               'inputs': {'name': 'input_pipe'},
                'outputs': {'name': 'output_file',
-                           'driver': 'AsciiFileOutputDriver',
-                           'args': "{{PIPE_OUT_FILE}}",
-                           'in_temp': True}}
+                           'default_file': {
+                               'name': "{{PIPE_OUT_FILE}}",
+                               'filetype': 'ascii',
+                               'in_temp': True}}}
         return out
 
     def before_run(self, nmsg, msg_size):
@@ -567,7 +570,7 @@ class TimedRun(tools.YggClass):
             str: Unique identifier for the run.
 
         """
-        assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
+        assert self.matlab_running == MatlabModelDriver.is_matlab_running()
         nmsg = int(nmsg)
         msg_size = int(msg_size)
         run_uuid = self.get_new_uuid()
@@ -599,7 +602,7 @@ class TimedRun(tools.YggClass):
         self.info("Finished %s: %f s", self.entry_name(nmsg, msg_size), result)
         self.check_output(fout, nmsg, msg_size)
         self.cleanup_output(fout)
-        assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
+        assert self.matlab_running == MatlabModelDriver.is_matlab_running()
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
     def run(self, run_uuid, timer=time.time, t0=None):
@@ -622,7 +625,7 @@ class TimedRun(tools.YggClass):
         r = runner.get_runner(self.fyaml[run_uuid],
                               namespace=self.name + run_uuid)
         times = r.run(timer=timer, t0=t0)
-        assert(not r.error_flag)
+        assert not r.error_flag
         del r
         return times
 
@@ -701,7 +704,7 @@ class TimedRun(tools.YggClass):
                '--inherit-environ=' + ','.join(copy_env),
                '--warmups=%d' % _pyperf_warmups]
         subprocess.call(cmd)
-        assert(os.path.isfile(self.filename))
+        assert os.path.isfile(self.filename)
         os.remove(self.pyperfscript)
 
     def time_run_mine(self, nmsg, msg_size, nrep):
@@ -794,7 +797,7 @@ class TimedRun(tools.YggClass):
             msg_size = self.default_msg_size
         if msg_count is None:
             msg_count = self.default_msg_count
-        if axs is None:
+        if axs is None and plt is not None:
             figure_size = (15.0, 6.0)
             figure_buff = 0.75
             fig, axs = plt.subplots(1, 2, figsize=figure_size, sharey=True)
@@ -812,8 +815,9 @@ class TimedRun(tools.YggClass):
                     axs_width, axs_height]
             axs[0].set_position(pos1)
             axs[1].set_position(pos2)
-        self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
-        self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
+        if plt is not None:
+            self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
+            self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
         # Get slopes
         fit = self.fit_scaling_count(msg_size=msg_size0, counts=msg_count)
         self.info('fit: slope = %f, intercept = %f', fit[0], fit[1])
@@ -821,7 +825,9 @@ class TimedRun(tools.YggClass):
         # xname = 'size'
         # self.info('%s: slope = %f, intercept = %f', xname, m, b)
         # Legend
-        axs[1].legend(loc='upper left', ncol=2, fontsize=_legend_fontsize)
+        if plt is not None:
+            axs[1].legend(loc='upper left', ncol=2,
+                          fontsize=_legend_fontsize)
         return axs, fit
         
     def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
@@ -858,6 +864,8 @@ class TimedRun(tools.YggClass):
             matplotlib.Axes: Axes containing the plotted scaling.
 
         """
+        if plt is None:  # pragma: debug
+            return axs
         if isinstance(msg_size, list):
             msg_size = np.array(msg_size)
         if isinstance(msg_count, list):
@@ -1170,7 +1178,7 @@ class TimedRun(tools.YggClass):
             with open(self.filename, 'rb') as fd:
                 out = pickle.load(fd, encoding='latin1')
         else:
-            assert(self.filename.endswith('.json'))
+            assert self.filename.endswith('.json')
             if as_json:
                 with open(self.filename, 'r') as fd:
                     out = json.load(fd)
@@ -1263,7 +1271,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
     if compare_values is None:
         compare_values = default_vals.get(compare, None)
     else:
-        assert(isinstance(compare_values, list))
+        assert isinstance(compare_values, list)
     per_message = kwargs.get('per_message', False)
     if compare == 'comm_type':
         color_var = 'comm_type'
@@ -1310,7 +1318,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         yscale = 'linear'
     else:
         raise ValueError("Invalid compare: '%s'" % compare)
-    assert(len(var_kws) > 0)
+    assert len(var_kws) > 0
     # Raise error if any of the varied keys are set in kwargs
     for k in var_kws[0].keys():
         if k in kwargs:
@@ -1345,7 +1353,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         kws.update(kwargs)
         if MatlabModelDriver.is_matlab_running():  # pragma: debug
             MatlabModelDriver.kill_all()
-            assert(not MatlabModelDriver.is_matlab_running())
+            assert not MatlabModelDriver.is_matlab_running()
         if ((kws.get('matlab_running', False)
              and MatlabModelDriver._matlab_engine_installed)):  # pragma: matlab
             nml = 0
@@ -1364,7 +1372,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
              and MatlabModelDriver._matlab_engine_installed)):  # pragma: matlab
             for v in ml_sessions:
                 MatlabModelDriver.stop_matlab_engine(*v)
-            assert(not MatlabModelDriver.is_matlab_running())
+            assert not MatlabModelDriver.is_matlab_running()
     # Print a table
     print('%-20s\t%-20s\t%-20s' % ('Label', 'Time per Message (s)', 'Overhead (s)'))
     print('%-20s\t%-20s\t%-20s' % (20 * '=', 20 * '=', 20 * '='))
@@ -1373,10 +1381,11 @@ def plot_scalings(compare='comm_type', compare_values=None,
         v = fits[k]
         print(fmt_row % (k, v[0], v[1]))
     # Save plot
-    plt.savefig(plotfile, dpi=600)
-    logger.info('plotfile: %s', plotfile)
-    if cleanup_plot:
-        os.remove(plotfile)
+    if plt is not None:
+        plt.savefig(plotfile, dpi=600)
+        logger.info('plotfile: %s', plotfile)
+        if cleanup_plot:
+            os.remove(plotfile)
     return plotfile
 
 

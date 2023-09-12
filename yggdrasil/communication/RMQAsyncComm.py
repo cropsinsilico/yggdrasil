@@ -47,6 +47,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                         + ['rmq_thread', '_consuming', '_reconnecting',
                            '_buffered_messages', '_deliveries',
                            '_external_close'])
+    _deprecated_drivers = ['RMQAsyncInputDriver', 'RMQAsyncOutputDriver']
 
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""
@@ -322,7 +323,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if call_on_thread:
             if not self.rmq_thread.is_alive():
                 # Ensure that shutdown is not prevented by flags
-                assert(self._closing.has_stopped())
+                assert self._closing.has_stopped()
                 return
             self._external_close.set()
             if self._reconnecting.is_running():  # pragma: debug

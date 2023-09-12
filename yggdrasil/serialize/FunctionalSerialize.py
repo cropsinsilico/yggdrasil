@@ -1,3 +1,4 @@
+import copy
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -42,27 +43,7 @@ class FunctionalSerialize(SerializeBase):
             kwargs['func_deserialize'] = kwargs['func_deserialize'].func_deserialize
         super(FunctionalSerialize, self).__init__(**kwargs)
 
-    # @property
-    # def base_class(self):
-    #     r"""DefaultSerialize: Default version of serialization."""
-    #     if getattr(self, '_base_class', None) is None:
-    #         self._base_class = DefaultSerialize(datatype=self.typedef,
-    #                                             **self.serializer_info)
-    #     return self._base_class
-
-    # TODO: In some cases this should be the object typedef
-    # @property
-    # def typedef(self):
-    #     r"""dict: Type definition."""
-    #     return self.encoded_typedef
-
     @property
     def serializer_info(self):
         r"""dict: Serializer info."""
-        raise RuntimeError("Cannot define serializer information for user "
-                           + "supplied functions.")
-
-    @property
-    def empty_msg(self):
-        r"""obj: Object indicating empty message."""
-        return self.encoded_datatype._empty_msg
+        return {'datatype': copy.deepcopy(self.datatype)}

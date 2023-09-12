@@ -147,10 +147,10 @@ class MPIComm(CommBase.CommBase):
     _maxMsgSize = 2**20
 
     def __init__(self, *args, ranks=[], tag_start=0, tag_stride=1, **kwargs):
-        assert(_on_mpi)
+        assert _on_mpi
         if kwargs.get('partner_mpi_ranks', []):
-            assert(kwargs.get('address', 'generate') in ['generate',
-                                                         'address'])
+            assert kwargs.get('address', 'generate') in ['generate',
+                                                         'address']
             ranks = kwargs['partner_mpi_ranks']
         self._request_lock = RLock(task_method='thread')
         self.requests = []
@@ -267,9 +267,9 @@ class MPIComm(CommBase.CommBase):
 
     def bind(self):
         r"""Bind to random queue if address is generate."""
-        assert(isinstance(self.address, str))
+        assert isinstance(self.address, str)
         if self.address in ['generate', 'address']:
-            assert(self.ranks)
+            assert self.ranks
             self.address = self.format_address(self.ranks, self.tag_start,
                                                self.tag_stride)
         else:
@@ -303,7 +303,7 @@ class MPIComm(CommBase.CommBase):
         #                     "other messages this comm will send.")
         tag = self.get_tag()
         tag_stride = 0
-        assert(tag not in self.response_tags)
+        assert tag not in self.response_tags
         self.response_tags.append(tag)
         out['address'] = self.format_address(
             [self.next_rank()], tag, tag_stride)
@@ -322,7 +322,7 @@ class MPIComm(CommBase.CommBase):
         super(MPIComm, self).open()
         if not self.is_open:
             self._is_open = True
-            assert(self.mpi_comm.Get_rank() not in self.ranks)
+            assert self.mpi_comm.Get_rank() not in self.ranks
             
     def _close(self, linger=False):
         r"""Close the queue."""

@@ -1,0 +1,402 @@
+general:
+  - chevron
+  - "cross-python_{{ target_platform }}":
+      method: conda_recipe
+      flags:
+        build: True
+        build_only: True
+        cross_build: True
+  - "{{ compiler('c') }}":
+      method: conda_recipe
+      flags:
+        build: True
+        build_only: True
+  - "{{ compiler('cxx') }}":
+      method: conda_recipe
+      flags:
+        build: True
+        build_only: True
+  - deprecation
+  - flask
+  - git:
+      method: conda
+  - matplotlib:
+      flags:
+        from_env: MATPLOTLIB
+      options:
+      - name: matplotlib-base
+        method: conda
+      - name: matplotlib
+        method: pip
+  - numpy>=1.13.0:
+      host: true
+      flags:
+        from_env: NUMPY
+        method_in_setup: conda
+        build: True
+  - pandas
+  - pip:
+      method: conda_recipe
+      host: True
+      host_only: True
+  - psutil
+  - pyperf
+  - python:
+      method: conda_recipe
+      host: True
+      flags:
+        build: True
+        cross_build: True
+  - pyyaml
+  - pyzmq
+  - requests
+  - scipy:
+      flags:
+        method_in_setup: conda
+  - six
+  - toml
+  - unyt
+  - GitPython
+  - sysv_ipc:
+      os: unix
+      host: True
+  
+extras:
+  c:
+    description: Dependencies required to compile and run models written in C/C++ as part of yggdrasil integrations
+    requires_extras:
+    - name: zmq
+      os: win
+    requirements:
+    - cmake:
+        method: conda
+        os: unix
+    - make:
+        method: conda
+        os: unix
+    - "{{ compiler('c') }}":
+        method: conda_recipe
+    - "{{ compiler('cxx') }}":
+        method: conda_recipe
+    # - c-compiler:
+    #   - name: "{{ compiler('c') }}"
+    #     method: conda_recipe
+    #   - name: c-compiler
+    #     method: conda
+    #     os: unix
+    # - cxx-compiler:
+    #   - name: "{{ compiler('cxx') }}"
+    #     method: conda_recipe
+    #   - name: cxx-compiler
+    #     method: conda
+    #     os: unix
+    - compiler-rt:
+        method: conda
+        os: osx
+  fortran:
+    description: Dependencies required to compile and run models written in Fortran as part of yggdrasil integrations
+    requires_extras: [c]
+    requirements:
+    - gfortran:
+        - name: "{{ compiler('fortran') }}"
+          method: conda_recipe
+          os: unix
+        - name: fortran-compiler
+          os: unix
+          method: conda
+        - name: m2w64-gcc-fortran
+          os: win
+          method: conda
+          add: [m2w64-toolchain_win-64]
+        - name: gfortran
+          method: apt
+        - name: gfortran
+          method: brew
+          add:
+            - name: gcc
+              flags:
+                reinstall: true
+        - name: mingw
+          method: choco
+        # Alternate source for windows
+        # - name: vcpkg-gfortran
+        #   method: vcpkg
+  r:
+    description: Dependencies required to run models written in R as part of yggdrasil integrations
+    requirements:
+    - r-base:
+        executable: R
+        options:
+        - method: conda
+          host: True
+        - method: apt
+          add: [r-base-dev]
+        - name: r
+          method: brew
+    - r-bit64:
+        - method: conda
+          host: True
+        - method: cran
+    - r-r6:
+        - method: conda
+          host: True
+        - method: cran
+    - r-reticulate:
+        - method: conda
+          host: True
+        - method: cran
+    - r-zeallot:
+        - method: conda
+          host: True
+        - method: cran
+    - r-units:
+        - method: conda
+          host: True
+        - method: cran
+    - udunits:
+        - name: libudunits2-dev
+          method: apt
+        - name: udunits
+          method: brew
+        - method: skip
+          os: win
+        - method: conda_skip
+  zmq:
+    description: Dependencies required to run models using ZeroMQ sockets for communication in C/C++/Fortran
+    requirements:
+    - czmq:
+        - method: conda
+          host: True
+        - name: libczmq-dev
+          method: apt
+        - method: brew
+          flags:
+            from_src_on_travis: true
+        - method: vcpkg
+    - lz4:
+        - name: lz4
+          method: conda
+          host: True
+        - name: lz4
+          method: pip_skip
+    - zeromq:
+        - method: conda
+          host: True
+        - name: libzmq3-dev
+          method: apt
+        - name: zmq
+          method: brew
+          flags:
+            from_src_on_travis: true
+        - method: vcpkg
+  julia:
+    description: Dependencies required to run models written in R as part of yggdrasil integrations
+    requirements:
+    - julia:
+        executable: julia
+        options:
+        - method: brew
+        - method: choco
+        # fails currently on Mac M1, but PR in progress to fix it
+        # fails on windows, unclear if it will be added
+        # - name: julia>=1.1.1
+        #   method: conda
+        #   host: True
+        #   os: unix
+        - name: juliaup
+          method: conda
+          host: true
+  mpi:
+    description: Dependencies required to run integrations as MPI parallel jobs
+    requirements:
+    - mpi4py
+    - mpi:
+        - name: mpich
+          os: linux
+          method: conda
+        - name: openmpi
+          os: osx
+          method: conda
+        - name: msmpi
+          os: win
+          method: conda
+        - name: openmpi-bin
+          method: apt
+          add: [libopenmpi-dev]
+        - name: openmpi
+          method: brew
+          flags:
+            method_validate: conda_supp
+          os: osx
+  omp:
+    description: Dependencies required to run integrations that use OpenMP
+    requirements:
+    - libomp:
+        - name: libomp-dev
+          method: apt
+        - method: brew
+          add: [llvm]  # LLVM clang required to work with omp
+        - method: skip
+          os: win
+        - method: conda_skip
+  rmq:
+    description: Dependencies required to run integrations with RabbitMQ communication
+    requirements:
+    - pika>=1.0.0
+  sbml:
+    description: Dependencies required to run SBML models as part of yggdrasil integrations
+    requirements:
+    - name: libroadrunner
+      method: pip
+    # - ncurses:
+    #     - name: ncurses==5.9
+    #       method: conda
+    #       os: linux
+    #     - name: libncurses5
+    #       method: apt
+    #       os: linux
+    #       add: [libncurses5-dev, libncursesw5-dev]
+    #     - method: skip
+    #       os: osx
+    #     - method: skip
+    #       os: win
+  lpy:
+    description: Dependencies required to run LPy models as part of yggdrasil integrations
+    requirements:
+    - name: lpy
+      method: conda
+      add:
+        - boost==1.66.0
+      flags:
+        install_flags: [-c, openalea]
+        not_in_recipe: true
+        not_in_txt: true
+  images:
+    description: Dependencies required to perform I/O on common image files.
+    requirements:
+    - pillow
+    - name: ghostscript
+      method: conda
+  seq:
+    description: Dependencies required to handle sequence (nucleotide/protein) I/O
+    requirements:
+    - biopython
+    # pysam only currently available on bioconda and not for osx arm64
+    - name: pysam
+      method: pip
+      os: unix
+  pytorch:
+    description: Dependencies required to run PyTorch models as part of yggdrasil integrations
+    requirements:
+    - name: torchvision
+      options:
+      - name: torchvision
+        method: pip
+      - name: torchvision
+        method: conda
+        os: unix
+      - method: conda_skip
+        os: win
+      # - name: torchvision
+      #   method: conda
+      #   os: win
+      #   flags:
+      #     install_flags: [-c, pytorch]
+      #     not_in_recipe: true
+      #     not_in_txt: true
+      #     method_validate: conda_supp
+    - name: pytorch
+      options:
+      - name: torch
+        method: pip
+      - name: pytorch
+        method: conda
+        os: unix
+      - method: conda_skip
+        os: win
+      # - name: pytorch
+      #   method: conda
+      #   os: win
+      #   flags:
+      #     install_flags: [-c, pytorch]
+      #     not_in_recipe: true
+      #     not_in_txt: true
+      #     method_validate: conda_supp
+  excel:
+    description: Dependencies required to read/write excel files
+    requirements:
+    - pandas
+    - openpyxl
+  testing:
+    description: Dependencies required to run yggdrasil tests
+    requirements:
+    - conda-tree:
+        method: conda
+    - coverage
+    - flake8
+    - flaky
+    - pytest
+    - pytest-cov
+    - pytest-mpi
+    - pytest-drop-dup-tests:
+        method: pip
+    - pytest-rerunfailures
+    - pytest-repeat
+    - pytest-timeout
+    - pytest-xdist
+    # Split these into another section?
+    - ccache:
+        method: conda
+        os: unix
+        flags:
+          method_validate: conda_supp
+          not_in_recipe: true
+    - strace:
+        method: apt
+        os: linux
+        flags:
+          method_validate: conda_supp
+    - valgrind:
+        method: apt
+        os: linux
+        flags:
+          method_validate: conda_supp
+  docs:
+    description: Dependencies required to build yggdrasil docs
+    requirements:
+    - breathe
+    - doxygen:
+        - method: conda
+        - method: apt
+        - method: brew
+        - method: choco
+        - method: vcpkg
+    - pandoc:
+        - method: apt
+        - name: pandoc-citeproc
+          method: brew
+          add: [Caskroom/cask/mactex]
+        - method: skip
+          os: win
+        - method: conda_skip
+    - pypandoc
+    # - r-rd2md:
+    #     method: conda
+    - r-roxygen2:
+        method: conda
+    - sphinx
+    - sphinx_rtd_theme
+    - sphinx-argparse
+  dev:
+    description: Dependencies recommended for yggdrasil development
+    requirements:
+    - black
+    - ipython
+    - PyGithub
+    - pre-commit
+    - emacs:
+        method: conda
+bespoke_extras:
+- astropy
+- pygments
+- trimesh

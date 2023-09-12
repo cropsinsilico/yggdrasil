@@ -1,7 +1,5 @@
-import json
-from yggdrasil import tools, constants
+from yggdrasil import tools, constants, rapidjson
 from yggdrasil.serialize.SerializeBase import SerializeBase
-from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
 
 class AsciiMapSerialize(SerializeBase):
@@ -40,11 +38,9 @@ class AsciiMapSerialize(SerializeBase):
         newline_str = tools.bytes2str(self.newline)
         for k in order:
             v = args[k]
-            if not isinstance(k, (str, bytes)):
-                raise ValueError("Serialization of non-string keys not supported.")
             out += tools.bytes2str(k)
             out += self.delimiter
-            out += json.dumps(v, cls=JSONReadableEncoder)
+            out += rapidjson.dumps(v, yggdrasil_mode=rapidjson.YM_READABLE)
             out += newline_str
         return tools.str2bytes(out)
 
@@ -70,7 +66,7 @@ class AsciiMapSerialize(SerializeBase):
                     out[kv[0]] = kv[1].strip("'")
                 else:
                     try:
-                        out[kv[0]] = json.loads(kv[1])
+                        out[kv[0]] = rapidjson.loads(kv[1])
                     except BaseException:
                         out[kv[0]] = kv[1]
             else:
@@ -96,7 +92,7 @@ class AsciiMapSerialize(SerializeBase):
         return [total]
         
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -110,5 +106,6 @@ class AsciiMapSerialize(SerializeBase):
         out['contents'] = (b'args1\t1\n'
                            + b'args2\t"this"\n'
                            + b'args3\t1.0\n'
-                           + b'args4\t[1, 2]\n')
+                           + b'args4\t[1,2]\n')
+        out['invalid_objects'] = [{'args1': int(1), 1: 'this'}]
         return out

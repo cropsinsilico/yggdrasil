@@ -39,6 +39,11 @@ case $1 in
 	yaml1='server_fortran.yml'
 	yaml2='client_fortran.yml'
 	;;
+    -j | --julia )
+	echo "Running Julia"
+	yaml1='server_julia.yml'
+	yaml2='client_julia.yml'
+	;;
 esac
 
 yggrun $yaml1 $yaml2

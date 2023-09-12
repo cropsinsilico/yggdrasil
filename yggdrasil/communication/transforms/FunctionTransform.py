@@ -16,6 +16,7 @@ class FunctionTransform(TransformBase):
     _transformtype = 'function'
     _schema_required = ['function']
     _schema_properties = {'function': {'type': 'function'}}
+    _schema_subtype_description = "Transform messages using a function."
 
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.
@@ -33,7 +34,7 @@ class FunctionTransform(TransformBase):
         return self.function(x)
     
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the transform class.
 
         Returns:
@@ -53,11 +54,11 @@ class FunctionTransform(TransformBase):
                  'in/out_t': [
                      ({'type': 'array',
                        'items': [
-                           {'type': 'int', 'title': x,
-                            'precision': 64, 'units': ''}
+                           {'type': 'scalar', 'subtype': 'int', 'title': x,
+                            'precision': 8}
                            for x in 'abc']},
                       {'type': 'array',
                        'items': [
-                           {'type': 'int', 'title': x,
-                            'precision': 64, 'units': ''}
+                           {'type': 'scalar', 'subtype': 'int', 'title': x,
+                            'precision': 8}
                            for x in 'abc']})]}]

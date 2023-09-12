@@ -1,0 +1,40 @@
+models:
+  - name: julia_modelA
+    language: julia
+    args: ./src/transformed_io_modelA.jl
+    function: modelA_function
+
+  - name: julia_modelB
+    language: julia
+    args: ./src/transformed_io_modelB.jl
+    function: modelB_function
+
+  - name: julia_modelC
+    language: julia
+    args: ./src/transformed_io_modelC.jl
+    function: modelC_function
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: julia_modelA:input
+    filetype: table
+  - input: julia_modelA:output  # Connection between model A output & model B input
+    outputs:
+      - name: julia_modelB:input
+        transform:
+          statement: "%x%*5"
+      - name: julia_modelC:input
+        transform:
+          function: ./src/transformed_io_modelC.py:transform_function
+  - input: julia_modelB:output  # Connection between model B, function 1 output and file
+    output: ./outputB.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRate
+    field_units: g/s,g/s
+    format_str: "%.1lf\t%.1lf\n"
+  - input: julia_modelC:output  # Connection between model C, function 1 output and file
+    output: ./outputC.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRateDensity
+    field_units: g/(s*(cm**2)),g/(s*(cm**2))
+    format_str: "%.1lf\t%.1lf\n"

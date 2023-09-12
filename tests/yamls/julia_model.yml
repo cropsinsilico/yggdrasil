@@ -1,0 +1,5 @@
+model:
+  name: julia_model
+  language: julia
+  args:
+    - ../scripts/julia_model.jl

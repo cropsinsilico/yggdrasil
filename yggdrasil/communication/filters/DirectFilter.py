@@ -5,6 +5,7 @@ class DirectFilter(FilterBase):
     r"""Class that always passes messages."""
 
     _filtertype = 'direct'
+    _schema_subtype_description = "Pass every message"
 
     def evaluate_filter(self, x):
         r"""Call filter on the provided message.
@@ -19,7 +20,7 @@ class DirectFilter(FilterBase):
         return True
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the filter class.
 
         Returns:

@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
-  generic_t obj = init_generic();
+  rapidjson::Document obj;
 
   // Loop until there is no longer input or the queues are closed
   while (flag >= 0) {
@@ -24,12 +24,12 @@ int main(int argc, char *argv[]) {
     }
 
     // Print received message
-    printf("Model B:\n");
-    display_generic(obj);
+    std::cerr << "Model B:" << std::endl <<
+      document2string(obj) << std::endl;
 
     // Send output to output channel
     // If there is an error, the flag will be negative
-    flag = out_channel.send(1, obj);
+    flag = out_channel.send(1, &obj);
     if (flag < 0) {
       std::cout << "Model B: Error sending output." << std::endl;
       break;
@@ -37,9 +37,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  // Free dynamically allocated obj structure
-  free_generic(&obj);
-  
   return 0;
 }
 

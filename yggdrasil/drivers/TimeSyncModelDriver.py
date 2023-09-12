@@ -53,7 +53,7 @@ class TimeSyncModelDriver(DSLModelDriver):
 
     """
 
-    _schema_subtype_description = ('Model is dedicated to synchronizing'
+    _schema_subtype_description = ('Model is dedicated to synchronizing '
                                    'timesteps between other models.')
     _schema_properties = {
         'synonyms': {'type': 'object',
@@ -97,7 +97,11 @@ class TimeSyncModelDriver(DSLModelDriver):
             'type': 'object',
             'additionalProperties': {'type': 'array',
                                      'items': {'type': 'string'}},
-            'default': {}}}
+            'default': {}},
+        'args': {'type': 'array', 'default': [],
+                 'items': {'type': ['string', 'number']},
+                 'allowSingular': True}}
+    _schema_no_default_subtype = True
     language = 'timesync'
     executable_type = 'other'
 
@@ -136,7 +140,7 @@ class TimeSyncModelDriver(DSLModelDriver):
             **kwargs: Additional keyword arguments are ignored.
 
         """
-        assert(isinstance(args, list) and (len(args) == 0))
+        assert isinstance(args, list) and (len(args) == 0)
         self.model_file = 'dummy'
         
     @property
@@ -224,10 +228,10 @@ class TimeSyncModelDriver(DSLModelDriver):
                     new_data = pd.DataFrame(new_data)
                     idx = table['time'].isin([t_pd])
                     if not idx.any():
-                        table = table.append(new_data, sort=False)
+                        table = pd.concat([table, new_data], sort=False)
                     elif model == client_model:
                         table = table.drop(table.index[idx])
-                        table = table.append(new_data, sort=False)
+                        table = pd.concat([table, new_data], sort=False)
                     tables[model] = table.sort_values('time')
             # Assign thread to handle checking when data is filled in
             threads[request_id] = multitasking.YggTaskLoop(
@@ -335,11 +339,11 @@ class TimeSyncModelDriver(DSLModelDriver):
             if alt['base2alt'] is not None:
                 alt_vars = alt['base2alt'](tot[kbase])
                 if isinstance(alt_vars, (tuple, list)):
-                    assert(len(alt_vars) == len(alt['alt']))
+                    assert len(alt_vars) == len(alt['alt'])
                     for k, v in zip(alt['alt'], alt_vars):
                         tot[k] = v
                 else:
-                    assert(len(alt['alt']) == 1)
+                    assert len(alt['alt']) == 1
                     tot[alt['alt'][0]] = alt_vars
             else:
                 tot[alt['alt'][0]] = tot[kbase]
@@ -431,7 +435,7 @@ class TimeSyncModelDriver(DSLModelDriver):
         # Append
         out = pd.DataFrame()
         for k, v in table_temp.items():
-            out = out.append(v, sort=False)
+            out = pd.concat([out, v], sort=False)
         # Groupby + aggregate
         out = out.groupby('time').agg(aggregation)
         return out

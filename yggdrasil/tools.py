@@ -256,26 +256,39 @@ def display_source_diff(fname1, fname2, number_lines=False,
     print(lines)
     
 
-def get_fds(by_column=None):  # pragma: debug
+def get_fds(by_column=None, ignore_closed=False, ignore_kqueue=False,
+            ignore_cwd=False, ignore_types=None, verbose=False):  # pragma: debug
     r"""Get a list of open file descriptors."""
     out = subprocess.check_output(
         'lsof -p {} | grep -v txt'.format(os.getpid()), shell=True)
+    if verbose:
+        print(f'{len(out.splitlines()) - 1}\n' + out.decode('utf8'))
     out = out.splitlines()[1:]
+    if ignore_closed:
+        out = [x for x in out if not x.endswith(b'(CLOSED)')]
+    if ignore_kqueue:
+        out = [x for x in out if not x.endswith(b'state=0xa')]
+    if ignore_cwd:
+        out = [x for x in out if x.split()[3] != b'cwd']
+    if ignore_types:
+        out = [x for x in out
+               if x.split()[4].decode('utf8') not in ignore_types]
     if by_column is not None:
         return {x.split()[by_column]: x for x in out}
     return out
 
 
 @contextlib.contextmanager
-def track_fds(prefix=''):  # pragma: debug
-    fds0 = get_fds(by_column=3)
+def track_fds(prefix='', **kwargs):  # pragma: debug
+    kwargs['by_column'] = 3
+    fds0 = get_fds(**kwargs)
     yield
-    fds1 = get_fds(by_column=3)
+    fds1 = get_fds(**kwargs)
     new_fds = set(fds1.keys()) - set(fds0.keys())
     diff = [fds1[k] for k in sorted(new_fds)]
     if diff:
         print(f'{prefix}{len(diff)} fds\n\t' + '\n\t'.join(
-            [str(x) for x in diff]))
+            [x.decode('utf8') for x in diff]))
     
 
 def get_shell():
@@ -291,7 +304,7 @@ def get_shell():
             shell = os.environ.get('COMSPEC', None)
         else:
             shell = '/bin/sh'  # Default used by subprocess
-        assert(shell)
+        assert shell
     # return psutil.Process(os.getppid()).name()
     if platform._is_win:  # pragma: windows
         shell = shell.lower()
@@ -410,14 +423,15 @@ def get_python_c_library(allow_failure=False, libtype=None):
         x = os.path.join(idir, base)
         if os.path.isfile(x):
             return x
+    error = (f"Could not determine the location of the Python "
+             f"C API library: {base}.\n"
+             f"sysconfig.get_paths():\n{pprint.pformat(paths)}\n"
+             f"sysconfig.get_config_vars():\n{pprint.pformat(cvars)}\n"
+             f"tried:\n{pprint.pformat(dir_try)}")  # pragma: debug
     if allow_failure:  # pragma: debug
+        warnings.warn(error)
         return base
-    raise RuntimeError(("Could not determine the location of the Python "
-                        "C API library: %s.\n"
-                        "sysconfig.get_paths():\n%s\n"
-                        "sysconfig.get_config_vars():\n%s\n")
-                       % (base, pprint.pformat(paths),
-                          pprint.pformat(cvars)))  # pragma: debug
+    raise RuntimeError(error)  # pragma: debug
 
 
 def get_env_prefixes():
@@ -734,6 +748,24 @@ def get_supported_platforms():
     return copy.deepcopy(platform._supported_platforms)
 
 
+def resolve_language_aliases(language):
+    r"""Get a list of languages, replacing any aliases.
+
+    Args:
+        language (str, list): One or more language.
+
+    Returns:
+        str, list: Aliased language(s).
+
+    """
+    if isinstance(language, (list, tuple)):
+        return [resolve_language_aliases(x) for x in language]
+    for k, v in constants.ALIASED_LANGUAGES.items():
+        if language in v:
+            return k
+    return language
+
+
 def is_language_alias(x, language):
     r"""Check if a string is an alias for a language.
 
@@ -782,8 +814,8 @@ def get_supported_type():
         list: The names of data types supported by yggdrasil.
 
     """
-    from yggdrasil.metaschema.datatypes import get_registered_types
-    return list(get_registered_types().keys())
+    from yggdrasil import rapidjson
+    return rapidjson.get_metaschema()['definitions']['simpleTypes']['enum']
 
 
 def get_supported_comm(dont_include_value=False):
@@ -916,7 +948,7 @@ def get_default_comm():
             _default_comm = max(tally)
             if tally[_default_comm] == 0:  # pragma: debug
                 raise Exception('Could not locate an installed comm.')
-    if _default_comm.endswith('Comm'):
+    if _default_comm.endswith('Comm'):  # pragma: debug
         _default_comm = import_component('comm', _default_comm)._commtype
     # if _default_comm == 'rmq':  # pragma: debug
     #     raise NotImplementedError('RMQ cannot be the default comm because '
@@ -1017,18 +1049,24 @@ def safe_eval(statement, **kwargs):
 
     """
     safe_dict = {}
-    _safe_lists = {'math': ['acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
-                            'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
-                            'frexp', 'hypot', 'ldexp', 'log', 'log10', 'modf', 'pi',
-                            'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'],
-                   'builtins': ['abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
-                                'list', 'map', 'max', 'min', 'repr', 'set', 'str',
-                                'sum', 'tuple', 'type'],
-                   'numpy': ['array', 'int8', 'int16', 'int32', 'int64',
-                             'uint8', 'uint16', 'uint32', 'uint64',
-                             'float16', 'float32', 'float64'],
-                   'yggdrasil.units': ['get_data', 'add_units'],
-                   'unyt.array': ['unyt_quantity', 'unyt_array']}
+    _safe_lists = {
+        'math': [
+            'acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
+            'cosh', 'degrees', 'e', 'exp', 'fabs', 'floor', 'fmod',
+            'frexp', 'hypot', 'ldexp', 'log', 'log10', 'modf', 'pi',
+            'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'],
+        'builtins': [
+            'abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
+            'list', 'map', 'max', 'min', 'repr', 'set', 'str',
+            'sum', 'tuple', 'type'],
+        'numpy': [
+            'array', 'int8', 'int16', 'int32', 'int64',
+            'uint8', 'uint16', 'uint32', 'uint64',
+            'float16', 'float32', 'float64'],
+        'yggdrasil.units': [
+            'get_data', 'add_units'],
+        'yggdrasil.rapidjson.units': [
+            'Quantity', 'QuantityArray']}
     for mod_name, func_list in _safe_lists.items():
         mod = importlib.import_module(mod_name)
         for func in func_list:
@@ -1095,7 +1133,7 @@ class ProxyMeta(type):
                          ['__overrides__'])
         for base in bases:
             overrides.extend(getattr(base, '__overrides__', []))
-        assert('_wrapped' in overrides)
+        assert '_wrapped' in overrides
         attrs['__overrides__'] = overrides
         
         def make_method(name):
@@ -1311,7 +1349,7 @@ def import_all_modules(base=None, exclude=None, do_first=None):
         exclude = []
     if do_first is None:
         do_first = []
-    assert(base.startswith('yggdrasil'))
+    assert base.startswith('yggdrasil')
     for x in do_first:
         import_all_modules(x, exclude=exclude)
     exclude = exclude + do_first

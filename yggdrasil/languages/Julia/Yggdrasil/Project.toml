@@ -1,0 +1,11 @@
+name = "Yggdrasil"
+uuid = "7c374a0e-bd8a-11eb-20e9-a5a7e5ac8532"
+authors = ["Meagan Lang <langmm.astro@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
+[compat]
+julia = "1.8.5"

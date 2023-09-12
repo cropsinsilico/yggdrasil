@@ -14,7 +14,12 @@
   outputs:
   - name: growth_rate
     datatype:
-      type: bytes
+      type: array
+      items:
+        - type: scalar
+          subtype: float
+          title: growth_rate
+          units: cm/s
     default_file:
       name: ./Output/output.txt
       filetype: table

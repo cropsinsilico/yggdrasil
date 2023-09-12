@@ -2,7 +2,6 @@ import pytest
 import os
 import sys
 import copy
-import flaky
 from yggdrasil import tools, timing, platform
 from tests import TestClassBase as base_class
 
@@ -32,7 +31,7 @@ def test_get_source():
     for lang in lang_list:
         for d in dir_list:
             fname = timing.get_source(lang, d)
-            assert(os.path.isfile(fname))
+            assert os.path.isfile(fname)
 
 
 def test_platform_error():
@@ -164,7 +163,7 @@ class TestTimedRun(TimedRunTestBase):
         x = instance.load(as_json=True)
         instance.save(x, overwrite=True)
         new_text = get_raw_data()
-        assert(new_text == old_text)
+        assert new_text == old_text
 
     def test_save(self, check_filename, get_raw_data, instance):
         r"""Test save with/without overwrite."""
@@ -173,7 +172,7 @@ class TestTimedRun(TimedRunTestBase):
             instance.save(instance.data)
         instance.save(instance.data, overwrite=True)
         new_text = get_raw_data()
-        assert(new_text == old_text)
+        assert new_text == old_text
 
     def test_scaling_count(self, check_filename, instance, count, size,
                            nrep):
@@ -201,10 +200,13 @@ class TestTimedRun(TimedRunTestBase):
     def close_figures(self):
         r"""Close figures after the test."""
         yield
-        import matplotlib.pyplot as plt  # noqa: E402
-        plt.clf()
-        plt.cla()
-        plt.close('all')
+        try:
+            import matplotlib.pyplot as plt  # noqa: E402
+            plt.clf()
+            plt.cla()
+            plt.close('all')
+        except ImportError:  # pragma: debug
+            pass
 
     def test_plot_scaling_joint(self, check_filename, instance, count, size,
                                 close_figures, disable_verify_count_fds):
@@ -334,14 +336,14 @@ class TestTimedRunTemp(TimedRunTestBase):
         r"""dict: Keyword arguments for time_run."""
         return {'nrep': nrep, 'overwrite': True}
 
-    @flaky.flaky
+    @pytest.mark.flaky_optin
     def test_pyperf_func(self, dont_use_pyperf, instance, count, size):
         r"""Test pyperf_func."""
         if dont_use_pyperf:
             pytest.skip("Don't use pyperf")
         timing.pyperf_func(1, instance, count, size, 0)
 
-    @flaky.flaky
+    @pytest.mark.flaky_optin
     def test_run_overwrite(self, time_run, python_class,
                            instance_args, instance_kwargs, entry_name):
         r"""Test performing a run twice, the second time with ovewrite."""
@@ -350,4 +352,4 @@ class TestTimedRunTemp(TimedRunTestBase):
         instance = python_class(*instance_args, **instance_kwargs)
         time_run(instance)
         instance.remove_entry(entry_name)
-        assert(not instance.has_entry(entry_name))
+        assert not instance.has_entry(entry_name)

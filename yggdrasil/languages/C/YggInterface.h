@@ -5,8 +5,6 @@
 #include "../tools.h"
 #include "../datatypes/datatypes.h"
 #include "../communication/communication.h"
-#include "../dataio/AsciiFile.h"
-#include "../dataio/AsciiTable.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -37,7 +35,7 @@ comm_t* yggRpcServerType_global(const char *name, dtype_t *inType, dtype_t *outT
       2. Prepare: Format data to a character array buffer.
 ```
             char buffer[YGG_MSG_BUF]; 
-	    sprintf(buffer, "a=%d, b=%d", 1, 2);
+	    snprintf(buffer, YGG_MSG_BUF, "a=%d, b=%d", 1, 2);
 ```
       3. Send:
 ```
@@ -80,7 +78,7 @@ yggOutput_t yggOutputType(const char *name, dtype_t *datatype) {
       return yggRpcServerType_global(YGG_MODEL_NAME, NULL, datatype);
     } else {
       char alt_name[100];
-      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      snprintf(alt_name, 100, "%s:%s", YGG_MODEL_NAME, name);
       if (strcmp(alt_name, YGG_SERVER_OUTPUT) == 0) {
 	return yggRpcServerType_global(YGG_MODEL_NAME, NULL, datatype);
       }
@@ -108,7 +106,7 @@ yggInput_t yggInputType(const char *name, dtype_t *datatype) {
       return yggRpcServerType_global(YGG_MODEL_NAME, datatype, NULL);
     } else {
       char alt_name[100];
-      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      snprintf(alt_name, 100, "%s:%s", YGG_MODEL_NAME, name);
       if (strcmp(alt_name, YGG_SERVER_INPUT) == 0) {
 	return yggRpcServerType_global(YGG_MODEL_NAME, datatype, NULL);
       }
@@ -234,7 +232,6 @@ int ygg_send_eof(const yggOutput_t yggQ) {
  */
 static inline
 int ygg_recv(yggInput_t yggQ, char *data, const size_t len){
-  char* temp = NULL;
   int ret = -1;
   size_t len_used = len;
   int nargs_exp = 2;
@@ -247,8 +244,6 @@ int ygg_recv(yggInput_t yggQ, char *data, const size_t len){
   } else {
     ret = nargs_used;
   }
-  if (temp != NULL)
-    free(temp);
   return ret;
 };
 
@@ -618,7 +613,6 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     list. If received message data will exceed the bounds of provided 
     variables, an error will be returned.
   @param[in] rpc RPC comm structure that message should be sent to.
-  @param[in] nargs Number of arguments contained in ap.
   @param[out] ap Variable list of arguments that should be assigned
     parameters extracted using the associated data type. Since these will 
     be assigned, they should be pointers to memory that has already been
@@ -626,14 +620,13 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecv(rpc, nargs, ap) vcommRecv(rpc, 0, nargs, ap)
+#define vrpcRecv(rpc, ap) vcommRecv(rpc, ap)
 
 /*!
   @brief Receive a message from a comm into variables in a variable argument
     list. If received message data will exceed the bounds of provided 
     variables, the variables will be reallocated.
   @param[in] rpc RPC comm structure that message should be sent to.
-  @param[in] nargs Number of arguments contained in ap.
   @param[out] ap Variable list of arguments that should be assigned
     parameters extracted using the associated data type. Since these will 
     be assigned and possibly reallocated, they should be pointers to memory 
@@ -641,7 +634,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
 */
-#define vrpcRecvRealloc(rpc, nargs, ap) vcommRecv(rpc, 1, nargs, ap)
+#define vrpcRecvRealloc(rpc, ap) vcommRecv(rpc, ap)
 
 /*!
   @brief Format and send a message to an RPC output queue.
@@ -692,12 +685,6 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     and assign arguments from the message using the input queue format 
     string to parse it.
   @param[in] rpc yggRpc_t structure with RPC information.
-  @param[in] allow_realloc int If 1, output arguments are assumed to be 
-    pointers to pointers such that they can be reallocated as necessary to 
-    receive incoming data. If 0, output arguments are assumed to be 
-    preallocated.
-  @param[in] nargs size_t Number of arguments contained in ap including both
-    input and output arguments.
   @param[in,out] ap va_list mixed arguments that include those that should be
     formatted using the output format string, followed by those that should 
     be assigned parameters extracted using the input format string. These 
@@ -707,8 +694,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
     indicate success.
  */
 static inline
-int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
-		 size_t nargs, va_list_t ap) {
+int vrpcCallBase(yggRpc_t rpc, va_list_t ap) {
   int sret, rret;
   rret = 0;
 
@@ -717,13 +703,15 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
   
   // pack the args and call
   comm_t *send_comm = (comm_t*)(rpc->handle);
-  size_t send_nargs;
+  size_t send_nargs = 0;
   if (is_empty_dtype(send_comm->datatype)) {
     send_nargs = 1;
   } else {
-    send_nargs = nargs_exp_dtype(send_comm->datatype);
+    send_nargs = nargs_exp_dtype(send_comm->datatype, 0);
   }
-  sret = vcommSend(rpc, send_nargs, ap);
+  size_t recv_nargs = size_va_list(ap) - send_nargs;
+  set_va_list_size(ap, &send_nargs);
+  sret = vcommSend(rpc, ap);
   if (sret < 0) {
     ygglog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
     return -1;
@@ -731,26 +719,29 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
 
   // Advance through sent arguments
   ygglog_debug("vrpcCall: Used %d arguments in send", sret);
-  if (sret > 0) {
-    if (skip_va_elements(send_comm->datatype, &nargs, &op)) {
-      ygglog_error("vrpcCall: Error skipping send arguments.");
-      return -1;
-    }
+  if (!skip_va_elements(send_comm->datatype, &op, false)) {
+    ygglog_error("vrpcCall: Error skipping vargs");
+    return -1;
   }
-
+  ygglog_debug("vrpcCall: %d remaining for receive", size_va_list(op));
+  if (size_va_list(op) != recv_nargs) {
+    ygglog_error("vrpcCall: Number of arguments after skip (%d) doesn't match the number expected (%d)", size_va_list(op), recv_nargs);
+    return -1;
+  }
   // unpack the messages into the remaining variable arguments
-  rret = vcommRecv(rpc, allow_realloc, nargs, op);
+  rret = vcommRecv(rpc, op);
   if (rret < 0) {
     ygglog_error("vrpcCall: vcommRecv error: ret %d: %s", sret, strerror(errno));
   }
-  end_va_list(&op);
+  ygglog_debug("vrpcCall: %d arguments after receive", size_va_list(op));
+  YGG_END_VAR_ARGS(op);
   
   return rret;
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#define vrpcCall(rpc, nargs, ap) vrpcCallBase(rpc, 0, nargs, ap)
-#define vrpcCallRealloc(rpc, nargs, ap) vrpcCallBase(rpc, 1, nargs, ap)
+#define vrpcCall(rpc, ap) vrpcCallBase(rpc, ap)
+#define vrpcCallRealloc(rpc, ap) vrpcCallBase(rpc, ap)
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /*!
@@ -779,10 +770,10 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
 static inline
 int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
-  va_list_t ap = init_va_list();
-  va_start(ap.va, nargs);
-  ret = vrpcCallBase(rpc, allow_realloc, nargs, ap);
-  end_va_list(&ap);
+  YGG_BEGIN_VAR_ARGS(ap, nargs, nargs, allow_realloc);
+  ygglog_debug("nrpcCallBase: nargs = %d", nargs);
+  ret = vrpcCallBase(rpc, ap);
+  YGG_END_VAR_ARGS(ap);
   return ret;
 };
   
@@ -1067,7 +1058,7 @@ comm_t* yggAsciiArrayInput(const char *name) {
 static inline
 comm_t* yggPlyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply(false));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1140,7 +1131,7 @@ comm_t* yggPlyInput(const char *name) {
 static inline
 comm_t* yggObjOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj(false));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1270,7 +1261,7 @@ comm_t* yggGenericInput(const char *name) {
 static inline
 comm_t* yggAnyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_any(true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1284,7 +1275,7 @@ comm_t* yggAnyOutput(const char *name) {
 static inline
 comm_t* yggAnyInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_any(true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1341,7 +1332,7 @@ comm_t* yggAnyInput(const char *name) {
 static inline
 comm_t* yggJSONArrayOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1355,7 +1346,7 @@ comm_t* yggJSONArrayOutput(const char *name) {
 static inline
 comm_t* yggJSONArrayInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1417,7 +1408,7 @@ comm_t* yggJSONArrayInput(const char *name) {
 static inline
 comm_t* yggJSONObjectOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
@@ -1431,7 +1422,7 @@ comm_t* yggJSONObjectOutput(const char *name) {
 static inline
 comm_t* yggJSONObjectInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;

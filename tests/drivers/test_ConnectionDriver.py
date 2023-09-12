@@ -47,6 +47,19 @@ class TestConnectionDriver(base_class):
         return default_comm
 
     @pytest.fixture(scope="class", autouse=True)
+    def check_installed(self, icomm_name, icomm_python_class,
+                        ocomm_name, ocomm_python_class):
+        r"""Check if classes installed."""
+        if not (ocomm_python_class.is_installed(language='python')
+                and icomm_python_class.is_installed(language='python')):
+            pytest.skip(
+                f"one of the tested comms ({icomm_name}="
+                f"{icomm_python_class.is_installed(language='python')}, "
+                f"{ocomm_name}="
+                f"{ocomm_python_class.is_installed(language='python')}) "
+                f"is not installed")
+
+    @pytest.fixture(scope="class", autouse=True)
     def running_service_for_comms(self, icomm_name, ocomm_name,
                                   running_service):
         if 'rest' in [icomm_name, ocomm_name]:
@@ -80,10 +93,12 @@ class TestConnectionDriver(base_class):
 
     @pytest.fixture(scope="class")
     def testing_options(self, python_class, options, is_output,
-                        icomm_python_class, ocomm_python_class):
+                        icomm_python_class, ocomm_python_class,
+                        testdir):
         r"""Testing options."""
         if 'explicit_testing_options' in options:
             return copy.deepcopy(options['explicit_testing_options'])
+        options['test_dir'] = testdir
         if is_output:
             out = ocomm_python_class.get_testing_options(**options)
         else:
@@ -135,14 +150,6 @@ class TestConnectionDriver(base_class):
                         icomm_name, icomm_python_class,
                         ocomm_name, ocomm_python_class):
         r"""Keyword arguments for a new instance of the tested class."""
-        if not (ocomm_python_class.is_installed(language='python')
-                and icomm_python_class.is_installed(language='python')):
-            pytest.skip(
-                f"one of the tested comms ({icomm_name}="
-                f"{icomm_python_class.is_installed(language='python')}, "
-                f"{ocomm_name}="
-                f"{ocomm_python_class.is_installed(language='python')}) "
-                f"is not installed")
         return dict(testing_options.get('kwargs', {}),
                     yml={'working_dir': working_dir},
                     timeout=timeout, sleeptime=polling_interval,
@@ -178,39 +185,39 @@ class TestConnectionDriver(base_class):
     def test_manipulate_shared_event(self, instance):
         r"""Test setting and clearing events in the shared dictionary."""
         instance.set_flag_attr('_skip_after_loop')
-        assert(instance.check_flag_attr('_skip_after_loop'))
+        assert instance.check_flag_attr('_skip_after_loop')
         instance.clear_flag_attr('_skip_after_loop')
-        assert(not instance.check_flag_attr('_skip_after_loop'))
+        assert not instance.check_flag_attr('_skip_after_loop')
 
     def test_send_recv_closed(self, instance, send_comm, recv_comm, test_msg):
         r"""Test sending/receiving with queues closed."""
         instance.close_comm()
         send_comm.close()
         recv_comm.close()
-        assert(instance.is_comm_closed)
-        assert(send_comm.is_closed)
-        assert(recv_comm.is_closed)
+        assert instance.is_comm_closed
+        assert send_comm.is_closed
+        assert recv_comm.is_closed
         flag = instance.send_message(CommBase.CommMessage(args=test_msg))
-        assert(not flag)
+        assert not flag
         flag = instance.recv_message()
         if instance.icomm._commtype != 'value':
-            assert(not flag)
+            assert not flag
         # Short
         if instance.icomm._commtype != 'value':
             flag = send_comm.send(test_msg)
-            assert(not flag)
+            assert not flag
         flag, ret = recv_comm.recv()
         if instance.icomm._commtype != 'value':
-            assert(not flag)
-            assert(ret is None)
+            assert not flag
+            assert ret is None
         # Long
         if instance.icomm._commtype != 'value':
             flag = send_comm.send_nolimit(test_msg)
-            assert(not flag)
+            assert not flag
         flag, ret = recv_comm.recv_nolimit()
         if instance.icomm._commtype != 'value':
-            assert(not flag)
-            assert(ret is None)
+            assert not flag
+            assert ret is None
         instance.confirm_output(timeout=1.0)
 
     def test_error_init_ocomm(self, monkeypatch, python_class,
@@ -244,7 +251,7 @@ class TestConnectionDriver(base_class):
                 m.setattr(instance.icomm, 'open', magic_error_replacement)
             with pytest.raises(MagicTestError):
                 instance.open_comm()
-            assert(instance.icomm.is_closed)
+            assert instance.icomm.is_closed
 
     def test_error_close_icomm(self, monkeypatch, instance,
                                MagicTestError, magic_error_replacement):
@@ -259,9 +266,9 @@ class TestConnectionDriver(base_class):
                           magic_error_replacement)
             with pytest.raises(MagicTestError):
                 instance.close_comm()
-        assert(instance.ocomm.is_closed)
+        assert instance.ocomm.is_closed
         instance.icomm.close()
-        assert(instance.icomm.is_closed)
+        assert instance.icomm.is_closed
         
     def test_error_close_ocomm(self, monkeypatch, instance,
                                MagicTestError, magic_error_replacement):
@@ -272,9 +279,9 @@ class TestConnectionDriver(base_class):
                       magic_error_replacement)
             with pytest.raises(MagicTestError):
                 instance.close_comm()
-        assert(instance.icomm.is_closed)
+        assert instance.icomm.is_closed
         instance.ocomm.close()
-        assert(instance.ocomm.is_closed)
+        assert instance.ocomm.is_closed
 
     def test_error_open_fails(self, monkeypatch, instance):
         r"""Test error raised when comms fail to open."""
@@ -294,7 +301,7 @@ class TestConnectionDriver(base_class):
             with pytest.raises(Exception):
                 instance.start()
         instance.close_comm()
-        assert(instance.is_comm_closed)
+        assert instance.is_comm_closed
 
     @pytest.fixture(scope="class")
     def nmsg_send(self):
@@ -341,7 +348,7 @@ class TestConnectionDriver(base_class):
         r"""Test early deletion of message queue."""
         started_instance.close_comm()
         started_instance.open_comm()
-        assert(started_instance.is_comm_closed)
+        assert started_instance.is_comm_closed
 
     @timeout_decorator(timeout=600)
     def test_send_recv(self, started_instance, send_comm, recv_comm,
@@ -352,15 +359,15 @@ class TestConnectionDriver(base_class):
             if started_instance.icomm._commtype != 'value':
                 for i in range(nmsg_send):
                     flag = send_comm.send(test_msg)
-                    assert(flag)
+                    assert flag
             # started_instance.sleep()
-            # assert(recv_comm.n_msg == 1)
+            # assert recv_comm.n_msg == 1
             for i in range(nmsg_recv):
                 flag, msg_recv = recv_comm.recv(timeout=timeout)
-                assert(flag)
-                assert(msg_recv == nested_result(test_msg))
+                assert flag
+                assert msg_recv == nested_result(test_msg)
             if icomm_name != 'value':
-                assert(started_instance.n_msg == 0)
+                assert started_instance.n_msg == 0
             after_recv()
         except BaseException:  # pragma: debug
             send_comm.printStatus()
@@ -375,14 +382,14 @@ class TestConnectionDriver(base_class):
         r"""Test sending/receiving large message."""
         try:
             if started_instance.icomm._commtype != 'value':
-                assert(len(msg_long) > maxMsgSize)
+                assert len(msg_long) > maxMsgSize
                 for i in range(nmsg_send):
                     flag = send_comm.send_nolimit(msg_long)
-                    assert(flag)
+                    assert flag
             for i in range(nmsg_recv):
                 flag, msg_recv = recv_comm.recv_nolimit(timeout=timeout)
-                assert(flag)
-                assert(msg_recv == nested_result(msg_long))
+                assert flag
+                assert msg_recv == nested_result(msg_long)
             after_recv()
         except BaseException:  # pragma: debug
             send_comm.printStatus()
@@ -395,7 +402,7 @@ class TestConnectionDriver(base_class):
         r"""Assertions to make before stopping the driver instance."""
         def assert_before_stop_w():
             if icomm_name != 'value':
-                assert(instance.is_comm_open)
+                assert instance.is_comm_open
         return assert_before_stop_w
 
     # TODO: This fails with ZMQ
@@ -410,8 +417,8 @@ class TestConnectionDriver(base_class):
     def assert_after_terminate(self, started_instance):
         r"""Assertions to make after terminating the driver instance."""
         def assert_after_terminate_w():
-            assert(not started_instance.is_alive())
-            assert(started_instance.is_comm_closed)
+            assert not started_instance.is_alive()
+            assert started_instance.is_comm_closed
         return assert_after_terminate_w
 
 
@@ -455,9 +462,9 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
                     yml={'working_dir': working_dir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, inputs=inputs, outputs=outputs,
-                    translator={'transformtype': 'select_fields',
-                                'selected': ['a'],
-                                'single_as_scalar': True},
+                    transform={'transformtype': 'select_fields',
+                               'selected': ['a'],
+                               'single_as_scalar': True},
                     onexit='printStatus')
 
     @pytest.fixture(scope="class")
@@ -525,9 +532,9 @@ class TestConnectionDriverIterate(TestConnectionDriver):
                     yml={'working_dir': working_dir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, inputs=inputs, outputs=outputs,
-                    translator=[{'transformtype': 'select_fields',
-                                 'selected': ['a', 'b']},
-                                {'transformtype': 'iterate'}],
+                    transform=[{'transformtype': 'select_fields',
+                                'selected': ['a', 'b']},
+                               {'transformtype': 'iterate'}],
                     onexit='printStatus')
 
     @pytest.fixture(scope="class")
@@ -541,12 +548,12 @@ class TestConnectionDriverIterate(TestConnectionDriver):
         r"""Test sending/receiving small message."""
         msg = test_msg
         flag = send_comm.send(msg)
-        assert(flag)
+        assert flag
         for imsg in [v for k, v in msg.items() if k in ['a', 'b']]:
             flag, msg_recv = recv_comm.recv(timeout)
-            assert(flag)
-            assert(msg_recv == nested_result(imsg))
-        assert(started_instance.n_msg == 0)
+            assert flag
+            assert msg_recv == nested_result(imsg)
+        assert started_instance.n_msg == 0
 
 
 class TestConnectionDriverProcess(TestConnectionDriver):
@@ -578,9 +585,9 @@ def test_ConnectionDriverOnexit_errors():
 
 def test_ConnectionDriverTranslate_errors():
     r"""Test that errors are raised for invalid translators."""
-    assert(not hasattr(invalid_translate, '__call__'))
+    assert not hasattr(invalid_translate, '__call__')
     with pytest.raises(ValueError):
-        ConnectionDriver('test', translator=invalid_translate)
+        ConnectionDriver('test', transform=invalid_translate)
 
 
 _comm_types = sorted(

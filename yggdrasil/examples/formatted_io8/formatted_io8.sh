@@ -31,6 +31,10 @@ case $1 in
 	echo "Running Fortran"
 	yaml='formatted_io8_fortran.yml'
 	;;
+    -j | --julia)
+	echo "Running Julia"
+	yaml='formatted_io8_julia.yml'
+	;;
 esac
 
 yggrun $yaml

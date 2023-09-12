@@ -25,12 +25,12 @@ int main(int argc,char *argv[]){
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
   printf("ascii_io(CPP): Receiving/sending ASCII file.\n");
-  char *line = (char*)malloc(LINE_SIZE_MAX);
-  // char line[LINE_SIZE_MAX];
+  char *line = (char*)malloc(BSIZE);
+  // char line[BSIZE];
   ret = 0;
   while (ret >= 0) {
     // Receive a single line
-    ret = FileInput.recv_line(line, LINE_SIZE_MAX);
+    ret = FileInput.recv_line(line, BSIZE);
     if (ret >= 0) {
       // If the receive was succesful, send the line to output
       printf("File: %s", line);

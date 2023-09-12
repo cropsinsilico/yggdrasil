@@ -2,10 +2,17 @@ from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
 class FilterTransform(TransformBase):
-    r"""Class for applying a filter."""
+    r"""Class for applying a filter.
+
+    Args:
+        filter (FilterBase): Filter used to exclude some messages based
+            on their contents.
+
+    """
     _transformtype = 'filter'
     _schema_required = ['filter']
     _schema_properties = {'filter': {'$ref': '#/definitions/filter'}}
+    _schema_subtype_description = "Pass only some messages based on a filter"
 
     def __init__(self, *args, **kwargs):
         super(FilterTransform, self).__init__(*args, **kwargs)
@@ -49,7 +56,7 @@ class FilterTransform(TransformBase):
         return iter([])
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the transform class.
 
         Returns:

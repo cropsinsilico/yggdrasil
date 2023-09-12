@@ -2,7 +2,9 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #endif
 
+#include <iostream>
 #include <string>
+#include <cstring>
 #include <regex>
 #include <cstdint>
 #include "regex_win32.h"
@@ -30,7 +32,7 @@ int count_matches(const char *regex_text, const char *to_match) {
       ret++;
     return ret;
   } catch (const std::regex_error& rerr) {
-    rerr;
+    std::cerr << "regex_error: " << rerr.what() << std::endl;
     return -1;
   }
 }
@@ -69,7 +71,7 @@ int find_matches(const char *regex_text, const char *to_match,
     }
     return ret;
   } catch (const std::regex_error& rerr) {
-    rerr;
+    std::cerr << "regex_error: " << rerr.what() << std::endl;
     return -1;
   }
 }
@@ -99,7 +101,7 @@ int find_match(const char *regex_text, const char *to_match,
     }
     return ret;
   } catch (const std::regex_error& rerr) {
-    rerr;
+    std::cerr << "regex_error: " << rerr.what() << std::endl;
     return -1;
   }
 }
@@ -168,7 +170,7 @@ int regex_replace_nosub(char *buf, const size_t len_buf,
       return (int)cur_siz;
     }
   } catch (const std::regex_error& rerr) {
-    rerr;
+    std::cerr << "regex_error: " << rerr.what() << std::endl;
     return -1;
   }
 }
@@ -249,7 +251,7 @@ int get_subrefs(const char *buf, size_t **refs) {
     // printf("%d refs in %s\n", nref, buf);
     return nref;
   } catch (const std::regex_error& rerr) {
-    rerr;
+    std::cerr << "regex_error: " << rerr.what() << std::endl;
     return -1;
   }
 }
@@ -354,7 +356,7 @@ int regex_replace_sub(char *buf, const size_t len_buf,
       return (int)(cur_siz);
     }
   } catch (const std::regex_error& rerr) {
-    rerr;
+    std::cerr << "regex_error: " << rerr.what() << std::endl;
     return -1;
   }
 }

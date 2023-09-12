@@ -274,4 +274,5 @@ class PythonModelDriver(InterpretedModelDriver):
         out = super(PythonModelDriver, cls).get_testing_options(**kwargs)
         out['deps'] = [{'package': 'numpy', 'arguments': '-v'},
                        'requests', 'pyyaml']
+        out['kwargs']['interpreter'] = sys.executable
         return out

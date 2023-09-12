@@ -1,5 +1,7 @@
+from collections import OrderedDict
 import re
 import os
+import sys
 import textwrap
 
 
@@ -90,16 +92,27 @@ def write_datatype_mapping_table(**kwargs):
         str, list: Name of file or files created.
 
     """
-    from yggdrasil import tools, components
-    from yggdrasil.metaschema.datatypes import _type_registry
+    from yggdrasil import tools, components, constants
     kwargs.setdefault('fname_base', 'datatype_mapping_table.rst')
-    args = {}
-    for k, v in _type_registry.items():
-        if v.cross_language_support:
-            args[k] = {'notes': get_docs_section(v.__doc__,
-                                                 keys=['Developer Notes:',
-                                                       'Development Notes:'],
-                                                 join_lines=True)}
+    notes = {'bytes': 'Precision X is preserved.',
+             'complex': 'Precision X is preserved.',
+             'float': 'Precision X is preserved.',
+             'int': 'Precision X is preserved.',
+             'uint': 'Precision X is preserved.',
+             'unicode': 'Precision X is preserved.',
+             'number': (
+                 'This covers the JSON default for floating point or '
+                 'integer values.'),
+             'scalar': ('yggdrasil defines scalars as an umbrella type '
+                        'encompassing int, uint, float, bytes, and '
+                        'unicode.'),
+             'string': 'User can specify an encoding for scalar strings.'}
+    args = {k: {} for k in constants.ALL_TYPES}
+    for k in constants.PYTHON_SCALARS:
+        args.setdefault(k, {})
+    for k, v in notes.items():
+        if k in args:
+            args[k]['notes'] = v
     for lang in tools.get_supported_lang():
         if lang in ['lpy', 'make', 'cmake', 'executable']:
             continue
@@ -202,12 +215,12 @@ def write_datatype_table(table_type='all', **kwargs):
         ValueError: If table_type is not one of the supported values.
 
     """
-    from yggdrasil.metaschema.datatypes import _type_registry
+    from yggdrasil import constants
     table_type_list = ['simple', 'container', 'yggdrasil']
     if table_type == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in table_type_list:
             out.append(write_datatype_table(table_type=k, **kwargs))
@@ -219,21 +232,14 @@ def write_datatype_table(table_type='all', **kwargs):
     target_types = []
     args = {}
     if table_type == 'simple':
-        for k, v in _type_registry.items():
-            if v._replaces_existing and (not hasattr(v, '_container_type')):
-                target_types.append(k)
+        target_types += constants.JSON_SIMPLE_TYPES
     elif table_type == 'container':
-        for k, v in _type_registry.items():
-            if v._replaces_existing and hasattr(v, '_container_type'):
-                target_types.append(k)
+        target_types += constants.JSON_CONTAINER_TYPES
     elif table_type == 'yggdrasil':
-        for k, v in _type_registry.items():
-            if not v._replaces_existing:
-                target_types.append(k)
+        target_types += constants.YGGDRASIL_TYPES
     for k in target_types:
-        v = _type_registry[k]
-        args[k] = {'description': v.description,
-                   'required properties': v.definition_properties}
+        args[k] = {'description': constants.ALL_TYPES[k]}
+        # 'required properties'?
     kwargs.setdefault('key_column_name', 'type')
     kwargs.setdefault('list_columns', 'required properties')
     lines = dict2table(args, **kwargs)
@@ -291,7 +297,7 @@ def write_classdocs_table(class_, table_type='all', **kwargs):
     if table_type == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in table_type_list:
             out.append(write_classdocs_table(class_, table_type=k, **kwargs))
@@ -350,7 +356,7 @@ def write_component_table(comp='all', table_type='all', **kwargs):
     if comp == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in s.keys():
             new_out = write_component_table(comp=k, table_type=table_type, **kwargs)
@@ -362,7 +368,7 @@ def write_component_table(comp='all', table_type='all', **kwargs):
     if table_type == 'all':
         fname = kwargs.get("fname", None)
         fname_base = kwargs.get("fname_base", None)
-        assert((fname is None) and (fname_base is None))
+        assert (fname is None) and (fname_base is None)
         out = []
         for k in table_type_list:
             out.append(write_component_table(comp=comp, table_type=k, **kwargs))
@@ -419,17 +425,28 @@ def component2table(comp, table_type, include_required=None,
         # Set defaults
         kwargs.setdefault('key_column_name', 'option')
         kwargs.setdefault('val_column_name', 'description')
-        kwargs.setdefault('column_order', [kwargs['key_column_name'],
-                                           'type', 'required',
-                                           kwargs['val_column_name']])
+        default_order = [kwargs['key_column_name'],
+                         'type', 'required',
+                         kwargs['val_column_name']]
+        if table_type == 'specific':
+            default_order.insert(2, 'Valid for \'%s\' of' % subtype_key)
+        kwargs.setdefault('column_order', default_order)
+        kwargs.setdefault('wrapped_columns', {'description': 80})
         if (not include_required) and ('required' in kwargs['column_order']):
             kwargs['column_order'].remove('required')
         # Get list of component subtypes
+        defs = s.get_definitions(relaxed=True)
         if table_type == 'general':
-            s_comp_list = [s[comp].get_subtype_schema('base', unique=True)]
+            s_comp_list = [s[comp].get_subtype_schema('base', unique=True,
+                                                      relaxed=True)]
         else:
-            s_comp_list = [s[comp].get_subtype_schema(x, unique=True)
-                           for x in s[comp].classes]
+            s_comp_list = [
+                defs[s[comp]._subtype_defkey(
+                    comp, s[comp].class2subtype[x][0])]
+                for x in s[comp].classes]
+            # s_comp_list = [s[comp].get_subtype_schema(x, unique=True,
+            #                                           relaxed=True)
+            #                for x in s[comp].classes]
         # Loop over subtyeps
         out_apply = {}
         for s_comp in s_comp_list:
@@ -437,7 +454,11 @@ def component2table(comp, table_type, include_required=None,
                 if (k == subtype_key) and (table_type == 'specific'):
                     continue
                 if k not in args:
-                    args[k] = {'type': v.get('type', ''),
+                    def_type = ''
+                    if '$ref' in v:
+                        v = defs[v['$ref'].split('#/definitions/')[-1]]
+                        def_type = 'object'
+                    args[k] = {'type': v.get('type', def_type),
                                'description': v.get('description', '')}
                     if include_required:
                         if k in s_comp.get('required', []):
@@ -456,15 +477,18 @@ def component2table(comp, table_type, include_required=None,
                 v['Valid for \'%s\' of' % subtype_key] = list(set(out_apply[k]))
     elif table_type == 'subtype':
         kwargs.setdefault('key_column_name', subtype_key)
+        s_base = s[comp].get_subtype_schema('base', unique=True,
+                                            relaxed=True)
         for x, subtypes in s[comp].schema_subtypes.items():
-            s_comp = s[comp].get_subtype_schema(x, unique=True)
+            s_comp = s[comp].get_subtype_schema(x, unique=True,
+                                                relaxed=True)
             subt = subtypes[0]
             args[subt] = {
                 'description': s_comp['properties'][subtype_key].get(
                     'description', '')}
             if len(subtypes) > 1:
                 args[subt]['aliases'] = subtypes[1:]
-            if s_comp['properties'][subtype_key].get('default', None) in subtypes:
+            if s_base['properties'][subtype_key].get('default', None) in subtypes:
                 args[subt]['description'] = ('[DEFAULT] '
                                              + args[subt]['description'])
     else:
@@ -476,7 +500,7 @@ def dict2table(args, key_column_name='option', val_column_name='description',
                column_order=None, wrapped_columns=None, list_columns=None,
                sort_on_key=True, sort_required_first=True,
                last_column=None, prune_empty_columns=False,
-               style='simple', **kwargs):
+               style='simple', textwrap_kwargs={}, **kwargs):
     r"""Convert a dictionary to a table.
 
     Args:
@@ -514,6 +538,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         style (str, optional): Style of table that should be used. 'simple'
             dosn't allow for multi-column or row cells, while 'complex'
             does. Defaults to 'simple'.
+        textwrap_kwargs (dict, optional): Keyword arguments to pass to
+            textwrap.wrap.
         **kwargs: Additional keyword arguments are ignored.
             
     Returns:
@@ -539,7 +565,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             v = args[k]
             if isinstance(v, dict) and v.get('required', False):
                 prop_req.append(k)
-        prop_order = list(set(prop_order) - set(prop_req))
+        if prop_req:
+            prop_order = list(set(prop_order) - set(prop_req))
     if sort_on_key:
         prop_req = sorted(prop_req)
         prop_order = sorted(prop_order)
@@ -670,7 +697,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             max_row_len = 1
             for k in column_order:
                 if k in wrapped_columns:
-                    row.append(textwrap.wrap(columns[k][i], wrapped_columns[k]))
+                    row.append(textwrap.wrap(columns[k][i], wrapped_columns[k],
+                                             **textwrap_kwargs))
                 elif k in list_columns:
                     row.append(columns[k][i])
                 else:
@@ -836,7 +864,7 @@ def document_cli_subcommand(prog, sub, alias=None, dummy_file=None,
                 f"   :func: {sub.__name__}.get_parser",
             ]
         else:
-            assert(dummy_def is not None)
+            assert dummy_def is not None
             dummy_def += [
                 f"def {prog}():",
                 f"    from {sub.__module__} import {sub.__name__}",
@@ -848,3 +876,79 @@ def document_cli_subcommand(prog, sub, alias=None, dummy_file=None,
     else:
         out += [f"Alias for ``{alias}``"]
     return out + ["", ""]
+
+
+def write_package_extras_table(**kwargs):
+    r"""Write a table describing the optional Python packages.
+
+    Args:
+        **kwargs: Additional keyword arguments are passed to dict2table and
+            write_table.
+
+    Returns:
+        str, list: Name of file or files created.
+
+    """
+    from yggdrasil import tools
+    utils_dir = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), 'utils')
+    try:
+        sys.path.insert(0, utils_dir)
+        from manage_requirements import YggRequirements
+        reqs = YggRequirements.from_file(None)
+        args = OrderedDict([(k.lower(), {}) for k in
+                            sorted(tools.get_supported_lang())
+                            if k.lower() in reqs['extras']])
+        conda_reqs_width = 10
+        pip_reqs_width = 10
+        for k, v in reqs['extras'].items():
+            args.setdefault(k, {})
+            args[k].update({
+                'description': str(v.description).replace(
+                    'yggdrasil', '|yggdrasil|'),
+                'conda syntax': 'n/a',
+                # 'conda deps': 'n/a',
+                'pip syntax': 'n/a',
+                # 'pip deps': 'n/a'
+            })
+            conda_reqs_extra = reqs.create_conda_recipe_varient(k)
+            if conda_reqs_extra:
+                conda_reqs = [
+                    x for x in conda_reqs_extra['requirements']['run']
+                    if 'pin_subpackage(' not in x]
+            if conda_reqs:
+                conda_reqs_width = max(conda_reqs_width,
+                                       len(max(conda_reqs, key=len)))
+                args[k]['conda syntax'] = f"yggdrasil.{k}"
+                # args[k]['conda deps'] = conda_reqs
+            pip_reqs = reqs.create_requirements_file_varient(
+                k, format_kws={'include_method': False,
+                               'include_extra': False})
+            if pip_reqs:
+                pip_reqs_width = max(pip_reqs_width,
+                                     len(max(pip_reqs, key=len)))
+                args[k]['pip syntax'] = f"yggdrasil[{k}]"
+                # args[k]['pip deps'] = pip_reqs
+        # for k, v in args.items():
+        #     for deps, deps_len in [('conda deps', conda_reqs_width),
+        #                            ('pip deps', pip_reqs_width)]:
+        #         if isinstance(v[deps], list):
+        #             v[deps] = ' '.join([x + ' ' * (deps_len - len(x))
+        #                                 for x in v[deps]])
+        # TODO: Fix deps table output
+        kwargs.setdefault('column_order', [
+            'extra', 'conda syntax', 'pip syntax'])
+        kwargs.setdefault('fname_base', 'package_extras.rst')
+        kwargs.setdefault('key_column_name', 'extra')
+        kwargs.setdefault('wrapped_columns',
+                          {'description': 40,
+                           'conda deps': conda_reqs_width,
+                           'pip deps': pip_reqs_width})
+        kwargs.setdefault('sort_on_key', False)
+        kwargs.setdefault('sort_required_first', False)
+        kwargs.setdefault('textwrap_kwargs', {'replace_whitespace': False})
+        lines = dict2table(args, **kwargs)
+        out = write_table(lines, **kwargs)
+    finally:
+        sys.path.pop(0)
+    return out

@@ -15,6 +15,11 @@ except ImportError:  # pragma: no cover
     _use_astropy = False
 
 
+class SerializationError(TypeError):
+    r"""Error during serialization due to unexpected type."""
+    pass
+
+
 def extract_formats(fmt_str):
     r"""Locate format codes within a format string.
 
@@ -148,14 +153,14 @@ def cformat2nptype(cfmt, names=None):
     """
     # TODO: this may fail on 32bit systems where C long types are 32 bit
     if not (isinstance(cfmt, list) or isinstance(cfmt, (str, bytes))):
-        raise TypeError("Input must be a string, bytes string, or list, not %s" %
-                        type(cfmt))
+        raise TypeError(f"Input must be a string, bytes string, or list,"
+                        f" not {type(cfmt)}")
     if isinstance(cfmt, (str, bytes)):
         cfmt = tools.bytes2str(cfmt)
         fmt_list = extract_formats(cfmt)
         if len(fmt_list) == 0:
-            raise ValueError("Could not locate any format codes in the "
-                             + "provided format string (%s)." % cfmt)
+            raise ValueError(f"Could not locate any format codes in the"
+                             f" provided format string ({cfmt}).")
     else:
         fmt_list = cfmt
     nfmt = len(fmt_list)
@@ -256,8 +261,8 @@ def cformat2pyscanf(cfmt):
                          + "provided format string (%s)." % cfmt)
     for cfmt_str in fmt_list:
         # Hacky, but necessary to handle concatenation of a single byte
-        if cfmt_str[-1] == 's':
-            out = '%s'
+        if cfmt_str[-1] in ['s', 'a']:
+            out = '%' + cfmt_str[-1]
         else:
             out = cfmt_str
         # if cfmt_str[-1] == 'j':
@@ -531,14 +536,17 @@ def consolidate_array(arrs, dtype=None):
             out = arrs
         else:
             if len(arrs.dtype) == 0:
-                if arrs.shape[-1] != len(dtype):
-                    raise ValueError("The last dimension of the input array "
-                                     + "(%d) " % arrs.shape[-1]
-                                     + "dosn't match the number of fields in "
-                                     + "the dtype (%d)." % len(dtype))
-                out = np.empty(arrs.shape[:-1], dtype=dtype)
-                for i in range(arrs.shape[-1]):
-                    out[dtype.names[i]] = arrs[..., i]
+                if len(arrs.shape) == 1 and len(dtype) == 1:
+                    out = np.array(arrs, dtype)
+                else:
+                    if arrs.shape[-1] != len(dtype):
+                        raise ValueError("The last dimension of the input array "
+                                         + "(%d) " % arrs.shape[-1]
+                                         + "dosn't match the number of fields in "
+                                         + "the dtype (%d)." % len(dtype))
+                    out = np.empty(arrs.shape[:-1], dtype=dtype)
+                    for i in range(arrs.shape[-1]):
+                        out[dtype.names[i]] = arrs[..., i]
             elif len(arrs.dtype) == len(dtype):
                 out = np.empty(arrs.shape, dtype=dtype)
                 for n1, n2 in zip(arrs.dtype.names, dtype.names):
@@ -772,6 +780,11 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         arr = np.genfromtxt(fd, **np_kws)
         if dtype is not None:
             arr = arr.astype(dtype)
+        elif arr.ndim == 2 and arr.dtype.names is None:
+            dtype_named = {
+                'names': [f'f{i}' for i in range(arr.shape[1])],
+                'formats': [dtype for i in range(arr.shape[1])]}
+            arr = arr.astype(dtype_named)
     fd.close()
     return arr
 
@@ -938,7 +951,7 @@ def format_header(format_str=None, dtype=None,
     out = []
     for x in [field_names, field_units, fmts]:
         if (x is not None) and (len(max(x, key=len)) > 0):
-            assert(len(x) == nfld)
+            assert len(x) == nfld
             x_bytes = tools.str2bytes(x, recurse=True)
             out.append(comment + delimiter.join(x_bytes))
     out = newline.join(out) + newline
@@ -976,9 +989,11 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
     header_lines = []
     header_size = 0
     prev_pos = fd.tell()
+    last_line = None
     for line in fd:
         sline = line.replace(platform._newline, newline)
         if not sline.startswith(comment):
+            last_line = sline
             break
         header_size += len(line)
         header_lines.append(sline)
@@ -994,8 +1009,24 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
         if v is not None:
             header[k] = v
     header.setdefault('format_str', None)
-    if (delimiter is None) or ('format_str' in header):
-        delimiter = header['delimiter']
+    delimiter = header['delimiter']
+    # Handle case where no header is found
+    if ((not header_lines)
+        and ((not delimiter)
+             or (delimiter == constants.DEFAULT_DELIMITER
+                 and not header['format_str']
+                 and delimiter not in last_line))):
+        for item in [b',', b';']:
+            if item in last_line:
+                p1, p2 = last_line.split(item, maxsplit=1)
+                p1 = p1.rstrip()
+                p2 = p2.lstrip()
+                break
+        else:
+            p1, p2 = last_line.split(maxsplit=1)
+        delimiter = last_line[
+            (last_line.index(p1) + len(p1)):last_line.index(p2)]
+        header['delimiter'] = delimiter
     # Try to determine format from array without header
     str_fmt = b'%s'
     if ((header['format_str'] is None) or (str_fmt in header['format_str'])):
@@ -1015,20 +1046,23 @@ def discover_header(fd, serializer, newline=constants.DEFAULT_NEWLINE,
         # Get format from array
         if header['format_str'] is None:
             header['format_str'] = table2format(
-                arr.dtype, delimiter=delimiter,
-                comment=b'',
+                arr.dtype, delimiter=delimiter, comment=b'',
                 newline=header['newline'])
         # Determine maximum size of string field
         while str_fmt in header['format_str']:
             field_formats = extract_formats(header['format_str'])
             ifld = tools.bytes2str(
                 header['field_names'][field_formats.index(str_fmt)])
-            max_len = len(max(arr[ifld], key=len))
+            if arr.ndim == 0:
+                max_len = len(arr[ifld].tolist())
+            else:
+                max_len = len(max(arr[ifld], key=len))
             new_str_fmt = b'%%%ds' % max_len
             header['format_str'] = header['format_str'].replace(
                 str_fmt, new_str_fmt, 1)
     # Update serializer
-    serializer.initialize_serializer(header)
+    if not serializer.initialized:
+        serializer.update_serializer(**header)
     # Seek to just after the header
     fd.seek(prev_pos + header_size)
 
@@ -1140,6 +1174,29 @@ def dict2list(d, order=None):
     return out
 
 
+def list2names(arrays, no_default=False):
+    r"""Get the field order based on the provided arrays. If the arrays do
+    not have fields, they are set based on order (e.g. 'f0', 'f1').
+
+    Args:
+        arrays (list): List of arrays.
+        no_default (bool, optional): If True, fields will not be set from
+            order if they cannot be determined from the passed arrays. None
+            will be returned instead.
+
+    Returns:
+        list: Field names.
+
+    """
+    if all(len(x.dtype) == 1 for x in arrays):
+        names = [x.dtype.names[0] for x in arrays]
+    elif no_default:
+        names = None
+    else:
+        names = ['f%d' % i for i in range(len(arrays))]
+    return names
+
+
 def list2dict(arrays, names=None):
     r"""Convert a list of arrays to a dictionary of arrays.
 
@@ -1156,7 +1213,9 @@ def list2dict(arrays, names=None):
         raise TypeError("arrays must be a list or tuple, not %s."
                         % type(arrays))
     if names is None:
-        names = ['f%d' % i for i in range(len(arrays))]
+        names = list2names(arrays)
+    if all((hasattr(x, 'dtype') and len(x.dtype) == 1) for x in arrays):
+        arrays = [x[x.dtype.names[0]] for x in arrays]
     out = {k: x for k, x in zip(names, arrays)}
     return out
 
@@ -1309,7 +1368,10 @@ def dict2pandas(d, order=None):
         pandas.DataFrame: Pandas data frame with contents from the input dict.
 
     """
-    return numpy2pandas(dict2numpy(d, order=order))
+    out = numpy2pandas(dict2numpy(d, order=order))
+    if order is None:
+        out.columns = pandas.RangeIndex(len(out.columns))
+    return out
 
 
 def pandas2dict(frame):
@@ -1339,23 +1401,25 @@ def list2pandas(arrays, names=None):
         pandas.DataFrame: Pandas data frame with contents from the input list.
 
     """
+    if names is None:
+        names = list2names(arrays, no_default=True)
     out = numpy2pandas(list2numpy(arrays, names=names))
     if names is None:
         out.columns = pandas.RangeIndex(len(arrays))
     return out
 
 
-def pandas2list(frame):
-    r"""Convert a Pandas DataFrame to a list of arrays.
+# def pandas2list(frame):
+#     r"""Convert a Pandas DataFrame to a list of arrays.
 
-    Args:
-        frame (pandas.DataFrame): Frame to convert.
+#     Args:
+#         frame (pandas.DataFrame): Frame to convert.
 
-    Returns:
-        list: List with contents from the input frame.
+#     Returns:
+#         list: List with contents from the input frame.
 
-    """
-    return numpy2list(pandas2numpy(frame))
+#     """
+#     return numpy2list(pandas2numpy(frame))
 
 
 __all__ = []

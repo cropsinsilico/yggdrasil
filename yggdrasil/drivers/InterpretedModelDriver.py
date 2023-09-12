@@ -83,14 +83,14 @@ class InterpretedModelDriver(ModelDriver):
                          'key': 'interpreter_flags',
                          'type': list}]
 
-    def __init__(self, name, args, **kwargs):
-        super(InterpretedModelDriver, self).__init__(name, args, **kwargs)
-        # Set defaults from attributes
-        for k0 in ['interpreter']:
-            for k in [k0, '%s_flags' % k0]:
-                v = getattr(self, k, None)
-                if v is None:
-                    setattr(self, k, getattr(self, 'default_%s' % k))
+    # def __init__(self, name, args, **kwargs):
+    #     super(InterpretedModelDriver, self).__init__(name, args, **kwargs)
+    #     # Set defaults from attributes
+    #     for k0 in ['interpreter']:
+    #         for k in [k0, '%s_flags' % k0]:
+    #             v = getattr(self, k, None)
+    #             if v is None:
+    #                 setattr(self, k, getattr(self, 'default_%s' % k))
 
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -113,6 +113,20 @@ class InterpretedModelDriver(ModelDriver):
             except ValueError:
                 pass
                 
+    @classmethod
+    def are_dependencies_installed(cls, **kwargs):
+        r"""Determine if the dependencies are installed for the interface (not
+        including dependencies needed by a particular communication type).
+
+        Returns:
+            bool: True if the dependencies are installed. False otherwise.
+
+        """
+        # Short cut by checking if yggdrasil installed
+        if not (cls.full_language and cls.is_interface_installed()):  # pragma: config
+            return super(InterpretedModelDriver, cls).are_dependencies_installed(**kwargs)
+        return True
+            
     def parse_arguments(self, *args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
@@ -138,6 +152,10 @@ class InterpretedModelDriver(ModelDriver):
         if out is None:
             raise NotImplementedError("Interpreter not set for language '%s'."
                                       % cls.language)
+        if not os.path.isfile(out):
+            out_full = shutil.which(out)
+            if out_full:
+                out = out_full
         return out
 
     @classmethod
@@ -215,7 +233,7 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         ext = cls.language_ext
-        assert(isinstance(ext, (tuple, list)))
+        assert isinstance(ext, (tuple, list))
         if exec_type == 'interpreter':
             if not cls.is_interpreter(args[0]):
                 if interpreter is None:

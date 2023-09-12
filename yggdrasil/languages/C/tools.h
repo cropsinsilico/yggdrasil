@@ -1,6 +1,28 @@
 #ifndef YGGTOOLS_H_
 #define YGGTOOLS_H_
 
+// Required for M_PI on MSVC
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+
+#ifndef RAPIDJSON_NO_INT64DEFINE
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+#if defined(_MSC_VER) && (_MSC_VER < 1800)      // Visual Studio 2013
+#include "rapidjson/msinttypes/stdint.h"
+#include "rapidjson/msinttypes/inttypes.h"
+#else
+// Other compilers should have this.
+#include <stdint.h>
+#include <inttypes.h>
+#endif
+#endif // RAPIDJSON_NO_INT64DEFINE
+
 #ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS 1
@@ -89,12 +111,19 @@ typedef long double _Complex complex_long_double;
 #define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
 #endif
 
-
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
 
 #include <math.h> // Required to prevent error when using mingw on windows
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+#ifndef PyObject
+#define PyObject void*
+#endif
+#ifndef npy_intp
+#define npy_intp int
+#endif
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
 #ifdef _DEBUG
 #undef _DEBUG
 #include <Python.h>
@@ -108,6 +137,7 @@ extern "C" {
 #include <numpy/ndarrayobject.h>
 #include <numpy/npy_common.h>
 #endif
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
   
 /*! @brief Wrapper for a complex number with float components. */
 typedef struct complex_float_t {
@@ -132,7 +162,6 @@ typedef struct complex_long_double_t {
 #include "regex_posix.h"
 #endif
 #ifdef _MSC_VER
-#include "windows_stdint.h"  // Use local copy for MSVC support
 // Prevent windows.h from including winsock.h
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -143,37 +172,17 @@ typedef struct complex_long_double_t {
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
-#include <stdint.h>
 #include <unistd.h>
 #define ygg_getpid getpid
 #endif
 
-#define STRBUFF 100
-  
-/*! @brief Maximum message size. */
-#ifdef IPCDEF
-#define YGG_MSG_MAX 2048
-#else
-#define YGG_MSG_MAX 1048576
-#endif
-/*! @brief End of file message. */
-#define YGG_MSG_EOF "EOF!!!"
-/*! @brief End of client message. */
-#define YGG_CLIENT_EOF "YGG_END_CLIENT"
-/*! @brief Resonable size for buffer. */
-#define YGG_MSG_BUF 2048
-/*! @brief Sleep time in micro-seconds */
-#define YGG_SLEEP_TIME ((int)250000)
-/*! @brief Size for buffers to contain names of Python objects. */
-#define PYTHON_NAME_SIZE 1000
+#include "constants.h"
 
-/*! @brief Define old style names for compatibility. */
-#define PSI_MSG_MAX YGG_MSG_MAX
-#define PSI_MSG_BUF YGG_MSG_BUF
-#define PSI_MSG_EOF YGG_MSG_EOF
+#define STRBUFF 100
 #ifdef PSI_DEBUG
 #define YGG_DEBUG PSI_DEBUG
 #endif
+  
 static int _ygg_error_flag = 0;
 
 /*! @brief Define macros to allow counts of variables. */
@@ -190,6 +199,17 @@ static int _ygg_error_flag = 0;
 #define COUNT_VARARGS(...) _GET_NTH_ARG("ignored", ##__VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #endif
 #define UNUSED(arg) ((void)&(arg))
+
+#define YGG_BEGIN_VAR_ARGS_CPP(name, first_arg, nargs, realloc)	\
+  va_list_t name = init_va_list(&nargs, realloc, 0);		\
+  va_list* name ## _va = get_va_list(name);			\
+  va_start(*name ## _va, first_arg)
+#define YGG_BEGIN_VAR_ARGS(name, first_arg, nargs, realloc)	\
+  va_list_t name = init_va_list(&nargs, realloc, 1);		\
+  va_list* name ## _va = get_va_list(name);			\
+  va_start(*name ## _va, first_arg)
+#define YGG_END_VAR_ARGS(name)			\
+  end_va_list(&name)
 
 /*! @brief Memory to allow thread association to be set via macro. */
 static int global_thread_id = -1;
@@ -211,27 +231,10 @@ unsigned long ptr2seed(void *ptr) {
 };
 
 
-/*! @brief Structure used to wrap va_list and allow pointer passing.
-@param va va_list Wrapped variable argument list.
-*/
-typedef struct va_list_t {
-  va_list va;  //!< Traditional variable argument list.
-  int using_ptrs; //!< Flag that is 1 if the arguments are stored using pointers.
-  void **ptrs; //!< Variable arguments stored as pointers.
-  int nptrs; //!< The number of variable arguments stored as pointers.
-  int iptr; //!< The index of the current variable argument pointer.
-  int for_fortran; //!< Flag that is 1 if this structure will be accessed by fortran.
-} va_list_t;
-
-
 /*! @brief Structure used to wrap Python objects. */
 typedef struct python_t {
-  char name[PYTHON_NAME_SIZE]; //!<Name of the Python class/type/function.
-  void *args; //!< Arguments used in creating a Python instance.
-  void *kwargs; //!< Keyword arguments used in creating a Python instance.
   PyObject *obj; //!< Python object.
 } python_t;
-
 
 /*!
   @brief Get the ID for the current thread (if inside one).
@@ -260,77 +263,11 @@ int get_thread_id() {
 static inline
 python_t init_python() {
   python_t out;
-  out.name[0] = '\0';
-  out.args = NULL;
-  out.kwargs = NULL;
   out.obj = NULL;
   return out;
 };
 
   
-/*!
-  @brief Initialize Numpy arrays if it is not initalized.
-  @returns int 0 if successful, other values indicate errors.
- */
-static inline
-int init_numpy_API() {
-  int out = 0;
-#ifdef _OPENMP
-#pragma omp critical (numpy)
-  {
-#endif
-  if (PyArray_API == NULL) {
-    if (_import_array() < 0) {
-      PyErr_Print();
-      out = -2;
-    }
-  }
-#ifdef _OPENMP
-  }
-#endif
-  return out;
-};
-
-
-/*!
-  @brief Initialize Python if it is not initialized.
-  @returns int 0 if successful, other values indicate errors.
- */
-static inline
-int init_python_API() {
-  int out = 0;
-#ifdef _OPENMP
-#pragma omp critical (python)
-  {
-#endif
-  if (!(Py_IsInitialized())) {
-    char *name = getenv("YGG_PYTHON_EXEC");
-    if (name != NULL) {
-      wchar_t *wname = Py_DecodeLocale(name, NULL);
-      if (wname == NULL) {
-	printf("Error decoding YGG_PYTHON_EXEC\n");
-	out = -1;
-      } else {
-	Py_SetProgramName(wname);
-	PyMem_RawFree(wname);
-      }
-    }
-    if (out >= 0) {
-      Py_Initialize();
-      if (!(Py_IsInitialized()))
-	out = -1;
-    }
-  }
-  if (out >= 0) {
-    out = init_numpy_API();
-  }
-#ifdef _OPENMP
-  }
-#endif
-  return out;
-};
-
-
 //==============================================================================
 /*!
   Logging
@@ -567,94 +504,6 @@ int is_send(const char *buf) {
   return not_empty_match("send", buf);
 };
 
-  
-/*!
-  @brief Initialize a variable argument list from an existing va_list.
-  @returns va_list_t New variable argument list structure.
- */
-static inline
-va_list_t init_va_list() {
-  va_list_t out;
-  out.using_ptrs = 0;
-  out.ptrs = NULL;
-  out.nptrs = 0;
-  out.iptr = 0;
-  out.for_fortran = 0;
-  return out;
-};
-
-
-/*! Initialize a variable argument list from an array of pointers.
-  @param[in] nptrs int Number of pointers.
-  @param[in] ptrs void** Array of pointers. 
-  @returns va_list_t New variable argument list structure.
-*/
-static inline
-va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
-  va_list_t out;
-  out.using_ptrs = 1;
-  out.ptrs = ptrs;
-  out.nptrs = nptrs;
-  out.iptr = 0;
-  out.for_fortran = 0;
-  return out;
-};
-  
-
-/*! Finalize a variable argument list.
-  @param[in] ap va_list_t Variable argument list.
-*/
-static inline
-void end_va_list(va_list_t *ap) {
-  if (!(ap->using_ptrs)) {
-    va_end(ap->va);
-  }
-};
-
-  
-/*! Copy a variable argument list.
-  @param[in] ap va_list_t Variable argument list structure to copy.
-  @returns va_list_t New variable argument list structure.
-*/
-static inline
-va_list_t copy_va_list(va_list_t ap) {
-  va_list_t out;
-  if (ap.using_ptrs) {
-    out = init_va_ptrs(ap.nptrs, ap.ptrs);
-    out.iptr = ap.iptr;
-  } else {
-    out = init_va_list();
-    va_copy(out.va, ap.va);
-  }
-  out.for_fortran = ap.for_fortran;
-  return out;
-};
-
-
-/*! @brief Method for skipping a number of bytes in the argument list.
-  @param[in] ap va_list_t* Structure containing variable argument list.
-  @param[in] nbytes size_t Number of bytes that should be skipped.
- */
-static inline
-void va_list_t_skip(va_list_t *ap, size_t nbytes) {
-  if (ap->using_ptrs) {
-    ap->iptr++;
-  } else {
-    if (nbytes == sizeof(void*)) {
-      va_arg(ap->va, void*);
-    } else if (nbytes == sizeof(size_t)) {
-      va_arg(ap->va, size_t);
-    } else if (nbytes == sizeof(char*)) {
-      va_arg(ap->va, char*);
-    } else {
-      printf("WARNING: Cannot get argument of size %ld.\n", nbytes);
-      va_arg(ap->va, void*);
-      // va_arg(ap->va, char[nbytes]);
-    }
-  }
-};
-
-  
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif

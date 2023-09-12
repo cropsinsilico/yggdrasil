@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import units
+from yggdrasil import units, rapidjson
 from yggdrasil.communication.filters.FilterBase import FilterBase
 
 
@@ -19,6 +19,7 @@ class FunctionFilter(FilterBase):
     _filtertype = 'function'
     _schema_required = ['function']
     _schema_properties = {'function': {'type': 'function'}}
+    _schema_subtype_description = "Filter messages based on a function"
 
     def evaluate_filter(self, x):
         r"""Call filter on the provided message.
@@ -30,10 +31,13 @@ class FunctionFilter(FilterBase):
             bool: True if the message will pass through the filter, False otherwise.
 
         """
-        return self.function(x)
-    
+        try:
+            return self.function(x)
+        except rapidjson.units.UnitsError:
+            return self.function(x.value)
+
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Get testing options for the filter class.
 
         Returns:

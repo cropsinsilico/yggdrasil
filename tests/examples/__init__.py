@@ -7,8 +7,7 @@ import importlib
 from yggdrasil.components import import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
-    get_example_yaml, get_example_source, get_example_languages,
-    ext_map, display_example, yamls)
+    get_example_yaml, get_example_languages, ext_map, source)
 from tests import TestBase as base_class
 
 
@@ -17,46 +16,7 @@ _test_registry = {}
 _default_comm = tools.get_default_comm()
 
 
-@pytest.mark.suite("examples", disabled=True)
-def test_get_example_yaml():
-    r"""Test get_example_yaml."""
-    with pytest.raises(KeyError):
-        get_example_yaml('invalid', 'invalid')
-    with pytest.raises(KeyError):
-        get_example_yaml('hello', 'invalid')
-    get_example_yaml('hello', 'r')
-    get_example_yaml('hello', 'R')
-
-
-@pytest.mark.suite("examples", disabled=True)
-def test_get_example_source():
-    r"""Test get_example_source."""
-    with pytest.raises(KeyError):
-        get_example_source('invalid', 'invalid')
-    with pytest.raises(KeyError):
-        get_example_source('hello', 'invalid')
-    get_example_source('hello', 'r')
-    get_example_source('hello', 'R')
-
-
-@pytest.mark.suite("examples", disabled=True)
-def test_get_example_languages():
-    r"""Test get_example_languages."""
-    with pytest.raises(KeyError):
-        get_example_languages('invalid')
-    get_example_languages('ascii_io')
-    get_example_languages('ascii_io', language='python')
-    get_example_languages('ascii_io', language='all')
-    get_example_languages('ascii_io', language='all_nomatlab')
-
-
-@pytest.mark.suite("examples", disabled=True)
-def test_display_example():
-    r"""Test display_example."""
-    display_example('hello', 'r')
-
-
-_examples = sorted([x for x in yamls.keys() if x not in
+_examples = sorted([x for x in source.keys() if x not in
                     ['SaM', 'ascii_io', 'conditional_io', 'rpcFib',
                      'rpc_lesson1', 'rpc_lesson2', 'rpc_lesson2b',
                      'timed_pipe', 'transforms', 'types',
@@ -94,7 +54,7 @@ class TestExample(base_class):
             makefile = os.path.join(yamldir, 'src', 'Makefile')
             if platform._is_win:  # pragma: windows
                 makedrv = import_component('model', 'make')
-                assert(makedrv.get_tool('compiler').toolname == 'nmake')
+                assert makedrv.get_tool('compiler').toolname == 'nmake'
                 make_ext = '_windows'
             else:
                 make_ext = '_linux'
@@ -248,7 +208,7 @@ class TestExample(base_class):
             return None
         out = []
         for fname in expected_output_files:
-            assert(os.path.isfile(fname))
+            assert os.path.isfile(fname)
             out.append(read_file(fname))
         return out
 
@@ -266,9 +226,9 @@ class TestExample(base_class):
             out_list = output_files
             if (out_list is None) or (res_list is None):
                 return
-            assert(res_list is not None)
-            assert(out_list is not None)
-            assert(len(res_list) == len(out_list))
+            assert res_list is not None
+            assert out_list is not None
+            assert len(res_list) == len(out_list)
             for res, fout in zip(res_list, out_list):
                 check_file_exists(fout)
                 if isinstance(res, tuple):
@@ -304,7 +264,7 @@ class TestExample(base_class):
             # Timesync examples include ploting in the verification script
             # which opens file descriptors that are not promptly cleaned up
             optionally_disable_verify_count_fds()
-        assert(yaml is not None)
+        assert yaml is not None
         # Run
         mpi_tag_start = None
         if on_mpi:
@@ -323,9 +283,9 @@ class TestExample(base_class):
             if mpi_rank != 0:
                 return
             if expects_error:
-                assert(r.error_flag)
+                assert r.error_flag
             else:
-                assert(not r.error_flag)
+                assert not r.error_flag
             try:
                 check_results()
             except BaseException:  # pragma: debug

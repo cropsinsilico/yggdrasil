@@ -47,7 +47,9 @@ class TestZMQComm(base_class):
     @pytest.fixture(scope="class")
     def sleep_after_connect(self, socket_type):
         r"""Indicates if sleep should occur after comm creation."""
-        return (socket_type == 'ROUTER')
+        if socket_type in ['ROUTER', 'PUB']:
+            return 0.1
+        return 0
 
     @pytest.fixture(scope="class")
     def testing_options(self, python_class, options, protocol, socket_type):
@@ -78,8 +80,8 @@ class TestZMQComm(base_class):
     def test_get_socket_type_mate(self, run_once, python_module):
         r"""Test socket type matching."""
         for s, r in python_module._socket_type_pairs:
-            assert(python_module.get_socket_type_mate(s) == r)
-            assert(python_module.get_socket_type_mate(r) == s)
+            assert python_module.get_socket_type_mate(s) == r
+            assert python_module.get_socket_type_mate(r) == s
         with pytest.raises(ValueError):
             python_module.get_socket_type_mate('INVALID')
 
@@ -90,9 +92,9 @@ class TestZMQComm(base_class):
         port = 5555
         address = python_module.format_address(protocol, host, port)
         result = python_module.parse_address(address)
-        assert(result['protocol'] == protocol)
-        assert(result['host'] == host)
-        assert(result['port'] == port)
+        assert result['protocol'] == protocol
+        assert result['host'] == host
+        assert result['port'] == port
         with pytest.raises(ValueError):
             python_module.parse_address('INVALID')
         with pytest.raises(ValueError):

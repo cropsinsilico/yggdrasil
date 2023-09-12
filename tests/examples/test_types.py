@@ -3,10 +3,9 @@ import os
 import copy
 import yaml
 import importlib
-from yggdrasil import constants
+from yggdrasil import constants, rapidjson
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
-from yggdrasil.metaschema.datatypes import encode_type
 from tests.examples import TestExample as base_class
 
 
@@ -150,6 +149,8 @@ class TestExampleTypes(base_class):
         for v in vars_list:
             out.append(v['name'])
             typename = v['datatype']['type']
+            if typename == 'scalar':
+                typename = v['datatype']['subtype']
             if (language == 'c') and (not dont_add_lengths):
                 if using_pointers:
                     if typename in ['string', 'bytes',
@@ -165,11 +166,19 @@ class TestExampleTypes(base_class):
     @pytest.fixture(scope="class")
     def env(self, example_name, language, typename, using_pointers,
             using_generics, split_array, dont_add_lengths,
-            length_prefix, example_module):
+            length_prefix, example_module, asan_installed):
         r"""dict: Environment variables set for the test."""
+        with_asan = (language in ['c', 'c++', 'cpp'] and asan_installed)
+        without_python = (
+            typename not in ['instance', 'class', 'function'])
+        # without_python = (
+        #     with_asan
+        #     and typename not in ['instance', 'class', 'function'])
+        # and typename not in ['instance', 'class', 'function'])
         kwargs = {}
         assign_kws = {}
         if language in ['c', 'c++', 'cpp']:
+            language = language.replace('+', 'p')
             # dont_add_lengths is only valid for C/C++
             kwargs['dont_add_lengths'] = dont_add_lengths
             kwargs['use_length_prefix'] = length_prefix
@@ -180,11 +189,14 @@ class TestExampleTypes(base_class):
         modelfile = os.path.join(os.path.dirname(__file__), example_name,
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
+        if with_asan or without_python and hasattr(drv, 'compile_dependencies'):
+            drv.compile_dependencies(with_asan=with_asan,
+                                     disable_python_c_api=without_python)
         if using_generics and drv.is_typed:
             testtype = {'type': 'any'}
         else:
             testdata = example_module.get_test_data(typename)
-            testtype = encode_type(testdata)
+            testtype = rapidjson.encode_schema(testdata)
             using_generics = False
         if split_array and (typename == 'array'):
             inputs = [{'name': 'x%d' % i, 'datatype': x} for i, x in
@@ -200,7 +212,11 @@ class TestExampleTypes(base_class):
         function_contents = []
         for i, o in zip(inputs, outputs):
             if using_pointers and drv.is_typed:
-                for k in ['shape', 'length']:
+                for x in i, o:
+                    xT = x['datatype']
+                    if xT['type'] == 'ndarray' and len(xT['shape']) == 1:
+                        xT['type'] = '1darray'
+                for k in ['shape', 'length', 'ndim']:
                     i['datatype'].pop(k, None)
                     o['datatype'].pop(k, None)
             function_contents += drv.write_assign_to_output(
@@ -221,19 +237,27 @@ class TestExampleTypes(base_class):
         env['TEST_LANGUAGE'] = language
         env['TEST_LANGUAGE_EXT'] = language_ext
         env['TEST_TYPENAME'] = typename
+        lines = []
+        if with_asan:
+            lines += ['with_asan: True']
+            if typename in ['instance', 'class', 'function']:
+                env['ASAN_OPTIONS'] = 'detect_leaks=0'
+            # else:
+            #     env['ASAN_OPTIONS'] = 'detect_leaks=1'
+        if without_python:
+            lines += ['disable_python_c_api: True']
         if (language in ['c', 'fortran']) and (not using_generics):
             yaml_fields['vars'] = True
             if typename in ['array', 'object']:
                 yaml_fields['dtype'] = True
         if any(list(yaml_fields.values())):
-            lines = []
             for io, io_vars in zip(['input', 'output'],
                                    [inputs, outputs]):
                 lines += [io + 's:',
                           '  name: %s' % io]
                 if yaml_fields['vars']:
                     lines.append(
-                        '  vars: %s' % self.get_varstr(
+                        '  vars: [%s]' % self.get_varstr(
                             io_vars, language,
                             using_pointers=using_pointers,
                             length_prefix=length_prefix,
@@ -250,6 +274,7 @@ class TestExampleTypes(base_class):
                         if "units: ''" in x:
                             continue
                         lines.append('    ' + x)
+        if lines:
             env['TEST_MODEL_IO'] = '\n    '.join(lines) + '\n'
         else:
             env['TEST_MODEL_IO'] = ''

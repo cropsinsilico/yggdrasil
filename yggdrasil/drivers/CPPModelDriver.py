@@ -1,10 +1,11 @@
 import os
-import re
 import copy
+import logging
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
     CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler, MSVCCompiler,
-    ClangLinker)
+    GCCLinker, ClangLinker)
+logger = logging.getLogger(__name__)
 
 
 class CPPCompilerBase(CCompilerBase):
@@ -18,19 +19,35 @@ class CPPCompilerBase(CCompilerBase):
     default_executable = None
 
     @classmethod
-    def add_standard_flag(cls, flags):
-        r"""Add a standard flag to the list of flags.
+    def find_standard_flag(cls, flags):
+        r"""Locate the standard flag in a list of flags.
 
         Args:
             flags (list): Compilation flags.
 
+        Returns:
+            int: Index of the standard flag. -1 if not present.
+
         """
-        std_flag = None
         for i, a in enumerate(flags):
             if a.startswith('-std='):
-                std_flag = i
-                break
-        if std_flag is None:
+                return i
+        return -1
+
+    @classmethod
+    def handle_standard_flag(cls, flags, skip_standard_flag=False):
+        r"""Add or remove standard flag from a list of flags.
+
+        Args:
+            flags (list): Compilation flags.
+            skip_standard_flag (bool, optional): If True, the C++
+                standard flag will not be added. Defaults to False.
+
+        """
+        std_flag_idx = cls.find_standard_flag(flags)
+        if skip_standard_flag and (std_flag_idx != -1):
+            del flags[std_flag_idx]
+        elif (not skip_standard_flag) and (std_flag_idx == -1):
             flags.append('-std=%s' % cls.cpp_std)
         return flags
 
@@ -39,6 +56,8 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     r"""Interface class for G++ compiler/linker."""
     toolname = 'g++'
     aliases = ['gnu-c++']
+    default_linker = 'g++'
+    is_linker = False
 
     @classmethod
     def get_flags(cls, skip_standard_flag=False, **kwargs):
@@ -55,9 +74,8 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
 
         """
         out = super(GPPCompiler, cls).get_flags(**kwargs)
-        # Add standard library flag
-        if not skip_standard_flag:
-            out = cls.add_standard_flag(out)
+        # Add/remove standard library flag
+        out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
 
 
@@ -94,9 +112,8 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
 
         """
         out = super(ClangPPCompiler, cls).get_flags(**kwargs)
-        # Add standard library flag
-        if not skip_standard_flag:
-            out = cls.add_standard_flag(out)
+        # Add/remove standard library flag
+        out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
         
     @classmethod
@@ -116,7 +133,7 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
             str: Output to stdout from the command execution.
 
         """
-        if platform._is_win:  # pragma: windows
+        if platform._is_win or platform._is_mac:
             for a in args:
                 if a.endswith('.c'):
                     kwargs['skip_standard_flag'] = True
@@ -142,9 +159,19 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
         return MSVCCompiler.before_registration(cls)
 
 
+class GPPLinker(GCCLinker):
+    r"""Interface class for clang++ linker (calls to ld)."""
+    toolname = GPPCompiler.toolname
+    aliases = GPPCompiler.aliases
+    languages = GPPCompiler.languages
+    default_executable = GPPCompiler.default_executable
+    toolset = GPPCompiler.toolset
+
+
 class ClangPPLinker(ClangLinker):
     r"""Interface class for clang++ linker (calls to ld)."""
     toolname = ClangPPCompiler.toolname
+    aliases = ClangPPCompiler.aliases
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
     toolset = ClangPPCompiler.toolset
@@ -152,7 +179,6 @@ class ClangPPLinker(ClangLinker):
 
 class CPPModelDriver(CModelDriver):
     r"""Class for running C++ models."""
-                
     _schema_subtype_description = ('Model is written in C++.')
     language = 'c++'
     language_ext = ['.cpp', '.CPP', '.cxx', '.C', '.c++', '.cc', '.cp', '.tcc',
@@ -178,6 +204,14 @@ class CPPModelDriver(CModelDriver):
         'recv': 'flag = {channel_obj}.recv({nargs}, {input_refs})',
         'call': 'flag = {channel_obj}.call({nargs}, {outputs}, {input_refs})',
     }
+    type_map = dict(
+        CModelDriver.type_map,
+        array='rapidjson::Document',
+        object='rapidjson::Document',
+        any='rapidjson::Document',
+        schema='rapidjson::Document',
+        ply='rapidjson::Ply',
+        obj='rapidjson::ObjWavefront')
     function_param = dict(
         CModelDriver.function_param,
         input='YggInput {channel}(\"{channel_name}\", {channel_type});',
@@ -188,14 +222,16 @@ class CPPModelDriver(CModelDriver):
         send_function='{channel}.send',
         exec_prefix=('#include <iostream>\n'
                      '#include <exception>\n'),
-        print_generic='std::cout << {object} << std::endl << std::flush;',
         error='throw \"{error_msg}\";',
         try_begin='try {',
         try_error_type='const std::exception&',
         try_except='}} catch ({error_type} {error_var}) {{',
         function_def_regex=(
             r'(?P<flag_type>.+?)\s*{function_name}\s*'
-            r'\((?P<inputs>(?:[^{{\&])*?)'
+            r'\(\s*(?P<inputs>'
+            r'(?:(?:const\s+[^{{\&]+\s+\&[^{{\&]+)|(?:[^{{\&]+))'
+            r'(?:\s*,\s*(?:const\s+[^{{\&]+\s+\&[^{{\&]+)|(?:[^{{\&]+))*?'
+            r')'
             r'(?:,\s*(?P<outputs>'
             r'(?:\s*(?:[^\s\&]+)'
             r'(?:(?:\&\s+)|(?:\s+(?:\()?\&))'
@@ -203,6 +239,13 @@ class CPPModelDriver(CModelDriver):
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?:(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
             r'|(?:\}}))'),
+        inputs_def_regex=(
+            r'\s*(?:const\s+)?(?P<native_type>(?:[^\s\&\<\*])+'
+            r'(?:\<(?P<subtypes>\s*.+?(?:\s*,\s*.+?)*\s*)\>)?(\s+)?'
+            r'(?P<ptr>\*+)?)(?:\s*\&)?'
+            r'(?(ptr)(?(3)(?:\s*)|(?:\s+)))'
+            r'(\((?P<name_ptr>\*+)?)?(?P<name>[^\&\>\*]+?)(?(5)(?:\)))'
+            r'(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'),
         outputs_def_regex=(
             r'\s*(?P<native_type>(?:[^\s])+)(\s+)?'
             r'(\()?(?P<ref>\&)(?(1)(?:\s*)|(?:\s+))'
@@ -211,6 +254,8 @@ class CPPModelDriver(CModelDriver):
     include_arg_count = True
     include_channel_obj = False
     dont_declare_channel = True
+    _document_types = ['array', 'object', 'schema', 'any']
+    _cpp_class_types = ['ply', 'obj']
     
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -224,6 +269,15 @@ class CPPModelDriver(CModelDriver):
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
         cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
+        for k in cls._document_types + cls._cpp_class_types:
+            cls.function_param.pop(f'init_{k}', None)
+            cls.function_param.pop(f'print_{k}', None)
+            cls.function_param.pop(f'copy_{k}', None)
+        for k in cls._document_types:
+            cls.function_param[f'print_{k}'] = (
+                'std::cout << document2string({object}) << std::endl;')
+            cls.function_param[f'copy_{k}'] = (
+                '{name}.CopyFrom({value}, {name}.GetAllocator(), true);')
         CModelDriver.after_registration(cls, **kwargs)
         if kwargs.get('second_pass', False):
             return
@@ -289,48 +343,21 @@ class CPPModelDriver(CModelDriver):
             try_contents, except_contents, **kwargs)
 
     @classmethod
-    def finalize_function_io(cls, direction, x):
-        r"""Finalize info for an input/output channel following function
-        parsing.
-
-        Args:
-            direction (str): Direction of channel ('input' or 'output')
-            x (dict): Channel info.
-
-        """
-        if direction == 'input':
-            for v in x['vars']:
-                grp_vect = cls.is_vector(v)
-                if grp_vect:
-                    v['ptr_var'] = dict(v, name=(v['name'] + '_ptr'))
-                    v['ptr_var'].pop('native_type')
-        elif direction == 'output':
-            for v in x['vars']:
-                if (not v.get('length_var', False)) and cls.is_vector(v):
-                    v['length_var'] = v['name'] + '.size()'
-                    v['ptr_var'] = v['name'] + '.data()'
-        super(CPPModelDriver, cls).finalize_function_io(direction, x)
-        if direction == 'input':
-            for v in x['vars']:
-                if 'ptr_var' in v:
-                    v['ptr_var']['length_var'] = v['length_var']
+    def add_extra_vars(cls, direction, x):
+        r"""Add extra variables required for communication.
         
-    @classmethod
-    def is_vector(cls, var):
-        r"""Determine if a variable uses a vector.
-
         Args:
-            var (dict): Variable.
-
-        Returns:
-            bool: True if it is a vector, False otherwise.
-
+            direction (str): Direction of channel ('input' or 'output').
+            x (dict): Dictionary describing the variable.
+        
         """
-        if isinstance(var, dict) and ('vector' in var.get('native_type', '')):
-            return re.fullmatch(cls.function_param['vector_regex'],
-                                var['native_type'])
-        return False
-    
+        super(CPPModelDriver, cls).add_extra_vars(direction, x)
+        if cls.is_std_class(x):
+            x['extra_vars']['std'] = {
+                'name': f'std_{direction}',
+                'datatype': {'type': 'any'},
+                'use_generic': True}
+            
     @classmethod
     def requires_length_var(cls, var):
         r"""Determine if a variable requires a separate length variable.
@@ -342,37 +369,153 @@ class CPPModelDriver(CModelDriver):
             bool: True if a length variable is required, False otherwise.
 
         """
-        if cls.is_vector(var):
-            return True
+        if cls.is_std_class(var):
+            return False
         return super(CPPModelDriver, cls).requires_length_var(var)
-
+        
     @classmethod
-    def write_declaration(cls, var, **kwargs):
-        r"""Return the lines required to declare a variable with a certain
-        type.
+    def is_cpp_class(cls, var):
+        r"""Determine if a variable uses a C++ class.
 
         Args:
-            var (dict, str): Name or information dictionary for the variable
-                being declared.
-            **kwargs: Additional keyword arguments are passed to the
-                parent class's method.
+            var (dict): Variable.
 
         Returns:
-            list: The lines declaring the variable.
+            bool: True if it is a C++ class, False otherwise.
 
         """
-        out = []
-        if 'ptr_var' in var:
-            var_copy = copy.deepcopy(var)
-            if isinstance(var['ptr_var'], dict):
-                out += super(CPPModelDriver, cls).write_declaration(
-                    var['ptr_var'], **kwargs)
-            out += super(CModelDriver, cls).write_declaration(var_copy,
-                                                              **kwargs)
-            return out
-        out += super(CPPModelDriver, cls).write_declaration(var, **kwargs)
-        return out
+        return (isinstance(var, dict)
+                and (var.get('datatype', {}).get('type', None)
+                     in ['obj', 'ply', 'any', 'schema',
+                         'array', 'object']
+                     or ('::' in var.get('native_type', '')
+                         and not var.get('ptr', ''))))
+
+    @classmethod
+    def is_std_class(cls, var):
+        r"""Determine if a variable utilizing a C++ stdlib class.
+
+        Args:
+           var (dict): Variable.
+
+        Returns:
+            bool: True if var is a C++ stdlib class, False otherwise.
         
+        """
+        return (isinstance(var, dict)
+                and var.get('native_type', '').startswith(
+                    ('std::string', 'std::vector', 'std::map')))
+
+    @classmethod
+    def allows_realloc(cls, var):
+        r"""Determine if a variable allows the receive call to perform
+        realloc.
+
+        Args:
+            var (dict): Dictionary of variable properties.
+
+        Returns:
+            bool: True if the variable allows realloc, False otherwise.
+
+        """
+        if cls.is_cpp_class(var):
+            return False
+        return super(CPPModelDriver, cls).allows_realloc(var)
+        
+    @classmethod
+    def prepare_input_variables(cls, vars_list, in_definition=False,
+                                for_yggdrasil=False):
+        r"""Concatenate a set of input variables such that it can be passed as a
+        single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable dictionaries containing info
+                (e.g. names) that should be used to prepare a string representing
+                input to a function call.
+            in_definition (bool, optional): If True, the returned sequence
+                will be of the format required for specifying input
+                variables in a function definition. Defaults to False.
+            for_yggdrasil (bool, optional): If True, the variables will be
+                prepared in the formated expected by calls to yggdarsil
+                send/recv methods. Defaults to False.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        if in_definition:
+            new_vars_list = []
+            for x in vars_list:
+                if isinstance(x, dict) and cls.is_cpp_class(x):
+                    new_vars_list.append(dict(x, name=f"&{x['name']}",
+                                              const=True))
+                else:
+                    new_vars_list.append(x)
+            vars_list = new_vars_list
+        return super(CPPModelDriver, cls).prepare_input_variables(
+            vars_list, in_definition=in_definition,
+            for_yggdrasil=for_yggdrasil)
+
+    @classmethod
+    def write_doc2vars(cls, channel, std, var_list):
+        r"""Generate the lines of code required to unpack a document
+        into a list of variables.
+
+        Args:
+            channel (str): Name of variable that the channel that the
+                document was received from is stored in.
+            std (dict): Variable information for the received document.
+            var_list (list): Variables that the document should be
+                unpacked into.
+
+        """
+        nVar = sum([(not v.get('is_length_var', False))
+                    for v in var_list])
+        out = cls.write_if_block(
+            f"(!({std['name']}.IsArray() && "
+            f"({std['name']}.Size() == {nVar})))",
+            [cls.format_function_param(
+                'error', error_msg=("Received document does not match "
+                                    "variables"))])
+        i = 0
+        for v in var_list:
+            if not v.get('is_length_var', False):
+                v_str = cls.prepare_input_variables(
+                    [v], for_yggdrasil=True)
+                out += [
+                    f"{std['name']}[{i}].Get({v_str});"
+                ]
+                i += 1
+        return out
+
+    @classmethod
+    def write_vars2doc(cls, channel, var_list, std):
+        r"""Generate the lines of code required to pack a list of
+        variables into a document.
+
+        Args:
+            channel (str): Name of variable that the channel that will be
+                used to send the document is stored in.
+            var_list (list): Variables that should be packed into the
+                document.
+            std (dict): Variable information for the document that will be
+                generated.
+
+        """
+        out = [f"{std['name']}.SetArray();"]
+        for v in var_list:
+            if not v.get('is_length_var', False):
+                v_str = cls.prepare_input_variables([v], for_yggdrasil=True)
+                out += [
+                    "{",
+                    "  rapidjson::Value tmp;",
+                    f"  tmp.Set({v_str}, {std['name']}.GetAllocator());",
+                    f"  {std['name']}.PushBack(tmp,"
+                    f" {std['name']}.GetAllocator());",
+                    "}"
+                ]
+        return out
+
     @classmethod
     def write_model_recv(cls, channel, recv_var, **kwargs):
         r"""Write a model receive call include checking the return flag.
@@ -392,33 +535,22 @@ class CPPModelDriver(CModelDriver):
         out_after = []
         if not isinstance(recv_var, str):
             recv_var_par = cls.channels2vars(recv_var)
-            allows_realloc = [cls.allows_realloc(v)
-                              for v in recv_var_par]
-            is_vector = [cls.is_vector(v) for v in recv_var_par]
-            if any(is_vector):
-                if all(allows_realloc):
-                    kwargs.setdefault('alt_recv_function',
-                                      cls.function_param['recv_heap'])
-                else:  # pragma: debug
-                    # kwargs.setdefault('alt_recv_function',
-                    #                   cls.function_param['recv_stack'])
-                    raise RuntimeError("Mixing vectors with stack allocated "
-                                       "arrays is not get supported.")
-                new_recv_var_par = []
-                for i, v in enumerate(recv_var_par):
-                    if cls.allows_realloc(v) and cls.is_vector(v):
-                        assert(v.get('ptr_var', False))
-                        out_after.append(
-                            '{var}.assign({ptr_var}, '
-                            '{ptr_var} + {len_var});'.format(
-                                var=v['name'], ptr_var=v['ptr_var']['name'],
-                                len_var=v['length_var']['name']))
-                        v = v['ptr_var']
-                    new_recv_var_par.append(v)
-                recv_var_par = new_recv_var_par
-                recv_var = cls.prepare_output_variables(
-                    recv_var_par, in_inputs=cls.outputs_in_inputs,
-                    for_yggdrasil=True)
+            std_var = None
+            for v in recv_var_par:
+                std_var = v['extra_vars'].get('std', None)
+                if std_var:
+                    break
+            if std_var:
+                kwargs['alt_recv_function'] = '{channel}.recvVar'
+                kwargs['include_arg_count'] = False
+                if len(recv_var_par) == 1:
+                    recv_var = v['name']
+                else:
+                    new_recv_var_par = [std_var]
+                    out_after += cls.write_doc2vars(
+                        channel, std_var, recv_var_par)
+                    recv_var_par = new_recv_var_par
+                    recv_var = std_var['name']
         out = super(CPPModelDriver, cls).write_model_recv(
             channel, recv_var, **kwargs)
         return out + out_after
@@ -445,12 +577,30 @@ class CPPModelDriver(CModelDriver):
         send_var_str = send_var
         out_before = []
         if not isinstance(send_var, str):
-            send_var_par = []
-            for v in cls.channels2vars(send_var):
-                if cls.is_vector(v):
-                    send_var_par += [v['ptr_var'], v['length_var']]
+            send_var_par = cls.channels2vars(send_var)
+            std_var = None
+            for v in send_var_par:
+                std_var = v['extra_vars'].get('std', None)
+                if std_var:
+                    break
+            new_send_var_par = []
+            if std_var:
+                kwargs['alt_send_function'] = '{channel}.sendVar'
+                kwargs['include_arg_count'] = False
+                if len(send_var_par) == 1:
+                    new_send_var_par.append(send_var_par[0])
                 else:
-                    send_var_par.append(v)
+                    new_send_var_par.append(std_var)
+                    out_before += cls.write_vars2doc(
+                        channel, send_var_par, std_var)
+            else:
+                for v in send_var_par:
+                    if cls.is_cpp_class(v):
+                        new_send_var_par.append(
+                            dict(v, name=f"&{v['name']}"))
+                    else:
+                        new_send_var_par.append(v)
+            send_var_par = new_send_var_par
             send_var_str = cls.prepare_input_variables(
                 send_var_par, for_yggdrasil=True)
         out = super(CPPModelDriver, cls).write_model_send(
@@ -499,17 +649,32 @@ class CPPModelDriver(CModelDriver):
             str, dict: The JSON type.
 
         """
-        regex_vect = r'(?:std\:\:)?vector\<\s*(?P<type>.*)\s*\>'
-        grp_vect = re.fullmatch(regex_vect, native_type)
-        if grp_vect:
-            out = cls.get_json_type(grp_vect.group('type'))
-            if out['type'] == 'scalar':
+        if '<' in native_type:
+            base, subtypes = native_type.split('<', 1)
+            subtypes = subtypes.rsplit('>', 1)[0]
+            subtypes = cls.split_variables(subtypes)
+            if base == 'std::vector':
+                assert len(subtypes) == 1
+                items = cls.get_json_type(subtypes[0])
+                assert items['type'] == 'scalar'
+                out = items
                 out['type'] = '1darray'
+            elif base == 'std::map':
+                assert len(subtypes) == 2
+                items = [cls.get_json_type(x) for x in subtypes]
+                if items[0]['type'] != 'string':  # pragma: debug
+                    raise ValueError("std::map with non-string keys not "
+                                     "currently supported")
+                out = {'type': 'object',
+                       'additionalProperties': items[1]}
             else:  # pragma: debug
-                raise ValueError("Type not currently supported: %s -> %s"
-                                 % (native_type, out))
+                raise ValueError(f"Template class '{base}' not "
+                                 f"currently supported")
+        elif 'std::string' in native_type:
+            out = super(CPPModelDriver, cls).get_json_type(
+                native_type.replace('std::string', 'char*'))
         else:
-            out = super(CPPModelDriver, cls).get_json_type(native_type)
+            return super(CPPModelDriver, cls).get_json_type(native_type)
         return out
 
     @classmethod
@@ -539,6 +704,6 @@ class CPPModelDriver(CModelDriver):
             else:
                 out['deps'].append('doxygen')
         out['write_try_except_kwargs'] = {'error_type': '...'}
-        out['kwargs'].setdefault('compiler_flags', [])
-        out['kwargs']['compiler_flags'].append('-std=c++11')
+        # out['kwargs'].setdefault('compiler_flags', [])
+        # out['kwargs']['compiler_flags'].append('-std=c++11')
         return out

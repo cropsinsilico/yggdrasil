@@ -41,7 +41,7 @@ class LockedBuffer(multitasking.Queue):
 
     def pop(self, index=0, default=None):
         r"""Remove the first element from the queue."""
-        assert(index == 0)
+        assert index == 0
         # with self.lock:
         if (len(self) == 0) and (default is not None):
             return default

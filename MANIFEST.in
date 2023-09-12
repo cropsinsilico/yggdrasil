@@ -19,8 +19,11 @@ recursive-include yggdrasil *.txt
 recursive-include yggdrasil *.json
 recursive-include yggdrasil *.f90
 recursive-include yggdrasil *.xml
+recursive-include yggdrasil *.jl
 recursive-include yggdrasil/examples *.py
 recursive-include yggdrasil/examples *.rst
+recursive-include yggdrasil/examples *.png
+recursive-include yggdrasil/examples *.pth
 recursive-include yggdrasil/demos *.py
 recursive-include yggdrasil/tests/scripts *.py
 recursive-include yggdrasil/examples Makefile_linux
@@ -34,6 +37,8 @@ include yggdrasil/languages/LPy/lpy_model.py
 include yggdrasil/languages/R/DESCRIPTION
 include yggdrasil/languages/R/NAMESPACE
 include yggdrasil/languages/R/R/*.R
+include yggdrasil/languages/Julia/Yggdrasil/*.toml
+include yggdrasil/languages/Julia/Yggdrasil/src/*.jl
 include yggdrasil/languages/fortran/*.f90
 include yggdrasil/languages/fortran/*.c
 include yggdrasil/languages/fortran/*.h
@@ -41,8 +46,14 @@ include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux
 include yggdrasil/tests/scripts/Makefile_windows
+include yggdrasil/tests/data/example.vcf
 graft docs
 include versioneer.py
 include yggdrasil/_version.py
 include create_coveragerc.py
+graft _vendor/python_rapidjson
 include utils/*.py
+include utils/requirements/*.txt
+include utils/requirements/*.yaml
+include utils/requirements/*.json
+include utils/requirements/*.ini

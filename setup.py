@@ -2,34 +2,47 @@ import os
 import sys
 import logging
 import warnings
-from setuptools import setup, find_packages
+import json
+from setuptools import setup, find_namespace_packages, Extension
 from distutils.sysconfig import get_python_lib
-import versioneer
-import create_coveragerc
-ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
-LANG_PATH = os.path.join(ROOT_PATH, 'yggdrasil', 'languages')
+PYRJ_PATH = os.path.join(ROOT_PATH, '_vendor', 'python_rapidjson')
+sys.path.insert(0, ROOT_PATH)
+import versioneer  # noqa: E402
+ygg_ver = versioneer.get_version()
+kwargs = {'cmdclass': versioneer.get_cmdclass()}
 
 
-# Import script from inside package
-sys.path.insert(0, LANG_PATH)
+# Clean up version
+if '--force-clean-version' in sys.argv:
+    sys.argv.remove('--force-clean-version')
+    if '+' in ygg_ver:
+        ygg_ver = ygg_ver.split('+')[0]
+    kwargs.pop('cmdclass')
+
+
+print(f"In setup.py: ver={ygg_ver}, sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
+logging.critical(
+    f"In setup.py: ver={ygg_ver}, sys.argv={sys.argv}, PYRJ_PATH={PYRJ_PATH}")
+
+
+# Get extension options for the vendored python-rapidjson
+sys.path.insert(0, PYRJ_PATH)
+if not any(x.startswith("--rj-include-dir") for x in sys.argv):
+    rj_include_dir = os.path.join('yggdrasil', 'rapidjson', 'include')
+    sys.argv.append(f"--rj-include-dir={rj_include_dir}")
+pwd = os.getcwd()
+os.chdir(PYRJ_PATH)
 try:
-    import install_languages
+    import pyrj_setup
+    pyrj_ext = pyrj_setup.extension_options
+    pyrj_ext.update(
+        sources=[os.path.join('yggdrasil', 'rapidjson.cpp')])
 finally:
     sys.path.pop(0)
-
-
-print("In setup.py", sys.argv)
-logging.critical("In setup.py: %s" % sys.argv)
-        
-
-# Don't do coverage or installation of packages for use with other languages
-# when building a source distribution
-if 'sdist' not in sys.argv:
-    # Attempt to install languages
-    installed_languages = install_languages.install_all_languages(from_setup=True)
-    # Set coverage options in .coveragerc
-    create_coveragerc.create_coveragerc(installed_languages)
+    os.chdir(pwd)
+print(f"pyrj_ext = {pyrj_ext}")
+logging.critical(f"pyrj_ext = {pyrj_ext}")
 
 
 # Create .rst README from .md and get long description
@@ -49,12 +62,13 @@ else:
 
 
 # Create requirements list based on platform
+req_dir = os.path.join("utils", "requirements")
 with open("requirements.txt", 'r') as fd:
     requirements = fd.read().splitlines()
-with open("requirements_testing.txt", 'r') as fd:
+with open(os.path.join(req_dir, "requirements_testing.txt"), 'r') as fd:
     test_requirements = fd.read().splitlines()
-# with open("requirements_optional.txt", 'r') as fd:
-#     optional_requirements = fd.read().splitlines()
+extras_requirements = json.load(
+    open(os.path.join(req_dir, "requirements_extras.json"), 'r'))
 with open("console_scripts.txt", 'r') as fd:
     console_scripts = fd.read().splitlines()
 
@@ -72,10 +86,10 @@ if '--user' in sys.argv:
     
 setup(
     name="yggdrasil-framework",
-    packages=find_packages(),
+    packages=find_namespace_packages(
+        exclude=["_vendor", "_vendor.*"]),
     include_package_data=True,
     version=ygg_ver,
-    cmdclass=versioneer.get_cmdclass(),
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,
@@ -85,18 +99,22 @@ setup(
     download_url=(
         "https://github.com/cropsinsilico/yggdrasil/archive/%s.tar.gz" % ygg_ver),
     keywords=["plants", "simulation", "models", "framework"],
+    ext_modules=[Extension('yggdrasil.rapidjson', **pyrj_ext)],
+    setup_requires=['numpy'],
     install_requires=requirements,
     tests_require=test_requirements,
+    extras_require=extras_requirements,
     classifiers=[
         "Programming Language :: C",
         "Programming Language :: C++",
         "Programming Language :: ML",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
@@ -108,5 +126,6 @@ setup(
         'console_scripts': console_scripts,
     },
     license="BSD",
-    python_requires='>=3.5',
+    python_requires='>=3.6',
+    **kwargs
 )

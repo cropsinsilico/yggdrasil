@@ -20,7 +20,7 @@ class TestAsciiMapSerialize(base_class):
     def test_error_nonstrval(self, instance):
         r"""Test error on serializing dictionary with non-string values."""
         obj = {1: 'here'}
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             instance.serialize(obj)
 
     def test_remove_quotes(self, instance):

@@ -1,0 +1,4 @@
+libroadrunner    # [pip,sbml]
+pysam; platform_system != 'Windows'  # [pip,seq]
+torch            # [pip,pytorch]
+torchvision      # [pip,pytorch]

@@ -10,8 +10,9 @@ class DummyUnits(int):
     units = 'cm'
 
 
+@pytest.mark.subset_rapidjson
 class TestUnits(base_class):
-    r"""Tests for using pint for units."""
+    r"""Tests for using rapidjson for units."""
 
     @pytest.fixture(scope="class")
     def vars_nounits(self):
@@ -46,7 +47,7 @@ class TestUnits(base_class):
         for v in vars_nounits:
             assert(units.get_units(v) == '')
         for v in vars_units:
-            assert(units.get_units(v) == str(units.as_unit('cm').units))
+            assert(units.get_units(v) == str(units.as_unit('cm')))
 
     def test_add_units(self, vars_nounits):
         r"""Test add_units."""
@@ -66,7 +67,7 @@ class TestUnits(base_class):
     def test_as_unit(self):
         r"""Test as_unit."""
         units.as_unit('cm')
-        with pytest.raises(ValueError):
+        with pytest.raises(units.UnitsError):
             units.as_unit('invalid')
 
     def test_is_unit(self):
@@ -75,7 +76,7 @@ class TestUnits(base_class):
         assert(units.is_unit(''))
         assert(units.is_unit('cm/s**2'))
         # Not supported by unyt
-        # assert(units.is_unit('cm/s^2'))
+        assert(units.is_unit('cm/s^2'))
         assert(units.is_unit('umol'))
         assert(units.is_unit('mmol'))
         assert(not units.is_unit('invalid'))
@@ -85,7 +86,7 @@ class TestUnits(base_class):
         units.convert_to(1, 'm')
         for v in vars_units:
             units.convert_to(v, 'm')
-            with pytest.raises(ValueError):
+            with pytest.raises(units.UnitsError):
                 units.convert_to(v, 's')
         x = units.add_units(int(1), 'umol')
         units.convert_to(x, 'mol')
@@ -101,16 +102,16 @@ class TestUnits(base_class):
 
     def test_convert_R_unit_string(self):
         r"""Test convert_R_unit_string."""
-        pairs = [('g', 'g'), ('g2', '(g**2)'),
+        pairs = [('g', 'g'), ('g2', 'g**2'),
                  ('g2 km s-2', '(g**2)*km*(s**-2)'),
-                 ('degC d', 'degC*d'),
+                 ('degC d', 'degC*day'),
                  (tools.bytes2str(b'\xc2\xb0C d'),
-                  tools.bytes2str(b'\xc2\xb0C*d')),
+                  tools.bytes2str('degC*day')),
                  ('h', 'hr'),
-                 ('hrs/kg', 'hr/kg'),
+                 ('hrs/kg', 'hr*(kg**-1)'),
                  ('', ''),
-                 ('cm**(-2)', '(cm**-2)')]
+                 ('cm**(-2)', 'cm**-2')]
         for x, y in pairs:
-            assert(units.convert_R_unit_string(x) == y)
-            assert(units.convert_R_unit_string(y) == y)
+            assert(str(units.Units(x)) == y)
+            assert(str(units.Units(y)) == y)
             units.add_units(1.0, x)

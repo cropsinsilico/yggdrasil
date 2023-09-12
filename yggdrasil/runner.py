@@ -174,7 +174,7 @@ class YggFunction(YggClass):
         self.runner.resume()
         # Check for arguments
         for a, arg in zip(self.arguments, args):
-            assert(a not in kwargs)
+            assert a not in kwargs
             kwargs[a] = arg
         for a in self.arguments:
             if a not in kwargs:  # pragma: debug
@@ -192,11 +192,11 @@ class YggFunction(YggClass):
                 raise RuntimeError("Failed to receive variable %s" % v)
             ivars = v['vars']
             if isinstance(data, (list, tuple)):
-                assert(len(data) == len(ivars))
+                assert len(data) == len(ivars)
                 for a, d in zip(ivars, data):
                     out[a] = d
             else:
-                assert(len(ivars) == 1)
+                assert len(ivars) == 1
                 out[ivars[0]] = data
         self.runner.pause()
         return out
@@ -269,6 +269,12 @@ class YggRunner(YggClass):
         validate (bool, optional): If True, the validation scripts for each
             modle (if present), will be run after the integration finishes
             running. Defaults to False.
+        with_debugger (str, optional): Tool (and any flags for the tool)
+            that should be used to run models.
+        disable_python_c_api (bool, optional): If True, the Python C API will
+            be disabled. Defaults to False.
+        with_asan (bool, optional): Compile and run all models with the
+            address sanitizer. Defaults to False.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any
@@ -288,8 +294,12 @@ class YggRunner(YggClass):
                  ygg_debug_prefix=None, connection_task_method='thread',
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
-                 mpi_tag_start=None, yaml_param=None, yaml_encoding=None,
-                 validate=False):
+                 mpi_tag_start=None, yaml_param=None, validate=False,
+                 with_debugger=None, disable_python_c_api=False,
+                 with_asan=False, yaml_encoding=None):
+        kwargs_models = {'with_debugger': with_debugger,
+                         'disable_python_c_api': disable_python_c_api,
+                         'with_asan': with_asan}
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -335,6 +345,11 @@ class YggRunner(YggClass):
                 encoding=yaml_encoding)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
+            for k, v in kwargs_models.items():
+                if not v:
+                    continue
+                for x in self.modeldrivers.values():
+                    x[k] = v
             for x in self.modeldrivers.values():
                 if x['driver'] == 'DummyModelDriver':
                     x['runner'] = self
@@ -525,7 +540,7 @@ class YggRunner(YggClass):
         else:
             models = [self.modeldrivers[
                 DuplicatedModelDriver.get_base_name(name)]]
-            assert(models[0].get('copies', 0) > 1)
+            assert models[0].get('copies', 0) > 1
         if rank is not None:  # pragma: debug
             # models = [x for x in models if (x['mpi_rank'] == rank)]
             raise NotImplementedError
@@ -776,7 +791,7 @@ class YggRunner(YggClass):
         # This is required if modelcopies are not joined before drivers
         # are started
         # if name in self.modelcopies:
-        #     assert(name not in self.modeldrivers)
+        #     assert name not in self.modeldrivers
         #     for cpy in self.modelcopies[name]:
         #         self.start_server(cpy)
         #     return
@@ -790,7 +805,7 @@ class YggRunner(YggClass):
         # This is required if modelcopies are not joined before drivers
         # are started
         # if name in self.modelcopies:
-        #     assert(name not in self.modeldrivers)
+        #     assert name not in self.modeldrivers
         #     for cpy in self.modelcopies[name]:
         #         self.stop_server(cpy)
         #     return
@@ -800,7 +815,7 @@ class YggRunner(YggClass):
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         if not self.mpi_comm or (self.rank == 0):
-            assert(not self.modelcopies)
+            assert not self.modelcopies
         self.info('Starting I/O drivers and models on system '
                   + '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))
@@ -817,8 +832,8 @@ class YggRunner(YggClass):
                 self.debug("Checking driver %s", driver['name'])
                 d = driver['instance']
                 d.wait_for_loop()
-                assert(d.was_loop)
-                assert(not d.errors)
+                assert d.was_loop
+                assert not d.errors
             # Start models
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])
@@ -965,7 +980,7 @@ class YggRunner(YggClass):
                 self.debug('Stop %s', driver['name'])
                 driver['instance'].terminate()
                 # Terminate should ensure instance not alive
-                assert(not driver['instance'].is_alive())
+                assert not driver['instance'].is_alive()
         self.debug('Returning')
 
     def cleanup(self):
@@ -1015,7 +1030,7 @@ class YggRunner(YggClass):
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
-                assert(not driver.is_alive())
+                assert not driver.is_alive()
         self.debug('Returning')
 
         
@@ -1048,6 +1063,7 @@ def get_runner(models, **kwargs):
 
 
 def run(*args, **kwargs):
+    run_kwargs = kwargs.pop('run_kwargs', {})
     yggRunner = get_runner(*args, **kwargs)
-    yggRunner.run()
+    yggRunner.run(**run_kwargs)
     yggRunner.debug("runner returns, exiting")

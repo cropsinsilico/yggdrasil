@@ -7,18 +7,14 @@ import subprocess
 import numpy as np
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, tools, constants
+from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
-    get_compilation_tool)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
-from numpy import distutils as numpy_distutils
 
 
 _default_internal_libtype = 'object'
-# if platform._is_win:  # pragma: windows
-#     _default_internal_libtype = 'static'
 _top_lang_dir = get_language_dir('c')
 
 
@@ -41,16 +37,19 @@ def get_OSX_SYSROOT():
         cfg_sdkroot = ygg_cfg.get('c', 'macos_sdkroot', None)
         if cfg_sdkroot:
             fname_try.append(cfg_sdkroot)
-        if xcode_dir is not None:
-            fname_base = os.path.join(xcode_dir, 'Platforms',
-                                      'MacOSX.platform', 'Developer',
-                                      'SDKs', 'MacOSX%s.sdk')
-            fname_try += [
-                fname_base % os.environ.get('MACOSX_DEPLOYMENT_TARGET', ''),
-                fname_base % '',
-                os.path.join(xcode_dir, 'SDKs', 'MacOSX.sdk')]
         if os.environ.get('SDKROOT', False):
-            fname_try.insert(0, os.environ['SDKROOT'])
+            fname_try.append(os.environ['SDKROOT'])
+        if xcode_dir is not None:
+            bases_try = [
+                os.path.join(xcode_dir, 'SDKs', 'MacOSX%s.sdk'),
+                os.path.join(xcode_dir, 'Platforms',
+                             'MacOSX.platform', 'Developer',
+                             'SDKs', 'MacOSX%s.sdk')]
+            vers_try = ['11.0', '']  # 11.0 used by conda-forge
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
+                vers_try.insert(0, os.environ['MACOSX_DEPLOYMENT_TARGET'])
+            for v in vers_try:
+                fname_try += [x % v for x in bases_try]
         for fcheck in fname_try:
             if os.path.isdir(fcheck):
                 fname = fcheck
@@ -78,22 +77,23 @@ class CCompilerBase(CompilerBase):
     search_regex = [r'(?:#include <...> search starts here:)|'
                     r'(?: ([^\n]+?)(?: \(framework directory\))?)\n']
 
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration including things like platform dependent properties and
-        checking environment variables for default settings.
-        """
-        if platform._is_mac:
-            cls.linker_attributes = dict(cls.linker_attributes,
-                                         search_path_flags=['-Xlinker', '-v'],
-                                         search_regex=[r'\t([^\t\n]+)\n'],
-                                         search_regex_begin='Library search paths:')
-        elif platform._is_linux:
-            cls.linker_attributes = dict(cls.linker_attributes,
-                                         search_path_flags=['-Xlinker', '--verbose'],
-                                         search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        CompilerBase.before_registration(cls)
+    # This is only needed if one of the linkers is created from the compiler
+    # @staticmethod
+    # def before_registration(cls):
+    #     r"""Operations that should be performed to modify class attributes prior
+    #     to registration including things like platform dependent properties and
+    #     checking environment variables for default settings.
+    #     """
+    #     if platform._is_mac:
+    #         cls.linker_attributes = dict(cls.linker_attributes,
+    #                                      search_path_flags=['-Xlinker', '-v'],
+    #                                      search_regex=[r'\t([^\t\n]+)\n'],
+    #                                      search_regex_begin='Library search paths:')
+    #     elif platform._is_linux:
+    #         cls.linker_attributes = dict(cls.linker_attributes,
+    #                                      search_path_flags=['-Xlinker', '--verbose'],
+    #                                      search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+    #     CompilerBase.before_registration(cls)
 
     @classmethod
     def set_env(cls, *args, **kwargs):
@@ -151,14 +151,19 @@ class GCCCompiler(CCompilerBase):
     toolname = 'gcc'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
-    linker_attributes = dict(
-        CCompilerBase.linker_attributes,
-        flag_options=OrderedDict(
-            list(LinkerBase.flag_options.items())
-            + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
-            + [('library_rpath', '-Wl,-rpath')]))
+    default_linker = 'gcc'
+    is_linker = False
+    # linker_attributes = dict(
+    #     CCompilerBase.linker_attributes,
+    #     flag_options=OrderedDict(
+    #         list(LinkerBase.flag_options.items())
+    #         + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
+    #         + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
-    aliases = ['gnu-cc']
+    aliases = ['gnu-cc', 'gnu-gcc']
+    asan_flags = ['-fsanitize=address']
+    preload_envvar = 'LD_PRELOAD'
+    object_tool = "ldd"
 
     @classmethod
     def is_installed(cls):
@@ -169,12 +174,23 @@ class GCCCompiler(CCompilerBase):
 
         """
         out = super(GCCCompiler, cls).is_installed()
+        # Disable gcc when it is an alias for clang
         if out and platform._is_mac:  # pragma: debug
-            ver = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+            ver = cls.tool_version()
             if 'clang' in ver:
-                out = False  # Disable gcc when it is an alias for clang
+                out = False
         return out
 
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of compiler flags."""
+        out = super(GCCCompiler, cls).get_flags(*args, **kwargs)
+        if platform._is_win:  # pragma: windows
+            ver = cls.tool_version()
+            if 'mingw' in ver.lower() or 'msys' in ver.lower():
+                out.append('-Wa,-mbig-obj')
+        return out
+        
     def dll2a(cls, dll, dst=None, overwrite=False):
         r"""Convert a window's .dll library into a static library.
 
@@ -209,7 +225,7 @@ class GCCCompiler(CCompilerBase):
                     [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
             else:
                 dst = dll
-        assert(os.path.isfile(dst))
+        assert os.path.isfile(dst)
         return dst
 
 
@@ -225,6 +241,9 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
+    asan_flags = ['-fsanitize=address']
+    preload_envvar = 'DYLD_INSERT_LIBRARIES'
+    object_tool = "otool -L"
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
     is_linker = False
@@ -236,8 +255,10 @@ class ClangCompiler(CCompilerBase):
         out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
         if '-fopenmp' in out:
             idx = out.index('-fopenmp')
-            if (idx > 0) and (out[idx - 1] != '-Xpreprocessor'):
-                out.insert(idx, '-Xpreprocessor')
+            # new_flag = '-Xpreprocessor'
+            new_flag = '-Xclang'
+            if (idx > 0) and (out[idx - 1] != new_flag):
+                out.insert(idx, new_flag)
         return out
         
 
@@ -254,6 +275,7 @@ class MSVCCompiler(CCompilerBase):
                      # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
                      # '/Z7',      # Symbolic debug in .obj (implies debug)
                      "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
+                     "/bigobj",  # Allow big files
                      '/TP',      # Treat all files as C++
                      "/nologo",  # Suppress startup banner
                      # Don't show errors from using scanf, strcpy, etc.
@@ -278,7 +300,8 @@ class MSVCCompiler(CCompilerBase):
                              flag_options=OrderedDict(
                                  [('library_libs', ''),
                                   ('library_libs_nonstd', ''),
-                                  ('library_dirs', '/LIBPATH:%s')]),
+                                  ('library_dirs', '/LIBPATH:%s'),
+                                  ('import_lib', '/IMPLIB:%s')]),
                              shared_library_flag='/DLL',
                              search_path_envvar=['LIB'],
                              search_path_flags=None)
@@ -297,8 +320,8 @@ class MSVCCompiler(CCompilerBase):
                   != os.path.dirname(linker_path).lower()))):
             cls.linker_attributes['default_executable'] = os.path.join(
                 os.path.dirname(compiler_path), os.path.basename(linker_path))
-            assert(os.path.isfile(
-                cls.linker_attributes['default_executable']))
+            assert os.path.isfile(
+                cls.linker_attributes['default_executable'])
         CCompilerBase.before_registration(cls)
         
     @classmethod
@@ -312,8 +335,7 @@ class MSVCCompiler(CCompilerBase):
             str: Version of the tool.
 
         """
-        out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
+        out = super(MSVCCompiler, cls).tool_version()
         if 'Copyright' not in out:  # pragma: debug
             raise RuntimeError("Version call failed: %s" % out)
         return out.split('Copyright')[0]
@@ -331,6 +353,7 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+    asan_flags = ['-fsanitize=address']
 
     @classmethod
     def tool_version(cls, **kwargs):
@@ -343,17 +366,38 @@ class LDLinker(LinkerBase):
             str: Version of the tool.
 
         """
-        out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
-        if platform._is_mac:
-            regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
-        else:
-            regex = (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
-                     r'(?P<version>\d+(?:\.\d+){0,2})')
-        match = re.search(regex, out)
+        out = super(LDLinker, cls).tool_version(**kwargs)
+        for regex in [r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
+                      (r'GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
+                       r'(?P<version>\d+(?:\.\d+){0,2})')]:
+            match = re.search(regex, out)
+            if match is not None:
+                break
         if match is None:  # pragma: debug
-            raise RuntimeError("Could not locate version in string: %s" % out)
+            raise RuntimeError(f"Could not locate version in string: {out}")
         return match.group('version')
+
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of linker flags."""
+        out = super(LDLinker, cls).get_flags(*args, **kwargs)
+        if '-lstdc++' not in out:
+            out.append('-lstdc++')
+        return out
+
+
+class GCCLinker(LDLinker):
+    r"""Interface class for gcc linker (calls to ld)."""
+    toolname = GCCCompiler.toolname
+    aliases = GCCCompiler.aliases
+    languages = GCCCompiler.languages
+    platforms = GCCCompiler.platforms
+    default_executable = GCCCompiler.default_executable
+    toolset = GCCCompiler.toolset
+    search_path_flags = ['-Xlinker', '--verbose']
+    search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
+    flag_options = OrderedDict(LDLinker.flag_options,
+                               **{'library_rpath': '-Wl,-rpath'})
 
 
 class ClangLinker(LDLinker):
@@ -371,6 +415,7 @@ class ClangLinker(LDLinker):
                                **{'linker-version': '-mlinker-version=%s',
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
+    asan_flags = ['-fsanitize=address', '-shared-libasan']
 
     @staticmethod
     def before_registration(cls):
@@ -380,11 +425,29 @@ class ClangLinker(LDLinker):
         """
         LDLinker.before_registration(cls)
         if platform._is_win:  # pragma: windows
-            # One windows clang calls the MSVC linker LINK.exe which does not
+            # On windows clang calls the MSVC linker LINK.exe which does not
             # accept rpath. Runtime libraries must be in the same directory
             # as the executable or a directory in the PATH env variable.
             cls.flag_options.pop('library_rpath', None)
 
+    @classmethod
+    def tool_version(cls, **kwargs):
+        r"""Determine the version of this tool.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of the tool.
+
+        """
+        out = super(LDLinker, cls).tool_version(**kwargs)
+        regex = r'clang version (?P<version>\d+\.\d+\.\d+)'
+        match = re.search(regex, out)
+        if match is None:  # pragma: debug
+            raise RuntimeError(f"Could not locate version in string: {out}")
+        return match.group('version')
+        
     @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of linker flags."""
@@ -394,10 +457,8 @@ class ClangLinker(LDLinker):
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
-        out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
-        regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
-        match = re.search(regex, out)
-        if (match is not None) and (int(match.group('version')) >= 10):
+        ver = cls.tool_version()
+        if int(ver.split('.')[0]) >= 10:
             ld_version = LDLinker.tool_version()
             if float(ld_version.split('.')[0]) < 520:  # pragma: version
                 # No longer covered as the default conda
@@ -406,10 +467,17 @@ class ClangLinker(LDLinker):
                 # as existing installs still have this mismatch
                 kwargs['linker-version'] = ld_version
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
-        if '-lstdc++' not in out:
-            out.append('-lstdc++')
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
+            if 'conda' not in cls.get_executable(full_path=True):
+                result = subprocess.check_output(
+                    "find /usr/local -xdev -name '*libomp*'",
+                    shell=True).splitlines()
+                for x in result:
+                    x_dir, x_file = os.path.split(x.decode("utf-8"))
+                    if x_file.endswith(('libomp.dylib', 'libomp.a')):
+                        out.append(f'-L{x_dir}')
+                        break
         return out
 
 
@@ -426,6 +494,7 @@ class ARArchiver(ArchiverBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIBRARY_PATH']
+    asan_flags = []
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -436,6 +505,7 @@ class LibtoolArchiver(ArchiverBase):
     static_library_flag = '-static'  # This is the default
     toolset = 'clang'
     search_path_envvar = ['LIBRARY_PATH']
+    asan_flags = []
     
 
 class MSVCArchiver(ArchiverBase):
@@ -488,11 +558,15 @@ try:
                               ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
         _python_lib = tools.get_python_c_library(
-            allow_failure=False, libtype=libtype_order[0])
+            allow_failure=True, libtype=libtype_order[0])
 except BaseException as e:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
     _python_lib = None
-_numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
+try:
+    _numpy_inc = [np.get_include()]
+except AttributeError:  # pragma: debug
+    from numpy import distutils as numpy_distutils
+    _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
 
 
@@ -500,6 +574,7 @@ class CModelDriver(CompiledModelDriver):
     r"""Class for running C models."""
 
     _schema_subtype_description = ('Model is written in C.')
+    _deprecated_drivers = ['GCCModelDriver']
     language = 'c'
     language_ext = ['.c', '.h']
     interface_library = 'ygg'
@@ -509,6 +584,7 @@ class CModelDriver(CompiledModelDriver):
         'zmq': {'libraries': ['zmq', 'czmq']}}
     interface_dependencies = ['rapidjson']
     interface_directories = [_incl_interface]
+    standard_libraries = ['m']
     external_libraries = {
         'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
                                               'rapidjson', 'include',
@@ -524,15 +600,17 @@ class CModelDriver(CompiledModelDriver):
         'numpy': {'include': os.path.join(_numpy_inc[0], 'numpy',
                                           'arrayobject.h'),
                   'libtype': 'header_only',
-                  'language': 'c'},
+                  'language': 'c',
+                  'for_python_api': True},
         'python': {'include': os.path.join(_python_inc, 'Python.h'),
-                   'language': 'c'}}
+                   'language': 'c',
+                   'for_python_api': True,
+                   'standard': True}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'language': 'c',
                 'linker_language': 'c++',  # Some dependencies are C++
-                'internal_dependencies': ['regex', 'datatypes',
-                                          'python_wrapper'],
+                'internal_dependencies': ['regex', 'datatypes'],
                 'external_dependencies': ['rapidjson',
                                           'python', 'numpy'],
                 'include_dirs': [_incl_comm, _incl_seri],
@@ -555,28 +633,23 @@ class CModelDriver(CompiledModelDriver):
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson',
                                                 'python', 'numpy'],
-                      'include_dirs': []},
-        'python_wrapper': {'source': 'python_wrapper.c',
-                           'directory': _top_lang_dir,
-                           'language': 'c',
-                           'libtype': 'shared',
-                           'external_dependencies': ['python', 'numpy'],
-                           'linker_language': 'c',
-                           'include_dirs': [_top_lang_dir]}}
+                      'include_dirs': []}}
     type_map = {
         'comm': 'comm_t*',
         'dtype': 'dtype_t*',
         'int': 'intX_t',
         'float': 'double',
-        'string': 'string_t',
+        'string': 'char*',  # string_t',
         'array': 'json_array_t',
         'object': 'json_object_t',
         'integer': 'int',
+        'number': 'double',
         'boolean': 'bool',
+        'length': 'size_t',
         'null': 'void*',
         'uint': 'uintX_t',
         'complex': 'complex_X',
-        'bytes': 'char*',
+        'bytes': 'string_t',  # char*',
         'unicode': 'unicode_t',
         '1darray': '*',
         'ndarray': '*',
@@ -624,6 +697,8 @@ class CModelDriver(CompiledModelDriver):
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
         'init_any': 'init_generic()',
+        'init_type_from_schema': ('create_dtype_from_schema(\"{schema}\",'
+                                  ' {use_generic})'),
         'init_type_array': ('create_dtype_json_array({nitems}, '
                             '{items}, {use_generic})'),
         'init_type_object': ('create_dtype_json_object({nitems}, '
@@ -648,15 +723,15 @@ class CModelDriver(CompiledModelDriver):
                             '{use_generic})'),
         'init_type_empty': ('create_dtype_empty({use_generic})'),
         'init_type_schema': ('create_dtype_schema({use_generic})'),
-        'copy_array': '{name} = copy_json_array({value});',
-        'copy_object': '{name} = copy_json_object({value});',
-        'copy_schema': '{name} = copy_schema({value});',
+        'copy_array': 'copy_generic_into(&{name}, {value});',
+        'copy_object': 'copy_generic_into(&{name}, {value});',
+        'copy_schema': 'copy_generic_into(&{name}, {value});',
         'copy_ply': '{name} = copy_ply({value});',
         'copy_obj': '{name} = copy_obj({value});',
         'copy_class': '{name} = copy_python({value});',
         'copy_function': '{name} = copy_python({value});',
-        'copy_instance': '{name} = copy_generic({value});',
-        'copy_any': '{name} = copy_generic({value});',
+        'copy_instance': 'copy_generic_into(&{name}, {value});',
+        'copy_any': 'copy_generic_into(&{name}, {value});',
         'free_array': 'free_json_array({variable});',
         'free_object': 'free_json_object({variable});',
         'free_schema': 'free_schema({variable});',
@@ -709,6 +784,7 @@ class CModelDriver(CompiledModelDriver):
         'exec_begin': 'int main() {',
         'exec_end': '  return 0;\n}',
         'exec_prefix': '#include <stdbool.h>',
+        'python_init': 'init_python_API();',
         'free': 'if ({variable} != NULL) {{ free({variable}); {variable} = NULL; }}',
         'function_def_begin': '{output_type} {function_name}({input_var}) {{',
         'return': 'return {output_var};',
@@ -764,7 +840,6 @@ class CModelDriver(CompiledModelDriver):
             for x in ['zmq', 'czmq', 'python']:
                 if x in cls.external_libraries:
                     cls.external_libraries[x]['libtype'] = 'windows_import'
-            cls.internal_libraries['python_wrapper']['libtype'] = 'windows_import'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -774,16 +849,15 @@ class CModelDriver(CompiledModelDriver):
         # Platform specific internal library options
         cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows
-            stdint_win = os.path.join(_top_lang_dir, 'windows_stdint.h')
-            assert(os.path.isfile(stdint_win))
-            shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
-            for x in ['ygg', 'datatypes', 'python_wrapper']:
+            for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
                 if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
+                if 'm' not in cls.internal_libraries[x]['external_dependencies']:
+                    cls.internal_libraries[x]['external_dependencies'].append('m')
         
     @classmethod
     def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None, **kwargs):
@@ -814,20 +888,23 @@ class CModelDriver(CompiledModelDriver):
         if vcpkg_dir is None:
             vcpkg_dir = os.environ.get('VCPKG_ROOT', None)
         if vcpkg_dir is not None:
+            print(f"Setting vcpkg_dir to {vcpkg_dir}"
+                  f" ({os.path.abspath(vcpkg_dir)})")
             vcpkg_dir = os.path.abspath(vcpkg_dir)
             if not os.path.isdir(vcpkg_dir):  # pragma: debug
                 raise ValueError("Path to vcpkg root directory "
                                  "does not exist: %s." % vcpkg_dir)
             cfg.set(cls._language, 'vcpkg_dir', vcpkg_dir)
-        if macos_sdkroot is None:
-            macos_sdkroot = _osx_sysroot
-        if macos_sdkroot is not None:
-            if not os.path.isdir(macos_sdkroot):  # pragma: debug
-                raise ValueError("Path to MacOS SDK root directory "
-                                 "does not exist: %s." % macos_sdkroot)
-            cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
-        # Call __func__ to avoid direct invoking of class which dosn't exist
-        # in after_registration where this is called
+        if cls.language == 'c':
+            if macos_sdkroot is None:
+                macos_sdkroot = cfg.get('c', 'macos_sdkroot', _osx_sysroot)
+            if macos_sdkroot is not None:
+                if not os.path.isdir(macos_sdkroot):  # pragma: debug
+                    raise ValueError(f"Path to MacOS SDK root directory "
+                                     f"does not exist: {macos_sdkroot}")
+                cfg.set('c', 'macos_sdkroot', macos_sdkroot)
+        # Call __func__ to avoid direct invoking of class which dosn't
+        # exist in after_registration where this is called
         out = CompiledModelDriver.configure.__func__(cls, cfg, **kwargs)
         # Change configuration to be directory containing include files
         rjlib = cfg.get(cls._language, 'rapidjson_include', None)
@@ -838,39 +915,6 @@ class CModelDriver(CompiledModelDriver):
         if (nplib is not None) and os.path.isfile(nplib):
             cfg.set(cls._language, 'numpy_include',
                     os.path.dirname(os.path.dirname(nplib)))
-        return out
-
-    @classmethod
-    def get_dependency_info(cls, dep, toolname=None, default=None):
-        r"""Get the dictionary of information associated with a
-        dependency.
-
-        Args:
-            dep (str): Name of internal or external dependency or full path
-                to the library.
-            toolname (str, optional): Name of compiler tool that should be used.
-                Defaults to None and the default compiler for the language will
-                be used.
-            default (dict, optional): Information dictionary that should
-                be returned if dep cannot be located. Defaults to None
-                and an error will be raised if dep cannot be found.
-
-        Returns:
-            dict: Dependency info.
-
-        """
-        replaced_toolname = False
-        if platform._is_win and (dep == 'python_wrapper'):
-            # The Python library is compiled against MSVC so a wrapper is requried
-            # to reconcile the differences in FILE* between gcc and MSVC.
-            if get_compilation_tool('compiler', 'cl').is_installed():
-                replaced_toolname = True
-                toolname = 'cl'
-        out = super(CModelDriver, cls).get_dependency_info(
-            dep, toolname=toolname, default=default)
-        if replaced_toolname:
-            out['remove_flags'] = ['/TP']
-            out['toolname'] = toolname
         return out
 
     @classmethod
@@ -931,8 +975,10 @@ class CModelDriver(CompiledModelDriver):
             paths_to_add = []
         paths_to_add = paths_to_add + [cls.get_language_dir()]
         if add_libpython_dir:
-            paths_to_add = paths_to_add + [os.path.dirname(
-                cls.get_dependency_library('python', toolname=toolname))]
+            python_lib = cls.get_dependency_library(
+                'python', toolname=toolname)
+            if os.path.isfile(python_lib):
+                paths_to_add.append(os.path.dirname(python_lib))
         if platform._is_win and ygg_cfg.get('c', 'vcpkg_dir', None):
             if platform._is_64bit:
                 arch = 'x64-windows'
@@ -1045,7 +1091,8 @@ class CModelDriver(CompiledModelDriver):
                 x['datatype']['shape'] = [
                     int(float(s.strip('[]')))
                     for s in x.pop('shape').split('][')]
-                assert(x['datatype']['subtype'] in constants.VALID_TYPES)
+                assert x['datatype']['subtype'] in (constants.SCALAR_TYPES
+                                                    + ['string'])
                 if len(x['datatype']['shape']) == 1:
                     x['datatype']['length'] = x['datatype'].pop(
                         'shape')[0]
@@ -1053,6 +1100,69 @@ class CModelDriver(CompiledModelDriver):
                 else:
                     x['datatype']['type'] = 'ndarray'
         return out
+        
+    @classmethod
+    def add_extra_vars(cls, direction, x):
+        r"""Add extra variables required for communication.
+        
+        Args:
+            direction (str): Direction of channel ('input' or 'output').
+            x (dict): Dictionary describing the variable.
+        
+        """
+        super(CModelDriver, cls).add_extra_vars(direction, x)
+        if ((cls.requires_length_var(x)
+             and (not x.get('length_var', False)))):
+            if direction == 'input':
+                x['length_var'] = {
+                    'name': x['name'] + '_length',
+                    'datatype': {
+                        'type': 'uint',
+                        'precision': rapidjson.SIZE_OF_SIZE_T},
+                    'is_length_var': True}
+                x.setdefault('extra_vars', {})
+                x['extra_vars']['length'] = x['length_var']
+            elif direction == 'output':
+                if x['datatype']['type'] in ['1darray', 'ndarray']:
+                    if 'iter_datatype' not in x:  # pragma: debug
+                        raise RuntimeError("Length must be defined for "
+                                           "arrays.")
+                else:
+                    subtype = x['datatype'].get('subtype', x['datatype']['type'])
+                    assert subtype in ['bytes', 'string', 'unicode']
+                    # if subtype == 'unicode':
+                    #     x['datatype'].setdefault('encoding', "UCS4")
+                    encoding_size = constants.FIXED_ENCODING_SIZES.get(
+                        x['datatype'].get('encoding', 'ASCII'), 4)
+                    if encoding_size == 1:
+                        x['length_var'] = 'strlen(%s)' % x['name']
+                    else:
+                        x['length_var'] = f"strlen{encoding_size}({x['name']})"
+        elif (cls.requires_shape_var(x)
+              and not (x.get('ndim_var', False)
+                       and x.get('shape_var', False))):  # pragma: debug
+            raise RuntimeError("Uncomment logic that follows "
+                               "and only raise error for output.")
+            # if direction == 'input':
+            #     if not x.get('ndim_var', False):
+            #         x['ndim_var'] = {
+            #             'name': x['name'] + '_ndim',
+            #             'datatype': {
+            #                 'type': 'uint',
+            #                 'precision': rapidjson.SIZE_OF_SIZE_T},
+            #             'is_length_var': True}
+            #         x.setdefault('extra_vars', {})
+            #         x['extra_vars']['ndim'] = x['ndim_var']
+            #     if not x.get('shape_var', False):
+            #         x['shape_var'] = {
+            #             'name': x['name'] + '_ndim',
+            #             'datatype': {
+            #                 'type': '1darray',
+            #                 'subtype': 'uint',
+            #                 'precision': rapidjson.SIZE_OF_SIZE_T},
+            #             'is_length_var': True}
+            #         x.setdefault('extra_vars', {})
+            #         x['extra_vars']['shape'] = x['shape_var']
         
     @classmethod
     def finalize_function_io(cls, direction, x):
@@ -1066,33 +1176,6 @@ class CModelDriver(CompiledModelDriver):
         """
         super(CModelDriver, cls).finalize_function_io(direction, x)
         if direction == 'input':
-            # Add length_vars if missing for use by yggdrasil
-            for v in x['vars']:
-                if cls.requires_length_var(v) and (not v.get('length_var', False)):
-                    v['length_var'] = {'name': v['name'] + '_length',
-                                       'datatype': {'type': 'uint',
-                                                    'precision': 64},
-                                       'is_length_var': True,
-                                       'dependent': True}
-                elif cls.requires_shape_var(v):
-                    if not (v.get('ndim_var', False)
-                            and v.get('shape_var', False)):  # pragma: debug
-                        raise RuntimeError("Uncomment logic that follows.")
-                    # if not v.get('ndim_var', False):
-                    #     v['ndim_var'] = {
-                    #         'name': v['name'] + '_ndim',
-                    #         'datatype': {'type': 'uint',
-                    #                      'precision': 64},
-                    #         'is_length_var': True,
-                    #         'dependent': True}
-                    # if not v.get('shape_var', False):
-                    #     v['shape_var'] = {
-                    #         'name': v['name'] + '_ndim',
-                    #         'datatype': {'type': '1darray',
-                    #                      'subtype': 'uint',
-                    #                      'precision': 64},
-                    #         'is_length_var': True,
-                    #         'dependent': True}
             # Flag input variables for reallocation
             allows_realloc = [cls.allows_realloc(v) for v in x['vars']]
             if all(allows_realloc):
@@ -1102,26 +1185,12 @@ class CModelDriver(CompiledModelDriver):
                          and (not v.get('is_length_var', False))
                          and (v['datatype']['type'] not in
                               ['any', 'object', 'array', 'schema',
-                               'instance', '1darray', 'ndarray'])
+                               'instance', '1darray', 'ndarray',
+                               'ply', 'obj'])
+                         # TODO: allow ply_t/obj_t to be passed by pointer
                          and (cls.function_param['recv_function']
                               == cls.function_param['recv_heap']))):
                         v['allow_realloc'] = True
-        elif direction == 'output':
-            # Add length_vars if missing for use by yggdrasil
-            for v in x['vars']:
-                if cls.requires_length_var(v) and (not v.get('length_var', False)):
-                    if v['datatype']['type'] in ['1darray', 'ndarray']:
-                        if 'iter_datatype' not in v:  # pragma: debug
-                            raise RuntimeError("Length must be defined for "
-                                               "arrays.")
-                    elif v['datatype'].get('subtype', v['datatype']['type']) == 'bytes':
-                        v['length_var'] = 'strlen(%s)' % v['name']
-                    else:
-                        v['length_var'] = 'strlen4(%s)' % v['name']
-                elif (cls.requires_shape_var(v)
-                      and not (v.get('ndim_var', False)
-                               and v.get('shape_var', False))):  # pragma: debug
-                    raise RuntimeError("Shape must be defined for ND arrays.")
         if x['datatype']['type'] == 'array':
             nvars_items = len(x['datatype'].get('items', []))
             nvars = sum([(not ix.get('is_length_var', False))
@@ -1145,7 +1214,7 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, cls).input2output(var)
         if out.get('ptr', ''):
-            assert(out['native_type'].endswith('*'))
+            assert out['native_type'].endswith('*')
             out['ptr'] = out['ptr'][:-1]
             out['native_type'] = out['native_type'][:-1]
             out['datatype'] = cls.get_json_type(out['native_type'])
@@ -1245,54 +1314,51 @@ class CModelDriver(CompiledModelDriver):
         return False
               
     @classmethod
-    def get_native_type(cls, **kwargs):
+    def get_native_type(cls, const=False, **kwargs):
         r"""Get the native type.
 
         Args:
             type (str, optional): Name of |yggdrasil| extended JSON
                 type or JSONSchema dictionary defining a datatype.
-            **kwargs: Additional keyword arguments may be used in determining
-                the precise declaration that should be used.
+            const (bool, optional): If True, the native type will be
+                marked as constant. Defaults to False.
+            **kwargs: Additional keyword arguments may be used in
+                determining the precise declaration that should be used.
 
         Returns:
             str: The native type.
 
         """
-        out = super(CModelDriver, cls).get_native_type(**kwargs)
+        out, json_type = super(CModelDriver, cls).get_native_type(
+            return_json=True, **kwargs)
+        prefix = ''
+        if const:
+            prefix = 'const '
         if not ((out == '*') or ('X' in out) or (out == 'double')):
-            return out
-        from yggdrasil.metaschema.datatypes import get_type_class
-        json_type = kwargs.get('datatype', kwargs)
-        if isinstance(json_type, str):
-            json_type = {'type': json_type}
-        # if 'type' in kwargs:
-        #     json_type.update(kwargs)
-        assert(isinstance(json_type, dict))
-        json_type = get_type_class(json_type['type']).normalize_definition(
-            json_type)
+            return prefix + out
         if out == '*':
             json_subtype = copy.deepcopy(json_type)
-            json_subtype['type'] = json_subtype.pop('subtype')
+            json_subtype['type'] = 'scalar'
             out = cls.get_native_type(datatype=json_subtype)
             if ('length' not in json_type) and ('shape' not in json_type):
                 out += '*'
         elif 'X' in out:
             precision = json_type['precision']
-            if json_type['type'] == 'complex':
-                precision_map = {64: 'float',
-                                 128: 'double',
-                                 256: 'long_double'}
+            if json_type['subtype'] == 'complex':
+                precision_map = {8: 'float',
+                                 16: 'double',
+                                 32: 'long_double'}
                 if precision in precision_map:
                     out = out.replace('X', precision_map[precision])
                 else:  # pragma: debug
                     raise ValueError("Unsupported precision for complex types: %d"
                                      % precision)
             else:
-                out = out.replace('X', str(precision))
+                out = out.replace('X', str(8 * precision))
         elif out == 'double':
-            if json_type['precision'] == 32:
+            if json_type.get('precision', 8) == 4:
                 out = 'float'
-        return out.replace(' ', '')
+        return prefix + out.replace(' ', '')
         
     @classmethod
     def get_json_type(cls, native_type):
@@ -1312,32 +1378,31 @@ class CModelDriver(CompiledModelDriver):
             out['precision'] = int(grp['precision'])
             grp['type'] = grp['type'].replace(grp['precision'], 'X')
         if grp['type'] == 'char':
-            out['type'] = 'bytes'
-            out['precision'] = 0
+            out['type'] = 'string'
         elif grp['type'] == 'void':
             out['type'] = 'null'
         elif grp['type'].startswith('complex'):
             out['type'] = 'complex'
-            precision_map = {'long_double': 256,
-                             'double': 128,
-                             'float': 64}
+            precision_map = {'long_double': 32,
+                             'double': 16,
+                             'float': 8}
             prec_str = grp['type'].split('complex_')[-1]
             if prec_str in precision_map:
                 out['precision'] = precision_map[prec_str]
             else:  # pragma: debug
                 raise ValueError("Cannot determine precision for complex type '%s'"
                                  % grp['type'])
+            
+        elif grp['type'] == 'double':
+            out['type'] = 'float'
+            out['precision'] = 8
+        elif grp['type'] == 'float':
+            out['type'] = 'float'
+            out['precision'] = 4
         else:
-            if grp['type'] == 'double':
-                out['precision'] = 8 * 8
-            elif grp['type'] == 'float':
-                grp['type'] = 'double'
-                out['precision'] = 4 * 8
-            elif grp['type'] in ['int', 'uint']:
+            if grp['type'] in ['int', 'uint']:
                 grp['type'] += 'X_t'
-                out['precision'] = 8 * np.dtype('intc').itemsize
-            elif grp['type'] in ['bytes_t', 'string_t', 'unicode_t']:
-                out['precision'] = 0
+                out['precision'] = np.dtype('intc').itemsize
             out['type'] = super(CModelDriver, cls).get_json_type(grp['type'])
         if grp.get('pointer', False):
             nptr = len(grp['pointer'])
@@ -1346,9 +1411,12 @@ class CModelDriver(CompiledModelDriver):
             if nptr > 0:
                 out['subtype'] = out['type']
                 out['type'] = '1darray'
-        if out['type'] in constants.VALID_TYPES:
+        if out['type'] in constants.SCALAR_TYPES:
             out['subtype'] = out['type']
             out['type'] = 'scalar'
+        if out.get('subtype', None) == 'unicode':
+            out['subtype'] = 'string'
+            out['encoding'] = 'UCS4'
         return out
         
     @classmethod
@@ -1490,12 +1558,7 @@ class CModelDriver(CompiledModelDriver):
             kwargs.setdefault('value', 'NULL')
         elif var.get('is_length_var', False):
             kwargs.setdefault('value', '0')
-        out = super(CModelDriver, cls).write_declaration(var, **kwargs)
-        for k in ['length', 'ndim', 'shape']:
-            if ((isinstance(var.get(k + '_var', None), dict)
-                 and var[k + '_var'].get('dependent', False))):
-                out += cls.write_declaration(var[k + '_var'])
-        return out
+        return super(CModelDriver, cls).write_declaration(var, **kwargs)
 
     @classmethod
     def get_name_declare(cls, var):
@@ -1510,13 +1573,14 @@ class CModelDriver(CompiledModelDriver):
         """
         if isinstance(var, str):  # pragma: no cover
             return var
-        assert(isinstance(var, dict))
+        assert isinstance(var, dict)
         out = var['name']
-        if 'length' in var.get('datatype', {}):
-            out += '[%d]' % var['datatype']['length']
-        elif 'shape' in var.get('datatype', {}):
-            for s in var['datatype']['shape']:
-                out += '[%d]' % s
+        if isinstance(var.get('datatype', None), dict):
+            if 'length' in var['datatype']:
+                out += '[%d]' % var['datatype']['length']
+            elif 'shape' in var['datatype']:
+                for s in var['datatype']['shape']:
+                    out += '[%d]' % s
         return out
         
     @classmethod
@@ -1576,7 +1640,7 @@ class CModelDriver(CompiledModelDriver):
             if isinstance(x, str):
                 new_vars_list.append(x)
             else:
-                assert(isinstance(x, dict))
+                assert isinstance(x, dict)
                 if for_yggdrasil and x.get('is_length_var', False):
                     continue
                 new_vars_list.append(x)
@@ -1709,30 +1773,34 @@ class CModelDriver(CompiledModelDriver):
                         if not x.get('length_var', False):
                             x['length_var'] = {
                                 'name': v_length,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64},
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['length_var'])
                     elif cls.requires_shape_var(x):
                         if not x.get('ndim_var', False):
                             x['ndim_var'] = {
                                 'name': v_ndim,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64},
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['ndim_var'])
                         if not x.get('shape_var', False):
                             x['shape_var'] = {
                                 'name': v_shape,
-                                'datatype': {'type': '1darray',
-                                             'subtype': 'uint',
-                                             'precision': 64},
+                                'datatype': {
+                                    'type': '1darray',
+                                    'subtype': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['shape_var'])
                         length_var = {
                             'name': v_length,
-                            'datatype': {'type': 'uint',
-                                         'precision': 64},
+                            'datatype': {
+                                'type': 'uint',
+                                'precision': rapidjson.SIZE_OF_SIZE_T},
                             'is_length_var': True}
                         kwargs['function_contents'] = (
                             cls.write_declaration(length_var)
@@ -1814,11 +1882,22 @@ class CModelDriver(CompiledModelDriver):
                      in ['1darray', 'ndarray'])):  # pragma: debug
                     raise RuntimeError("Length must be set in order "
                                        "to write array assignments.")
-                elif (dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
-                      in ['bytes']):
-                    src_var_length = '(strlen(%s)+1)' % src_var['name']
                 else:
-                    src_var_length = '(strlen4(%s)+1)' % src_var['name']
+                    subtype = dst_var['datatype'].get(
+                        'subtype', dst_var['datatype']['type'])
+                    assert subtype in ['bytes', 'string', 'unicode']
+                    # if subtype == 'unicode':
+                    #     dst_var['datatype'].setdefault('encoding', "UCS4")
+                    encoding_size = constants.FIXED_ENCODING_SIZES.get(
+                        dst_var['datatype'].get('encoding', 'ASCII'), 4)
+                    if encoding_size == 1:
+                        src_var_length = 'strlen(%s)' % src_var['name']
+                    else:
+                        src_var_length = f"strlen{encoding_size}({src_var['name']})"
+                        
+            if ((dst_var['datatype'].get('subtype', dst_var['datatype']['type'])
+                 in ['bytes', 'string', 'unicode'])):
+                src_var_length = f"({src_var_length}+1)"
             src_var_dtype = cls.get_native_type(**src_var)
             if src_var_dtype in ['bytes_t', 'unicode_t', 'string_t']:
                 src_var_dtype = 'char*'
@@ -1854,12 +1933,14 @@ class CModelDriver(CompiledModelDriver):
                     dst_var_ndim = dst_var['name'] + '_ndim'
             if isinstance(src_var_ndim, str):
                 src_var_ndim = {'name': src_var_ndim,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64}}
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T}}
             if isinstance(dst_var_ndim, str):
                 dst_var_ndim = {'name': dst_var_ndim,
-                                'datatype': {'type': 'uint',
-                                             'precision': 64}}
+                                'datatype': {
+                                    'type': 'uint',
+                                    'precision': rapidjson.SIZE_OF_SIZE_T}}
 
             out += cls.write_assign_to_output(
                 dst_var_ndim, src_var_ndim,
@@ -1883,15 +1964,17 @@ class CModelDriver(CompiledModelDriver):
                     dst_var_shape = dst_var['name'] + '_shape'
             if isinstance(src_var_shape, str):
                 src_var_shape = {'name': src_var_shape,
-                                 'datatype': {'type': '1darray',
-                                              'subtype': 'uint',
-                                              'precision': 64},
+                                 'datatype': {
+                                     'type': '1darray',
+                                     'subtype': 'uint',
+                                     'precision': rapidjson.SIZE_OF_SIZE_T},
                                  'length_var': src_var_ndim['name']}
             if isinstance(dst_var_shape, str):
                 dst_var_shape = {'name': dst_var_shape,
-                                 'datatype': {'type': '1darray',
-                                              'subtype': 'uint',
-                                              'precision': 64},
+                                 'datatype': {
+                                     'type': '1darray',
+                                     'subtype': 'uint',
+                                     'precision': rapidjson.SIZE_OF_SIZE_T},
                                  'length_var': dst_var_ndim['name']}
             out += cls.write_assign_to_output(
                 dst_var_shape, src_var_shape,
@@ -1922,11 +2005,9 @@ class CModelDriver(CompiledModelDriver):
                 nele = 1
                 for s in dst_var['datatype']['shape']:
                     nele *= s
+                dst_var_type = cls.get_native_type(**dst_var)
                 kwargs.update(copy=True, N=nele,
-                              native_type=dst_var['datatype']['subtype'])
-            elif 'length' in dst_var.get('datatype', {}):
-                kwargs.update(copy=True, N=dst_var['datatype']['length'],
-                              native_type=dst_var['datatype']['subtype'])
+                              native_type=dst_var_type)
         if outputs_in_inputs and (cls.language != 'c++'):
             if isinstance(dst_var, dict):
                 dst_var = dict(dst_var,
@@ -1957,12 +2038,11 @@ class CModelDriver(CompiledModelDriver):
         out['replacement_code_types'] = {}
         for k, v in cls.type_map.items():
             if v == '*':
-                knew = {'type': k, 'subtype': 'float',
-                        'precision': 32}
+                knew = {'type': k, 'subtype': 'float', 'precision': 4}
                 vnew = 'float*'
                 out['replacement_code_types'][(k, v)] = (knew, vnew)
             elif 'X' in v:
-                knew = {'type': k, 'precision': 64}
+                knew = {'type': 'scalar', 'subtype': k, 'precision': 8}
                 if k == 'complex':
                     vnew = v.replace('X', 'float')
                 else:
@@ -1974,18 +2054,18 @@ class CModelDriver(CompiledModelDriver):
             # Single output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [{'name': 'y',
                           'datatype': {'type': 'float',
-                                       'precision': 32,
+                                       'precision': 4,
                                        'units': 'cm'}}],
              'outputs_in_inputs': False,
              'dont_add_lengths': True},
             # No output
             {'inputs': [{'name': 'x', 'value': 1.0,
                          'datatype': {'type': 'float',
-                                      'precision': 32,
+                                      'precision': 4,
                                       'units': 'cm'}}],
              'outputs': [],
              'outputs_in_inputs': False},
@@ -1997,7 +2077,7 @@ class CModelDriver(CompiledModelDriver):
                                       'units': ''}},
                         {'name': 'length_x', 'value': 5,
                          'datatype': {'type': 'uint',
-                                      'precision': 64},
+                                      'precision': rapidjson.SIZE_OF_SIZE_T},
                          'is_length_var': True}],
              'outputs': [{'name': 'y',
                           'length_var': 'length_y',
@@ -2006,7 +2086,7 @@ class CModelDriver(CompiledModelDriver):
                                        'units': ''}},
                          {'name': 'length_y',
                           'datatype': {'type': 'uint',
-                                       'precision': 64},
+                                       'precision': rapidjson.SIZE_OF_SIZE_T},
                           'is_length_var': True}],
              'dont_add_lengths': True},
         ]

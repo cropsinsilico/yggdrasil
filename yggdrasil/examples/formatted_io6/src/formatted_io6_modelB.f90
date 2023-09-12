@@ -25,7 +25,9 @@ program main
      end if
 
      ! Print received message
-     print *, "Model B: (", p%nvert, " verts, ", p%nface, " faces)"
+     print *, "Model B: (", &
+          nelements_obj(p, "v"), " verts, ", &
+          nelements_obj(p, "f"), " faces)"
      call display_obj_indent(p, "  ")
 
      ! Send output to output channel

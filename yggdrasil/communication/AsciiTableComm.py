@@ -10,3 +10,4 @@ class AsciiTableComm(FileComm):
                                    '``as_array`` is ``True``, the table will '
                                    'be read/written all at once.')
     _default_serializer = 'table'
+    _deprecated_drivers = ['AsciiTableInputDriver', 'AsciiTableOutputDriver']

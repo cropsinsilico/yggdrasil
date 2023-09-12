@@ -47,11 +47,13 @@ class OSRModelDriver(ExecutableModelDriver):
         'copy_xml_to_osr': {'type': 'boolean', 'default': False},
         'update_interval': {'type': 'object',
                             'additionalProperties': {'type': 'float'},
-                            'default': {'timesync': 1.0}}}
+                            'default': {'timesync': 1.0}},
+        'disable_python_c_api': {'type': 'boolean'},
+        'with_asan': {'type': 'boolean'}}
     executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
-    base_languages = ['cpp']
+    base_languages = ['c++']
     interface_dependencies = ['make']
     repository = None
     executable_path = None
@@ -96,8 +98,12 @@ class OSRModelDriver(ExecutableModelDriver):
                 os.path.basename(self.model_file))
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
-        self.compile_dependencies()
-        assert(os.path.isfile(self.executable_path))
+        compile_kwargs = {}
+        for k in CPPModelDriver.kwargs_in_suffix:
+            if hasattr(self, k):
+                compile_kwargs[k] = getattr(self, k)
+        self.compile_dependencies(**compile_kwargs)
+        assert os.path.isfile(self.executable_path)
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):
@@ -119,7 +125,8 @@ class OSRModelDriver(ExecutableModelDriver):
             lib, **kwargs)  # pragma: debug
 
     @classmethod
-    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None):
+    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None,
+                             **kwargs):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
 
         Args:
@@ -129,6 +136,8 @@ class OSRModelDriver(ExecutableModelDriver):
             toolname (str, optional): C++ compiler that should be used. Forced
                 to be 'cl.exe' on windows. Otherwise the default C++ compiler will
                 be used.
+            **kwargs: Additional keyword arguments are passed to the
+                compile_dependencies methods of the base classes.
 
         """
         if (cls.repository is not None) and CPPModelDriver.is_installed():
@@ -165,14 +174,25 @@ class OSRModelDriver(ExecutableModelDriver):
                 cwd = os.path.join(cwd, 'StaticBuild_win64')
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
+            flag_options = ''
+            for k in CPPModelDriver.kwargs_in_suffix:
+                if k in ['commtype'] or not kwargs.get(k, False):
+                    continue
+                # if k in ['commtype']:
+                #     flag_options += f" --{k.replace('_', '-')}={kwargs[k]}"
+                # else:
+                flag_options += f" --{k.replace('_', '-')}"
+            if flag_options:
+                env['YGG_OSR_FLAG_OPTIONS'] = flag_options.strip()
             if target != 'cleanygg':
                 for x in cls.base_languages:
                     base_cls = import_component('model', x)
-                    base_cls.compile_dependencies(toolname=toolname)
-                    env = base_cls.set_env_class(existing=env)
+                    base_cls.compile_dependencies(toolname=toolname,
+                                                  **kwargs)
             elif not os.path.isfile(cls.executable_path):
                 return
             cmd = ['make', target] + flags
+            logger.debug(f"Calling {cmd} from {cwd}")
             subprocess.check_call(cmd, cwd=cwd, env=env)
 
     def write_wrappers(self, **kwargs):
@@ -209,14 +229,14 @@ class OSRModelDriver(ExecutableModelDriver):
             sio.StringIO(src_contents).getvalue(), self.set_env())
         root = ET.fromstring(src_contents)
         timesync = self.timesync
-        assert(timesync)
+        assert timesync
         if not isinstance(timesync, list):
             timesync = [timesync]
         for tsync in reversed(timesync):
             ivars = tsync.get('inputs', [])
             ovars = tsync.get('outputs', [])
-            assert(isinstance(ivars, list))
-            assert(isinstance(ovars, list))
+            assert isinstance(ivars, list)
+            assert isinstance(ovars, list)
             ivars = ' '.join(ivars)
             ovars = ' '.join(ovars)
             tupdate = self.update_interval.get(tsync['name'], 1.0)
@@ -263,6 +283,20 @@ class OSRModelDriver(ExecutableModelDriver):
         """
         return (cls.repository is not None)
 
+    @classmethod
+    def language_version(cls, version_flags=None, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.run_executable.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        repo = git.Repo(cls.repository)
+        return str(repo.commit())
+        
     @classmethod
     def clone_repository(cls, dest=None):
         r"""Clone the OpenSimRoot repository.
@@ -380,7 +414,7 @@ class OSRModelDriver(ExecutableModelDriver):
         super(OSRModelDriver, cls).cleanup_dependencies(*args, **kwargs)
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:

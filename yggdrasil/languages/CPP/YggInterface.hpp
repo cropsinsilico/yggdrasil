@@ -2,7 +2,9 @@
 #ifndef YGGINTERFACE_HPP_
 #define YGGINTERFACE_HPP_
 
+#define RAPIDJSON_YGGDRASIL
 #include "YggInterface.h"
+#include "datatypes/serialization.h"
 #include <string>
 
 
@@ -106,6 +108,38 @@ public:
   };
 
   /*!
+    @brief Receive a message into a single variable.
+    @tparam T Expected data type to be received.
+    @param[in] data Variable to received message into.
+    @return integer specifying if the receive was succesful. Values >= 0
+      indicate success.
+  */
+  template<typename T>
+  int recvVar(T& data) {
+    rapidjson::Document d;
+    int ret = recvVar(d);
+    if (ret < 0)
+      return ret;
+    if (!d.Is<T>())
+      ygglog_throw_error("YggInput::recvVar: Received data is not the correct type");
+    data = d.Get<T>();
+    return ret;
+  }
+  int recvVar(rapidjson::Document& data) {
+    char *buf = NULL;
+    size_t buf_siz = 0;
+    int ret = comm_recv_realloc(_pi, &buf, buf_siz);
+    if (ret < 0)
+      return ret;
+    rapidjson::StringStream s(buf);
+    data.ParseStream(s);
+    if (data.HasParseError())
+      ygglog_throw_error("YggInput::recvVar: Error parsing JSON");
+    free(buf);
+    return ret;
+  }
+
+  /*!
     @brief Receive a message shorter than YGG_MSG_MAX from the input queue.
     See ygg_recv in YggInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
@@ -128,10 +162,9 @@ public:
    */
   int recv(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 0, nargs_copy, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -147,10 +180,9 @@ public:
    */
   int recvRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vcommRecv(_pi, 1, nargs_copy, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 1);
+    int ret = vcommRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   
@@ -178,10 +210,10 @@ public:
     indicate success.
    */
   int recv_nolimit(const int nargs, ...) {
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vyggRecv(_pi, 0, nargs, va);
-    va_end(va.va);
+    size_t nargs_copy = (size_t)nargs;
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   
@@ -286,6 +318,27 @@ public:
   };
 
   /*!
+    @brief Send a single variable as a message.
+    @tparam T Type of variable to send.
+    @param[in] data Variable to send as a message.
+    @returns int 0 if send succesfull, -1 if send unsuccessful.
+   */
+  template<typename T>
+  int sendVar(const T& data) {
+    rapidjson::Document d;
+    d.Set(data, d.GetAllocator());
+    return sendVar(d);
+  }
+  int sendVar(const rapidjson::Document& data) {
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    if (!data.Accept(writer))
+      ygglog_throw_error("YggOutput::sendVar: Error serializing document.");
+    return comm_send_multipart(_pi, buffer.GetString(),
+			       static_cast<size_t>(buffer.GetLength()));
+  }
+
+  /*!
     @brief Send a message smaller than YGG_MSG_MAX to the output queue.
     If the message is larger than YGG_MSG_MAX an error code will be returned.
     See ygg_send in YggInterface.h for details.
@@ -306,10 +359,10 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vyggSend(_pi, (size_t)nargs, va);
-    va_end(va.va);
+    size_t nargs_copy = (size_t)nargs;
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommSend(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -333,10 +386,10 @@ public:
     success.
   */
   int send_nolimit(const int nargs, ...) {
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vyggSend(_pi, nargs, va);
-    va_end(va.va);
+    size_t nargs_copy = (size_t)nargs;
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vcommSend(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -402,10 +455,10 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vrpcSend(_pi, nargs, va);
-    va_end(va.va);
+    size_t nargs_copy = (size_t)nargs;
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vrpcSend(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -420,10 +473,10 @@ public:
     indicate success.
    */
   int recv(const int nargs, ...) {
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vrpcRecv(_pi, nargs, va);
-    va_end(va.va);
+    size_t nargs_copy = (size_t)nargs;
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vrpcRecv(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
 
@@ -440,10 +493,63 @@ public:
     indicate success.
    */
   int recvRealloc(const int nargs, ...) {
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vrpcRecvRealloc(_pi, nargs, va);
-    va_end(va.va);
+    size_t nargs_copy = (size_t)nargs;
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 1);
+    int ret = vrpcRecvRealloc(_pi, ap);
+    YGG_END_VAR_ARGS(ap);
+    return ret;
+  }
+  
+  /*!
+    @brief Send a single variable as a message.
+    @tparam T Type of variable to send.
+    @param[in] data Variable to send as a message.
+    @returns int 0 if send succesfull, -1 if send unsuccessful.
+   */
+  template<typename T>
+  int sendVar(const T& data) {
+    rapidjson::Document d;
+    d.Set(data, d.GetAllocator());
+    return sendVar(d);
+  }
+  int sendVar(const rapidjson::Document& data) {
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    if (!data.Accept(writer))
+      ygglog_throw_error("YggRpc::sendVar: Error serializing document.");
+    return comm_send_multipart(_pi, buffer.GetString(),
+			       static_cast<size_t>(buffer.GetLength()));
+  }
+  
+  /*!
+    @brief Receive a message into a single variable.
+    @tparam T Expected data type to be received.
+    @param[in] data Variable to received message into.
+    @return integer specifying if the receive was succesful. Values >= 0
+      indicate success.
+  */
+  template<typename T>
+  int recvVar(T& data) {
+    rapidjson::Document d;
+    int ret = recvVar(d);
+    if (ret < 0)
+      return ret;
+    if (!d.Is<T>())
+      ygglog_throw_error("YggRpc::recvVar: Received data is not the correct type");
+    data = d.Get<T>();
+    return ret;
+  }
+  int recvVar(rapidjson::Document& data) {
+    char *buf = NULL;
+    size_t buf_siz = 0;
+    int ret = comm_recv_realloc(_pi, &buf, buf_siz);
+    if (ret < 0)
+      return ret;
+    rapidjson::StringStream s(buf);
+    data.ParseStream(s);
+    if (data.HasParseError())
+      ygglog_throw_error("YggRpc::recvVar: Error parsing JSON");
+    free(buf);
     return ret;
   }
 };
@@ -561,11 +667,11 @@ public:
     indicate success.
   */
   int call(const int nargs, ...) {
+    size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vrpcCall(_cpi, nargs, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 0);
+    int ret = vrpcCall(_cpi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   
@@ -585,11 +691,11 @@ public:
     indicate success.
   */
   int callRealloc(const int nargs, ...) {
+    size_t nargs_copy = (size_t)nargs;
     yggRpc_t _cpi = pi();
-    va_list_t va = init_va_list();
-    va_start(va.va, nargs);
-    int ret = vrpcCallRealloc(_cpi, nargs, va);
-    va_end(va.va);
+    YGG_BEGIN_VAR_ARGS_CPP(ap, nargs, nargs_copy, 1);
+    int ret = vrpcCallRealloc(_cpi, ap);
+    YGG_END_VAR_ARGS(ap);
     return ret;
   }
   

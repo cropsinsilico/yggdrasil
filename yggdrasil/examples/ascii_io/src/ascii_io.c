@@ -26,11 +26,11 @@ int main(int argc,char *argv[]){
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
   printf("ascii_io(C): Receiving/sending ASCII file.\n");
-  size_t line_size = LINE_SIZE_MAX;
+  size_t line_size = BSIZE;
   char *line = (char*)malloc(line_size);
   ret = 0;
   while (ret >= 0) {
-    line_size = LINE_SIZE_MAX; // Reset to size of buffer
+    line_size = BSIZE; // Reset to size of buffer
 
     // Receive a single line
     ret = yggRecvRealloc(FileInput, &line, &line_size);

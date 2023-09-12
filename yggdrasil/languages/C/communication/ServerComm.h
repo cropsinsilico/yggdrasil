@@ -149,7 +149,7 @@ int server_has_comm(requests_t *x, const char* response_address) {
   @returns int -1 if there is an error, 0 otherwise.
  */
 static inline
-int server_add_comm(requests_t *x, char* response_address,
+int server_add_comm(requests_t *x, const char* response_address,
 		    const dtype_t* datatype) {
   if (x == NULL) return -1;
   x->comms = (comm_t**)realloc(x->comms, (x->ncomm + 1) * sizeof(comm_t*));
@@ -164,7 +164,7 @@ int server_add_comm(requests_t *x, char* response_address,
   x->comms[x->ncomm] = new_comm_base(response_address, "send",
 				     _default_comm, dtype_copy);
   x->comms[x->ncomm]->flags = x->comms[x->ncomm]->flags | COMM_ALLOW_MULTIPLE_COMMS;
-  /* sprintf(x->comms[x->ncomm]->name, "server_response.%s",x->comms[x->ncomm]->address); */
+  /* snprintf(x->comms[x->ncomm]->name, COMM_NAME_SIZE, "server_response.%s",x->comms[x->ncomm]->address); */
   int newret = init_default_comm(x->comms[x->ncomm]);
   if (newret < 0) {
     ygglog_error("server_add_comm(%s): Could not initialize response comm.", response_address);
@@ -201,7 +201,8 @@ comm_t* server_get_comm(requests_t *x, size_t idx) {
   @returns int -1 if there is an error, 0 otherwise.
 */
 static inline
-int server_add_request(requests_t *x, const char* request_id, char* response_address,
+int server_add_request(requests_t *x, const char* request_id,
+		       const char* response_address,
 		       const dtype_t* datatype) {
   if (x == NULL) return -1;
   ygglog_debug("server_add_request: adding request %s for address %s",
@@ -210,7 +211,7 @@ int server_add_request(requests_t *x, const char* request_id, char* response_add
   char uuid[10] = "";
   strcpy(response_id, request_id);
   while (server_has_response(x, response_id) >= 0) {
-    sprintf(uuid, "%d", rand());
+    snprintf(uuid, 10, "%d", rand());
     strcat(response_id, uuid);
   }
   ygglog_debug("server_add_request: Response id = %s", response_id);
@@ -306,7 +307,7 @@ int init_server_comm(comm_t *comm) {
   comm_t *handle;
   if (strlen(comm->name) == 0) {
     handle = new_comm_base(comm->address, "recv", _default_comm, dtype_in);
-    sprintf(handle->name, "server_request.%s", comm->address);
+    snprintf(handle->name, COMM_NAME_SIZE, "server_request.%s", comm->address);
   } else {
     handle = init_comm_base(comm->name, "recv", _default_comm, dtype_in);
   }
@@ -373,13 +374,17 @@ comm_head_t server_response_header(const comm_t* x, comm_head_t head) {
   if ((info == NULL) || (info->nreq == 0)) {
     ygglog_error("server_response_header(%s): There are not any registered requests.",
 		 x->name);
-    head.flags = head.flags & ~HEAD_FLAG_VALID;
+    invalidate_header(&head);
     return head;
   }
   // Add request ID to header
-  strcpy(head.request_id, info->request_id[0]);
+  if (!header_SetMetaString(&head, "request_id", info->request_id[0])) {
+    ygglog_error("server_response_header(%s): Error setting request_id");
+    invalidate_header(&head);
+    return head;
+  }
   ygglog_debug("server_response_header(%s): request_id = %s",
-	       x->name, head.request_id);
+	       x->name, info->request_id[0]);
   return head;
 };
 
@@ -432,35 +437,41 @@ int server_comm_recv(comm_t* x, char **data, const size_t len, const int allow_r
   if (ret < 0) {
     return ret;
   }
-  // Return EOF
-  if (is_eof(*data)) {
-    req_comm->const_flags[0] = req_comm->const_flags[0] | COMM_EOF_RECV;
-    return ret;
-  }
   // Initialize new comm from received address
-  comm_head_t head = parse_comm_header(*data, ret);
-  if (!(head.flags & HEAD_FLAG_VALID)) {
+  comm_head_t head = create_recv_header(data, len, ret, allow_realloc, 1);
+  if (!header_is_valid(head)) {
     ygglog_error("server_comm_recv(%s): Error parsing header.", x->name);
     return -1;
   }
   // Return EOF
-  if (is_eof((*data) + head.bodybeg)) {
+  if (head.flags[0] & HEAD_FLAG_EOF) {
+    destroy_header(&head);
     req_comm->const_flags[0] = req_comm->const_flags[0] | COMM_EOF_RECV;
     return ret;
   }
   // On client sign off, do a second recv
-  if (strcmp((*data) + head.bodybeg, YGG_CLIENT_EOF) == 0) {
+  if (head.flags[0] & HEAD_FLAG_CLIENT_EOF) {
+    destroy_header(&head);
     return server_comm_recv(x, data, len, allow_realloc);
   }
   // If there is not a response address
-  if (strlen(head.response_address) == 0) {
+  const char* response_address;
+  if (!header_GetMetaString(head, "response_address", &response_address)) {
     ygglog_error("server_comm_recv(%s): No response address in message.", x->name);
+    destroy_header(&head);
     return -1;
   }
-  strcpy(x->address, head.id);
+  strcpy(x->address, response_address);
   requests_t *info = (requests_t*)(x->info);
-  if (server_add_request(info, head.request_id, head.response_address,
-			 x->datatype) < 0) return -1;
+  const char* request_id;
+  if (!header_GetMetaString(head, "request_id", &request_id)) {
+    ygglog_error("server_comm_recv(%s): No request id in message.", x->name);
+    destroy_header(&head);
+    return -1;
+  }
+  if (server_add_request(info, request_id, response_address,
+			 x->datatype) < 0) ret = -1;
+  destroy_header(&head);
   return ret;
 };
 

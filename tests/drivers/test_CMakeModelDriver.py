@@ -20,14 +20,14 @@ def test_CMakeConfigure(scripts):
     builddir = sourcedir
     # Test get_output_file
     out = CMakeConfigure.get_output_file(src, dont_build=True)
-    assert(out == builddir)
+    assert out == builddir
     out = CMakeConfigure.get_output_file(src, dont_build=True,
                                          builddir='.', working_dir=sourcedir)
-    assert(out == builddir)
+    assert out == builddir
     # Test get_flags
     out_A = CMakeConfigure.get_flags(dont_link=True)
     out_B = CMakeConfigure.get_flags(dont_link=True, outfile='.')
-    assert(out_A == out_B)
+    assert out_A == out_B
 
 
 @pytest.mark.related_language('cmake')
@@ -41,16 +41,16 @@ def test_CMakeBuilder(scripts):
     if platform._is_win:  # pragma: windows
         out += '.exe'
     # Test get_output_file
-    assert(CMakeBuilder.get_output_file(obj) == out)
-    assert(CMakeBuilder.get_output_file(obj, target='clean') == 'clean')
-    assert(CMakeBuilder.get_output_file(builddir, target=target) == out)
+    assert CMakeBuilder.get_output_file(obj) == out
+    assert CMakeBuilder.get_output_file(obj, target='clean') == 'clean'
+    assert CMakeBuilder.get_output_file(builddir, target=target) == out
     with pytest.raises(RuntimeError):
         CMakeBuilder.get_output_file(builddir)
     # Test get_flags
     out_A = CMakeBuilder.get_flags(target=target, working_dir=builddir)
     out_B = CMakeBuilder.get_flags(target=target,
                                    outfile=os.path.join('.', os.path.basename(out)))
-    assert(out_A == out_B)
+    assert out_A == out_B
 
 
 @pytest.mark.language('cmake')
@@ -63,7 +63,7 @@ def test_create_include():
     for fname in [fname_dll, fname_lib]:
         with open(fname, 'w') as fd:
             fd.write('')
-        assert(os.path.isfile(fname))
+        assert os.path.isfile(fname)
     testlist = [(['-DYGG'], [], ['ADD_DEFINITIONS(-DYGG)']),
                 (['-Wall'], [], ['ADD_DEFINITIONS(-Wall)']),
                 (['/nologo'], [], ['ADD_DEFINITIONS(/nologo)']),
@@ -96,7 +96,7 @@ def test_create_include():
                                             **kws)
         for x in lines:
             try:
-                assert(x in out)
+                assert x in out
             except AssertionError:  # pragma: debug
                 print("Could not find '%s':" % x)
                 pprint.pprint(out)
@@ -165,7 +165,7 @@ class TestCMakeModelDriver(base_class):
     def dont_verify_fds(self, verify_count_fds, disable_verify_count_fds):
         r"""Turn off verification, fds linger on windows."""
         yield
-    
+
     @pytest.fixture
     def instance_kwargs(self, testing_options, timeout, sourcedir,
                         polling_interval, namespace, source):
@@ -185,8 +185,8 @@ class TestCMakeModelDriver(base_class):
 
     def test_sbdir(self, instance, sourcedir, builddir):
         r"""Test that source/build directories set correctly."""
-        assert(instance.sourcedir == sourcedir)
-        assert(instance.builddir == builddir)
+        assert instance.sourcedir == sourcedir
+        assert instance.builddir == builddir
 
     def test_write_wrappers(self, instance):
         r"""Test write_wrappers method with verbosity and existing
@@ -218,6 +218,7 @@ class TestCMakeModelDriver_wd(TestCMakeModelDriver):
     
     # Disable instance args?
 
+    # @pytest.mark.skip(reason="determine what lines this is testing")
     def test_call_compiler(self, python_class, instance):
         r"""Test call_compiler without full path."""
         # instance.cleanup()

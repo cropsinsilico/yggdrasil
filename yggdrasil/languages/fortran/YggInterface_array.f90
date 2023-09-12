@@ -36,6 +36,7 @@ subroutine generic_array_get_null(x, index, out)
   type(yggnull) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_item(x, index, "null")
+  out%ptr = c_null_ptr
   ! call c_f_pointer(c_out%ptr, out)
 end subroutine generic_array_get_null
 subroutine generic_array_get_number(x, index, out)
@@ -53,7 +54,6 @@ subroutine generic_array_get_string(x, index, out)
   integer, intent(in) :: index
   character(len=:, kind=c_char), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  integer :: nbytes
   c_out = generic_array_get_item(x, index, "string")
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_string
@@ -81,9 +81,13 @@ subroutine generic_array_get_ply(x, index, out)
   integer, intent(in) :: index
   type(c_ptr) :: c_out
   type(yggply), pointer, intent(out) :: out
+  integer(kind=c_int) :: copy
+  allocate(out)
+  out = init_ply()
+  ! this returns a copy, is there a way to get a reference?
   c_out = generic_array_get_item(x, index, "ply")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  copy = 0
+  call set_ply(out, c_out, copy)
 end subroutine generic_array_get_ply
 subroutine generic_array_get_obj(x, index, out)
   implicit none
@@ -91,29 +95,33 @@ subroutine generic_array_get_obj(x, index, out)
   integer, intent(in) :: index
   type(c_ptr) :: c_out
   type(yggobj), pointer, intent(out) :: out
+  integer(kind=c_int) :: copy
+  allocate(out)
+  out = init_obj()
+  ! this returns a copy, is there a way to get a reference?
   c_out = generic_array_get_item(x, index, "obj")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  copy = 0
+  call set_obj(out, c_out, copy)
 end subroutine generic_array_get_obj
 subroutine generic_array_get_python_class(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(c_ptr) :: c_out
   type(yggpython), pointer, intent(out) :: out
-  c_out = generic_array_get_item(x, index, "class")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  allocate(out)
+  out = yggpython(init_python())
+  ! this returns a copy, is there a way to get a reference?
+  out%obj = generic_array_get_item(x, index, "class")
 end subroutine generic_array_get_python_class
 subroutine generic_array_get_python_function(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(c_ptr) :: c_out
   type(yggpython), pointer, intent(out) :: out
-  c_out = generic_array_get_item(x, index, "function")
-  ! Copy?
-  call c_f_pointer(c_out, out)
+  allocate(out)
+  out = yggpython(init_python())
+  ! this returns a copy, is there a way to get a reference?
+  out%obj = generic_array_get_item(x, index, "function")
 end subroutine generic_array_get_python_function
 subroutine generic_array_get_schema(x, index, out)
   implicit none
@@ -140,7 +148,7 @@ subroutine generic_array_get_integer2(x, index, out)
   integer, intent(in) :: index
   integer(kind=2), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "int", 8 * 2)
+  c_out = generic_array_get_scalar(x, index, "int", 2)
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_integer2
 subroutine generic_array_get_integer4(x, index, out)
@@ -149,7 +157,7 @@ subroutine generic_array_get_integer4(x, index, out)
   integer, intent(in) :: index
   integer(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "int", 8 * 4)
+  c_out = generic_array_get_scalar(x, index, "int", 4)
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_integer4
 subroutine generic_array_get_integer8(x, index, out)
@@ -158,7 +166,7 @@ subroutine generic_array_get_integer8(x, index, out)
   integer, intent(in) :: index
   integer(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "int", 8 * 8)
+  c_out = generic_array_get_scalar(x, index, "int", 8)
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_integer8
 ! Get scalar uint
@@ -169,7 +177,7 @@ subroutine generic_array_get_unsigned1(x, index, out)
   type(ygguint1) :: out
   integer(kind=1), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "uint", 8 * 1)
+  c_out = generic_array_get_scalar(x, index, "uint", 1)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -181,7 +189,7 @@ subroutine generic_array_get_unsigned2(x, index, out)
   type(ygguint2) :: out
   integer(kind=2), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "uint", 8 * 2)
+  c_out = generic_array_get_scalar(x, index, "uint", 2)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -193,7 +201,7 @@ subroutine generic_array_get_unsigned4(x, index, out)
   type(ygguint4) :: out
   integer(kind=4), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "uint", 8 * 4)
+  c_out = generic_array_get_scalar(x, index, "uint", 4)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -205,7 +213,7 @@ subroutine generic_array_get_unsigned8(x, index, out)
   type(ygguint8) :: out
   integer(kind=8), pointer :: temp
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "uint", 8 * 8)
+  c_out = generic_array_get_scalar(x, index, "uint", 8)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
@@ -217,7 +225,7 @@ subroutine generic_array_get_real4(x, index, out)
   integer, intent(in) :: index
   real(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "float", 8 * 4)
+  c_out = generic_array_get_scalar(x, index, "float", 4)
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_real4
 subroutine generic_array_get_real8(x, index, out)
@@ -226,7 +234,7 @@ subroutine generic_array_get_real8(x, index, out)
   integer, intent(in) :: index
   real(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "float", 8 * 8)
+  c_out = generic_array_get_scalar(x, index, "float", 8)
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_real8
 ! Get scalar complex
@@ -236,7 +244,7 @@ subroutine generic_array_get_complex4(x, index, out)
   integer, intent(in) :: index
   complex(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "complex", 8 * 4)
+  c_out = generic_array_get_scalar(x, index, "complex", 4)
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_complex4
 subroutine generic_array_get_complex8(x, index, out)
@@ -245,7 +253,7 @@ subroutine generic_array_get_complex8(x, index, out)
   integer, intent(in) :: index
   complex(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
-  c_out = generic_array_get_scalar(x, index, "complex", 8 * 8)
+  c_out = generic_array_get_scalar(x, index, "complex", 8)
   call c_f_pointer(c_out, out)
 end subroutine generic_array_get_complex8
 ! Get scalar string
@@ -258,7 +266,7 @@ subroutine generic_array_get_bytes(x, index, out)
   type(c_ptr) :: c_out
   integer :: length, i
   c_out = generic_array_get_scalar(x, index, "bytes", 0)
-  length = generic_array_get_item_nbytes(x, index)
+  length = generic_array_get_item_nbytes(x, index, "bytes")
   call c_f_pointer(c_out, temp, [length])
   allocate(character(len=length) :: out)
   do i = 1, length
@@ -275,7 +283,7 @@ subroutine generic_array_get_unicode(x, index, out)
   type(c_ptr) :: c_out
   integer :: length, i
   c_out = generic_array_get_scalar(x, index, "unicode", 0)
-  length = generic_array_get_item_nbytes(x, index)/4
+  length = generic_array_get_item_nbytes(x, index, "unicode")/4
   call c_f_pointer(c_out, temp, [length])
   allocate(character(kind=ucs4, len=length) :: out)
   do i = 1, length
@@ -296,7 +304,7 @@ subroutine generic_array_get_1darray_integer2(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "int", 8 * 2, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "int", 2, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_integer2
@@ -311,7 +319,7 @@ subroutine generic_array_get_1darray_integer4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "int", 8 * 4, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "int", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_integer4
@@ -326,7 +334,7 @@ subroutine generic_array_get_1darray_integer8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "int", 8 * 8, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "int", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_integer8
@@ -342,7 +350,7 @@ subroutine generic_array_get_1darray_unsigned1(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "uint", 8 * 1, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "uint", 1, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_unsigned1
@@ -357,7 +365,7 @@ subroutine generic_array_get_1darray_unsigned2(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "uint", 8 * 2, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "uint", 2, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_unsigned2
@@ -372,7 +380,7 @@ subroutine generic_array_get_1darray_unsigned4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "uint", 8 * 4, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "uint", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_unsigned4
@@ -387,7 +395,7 @@ subroutine generic_array_get_1darray_unsigned8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "uint", 8 * 8, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "uint", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_unsigned8
@@ -403,7 +411,7 @@ subroutine generic_array_get_1darray_real4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "float", 8 * 4, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "float", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_real4
@@ -418,7 +426,7 @@ subroutine generic_array_get_1darray_real8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "float", 8 * 8, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "float", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_real8
@@ -434,7 +442,7 @@ subroutine generic_array_get_1darray_complex4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "complex", 8 * 4, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "complex", 4, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_complex4
@@ -449,7 +457,7 @@ subroutine generic_array_get_1darray_complex8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  c_length = generic_array_get_1darray(x, index, "complex", 8 * 8, c_out_ptr)
+  c_length = generic_array_get_1darray(x, index, "complex", 8, c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out, [c_length])
 end subroutine generic_array_get_1darray_complex8
@@ -468,7 +476,7 @@ subroutine generic_array_get_1darray_bytes(x, index, out)
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
   c_length = generic_array_get_1darray(x, index, "bytes", 0, c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "bytes")
   precision = nbytes/int(c_length, kind=4)
   call c_f_pointer(c_out_ptr, temp_ptr)
   call c_f_pointer(temp_ptr, temp, [nbytes])
@@ -494,7 +502,7 @@ subroutine generic_array_get_1darray_unicode(x, index, out)
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
   c_length = generic_array_get_1darray(x, index, "unicode", 0, c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "unicode")
   precision = nbytes/(int(c_length, kind=4)*4)
   call c_f_pointer(c_out_ptr, temp_ptr)
   call c_f_pointer(temp_ptr, temp, [nbytes/4])
@@ -518,7 +526,7 @@ subroutine generic_array_get_ndarray_integer2(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "int", 8 * 2, &
+  out%shape => generic_array_get_ndarray(x, index, "int", 2, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -533,7 +541,7 @@ subroutine generic_array_get_ndarray_integer4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "int", 8 * 4, &
+  out%shape => generic_array_get_ndarray(x, index, "int", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -548,7 +556,7 @@ subroutine generic_array_get_ndarray_integer8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "int", 8 * 8, &
+  out%shape => generic_array_get_ndarray(x, index, "int", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -564,7 +572,7 @@ subroutine generic_array_get_ndarray_unsigned1(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 1, &
+  out%shape => generic_array_get_ndarray(x, index, "uint", 1, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -579,7 +587,7 @@ subroutine generic_array_get_ndarray_unsigned2(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 2, &
+  out%shape => generic_array_get_ndarray(x, index, "uint", 2, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -594,7 +602,7 @@ subroutine generic_array_get_ndarray_unsigned4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 4, &
+  out%shape => generic_array_get_ndarray(x, index, "uint", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -609,7 +617,7 @@ subroutine generic_array_get_ndarray_unsigned8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 8, &
+  out%shape => generic_array_get_ndarray(x, index, "uint", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -625,7 +633,7 @@ subroutine generic_array_get_ndarray_real4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "float", 8 * 4, &
+  out%shape => generic_array_get_ndarray(x, index, "float", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -640,7 +648,7 @@ subroutine generic_array_get_ndarray_real8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "float", 8 * 8, &
+  out%shape => generic_array_get_ndarray(x, index, "float", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -656,7 +664,7 @@ subroutine generic_array_get_ndarray_complex4(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "complex", 8 * 4, &
+  out%shape => generic_array_get_ndarray(x, index, "complex", 4, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -671,7 +679,7 @@ subroutine generic_array_get_ndarray_complex8(x, index, out)
   type(c_ptr) :: c_out_ptr
   c_out = c_null_ptr
   c_out_ptr = c_loc(c_out)
-  out%shape => generic_array_get_ndarray(x, index, "complex", 8 * 8, &
+  out%shape => generic_array_get_ndarray(x, index, "complex", 8, &
        c_out_ptr)
   call c_f_pointer(c_out_ptr, temp)
   call c_f_pointer(temp, out%x, out%shape)
@@ -692,7 +700,7 @@ subroutine generic_array_get_ndarray_character(x, index, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_array_get_ndarray(x, index, "bytes", 0, &
        c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "bytes")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
@@ -724,7 +732,7 @@ subroutine generic_array_get_ndarray_bytes(x, index, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_array_get_ndarray(x, index, "bytes", 0, &
        c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "bytes")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
@@ -755,7 +763,7 @@ subroutine generic_array_get_ndarray_unicode(x, index, out)
   c_out_ptr = c_loc(c_out)
   out%shape => generic_array_get_ndarray(x, index, "unicode", 0, &
        c_out_ptr)
-  nbytes = generic_array_get_item_nbytes(x, index)
+  nbytes = generic_array_get_item_nbytes(x, index, "unicode")
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
@@ -808,7 +816,7 @@ subroutine generic_array_set_null(x, index, val)
   integer, intent(in) :: index
   type(yggnull), intent(in) :: val
   type(c_ptr) :: c_val
-  c_val = c_null_ptr
+  c_val = val%ptr
   call generic_array_set_item(x, index, "null", c_val)
 end subroutine generic_array_set_null
 subroutine generic_array_set_number(x, index, val)
@@ -908,7 +916,7 @@ subroutine generic_array_set_integer2(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_array_set_scalar(x, index, c_val, "int", 2 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "int", 2, units)
 end subroutine generic_array_set_integer2
 subroutine generic_array_set_integer4(x, index, val, units_in)
   implicit none
@@ -925,7 +933,7 @@ subroutine generic_array_set_integer4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_array_set_scalar(x, index, c_val, "int", 4 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "int", 4, units)
 end subroutine generic_array_set_integer4
 subroutine generic_array_set_integer8(x, index, val, units_in)
   implicit none
@@ -942,7 +950,7 @@ subroutine generic_array_set_integer8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_array_set_scalar(x, index, c_val, "int", 8 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "int", 8, units)
 end subroutine generic_array_set_integer8
 ! Set scalar uint
 subroutine generic_array_set_unsigned1(x, index, val, units_in)
@@ -960,7 +968,7 @@ subroutine generic_array_set_unsigned1(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_array_set_scalar(x, index, c_val, "uint", 1 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "uint", 1, units)
 end subroutine generic_array_set_unsigned1
 subroutine generic_array_set_unsigned2(x, index, val, units_in)
   implicit none
@@ -977,7 +985,7 @@ subroutine generic_array_set_unsigned2(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_array_set_scalar(x, index, c_val, "uint", 2 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "uint", 2, units)
 end subroutine generic_array_set_unsigned2
 subroutine generic_array_set_unsigned4(x, index, val, units_in)
   implicit none
@@ -994,7 +1002,7 @@ subroutine generic_array_set_unsigned4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_array_set_scalar(x, index, c_val, "uint", 4 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "uint", 4, units)
 end subroutine generic_array_set_unsigned4
 subroutine generic_array_set_unsigned8(x, index, val, units_in)
   implicit none
@@ -1011,7 +1019,7 @@ subroutine generic_array_set_unsigned8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x)
-  call generic_array_set_scalar(x, index, c_val, "uint", 8 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "uint", 8, units)
 end subroutine generic_array_set_unsigned8
 ! Set scalar real
 subroutine generic_array_set_real4(x, index, val, units_in)
@@ -1029,7 +1037,7 @@ subroutine generic_array_set_real4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_array_set_scalar(x, index, c_val, "float", 4 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "float", 4, units)
 end subroutine generic_array_set_real4
 subroutine generic_array_set_real8(x, index, val, units_in)
   implicit none
@@ -1046,7 +1054,7 @@ subroutine generic_array_set_real8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_array_set_scalar(x, index, c_val, "float", 8 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "float", 8, units)
 end subroutine generic_array_set_real8
 ! Set scalar complex
 subroutine generic_array_set_complex4(x, index, val, units_in)
@@ -1064,7 +1072,7 @@ subroutine generic_array_set_complex4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_array_set_scalar(x, index, c_val, "complex", 4 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "complex", 4, units)
 end subroutine generic_array_set_complex4
 subroutine generic_array_set_complex8(x, index, val, units_in)
   implicit none
@@ -1081,7 +1089,7 @@ subroutine generic_array_set_complex8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val)
-  call generic_array_set_scalar(x, index, c_val, "complex", 8 * 8, units)
+  call generic_array_set_scalar(x, index, c_val, "complex", 8, units)
 end subroutine generic_array_set_complex8
 ! Set scalar string
 subroutine generic_array_set_bytes(x, index, val, units_in)
@@ -1137,7 +1145,7 @@ subroutine generic_array_set_1darray_integer2(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "int", 2 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "int", 2, &
        size(val), units)
 end subroutine generic_array_set_1darray_integer2
 subroutine generic_array_set_1darray_integer4(x, index, val, units_in)
@@ -1155,7 +1163,7 @@ subroutine generic_array_set_1darray_integer4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "int", 4 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "int", 4, &
        size(val), units)
 end subroutine generic_array_set_1darray_integer4
 subroutine generic_array_set_1darray_integer8(x, index, val, units_in)
@@ -1173,7 +1181,7 @@ subroutine generic_array_set_1darray_integer8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "int", 8 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "int", 8, &
        size(val), units)
 end subroutine generic_array_set_1darray_integer8
 ! Set 1darray uint
@@ -1192,7 +1200,7 @@ subroutine generic_array_set_1darray_unsigned1(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "uint", 1 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "uint", 1, &
        size(val), units)
 end subroutine generic_array_set_1darray_unsigned1
 subroutine generic_array_set_1darray_unsigned2(x, index, val, units_in)
@@ -1210,7 +1218,7 @@ subroutine generic_array_set_1darray_unsigned2(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "uint", 2 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "uint", 2, &
        size(val), units)
 end subroutine generic_array_set_1darray_unsigned2
 subroutine generic_array_set_1darray_unsigned4(x, index, val, units_in)
@@ -1228,7 +1236,7 @@ subroutine generic_array_set_1darray_unsigned4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "uint", 4 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "uint", 4, &
        size(val), units)
 end subroutine generic_array_set_1darray_unsigned4
 subroutine generic_array_set_1darray_unsigned8(x, index, val, units_in)
@@ -1246,7 +1254,7 @@ subroutine generic_array_set_1darray_unsigned8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "uint", 8 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "uint", 8, &
        size(val), units)
 end subroutine generic_array_set_1darray_unsigned8
 ! Set 1darray real
@@ -1265,7 +1273,7 @@ subroutine generic_array_set_1darray_real4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "float", 4 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "float", 4, &
        size(val), units)
 end subroutine generic_array_set_1darray_real4
 subroutine generic_array_set_1darray_real8(x, index, val, units_in)
@@ -1283,7 +1291,7 @@ subroutine generic_array_set_1darray_real8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "float", 8 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "float", 8, &
        size(val), units)
 end subroutine generic_array_set_1darray_real8
 ! Set 1darray complex
@@ -1302,7 +1310,7 @@ subroutine generic_array_set_1darray_complex4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "complex", 4 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "complex", 4, &
        size(val), units)
 end subroutine generic_array_set_1darray_complex4
 subroutine generic_array_set_1darray_complex8(x, index, val, units_in)
@@ -1320,7 +1328,7 @@ subroutine generic_array_set_1darray_complex8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val(1))
-  call generic_array_set_1darray(x, index, c_val, "complex", 8 * 8, &
+  call generic_array_set_1darray(x, index, c_val, "complex", 8, &
        size(val), units)
 end subroutine generic_array_set_1darray_complex8
 ! Set 1darray string
@@ -1379,7 +1387,7 @@ subroutine generic_array_set_ndarray_integer2(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "int", 2 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "int", 2, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_integer2
 subroutine generic_array_set_ndarray_integer4(x, index, val, units_in)
@@ -1397,7 +1405,7 @@ subroutine generic_array_set_ndarray_integer4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "int", 4 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "int", 4, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_integer4
 subroutine generic_array_set_ndarray_integer8(x, index, val, units_in)
@@ -1415,7 +1423,7 @@ subroutine generic_array_set_ndarray_integer8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "int", 8 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "int", 8, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_integer8
 ! Get ndarray uint
@@ -1434,7 +1442,7 @@ subroutine generic_array_set_ndarray_unsigned1(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "uint", 1 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "uint", 1, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_unsigned1
 subroutine generic_array_set_ndarray_unsigned2(x, index, val, units_in)
@@ -1452,7 +1460,7 @@ subroutine generic_array_set_ndarray_unsigned2(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "uint", 2 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "uint", 2, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_unsigned2
 subroutine generic_array_set_ndarray_unsigned4(x, index, val, units_in)
@@ -1470,7 +1478,7 @@ subroutine generic_array_set_ndarray_unsigned4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "uint", 4 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "uint", 4, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_unsigned4
 subroutine generic_array_set_ndarray_unsigned8(x, index, val, units_in)
@@ -1488,7 +1496,7 @@ subroutine generic_array_set_ndarray_unsigned8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "uint", 8 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "uint", 8, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_unsigned8
 ! Set ndarray real
@@ -1507,7 +1515,7 @@ subroutine generic_array_set_ndarray_real4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "float", 4 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "float", 4, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_real4
 subroutine generic_array_set_ndarray_real8(x, index, val, units_in)
@@ -1525,7 +1533,7 @@ subroutine generic_array_set_ndarray_real8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "float", 8 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "float", 8, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_real8
 ! Set ndarray complex
@@ -1544,7 +1552,7 @@ subroutine generic_array_set_ndarray_complex4(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "complex", 4 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "complex", 4, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_complex4
 subroutine generic_array_set_ndarray_complex8(x, index, val, units_in)
@@ -1562,7 +1570,7 @@ subroutine generic_array_set_ndarray_complex8(x, index, val, units_in)
      units = ""
   end if
   c_val = c_loc(val%x(1))
-  call generic_array_set_ndarray(x, index, c_val, "complex", 8 * 8, &
+  call generic_array_set_ndarray(x, index, c_val, "complex", 8, &
        val%shape, units)
 end subroutine generic_array_set_ndarray_complex8
 ! Set ndarray string

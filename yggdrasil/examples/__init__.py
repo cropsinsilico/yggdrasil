@@ -31,8 +31,8 @@ def register_example(example_dir):
     # Check that the source directory and test exist
     example_base = os.path.basename(example_dir)
     srcdir = os.path.join(example_dir, 'src')
-    if not os.path.isdir(srcdir):
-        srcdir = None
+    if not os.path.isdir(srcdir):  # pragma: no cover
+        return {}
     # Determine which languages are present in the example
     lang_base = []
     lang_avail = []
@@ -40,6 +40,8 @@ def register_example(example_dir):
     if example_base in ['rpcFib', 'maxMsg']:
         lang_search = example_base + 'Cli_%s.yml'
         lang_avail += ['all', 'all_nomatlab']
+    elif example_base == 'rpc_lesson3b':
+        lang_search = 'server_%s.yml'
     elif example_base.startswith('rpc_'):
         lang_search = 'client_%s.yml'
     elif example_base == 'root_to_shoot':
@@ -54,6 +56,8 @@ def register_example(example_dir):
         lang_avail = ['sbml']
     elif example_base.startswith('ode'):
         lang_avail = ['ode']
+    elif example_base.startswith('pytorch'):
+        lang_avail = ['pytorch']
     elif example_base.startswith('osr'):
         lang_search = example_base + '_%s.yml'
         lang_base += ['osr']
@@ -98,6 +102,11 @@ def register_example(example_dir):
                          '%sSrv_%s.yml' % (example_base, lang_set[1])]
             src_names = ['%sCli%s' % (example_base, ext_map[lang_set[0]]),
                          '%sSrv%s' % (example_base, ext_map[lang_set[1]])]
+        elif example_base == 'rpc_lesson3b':
+            yml_names = ['server_%s.yml' % lang,
+                         'client_%s.yml' % 'c']
+            src_names = ['server%s' % ext_map[lang],
+                         'client%s' % ext_map['c']]
         elif example_base.startswith('rpc_'):
             yml_names = ['server_%s.yml' % lang,
                          'client_%s.yml' % lang]
@@ -142,6 +151,9 @@ def register_example(example_dir):
         elif example_base.startswith(('sbml', 'ode')):
             yml_names = ['%s.yml' % example_base]
             src_names = ['%s.xml' % example_base]
+        elif example_base.startswith('pytorch'):
+            yml_names = ['%s.yml' % example_base]
+            src_names = ['model.py']
         else:
             src_is_abs = True
             yml_names = ['%s_%s.yml' % (example_base, lang)]
@@ -177,6 +189,46 @@ def register_example(example_dir):
             if len(out_src[lang]) == 1:
                 out_src[lang] = out_src[lang][0]
     return lang_base, lang_avail, out_yml, out_src
+
+
+def find_missing(languages=None, ignore_examples=None):
+    r"""Determine which languages are missing for the specified languages.
+
+    Args:
+        languages (str, dict, optional): One or more languages to check.
+            If not provided, all supported languages will be checked.
+        ignore_examples (list, optional): Examples to ignore. By default
+            those specific to a language or for demos will be ignored.
+
+    Returns:
+        dict: Mapping between the provided languages and a list of the
+            missing examples.
+    
+    """
+    remove_existing = (languages is None)
+    if languages is None:
+        languages = [
+            k for k in constants.LANGUAGES['all']
+            if constants.LANGUAGE_PROPERTIES.get(k, {}).get('full_language', False)]
+    if ignore_examples is None:
+        ignore_examples = ['sbml1', 'sbml2', 'sbml3', 'proposal',
+                           'root_to_shoot', 'fakeplant', 'viz',
+                           'pytorch1']
+    if not isinstance(languages, list):
+        languages = [languages]
+    examples = discover_examples()[1]
+    out = {}
+    for lang in languages:
+        out[lang] = []
+        lang_aliases = [lang] + constants.ALIASED_LANGUAGES.get(lang, [])
+        for k, v in examples.items():
+            if k in ignore_examples:
+                continue
+            if not any(x in v for x in lang_aliases):
+                out[lang].append(k)
+        if remove_existing and not out[lang]:
+            del out[lang]
+    return out
 
 
 def discover_examples(parent_dir=None):

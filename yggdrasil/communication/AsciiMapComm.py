@@ -15,3 +15,4 @@ class AsciiMapComm(FileComm.FileComm):
                                    'with one key/value pair per line and '
                                    'separated by some delimiter.')
     _default_serializer = 'map'
+    _deprecated_drivers = ['AsciiMapInputDriver', 'AsciiMapOutputDriver']

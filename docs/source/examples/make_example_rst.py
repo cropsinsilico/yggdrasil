@@ -12,6 +12,7 @@ lang2print = {'python': 'Python',
               'r': 'R',
               'R': 'R',
               'c': 'C',
+              'julia': 'Julia',
               'cpp': 'C++',
               'all': 'Mixed',
               'all_nomatlab': 'Mixed w/o Matlab',
@@ -20,8 +21,10 @@ lang2print = {'python': 'Python',
               'osr': 'OpenSimRoot',
               'ode': 'ODE',
               'dummy': 'Dummy',
-              'timesync': 'Timesync'}
-_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab', 'sbml', 'ode']
+              'timesync': 'Timesync',
+              'pytorch': 'PyTorch'}
+_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab',
+                 'sbml', 'ode', 'pytorch']
 
 
 def get_file(fname, local=False):
@@ -95,7 +98,7 @@ def get_default_lang(k):
 
 def write_src_ref(fd, k):
     default = get_default_lang(k)
-    assert(default)
+    assert default
     write_src(fd, k, default, upone=True)
     fd.write('\n')
     write_ref_link(fd, k)
@@ -103,7 +106,7 @@ def write_src_ref(fd, k):
     
 def write_yml_ref(fd, k):
     default = get_default_lang(k)
-    assert(default)
+    assert default
     write_yml(fd, k, default, upone=True)
     fd.write('\n')
     write_ref_link(fd, k)

@@ -22,7 +22,7 @@ def is_path(fpath):
 
     """
     pdir, base = os.path.split(fpath)
-    return(base in os.listdir(pdir))
+    return (base in os.listdir(pdir))
 
 
 def is_file(fname):
@@ -104,6 +104,9 @@ def import_language_install(language, no_import=False):
             sys.path.insert(0, os.path.join(lang_dir, language))
             import install
             yield install
+        except BaseException:  # pragma: debug
+            install = None
+            raise
         finally:
             sys.path.pop(0)
             if install is not None:
@@ -160,6 +163,8 @@ def update_argparser(parser=None, language=None, no_import=None,
             language = get_language_directories()
     else:
         args = parser.parse_known_args(args=arglist)[0]
+        args.language = getattr(
+            args, 'languages', getattr(args, 'language', None))
         if no_import is None:
             no_import = args.no_import
         if language is None:

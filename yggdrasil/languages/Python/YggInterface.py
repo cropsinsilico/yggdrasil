@@ -282,7 +282,7 @@ def YggAsciiTableInput(name, as_array=False, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['serializer_kwargs'] = dict(as_array=as_array)
+    kwargs['serializer'] = dict(as_array=as_array)
     return YggInput(name, **kwargs)
 
 
@@ -302,9 +302,9 @@ def YggAsciiTableOutput(name, fmt=None, as_array=False, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['serializer_kwargs'] = dict(as_array=as_array)
+    kwargs['serializer'] = dict(as_array=as_array)
     if fmt is not None:
-        kwargs['serializer_kwargs']['format_str'] = fmt
+        kwargs['serializer']['format_str'] = fmt
     return YggOutput(name, **kwargs)
     
 
@@ -451,7 +451,7 @@ def YggPlyInput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['serializer_kwargs'] = {'type': 'ply'}
+    kwargs['serializer'] = {'type': 'ply'}
     return YggInput(name, **kwargs)
 
 
@@ -466,7 +466,7 @@ def YggPlyOutput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['serializer_kwargs'] = {'type': 'ply'}
+    kwargs['serializer'] = {'type': 'ply'}
     return YggOutput(name, **kwargs)
 
 
@@ -483,7 +483,7 @@ def YggObjInput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['serializer_kwargs'] = {'type': 'obj'}
+    kwargs['serializer'] = {'type': 'obj'}
     return YggInput(name, **kwargs)
 
 
@@ -498,5 +498,5 @@ def YggObjOutput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['serializer_kwargs'] = {'type': 'obj'}
+    kwargs['serializer'] = {'type': 'obj'}
     return YggOutput(name, **kwargs)

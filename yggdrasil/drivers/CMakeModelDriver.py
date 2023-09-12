@@ -343,7 +343,7 @@ class CMakeConfigure(BuildToolBase):
             str: Output to stdout from the command execution.
 
         """
-        assert(len(args) == 1)
+        assert len(args) == 1
         new_args = []
         if (args == cls.version_flags) or ('--help' in args):
             new_args = args
@@ -372,7 +372,7 @@ class CMakeConfigure(BuildToolBase):
         return x
         
     @classmethod
-    def create_include(cls, fname, target,
+    def create_include(cls, fname, target, driver=None,
                        compiler=None, compiler_flags=None,
                        linker=None, linker_flags=None,
                        library_flags=None, internal_library_flags=None,
@@ -383,28 +383,31 @@ class CMakeConfigure(BuildToolBase):
         Args:
             fname (str): File where the include file should be saved.
             target (str): Target that links should be added to.
-            compiler (CompilerBase): Compiler that should be used to generate the
-                list of compilation flags.
+            driver (CompiledModelDriver): Driver for the language being
+                compiled.
+            compiler (CompilerBase): Compiler that should be used to
+                generate the list of compilation flags.
             compile_flags (list, optional): Additional compile flags that
                 should be set. Defaults to [].
-            linker (LinkerBase): Linker that should be used to generate the
-                list of compilation flags.
+            linker (LinkerBase): Linker that should be used to generate
+                the list of compilation flags.
             linker_flags (list, optional): Additional linker flags that
                 should be set. Defaults to [].
             library_flags (list, optional): List of library flags to add.
                 Defaults to [].
             internal_library_flags (list, optional): List of library flags
                 associated with yggdrasil libraries. Defaults to [].
-            configuration (str, optional): Build type/configuration that should
-                be built. Defaults to 'Release'. Only used on Windows to
-                determin the standard library.
-            verbose (bool, optional): If True, the contents of the created file
-                are displayed. Defaults to False.
+            configuration (str, optional): Build type/configuration that
+                should be built. Defaults to 'Release'. Only used on
+                Windows to determine the standard library.
+            verbose (bool, optional): If True, the contents of the created
+                file are displayed. Defaults to False.
             **kwargs: Additional keyword arguments are ignored.
 
         Returns:
-            list: Lines that should be added before the executable is defined
-                in the CMakeLists.txt (e.g. LINK_DIRECTORIES commands).
+            list: Lines that should be added before the executable is
+                defined in the CMakeLists.txt (e.g. LINK_DIRECTORIES
+                commands).
 
         Raises:
             ValueError: If a linker or compiler flag cannot be interpreted.
@@ -420,8 +423,8 @@ class CMakeConfigure(BuildToolBase):
             library_flags = []
         if internal_library_flags is None:
             internal_library_flags = []
-        assert(compiler is not None)
-        assert(linker is not None)
+        assert compiler is not None
+        assert linker is not None
         lines = []
         pretarget_lines = []
         preamble_lines = []
@@ -454,10 +457,10 @@ class CMakeConfigure(BuildToolBase):
         # Compilation flags
         for x in compiler_flags:
             if x.startswith('-D'):
-                preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
+                preamble_lines.append(f'ADD_DEFINITIONS({x})')
             elif x.startswith('-I'):
                 xdir = cls.fix_path(x.split('-I', 1)[-1], is_gnu=is_gnu)
-                new_dir = 'INCLUDE_DIRECTORIES(%s)' % xdir
+                new_dir = f'INCLUDE_DIRECTORIES({xdir})'
                 if new_dir not in preamble_lines:
                     preamble_lines.append(new_dir)
             elif x.startswith('-std=c++') or x.startswith('/std=c++'):
@@ -465,36 +468,39 @@ class CMakeConfigure(BuildToolBase):
                 if new_def not in preamble_lines:
                     preamble_lines.append(new_def)
             elif x.startswith('-') or x.startswith('/'):
-                new_def = 'ADD_DEFINITIONS(%s)' % x
+                new_def = f'ADD_DEFINITIONS({x})'
                 if new_def not in preamble_lines:
                     preamble_lines.append(new_def)
             else:
-                raise ValueError("Could not parse compiler flag '%s'." % x)
+                raise ValueError(f"Could not parse compiler flag '{x}'.")
         # Linker flags
         for x in linker_flags:
             if x.startswith('-l'):
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+                lines.append(f'TARGET_LINK_LIBRARIES({target} {x})')
             elif x.startswith('-L'):
                 libdir = cls.fix_path(x.split('-L')[-1], is_gnu=is_gnu)
-                pretarget_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                pretarget_lines.append(f'LINK_DIRECTORIES({libdir})')
             elif x.startswith('/LIBPATH:'):  # pragma: windows
                 libdir = x.split('/LIBPATH:')[-1]
                 if '"' in libdir:
                     libdir = libdir.split('"')[1]
                 libdir = cls.fix_path(libdir, is_gnu=is_gnu)
-                pretarget_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                pretarget_lines.append(f'LINK_DIRECTORIES({libdir})')
             elif os.path.isfile(x):
                 library_flags.append(x)
             elif x.startswith('-mlinker-version='):  # pragma: version
                 # Currently this only called when clang is >=10
                 # and ld is <520 or mlinker is set in the env
                 # flags via CFLAGS, CXXFLAGS, etc.
-                preamble_lines.insert(0, 'target_link_options(%s PRIVATE %s)'
-                                      % (target, x))
+                preamble_lines.insert(
+                    0, f'target_link_options({target} PRIVATE {x})')
+            elif x.startswith(('-fsanitize=', '-shared-libasan')):
+                preamble_lines.insert(
+                    0, f'target_link_options({target} PRIVATE {x})')
             elif x.startswith('-') or x.startswith('/'):
-                raise ValueError("Could not parse linker flag '%s'." % x)
+                raise ValueError(f"Could not parse linker flag '{x}'.")
             else:
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+                lines.append(f'TARGET_LINK_LIBRARIES({target} {x})')
         # Libraries
         for x in library_flags:
             xorig = x
@@ -504,30 +510,33 @@ class CMakeConfigure(BuildToolBase):
             x = cls.fix_path(x, is_gnu=is_gnu)
             xd = cls.fix_path(xd, is_gnu=is_gnu)
             xn = os.path.splitext(xl)[0]
-            new_dir = 'LINK_DIRECTORIES(%s)' % xd
+            new_dir = f'LINK_DIRECTORIES({xd})'
             if new_dir not in preamble_lines:
                 pretarget_lines.append(new_dir)
             if cls.add_libraries or (xorig in internal_library_flags):
                 # Version adding library
-                lines.append('if (NOT TARGET %s)' % xl)
-                if xe.lower() in ['.so', '.dll', '.dylib']:
-                    lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
+                lines.append(f'if (NOT TARGET {xl})')
+                if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
+                    # Not covered atm due to internal libraries being
+                    # compiled as static libraries, but this may change
+                    lines.append(f'    ADD_LIBRARY({xl} SHARED IMPORTED)')
                 else:
-                    lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
+                    lines.append(f'    ADD_LIBRARY({xl} STATIC IMPORTED)')
                 lines += ['    SET_TARGET_PROPERTIES(',
-                          '        %s PROPERTIES' % xl]
+                          f'        {xl} PROPERTIES']
                 # Untested on appveyor, but required when using dynamic
                 # library directly (if dll2a not used).
                 # if xe.lower() == '.dll':
                 #     lines.append('        IMPORTED_IMPLIB %s'
                 #                  % x.replace('.dll', '.lib'))
-                lines += ['        IMPORTED_LOCATION %s)' % x,
+                lines += [f'        IMPORTED_LOCATION {x})',
                           'endif()',
-                          'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
-            else:
+                          f'TARGET_LINK_LIBRARIES({target} {xl})']
+            elif not (driver and driver.is_standard_library(xn)):
                 # Version finding library
-                lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
-                             % (xn.upper(), xf, xn, xd))
+                lines.append(
+                    f'FIND_LIBRARY({xn.upper()}_LIBRARY NAMES {xf} {xn}'
+                    f' HINTS {xd})')
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
@@ -689,7 +698,7 @@ class CMakeBuilder(LinkerBase):
             str: Output to stdout from the command execution.
 
         """
-        assert(len(args) == 1)
+        assert len(args) == 1
         if not kwargs.get('skip_flags', False):
             builddir = kwargs.get('builddir', args[0])
             if not os.path.isabs(builddir) and os.path.isabs(args[0]):
@@ -802,6 +811,7 @@ class CMakeModelDriver(BuildModelDriver):
             return out
         kws = dict(compiler=self.target_language_info['compiler'],
                    linker=self.target_language_info['linker'],
+                   driver=self.target_language_info['driver'],
                    configuration=self.configuration,
                    verbose=kwargs.get('verbose', False))
         if not self.use_env_vars:
@@ -813,7 +823,7 @@ class CMakeModelDriver(BuildModelDriver):
                     self.target_language_info['internal_library_flags']))
         newlines_before = self.get_tool_instance('compiler').create_include(
             include_file, self.target, **kws)
-        assert(os.path.isfile(include_file))
+        assert os.path.isfile(include_file)
         # Create copy of cmakelists and modify
         newlines_after = []
         if os.path.isfile(self.buildfile):
@@ -960,12 +970,6 @@ class CMakeModelDriver(BuildModelDriver):
                 linker_flag_kwargs['use_library_path_internal'], [])
             internal_library_flags = linker_flag_kwargs[
                 linker_flag_kwargs['use_library_path_internal']]
-        # Add python flags
-        python_flags = sysconfig.get_config_var('LIBS')
-        if python_flags:
-            for x in python_flags.split():
-                if x.startswith(('-L', '-l')) and (x not in target_linker_flags):
-                    target_linker_flags.append(x)
         # Link local lib on MacOS because on Mac >=10.14 setting sysroot
         # clobbers the default paths.
         # https://stackoverflow.com/questions/54068035/linking-not-working-in
@@ -985,6 +989,14 @@ class CMakeModelDriver(BuildModelDriver):
                                + internal_library_flags),
                 external_library_flags=external_library_flags,
                 internal_library_flags=internal_library_flags)
+        # Add python flags
+        if out['compiler'].env_matches_tool(use_sysconfig=True):
+            python_flags = sysconfig.get_config_var('LIBS')
+            if python_flags:
+                for x in python_flags.split():
+                    if ((x.startswith(('-L', '-l'))
+                         and (x not in target_linker_flags))):
+                        target_linker_flags.append(x)
         for k in constants.LANGUAGES['compiled']:
             if k == out['driver'].language:
                 continue
@@ -992,7 +1004,7 @@ class CMakeModelDriver(BuildModelDriver):
                 itool = get_compatible_tool(out['compiler'], 'compiler', k)
             except ValueError:
                 continue
-            if not itool.is_installed():
+            if not itool.is_installed():  # pragma: debug
                 continue
             if itool.default_executable_env:
                 out['env'][itool.default_executable_env] = (

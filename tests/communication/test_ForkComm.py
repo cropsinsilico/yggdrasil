@@ -94,13 +94,19 @@ class TestForkComm(base_class):
              and (recv_pattern == 'cycle'))):
             return ncomm
         return 1
-    
-    def test_send_recv_eof_no_close(self, send_comm, recv_comm, do_send_recv):
+
+    def test_send_recv_eof_no_close(self, ncomm, send_pattern, recv_pattern,
+                                    send_comm, recv_comm, do_send_recv):
         r"""Test send/recv of EOF message with no close."""
         recv_comm.close_on_eof_recv = False
         for x in recv_comm.comm_list:
             x.close_on_eof_recv = False
+        recv_params = {}
+        if (((send_pattern in ['broadcast', 'scatter'])
+             and (recv_pattern == 'cycle'))):
+            recv_params['kwargs'] = {'timeout': 10}
         do_send_recv(send_comm, recv_comm,
+                     recv_params=recv_params,
                      send_params={'method': 'send_eof'})
 
     def test_send_recv_filter_eof(self, run_once, filtered_comms, send_comm,
@@ -110,7 +116,7 @@ class TestForkComm(base_class):
                      send_params={'method': 'send_eof'},
                      recv_params={'flag': False,
                                   'kwargs': {'timeout': 2 * timeout}})
-        assert(recv_comm.is_closed)
+        assert recv_comm.is_closed
         
     def test_send_recv_filter_recv_filter(self, filtered_comms,
                                           msg_filter_recv, send_comm,
@@ -137,12 +143,12 @@ class TestForkComm(base_class):
             recv_comm.bind()
         send_comm.close()
         recv_comm.close()
-        assert(send_comm.is_closed)
-        assert(recv_comm.is_closed)
+        assert send_comm.is_closed
+        assert recv_comm.is_closed
         flag = send_comm.send([testing_options['msg'] for _ in range(ncomm)])
-        assert(not flag)
+        assert not flag
         flag, msg_recv = recv_comm.recv()
-        assert(not flag)
+        assert not flag
         
     def test_async_gather(self, testing_options, send_pattern, recv_pattern,
                           send_comm, recv_comm, map_sent2recv, timeout):
@@ -152,13 +158,13 @@ class TestForkComm(base_class):
         test_msg = testing_options['msg']
         send_comm.comm_list[0].send(test_msg[0])
         flag, msg_recv = recv_comm.recv()
-        assert(flag)
-        assert(recv_comm.is_empty_recv(msg_recv))
+        assert flag
+        assert recv_comm.is_empty_recv(msg_recv)
         for msg_send, comm in zip(test_msg[1:], send_comm.comm_list[1:]):
-            assert(comm.send(msg_send))
+            assert comm.send(msg_send)
         flag, msg_recv = recv_comm.recv(timeout=timeout)
-        assert(flag)
-        assert(msg_recv == map_sent2recv(test_msg))
+        assert flag
+        assert msg_recv == map_sent2recv(test_msg)
 
 
 class TestForkCommList(TestForkComm):

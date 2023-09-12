@@ -3,8 +3,7 @@ import os
 import numpy as np
 from yggdrasil import units, tools
 from yggdrasil.communication import AsciiTableComm
-from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
-    data2dtype)
+from yggdrasil.datatypes import data2dtype
 from tests.communication.test_FileComm import TestFileComm as base_class
 
 
@@ -20,14 +19,14 @@ def test_AsciiTableComm_nofmt():
     inst.open()
     for ans in rows:
         flag, x = inst.recv_dict()
-        assert(flag)
+        assert flag
         irow = [e for e in ans]
         irow[0] = irow[0].encode("utf-8")
         idict = {'f%d' % i: irow[i] for i in range(len(irow))}
         # irow = tuple(irow)
-        assert(x == idict)
+        assert x == idict
     flag, x = inst.recv()
-    assert(not flag)
+    assert not flag
     inst.close()
     os.remove(test_file)
 
@@ -59,7 +58,6 @@ class TestAsciiTableComm(base_class):
         return wrapped_map_sent2recv
 
 
-@pytest.mark.usefixtures("unyts_equality_patch")
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""
 

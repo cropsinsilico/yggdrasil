@@ -4,7 +4,7 @@ CFLAGS += -I$(IDIR)
 
 ODIR = .
 
-LIBS = -lm $(LDFLAGS)
+LIBS = $(LDFLAGS) -lm
 
 .PHONY: all
 all: backwards_modelA backwards_modelB

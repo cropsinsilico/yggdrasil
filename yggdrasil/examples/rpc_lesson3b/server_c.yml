@@ -10,4 +10,4 @@ model:
     output: out_buf
   inputs: in_buf
   outputs: out_buf
-  copies: 10
+  copies: 5

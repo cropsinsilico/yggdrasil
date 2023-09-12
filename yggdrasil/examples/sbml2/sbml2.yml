@@ -9,7 +9,7 @@ model:
     relative_tolerance: 1.0e-10
   inputs:
     - name: input
-      vars: time,S1,S2
+      vars: [time,S1,S2]
       default_file:
         name: ./Input/input.txt
         filetype: table

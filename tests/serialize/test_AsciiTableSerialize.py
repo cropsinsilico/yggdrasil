@@ -1,25 +1,15 @@
 import pytest
-import numpy as np
 from yggdrasil.serialize import AsciiTableSerialize
 from yggdrasil import platform
 from tests.serialize.test_DefaultSerialize import (
     TestDefaultSerialize as base_class)
 
 
-def test_serialize_nofmt():
-    r"""Test error on serialization without a format."""
-    inst = AsciiTableSerialize.AsciiTableSerialize()
-    inst.initialized = True
-    test_msg = np.zeros((5, 5))
-    with pytest.raises(RuntimeError):
-        inst.serialize(test_msg)
-
-    
 def test_deserialize_nofmt():
     r"""Test error on deserialization without a format."""
     inst = AsciiTableSerialize.AsciiTableSerialize()
     test_msg = b'lskdbjs;kfbj'
-    test_msg = inst.encoded_datatype.serialize(test_msg, metadata={})
+    test_msg = inst.encode(test_msg, {})
     with pytest.raises(RuntimeError):
         inst.deserialize(test_msg)
 
@@ -33,10 +23,10 @@ def test_discover_header_no_header(tmpdir):
     inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
     inst.deserialize_file_header(fd)
     if platform._is_win:  # pragma: windows
-        assert(inst.format_str == b'%d %6s\n')
+        assert inst.format_str == b'%d %6s\n'
     else:
-        assert(inst.format_str == b'%ld %6s\n')
-    assert(inst.field_names == ('f0', 'f1'))
+        assert inst.format_str == b'%ld %6s\n'
+    assert inst.field_names == ('f0', 'f1')
 
 
 def test_discover_header_one_element(tmpdir):
@@ -46,8 +36,8 @@ def test_discover_header_one_element(tmpdir):
     fd = fd0.open('rb')
     inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
     inst.deserialize_file_header(fd)
-    assert(inst.format_str == b'%6s\n')
-    assert(inst.field_names == ('f0',))
+    assert inst.format_str == b'%6s\n'
+    assert inst.field_names == ('f0',)
 
 
 _options = [
@@ -57,8 +47,11 @@ _options = [
         'empty': [],
         'objects': [[1]],
         'extra_kwargs': {},
-        'typedef': {'type': 'array',
-                    'items': [{'type': 'int', 'precision': 32}]},
+        'datatype': {'type': 'array',
+                     'items': [{'type': 'scalar',
+                                'subtype': 'int',
+                                'precision': 4}],
+                     'allowSingular': True},
         'dtype': None,
         'is_user_defined': False}},
     {'array_columns': True},
@@ -78,21 +71,23 @@ class TestAsciiTableSerialize(base_class):
         r"""Arguments that should be provided when getting testing options."""
         return request.param
 
-    def test_field_specs(self, instance, testing_options, nested_approx):
+    def test_field_specs(self, instance, testing_options, nested_approx,
+                         initialize_instance):
         r"""Test field specifiers."""
         if not instance.initialized:
             instance.serialize(testing_options['objects'][0],
                                no_metadata=True)
         super(TestAsciiTableSerialize, self).test_field_specs(
-            instance, testing_options, nested_approx)
+            instance, testing_options, nested_approx,
+            initialize_instance)
         # Specific to this class
         if 'format_str' in testing_options:
-            assert(instance.format_str
-                   == testing_options['format_str'].encode("utf-8"))
+            assert (instance.format_str
+                    == testing_options['format_str'].encode("utf-8"))
         field_names = testing_options.get('field_names', None)
-        assert(instance.field_names == field_names)
+        assert instance.field_names == field_names
         field_units = testing_options.get('field_units', None)
-        assert(instance.field_units == field_units)
+        assert instance.field_units == field_units
 
 
 class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
@@ -110,11 +105,11 @@ class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
         out.update(
             kwargs={'field_units': out['kwargs']['field_units']},
             format_str='%s\t%d\t%g\n',
-            field_names=['%s_%s' % (k, x) for k, x
+            field_names=[f'{k}_{x}' for k, x
                          in zip('abc', out['field_names'])])
         out['objects'] = [{k: ix for k, ix in zip(out['field_names'], x)}
                           for x in out['objects']]
-        for x, k2 in zip(out['typedef']['items'], out['field_names']):
+        for x, k2 in zip(out['datatype']['items'], out['field_names']):
             out['contents'].replace(x['title'].encode("utf-8"),
                                     k2.encode("utf-8"))
             x['title'] = k2
@@ -124,6 +119,5 @@ class TestAsciiTableSerialize_object(TestAsciiTableSerialize):
     def map_sent2recv(self, nested_approx, instance):
         r"""Factory for method to convert sent messages to received."""
         def wrapped_map_sent2recv(obj):
-            return instance.datatype.coerce_type(
-                nested_approx(obj), typedef=instance.typedef)
+            return nested_approx(instance.normalize(obj))
         return wrapped_map_sent2recv

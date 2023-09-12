@@ -1,0 +1,5 @@
+PyGithub
+black
+emacs            # [conda]
+ipython
+pre-commit

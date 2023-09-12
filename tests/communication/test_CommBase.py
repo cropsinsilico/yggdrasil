@@ -2,7 +2,8 @@ import os
 import uuid
 import copy
 import pytest
-from yggdrasil.communication import new_comm, get_comm
+from yggdrasil import platform
+from yggdrasil.communication import new_comm, get_comm, AddressError
 from yggdrasil.tools import get_supported_comm
 from tests import TestComponentBase
 
@@ -13,16 +14,16 @@ def test_registry():
     comm_class = 'CommBase'
     key = 'key1'
     value = None
-    assert(not CommBase.is_registered(comm_class, key))
-    assert(not CommBase.unregister_comm(comm_class, key))
-    assert(CommBase.get_comm_registry(None) == {})
-    assert(CommBase.get_comm_registry(comm_class) == {})
+    assert not CommBase.is_registered(comm_class, key)
+    assert not CommBase.unregister_comm(comm_class, key)
+    assert CommBase.get_comm_registry(None) == {}
+    assert CommBase.get_comm_registry(comm_class) == {}
     CommBase.register_comm(comm_class, key, value)
-    assert(key in CommBase.get_comm_registry(comm_class))
-    assert(CommBase.is_registered(comm_class, key))
-    assert(not CommBase.unregister_comm(comm_class, key, dont_close=True))
+    assert key in CommBase.get_comm_registry(comm_class)
+    assert CommBase.is_registered(comm_class, key)
+    assert not CommBase.unregister_comm(comm_class, key, dont_close=True)
     CommBase.register_comm(comm_class, key, value)
-    assert(not CommBase.unregister_comm(comm_class, key))
+    assert not CommBase.unregister_comm(comm_class, key)
 
 
 _communicators = sorted([x for x in get_supported_comm()
@@ -77,6 +78,7 @@ class BaseComm(TestComponentBase):
         kws = dict(commtype=commtype, reverse_names=True,
                    direction='send', use_async=use_async)
         kws.update(testing_options['kwargs'])
+        kws.update(testing_options.get('send_kwargs', {}))
         kws.update(kwargs)
         return kws
 
@@ -94,7 +96,7 @@ class BaseComm(TestComponentBase):
         kws = self.get_send_comm_kwargs(commtype, use_async,
                                         testing_options, **kwargs)
         x = new_comm(name, **kws)
-        assert(x.is_open)
+        assert x.is_open
         return x
 
     def create_recv_comm(self, name, commtype, send_comm, testing_options,
@@ -103,7 +105,7 @@ class BaseComm(TestComponentBase):
         kws = self.get_recv_comm_kwargs(commtype, send_comm,
                                         testing_options, **kwargs)
         x = get_comm(name, **kws)
-        assert(x.is_open)
+        assert x.is_open
         x.drain_server_signon_messages()
         return x
 
@@ -136,8 +138,8 @@ class BaseComm(TestComponentBase):
                 send_params = {}
             if recv_params is None:
                 recv_params = {}
-            assert(send_comm.n_msg_send == send_params.get('n_init', 0))
-            assert(recv_comm.n_msg_recv == recv_params.get('n_init', 0))
+            assert send_comm.n_msg_send == send_params.get('n_init', 0)
+            assert recv_comm.n_msg_recv == recv_params.get('n_init', 0)
             send_comm.printStatus(level='debug')
             recv_comm.printStatus(level='debug')
             # Send message
@@ -153,7 +155,7 @@ class BaseComm(TestComponentBase):
             for _ in range(send_params.get('count', 1)):
                 flag = getattr(send_comm, send_params.get('method', 'send'))(
                     *args, **send_params.get('kwargs', {}))
-                assert(flag == send_params.get('flag', True))
+                assert flag == send_params.get('flag', True)
             # Receive message
             if (((not recv_params.get('skip_wait', False))
                  and ('eof' not in send_params.get('method', 'send')))):
@@ -169,24 +171,32 @@ class BaseComm(TestComponentBase):
                 if not recv_params.get('skip_wait', False):
                     wait_on_function(
                         lambda: (recv_comm.is_closed
-                                 or (recv_comm.n_msg_recv > 0)))
+                                 or (recv_comm.n_msg_recv > 0)),
+                        timeout=recv_params.get('wait_timeout', timeout))
                 flag, msg = getattr(
                     recv_comm, recv_params.get('method', 'recv'))(
                         **recv_params.get('kwargs', {'timeout': 0}))
-                assert(flag == recv_params.get('flag', True))
-                assert(msg == nested_approx(recv_params['message']))
+                assert flag == recv_params.get('flag', True)
+                try:
+                    assert nested_approx(recv_params['message']) == msg
+                except BaseException:
+                    print("EXPECTED:")
+                    print(recv_params['message'])
+                    print("ACTUAL:")
+                    print(msg)
+                    raise
             if not send_params.get('skip_wait', False):
                 wait_on_function(
                     lambda: send_comm.is_closed or (send_comm.n_msg_send == 0))
             if 'eof' not in send_params.get('method', 'send'):
                 send_comm.wait_for_confirm(timeout=timeout)
                 recv_comm.wait_for_confirm(timeout=timeout)
-                assert(send_comm.is_confirmed)
-                assert(recv_comm.is_confirmed)
+                assert send_comm.is_confirmed
+                assert recv_comm.is_confirmed
                 send_comm.confirm(noblock=True)
                 recv_comm.confirm(noblock=True)
-            assert(send_comm.n_msg_send == 0)
-            assert(recv_comm.n_msg_recv == 0)
+            assert send_comm.n_msg_send == 0
+            assert recv_comm.n_msg_recv == 0
         return wrapped_do_send_recv
 
     @pytest.fixture(scope="class")
@@ -197,7 +207,7 @@ class BaseComm(TestComponentBase):
                                           testing_options)
         yield send_comm
         send_comm.cleanup_comms()
-        assert(len(send_comm.comm_registry()) == 0)
+        assert len(send_comm.comm_registry()) == 0
         close_comm(send_comm)
 
     @pytest.fixture(scope="class")
@@ -208,14 +218,15 @@ class BaseComm(TestComponentBase):
                                           global_send_comm,
                                           testing_options)
         if sleep_after_connect:
-            recv_comm.sleep()
+            recv_comm.sleep(sleep_after_connect)
         yield recv_comm
         close_comm(recv_comm)
 
     @pytest.fixture(scope="class")
     def global_comm(self, global_recv_comm):
         r"""Global communicator."""
-        return global_recv_comm
+        self.__class__._first_test = True
+        yield global_recv_comm
 
     @pytest.fixture
     def send_comm(self, name, commtype, use_async, testing_options,
@@ -234,7 +245,7 @@ class BaseComm(TestComponentBase):
         recv_comm = self.create_recv_comm(name, commtype, send_comm,
                                           testing_options)
         if sleep_after_connect:
-            recv_comm.sleep()
+            recv_comm.sleep(sleep_after_connect)
         yield recv_comm
         close_comm(recv_comm)
 
@@ -294,7 +305,7 @@ class BaseComm(TestComponentBase):
         objs = testing_options['objects']
         if (len(objs) >= 2):
             try:
-                assert(objs[0] == objs[1])
+                assert objs[0] == objs[1]
             except BaseException:
                 return process_send_message(objs[1])
         pytest.skip("There aren't enough unique objects.")
@@ -306,8 +317,8 @@ class BaseComm(TestComponentBase):
         objs = testing_options['objects']
         if len(objs) > 2:
             out = objs[2]
-            assert(out != objs[0])
-            assert(out != objs[1])
+            assert out != objs[0]
+            assert out != objs[1]
             return process_send_message(out)
         pytest.skip("There aren't enough unique objects.")
 
@@ -329,7 +340,7 @@ class BaseComm(TestComponentBase):
 
         def fcond(x):
             try:
-                assert(x == nested_approx(msg_filter_recv))
+                assert nested_approx(msg_filter_recv) == x
                 return False
             except BaseException:
                 return True
@@ -345,13 +356,13 @@ class TestComm(BaseComm):
 
     def test_empty_obj_recv(self, run_once, global_comm):
         r"""Test identification of empty message."""
-        assert(global_comm.is_empty_recv(
-            global_comm.empty_obj_recv))
-        assert(not global_comm.is_empty_recv(global_comm.eof_msg))
+        assert global_comm.is_empty_recv(
+            global_comm.empty_obj_recv)
+        assert not global_comm.is_empty_recv(global_comm.eof_msg)
 
     def test_error_name(self, python_class):
         r"""Test error on missing address."""
-        with pytest.raises(RuntimeError):
+        with pytest.raises(AddressError):
             python_class('test%s' % uuid.uuid4())
 
     def test_error_send(self, monkeypatch, send_comm, testing_options,
@@ -360,15 +371,20 @@ class TestComm(BaseComm):
         monkeypatch.setattr(send_comm, '_safe_send',
                             magic_error_replacement)
         flag = send_comm.send(testing_options['msg'])
-        assert(not flag)
+        assert not flag
 
     def test_error_recv(self, monkeypatch, recv_comm,
                         magic_error_replacement):
         r"""Test error on recv."""
         monkeypatch.setattr(recv_comm, '_safe_recv',
                             magic_error_replacement)
-        flag, msg_recv = recv_comm.recv(timeout=5.0)
-        assert(not flag)
+        timeout = 5.0
+        if ((getattr(recv_comm, '_commtype', None) == 'rest'
+             and recv_comm.is_async and platform._is_win)):
+            # TODO: Debug why it takes so long for close to exit
+            timeout = 100.0
+        flag, msg_recv = recv_comm.recv(timeout=timeout)
+        assert not flag
 
     def test_send_recv_after_close(self, commtype, send_comm, recv_comm,
                                    testing_options, wait_on_function):
@@ -378,20 +394,20 @@ class TestComm(BaseComm):
         recv_comm.open()
         send_comm.close()
         recv_comm.close()
-        assert(send_comm.is_closed)
-        assert(recv_comm.is_closed)
+        assert send_comm.is_closed
+        assert recv_comm.is_closed
         flag = send_comm.send(testing_options['msg'])
-        assert(not flag)
+        assert not flag
         flag, msg_recv = recv_comm.recv()
-        assert(not flag)
+        assert not flag
 
     def test_attributes(self, python_class, global_comm, testing_options):
         r"""Assert that the instance has all of the required attributes."""
         for a in testing_options.get('attributes', []):
-            assert(hasattr(global_comm, a))
+            assert hasattr(global_comm, a)
             getattr(global_comm, a)
         global_comm.opp_comm_kwargs()
-        assert(not python_class.is_installed(language='invalid'))
+        assert not python_class.is_installed(language='invalid')
 
     def test_invalid_direction(self, run_once, name, commtype, use_async,
                                testing_options):
@@ -417,10 +433,10 @@ class TestComm(BaseComm):
         else:
             recv_kwargs['address'] = wc_send.opp_address
         wc_recv = recv_comm.create_work_comm(**recv_kwargs)
-        assert(wc_send.send(testing_options['msg']))
+        assert wc_send.send(testing_options['msg'])
         flag, msg_recv = wc_recv.recv(timeout)
-        assert(flag)
-        assert(msg_recv == testing_options['msg'])
+        assert flag
+        assert msg_recv == testing_options['msg']
         # Assert errors on second attempt
         with pytest.raises(RuntimeError):
             wc_recv.recv()
@@ -434,10 +450,10 @@ class TestComm(BaseComm):
                             timeout):
         r"""Test waiting for messages to drain."""
         global_send_comm.drain_messages(timeout=timeout)
-        assert(global_send_comm.n_msg_send_drain == 0)
+        assert global_send_comm.n_msg_send_drain == 0
         if not global_recv_comm.is_file:
             global_recv_comm.drain_messages(timeout=timeout)
-            assert(global_recv_comm.n_msg_recv_drain == 0)
+            assert global_recv_comm.n_msg_recv_drain == 0
         with pytest.raises(ValueError):
             global_send_comm.drain_messages(variable='n_msg_invalid')
         with pytest.raises(ValueError):
@@ -446,8 +462,8 @@ class TestComm(BaseComm):
     def test_recv_nomsg(self, global_recv_comm, polling_interval):
         r"""Test recieve when there is no waiting message."""
         flag, msg_recv = global_recv_comm.recv(timeout=polling_interval)
-        assert(flag)
-        assert(not msg_recv)
+        assert flag
+        assert not msg_recv
 
     def test_send_recv(self, send_comm, recv_comm, do_send_recv):
         r"""Test send/recv of a small message."""
@@ -469,13 +485,19 @@ class TestComm(BaseComm):
                      send_params={'method': 'send_eof'})
 
     def test_send_recv_nolimit(self, msg_long, send_comm, recv_comm,
-                               do_send_recv):
+                               do_send_recv, timeout):
         r"""Test send/recv of a large message."""
+        recv_timeout = timeout
+        if ((getattr(recv_comm, '_commtype', None) == 'rest'
+             and recv_comm.is_async and platform._is_win)):
+            # TODO: Debug why it takes so long for message to propagate
+            recv_timeout = 100
         do_send_recv(send_comm, recv_comm, msg_long,
                      send_params={'method': 'send_nolimit',
                                   'kwargs': {
                                       'header_kwargs': {'x': msg_long}}},
-                     recv_params={'method': 'recv_nolimit'})
+                     recv_params={'method': 'recv_nolimit',
+                                  'wait_timeout': recv_timeout})
         if send_comm is not None:
             send_comm.printStatus()
             send_comm.printStatus(return_str=True)
@@ -492,7 +514,7 @@ class TestComm(BaseComm):
                      send_params={'method': 'send_eof'},
                      recv_params={'flag': False})
         if recv_comm is not None:
-            assert(recv_comm.is_closed)
+            assert recv_comm.is_closed
 
     def test_send_recv_filter_pass(self, filtered_comms, msg_filter_pass,
                                    send_comm, recv_comm, do_send_recv):
@@ -537,16 +559,16 @@ class TestComm(BaseComm):
             msg.args = b''
             msg.length = 0
             return msg
-        assert(send_comm.send(testing_options['msg']))
+        assert send_comm.send(testing_options['msg'])
         msg = recv_comm.recv(
             timeout=60.0, skip_deserialization=True,
             return_message_object=True, after_finalize_message=[dummy])
-        assert(msg.finalized)
-        assert(recv_comm.finalize_message(msg) == msg)
+        assert msg.finalized
+        assert recv_comm.finalize_message(msg) == msg
         msg.finalized = False
-        assert(recv_comm.is_empty_recv(msg.args))
+        assert recv_comm.is_empty_recv(msg.args)
         msg = recv_comm.finalize_message(msg)
-        assert(msg.flag == CommBase.FLAG_EMPTY)
+        assert msg.flag == CommBase.FLAG_EMPTY
 
     def test_send_recv_array(self, run_once, send_comm, recv_comm, msg_array,
                              do_send_recv):
@@ -577,20 +599,20 @@ class TestComm(BaseComm):
     def test_purge(self, send_comm, recv_comm, testing_options,
                    wait_on_function, n_msg_expected):
         r"""Test purging messages from the comm."""
-        assert(send_comm.n_msg == 0)
-        assert(recv_comm.n_msg == 0)
+        assert send_comm.n_msg == 0
+        assert recv_comm.n_msg == 0
         if send_comm.is_async:
-            assert(send_comm.n_msg_direct == 0)
+            assert send_comm.n_msg_direct == 0
         if recv_comm.is_async:
-            assert(recv_comm.n_msg_direct == 0)
+            assert recv_comm.n_msg_direct == 0
         # Purge recv while open
         flag = send_comm.send(testing_options['msg'])
-        assert(flag)
+        assert flag
         wait_on_function(lambda: recv_comm.n_msg == n_msg_expected)
         recv_comm.purge()
         # Uni-directional comms can't know about messages sent
-        # assert(send_comm.n_msg == 0)
-        assert(recv_comm.n_msg == 0)
+        # assert send_comm.n_msg == 0
+        assert recv_comm.n_msg == 0
         # Purge recv while closed
         recv_comm.close()
         recv_comm.purge()

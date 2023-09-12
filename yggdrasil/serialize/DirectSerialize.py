@@ -54,7 +54,7 @@ class DirectSerialize(SerializeBase):
         return [b''.join(objects)]
     
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -73,7 +73,7 @@ class DirectSerialize(SerializeBase):
 
         """
         out = {'kwargs': {}, 'empty': b'', 'dtype': None,
-               'typedef': cls.default_datatype,
+               'datatype': cls.default_datatype,
                'extra_kwargs': {}}
         out['objects'] = [b'Test message\n', b'Test message 2\n']
         out['contents'] = b''.join(out['objects'])

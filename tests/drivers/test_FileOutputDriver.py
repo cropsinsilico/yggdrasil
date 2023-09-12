@@ -41,12 +41,13 @@ class TestFileOutputDriver(base_class):
     def filepath(self, name, ocomm_python_class):
         r"""str: Path to the test file."""
         out = os.path.abspath(
-            f'{name}_input{ocomm_python_class._default_extension}')
+            f'{name}_input{ocomm_python_class._extensions[0]}')
         try:
             yield out
         finally:
             if os.path.isfile(out):
                 os.remove(out)
+                ocomm_python_class.remove_companion_files(out)
 
     @pytest.fixture
     def recv_comm(self):
@@ -68,9 +69,9 @@ class TestFileOutputDriver(base_class):
         def after_instance_started_w(x):
             for x in testing_options['send']:
                 flag = send_comm.send(x)
-                assert(flag)
+                assert flag
             flag = send_comm.send_eof()
-            assert(flag)
+            assert flag
         return after_instance_started_w
 
     @pytest.fixture
@@ -81,8 +82,23 @@ class TestFileOutputDriver(base_class):
         return run_before_stop_w
     
     @pytest.fixture
-    def contents_to_read(self, testing_options):
+    def assert_before_stop(self):
+        r"""Assertions to make before stopping the driver instance."""
+        def assert_before_stop_w():
+            # No guarantee that sending EOF won't close driver before
+            # stop is called
+            pass
+        return assert_before_stop_w
+
+    @pytest.fixture
+    def contents_to_read(self, testing_options, ocomm_python_class):
         r"""str: Contents that should be read to the file."""
+        if not testing_options.get('contents', None):
+            contents = ocomm_python_class.get_test_contents(
+                testing_options['send'], **testing_options['kwargs'])
+            if testing_options.get('contents', False) is None:
+                return contents
+            print(contents)
         return testing_options['contents']
 
     @pytest.fixture
@@ -91,11 +107,11 @@ class TestFileOutputDriver(base_class):
         r"""Assertions to make after stopping the driver instance."""
         def assert_after_stop_w():
             assert_after_terminate()
-            assert(os.path.isfile(filepath))
+            assert os.path.isfile(filepath)
             if testing_options.get('exact_contents', True):
                 with open(filepath, 'rb') as fd:
                     data = fd.read()
-                assert(data == contents_to_read)
+                assert data == contents_to_read
         return assert_after_stop_w
     
     # These are disabled to prevent writting extraneous data

@@ -112,8 +112,9 @@ class RESTComm(CommBase.CommBase):
             if '{port}' in self.host:
                 self.host = self.host.format(port=self.port)
             host = self.host
-            name = self.name_base
-            assert(client_id is not None)
+            name = self.name_base.replace(':', '-')
+            assert client_id is not None
+            assert ':' not in name
             self.address = f'{host}{client_id}/{model}/{name}'
         return super(RESTComm, self).bind(*args, **kwargs)
 
@@ -143,11 +144,12 @@ class RESTComm(CommBase.CommBase):
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
         self._is_open = False
-        r = requests.get(
-            self.address + '/remove',
-            params=self.params,
-            cookies=self.cookies)
-        r.raise_for_status()
+        if self.address != 'address':
+            r = requests.get(
+                self.address + '/remove',
+                params=self.params,
+                cookies=self.cookies)
+            r.raise_for_status()
         
     def _send(self, payload):
         r = requests.post(

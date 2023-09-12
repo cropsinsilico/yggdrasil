@@ -2,13 +2,12 @@ import pytest
 import tempfile
 import os
 import yaml
-import flaky
 import io as sio
-from jsonschema.exceptions import ValidationError
-from yggdrasil import yamlfile
+from yggdrasil import yamlfile, rapidjson
 from yaml.constructor import ConstructorError
 from tests import TestBase as base_class
 _yaml_env = 'TEST_YAML_FILE'
+_func_prefix = __name__  # __file__
 
 
 def direct_translate(msg):  # pragma: no cover
@@ -22,6 +21,8 @@ def test_load_yaml():
     fname = os.path.join(cwd, 'test_load_yaml.yml')
     dict_write = {'test': 'hello'}
     dict_read = {'test': 'hello',
+                 'models': [],
+                 'connections': [],
                  'working_dir': cwd}
     contents = yaml.dump(dict_write)
     with open(fname, 'w') as fd:
@@ -29,17 +30,17 @@ def test_load_yaml():
     try:
         # Dictionary
         out = yamlfile.load_yaml(dict_write)
-        assert(out == dict_read)
+        assert out == dict_read
         # File name
         out = yamlfile.load_yaml(fname)
-        assert(out == dict_read)
+        assert out == dict_read
         # Open file object
         with open(fname, 'r') as fd:
             out = yamlfile.load_yaml(fd)
-            assert(out == dict_read)
+            assert out == dict_read
         # Open stream
         out = yamlfile.load_yaml(sio.StringIO(contents))
-        assert(out == dict_read)
+        assert out == dict_read
     finally:
         # Remove file
         if os.path.isfile(fname):
@@ -52,27 +53,20 @@ def test_load_yaml_error():
         yamlfile.load_yaml('invalid')
 
 
-def test_parse_component_error():
-    r"""Test errors in parse_component."""
-    with pytest.raises(yamlfile.YAMLSpecificationError):
-        yamlfile.parse_component(1, 'invalid', 'invalid')
-    with pytest.raises(yamlfile.YAMLSpecificationError):
-        yamlfile.parse_component({}, 'invalid', 'invalid')
-
-
-@flaky.flaky(max_runs=3)
+@pytest.mark.flaky_optin(max_runs=3)
 def test_load_yaml_git():
     r"""Test loading a yaml from a remote git repository."""
     import git
     yml = "https://github.com/cropsinsilico/example-fakemodel/fakemodel.yml"
     with pytest.raises(Exception):
         yamlfile.load_yaml(yml)
-    assert('model' in yamlfile.load_yaml('git:' + yml))
+    assert 'models' in yamlfile.load_yaml('git:' + yml)
     yml = "cropsinsilico/example-fakemodel/fakemodel.yml"
-    assert('model' in yamlfile.load_yaml('git:' + yml))
+    assert 'models' in yamlfile.load_yaml('git:' + yml)
     git.rmtree("cropsinsilico")
     
 
+@pytest.mark.subset_rapidjson
 class YamlTestBase(base_class):
     r"""Test base for yamlfile."""
     
@@ -165,6 +159,7 @@ class YamlTestBase(base_class):
             yamlfile.parse_yaml(files, **parse_kwargs)
 
 
+@pytest.mark.subset_rapidjson
 class YamlTestBaseError(YamlTestBase):
     r"""Test error for yamlfile."""
     
@@ -213,6 +208,16 @@ class TestYamlModelOnly(YamlTestBase):
                   '    TEST_VAR: 1'], )
 
 
+class TestYamlBackwardsCompat(YamlTestBase):
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.cpp'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    args: ./src/modelB.c'])
+
+
 class TestYamlServerClient(YamlTestBase):
     r"""Test specification of server/client models."""
     _contents = (['models:',
@@ -236,18 +241,18 @@ class TestYamlIODrivers(YamlTestBase):
                   '    inputs:',
                   '      - name: inputA',
                   '        driver: FileInputDriver',
-                  '        translator: %s:direct_translate' % __name__,
+                  '        translator: %s:direct_translate' % _func_prefix,
                   '        onexit: printStatus',
                   '        args: {{ %s }}' % _yaml_env,
                   '    outputs:',
                   '      - name: outputA',
                   '        driver: FileOutputDriver',
-                  '        translator: %s:direct_translate' % __name__,
+                  '        translator: %s:direct_translate' % _func_prefix,
                   '        onexit: printStatus',
                   '        args: fileA.txt',
                   '      - name: outputA2',
                   '        driver: OutputDriver',
-                  '        translator: %s:direct_translate' % __name__,
+                  '        translator: %s:direct_translate' % _func_prefix,
                   '        onexit: printStatus',
                   '        args: A_to_B'],
                  ['model:',
@@ -395,7 +400,7 @@ class TestYamlConnectionTranslator(YamlTestBase):
                   'connections:',
                   '  - input: outputB',
                   '    output: inputA',
-                  '    translator: %s:direct_translate' % __name__],
+                  '    translator: %s:direct_translate' % _func_prefix],
                  ['models:',
                   '  - name: modelB',
                   '    driver: GCCModelDriver',
@@ -781,7 +786,7 @@ class TestYamlServerDictNoOutput(YamlTestBaseError):
 
 class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models: error'],)
 
 
@@ -865,7 +870,7 @@ class TestYamlConnectionError_forkin(YamlTestBaseError):
 
 class TestYamlConnectionError_readmeth(YamlTestBaseError):
     r"""Test error when read_meth is specified for non-file."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -887,7 +892,7 @@ class TestYamlConnectionError_readmeth(YamlTestBaseError):
 
 class TestYamlConnectionError_writemeth(YamlTestBaseError):
     r"""Test error when write_meth is specified for non-file."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -909,7 +914,7 @@ class TestYamlConnectionError_writemeth(YamlTestBaseError):
 
 class TestYamlMissingModelArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a model."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    inputs:',
@@ -918,9 +923,20 @@ class TestYamlMissingModelArgsError(YamlTestBaseError):
                   '      args: {{ %s }}' % _yaml_env],)
 
 
+class TestYamlMissingModelNameError(YamlTestBaseError):
+    r"""Test error when there is a missing arguments to a model."""
+    _error = rapidjson.NormalizationError
+    _contents = (['models:',
+                  '  - args: modelA',
+                  '    inputs:',
+                  '      name: inputA',
+                  '      driver: FileInputDriver',
+                  '      args: {{ %s }}' % _yaml_env],)
+
+
 class TestYamlMissingIOArgsError_input(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an input driver."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -932,7 +948,7 @@ class TestYamlMissingIOArgsError_input(YamlTestBaseError):
 
 class TestYamlMissingIOArgsError_output(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an output driver."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -944,7 +960,7 @@ class TestYamlMissingIOArgsError_output(YamlTestBaseError):
 
 class TestYamlMissingConnArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a connection."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -964,7 +980,7 @@ class TestYamlMissingConnArgsError(YamlTestBaseError):
 
 class TestYamlMissingConnInputError(YamlTestBaseError):
     r"""Test error when there is no model output matching connection input."""
-    _error = RuntimeError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -983,7 +999,7 @@ class TestYamlMissingConnInputError(YamlTestBaseError):
 
 class TestYamlMissingConnInputFileError(YamlTestBaseError):
     r"""Test error when there is no file for missing connection input."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1000,7 +1016,7 @@ class TestYamlMissingConnInputFileError(YamlTestBaseError):
 
 class TestYamlMissingConnIOError(YamlTestBaseError):
     r"""Test error when there is no model input/output matching connection."""
-    _error = ValidationError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1013,7 +1029,7 @@ class TestYamlMissingConnIOError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
     r"""Test error for invalid read_meth."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1033,7 +1049,7 @@ class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileWriteMethError(YamlTestBaseError):
     r"""Test error for invalid write_meth."""
-    _error = ValidationError
+    _error = rapidjson.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',

@@ -1,0 +1,14 @@
+models:
+  - name: julia_model
+    language: julia  # Runs the julia script using default Julia
+    args: ./src/gs_lesson3.jl
+    inputs:
+      - input
+    outputs:
+      - output
+
+connections:
+  - input_file: ./Input/input.txt
+    output: input
+  - input: output
+    output: ./output.txt

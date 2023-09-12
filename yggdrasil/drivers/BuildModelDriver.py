@@ -458,6 +458,9 @@ class BuildModelDriver(CompiledModelDriver):
                 target_linker=self.target_linker,
                 target_linker_flags=self.target_linker_flags,
                 logging_level=self.numeric_logging_level)
+            if self.with_asan:
+                kws['compiler_flag_kwargs'] = {'with_asan': self.with_asan}
+                kws['linker_flag_kwargs'] = {'with_asan': self.with_asan}
             for x in ['compiler', 'linker']:
                 if getattr(self, 'env_%s' % x):
                     kws['%s_env' % x] = (
@@ -490,8 +493,9 @@ class BuildModelDriver(CompiledModelDriver):
         r"""Compile dependencies specifically for this instance."""
         if (((self.target_language_driver is not None)
              and (not kwargs.get('dry_run', False)))):
+            suffix_kws = self.select_suffix_kwargs(kwargs)
             self.target_language_driver.compile_dependencies(
-                toolname=self.target_compiler)
+                toolname=self.target_compiler, **suffix_kws)
         
     def compile_model(self, **kwargs):
         r"""Compile model executable(s).
@@ -572,7 +576,7 @@ class BuildModelDriver(CompiledModelDriver):
             dict: Environment variables for the model process.
 
         """
-        assert(language_info is not None)
+        assert language_info is not None
         kwargs['compiler'] = language_info['compiler']
         out = super(BuildModelDriver, cls).set_env_compiler(**kwargs)
         if language_info['compiler_env'] and language_info['compiler_executable']:
@@ -609,4 +613,6 @@ class BuildModelDriver(CompiledModelDriver):
             kwargs['existing'] = out
             if hasattr(self.target_language_driver, 'set_env_class'):
                 out = self.target_language_driver.set_env_class(**kwargs)
+            if self.with_asan:
+                self.target_language_info['compiler'].init_asan_env(out)
         return out

@@ -3,8 +3,7 @@ import os
 import pprint
 import tempfile
 import subprocess
-from jsonschema import ValidationError
-from yggdrasil import schema, components
+from yggdrasil import schema, components, rapidjson
 
 
 def filter_func_ex():  # pragma: no cover
@@ -28,48 +27,72 @@ def normalize_objects(patch_equality, functions_equality):
                  'column_names': ['a', 'b'],
                  'column_units': ['cm', 'g'],
                  'filter': {
-                     'function': filter_func_ex_name}}],
+                     'function': filter_func_ex_name}},
+                {'name': 'outputB'}],
             'working_dir': os.getcwd()}],
-          'connections': [{
-              'inputs': 'outputA',
-              'outputs': 'fileA.txt',
-              'seritype': 'direct',
-              'working_dir': os.getcwd()}]},
+          'connections': [
+              {'inputs': 'outputA',
+               'outputs': 'fileA.txt',
+               'seritype': 'ply',
+               'working_dir': os.getcwd()},
+              {'inputs': 'outputB',
+               'outputs': {
+                   'name': 'fileB.txt',
+                   'filetype': 'table'},
+               'working_dir': os.getcwd()}]},
          {'models': [{
              'name': 'modelA',
              'language': 'c',
              'args': ['model.c'],
              'inputs': [{'commtype': 'default',
-                         'datatype': {'type': 'bytes'},
+                         'datatype': {'type': 'scalar',
+                                      'subtype': 'string'},
                          'is_default': True,
-                         'name': 'modelA:input'}],
-             'outputs': [{'name': 'modelA:outputA',
+                         'name': 'input'}],
+             'outputs': [{'name': 'outputA',
                           'commtype': 'default',
-                          'datatype': {'type': 'bytes'},
+                          'datatype': {'type': 'scalar',
+                                       'subtype': 'string'},
                           'filter': {
-                              'function': filter_func_ex2}}],
+                              'function': filter_func_ex2},
+                          'field_names': ['a', 'b'],
+                          'field_units': ['cm', 'g']},
+                         {'name': 'outputB',
+                          'commtype': 'default',
+                          'datatype': {'type': 'scalar',
+                                       'subtype': 'string'}}],
              'working_dir': os.getcwd()}],
-          'connections': [{
-              'inputs': [
-                  {'name': 'modelA:outputA',
-                   'datatype': {'type': 'bytes'},
+          'connections': [
+              {'inputs': [
+                  {'name': 'outputA',
+                   'datatype': {'type': 'scalar',
+                                'subtype': 'string'},
                    'commtype': 'default',
-                   'filter': {
-                       'function': filter_func_ex2}}],
-              'outputs': [
-                  {'name': 'fileA.txt',
-                   'filetype': 'binary',
-                   'working_dir': os.getcwd(),
-                   'serializer': {'seritype': 'direct'},
-                   'field_names': ['a', 'b'],
-                   'field_units': ['cm', 'g']}]}]})]
+                   'working_dir': os.getcwd()}],
+               'outputs': [
+                   {'name': 'fileA.txt',
+                    'filetype': 'binary',
+                    'working_dir': os.getcwd(),
+                    'serializer': {'seritype': 'ply'}}],
+               'working_dir': os.getcwd()},
+              {'inputs': [
+                  {'name': 'outputB',
+                   'datatype': {'type': 'scalar',
+                                'subtype': 'string'},
+                   'commtype': 'default',
+                   'working_dir': os.getcwd()}],
+               'outputs': [
+                   {'name': 'fileB.txt',
+                    'filetype': 'table',
+                    'working_dir': os.getcwd()}],
+               'working_dir': os.getcwd()}]})]
 
 
 def test_get_json_schema():
     r"""Test getting pure JSON version of schema."""
     test_file = 'strict_json_schema.json'
     schema.get_json_schema(test_file)
-    assert(os.path.isfile(test_file))
+    assert os.path.isfile(test_file)
     os.remove(test_file)
     
 
@@ -78,7 +101,7 @@ def test_SchemaRegistry():
     with pytest.raises(ValueError):
         schema.SchemaRegistry({})
     x = schema.SchemaRegistry()
-    assert((x == 0) is False)
+    assert (x == 0) is False
     fname = os.path.join(tempfile.gettempdir(), 'temp.yml')
     with open(fname, 'w') as fd:
         fd.write('')
@@ -90,14 +113,14 @@ def test_SchemaRegistry():
 def test_default_schema():
     r"""Test getting default schema."""
     s = schema.get_schema()
-    assert(s is not None)
+    assert s is not None
     schema.clear_schema()
-    assert(schema._schema is None)
+    assert schema._schema is None
     s = schema.get_schema()
-    assert(s is not None)
+    assert s is not None
     for k in s.keys():
-        assert(isinstance(s[k].subtypes, list))
-        assert(isinstance(s[k].classes, list))
+        assert isinstance(s[k].subtypes, list)
+        assert isinstance(s[k].classes, list)
         for ksub in s[k].classes:
             s[k].get_subtype_properties(ksub)
             s[k].default_subtype
@@ -119,8 +142,8 @@ def test_create_schema():
         subprocess.check_call(['yggschema'])
         new_schema = open(f_schema, 'r').read()
         new_consts = open(f_consts, 'r').read()
-        assert(new_consts == old_consts)
-        assert(new_schema == old_schema)
+        assert new_consts == old_consts
+        assert new_schema == old_schema
     finally:
         open(f_schema, 'w').write(old_schema)
         open(f_consts, 'w').write(old_consts)
@@ -134,62 +157,50 @@ def test_save_load_schema():
     # Test saving/loading schema
     s0 = schema.load_schema()
     s0.save(fname)
-    assert(s0 is not None)
-    assert(os.path.isfile(fname))
+    assert s0 is not None
+    assert os.path.isfile(fname)
+    old_contents = open(schema._schema_fname, 'r').read()
+    new_contents = open(fname, 'r').read()
+    assert new_contents == old_contents
     s1 = schema.get_schema(fname)
-    assert(s1.schema == s0.schema)
-    # assert(s1 == s0)
+    assert s1.schema == s0.schema
+    # assert s1 == s0
     os.remove(fname)
     # Test getting schema
     s2 = schema.load_schema(fname)
-    assert(os.path.isfile(fname))
-    assert(s2.schema == s0.schema)
-    assert(s2 == s0)
+    assert os.path.isfile(fname)
+    assert s2.schema == s0.schema  # Error HERE
+    # s2 has args required in model type schemas
+    # s0 has args default [] in model base schema and required
+    assert s2 == s0
     os.remove(fname)
 
 
-def test_cdriver2filetype_error():
-    r"""Test errors in cdriver2filetype."""
-    with pytest.raises(ValueError):
-        schema.cdriver2filetype('invalid')
-
-
-def test_standardize():
-    r"""Test standardize."""
-    vals = [(False, ['inputs', 'outputs'], ['_file'],
-             {'input': 'inputA', 'output_file': 'outputA'},
-             {'inputs': [{'name': 'inputA'}],
-              'outputs': [{'name': 'outputA'}]}),
-            (True, ['input', 'output'], ['_file'],
-             {'inputs': 'inputA', 'output_files': 'outputA'},
-             {'input': [{'name': 'inputA'}],
-              'output': [{'name': 'outputA'}]})]
-    for is_singular, keys, suffixes, x, y in vals:
-        schema.standardize(x, keys, suffixes=suffixes, is_singular=is_singular)
-        assert(x == y)
-
-
-def test_normalize(normalize_objects):
+@pytest.mark.subset_rapidjson
+def test_normalize(normalize_objects, display_diff):
     r"""Test normalization of legacy formats."""
     s = schema.get_schema()
     for x, y in normalize_objects:
-        a = s.normalize(x, backwards_compat=True)  # , show_errors=True)
         try:
-            assert(a == y)
+            a = s.normalize(x)
+        except (rapidjson.ValidationError, rapidjson.NormalizationError):  # pragma: debug
+            print("A:")
+            pprint.pprint(x)
+            print("\nB:")
+            pprint.pprint(y)
+            raise
+        try:
+            assert a == y
         except BaseException:  # pragma: debug
             print("Unexpected Normalization:\n\nA:")
             pprint.pprint(a)
             print('\nB:')
             pprint.pprint(y)
+            display_diff(a, y)
             raise
 
 
-def test_cdriver2commtype_error():
-    r"""Test error when invalid driver supplied."""
-    with pytest.raises(ValueError):
-        schema.cdriver2commtype('invalid')
-
-
+@pytest.mark.subset_rapidjson
 def test_get_schema_subtype():
     r"""Test get_schema_subtype for allow_instance=True."""
     component = 'serializer'
@@ -201,11 +212,10 @@ def test_get_schema_subtype():
     kwargs = {'subtype': subtype, 'allow_instance': True}
     s.validate_component(component, doc, **kwargs)
     s.validate_component(component, valid, **kwargs)
-    with pytest.raises(ValidationError):
+    with pytest.raises(rapidjson.ValidationError):
         s.validate_component(component, invalid, **kwargs)
     s.validate_component(component, doc, subtype=subtype)
-    with pytest.raises(ValidationError):
-        s.validate_component(component, valid, subtype=subtype)
+    s.validate_component(component, valid, subtype=subtype)
     # Test for base
     s.validate_component(component, valid, subtype='base',
                          allow_instance=True)
@@ -218,13 +228,13 @@ def test_get_model_form_schema():
     fname = os.path.join(tempfile.gettempdir(), 'temp.json')
     try:
         schema.get_model_form_schema(fname_dst=fname)
-        assert(os.path.isfile(fname))
+        assert os.path.isfile(fname)
     finally:
         if os.path.isfile(fname):
             os.remove(fname)
 
 
-def test_update_constants(project_dir):
+def test_update_constants(project_dir, display_diff):
     r"""Test script to update constants and check that they have not changed."""
     filename = os.path.join(project_dir, 'constants.py')
     with open(filename, 'r') as fd:
@@ -233,7 +243,24 @@ def test_update_constants(project_dir):
         schema.update_constants()
         with open(filename, 'r') as fd:
             new = fd.read()
-        assert(old == new)
+        assert old == new
+    except AssertionError:
+        display_diff(old, new)
+        raise
     finally:
         with open(filename, 'w') as fd:
             fd.write(old)
+
+
+def test_get_full_schema():
+    r"""Test full schema."""
+    s = schema.get_schema()
+    s.get_schema(full=True)
+
+
+@pytest.mark.subset_rapidjson
+def test_validate_component():
+    r"""Test validate_component."""
+    s = schema.get_schema()
+    x = {"seritype": "direct"}
+    s.validate_component('serializer', x)

@@ -39,6 +39,10 @@ case $1 in
 	echo "Running Fortran"
 	yaml='SaM_fortran.yml'
 	;;
+    -j | --julia )
+	echo "Running Julia"
+	yaml='SaM_julia.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1
