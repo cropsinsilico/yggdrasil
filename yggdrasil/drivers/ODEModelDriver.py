@@ -1229,7 +1229,7 @@ class ODEModelDriver(DSLModelDriver):
             first_loop = False
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -1238,7 +1238,7 @@ class ODEModelDriver(DSLModelDriver):
                 deps (list): Dependencies to install.
 
         """
-        out = super(ODEModelDriver, cls).get_testing_options()
+        out = super(ODEModelDriver, cls).get_testing_options(**kwargs)
         out.update(
             requires_partner=True,
             source=[],
