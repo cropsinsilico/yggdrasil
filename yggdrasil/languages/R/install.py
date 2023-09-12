@@ -380,6 +380,7 @@ def install(args=None, with_sudo=None, skip_requirements=None,
             requirements = requirements_from_description()
             if os.environ.get('BUILDDOCS', '') == '1':
                 requirements += ['roxygen2', 'Rd2md']
+            requirements.insert(0, 'vdiffr (<= 1.0.5)')
             if not install_packages(requirements, update=update_requirements,
                                     R_exe=Rscript_exe, **kwargs):
                 logger.error("Failed to install dependencies")
