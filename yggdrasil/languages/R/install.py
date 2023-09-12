@@ -180,7 +180,8 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                     ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
                      '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver']))
                 name = 'packageurl'
-                args = ('repos=NULL, type=\"source\"'
+                # args = ('repos=NULL, type=\"source\"'
+                args = ('type=\"source\", dep=TRUE'
                         + ("," if x.get('args', '') else "")
                         + x.get('args', ''))
             if update:
