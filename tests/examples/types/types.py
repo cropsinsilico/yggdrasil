@@ -1,6 +1,6 @@
 import os
 import argparse
-from yggdrasil.examples.tests.test_types import TestExampleTypes
+from tests.examples.test_types import TestExampleTypes
 from yggdrasil.languages import get_language_ext
 from yggdrasil.runner import run
 _this_dir = os.path.dirname(__file__)
