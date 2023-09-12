@@ -143,6 +143,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                  r'(?P<ver>[^\s=<>]+?)\s*\))?')
     req_ver = []
     req_nover = []
+    logger.info(f"package_list = {package_list}")
     for x in package_list:
         out = re.fullmatch(regex_ver, x).groupdict()
         kws = {}
@@ -167,27 +168,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
             req_nover.append(out['name'])
     if repos is None:
         repos = 'http://cloud.r-project.org'
-    if req_nover:
-        req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in req_nover])
-        if update:
-            # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
-            R_cmd += ['req <- %s' % req_list,
-                      'for (x in req) {',
-                      '  if (is.element(x, installed.packages()[,1])) {',
-                      '    remove.packages(x)',
-                      '  }',
-                      '  install.packages(x, dep=TRUE, repos="%s")' % repos,
-                      '}']
-        else:
-            R_cmd += ['req <- %s' % req_list,
-                      'for (x in req) {',
-                      '  if (!is.element(x, installed.packages()[,1])) {',
-                      '    print(sprintf("Installing \'%s\' from CRAN.", x))',
-                      '    install.packages(x, dep=TRUE, repos="%s")' % repos,
-                      '  } else {',
-                      '    print(sprintf("%s already installed.", x))',
-                      '  }',
-                      '}']
+    logger.info(f"req_ver = {req_ver}")
     if req_ver:
         for x in req_ver:
             name = "\"%s\"" % x['name']
@@ -215,6 +196,28 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                     '} else {',
                     '  print("%s already installed.")' % x['name'],
                     '}']
+    logger.info(f"req_nover = {req_nover}")
+    if req_nover:
+        req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in req_nover])
+        if update:
+            # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
+            R_cmd += ['req <- %s' % req_list,
+                      'for (x in req) {',
+                      '  if (is.element(x, installed.packages()[,1])) {',
+                      '    remove.packages(x)',
+                      '  }',
+                      '  install.packages(x, dep=TRUE, repos="%s")' % repos,
+                      '}']
+        else:
+            R_cmd += ['req <- %s' % req_list,
+                      'for (x in req) {',
+                      '  if (!is.element(x, installed.packages()[,1])) {',
+                      '    print(sprintf("Installing \'%s\' from CRAN.", x))',
+                      '    install.packages(x, dep=TRUE, repos="%s")' % repos,
+                      '  } else {',
+                      '    print(sprintf("%s already installed.", x))',
+                      '  }',
+                      '}']
     if not call_R(R_cmd, **kwargs):
         logger.error("Error installing dependencies: %s" % ', '.join(package_list))
         return False
