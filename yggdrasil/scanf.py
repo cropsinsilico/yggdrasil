@@ -242,10 +242,10 @@ def parse_cformat(format, i):
 #   few characters needed to handle the field ommision.
 scanf_translate = [
     (re.compile(_token), _pattern, _cast) for _token, _pattern, _cast in [
-        ("%c", "(.)", lambda x:x),
+        ("%c", "(.)", lambda x: x),
         ("%\\*c", "(?:.)", None),
         
-        ("%(\\d)c", "(.{%s})", lambda x:x),
+        ("%(\\d)c", "(.{%s})", lambda x: x),
         ("%\\*(\\d)c", "(?:.{%s})", None),
         
         ("%(\\d)[di]", "([+-]?\\d{%s})", int),
@@ -280,16 +280,16 @@ scanf_translate = [
         ("%\\*[fgeE]", "(?:[-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][-+]?\\d+)?)", None),
         
         # langmm: Added to allows matching of %5s
-        ("%(\\d)s", "(.{%s})", lambda x:x.strip()),
+        ("%(\\d)s", "(.{%s})", lambda x: x.strip()),
         ("%\\*(\\d)s", "(?:.{%s})", None),
         
-        ("%s", "(\\S+)", lambda x:x),
+        ("%s", "(\\S+)", lambda x: x),
         ("%\\*s", "(?:\\S+)", None),
         
-        ("%([xX])", "(0%s[\\dA-Za-f]+)", lambda x:int(x, 16)),
+        ("%([xX])", "(0%s[\\dA-Za-f]+)", lambda x: int(x, 16)),
         ("%\\*([xX])", "(?:0%s[\\dA-Za-f]+)", None),
         
-        ("%o", "(0[0-7]*)", lambda x:int(x, 8)),
+        ("%o", "(0[0-7]*)", lambda x: int(x, 8)),
         ("%\\*o", "(?:0[0-7]*)", None),
     ]]
 
