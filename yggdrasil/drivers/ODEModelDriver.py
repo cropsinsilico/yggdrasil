@@ -215,7 +215,7 @@ class ODEModel(object):
             for k in self.locate_unknown_symbols(self.eqns[lhs]):
                 self.local_map[str(k)] = k
                 self.param[str(k)] = None
-        assert(not self.normalize_inputs(ics))
+        assert not self.normalize_inputs(ics)
         self.complete_system()
         self.funcs_deriv = [f.diff(self.t) for f in self.funcs]
         self.sol = None
@@ -322,7 +322,7 @@ class ODEModel(object):
                 else:
                     iout['n'] = len(mdict['n_tics'])
             elif mdict.get('n_top', None) or mdict.get('n_bottom', None):
-                assert(mdict['n_top'] == mdict['n_bottom'])
+                assert mdict['n_top'] == mdict['n_bottom']
                 iout['n'] = int(mdict['n_top'])
             return iout
             
@@ -465,7 +465,7 @@ class ODEModel(object):
         else:
             out = sympify(out, locals=self.local_map)
         if assumptions:
-            assert(isinstance(out, Symbol))
+            assert isinstance(out, Symbol)
             out = Symbol(str(out), **assumptions)
         for a, b in subs.items():
             out = out.subs(a, b)
@@ -605,7 +605,7 @@ class ODEModel(object):
         try:
             result = sol(iparam, constants=self.constants)
         except RetryWithNumeric as e:
-            assert(not sol.is_numeric)
+            assert not sol.is_numeric
             sol = self.solve(compute_method, use_numeric=True)
             result = sol(iparam, constants=self.constants)
             if not e.temp_solution:
@@ -863,7 +863,7 @@ class LambdifySolution(object):
                     self.units.setdefault(
                         ivar, f"{self.units[ilhs]}/({self.t_units}**{deg})")
                 iexpr = Derivative(iexpr, self.t, deg).doit()
-            assert(t == self.t)
+            assert t == self.t
             # if t != self.t:
             #     iexpr = iexpr.subs(self.t, t)
             #     raise ODEError(f"CHECK SUBST {self.t} -> {t}: {iexpr}")
@@ -915,7 +915,7 @@ class LambdifySolution(object):
             if t0 is None:
                 t0 = tv
             else:
-                assert(tv == t0)
+                assert tv == t0
         t0_f = t0
         if isinstance(t0, Number):
             # TODO: Check for non-float (e.g. complex)?
@@ -946,7 +946,7 @@ class LambdifySolution(object):
             x_ode.set_f_params(param[NX:], t0_f)
             x_ode.set_initial_value(X0, 0.0)
             out = x_ode.integrate(tF - t0_f)
-            assert(x_ode.get_return_code() == 2)
+            assert x_ode.get_return_code() == 2
         else:
             from scipy.integrate import odeint
             t = np.array([0.0, tF - t0_f])
