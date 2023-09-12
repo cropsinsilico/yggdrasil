@@ -2,6 +2,22 @@
 History
 =======
 
+1.11.0 (2023-XX-XX) Support for symbolically defined ODEs and connection callbacks
+-------------------
+
+* Added ODEModelDriver for 'ode' language models that integrate ordinary differential equations (ODEs) symbolically represented in the YAML file using the sympy package
+* Added ode1 example of symbolic ODE model solved symbolically and integrated
+* Added ode2 example of symbolic ODE model solved numerically on failure to solve symbolically and integrated
+* Added ode3 example of symbolic ODE model solved symbolically using roots for the steady state solution
+* Added ode4 example of symbolic ODE model solved symbolically for the steady state solution
+* Added ode5 example of symbolic ODE model solved numerically for the steady state solution
+* Added ode6 example of symbolic ODE model from Ajmera et al. (2018)
+
+TODO
+~~~~
+
+* Add support for merging ODEs when there is more than one
+
 1.10.1 (2023-06-27) New map transformation, composite function wrapping example, and various refactoring of internal methods
 -------------------
 
@@ -106,13 +122,6 @@ History
 1.8.2 (2022-03-18) Migrate tests out of package into pytest fixtures & various bug fixes
 ------------------
 
-* Added ODEModelDriver for 'ode' language models that integrate ordinary differential equations (ODEs) symbolically represented in the YAML file using the sympy package
-* Added ode1 example of symbolic ODE model solved symbolically and integrated
-* Added ode2 example of symbolic ODE model solved numerically on failure to solve symbolically and integrated
-* Added ode3 example of symbolic ODE model solved symbolically using roots for the steady state solution
-* Added ode4 example of symbolic ODE model solved symbolically for the steady state solution
-* Added ode5 example of symbolic ODE model solved numerically for the steady state solution
-* Added ode6 example of symbolic ODE model from Ajmera et al. (2018)
 * Move tests out of package to take advantage of pytest conftest.py structure and reduce the size of the package
 * Refactor tests to use pytest fixtures instead of the unittest setup/teardown structure
 * Remove the yggtest CLI and migrate options into pytest CLI options
@@ -129,11 +138,6 @@ History
 * Added the split_and_merge example of using communication patterns to split and merge messages between multiple inputs/outputs
 * Fixed a bug in pandas serializer where strings are now stored as objects by default
 * Fixed a bug in table serializer where table parameters were not being passed to the header discovery function, resulting in them being ignored in some cases
-
-TODO
-~~~~
-
-* Add support for merging ODEs when there is more than one
 
 1.8.1 (2021-10-15) Minor updates to support model submission form development
 ------------------
