@@ -14,7 +14,8 @@ Imports:
     Rcpp,
     units,
     zeallot,
-    R6
+    R6,
+    vdiffr (<= 1.0.5)
 Depends:
     R (>= 3.1.0),
     zeallot
