@@ -175,27 +175,33 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
             args = ('repos=\"%s\"' % repos
                     + ("," if x.get('args', '') else "")
                     + x.get('args', ''))
+            install_method = 'install.packages'
             if 'ver' in x:
-                R_cmd.append(
-                    ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
-                     '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver']))
-                name = 'packageurl'
-                # args = ('repos=NULL, type=\"source\"'
-                args = ('type=\"source\", dep=TRUE'
+                R_cmd += [
+                    'install.packages("devtools")',
+                    # ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
+                    #  '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver'])
+                ]
+                install_method = 'devtools::install_version'
+                args = (f"version=\"{x['ver']}\""
                         + ("," if x.get('args', '') else "")
                         + x.get('args', ''))
+                # name = 'packageurl'
+                # args = ('repos=NULL, type=\"source\"'
+                #         + ("," if x.get('args', '') else "")
+                #         + x.get('args', ''))
             if update:
                 R_cmd += [
-                    'if (is.element(\"%s\", installed.packages()[,1])) {' % x['name'],
-                    '  remove.packages(\"%s\")' % x['name'],
-                    '}'
-                    'install.packages(%s, %s)' % (name, args)]
+                    f"if (is.element(\"{x['name']}\", installed.packages()[,1])) {{",
+                    f"  remove.packages(\"{x['name']}\")",
+                    '}',
+                    f"{install_method}({name}, {args})"]
             else:
                 R_cmd += [
-                    'if (!is.element(\"%s\", installed.packages()[,1])) {' % x['name'],
-                    '  install.packages(%s, %s)' % (name, args),
+                    f"if (!is.element(\"{x['name']}\", installed.packages()[,1])) {{",
+                    f"{install_method}({name}, {args})",
                     '} else {',
-                    '  print("%s already installed.")' % x['name'],
+                    f"  print(\"{x['name']} already installed.\")",
                     '}']
     logger.info(f"req_nover = {req_nover}")
     if req_nover:
