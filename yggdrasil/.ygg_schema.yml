@@ -2727,7 +2727,8 @@ definitions:
         type: object
       boundary_conditions:
         additionalProperties:
-          type: float
+          subtype: float
+          type: scalar
         description: Mapping between variables and their boundary conditions.
         type: object
       builddir:
@@ -3129,7 +3130,8 @@ definitions:
         type: boolean
       parameters:
         additionalProperties:
-          type: float
+          subtype: float
+          type: scalar
         description: Mapping between named parameters in the equations and their values.
         type: object
       preserve_cache:
@@ -4243,7 +4245,8 @@ definitions:
         type: object
       boundary_conditions:
         additionalProperties:
-          type: float
+          subtype: float
+          type: scalar
         description: Mapping between variables and their boundary conditions.
         type: object
       compute_method:
@@ -4319,7 +4322,8 @@ definitions:
         type: object
       parameters:
         additionalProperties:
-          type: float
+          subtype: float
+          type: scalar
         description: Mapping between named parameters in the equations and their values.
         type: object
       skip_interpreter:

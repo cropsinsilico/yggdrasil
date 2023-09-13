@@ -57,6 +57,7 @@ requirements:
     - sysv_ipc  # [not win]
   run:
     - GitPython
+    - antlr-python-runtime ==4.10
     - chevron
     - deprecation
     - flask

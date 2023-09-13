@@ -515,7 +515,7 @@ class ODEModel(object):
                     kt = k0.subs(arg, self.t)
                 if unyts.has_units(v):
                     if kt in self.units:
-                        v = v.in_units(self.units[kt])
+                        v = v.to(self.units[kt])
                     else:
                         self.units[kt] = unyts.get_units(v)
                 if f:
@@ -919,10 +919,13 @@ class LambdifySolution(object):
         t0_f = t0
         if isinstance(t0, Number):
             # TODO: Check for non-float (e.g. complex)?
+            # TODO: Units?
             t0_f = np.float64(t0)
         return t0, t0_f
 
     def _fodeint(self, t, X, args, t0):
+        if unyts.has_units(t0) and not unyts.has_units(t):
+            t = unyts.add_units(t, unyts.get_units(t0))
         args = [t0 + t] + list(X) + list(args)
         return self.solution(*args)
 
@@ -935,7 +938,12 @@ class LambdifySolution(object):
             X0 = [self.ics[f.subs(self.t, t0)] for f in self.funcs]
         param = [iparam.get(k, None) for k in self.order]
         NX = len(X0) + 1
+        tS = 0.0
         tF = param[0]
+        if unyts.has_units(tF):
+            tS = unyts.add_units(tS, unyts.get_units(tF))
+            if not unyts.has_units(t0_f):
+                t0_f = unyts.add_units(t0_f, unyts.get_units(tF))
         if tF == t0_f:
             out = X0
         elif 'name' in kwargs:
@@ -949,7 +957,7 @@ class LambdifySolution(object):
             assert x_ode.get_return_code() == 2
         else:
             from scipy.integrate import odeint
-            t = np.array([0.0, tF - t0_f])
+            t = np.array([tS, tF - t0_f])
             out = odeint(self._fodeint, X0, t, args=(param[NX:], t0_f),
                          tfirst=True, **kwargs)[-1]
             # x_ode = solve_ivp(self._fodeint, (t0_f, tF), X0,
@@ -1053,10 +1061,12 @@ class ODEModelDriver(DSLModelDriver):
         'dependent_vars': {'type': 'array', 'items': {'type': 'string'}},
         'boundary_conditions': {
             'type': 'object',
-            'additionalProperties': {'type': 'float'}},
+            'additionalProperties': {'type': 'scalar',
+                                     'subtype': 'float'}},
         'parameters': {
             'type': 'object',
-            'additionalProperties': {'type': 'float'}},
+            'additionalProperties': {'type': 'scalar',
+                                     'subtype': 'float'}},
         'assumptions': {
             'type': 'object',
             'additionalProperties': {
@@ -1151,6 +1161,7 @@ class ODEModelDriver(DSLModelDriver):
         input_vars = {}
         for v in input_map.values():
             if v['vars']:
+                v['vars'] = [vv['name'] for vv in v['vars']]
                 for k in v['vars']:
                     input_vars.setdefault(k, [])
                     input_vars[k].append(v)
@@ -1179,6 +1190,8 @@ class ODEModelDriver(DSLModelDriver):
         for v in output_map.values():
             if not v.get('vars', None):
                 v['vars'] = default_ovars
+            else:
+                v['vars'] = [vv['name'] for vv in v['vars']]
             output_vars += v['vars']
         output_vars = {k: model.sympify(k) for k in set(output_vars)}
         # Get static inputs

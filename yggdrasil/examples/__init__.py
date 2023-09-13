@@ -31,8 +31,8 @@ def register_example(example_dir):
     # Check that the source directory and test exist
     example_base = os.path.basename(example_dir)
     srcdir = os.path.join(example_dir, 'src')
-    if not os.path.isdir(srcdir):  # pragma: no cover
-        return {}
+    if not os.path.isdir(srcdir):
+        srcdir = None
     # Determine which languages are present in the example
     lang_base = []
     lang_avail = []
