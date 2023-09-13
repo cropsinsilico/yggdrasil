@@ -30,6 +30,7 @@
     "pytest",
     "pytest-cov",
     "pytest-drop-dup-tests",
+    "pytest-mock",
     "pytest-mpi",
     "pytest-repeat",
     "pytest-rerunfailures",

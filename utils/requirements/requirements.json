@@ -94,6 +94,7 @@
       }
     },
     "six",
+    "sympy",
     "toml",
     "unyt",
     "GitPython",
@@ -561,6 +562,7 @@
         "flaky",
         "pytest",
         "pytest-cov",
+        "pytest-mock",
         "pytest-mpi",
         {
           "pytest-drop-dup-tests": {

@@ -72,6 +72,7 @@ requirements:
     - requests
     - scipy
     - six
+    - sympy
     - sysv_ipc  # [not win]
     - toml
     - unyt
@@ -250,6 +251,7 @@ outputs:
         - flaky
         - pytest
         - pytest-cov
+        - pytest-mock
         - pytest-mpi
         - pytest-repeat
         - pytest-rerunfailures

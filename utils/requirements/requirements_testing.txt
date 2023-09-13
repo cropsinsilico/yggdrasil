@@ -6,6 +6,7 @@ flaky
 pytest
 pytest-cov
 pytest-drop-dup-tests  # [pip]
+pytest-mock
 pytest-mpi
 pytest-repeat
 pytest-rerunfailures

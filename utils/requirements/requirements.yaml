@@ -54,6 +54,7 @@ general:
       flags:
         method_in_setup: conda
   - six
+  - sympy
   - toml
   - unyt
   - GitPython
@@ -337,6 +338,7 @@ extras:
     - flaky
     - pytest
     - pytest-cov
+    - pytest-mock
     - pytest-mpi
     - pytest-drop-dup-tests:
         method: pip
