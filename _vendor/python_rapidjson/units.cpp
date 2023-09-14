@@ -1368,6 +1368,18 @@ static PyObject* quantity_array__array_ufunc__(PyObject* self, PyObject* args, P
 		    goto cleanup;
 		}
 	    }
+	} else if (ufunc_name == "exp") {
+	    if (_has_units(i0)) {
+		tmp2 = _get_units(i0);
+		if (((UnitsObject*)tmp2)->units->is_null()) {
+		    Py_DECREF(tmp2);
+		    convert_units = get_empty_units();
+		} else {
+		    // Allow radians here?
+		    Py_DECREF(tmp2);
+		    goto cleanup;
+		}
+	    }
 	} else if (ufunc_name == "sin" ||
 		   ufunc_name == "cos" ||
 		   ufunc_name == "tan" ||
