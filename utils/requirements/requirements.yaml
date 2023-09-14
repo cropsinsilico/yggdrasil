@@ -139,6 +139,22 @@ extras:
           add: [r-base-dev]
         - name: r
           method: brew
+    - r-devtools:
+        options:
+        - method: conda
+          host: True
+        - method: cran
+    - harfbuzz:
+        options:
+        - name: libharfbuzz-dev
+          method: apt
+          add: [libfribidi-dev, r-cran-devtools]
+        - name: harfbuzz
+          add: [fribidi, libgit2]
+          method: brew
+        - method: skip
+          os: win
+        - method: conda_skip
     - r-bit64:
         - method: conda
           host: True

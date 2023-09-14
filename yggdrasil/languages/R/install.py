@@ -178,12 +178,14 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
             install_method = 'install.packages'
             if 'ver' in x:
                 R_cmd += [
-                    f'install.packages("devtools", repos="{repos}")',
+                    f'install.packages("devtools", repos="{repos}", '
+                    f'dependencies=TRUE)',
                     # ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
                     #  '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver'])
                 ]
                 install_method = 'devtools::install_version'
-                args = (f"version=\"{x['ver']}\", repos=\"{repos}\""
+                args = (f"version=\"{x['ver']}\", repos=\"{repos}\", "
+                        f"dependencies=TRUE"
                         + ("," if x.get('args', '') else "")
                         + x.get('args', ''))
                 # name = 'packageurl'
