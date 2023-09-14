@@ -3,7 +3,6 @@
 #include "utils.h"
 #include "serialization.h"
 
-#define RAPIDJSON_YGGDRASIL
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
