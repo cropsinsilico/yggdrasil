@@ -184,7 +184,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                     #  '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver'])
                 ]
                 install_method = 'devtools::install_version'
-                args = (f"version=\"{x['ver']}\", repos=\"{repos}\""
+                args = (f"version=\"{x['ver']}\", repos=\"{repos}\", "
                         f"dependencies=TRUE"
                         + ("," if x.get('args', '') else "")
                         + x.get('args', ''))
