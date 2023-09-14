@@ -94,7 +94,7 @@
       }
     },
     "six",
-    "sympy",
+    "sympy>=1.10",
     "toml",
     "unyt",
     "GitPython",

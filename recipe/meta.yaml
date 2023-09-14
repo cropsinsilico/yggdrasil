@@ -73,7 +73,7 @@ requirements:
     - requests
     - scipy
     - six
-    - sympy
+    - sympy >=1.10
     - sysv_ipc  # [not win]
     - toml
     - unyt

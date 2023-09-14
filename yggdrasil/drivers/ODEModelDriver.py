@@ -14,7 +14,8 @@ try:
     from sympy.core.function import UndefinedFunction, AppliedUndef, Subs
     from sympy.solvers.ode.systems import dsolve_system
     from sympy.parsing.latex import parse_latex
-except ImportError:  # pragma: debug
+except ImportError as e:  # pragma: debug
+    print(f"ERROR = {e}")
     sympy = None
 logger = logging.getLogger(__name__)
 

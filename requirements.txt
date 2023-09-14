@@ -13,7 +13,7 @@ pyzmq
 requests
 scipy
 six
-sympy
+sympy>=1.10
 sysv_ipc; platform_system != 'Windows'
 toml
 unyt
