@@ -111,34 +111,16 @@ typedef long double _Complex complex_long_double;
 #define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
 #endif
 
+#include <math.h> // Required to prevent error when using mingw on windows
+  
+#define RAPIDJSON_YGGDRASIL
+#define RAPIDJSON_HAS_STDSTRING 1
+#include "rapidjson/pyrj_c.h"
+
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
 
-#include <math.h> // Required to prevent error when using mingw on windows
-#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
-#ifndef PyObject
-#define PyObject void*
-#endif
-#ifndef npy_intp
-#define npy_intp int
-#endif
-#else // YGGDRASIL_DISABLE_PYTHON_C_API
-#ifdef _DEBUG
-#undef _DEBUG
-#include <Python.h>
-#include <numpy/arrayobject.h>
-#include <numpy/ndarrayobject.h>
-#include <numpy/npy_common.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#include <numpy/arrayobject.h>
-#include <numpy/ndarrayobject.h>
-#include <numpy/npy_common.h>
-#endif
-#endif // YGGDRASIL_DISABLE_PYTHON_C_API
-  
 /*! @brief Wrapper for a complex number with float components. */
 typedef struct complex_float_t {
   float re; //!< Real component
