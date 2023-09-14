@@ -554,11 +554,13 @@ try:
         libtype_order = ['static', 'shared']
     else:
         libtype_order = ['shared', 'static']
-    _python_lib = ygg_cfg.get('c', 'python_%s' % libtype_order[0],
-                              ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
-    if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
+    _python_lib = ygg_cfg.get('c', f'python_{libtype_order[0]}',
+                              ygg_cfg.get('c', f'python_{libtype_order[1]}', None))
+    for _python_libtype in libtype_order:
+        if (_python_lib is not None) and os.path.isfile(_python_lib):
+            break
         _python_lib = tools.get_python_c_library(
-            allow_failure=True, libtype=libtype_order[0])
+            allow_failure=True, libtype=_python_libtype)
 except BaseException as e:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
     _python_lib = None
