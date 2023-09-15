@@ -183,6 +183,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                     f'  install.packages("devtools", repos="{repos}", '
                     f'dependencies=TRUE)',
                     "}",
+                    "library(devtools)",
                     # ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
                     #  '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver'])
                 ]
@@ -399,7 +400,8 @@ def install(args=None, with_sudo=None, skip_requirements=None,
             requirements = requirements_from_description()
             if os.environ.get('BUILDDOCS', '') == '1':
                 requirements += ['roxygen2', 'Rd2md']
-            requirements.insert(0, 'vdiffr (<= 1.0.5)')
+            if 'linux' in sys.platform:
+                requirements.insert(0, 'vdiffr (<= 1.0.5)')
             if not install_packages(requirements, update=update_requirements,
                                     R_exe=Rscript_exe, **kwargs):
                 logger.error("Failed to install dependencies")
