@@ -175,11 +175,14 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
             args = ('repos=\"%s\"' % repos
                     + ("," if x.get('args', '') else "")
                     + x.get('args', ''))
-            install_method = 'install.packages'
+            before_install = ''
+            install_method = []
             if 'ver' in x:
-                R_cmd += [
-                    f'install.packages("devtools", repos="{repos}", '
+                before_install = [
+                    "if (!is.element(\"devtools\", installed.packages()[,1])) {",
+                    f'  install.packages("devtools", repos="{repos}", '
                     f'dependencies=TRUE)',
+                    "}",
                     # ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
                     #  '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver'])
                 ]
@@ -196,11 +199,15 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                 R_cmd += [
                     f"if (is.element(\"{x['name']}\", installed.packages()[,1])) {{",
                     f"  remove.packages(\"{x['name']}\")",
-                    '}',
+                    '}']
+                R_cmd += before_install
+                R_cmd += [
                     f"{install_method}({name}, {args})"]
             else:
                 R_cmd += [
-                    f"if (!is.element(\"{x['name']}\", installed.packages()[,1])) {{",
+                    f"if (!is.element(\"{x['name']}\", installed.packages()[,1])) {{"]
+                R_cmd += ['  ' + iline for iline in before_install]
+                R_cmd += [
                     f"  {install_method}({name}, {args})",
                     '} else {',
                     f"  print(\"{x['name']} already installed.\")",

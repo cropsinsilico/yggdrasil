@@ -310,6 +310,7 @@ int ygg_init() {
 #endif
   ygglog_debug("ygg_init: clean_registered = %d", clean_registered);
   if (clean_registered == 0) {
+    init_python_API();
 #if defined(ZMQINSTALLED)
     if (!(ygg_zsys_init())) {
       out = -1;

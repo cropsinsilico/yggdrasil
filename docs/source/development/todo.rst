@@ -20,6 +20,7 @@ Documentation
 * Expand development section into contributing guide
 * Go through and update/prune interface documentation
 * Docs on default_file/default_value
+* Docs on use of YggInterface.h vs YggLibrary.h in main source vs. other source files when a module has more than one
   
 Refactor
 --------
