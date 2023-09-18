@@ -176,7 +176,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                     + ("," if x.get('args', '') else "")
                     + x.get('args', ''))
             before_install = ''
-            install_method = []
+            install_method = 'install.packages'
             if 'ver' in x:
                 before_install = [
                     "if (!is.element(\"devtools\", installed.packages()[,1])) {",
