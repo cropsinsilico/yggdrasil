@@ -187,6 +187,11 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                     # ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
                     #  '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver'])
                 ]
+                if not shutil.which('gtar'):
+                    tar_exe = shutil.which('tar')
+                    assert tar_exe
+                    before_install.insert(
+                        0, f'Sys.setenv(TAR = "{tar_exe}")')
                 install_method = 'devtools::install_version'
                 args = (f"version=\"{x['ver']}\", repos=\"{repos}\", "
                         f"dependencies=TRUE"
