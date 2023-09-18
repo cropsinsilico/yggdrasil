@@ -54,18 +54,12 @@ general:
       flags:
         method_in_setup: conda
   - six
-  - sympy>=1.10
   - toml
   - unyt
   - GitPython
   - sysv_ipc:
       os: unix
       host: True
-  - antlr:
-      - name: antlr4-python3-runtime==4.10
-        method: pip
-      - name: antlr-python-runtime==4.10
-        method: conda
   
 extras:
   c:
@@ -349,6 +343,15 @@ extras:
     requirements:
     - pandas
     - openpyxl
+  ode:
+    description: Dependencies required to run symbolic ODE models
+    requirements:
+    - antlr:
+      - name: antlr4-python3-runtime==4.10
+        method: pip
+      - name: antlr-python-runtime==4.10
+        method: conda
+    - sympy>=1.10
   testing:
     description: Dependencies required to run yggdrasil tests
     requirements:

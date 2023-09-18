@@ -57,7 +57,6 @@ requirements:
     - sysv_ipc  # [not win]
   run:
     - GitPython
-    - antlr-python-runtime ==4.10
     - chevron
     - deprecation
     - flask
@@ -73,7 +72,6 @@ requirements:
     - requests
     - scipy
     - six
-    - sympy >=1.10
     - sysv_ipc  # [not win]
     - toml
     - unyt
@@ -238,6 +236,18 @@ outputs:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - openpyxl
         - pandas
+  - name: yggdrasil.ode
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.ode') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - antlr-python-runtime ==4.10
+        - sympy >=1.10
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

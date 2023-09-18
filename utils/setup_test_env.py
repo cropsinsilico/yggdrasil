@@ -843,6 +843,7 @@ def get_install_opts(old=None, empty=False):
             'images': False,
             'seq': False,
             'excel': False,
+            'ode': False,
             'omp': False,
             'docs': False,
             'no_sudo': False,
@@ -868,6 +869,7 @@ def get_install_opts(old=None, empty=False):
             'images': (os.environ.get('INSTALLIMAGES', '0') == '1'),
             'seq': (os.environ.get('INSTALLSEQ', '0') == '1'),
             'excel': (os.environ.get('INSTALLEXCEL', '0') == '1'),
+            'ode': (os.environ.get('INSTALLODE', '0') == '1'),
             'omp': (os.environ.get('INSTALLOMP', '0') == '1'),
             'docs': (os.environ.get('BUILDDOCS', '0') == '1'),
             'no_sudo': False,
@@ -894,6 +896,7 @@ def get_install_opts(old=None, empty=False):
             'images': True,
             'seq': True,
             'excel': True,
+            'ode': True,
             'omp': False,
             'docs': True,
             'no_sudo': False,
@@ -920,6 +923,8 @@ def get_install_opts(old=None, empty=False):
             out.update(fortran=False, zmq=False)
         if out['docs']:
             out['r'] = True  # Allow roxygen
+    if sys.version_info[:2] < (3, 8):
+        out['ode'] = False  # sympy dropped support for Python < 3.8
     return out
 
 
@@ -1768,7 +1773,7 @@ def verify_pkg(install_opts=None):
     sys.stdout.flush()
     from yggdrasil.tools import is_lang_installed, is_comm_installed
     errors = []
-    for name in ['c', 'r', 'fortran', 'sbml', 'lpy', 'julia']:
+    for name in ['c', 'r', 'fortran', 'sbml', 'lpy', 'julia', 'ode']:
         flag = install_opts[name]
         if flag and (not is_lang_installed(name)):
             errors.append("Language '%s' should be installed, but is not."
