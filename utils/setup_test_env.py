@@ -1779,11 +1779,14 @@ def verify_pkg(install_opts=None):
             errors.append("Language '%s' should be installed, but is not."
                           % name)
         elif (not flag) and is_lang_installed(name):
-            if name in ['r']:
+            if name in ['r', 'ode']:
                 # Allow R to be installed even if the settings is not as
                 # packages may be installed from CRAN, unless there is an
                 # error which can occur when a new release of a dependency
                 # comes out but there are not yet binaries available
+                # Allow ode to be installed despite settings because
+                # sympy may be installed as a dependency for another
+                # package
                 continue
             errors.append("Language '%s' should NOT be installed, but is."
                           % name)
