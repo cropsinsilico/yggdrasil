@@ -405,7 +405,7 @@ def install(args=None, with_sudo=None, skip_requirements=None,
             requirements = requirements_from_description()
             if os.environ.get('BUILDDOCS', '') == '1':
                 requirements += ['roxygen2', 'Rd2md']
-            if 'linux' in sys.platform:
+            if 'linux' in sys.platform and (not os.environ.get('CONDA_PREFIX', '')):
                 requirements.insert(0, 'vdiffr (<= 1.0.5)')
             if not install_packages(requirements, update=update_requirements,
                                     R_exe=Rscript_exe, **kwargs):
