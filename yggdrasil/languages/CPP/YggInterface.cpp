@@ -1,2 +1,2 @@
-#define YGGINTERFACE_OUTSIDE_MAIN
+// #define YGGINTERFACE_OUTSIDE_MAIN
 #include "YggInterface.hpp"
