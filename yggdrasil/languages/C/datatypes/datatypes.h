@@ -1,6 +1,35 @@
 #ifndef DATATYPES_H_
 #define DATATYPES_H_
 
+// Required for M_PI on MSVC
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+
+#ifndef RAPIDJSON_NO_INT64DEFINE
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+#if defined(_MSC_VER) && (_MSC_VER < 1800)      // Visual Studio 2013
+#include "rapidjson/msinttypes/stdint.h"
+#include "rapidjson/msinttypes/inttypes.h"
+#else
+// Other compilers should have this.
+#include <stdint.h>
+#include <inttypes.h>
+#endif
+#endif // RAPIDJSON_NO_INT64DEFINE
+
+#ifdef _MSC_VER
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS 1
+#endif
+#endif
+
+#include <math.h> // Required to prevent error when using mingw on windows
 #include <stdbool.h>
 
 #define RAPIDJSON_YGGDRASIL
