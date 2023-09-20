@@ -5,6 +5,7 @@
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #endif
+#include <cmath>
 
 #ifndef RAPIDJSON_NO_INT64DEFINE
 #ifndef __STDC_LIMIT_MACROS
@@ -29,29 +30,12 @@
 #endif
 #endif
 
-#include <math.h> // Required to prevent error when using mingw on windows
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define RAPIDJSON_YGGDRASIL
 #define RAPIDJSON_HAS_STDSTRING 1
-
-#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
-
-#ifndef PyObject
-#define PyObject void*
-#endif
-
-#else // YGGDRASIL_DISABLE_PYTHON_C_API
-
-#ifdef _DEBUG
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#endif
-
-#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 
 #ifdef USE_OSR_YGG
 struct complex_float{
@@ -126,6 +110,26 @@ typedef long double _Complex complex_long_double;
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
+
+#include <math.h> // Required to prevent error when using mingw on windows
+  
+#ifdef YGGDRASIL_DISABLE_PYTHON_C_API
+
+#ifndef PyObject
+#define PyObject void*
+#endif
+
+#else // YGGDRASIL_DISABLE_PYTHON_C_API
+
+#ifdef _DEBUG
+#undef _DEBUG
+#include <Python.h>
+#define _DEBUG
+#else
+#include <Python.h>
+#endif
+
+#endif // YGGDRASIL_DISABLE_PYTHON_C_API
 
 /*! @brief Wrapper for a complex number with float components. */
 typedef struct complex_float_t {
