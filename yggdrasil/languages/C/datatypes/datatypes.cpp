@@ -1,3 +1,5 @@
+#define RAPIDJSON_FORCE_IMPORT_ARRAY
+#include "rapidjson/pyrj_c.h"
 #include "datatypes.h"
 #include "utils.h"
 #include "serialization.h"
