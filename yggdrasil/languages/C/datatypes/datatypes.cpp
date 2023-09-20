@@ -1,4 +1,3 @@
-#include "../tools.h"
 #include "datatypes.h"
 #include "utils.h"
 #include "serialization.h"
@@ -1706,6 +1705,12 @@ extern "C" {
     return out;
   }
 
+  python_t init_python() {
+    python_t out;
+    out.obj = NULL;
+    return out;
+  }
+  
   void destroy_python(python_t *x) {
     if (x != NULL) {
       if (x->obj != NULL) {

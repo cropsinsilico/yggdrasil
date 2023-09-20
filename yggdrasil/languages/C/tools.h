@@ -41,101 +41,12 @@
 #include <time.h>
 
 
-#ifdef USE_OSR_YGG
-struct complex_float{
-  float re;
-  float im;
-};
-struct complex_double{
-  double re;
-  double im;
-};
-struct complex_long_double{
-  long double re;
-  long double im;
-};
-typedef struct complex_float complex_float;
-typedef struct complex_double complex_double;
-typedef struct complex_long_double complex_long_double;
-#define creal(x) x.re
-#define crealf(x) x.re
-#define creall(x) x.re
-#define cimag(x) x.im
-#define cimagf(x) x.im
-#define cimagl(x) x.im
-#else /*USE_YGG_OSR*/
-#ifdef _MSC_VER
-#ifdef __cplusplus
-#include <complex>
-typedef std::complex<float> complex_float;
-typedef std::complex<double> complex_double;
-typedef std::complex<long double> complex_long_double;
-#ifndef creal
-#define creal(x) x.real()
-#define crealf(x) x.real()
-#define creall(x) x.real()
-#define cimag(x) x.imag()
-#define cimagf(x) x.imag()
-#define cimagl(x) x.imag()
-#endif /*creal*/
-#else /*__cplusplus*/
-#include <complex.h>
-typedef _Fcomplex complex_float;
-typedef _Dcomplex complex_double;
-typedef _Lcomplex complex_long_double;
-#define print_complex(x) printf("%lf+%lfj\n", (double)(x._Val[0]), (double)(x._Val[1]))
-#endif /*__cplusplus*/
-#else // Unix
-#ifdef __cplusplus
-#include <complex>
-typedef std::complex<float> complex_float;
-typedef std::complex<double> complex_double;
-typedef std::complex<long double> complex_long_double;
-#ifndef creal
-#define creal(x) x.real()
-#define crealf(x) x.real()
-#define creall(x) x.real()
-#define cimag(x) x.imag()
-#define cimagf(x) x.imag()
-#define cimagl(x) x.imag()
-#endif /*creal*/
-#else /*__cplusplus*/
-#include <complex.h>
-typedef float _Complex complex_float;
-typedef double _Complex complex_double;
-typedef long double _Complex complex_long_double;
-#endif /*__cplusplus*/
-#endif /*Unix*/
-#endif /*USE_YGG_OSR*/
-#ifndef print_complex
-#define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
-#endif
-
 #include <math.h> // Required to prevent error when using mingw on windows
   
-#define RAPIDJSON_YGGDRASIL
-#define RAPIDJSON_HAS_STDSTRING 1
-#include "rapidjson/pyrj_c.h"
-
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
 
-/*! @brief Wrapper for a complex number with float components. */
-typedef struct complex_float_t {
-  float re; //!< Real component
-  float im; //!< Imaginary component
-} complex_float_t;
-/*! @brief Wrapper for a complex number with double components. */
-typedef struct complex_double_t {
-  double re; //!< Real component
-  double im; //!< Imaginary component
-} complex_double_t;
-/*! @brief Wrapper for a complex number with long double components. */
-typedef struct complex_long_double_t {
-  long double re; //!< Real component
-  long double im; //!< Imaginary component
-} complex_long_double_t;
 // Platform specific
 #ifdef _WIN32
 #include "regex/regex_win32.h"
@@ -213,11 +124,6 @@ unsigned long ptr2seed(void *ptr) {
 };
 
 
-/*! @brief Structure used to wrap Python objects. */
-typedef struct python_t {
-  PyObject *obj; //!< Python object.
-} python_t;
-
 /*!
   @brief Get the ID for the current thread (if inside one).
   @returns int Thread ID.
@@ -238,18 +144,6 @@ int get_thread_id() {
 };
 
 
-/*!
-  @brief Initialize a structure to contain a Python object.
-  @returns python_t New Python object structure.
- */
-static inline
-python_t init_python() {
-  python_t out;
-  out.obj = NULL;
-  return out;
-};
-
-  
 //==============================================================================
 /*!
   Logging

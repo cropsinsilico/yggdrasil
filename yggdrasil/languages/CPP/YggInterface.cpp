@@ -1,2 +1,3 @@
-// #define YGGINTERFACE_OUTSIDE_MAIN
+#define RAPIDJSON_FORCE_IMPORT_ARRAY
+#include "rapidjson/pyrj_c.h"
 #include "YggInterface.hpp"
