@@ -2,9 +2,9 @@
 #ifndef YGGINTERFACE_H_
 #define YGGINTERFACE_H_
 
-#ifndef YGGINTERFACE_OUTSIDE_MAIN
-#define RAPIDJSON_FORCE_IMPORT_ARRAY
-#endif // YGGINTERFACE_OUTSIDE_MAIN
+/* #ifndef YGGINTERFACE_OUTSIDE_MAIN */
+/* #define RAPIDJSON_FORCE_IMPORT_ARRAY */
+/* #endif // YGGINTERFACE_OUTSIDE_MAIN */
 #include "../tools.h"
 #include "../datatypes/datatypes.h"
 #include "../communication/communication.h"
