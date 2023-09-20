@@ -1592,6 +1592,7 @@ class CompilerBase(CompilationToolBase):
             from yggdrasil import __version__
             kwargs.setdefault('definitions', [])
             kwargs['definitions'].append('WITH_YGGDRASIL')
+            kwargs['definitions'].append('_USE_MATH_DEFINES')
             yggver = __version__.split('+')[0].split('v')[-1].split('.')
             if len(yggver) > 0:
                 kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}']
