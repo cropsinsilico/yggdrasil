@@ -270,7 +270,7 @@ jobs:
       run: |
         cmake -h
         where.exe python
-        python -m pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
     - name: Run tests (1st)
       timeout-minutes: 180
