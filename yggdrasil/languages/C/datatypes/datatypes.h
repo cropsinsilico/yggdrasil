@@ -5,7 +5,6 @@
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #endif
-#include <cmath>
 
 #ifndef RAPIDJSON_NO_INT64DEFINE
 #ifndef __STDC_LIMIT_MACROS
