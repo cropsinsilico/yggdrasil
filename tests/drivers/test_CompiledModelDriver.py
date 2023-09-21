@@ -197,7 +197,7 @@ class TestDummyCompiler(TestCompilationTool):
         from yggdrasil import __version__ as yggver
         yggver = yggver.split('+')[0].split('v')[-1].split('.')
         assert (python_class.get_flags(flags='hello', libtype='object')
-                == ['hello', '-DWITH_YGGDRASIL',
+                == ['hello', '-DWITH_YGGDRASIL', '-D_USE_MATH_DEFINES',
                     f'-DYGGVER_MAJOR={yggver[0]}'])
         
     def test_get_executable_command(self, python_class):
