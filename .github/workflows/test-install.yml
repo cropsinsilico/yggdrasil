@@ -439,7 +439,7 @@ jobs:
 
         where.exe python
 
-        python -m pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
       shell: cmd /C CALL {0}
@@ -788,7 +788,7 @@ jobs:
 
         where.exe python
 
-        python -m pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
       shell: cmd /C CALL {0}
@@ -1129,7 +1129,7 @@ jobs:
 
         where.exe python
 
-        python -m pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
       shell: cmd /C CALL {0}
@@ -1453,7 +1453,7 @@ jobs:
 
         where.exe python
 
-        python -m pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
       shell: cmd /C CALL {0}
@@ -1776,7 +1776,7 @@ jobs:
 
         where.exe python
 
-        python -m pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
         '
       shell: cmd /C CALL {0}
