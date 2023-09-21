@@ -5,6 +5,11 @@
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #endif
+#ifdef __cplusplus
+#include <cmath>
+#else // __cplusplus
+#include <math.h> // Required to prevent error when using mingw on windows
+#endif // __cplusplus
 
 #ifndef RAPIDJSON_NO_INT64DEFINE
 #ifndef __STDC_LIMIT_MACROS
@@ -110,8 +115,6 @@ typedef long double _Complex complex_long_double;
 extern "C" {
 #endif
 
-#include <math.h> // Required to prevent error when using mingw on windows
-  
 #ifdef YGGDRASIL_DISABLE_PYTHON_C_API
 
 #ifndef PyObject
