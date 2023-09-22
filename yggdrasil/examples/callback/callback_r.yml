@@ -1,0 +1,26 @@
+models:
+  - name: R_modelA
+    language: R
+    args: ./src/callback_modelA.R
+    function: modelA_function
+
+  - name: R_modelB
+    language: R
+    args: ./src/callback_modelB.R
+    function: modelB_function
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: R_modelA:input
+    filetype: table
+  - input: R_modelA:output  # Connection between model A output & model B input
+    output: R_modelB:input
+    callback:
+      function: ./src/callback.py:callback_function
+      interval: 2
+  - input: R_modelB:output  # Connection between model B, function 1 output and file
+    output: ./outputB.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRate
+    field_units: g/s,g/s
+    format_str: "%.1lf\t%.1lf\n"

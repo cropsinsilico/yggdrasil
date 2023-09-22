@@ -281,6 +281,8 @@ class ConnectionDriver(Driver):
         'onexit': {'type': 'string'},
         'working_dir': {'type': 'string'},
         'callbacks': {'type': 'array', 'default': [],
+                      'allowSingular': True,
+                      'aliases': ['callback'],
                       'items': {'oneOf': [
                           {'type': 'function'},
                           {'type': 'object',

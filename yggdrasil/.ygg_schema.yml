@@ -525,6 +525,9 @@ definitions:
         description: '[DEPRECATED] Arguments that should be provided to the driver.'
         type: string
       callbacks:
+        aliases:
+        - callback
+        allowSingular: true
         default: []
         description: 'One or more functions that should be called each time a message
           is received. The functions should take the message as input. Entries can

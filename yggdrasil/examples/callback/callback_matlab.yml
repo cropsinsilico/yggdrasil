@@ -1,0 +1,26 @@
+models:
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/callback_modelA.m
+    function: callback_modelA
+
+  - name: matlab_modelB
+    language: matlab
+    args: ./src/callback_modelB.m
+    function: callback_modelB
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: matlab_modelA:input
+    filetype: table
+  - input: matlab_modelA:output  # Connection between model A output & model B input
+    output: matlab_modelB:input
+    callback:
+      function: ./src/callback.py:callback_function
+      interval: 2
+  - input: matlab_modelB:output  # Connection between model B, function 1 output and file
+    output: ./outputB.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRate
+    field_units: g/s,g/s
+    format_str: "%.1lf\t%.1lf\n"

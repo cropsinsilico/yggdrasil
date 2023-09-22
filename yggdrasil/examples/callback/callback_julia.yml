@@ -1,0 +1,26 @@
+models:
+  - name: julia_modelA
+    language: julia
+    args: ./src/callback_modelA.jl
+    function: modelA_function
+
+  - name: julia_modelB
+    language: julia
+    args: ./src/callback_modelB.jl
+    function: modelB_function
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: julia_modelA:input
+    filetype: table
+  - input: julia_modelA:output  # Connection between model A output & model B input
+    output: julia_modelB:input
+    callback:
+      function: ./src/callback.py:callback_function
+      interval: 2
+  - input: julia_modelB:output  # Connection between model B and file
+    output: ./outputB.txt
+    filetype: table
+    field_names: InputMassRate,OuputMassRate
+    field_units: g/s,g/s
+    format_str: "%.1lf\t%.1lf\n"
