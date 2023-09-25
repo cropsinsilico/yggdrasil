@@ -72,8 +72,12 @@ extras:
         method: conda
         os: unix
     - make:
-        method: conda
-        os: unix
+        options:
+        - method: conda
+          os: unix
+        - name: m2w64-make
+          method: conda
+          os: win
     - "{{ compiler('c') }}":
         method: conda_recipe
     - "{{ compiler('cxx') }}":

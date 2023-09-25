@@ -96,6 +96,7 @@ outputs:
         - {{ pin_subpackage('yggdrasil.zmq', exact=True) }}  # [win]
         - cmake  # [not win]
         - compiler-rt  # [osx]
+        - m2w64-make  # [win]
         - make  # [not win]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
