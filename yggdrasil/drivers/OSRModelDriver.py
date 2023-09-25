@@ -191,8 +191,10 @@ class OSRModelDriver(ExecutableModelDriver):
             elif not os.path.isfile(cls.executable_path):
                 return
             cmd = ['make', target] + flags
-            logger.info(f"Calling {cmd} from {cwd} with make="
-                        f"{shutil.which('make')}")
+            logger.info(
+                f"Calling {cmd} from {cwd} with make="
+                f"{shutil.which('make')} and PATH=\n    "
+                + '\n    '.join(os.environ['PATH'].split(os.pathsep)))
             subprocess.check_call(cmd, cwd=cwd, env=env)
 
     def write_wrappers(self, **kwargs):
