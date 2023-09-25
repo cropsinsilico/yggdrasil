@@ -106,6 +106,14 @@ class OSRModelDriver(ExecutableModelDriver):
         assert os.path.isfile(self.executable_path)
 
     @classmethod
+    def make_name(cls):
+        r"""str: Name of make executable to use"""
+        make_base = 'make'
+        if platform._is_win:  # pragma: windows
+            make_base = 'mingw32-make'
+        return shutil.which(make_base)
+
+    @classmethod
     def is_library_installed(cls, lib, **kwargs):
         r"""Determine if a dependency is installed.
 
@@ -120,7 +128,7 @@ class OSRModelDriver(ExecutableModelDriver):
         # Need to treat gnu make as dependency since OSR Makefile is not
         # compatible with nmake
         if lib == 'make':
-            return bool(shutil.which('make'))
+            return bool(cls.make_name())
         return super(OSRModelDriver, cls).is_library_installed(
             lib, **kwargs)  # pragma: debug
 
@@ -191,10 +199,9 @@ class OSRModelDriver(ExecutableModelDriver):
                                                   **kwargs)
             elif not os.path.isfile(cls.executable_path):
                 return
-            cmd = ['make', target] + flags
+            cmd = [cls.make_name(), target] + flags
             logger.info(
-                f"Calling {cmd} from {cwd} with make="
-                f"{shutil.which('make')} and PATH=\n    "
+                f"Calling {cmd} from {cwd} with PATH=\n    "
                 + '\n    '.join(os.environ['PATH'].split(os.pathsep)))
             subprocess.check_call(cmd, cwd=cwd, env=env)
 
