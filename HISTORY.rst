@@ -18,6 +18,13 @@ TODO
 
 * Add support for merging ODEs when there is more than one
 
+1.10.2 (2023-09-22) Minor bug fixes and dependency updates
+-------------------
+
+* Updated rapidjson version to include normalization of units in human readable strings
+* Fix CI R dependency installation bug by pinning vdiffr to 1.0.5
+* Fix bug in types test that assumed different directory structure
+
 1.10.1 (2023-06-27) New map transformation, composite function wrapping example, and various refactoring of internal methods
 -------------------
 
