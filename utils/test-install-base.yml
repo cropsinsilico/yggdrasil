@@ -54,7 +54,7 @@ jobs:
         os-base: [ubuntu, macos, windows]
         python-version: [3.7]
         install-method: [pip]
-        test-flags1: [--long-running --suites timing demos top, --suite=examples --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3, --suite=types --skip-languages c cpp, --suite=types --languages c cpp]
+        test-flags1: [--long-running --suites timing demos top, --suite=examples -x --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3, --suite=types --skip-languages c cpp, --suite=types --languages c cpp]
         test-flags2: [""]
         install-c: [true]
         install-mpi: [true]
