@@ -108,6 +108,8 @@ class SerializeBase(tools.YggClass):
             object: Serializable object.
 
         """
+        if len(obj) > 1:
+            return obj
         assert len(obj) == 1
         return list(obj.values())[0]
         
