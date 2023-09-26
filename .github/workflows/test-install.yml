@@ -273,8 +273,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
+    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
+        'pip'
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -622,8 +622,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
+    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
+        'pip'
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -963,8 +963,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
+    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
+        'pip'
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -1287,8 +1287,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
+    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
+        'pip'
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -1610,8 +1610,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
+    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
+        'pip'
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
