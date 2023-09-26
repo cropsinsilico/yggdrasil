@@ -106,7 +106,7 @@ jobs:
     # ========================================================
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC == 1
+      if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method == 'pip' 
       with:
         toolset: 14.0
     - name: (WINDOWS,PIP) Set up MSMPI
