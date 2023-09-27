@@ -143,6 +143,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                  r'(?P<ver>[^\s=<>]+?)\s*\))?')
     req_ver = []
     req_nover = []
+    logger.info(f"package_list = {package_list}")
     for x in package_list:
         out = re.fullmatch(regex_ver, x).groupdict()
         kws = {}
@@ -167,6 +168,57 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
             req_nover.append(out['name'])
     if repos is None:
         repos = 'http://cloud.r-project.org'
+    logger.info(f"req_ver = {req_ver}")
+    if req_ver:
+        for x in req_ver:
+            name = "\"%s\"" % x['name']
+            args = ('repos=\"%s\"' % repos
+                    + ("," if x.get('args', '') else "")
+                    + x.get('args', ''))
+            before_install = ''
+            install_method = 'install.packages'
+            if 'ver' in x:
+                before_install = [
+                    "if (!is.element(\"devtools\", installed.packages()[,1])) {",
+                    f'  install.packages("devtools", repos="{repos}", '
+                    f'dependencies=TRUE)',
+                    "}",
+                    "library(devtools)",
+                    # ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
+                    #  '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver'])
+                ]
+                if not shutil.which('gtar'):
+                    tar_exe = shutil.which('tar')
+                    assert tar_exe
+                    before_install.insert(
+                        0, f'Sys.setenv(TAR = "{tar_exe}")')
+                install_method = 'devtools::install_version'
+                args = (f"version=\"{x['ver']}\", repos=\"{repos}\", "
+                        f"dependencies=TRUE"
+                        + ("," if x.get('args', '') else "")
+                        + x.get('args', ''))
+                # name = 'packageurl'
+                # args = ('repos=NULL, type=\"source\"'
+                #         + ("," if x.get('args', '') else "")
+                #         + x.get('args', ''))
+            if update:
+                R_cmd += [
+                    f"if (is.element(\"{x['name']}\", installed.packages()[,1])) {{",
+                    f"  remove.packages(\"{x['name']}\")",
+                    '}']
+                R_cmd += before_install
+                R_cmd += [
+                    f"{install_method}({name}, {args})"]
+            else:
+                R_cmd += [
+                    f"if (!is.element(\"{x['name']}\", installed.packages()[,1])) {{"]
+                R_cmd += ['  ' + iline for iline in before_install]
+                R_cmd += [
+                    f"  {install_method}({name}, {args})",
+                    '} else {',
+                    f"  print(\"{x['name']} already installed.\")",
+                    '}']
+    logger.info(f"req_nover = {req_nover}")
     if req_nover:
         req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in req_nover])
         if update:
@@ -188,33 +240,6 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                       '    print(sprintf("%s already installed.", x))',
                       '  }',
                       '}']
-    if req_ver:
-        for x in req_ver:
-            name = "\"%s\"" % x['name']
-            args = ('repos=\"%s\"' % repos
-                    + ("," if x.get('args', '') else "")
-                    + x.get('args', ''))
-            if 'ver' in x:
-                R_cmd.append(
-                    ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
-                     '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver']))
-                name = 'packageurl'
-                args = ('repos=NULL, type=\"source\"'
-                        + ("," if x.get('args', '') else "")
-                        + x.get('args', ''))
-            if update:
-                R_cmd += [
-                    'if (is.element(\"%s\", installed.packages()[,1])) {' % x['name'],
-                    '  remove.packages(\"%s\")' % x['name'],
-                    '}'
-                    'install.packages(%s, %s)' % (name, args)]
-            else:
-                R_cmd += [
-                    'if (!is.element(\"%s\", installed.packages()[,1])) {' % x['name'],
-                    '  install.packages(%s, %s)' % (name, args),
-                    '} else {',
-                    '  print("%s already installed.")' % x['name'],
-                    '}']
     if not call_R(R_cmd, **kwargs):
         logger.error("Error installing dependencies: %s" % ', '.join(package_list))
         return False
@@ -380,6 +405,8 @@ def install(args=None, with_sudo=None, skip_requirements=None,
             requirements = requirements_from_description()
             if os.environ.get('BUILDDOCS', '') == '1':
                 requirements += ['roxygen2', 'Rd2md']
+            if 'linux' in sys.platform and (not os.environ.get('CONDA_PREFIX', '')):
+                requirements.insert(0, 'vdiffr (<= 1.0.5)')
             if not install_packages(requirements, update=update_requirements,
                                     R_exe=Rscript_exe, **kwargs):
                 logger.error("Failed to install dependencies")

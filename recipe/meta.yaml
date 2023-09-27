@@ -122,6 +122,7 @@ outputs:
         - python
         - r-base
         - r-bit64
+        - r-devtools
         - r-r6
         - r-reticulate
         - r-units
@@ -130,6 +131,7 @@ outputs:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - r-base
         - r-bit64
+        - r-devtools
         - r-r6
         - r-reticulate
         - r-units
