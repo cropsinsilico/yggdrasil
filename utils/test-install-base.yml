@@ -271,6 +271,7 @@ jobs:
       if: runner.os == 'Windows'
       shell: cmd /C CALL {0}
       run: |
+        echo %PATH%
         cmake -h
         where.exe python
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py

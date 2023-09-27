@@ -440,7 +440,9 @@ jobs:
         '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'cmake -h
+      run: 'echo %PATH%
+
+        cmake -h
 
         where.exe python
 
@@ -795,7 +797,9 @@ jobs:
         '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'cmake -h
+      run: 'echo %PATH%
+
+        cmake -h
 
         where.exe python
 
@@ -1142,7 +1146,9 @@ jobs:
         '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'cmake -h
+      run: 'echo %PATH%
+
+        cmake -h
 
         where.exe python
 
@@ -1472,7 +1478,9 @@ jobs:
         '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'cmake -h
+      run: 'echo %PATH%
+
+        cmake -h
 
         where.exe python
 
@@ -1801,7 +1809,9 @@ jobs:
         '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'cmake -h
+      run: 'echo %PATH%
+
+        cmake -h
 
         where.exe python
 
