@@ -262,7 +262,10 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: yggcompile
+      run: |
+        git rev-parse --short=10 HEAD
+        git diff-index --quiet HEAD || echo "plus uncommitted changes"
+        yggcompile
     - name: Run cmake test in command prompt
       timeout-minutes: 180
       if: runner.os == 'Windows'

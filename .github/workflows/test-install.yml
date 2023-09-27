@@ -431,7 +431,13 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: yggcompile
+      run: 'git rev-parse --short=10 HEAD
+
+        git diff-index --quiet HEAD || echo "plus uncommitted changes"
+
+        yggcompile
+
+        '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'cmake -h
@@ -780,7 +786,13 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: yggcompile
+      run: 'git rev-parse --short=10 HEAD
+
+        git diff-index --quiet HEAD || echo "plus uncommitted changes"
+
+        yggcompile
+
+        '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'cmake -h
@@ -1121,7 +1133,13 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: yggcompile
+      run: 'git rev-parse --short=10 HEAD
+
+        git diff-index --quiet HEAD || echo "plus uncommitted changes"
+
+        yggcompile
+
+        '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'cmake -h
@@ -1445,7 +1463,13 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: yggcompile
+      run: 'git rev-parse --short=10 HEAD
+
+        git diff-index --quiet HEAD || echo "plus uncommitted changes"
+
+        yggcompile
+
+        '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'cmake -h
@@ -1768,7 +1792,13 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: yggcompile
+      run: 'git rev-parse --short=10 HEAD
+
+        git diff-index --quiet HEAD || echo "plus uncommitted changes"
+
+        yggcompile
+
+        '
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'cmake -h
