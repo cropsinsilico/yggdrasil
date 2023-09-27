@@ -137,7 +137,10 @@ extras:
         options:
         - method: conda
           host: True
+          os: unix
         - method: cran
+        - method: skip
+          os: win
     - harfbuzz:
         options:
         - name: libharfbuzz-dev
