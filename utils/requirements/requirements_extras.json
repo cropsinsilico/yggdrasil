@@ -24,8 +24,7 @@
     "pandas"
   ],
   "ode": [
-    "antlr4-python3-runtime==4.10",
-    "sympy>=1.10"
+    "sympy"
   ],
   "testing": [
     "coverage",

@@ -34,6 +34,7 @@ general:
         from_env: NUMPY
         method_in_setup: conda
         build: True
+  - packaging
   - pandas
   - pip:
       method: conda_recipe
@@ -350,12 +351,12 @@ extras:
   ode:
     description: Dependencies required to run symbolic ODE models
     requirements:
-    - antlr:
-      - name: antlr4-python3-runtime==4.10
-        method: pip
-      - name: antlr-python-runtime==4.10
-        method: conda
-    - sympy>=1.10
+    # - antlr:
+    #   - name: antlr4-python3-runtime==4.10
+    #     method: pip
+    #   - name: antlr-python-runtime==4.10
+    #     method: conda
+    - sympy
   testing:
     description: Dependencies required to run yggdrasil tests
     requirements:

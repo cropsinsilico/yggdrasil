@@ -4,6 +4,7 @@ deprecation
 flask
 matplotlib       # [pip]
 numpy>=1.13.0
+packaging
 pandas
 psutil
 pyperf

@@ -63,6 +63,7 @@
         }
       }
     },
+    "packaging",
     "pandas",
     {
       "pip": {
@@ -593,19 +594,7 @@
     "ode": {
       "description": "Dependencies required to run symbolic ODE models",
       "requirements": [
-        {
-          "antlr": [
-            {
-              "name": "antlr4-python3-runtime==4.10",
-              "method": "pip"
-            },
-            {
-              "name": "antlr-python-runtime==4.10",
-              "method": "conda"
-            }
-          ]
-        },
-        "sympy>=1.10"
+        "sympy"
       ]
     },
     "testing": {

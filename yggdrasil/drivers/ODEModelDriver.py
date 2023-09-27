@@ -14,8 +14,7 @@ try:
     from sympy.core.function import UndefinedFunction, AppliedUndef, Subs
     from sympy.solvers.ode.systems import dsolve_system
     from sympy.parsing.latex import parse_latex
-except ImportError as e:  # pragma: debug
-    print(f"ERROR = {e}")
+except ImportError:  # pragma: debug
     sympy = None
 logger = logging.getLogger(__name__)
 
@@ -1113,6 +1112,23 @@ class ODEModelDriver(DSLModelDriver):
                 self.equations = fd.readlines()
         else:
             self.equations = self.args
+        if self.use_latex and sympy:
+            from packaging import version
+            sympy_ver = version.parse(sympy.__version__)
+            ver_map = {(1, 11): "4.10",
+                       (1, 12): "4.11"}
+            antlr_ver = "4.7.2"
+            if sympy_ver >= version.parse("1.11"):
+                antlr_ver = ver_map.get((sympy_ver.major,
+                                         sympy_ver.minor), None)
+            if antlr_ver:
+                if not self.additional_dependencies:
+                    self.additional_dependencies = {}
+                self.additional_dependencies.setdefault('python', [])
+                self.additional_dependencies['python'].append(
+                    f"antlr4-python3-runtime=={antlr_ver}")
+            # Don't install anything for future versions to allow error
+            # to be raised
 
     @property
     def model_wrapper_kwargs(self):

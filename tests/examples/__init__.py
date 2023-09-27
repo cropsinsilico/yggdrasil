@@ -85,6 +85,11 @@ class TestExample(base_class):
             return example_module.get_testing_options()
         return {}
 
+    @pytest.fixture(scope="class", autouse=True)
+    def should_be_skipped(self, testing_options):
+        if testing_options.get('skip', False):
+            pytest.skip(testing_options['skip'])
+
     @pytest.fixture(scope="class")
     def expects_error(self, testing_options):
         r"""bool: True if the example expects to raise an error."""

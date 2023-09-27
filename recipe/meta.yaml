@@ -63,6 +63,7 @@ requirements:
     - git
     - matplotlib-base
     - numpy >=1.13.0
+    - packaging
     - pandas
     - psutil
     - pyperf
@@ -246,8 +247,7 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - antlr-python-runtime ==4.10
-        - sympy >=1.10
+        - sympy
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

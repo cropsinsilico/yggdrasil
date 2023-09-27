@@ -923,8 +923,6 @@ def get_install_opts(old=None, empty=False):
             out.update(fortran=False, zmq=False)
         if out['docs']:
             out['r'] = True  # Allow roxygen
-    if sys.version_info[:2] < (3, 8):
-        out['ode'] = False  # sympy dropped support for Python < 3.8
     return out
 
 
