@@ -224,10 +224,15 @@
             "options": [
               {
                 "method": "conda",
-                "host": true
+                "host": true,
+                "os": "unix"
               },
               {
                 "method": "cran"
+              },
+              {
+                "method": "skip",
+                "os": "win"
               }
             ]
           }
