@@ -273,8 +273,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
-        'pip'
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -431,13 +431,7 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: 'git rev-parse --short=10 HEAD
-
-        git diff-index --quiet HEAD || echo "plus uncommitted changes"
-
-        yggcompile
-
-        '
+      run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'echo %PATH%
@@ -630,8 +624,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
-        'pip'
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -788,13 +782,7 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: 'git rev-parse --short=10 HEAD
-
-        git diff-index --quiet HEAD || echo "plus uncommitted changes"
-
-        yggcompile
-
-        '
+      run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'echo %PATH%
@@ -979,8 +967,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
-        'pip'
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -1137,13 +1125,7 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: 'git rev-parse --short=10 HEAD
-
-        git diff-index --quiet HEAD || echo "plus uncommitted changes"
-
-        yggcompile
-
-        '
+      run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'echo %PATH%
@@ -1311,8 +1293,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
-        'pip'
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -1469,13 +1451,7 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: 'git rev-parse --short=10 HEAD
-
-        git diff-index --quiet HEAD || echo "plus uncommitted changes"
-
-        yggcompile
-
-        '
+      run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'echo %PATH%
@@ -1642,8 +1618,8 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method ==
-        'pip'
+    - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -1800,13 +1776,7 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: 'git rev-parse --short=10 HEAD
-
-        git diff-index --quiet HEAD || echo "plus uncommitted changes"
-
-        yggcompile
-
-        '
+      run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
       run: 'echo %PATH%

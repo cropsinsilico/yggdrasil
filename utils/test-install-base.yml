@@ -105,7 +105,7 @@ jobs:
     # ========================================================
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows' && env.INSTALLC == 1 && matrix.install-method == 'pip' 
+      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLC == 1
       with:
         toolset: 14.0
     - name: (WINDOWS,PIP) Set up MSMPI
@@ -262,10 +262,7 @@ jobs:
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
-      run: |
-        git rev-parse --short=10 HEAD
-        git diff-index --quiet HEAD || echo "plus uncommitted changes"
-        yggcompile
+      run: yggcompile
     - name: Run cmake test in command prompt
       timeout-minutes: 180
       if: runner.os == 'Windows'
