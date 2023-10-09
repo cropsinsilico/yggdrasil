@@ -270,6 +270,8 @@ jobs:
       run: |
         echo %PATH%
         cmake -h
+        conda info
+        conda activate test
         where.exe python
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
