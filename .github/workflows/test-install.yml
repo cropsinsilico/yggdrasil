@@ -435,15 +435,15 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'echo %PATH%
+      run: '# echo %PATH%
 
-        cmake -h
-
-        conda info
+        # cmake -h
 
         conda activate test
 
-        where.exe python
+        conda info
+
+        # where.exe python
 
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
@@ -790,15 +790,15 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'echo %PATH%
+      run: '# echo %PATH%
 
-        cmake -h
-
-        conda info
+        # cmake -h
 
         conda activate test
 
-        where.exe python
+        conda info
+
+        # where.exe python
 
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
@@ -1137,15 +1137,15 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'echo %PATH%
+      run: '# echo %PATH%
 
-        cmake -h
-
-        conda info
+        # cmake -h
 
         conda activate test
 
-        where.exe python
+        conda info
+
+        # where.exe python
 
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
@@ -1467,15 +1467,15 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'echo %PATH%
+      run: '# echo %PATH%
 
-        cmake -h
-
-        conda info
+        # cmake -h
 
         conda activate test
 
-        where.exe python
+        conda info
+
+        # where.exe python
 
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
@@ -1796,15 +1796,15 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: 'echo %PATH%
+      run: '# echo %PATH%
 
-        cmake -h
-
-        conda info
+        # cmake -h
 
         conda activate test
 
-        where.exe python
+        conda info
+
+        # where.exe python
 
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
 
