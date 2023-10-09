@@ -434,19 +434,8 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: '# echo %PATH%
-
-        # cmake -h
-
-        conda activate test
-
-        conda info
-
-        # where.exe python
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
+      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
+        --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -789,19 +778,8 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: '# echo %PATH%
-
-        # cmake -h
-
-        conda activate test
-
-        conda info
-
-        # where.exe python
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
+      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
+        --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -1136,19 +1114,8 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: '# echo %PATH%
-
-        # cmake -h
-
-        conda activate test
-
-        conda info
-
-        # where.exe python
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
+      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
+        --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -1466,19 +1433,8 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: '# echo %PATH%
-
-        # cmake -h
-
-        conda activate test
-
-        conda info
-
-        # where.exe python
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
+      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
+        --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -1795,19 +1751,8 @@ jobs:
       run: yggcompile
     - if: runner.os == 'Windows'
       name: Run cmake test in command prompt
-      run: '# echo %PATH%
-
-        # cmake -h
-
-        conda activate test
-
-        conda info
-
-        # where.exe python
-
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
-        '
+      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
+        --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true

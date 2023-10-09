@@ -267,14 +267,13 @@ jobs:
       timeout-minutes: 180
       if: runner.os == 'Windows'
       shell: cmd /C CALL {0}
-      run: |
-        # echo %PATH%
-        # cmake -h
-        conda activate test
-        conda info
-        # where.exe python
-        pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
+      run: >-
+        conda activate test && pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+    # echo %PATH%
+    # cmake -h
+    # conda activate test
+    # conda info
+    # where.exe python
     - name: Run tests (1st)
       timeout-minutes: 180
       id: test1
