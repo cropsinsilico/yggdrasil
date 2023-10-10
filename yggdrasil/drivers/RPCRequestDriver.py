@@ -19,7 +19,8 @@ class RPCRequestDriver(ConnectionDriver):
 
     _connection_type = 'rpc_request'
 
-    def __init__(self, model_request_name, response_kwargs=None, **kwargs):
+    def __init__(self, model_request_name, args=None,
+                 response_kwargs=None, **kwargs):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
         # inputs[0]['name'] = model_request_name + '.client_model_request'
