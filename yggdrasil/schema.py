@@ -1352,7 +1352,8 @@ class SchemaRegistry(object):
         return out
 
     def get_schema(self, relaxed=False, allow_instance=False, for_form=False,
-                   partial=False, full=False, allow_driver=True):
+                   partial=False, full=False, allow_driver=True,
+                   component=None):
         r"""Get the schema defining this component.
 
         Args:
@@ -1379,6 +1380,9 @@ class SchemaRegistry(object):
             allow_driver (bool, optional): If True, the returned schema
                 will include the deprecated driver based schemas. Defaults to
                 True.
+            component (str, optional): Return a schema for an isolated
+                component. If not provided, the schema for yggdrasil
+                YAML specification files will be returned.
 
         Returns:
             dict: Schema for this component.
@@ -1401,6 +1405,8 @@ class SchemaRegistry(object):
             cache_key += '_full'
         if allow_driver:
             cache_key += '_driver'
+        if component:
+            cache_key += f'_{component}'
         if cache_key not in self._cache:
             if allow_driver:
                 model_ref = {'anyOf': [{'$ref': '#/definitions/model'},
@@ -1440,6 +1446,11 @@ class SchemaRegistry(object):
                 out.pop('additionalProperties')
                 out['properties']['models'].pop('minItems')
                 out['properties']['models']['default'] = []
+            if component:
+                for k in ['type', 'required', 'additionalProperties',
+                          'properties']:
+                    out.pop(k, None)
+                out['$ref'] = f'#/definitions/{component}'
             self._cache[cache_key] = out
         return copy.deepcopy(self._cache[cache_key])
 

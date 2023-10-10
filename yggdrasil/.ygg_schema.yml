@@ -88,6 +88,7 @@ definitions:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
         enum:
+        - ConnectionDriver
         - IPCInputDriver
         - IPCOutputDriver
         - InputDriver
@@ -264,6 +265,7 @@ definitions:
         enum:
         - InputDriver
         - OutputDriver
+        - ConnectionDriver
         type: string
       name:
         description: Name used for component in log messages.

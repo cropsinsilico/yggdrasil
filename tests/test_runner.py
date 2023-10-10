@@ -60,7 +60,7 @@ def test_supplemental_parameters():
                supplemental_parameters={
                    'connections': {
                        'hello_python:helloQueueOut_to_hello_python:helloQueueIn': {
-                           'callbacks': [callback_function]}}})
+                           'callback': callback_function}}})
     print(buff)
     assert len(buff) == 1
 

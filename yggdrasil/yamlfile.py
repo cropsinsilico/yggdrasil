@@ -294,6 +294,9 @@ def supplement_parameters(yml, parameters):
         parameters (dict): Parameters with which to supplement
             models/connections in the provided YAML file(s).
 
+    Returns:
+        dict: Updated yml dictionary.
+
     """
     def _update(old, new):
         if isinstance(old, dict) and isinstance(new, dict):
@@ -302,6 +305,8 @@ def supplement_parameters(yml, parameters):
                     old[k] = v
             return True
         elif (isinstance(old, list) and isinstance(new, list)
+              and all(isinstance(x, dict) for x in old)
+              and all(isinstance(x, dict) for x in new)
               and len(old) == len(new)):
             for i in range(len(old)):
                 if not _update(old[i], new[i]):
@@ -309,12 +314,17 @@ def supplement_parameters(yml, parameters):
             return True
         return False
 
-    if 'name' in yml:
-        name = yml['name']
-    else:
-        name = name_connection(yml)
-    if name in parameters:
-        _update(yml, parameters.pop(name))
+    if yml['name'] in parameters:
+        _update(yml, parameters.pop(yml['name']))
+        ctype = 'model'
+        if 'inputs' in yml:
+            ctype = 'connection'
+        s = get_schema()
+        __display_progress(True, yml, 'un-normalized')
+        new_yml = s.normalize(yml, component=ctype, relaxed=True)
+        yml.update(new_yml)
+        __display_progress(True, yml, 'normalized')
+    return yml
 
 
 def parse_yaml(files, complete_partial=False, partial_commtype=None,
@@ -636,7 +646,8 @@ def parse_component(yml, ctype, existing=None):
             yml['name'], ctype))
     # Supplement with parameters provided via the Python API
     if existing['supplement'] and ctype + 's' in existing['supplement']:
-        supplement_parameters(yml, existing['supplement'][ctype + 's'])
+        yml = supplement_parameters(
+            yml, existing['supplement'][ctype + 's'])
     existing[ctype][yml['name']] = yml
     return existing
 
@@ -896,6 +907,7 @@ def parse_connection(yml, existing):
     yml.update(xx)
     yml.setdefault('driver', 'ConnectionDriver')
     yml.setdefault('name', name)
+    yml.setdefault('args', name)
     return existing
 
 

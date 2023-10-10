@@ -306,7 +306,7 @@ class ConnectionDriver(Driver):
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread',
         'icomm', 'ocomm']
 
-    def __init__(self, name, single_use=False, onexit=None,
+    def __init__(self, name, args=None, single_use=False, onexit=None,
                  models=None, **kwargs):
         # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)

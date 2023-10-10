@@ -8,7 +8,7 @@ class DefaultComm(CommBase):
     _commtype = 'default'
     _schema_subtype_description = ('Communication mechanism selected '
                                    'based on the current platform.')
-    _deprecated_drivers = ['InputDriver', 'OutputDriver']
+    _deprecated_drivers = ['InputDriver', 'OutputDriver', 'ConnectionDriver']
 
     def __new__(cls, *args, **kwargs):
         return cls._get_alias()(*args, **kwargs)
