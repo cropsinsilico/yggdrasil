@@ -440,7 +440,7 @@ jobs:
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba')
+        != 'mamba'
       name: Run cmake test in command prompt (PIP)
       run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
@@ -791,7 +791,7 @@ jobs:
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba')
+        != 'mamba'
       name: Run cmake test in command prompt (PIP)
       run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
@@ -1134,7 +1134,7 @@ jobs:
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba')
+        != 'mamba'
       name: Run cmake test in command prompt (PIP)
       run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
@@ -1460,7 +1460,7 @@ jobs:
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba')
+        != 'mamba'
       name: Run cmake test in command prompt (PIP)
       run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
@@ -1785,7 +1785,7 @@ jobs:
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
-        != 'mamba')
+        != 'mamba'
       name: Run cmake test in command prompt (PIP)
       run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
