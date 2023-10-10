@@ -12,6 +12,8 @@ History
 * Added ode4 example of symbolic ODE model solved symbolically for the steady state solution
 * Added ode5 example of symbolic ODE model solved numerically for the steady state solution
 * Added ode6 example of symbolic ODE model from Ajmera et al. (2018)
+* Added support for connection callbacks that are functions called for each message processed by a connection
+* Added support for providing supplemental parameters to models/connections via the Python runner API to extend parameters provided via YAML file(s)
 
 TODO
 ~~~~

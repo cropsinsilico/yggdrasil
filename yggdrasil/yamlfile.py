@@ -284,9 +284,43 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
     return yml_all
 
 
+def supplement_parameters(yml, parameters):
+    r"""Update components with supplemental parameters passed in via the
+    Python API.
+
+    Args:
+        yml (dict): Dictionary describing an integration component loaded
+            from a YAML file.
+        parameters (dict): Parameters with which to supplement
+            models/connections in the provided YAML file(s).
+
+    """
+    def _update(old, new):
+        if isinstance(old, dict) and isinstance(new, dict):
+            for k, v in new.items():
+                if (k not in old) or not _update(old[k], v):
+                    old[k] = v
+            return True
+        elif (isinstance(old, list) and isinstance(new, list)
+              and len(old) == len(new)):
+            for i in range(len(old)):
+                if not _update(old[i], new[i]):
+                    old[i] = new[i]
+            return True
+        return False
+
+    if 'name' in yml:
+        name = yml['name']
+    else:
+        name = name_connection(yml)
+    if name in parameters:
+        _update(yml, parameters.pop(name))
+
+
 def parse_yaml(files, complete_partial=False, partial_commtype=None,
                model_only=False, model_submission=False, yaml_param=None,
-               directory_for_clones=None, verbose=False, encoding=None):
+               directory_for_clones=None, verbose=False, encoding=None,
+               supplemental_parameters=None):
     r"""Parse list of yaml files.
 
     Args:
@@ -314,6 +348,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
             process will be printed. Defaults to False.
         encoding (str, optional): Encoding of the YAML file. Default is
             platform dependent (locale.getpreferredencoding).
+        supplemental_parameters (dict, optional): Parameters with which to
+            supplement models/connections in the provided YAML file(s).
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or
@@ -334,6 +370,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
                          model_submission=model_submission,
                          verbose=verbose, encoding=encoding)
     __display_progress(verbose, yml_norm, "prepped")
+    # Validate model submission without working directory
     if model_submission:
         models = []
         for yml in yml_norm['models']:
@@ -384,6 +421,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     existing['input_drivers'] = []
     existing['output_drivers'] = []
     existing['backward'] = run_backwards_compat
+    existing['supplement'] = supplemental_parameters
     for yml in yml_norm['models']:
         existing = parse_component(yml, 'model', existing=existing)
     backward_compat(yml_norm, existing)
@@ -486,6 +524,17 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     # Link io drivers back to models
     existing = link_model_io(existing)
     __display_progress(verbose, existing, "Finalized yaml info")
+    # Raise an error if there are unprocessed supplemental parameters
+    if supplemental_parameters:
+        error = ""
+        for x in ["models", "connections"]:
+            if supplemental_parameters.get(x, {}):
+                error += (
+                    f"Unprocessed supplemental parameters for {x} "
+                    f"{list(supplemental_parameters[x].keys())} "
+                    f"(existing names are {list(existing[x[:-1]].keys())})")
+        if error:
+            raise YAMLSpecificationError(error)
     return existing
 
 
@@ -585,6 +634,9 @@ def parse_component(yml, ctype, existing=None):
         pprint.pprint(yml)
         raise YAMLSpecificationError("%s is already a registered '%s' component." % (
             yml['name'], ctype))
+    # Supplement with parameters provided via the Python API
+    if existing['supplement'] and ctype + 's' in existing['supplement']:
+        supplement_parameters(yml, existing['supplement'][ctype + 's'])
     existing[ctype][yml['name']] = yml
     return existing
 
@@ -707,6 +759,37 @@ def parse_model(yml, existing):
     return existing
 
 
+def name_connection(yml):
+    r"""Create a string to identify a connection based on its inputs and
+    outputs.
+
+    Args:
+        yml (dict): Connection parameters.
+
+    Returns:
+        string: Connection name.
+
+    """
+    name_list = {}
+    for io in ['inputs', 'outputs']:
+        name_list[io] = []
+        for x in yml[io]:
+            if not ('filetype' in x or 'default_value' in x):
+                iname = x['name']
+                if '::' in iname:
+                    iname, _ = x['name'].split('::')
+                name_list[io].append(iname)
+    iname = ','.join(name_list['inputs'])
+    oname = ','.join(name_list['outputs'])
+    if not iname:
+        args = oname
+    elif not oname:
+        args = iname
+    else:
+        args = f'{iname}_to_{oname}'
+    return args
+
+
 def parse_connection(yml, existing):
     r"""Parse a yaml entry for a connection between I/O channels.
 
@@ -726,7 +809,6 @@ def parse_connection(yml, existing):
     backward_compat_connections(yml, existing)
     # File input
     is_file = {'inputs': [], 'outputs': []}
-    iname_list = []
     for x in yml['inputs']:
         is_file['inputs'].append('filetype' in x)
         if is_file['inputs'][-1]:
@@ -754,9 +836,7 @@ def parse_connection(yml, existing):
                 raise YAMLSpecificationError(
                     f"Input '{x['name']}' does not match a corresponding "
                     f"output.")
-            iname_list.append(x['name'])
     # File output
-    oname_list = []
     for x in yml['outputs']:
         is_file['outputs'].append('filetype' in x)
         if is_file['outputs'][-1]:
@@ -779,16 +859,7 @@ def parse_connection(yml, existing):
                 raise YAMLSpecificationError(
                     f"Output '{x['name']}' does not match a corresponding "
                     f"input.")
-            oname_list.append(x['name'])
-    iname = ','.join(iname_list)
-    oname = ','.join(oname_list)
-    if not iname:
-        args = oname
-    elif not oname:
-        args = iname
-    else:
-        args = '%s_to_%s' % (iname, oname)
-    name = args
+    name = name_connection(yml)
     if all(is_file['inputs']) and all(is_file['outputs']):  # pragma: debug
         raise YAMLSpecificationError(
             f"Both the input and output fro this connection appear to be "

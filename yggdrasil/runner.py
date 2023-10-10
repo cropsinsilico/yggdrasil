@@ -275,6 +275,14 @@ class YggRunner(YggClass):
             be disabled. Defaults to False.
         with_asan (bool, optional): Compile and run all models with the
             address sanitizer. Defaults to False.
+        supplemental_parameters (dict, optional): Mapping of in memory
+            model/connection parameters with which to supplement the
+            parameters read from the YAML file(s). 'models'/'connections'
+            keys should denote parameters specific to each of those
+            components with values being dictionaries. Keys within these
+            nested dictionaries for each component should be model or
+            connection names and values should be dictionaries that obey
+            the model/connection schema for those parameters provided.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any
@@ -296,7 +304,8 @@ class YggRunner(YggClass):
                  partial_commtype=None, production_run=False,
                  mpi_tag_start=None, yaml_param=None, validate=False,
                  with_debugger=None, disable_python_c_api=False,
-                 with_asan=False, yaml_encoding=None):
+                 with_asan=False, yaml_encoding=None,
+                 supplemental_parameters=None):
         kwargs_models = {'with_debugger': with_debugger,
                          'disable_python_c_api': disable_python_c_api,
                          'with_asan': with_asan}
@@ -342,7 +351,8 @@ class YggRunner(YggClass):
             self.drivers = yamlfile.parse_yaml(
                 modelYmls, complete_partial=complete_partial,
                 partial_commtype=partial_commtype, yaml_param=yaml_param,
-                encoding=yaml_encoding)
+                encoding=yaml_encoding,
+                supplemental_parameters=supplemental_parameters)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
             for k, v in kwargs_models.items():

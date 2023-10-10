@@ -42,6 +42,28 @@ def test_run_process_connections():
                namespace=namespace)
 
 
+def test_supplemental_parameters():
+    from yggdrasil.yamlfile import YAMLSpecificationError
+    namespace = "test_run_%s" % str(uuid.uuid4)
+    with pytest.raises(YAMLSpecificationError):
+        runner.run([ex_yamls['hello']['python']],
+                   namespace=namespace,
+                   supplemental_parameters={
+                       'models': {'invalid': {'outputs': ['x']}}})
+    buff = []
+    
+    def callback_function(msg):
+        buff.append(msg)
+        
+    runner.run([ex_yamls['hello']['python']],
+               namespace=namespace,
+               supplemental_parameters={
+                   'connections': {
+                       'hello_python:helloQueueOut_to_hello_python:helloQueueIn': {
+                           'callbacks': [callback_function]}}})
+    print(buff)
+    assert len(buff) == 1
+
 # def test_runner_error():
 #     r"""Start a runner for a model with an error."""
 #     cr = runner.get_runner([sc_yamls['error']])
