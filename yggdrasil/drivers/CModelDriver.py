@@ -559,7 +559,7 @@ try:
     for _python_libtype in libtype_order:
         if (_python_lib is not None) and os.path.isfile(_python_lib):
             break
-        _python_lib = tools.get_python_c_library(
+        _python_lib = tools.get_python_c_library(  # pragma: no cover
             allow_failure=True, libtype=_python_libtype)
 except BaseException as e:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
