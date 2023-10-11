@@ -309,8 +309,9 @@ def supplement_parameters(yml, parameters):
               and all(isinstance(x, dict) for x in new)
               and len(old) == len(new)):
             for i in range(len(old)):
-                if not _update(old[i], new[i]):
-                    old[i] = new[i]
+                assert _update(old[i], new[i])
+                # if not _update(old[i], new[i]):
+                #     old[i] = new[i]
             return True
         return False
 
@@ -320,10 +321,8 @@ def supplement_parameters(yml, parameters):
         if 'inputs' in yml:
             ctype = 'connection'
         s = get_schema()
-        __display_progress(True, yml, 'un-normalized')
         new_yml = s.normalize(yml, component=ctype, relaxed=True)
         yml.update(new_yml)
-        __display_progress(True, yml, 'normalized')
     return yml
 
 
@@ -786,10 +785,7 @@ def name_connection(yml):
         name_list[io] = []
         for x in yml[io]:
             if not ('filetype' in x or 'default_value' in x):
-                iname = x['name']
-                if '::' in iname:
-                    iname, _ = x['name'].split('::')
-                name_list[io].append(iname)
+                name_list[io].append(x['name'])
     iname = ','.join(name_list['inputs'])
     oname = ','.join(name_list['outputs'])
     if not iname:

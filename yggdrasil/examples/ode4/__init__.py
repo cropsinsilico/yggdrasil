@@ -11,6 +11,6 @@ def get_testing_options():
         # This example hangs indefinitely for sympy 1.10 and 1.11
         if version.parse("1.10") <= sympy_ver < version.parse("1.12"):
             out['skip'] = "sympy >= 1.12 or < 1.10 is required for this example"
-    except ImportError:
+    except ImportError:  # pragma: debug
         pass
     return out

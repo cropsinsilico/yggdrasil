@@ -50,19 +50,30 @@ def test_supplemental_parameters():
                    namespace=namespace,
                    supplemental_parameters={
                        'models': {'invalid': {'outputs': ['x']}}})
-    buff = []
+    buff1 = []
+    buff2 = []
     
     def callback_function(msg):
-        buff.append(msg)
+        buff1.append(msg)
+
+    def transform_function(msg):
+        buff2.append(msg)
+        return msg
         
     runner.run([ex_yamls['hello']['python']],
                namespace=namespace,
                supplemental_parameters={
                    'connections': {
                        'hello_python:helloQueueOut_to_hello_python:helloQueueIn': {
-                           'callback': callback_function}}})
-    print(buff)
-    assert len(buff) == 1
+                           'callback': callback_function,
+                           'inputs': [
+                               {'name': 'hello_python:helloQueueOut',
+                                'transform': transform_function}],
+                       }}})
+    print(buff1)
+    print(buff2)
+    assert len(buff1) == 1
+    assert len(buff2) == 2
 
 # def test_runner_error():
 #     r"""Start a runner for a model with an error."""
