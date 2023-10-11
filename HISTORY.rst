@@ -2,7 +2,7 @@
 History
 =======
 
-1.10.2 (2023-09-22) Minor bug fixes and dependency updates
+1.10.2 (2023-10-12) Minor bug fixes and dependency updates
 -------------------
 
 * Updated rapidjson version to include normalization of units in human readable strings
