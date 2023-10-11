@@ -24,7 +24,7 @@
     "pandas"
   ],
   "ode": [
-    "sympy"
+    "sympy<1.10"
   ],
   "testing": [
     "coverage",

@@ -247,7 +247,7 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - sympy
+        - sympy <1.10
   - name: yggdrasil.testing
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

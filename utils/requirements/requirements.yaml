@@ -355,7 +355,7 @@ extras:
     #     method: pip
     #   - name: antlr-python-runtime==4.10
     #     method: conda
-    - sympy
+    - sympy<1.10
   testing:
     description: Dependencies required to run yggdrasil tests
     requirements:

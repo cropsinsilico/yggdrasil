@@ -599,7 +599,7 @@
     "ode": {
       "description": "Dependencies required to run symbolic ODE models",
       "requirements": [
-        "sympy"
+        "sympy<1.10"
       ]
     },
     "testing": {
