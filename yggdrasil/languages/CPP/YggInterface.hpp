@@ -2,7 +2,6 @@
 #ifndef YGGINTERFACE_HPP_
 #define YGGINTERFACE_HPP_
 
-#define RAPIDJSON_YGGDRASIL
 #include "YggInterface.h"
 #include "datatypes/serialization.h"
 #include <string>

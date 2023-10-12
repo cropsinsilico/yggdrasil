@@ -1,9 +1,9 @@
-#include "../tools.h"
+#define RAPIDJSON_FORCE_IMPORT_ARRAY
+#include "rapidjson/pyrj_c.h"
 #include "datatypes.h"
 #include "utils.h"
 #include "serialization.h"
 
-#define RAPIDJSON_YGGDRASIL
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
@@ -1707,6 +1707,12 @@ extern "C" {
     return out;
   }
 
+  python_t init_python() {
+    python_t out;
+    out.obj = NULL;
+    return out;
+  }
+  
   void destroy_python(python_t *x) {
     if (x != NULL) {
       if (x->obj != NULL) {

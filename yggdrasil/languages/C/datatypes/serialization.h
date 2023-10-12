@@ -7,11 +7,10 @@
 #else
 #include "../regex/regex_posix.h"
 #endif
+#include "../tools.h"
 #include "../constants.h"
 #include "utils.h"
 
-#define RAPIDJSON_YGGDRASIL
-#define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"

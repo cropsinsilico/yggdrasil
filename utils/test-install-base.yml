@@ -263,14 +263,18 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
-    - name: Run cmake test in command prompt
+    - name: Run cmake test in command prompt (CONDA)
       timeout-minutes: 180
-      if: runner.os == 'Windows'
+      if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       shell: cmd /C CALL {0}
-      run: |
-        cmake -h
+      run: >-
+        conda activate test && pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+    - name: Run cmake test in command prompt (PIP)
+      timeout-minutes: 180
+      if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method != 'mamba'
+      shell: cmd /C CALL {0}
+      run: >-
         pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
-
     - name: Run tests (1st)
       timeout-minutes: 180
       id: test1

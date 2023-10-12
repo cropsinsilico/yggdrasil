@@ -522,17 +522,24 @@ class SetupParam(object):
 
 
 def prune_windows_path():
-    to_remove = [
-        'C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn',
-        'C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn',
-        'C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn']
-    print(f"PRUNING PATH: {os.environ['PATH']}")
-    path_list = os.environ['PATH'].split(os.pathsep)
-    for x in to_remove:
-        if x in path_list:
-            path_list.remove(x)
+    to_remove = (
+        'C:\\Program Files\\Microsoft SQL Server', )
+    # to_remove = [
+    #     'C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn',
+    #     'C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn',
+    #     'C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn']
+    print(f"PRUNING PATH ({len(os.environ['PATH'])}): "
+          f"{os.environ['PATH']}")
+    old_path_list = os.environ['PATH'].split(os.pathsep)
+    path_list = []
+    for x in old_path_list:
+        if not x.startswith(to_remove):
+            path_list.append(x)
+    # for x in to_remove:
+    #     if x in path_list:
+    #         path_list.remove(x)
     new_path = os.pathsep.join(path_list)
-    print(f"PRUNED PATH: {new_path}")
+    print(f"PRUNED PATH ({len(os.environ['PATH'])}): {new_path}")
     cmds = [f"set \"PATH={new_path}\""]
     return cmds
     
