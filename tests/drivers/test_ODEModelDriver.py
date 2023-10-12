@@ -25,9 +25,11 @@ def test_derivative_regexs():
 
 
 def test_mistmatched_t():
-    r"""Test error handling when equations have conflicting time values."""
+    r"""Test error handling when equations have conflicting time
+    variables/values."""
     with pytest.raises(ODEError):
         ODEModel(['dx/dt = x**2', 'dy/dq = y**2'])
+        ODEModel(['dx(0)/dt = 5.0', 'dx(1)/dt = 4.0'])
     # Cannot remember what this is meant to test. Is the substitution
     #   value (0) somehow in conflict? Are there not enough equations?
     # with pytest.raises(ODEError):

@@ -6,6 +6,7 @@ model:
     A: -2.0 hr**-2
   boundary_conditions:
     f(0): 1.0 kg
+  independent_var: t
   independent_var_units: hr
   inputs:
     - name: input

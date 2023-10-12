@@ -1,0 +1,1 @@
+A single ODE from https://docs.sympy.org/latest/modules/solvers/ode.html#sympy.solvers.ode.single.SecondLinearBessel that could be solved symbolically, but is solved numerically due to the form it is presented in.

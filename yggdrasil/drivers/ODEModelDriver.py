@@ -136,11 +136,11 @@ class ODEModel(object):
         r'\s*d\s*(?P<t>[a-zA-Z]\w*)(?:\^(?P<n_bottom>\d+))?',
         # LaTeX version of Leibniz's notation
         r'\\frac\{d(?:\^(?P<n_top_b>\{\s*)?(?P<n_top>\d+)'
-        r'(?(n_top_b)(?:\s*\})|(?:))?)?'
-        r'\s*(?P<f>[a-zA-Z]\w*(?:\_(?P<f_subk>\{\s*)?'
+        r'(?(n_top_b)(?:\s*\})|(?:)))?'
+        r'\s*(?P<f>[a-zA-Z]\w*?(?:\_(?P<f_subk>\{\s*)?'
         r'(?P<f_sub>\w+)(?(f_subk)(?:\s*\})|(?:)))?)\s*'
         r'(?:\(\s*(?P<args>ARG\s*(?:\,\s*ARG\s*)*)\))?\s*\}\s*'
-        r'\{\s*d\s*(?P<t>[a-zA-Z]\w*(?:\_(?P<t_subk>\{\s*)?'
+        r'\{\s*d\s*(?P<t>[a-zA-Z]\w*?(?:\_(?P<t_subk>\{\s*)?'
         r'(?P<t_sub>\w+)(?(t_subk)(?:\s*\})|(?:)))?)'
         r'(?:\^(?P<n_bottom_b>\{\s*)?(?P<n_bottom>\d+)'
         r'(?(n_bottom_b)(?:\s*\})|(?:))?)?\s*\}',
@@ -163,6 +163,10 @@ class ODEModel(object):
     _arg_regex = (
         r'(?:(?:\w+(?:\_\{\w+\})?)|(?:(?:\-|\+)?\d+(?:\.\d+)?'
         r'(?:(?:e|E)(\-|\+)?\d+?)?))'
+    )
+    _latex_subscript_regex = (
+        r'(?P<name>[a-zA-Z][a-zA-Z0-9]*)\_(?P<bket>\{)?'
+        r'(?P<sub>[a-zA-Z0-9]+)(?(bket)(?:\s*\})|(?:))'
     )
 
     def __init__(self, eqns, t=None, funcs=None, ics={}, param=None,
@@ -198,19 +202,26 @@ class ODEModel(object):
                           for k in param.keys()}
         if t is not None:
             self.add_t(t)
-        if isinstance(eqns, str):
-            eqns = [eqns]
         subs = {}
-        eqns = [self.replace_derivatives(eqn, subs=subs) for eqn in eqns]
+        orders = [{} for _ in range(len(eqns))]
+        eqns = [self.replace_derivatives(eqn, subs=subs, orders=iord)
+                for eqn, iord in zip(eqns, orders)]
         for x in funcs:
             self.add_func(x.split('(', 1)[0])
         eqns = [self.replace_functions(eqn) for eqn in eqns]
-        for x in eqns:
+        for x, iord in zip(eqns, orders):
             lhs = self.sympify(x.split('=')[0])
             rhs = self.sympify(x.split('=')[1])
             for a, b in subs.items():
                 lhs = lhs.subs(a, b)
                 rhs = rhs.subs(a, b)
+            x_expr = Eq(lhs, rhs)
+            fmax = max(iord.keys(), key=lambda x: iord[x])
+            farg = iord[fmax] * [self.t]
+            lhs = Derivative(fmax, *farg)
+            sols = solve(x_expr, lhs, dict=True)
+            assert len(sols) == 1
+            rhs = sols[0][lhs]
             self.eqns[lhs] = Eq(lhs, rhs)
             for k in self.locate_unknown_symbols(self.eqns[lhs]):
                 self.local_map[str(k)] = k
@@ -310,9 +321,6 @@ class ODEModel(object):
                     'f': m.group('f'),
                     't': mdict.get('t', 't'),
                     'n': 1}
-            if mdict.get('f_sub', None) and (not mdict.get('f_subk', None)):
-                iout['f'] = iout['f'].replace(mdict['f_sub'],
-                                              "{" + mdict['f_sub'] + "}")
             iout['tval'] = mdict.get('args', iout['t'])
             if iout['tval']:
                 iout['tval'] = iout['tval'].strip()
@@ -361,7 +369,8 @@ class ODEModel(object):
                                f"({subs})")
         return True
     
-    def replace_derivatives(self, eqn, subs=None, use_latex=None):
+    def replace_derivatives(self, eqn, subs=None, orders=None,
+                            use_latex=None):
         r"""Replace derivative expressions with versions that sympy can
         parse.
 
@@ -369,6 +378,8 @@ class ODEModel(object):
             eqn (str): Equation to be modified.
             subs (dict, optional): Existing dict that substitutions should be
                 added to for constants.
+            orders (dict, optional): Existing dict that maximum orders
+                should be added to for all identified derivatives.
             use_latex (bool, optional): If True, the expression will be parsed
                 as LaTeX using Sympy's parse_latex function. Defaults to the
                 object attribute if not provided.
@@ -387,22 +398,31 @@ class ODEModel(object):
         out = eqn
         for x in replace_derivs:
             fx = self.add_func(x['f'])
+            if orders is not None:
+                orders[fx] = max(x['n'], orders.get(fx, 0))
             if x['t'] != x['tval']:
                 self.check_t(eqn, x['t'])
             self.check_t(eqn, x['tval'], subs=subs)
             args = [f"{x['f']}({self.t})"] + x['n'] * [str(self.t)]
             replacement = f"Derivative({', '.join(args)})"
+            if x['tval'] is not None:
+                replacement = f"Subs({replacement}, {str(self.t)}, {x['tval']})"
             if use_latex:
                 i = 0
-                while f"\\ygg_{i}" in subs:
-                    i += 1
-                subs[Symbol(f"ygg_{{{i}}}")] = Derivative(
+                symfmt = "ygg_{%d}"
+                sym = Derivative(
                     fx, *[self.t for _ in range(x['n'])])
-                replacement = f"\\ygg_{i}"
+                if x['tval'] is not None:
+                    sym = sym.subs(self.t, float(x['tval']))
+                while Symbol(symfmt % i) in subs:
+                    i += 1
+                symstr = symfmt % i
+                replacement = "\\" + symstr
+                subs[Symbol(symstr)] = sym
             out = out.replace(x['name'], replacement)
         return out
 
-    def replace_functions(self, eqn, subs=None):
+    def replace_functions(self, eqn, subs=None, use_latex=None):
         r"""Replace function expressions without forms with explicit
         functional dependence on the independent variable with versions that
         sympy can parse.
@@ -411,15 +431,25 @@ class ODEModel(object):
             eqn (str): Equation to be modified.
             subs (dict, optional): Existing dict that substitutions should be
                 added to for constants.
+            use_latex (bool, optional): If True, the expression will be parsed
+                as LaTeX using Sympy's parse_latex function. Defaults to the
+                object attribute if not provided.
 
         Returns:
             str: Modified equation.
 
         """
+        if use_latex is None:
+            use_latex = self.use_latex
         out = eqn
         for k, v in self.local_map.items():
             if isinstance(v, UndefinedFunction):
-                func_regex = self._function_regex.replace('FUNC', k).replace(
+                fk = k
+                if use_latex:
+                    for x in ['{', '}']:
+                        if x in fk:
+                            fk = fk.replace(x, '\\' + x)
+                func_regex = self._function_regex.replace('FUNC', fk).replace(
                     'ARG', self._arg_regex)
                 for m in reversed(list(re.finditer(func_regex, out))):
                     if self.check_t(eqn, m.group('args'), subs=subs):
@@ -428,7 +458,7 @@ class ODEModel(object):
                                + out[m.end():])
                 # Places where function name appears without arguments,
                 # assuming (t) is implied
-                func_regex = self._noarg_function_regex.replace('FUNC', k)
+                func_regex = self._noarg_function_regex.replace('FUNC', fk)
                 for m in reversed(list(re.finditer(func_regex, out))):
                     out = (out[:m.start()]
                            + f"{k}({self.t})"
@@ -459,7 +489,8 @@ class ODEModel(object):
         if not skip_replace:
             out = self.replace_derivatives(out, subs=subs,
                                            use_latex=use_latex)
-            out = self.replace_functions(out, subs=subs)
+            out = self.replace_functions(out, subs=subs,
+                                         use_latex=use_latex)
         if use_latex:
             out = parse_latex(out)
         else:
@@ -540,12 +571,24 @@ class ODEModel(object):
             for i in range(1, nmax):
                 k = f(t).diff(t, i)
                 if k not in self.eqns:
-                    v = Function(f"{f}_d{i}")(t)
+                    # Use single character with number subscript for
+                    # compatibility with parse_latex
+                    letters = 'abcdefghijklmnopqrstuvwxyz'
+                    letters = letters.upper() + letters
+                    fs = f"{{{len(subs)//2}}}"
+                    ifb = 0
+                    while f"{letters[ifb]}_{fs}" in self.local_map:
+                        ifb += 1
+                    fb = letters[ifb]
+                    vf = UndefinedFunction(f"{fb}_{fs}")
+                    v = vf(t)
                     self.eqns[k] = Eq(k, v)
                     self.funcs.append(v)
+                    self.local_map[str(vf)] = vf
                     self.local_map[str(v)] = v
                     k2 = f(t).diff(t, i + 1)
                     subs[k] = v
+                    subs[k2] = v.diff(t, 1)
                     if k2 in self.eqns:
                         self.eqns[v.diff(t, 1)] = self.eqns.pop(k2)
         for k, v in subs.items():

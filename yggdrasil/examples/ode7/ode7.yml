@@ -1,0 +1,25 @@
+# https://docs.sympy.org/latest/modules/solvers/ode.html#sympy.solvers.ode.single.SecondLinearBessel
+model:
+  name: ode7
+  language: ode
+  args: x^2*\frac{d^2y}{dx^2} + x*\frac{dy}{dx}*y + (x^2 - n^2)*y = 0
+  use_latex: true
+  parameters:
+    n: 4
+  assumptions:
+    n:
+      positive: true
+  boundary_conditions:
+    y(1): -33.0
+    dy(1)/dx: 127.0
+  inputs:
+    - name: input
+      vars: [x]
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+  outputs:
+    - name: output
+      default_file:
+        name: ./output.txt
+        filetype: table
