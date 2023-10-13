@@ -406,7 +406,7 @@ class ODEModel(object):
             args = [f"{x['f']}({self.t})"] + x['n'] * [str(self.t)]
             replacement = f"Derivative({', '.join(args)})"
             if x['tval'] is not None:
-                replacement = f"Subs({replacement}, {str(self.t)}, {x['tval']})"
+                replacement = f"Subs({replacement}, {str(self.t)}, {float(x['tval'])})"
             if use_latex:
                 i = 0
                 symfmt = "ygg_{%d}"
