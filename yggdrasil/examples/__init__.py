@@ -214,7 +214,8 @@ def find_missing(languages=None, ignore_examples=None):
         ignore_examples = ['sbml1', 'sbml2', 'sbml3', 'proposal',
                            'root_to_shoot', 'fakeplant', 'viz',
                            'pytorch1',
-                           'ode1', 'ode2', 'ode3', 'ode4', 'ode5', 'ode6']
+                           'ode1', 'ode2', 'ode3', 'ode4', 'ode5',
+                           'ode6', 'ode7']
     if not isinstance(languages, list):
         languages = [languages]
     examples = discover_examples()[1]
