@@ -782,8 +782,13 @@ class LambdifiedExpression(object):
                         raise RetryWithNumeric("Complex limit")
                     expr.append(x)
                 fexpr = lambdify(self.args, expr)
-            out = fexpr(*iargs)
-            out = [float(x) if isinstance(x, int) else x for x in out]
+            try:
+                out = fexpr(*iargs)
+            except unyts.UnitsError:
+                arg_map = {a: ia for a, ia in zip(self.args, iargs)}
+                out = [x.subs(arg_map) for x in self.expr]
+            out = [float(x) if isinstance(x, (int, sympy.core.numbers.Float))
+                   else x for x in out]
             out = [unyts.add_units(x, u)
                    if (u and not unyts.has_units(x)) else x
                    for x, u in zip(out, funcs_units)]
