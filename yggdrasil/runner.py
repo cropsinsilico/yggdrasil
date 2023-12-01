@@ -171,44 +171,50 @@ class YggFunction(YggClass):
             dict: Returned values for each return variable.
 
         """
-        self.runner.resume()
-        # Check for arguments
-        for a, arg in zip(self.arguments, args):
-            assert a not in kwargs
-            kwargs[a] = arg
-        for a in self.arguments:
-            if a not in kwargs:  # pragma: debug
-                raise RuntimeError("Required argument %s not provided." % a)
-        # Send
-        for k, v in self.inputs.items():
-            flag = v['comm'].send([kwargs[a] for a in v['vars']])
-            if not flag:  # pragma: debug
-                raise RuntimeError("Failed to send %s" % k)
-        # Receive
-        out = {}
-        for k, v in self.outputs.items():
-            flag, data = v['comm'].recv(timeout=60.0)
-            if not flag:  # pragma: debug
-                raise RuntimeError("Failed to receive variable %s" % v)
-            ivars = v['vars']
-            if isinstance(data, (list, tuple)):
-                assert len(data) == len(ivars)
-                for a, d in zip(ivars, data):
-                    out[a] = d
-            else:
-                assert len(ivars) == 1
-                out[ivars[0]] = data
-        self.runner.pause()
-        return out
+        try:
+            self.runner.resume()
+            # Check for arguments
+            for a, arg in zip(self.arguments, args):
+                assert a not in kwargs
+                kwargs[a] = arg
+            for a in self.arguments:
+                if a not in kwargs:  # pragma: debug
+                    raise RuntimeError("Required argument %s not provided." % a)
+            # Send
+            for k, v in self.inputs.items():
+                flag = v['comm'].send([kwargs[a] for a in v['vars']])
+                if not flag:  # pragma: debug
+                    raise RuntimeError("Failed to send %s" % k)
+            # Receive
+            out = {}
+            for k, v in self.outputs.items():
+                flag, data = v['comm'].recv(timeout=60.0)
+                if not flag:  # pragma: debug
+                    raise RuntimeError("Failed to receive variable %s" % v)
+                ivars = v['vars']
+                if ((isinstance(data, (list, tuple))
+                     and (len(ivars) > 1 or len(data) == len(ivars)))):
+                    assert len(data) == len(ivars)
+                    for a, d in zip(ivars, data):
+                        out[a] = d
+                else:
+                    assert len(ivars) == 1
+                    out[ivars[0]] = data
+            self.runner.pause()
+            return out
+        except BaseException:
+            self.stop(error=True)
+            raise
 
-    def stop(self):
+    def stop(self, error=False):
         r"""Stop the model(s) from running."""
         self.runner.resume()
         if self._stop_called:
             return
         self._stop_called = True
-        for x in self.inputs.values():
-            x['comm'].send_eof()
+        if not error:
+            for x in self.inputs.values():
+                x['comm'].send_eof()
         self.model_driver['instance'].set_break_flag()
         self.runner.waitModels(timeout=10)
         for x in self.inputs.values():
