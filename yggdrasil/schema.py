@@ -240,9 +240,23 @@ def update_constants(schema=None):
                     repr(k), as_lines(v, newline=(newline + '    '))) + newline
             out += "}"
         elif isinstance(x, list):
-            out += "[" + newline
-            out += "    " + ", ".join(
-                [as_lines(xx, newline=(newline + '    ')) for xx in x]) + "]"
+            if x:
+                elem = [as_lines(xx, newline=(newline + '    ')) for xx in x]
+                out += "[" + newline
+                last_pos = len(out)
+                i = 0
+                while i < len(elem):
+                    while i < len(elem) and (len(out) - last_pos) < 50:
+                        if (len(out) - last_pos) == 0:
+                            out += "    "
+                        out += elem[i] + ", "
+                        i += 1
+                    out = out[:-1]
+                    out += newline
+                    last_pos = len(out)
+                out += "]"
+            else:
+                out += "[]"
         else:
             out += repr(x)
         return out
@@ -274,6 +288,7 @@ def update_constants(schema=None):
     language_cat = ['compiled', 'interpreted', 'build', 'dsl', 'other']
     typemap = {'compiler': 'compiled', 'interpreter': 'interpreted'}
     lang2ext = {'yaml': '.yml', 'executable': '.exe'}
+    lang2ext_full = {}
     languages = {k: [] for k in language_cat}
     languages_with_aliases = {k: [] for k in language_cat}
     language_properties = {}
@@ -290,8 +305,15 @@ def update_constants(schema=None):
             if k not in lang2ext:
                 assert isinstance(drv.language_ext, list)
                 lang2ext[k] = drv.language_ext[0]
+                lang2ext_full[k] = copy.copy(drv.get_language_ext())
             for ka in drv.language_aliases:
                 lang2ext[ka] = lang2ext[k]
+                lang2ext_full[ka] = lang2ext_full[k]
+        else:
+            if k not in lang2ext_full:
+                lang2ext_full[k] = drv.get_language_ext()
+            for ka in drv.language_aliases:
+                lang2ext_full[ka] = lang2ext_full[k]
         languages.setdefault(drv_type, [])
         languages[drv_type].append(drv.language)
         languages_with_aliases.setdefault(drv_type, [])
@@ -306,6 +328,12 @@ def update_constants(schema=None):
     languages = {k: sorted(v) for k, v in languages.items()}
     languages_with_aliases = {k: sorted(v) for k, v in
                               languages_with_aliases.items()}
+    ext2lang_full = {}
+    for k, exts in lang2ext_full.items():
+        for v in exts:
+            ext2lang_full.setdefault(v, [])
+            ext2lang_full[v].append(k)
+    ext2lang_full = {k: sorted(v) for k, v in ext2lang_full.items()}
     for x in ['compiler', 'linker', 'archiver']:
         reg = get_compilation_tool_registry(x).get('by_language', {})
         for lang, tools in reg.items():
@@ -332,7 +360,10 @@ def update_constants(schema=None):
     lines += [
         "", "# Language driver constants",
         "LANG2EXT = %s" % as_lines(lang2ext),
+        "LANG2EXT_FULL = %s" % as_lines(lang2ext_full),
+        "EXT2LANG_FULL = %s" % as_lines(ext2lang_full),
         "EXT2LANG = {v: k for k, v in LANG2EXT.items()}",
+        "ALL_LANGUAGE_EXTS = %s" % as_lines(sorted(list(ext2lang_full.keys()))),
         "LANGUAGES = %s" % as_lines(languages, key_order=language_cat)]
     lines.append(
         "LANGUAGES['all'] = (\n    LANGUAGES[%s]"

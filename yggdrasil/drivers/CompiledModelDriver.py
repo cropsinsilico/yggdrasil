@@ -10,8 +10,8 @@ import contextlib
 import threading
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, tools, scanf
-from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
+from yggdrasil import platform, tools, scanf, constants
+from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.components import import_component
 
 
@@ -367,7 +367,6 @@ class CompilationToolBase(object):
     version_flags = ['--version']
     product_exts = []
     product_files = []
-    source_product_exts = []
     remove_product_exts = []
     is_gnu = False
     toolset = None
@@ -1123,81 +1122,34 @@ class CompilationToolBase(object):
         return cmd
 
     @classmethod
-    def remove_products(cls, src, new):
-        r"""Remove products produced during compilation.
+    def append_product(cls, products, new, sources=None,
+                       exclude_sources=False, **kwargs):
+        r"""Append a product to the specified list along with additional
+        values indicated by cls.product_exts.
 
         Args:
-            src (list): Input arguments to compilation call that was used to
-                generate the output file (usually one or more source files).
-            new (str): The full path to the primary product of the compilation
-                call (usually an object, executable, or library).
-
-        """
-        products = []
-        cls.append_product(products, src, new)
-        source_products = cls.get_source_products(products)
-        remove_products(products, source_products)
-
-    @classmethod
-    def get_source_products(cls, products, source_products=[]):
-        r"""Get the list of products that should be removed without checking
-        for source files based on cls.remove_product_exts.
-
-        Args:
-            products (list): List of products that should be checked against
-                cls.remove_product_exts.
-            source_products (list, optional): Existing list of products that
-                new source_products should be added to. Defaults to [].
-
-        Returns:
-            list: Products that should be removed without checking for source
-                files.
-
-        """
-        remove_ext = tuple(cls.remove_product_exts)
-        for x in products:
-            if x.endswith(remove_ext) and (x not in source_products):
-                source_products.append(x)
-        return source_products
-
-    @classmethod
-    def append_product(cls, products, src, new, new_dir=None,
-                       dont_append_src=False):
-        r"""Append a product to the specified list along with additional values
-        indicated by cls.product_exts.
-
-        Args:
-            products (list): List of of existing products that new product
+            products (tools.IntegrationPathSet, optional): Existing set
+                that additional products produced by the compilation
                 should be appended to.
-            src (list): Input arguments to compilation call that was used to
-                generate the output file (usually one or more source files).
             new (str): New product that should be appended to the list.
-            new_dir (str, optional): Directory that should be used as base when
-                adding files listed in cls.product_files. Defaults to
-                os.path.dirname(new).
-            dont_append_src (bool, optional): If True and src is in the list of
-                products, it will be removed. Defaults to False.
+            sources (list, optional): Sources files associated with the
+                new product.
+            exclude_sources (bool, optional): If True, the sources will
+                be excluded from the removable files.
+            **kwargs: Additional keyword arguments are passed to
+                IntegrationPathSet.append_compilation_product
 
         """
-        products.append(new)
-        # Add products based on extensions
-        new_base = os.path.splitext(new)[0]
-        for ext in cls.product_exts:
-            inew = new_base + ext
-            if inew not in products:
-                products.append(inew)
-        # Add products based on directory
-        if new_dir is None:
-            new_dir = os.path.dirname(new)
-        for base in cls.product_files:
-            inew = os.path.join(new_dir, base)
-            if inew not in products:
-                products.append(inew)
-        # Make sure the source is not in the product list
-        if dont_append_src:
-            for isrc in src:
-                if isrc in products:  # pragma: debug
-                    products.remove(isrc)
+        assert isinstance(products, tools.IntegrationPathSet)
+        kwargs.setdefault('extensions', [])
+        kwargs.setdefault('files', [])
+        kwargs.setdefault('removable_source_exts',
+                          tuple(cls.remove_product_exts))
+        kwargs['extensions'] += cls.product_exts
+        if exclude_sources:
+            kwargs['sources'] = sources
+        kwargs['files'] += cls.product_files
+        products.append_compilation_product(new, **kwargs)
 
     @classmethod
     def tool_version(cls, **kwargs):
@@ -1243,9 +1195,9 @@ class CompilationToolBase(object):
             overwrite (bool, optional): If True, the existing compile file will
                 be overwritten. Otherwise, it will be kept and this function
                 will return without recompiling the source file.
-            products (list, optional): Existing Python list that additional
-                products produced by the compilation should be appended to.
-                Defaults to None and is ignored.
+            products (tools.IntegrationPathSet, optional): Existing set
+                that additional products produced by the compilation
+                should be appended to. Defaults to None and is ignored.
             allow_error (bool, optional): If True and there is an error when
                 call the executable, it will be ignored. If False, errors will
                 result in an exception being raised. Defaults to False.
@@ -1285,7 +1237,8 @@ class CompilationToolBase(object):
         # Process arguments only valid if skip_flags is False
         if (not skip_flags):
             if products is None:
-                products = []
+                # TODO: cache_dir?
+                products = tools.IntegrationPathSet(overwrite=overwrite)
             # Get output file
             if out is None:
                 out = cls.get_output_file(args[0], working_dir=working_dir,
@@ -1294,15 +1247,15 @@ class CompilationToolBase(object):
                    and (working_dir is not None))):
                 out = os.path.join(working_dir, out)
             assert out not in args  # Don't remove source files
-            # Check for file
-            if overwrite and (not dry_run):
-                cls.remove_products(args, out)
-                if os.path.isfile(out) or os.path.isdir(out):  # pragma: debug
-                    raise RuntimeError("Product not removed: %s" % out)
-            if (not dry_run) and (os.path.isfile(out) or os.path.isdir(out)):
-                cls.append_product(products, args, out)
-                logger.debug(f"Output already exists: {out}")
-                return out
+            # Add product and check for file
+            if out != 'clean':
+                cls.append_product(products, out, sources=args,
+                                   overwrite=overwrite)
+                if not dry_run:
+                    products.last.setup()
+                    if products.last.exists:
+                        logger.debug(f"Output already exists: {out}")
+                        return out
             kwargs['outfile'] = out
         # Get command
         unused_kwargs = kwargs.pop('unused_kwargs', {})
@@ -1314,13 +1267,11 @@ class CompilationToolBase(object):
                 cache_key = ' '.join(cmd)
             if cache_key in cls._language_cache:
                 return cls._language_cache[cache_key]
-        # Return if dry run, adding potential output to product
+        # Return if dry run
         if dry_run:
             if skip_flags:
                 return ''
             else:
-                if out != 'clean':
-                    cls.append_product(products, args, out)
                 return out
         # Run command
         output = ''
@@ -1351,18 +1302,14 @@ class CompilationToolBase(object):
         # Check for output
         if (not skip_flags):
             if (out != 'clean'):
-                expected_products = [out]
-                for x in expected_products:
-                    if not (os.path.isfile(x)
-                            or os.path.isdir(x)):  # pragma: debug
-                        logger.error('%s\n%s' % (' '.join(cmd), output))
-                        raise RuntimeError(
-                            f"{cls.tooltype.title()} tool, {cls.toolname}"
-                            f", failed to produce result \'{x}\'")
-                    cls.append_product(products, args, x)
+                if not products.last.exists:  # pragma: debug
+                    logger.error('%s\n%s' % (' '.join(cmd), output))
+                    raise RuntimeError(
+                        f"{cls.tooltype.title()} tool, {cls.toolname}"
+                        f", failed to produce result \'{out}\'")
                 logger.debug(
                     f"{cls.tooltype.title()} {cls.toolname} produced "
-                    f"{expected_products}")
+                    f"{out}")
             return out
         if cache_key:
             cls._language_cache[cache_key] = output
@@ -2441,7 +2388,7 @@ class CompiledModelDriver(ModelDriver):
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
         # Compile
         if not skip_compile:
-            self.compile_model()
+            self.compile_model(products=self.products)
             self.products.append(self.model_file)
             assert os.path.isfile(self.model_file)
             self.debug("Compiled %s", self.model_file)
@@ -2544,7 +2491,7 @@ class CompiledModelDriver(ModelDriver):
             else:
                 # Assert that model file is not source code in any of the
                 # registered languages
-                if (((model_ext in self.get_all_language_ext())
+                if (((model_ext in constants.ALL_LANGUAGE_EXTS)
                      and (model_ext != '.exe'))):  # pragma: debug
                     from yggdrasil.components import import_component
                     from yggdrasil.schema import get_schema
@@ -2573,9 +2520,6 @@ class CompiledModelDriver(ModelDriver):
         if model_is_source:
             self.debug('Determined model file: %s', out)
             self.model_file = out
-        # Adjust products
-        self.get_tool_instance('compiler').get_source_products(
-            self.products, source_products=self.source_products)
         self.debug("source_files: %s", str(self.source_files))
         self.debug("model_file: %s", self.model_file)
         # Add the buildfile_lock and pass the file
@@ -4049,7 +3993,6 @@ class CompiledModelDriver(ModelDriver):
         r"""Compile any required internal libraries, including the interface."""
         if dep is None:
             dep = cls.interface_library
-        kwargs.setdefault('products', [])
         base_libraries = []
         compiler = cls.get_tool('compiler', toolname=toolname)
         for x in cls.base_languages:
@@ -4073,28 +4016,25 @@ class CompiledModelDriver(ModelDriver):
                     cls.call_compiler(k, toolname=toolname, **kwargs)
 
     @classmethod
-    def cleanup_dependencies(cls, products=None, verbose=False, **kwargs):
+    def cleanup_dependencies(cls, products=None, **kwargs):
         r"""Cleanup dependencies."""
-        if products is None:
-            products = []
         kwargs['dry_run'] = True
-        compiler = cls.get_tool('compiler', toolname=kwargs.get('toolname', None),
+        compiler = cls.get_tool('compiler',
+                                toolname=kwargs.get('toolname', None),
                                 default=None)
         if compiler is not None:
             kws = cls.select_suffix_kwargs(kwargs)
             suffix = cls.get_internal_suffix(**kws)
             suffix += compiler.get_tool_suffix()
+            if products is None:
+                products = tools.IntegrationPathSet(
+                    generalized_suffix=suffix)
             try:
                 cls.compile_dependencies(products=products, **kwargs)
             except NotImplementedError:  # pragma: debug
                 pass
-            new_products = []
-            for i in range(len(products)):
-                if suffix in products[i]:
-                    new_products += glob.glob(products[i].replace(suffix, '*'))
-            products += new_products
         super(CompiledModelDriver, cls).cleanup_dependencies(
-            products=products, verbose=verbose)
+            products=products)
 
     def compile_model(self, source_files=None, skip_interface_flags=False,
                       **kwargs):
@@ -4126,7 +4066,6 @@ class CompiledModelDriver(ModelDriver):
                                   skip_interface_flags=skip_interface_flags,
                                   overwrite=self.overwrite,
                                   working_dir=self.working_dir,
-                                  products=self.products,
                                   toolname=self.get_tool_instance(
                                       'compiler', return_prop='name'),
                                   suffix=('_%s' % self.name))
@@ -4137,11 +4076,16 @@ class CompiledModelDriver(ModelDriver):
                 default_kwargs.update(linker_flags=self.linker_flags)
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
-            suffix_kws = self.select_suffix_kwargs(kwargs)
+            if 'products' not in kwargs:
+                kwargs['products'] = tools.IntegrationPathSet(
+                    overwrite=kwargs['overwrite'])
+            # Early exit for existing file
             if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
                  and (not kwargs['overwrite']))):
+                kwargs['products'].append(kwargs['out'])
                 self.debug("Result already exists: %s", kwargs['out'])
                 return kwargs['out']
+            suffix_kws = self.select_suffix_kwargs(kwargs)
             if 'env' not in kwargs:
                 kwargs['env'] = self.set_env(for_compile=True,
                                              toolname=kwargs['toolname'])
@@ -4151,10 +4095,10 @@ class CompiledModelDriver(ModelDriver):
                         toolname=kwargs['toolname'], **suffix_kws)
                 return self.call_compiler(source_files, **kwargs)
             except BaseException:
-                self.cleanup_products()
+                kwargs['products'].teardown()
                 raise
             finally:
-                self.restore_files()
+                kwargs['products'].restore_modified()
 
     @classmethod
     def get_internal_suffix(cls, commtype=None, disable_python_c_api=False,
@@ -4213,9 +4157,9 @@ class CompiledModelDriver(ModelDriver):
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
-            products (list, optional): Existing Python list that additional
-                products produced by the compilation should be appended to.
-                Defaults to None and is ignored.
+            products (tools.IntegrationPathSet, optional): Existing set
+                that additional products produced by the compilation
+                should be appended to. Defaults to None and is ignored.
             **kwargs: Additional keyword arguments are passed to run_executable.
                 and call_linker if dont_link is False.
 

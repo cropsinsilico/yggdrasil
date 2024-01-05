@@ -4,7 +4,7 @@ from tests.drivers.test_ModelDriver import TestModelDriver as model_base_class
 import os
 import copy
 import shutil
-from yggdrasil import platform, constants
+from yggdrasil import platform, constants, tools
 from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers import CompiledModelDriver
 from yggdrasil.components import import_component
@@ -233,13 +233,14 @@ class TestCompiledModelDriver(model_base_class):
                 testing_options.get('kwargs', {})),
             yml={'working_dir': working_dir},
             timeout=timeout, sleeptime=polling_interval,
-            namespace=namespace, source_files=source)
+            namespace=namespace, source_files=source,
+            remove_products=True)
     
     @pytest.fixture
     def run_model_instance_kwargs(self):
         r"""dict: Additional keyword arguments that should be used in calls
         to run_model_instance"""
-        return {'skip_compile': False}
+        return {'skip_compile': False, 'overwrite': True}
         
     @pytest.mark.skipif(platform._is_win,
                         reason="No ASAN for Windows MSVC")
@@ -448,7 +449,9 @@ class TestCompiledModelDriver(model_base_class):
             setattr(instance, 'compiler_tool', v)
             setattr(instance, 'linker_tool', v.linker())
             setattr(instance, 'archiver_tool', v.archiver())
-            instance.compile_model(use_ccache=True)
+            products = tools.IntegrationPathSet()
+            instance.compile_model(use_ccache=True, products=products)
+            products.teardown()
         # Restore the old tools
         for k, v in old_tools.items():
             setattr(instance, k, v)
@@ -457,17 +460,22 @@ class TestCompiledModelDriver(model_base_class):
         r"""Test compile model with alternate set of input arguments."""
         fname = source[0]
         with pytest.raises(RuntimeError):
+            # Error raised when output is a source file
             instance.compile_model(out=os.path.basename(fname),
                                    working_dir=os.path.dirname(fname),
                                    overwrite=True)
         if not instance.is_build_tool:
+            products = tools.IntegrationPathSet()
             instance.compile_model(out=instance.model_file,
-                                   overwrite=False)
+                                   overwrite=True,
+                                   products=products)
             assert os.path.isfile(instance.model_file)
             instance.compile_model(out=instance.model_file,
-                                   overwrite=False)
+                                   overwrite=False,
+                                   products=products)
             assert os.path.isfile(instance.model_file)
-            os.remove(instance.model_file)
+            products.teardown()
+            assert not os.path.isfile(instance.model_file)
 
     def test_call_linker(self, instance):
         r"""Test call_linker with static."""

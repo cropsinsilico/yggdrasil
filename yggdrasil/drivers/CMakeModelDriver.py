@@ -6,7 +6,7 @@ import shutil
 import logging
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, constants
+from yggdrasil import platform, constants, tools
 from yggdrasil.components import import_component
 from yggdrasil.drivers.CompiledModelDriver import (
     LinkerBase, get_compilation_tool, get_compatible_tool)
@@ -127,24 +127,22 @@ class CMakeConfigure(BuildToolBase):
         return out
         
     @classmethod
-    def append_product(cls, products, src, new, **kwargs):
+    def append_product(cls, products, new, **kwargs):
         r"""Append a product to the specified list along with additional values
         indicated by cls.product_exts.
 
         Args:
-            products (list): List of of existing products that new product
-                should be appended to.
-            src (list): Input arguments to compilation call that was used to
-                generate the output file (usually one or more source files).
+            products (tools.ManagedFileSet): List of of existing products
+                that new product should be appended to.
             new (str): New product that should be appended to the list.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+            **kwargs: Additional keyword arguments are passed to
+                ManagedFileSet.append_compilation_product
 
         """
-        kwargs.setdefault('new_dir', new)
-        kwargs.setdefault('dont_append_src', True)
-        return super(CMakeConfigure, cls).append_product(products, src,
-                                                         new, **kwargs)
+        kwargs.setdefault('exclude_sources', True)
+        kwargs.setdefault('directory', new)
+        return super(CMakeConfigure, cls).append_product(
+            products, new, **kwargs)
         
     @classmethod
     def get_output_file(cls, src, dont_link=False, dont_build=None,
@@ -372,7 +370,7 @@ class CMakeConfigure(BuildToolBase):
         return x
         
     @classmethod
-    def create_include(cls, fname, target, driver=None,
+    def create_include(cls, fname, target, products=None, driver=None,
                        compiler=None, compiler_flags=None,
                        linker=None, linker_flags=None,
                        library_flags=None, internal_library_flags=None,
@@ -385,6 +383,8 @@ class CMakeConfigure(BuildToolBase):
             target (str): Target that links should be added to.
             driver (CompiledModelDriver): Driver for the language being
                 compiled.
+            products (tools.IntegratedPathSet, optional): Path set to
+                added include file to.
             compiler (CompilerBase): Compiler that should be used to
                 generate the list of compilation flags.
             compile_flags (list, optional): Additional compile flags that
@@ -554,10 +554,12 @@ class CMakeConfigure(BuildToolBase):
         if fname is None:
             return pretarget_lines + lines
         else:
-            if os.path.isfile(fname):
-                os.remove(fname)
-            with open(fname, 'w') as fd:
-                fd.write('\n'.join(lines))
+            force_write = (products is None)
+            if products is None:
+                products = tools.IntegrationFileSet(overwrite=True)
+            products.append_generated(fname, lines)
+            if force_write:
+                products.setup()
             return pretarget_lines
 
     
@@ -776,18 +778,6 @@ class CMakeModelDriver(BuildModelDriver):
             self.builddir_base = 'build_%s' % self.target
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
 
-    @property
-    def buildfile_orig(self):
-        r"""str: Full path to where the original CMakeLists.txt file will
-        be stored during compilation of the modified file."""
-        return '_orig'.join(os.path.splitext(self.buildfile))
-
-    @property
-    def buildfile_ygg(self):
-        r"""str: Full path to the verison of the CMakeLists.txt that has been
-        updated w/ yggdrasil compilation flags."""
-        return ('_ygg_%s' % self.name).join(os.path.splitext(self.buildfile))
-    
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 
@@ -803,12 +793,8 @@ class CMakeModelDriver(BuildModelDriver):
         if self.target is None:
             include_base = 'ygg_cmake.txt'
         else:
-            include_base = 'ygg_cmake_%s.txt' % self.target
+            include_base = f'ygg_cmake_{self.target}.txt'
         include_file = os.path.join(self.sourcedir, include_base)
-        out.append(include_file)
-        out.append(self.buildfile_ygg)
-        if os.path.isfile(self.buildfile_ygg) and (not self.overwrite):
-            return out
         kws = dict(compiler=self.target_language_info['compiler'],
                    linker=self.target_language_info['linker'],
                    driver=self.target_language_info['driver'],
@@ -822,12 +808,18 @@ class CMakeModelDriver(BuildModelDriver):
                 internal_library_flags=(
                     self.target_language_info['internal_library_flags']))
         newlines_before = self.get_tool_instance('compiler').create_include(
-            include_file, self.target, **kws)
-        assert os.path.isfile(include_file)
+            include_file, self.target, products=self.products, **kws)
         # Create copy of cmakelists and modify
         newlines_after = []
-        if os.path.isfile(self.buildfile):
-            with open(self.buildfile, 'r') as fd:
+        self.products.append_generated(
+            self.buildfile, [], replaces=True,
+            verbose=kwargs.get('verbose', False))
+        build_product = self.products.last
+        orig_buildfile = build_product.name
+        if os.path.isfile(build_product.replaces):
+            orig_buildfile = build_product.replaces
+        if os.path.isfile(orig_buildfile):
+            with open(orig_buildfile, 'r') as fd:
                 contents = fd.read().splitlines()
             # Prevent error when cross compiling by building static lib as test
             newlines_before.append(
@@ -860,15 +852,8 @@ class CMakeModelDriver(BuildModelDriver):
             for newline in newlines_after:
                 if newline not in contents:
                     lines.append(newline)
-            # Write contents to the build file, check for new lines that may
-            # already be included
-            log_msg = 'New CMakeLists.txt:\n\t' + '\n\t'.join(lines)
-            if kwargs.get('verbose', False):
-                logger.info(log_msg)
-            else:
-                logger.debug(log_msg)
-            with open(self.buildfile_ygg, 'w') as fd:
-                fd.write('\n'.join(lines))
+            # Append to product list
+            build_product.lines = lines
         return out
 
     @classmethod
@@ -1051,12 +1036,6 @@ class CMakeModelDriver(BuildModelDriver):
             default_kwargs['configuration'] = self.configuration
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
-            if (not kwargs.get('dry_run', False)) and os.path.isfile(self.buildfile):
-                if not os.path.isfile(self.buildfile_orig):
-                    shutil.copy2(self.buildfile, self.buildfile_orig)
-                    self.modified_files.append((self.buildfile_orig,
-                                                self.buildfile))
-                shutil.copy2(self.buildfile_ygg, self.buildfile)
             out = super(CMakeModelDriver, self).compile_model(**kwargs)
         return out
 

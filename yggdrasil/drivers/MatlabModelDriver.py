@@ -584,7 +584,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         # Matlab has a variable name limit of 62
         wrap_base = wrap_base[:min(len(wrap_base), 60)]
         self.model_wrapper = os.path.join(self.model_dir, wrap_base + model_ext)
-        self.wrapper_products.append(self.model_wrapper)
+        self.products.append_generated(self.model_wrapper, [])
         
     @classmethod
     def write_error_wrapper(cls, fname, try_lines, env=None,

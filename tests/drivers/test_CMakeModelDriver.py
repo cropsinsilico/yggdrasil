@@ -128,7 +128,8 @@ def test_CMakeModelDriver_error_cmake(scripts):
     with pytest.raises(RuntimeError):
         CMakeModelDriver('test', target,
                          sourcedir=makedir, compiler_flags='-P',
-                         target_language='c')
+                         target_language='c',
+                         overwrite=True, remove_products=True)
 
 
 @pytest.mark.language('cmake')
@@ -137,16 +138,17 @@ def test_CMakeModelDriver_error_notarget(scripts):
     makedir, target = os.path.split(scripts['cmake'])
     with pytest.raises(RuntimeError):
         CMakeModelDriver('test', 'invalid',
-                         sourcedir=makedir, target_language='c')
+                         sourcedir=makedir, target_language='c',
+                         overwrite=True, remove_products=True)
 
 
 @pytest.mark.language('cmake')
 def test_CMakeModelDriver_error_nofile():
     r"""Test CMakeModelDriver error for missing CMakeLists.txt."""
     with pytest.raises(RuntimeError):
-        CMakeModelDriver('test', 'invalid',
-                         target_language='c')
-
+        CMakeModelDriver('test', 'invalid', target_language='c',
+                         overwrite=True, remove_products=True)
+                         
 
 class TestCMakeModelDriver(base_class):
     r"""Test runner for CMakeModelDriver."""

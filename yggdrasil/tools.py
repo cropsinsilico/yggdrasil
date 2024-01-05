@@ -1968,3 +1968,404 @@ class YggClass(ComponentBase):
                 self.info("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
+
+
+class IntegrationPathSet(object):
+    r"""Class for managing a set of files or directories created during an
+    integration.
+
+    Args:
+        products (list, optional): Products to initialize the set with.
+        overwrite (bool, optional): If True, overwrite any existing file
+            or directory with the specified name by removing it during
+            setup.
+        cache_dir (str, optional): Directory where the original file or
+            directory should be cached for generated files that replace
+            existing files or directories. Defaults to a _ygg_cache
+            subdirectory in the directory containing the original if not
+            provided.
+        removable_source_exts (tuple, optional): Source extensions that
+            can be removed. Attempting to remove source files with any
+            other extensions (as defined by constants.ALL_LANGUAGE_EXTS)
+            will raise a RuntimeError.
+        generalized_suffix (str, optional): Suffix to replace with * in
+            associated paths in order to search for related paths that
+            should also be managed.
+
+    """
+
+    def __init__(self, products=None, overwrite=False, cache_dir=None,
+                 removable_source_exts=None, generalized_suffix=None):
+        self.overwrite = overwrite
+        self.cache_dir = cache_dir
+        self.removable_source_exts = removable_source_exts
+        self._generalized_suffix = generalized_suffix
+        if self.removable_source_exts is None:
+            self.removable_source_exts = tuple([])
+        self.paths = []
+        self.last_idx = -1
+        if products:
+            for x in products:
+                self.append(products)
+
+    def __str__(self):
+        return 'IntegrationPathSet([' + ', '.join(
+            [str(x) for x in self.paths]) + '])'
+
+    @property
+    def generalized_suffix(self):
+        r"""str: Suffix to replace with * to remove additional paths."""
+        return self._generalized_suffix
+
+    @generalized_suffix.setter
+    def generalized_suffix(self, value):
+        self._generalized_suffix = value
+        for x in self.paths:
+            x.generalized_suffix = value
+
+    def index(self, name):
+        r"""Determine the index of a path in the set.
+
+        Args:
+            name (str): Path to locate.
+
+        Returns:
+            int: Index of the path in the set if it is present, -1 if it
+                is not present.
+
+        """
+        for i, x in enumerate(self.paths):
+            if x.name == name:
+                return i
+        return -1
+
+    def append(self, name, *args, **kwargs):
+        r"""Append a IntegrationPath to this set."""
+        assert isinstance(name, str)
+        idx = self.index(name)
+        cls = kwargs.pop('cls', IntegrationPath)
+        kwargs.setdefault('overwrite', self.overwrite)
+        kwargs.setdefault('removable_source_exts',
+                          self.removable_source_exts)
+        kwargs.setdefault('generalized_suffix', self.generalized_suffix)
+        path = cls(name, *args, **kwargs)
+        if idx == -1:
+            self.last_idx = len(self.paths)
+            self.paths.append(path)
+        else:
+            self.last_idx = idx
+            self.paths[idx] = path
+
+    def append_generated(self, *args, **kwargs):
+        r"""Append a GeneratedFile to this path set."""
+        kwargs['cls'] = GeneratedFile
+        kwargs.setdefault('cache_dir', self.cache_dir)
+        return self.append(*args, **kwargs)
+
+    def append_compilation_product(self, *args, **kwargs):
+        r"""Append a CompilationProduct to this path set."""
+        kwargs['cls'] = CompilationProduct
+        return self.append(*args, **kwargs)
+
+    def setup(self):
+        r"""Perform actions on the paths before an integration run."""
+        for x in self.paths:
+            x.setup()
+
+    def teardown(self):
+        r"""Perform actions to cleanup the paths after an integration run."""
+        for x in self.paths:
+            x.teardown()
+
+    def restore_modified(self):
+        r"""Restore modified original files."""
+        for x in self.paths:
+            x.restore_modified()
+
+    @property
+    def last(self):
+        r"""IntegrationPath: The last path added to the set."""
+        assert self.last_idx >= 0
+        return self.paths[self.last_idx]
+
+
+class IntegrationPath(object):
+    r"""Class for handling generation and managment of paths associated
+    with integrations.
+
+    Args:
+        name (str): Root path name for the file or directory.
+        overwrite (bool, optional): If True, overwrite any existing path
+            with the specified name.
+        additional_products (list, optional): Additional products that
+            should be associated with the path and removed on cleanup.
+        removable_source_exts (tuple, optional): Source extensions that
+            can be removed. Attempting to remove source files with any
+            other extensions (as defined by constants.ALL_LANGUAGE_EXTS)
+            will raise a RuntimeError.
+        generalized_suffix (str, optional): Suffix to replace with * in
+            associated paths in order to search for related paths that
+            should also be managed.
+        skip_source_check (bool, optional): If True, the products will
+            not be checked for source files prior to be removed.
+
+    """
+
+    def __init__(self, name, overwrite=False, additional_products=None,
+                 removable_source_exts=None, generalized_suffix=None,
+                 skip_source_check=False):
+        self.name = name
+        self.overwrite = overwrite
+        self.additional_products = additional_products
+        self.removable_source_exts = removable_source_exts
+        self.generalized_suffix = generalized_suffix
+        self.skip_source_check = skip_source_check
+        if self.additional_products is None:
+            self.additional_products = []
+        if self.removable_source_exts is None:
+            self.removable_source_exts = tuple([])
+        self.removed = False
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def products(self):
+        r"""Products to remove during setup when overwrite is set or
+        during teardown."""
+        return [self.name] + self.additional_products
+
+    @property
+    def generalized_products(self):
+        r"""Related products based on generalized_suffix to remove during
+        setup when overwrite is set or during teardown."""
+        if not self.generalized_suffix:
+            return []
+        out = []
+        for x in self.products:
+            if self.generalized_suffix in x:
+                for alt in glob.glob(x.replace(self.generalized_suffix, '*')):
+                    if alt not in self.products:
+                        out.append(alt)
+        return out
+
+    @property
+    def exists(self):
+        r"""bool: True if the file or directory exists."""
+        return (os.path.isfile(self.name) or os.path.isdir(self.name))
+
+    def setup(self):
+        r"""Perform actions on the path before an integration."""
+        if self.overwrite:
+            self.remove_products()
+
+    def teardown(self):
+        r"""Perform actions to cleanup the path after an integration."""
+        self.remove_products()
+
+    @property
+    def split_sources(self):
+        r"""tuple: Products that can contain sources and those that cannot."""
+        out = {'allowed': [], 'disallowed': []}
+        for x in self.products + self.generalized_products:
+            if x.endswith(self.removable_source_exts):
+                out['allowed'].append(x)
+            else:
+                out['disallowed'].append(x)
+        return out
+
+    def remove_products(self):
+        r"""Remove products associated with the managed path."""
+        split_sources = self.split_sources
+        for x in split_sources['allowed']:
+            self.remove_product(x, skip_source_check=True)
+        for x in split_sources['disallowed']:
+            self.remove_product(x)
+        if self.exists:  # pragma: debug
+            raise RuntimeError(f"Product not removed: {self.name}")
+        self.removed = True
+
+    def restore_modified(self):
+        r"""Restore modified original files."""
+        pass
+
+    def remove_product(self, product, skip_source_check=None):
+        r"""Remove a single product.
+
+        Args:
+            product (str): Product to remove.
+
+        """
+        logger.debug(f"Removing product {product}")
+        if skip_source_check is None:
+            skip_source_check = self.skip_source_check
+        if not skip_source_check:
+            src = self.find_source_files(product)
+            if src:
+                raise RuntimeError(f"Removing product would remove "
+                                   f"source files {src}")
+        remove_path(product)
+
+    def find_source_files(self, product):
+        r"""Check for sources files in the managed path.
+
+        Args:
+            product (str): Path to check.
+
+        Returns:
+            list: Paths to located source files.
+
+        """
+        out = []
+        source_keys = copy.copy(constants.ALL_LANGUAGE_EXTS)
+        if '.exe' in source_keys:  # pragma: windows
+            source_keys.remove('.exe')
+        if os.path.isdir(product):
+            ext_tuple = tuple(source_keys)
+            for root, dirs, files in os.walk(product):
+                for f in files:
+                    tmp = os.path.join(root, f)
+                    if tmp.endswith(ext_tuple):
+                        out += self.find_source_files(tmp)
+        elif (os.path.isfile(product)
+              and os.path.splitext(product)[-1] in source_keys):
+            out.append(product)
+        return out
+
+
+class GeneratedFile(IntegrationPath):
+    r"""Class for handling generation of files associated with integrations.
+
+    Args:
+        name (str): Root path name for the file.
+        lines (list): List of lines that should be placed in the file.
+        overwrite (bool, optional): If True, overwrite any existing file
+            with the specified name. If replaces is True, the existing
+            file will only be removed if the replaced file is preserved.
+        replaces (bool, optional): If True, the file replaces any existing
+            file that will be preserved and restored when the generated
+            file is removed.
+        cache_dir (str, optional): Directory where the original file
+            should be cached if replaces is True. Defaults to a _ygg_cache
+            subdirectory in the directory containing name if not provided.
+        verbose (bool, optional): If True, log information will be
+            displayed when the file is generated.
+        **kwargs: Additional keyword arguments are passed to the
+            IntegrationPath constructor.
+    
+    """
+
+    def __init__(self, name, lines, replaces=False, cache_dir=None,
+                 verbose=False, **kwargs):
+        kwargs.setdefault('skip_source_check', True)
+        super(GeneratedFile, self).__init__(name, **kwargs)
+        self.replaces = replaces
+        self.lines = lines
+        self.generated = False
+        self.cache_dir = cache_dir
+        self.verbose = verbose
+        self.created_cache_dir = False
+        if self.cache_dir is None:
+            self.cache_dir = os.path.join(
+                os.path.dirname(name), '_ygg_cache')
+        if self.replaces:
+            self.replaces = os.path.join(self.cache_dir,
+                                         os.path.basename(name))
+
+    def remove_products(self):
+        r"""Remove products associated with the managed path, preserving
+        the original first if one is being replaced and the cache
+        doesn't exist."""
+        self.cache_original()
+        super(GeneratedFile, self).remove_products()
+
+    def cache_original(self):
+        r"""Cache the original file."""
+        if self.replaces and not os.path.isfile(self.replaces):
+            if not os.path.isdir(self.cache_dir):
+                self.created_cache_dir = True
+                os.mkdir(self.cache_dir)
+            shutil.move(self.name, self.replaces)
+        
+    def restore_modified(self):
+        r"""Restore modified original files."""
+        if self.replaces and os.path.isfile(self.replaces):
+            shutil.move(self.replaces, self.name)
+            if self.created_cache_dir:
+                os.rmdir(self.cache_dir)
+        
+    def setup(self):
+        r"""Perform actions on the file before an integration run
+        including generating the file."""
+        self.cache_original()
+        super(GeneratedFile, self).setup()
+        if self.lines and not os.path.isfile(self.name):
+            log_msg = (f'Generating {self.name}:\n\t'
+                       + '\n\t'.join(self.lines))
+            if self.verbose:
+                logger.info(log_msg)
+            else:
+                logger.debug(log_msg)
+            with open(self.name, 'w') as fd:
+                fd.write('\n'.join(self.lines))
+            self.generated = True
+
+    def teardown(self):
+        r"""Perform actions to cleanup the file after an integration run."""
+        super(GeneratedFile, self).teardown()
+        self.restore_modified()
+
+
+class CompilationProduct(IntegrationPath):
+    r"""Class for handling management of compilation products.
+
+    Args:
+        name (str): Root path name for the compilation product.
+        extensions (list, optional): List of extensions to add to the file
+            base in name to generate additional product file names.
+        files (list, optional): List of file names in directory to add
+            to the list of associated products.
+        directory (str, optional): Directory containing associated
+            compilation products provided by files. Defaults to the
+            directory containing name if not provided.
+        sources (list, optional): List of sources files to exclude from
+            the product list.
+        **kwargs: Additional keyword arguments are passed to the IntegrationPath
+            constructor.
+
+    """
+
+    def __init__(self, name, extensions=None, files=None,
+                 directory=None, sources=None, **kwargs):
+        super(CompilationProduct, self).__init__(name, **kwargs)
+        self.extensions = extensions
+        self.files = files
+        self.directory = directory
+        self.sources = sources
+        if self.extensions is None:
+            self.extensions = []
+        if self.files is None:
+            self.files = []
+        if self.directory is None:
+            self.directory = os.path.dirname(self.name)
+        if self.sources is None:
+            self.sources = []
+        self._products = [self.name]
+        base = os.path.splitext(self.name)[0]
+        for x in self.extensions:
+            inew = base + x
+            if inew not in self._products:
+                self._products.append(inew)
+        for x in self.files:
+            inew = os.path.join(self.directory, x)
+            if inew not in self._products:
+                self._products.append(inew)
+        for x in self.sources:
+            if x in self._products:
+                self._products.remove(x)
+
+    @property
+    def products(self):
+        r"""Products to remove during setup when overwrite is set or
+        during teardown."""
+        return copy.copy(self._products)

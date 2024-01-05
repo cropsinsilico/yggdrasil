@@ -2,6 +2,12 @@
 History
 =======
 
+1.10.3 (2024-01-??) Minor bug fixes
+-------------------
+
+* Refactor how integration product cleanup is handled to be more uniform through the introduction of specialized IntegrationPathSet and IntegrationPath classes; change default behavior to preserve products between runs
+* Add command line arguments to the yggrun CLI for overwriting or removing integration products (--overwrite & --remove-products)
+
 1.10.2 (2023-10-12) Minor bug fixes and dependency updates
 -------------------
 

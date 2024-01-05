@@ -279,6 +279,15 @@ class YggRunner(YggClass):
             be disabled. Defaults to False.
         with_asan (bool, optional): Compile and run all models with the
             address sanitizer. Defaults to False.
+        overwrite (bool, optional): If True, any existing model products
+            (compilation products, wrapper scripts, etc.) are removed prior to
+            the run. If False, the products are not removed. Defaults to True.
+            Setting this to False can improve the performance, particularly for
+            models that take a long time to compile, but this should only be
+            done once the model has been fully debugged to ensure that each run
+            is tested on a clean copy of the model.
+        remove_products (bool, optional): If True, integration products
+            will be removed after running the model.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any
@@ -300,10 +309,12 @@ class YggRunner(YggClass):
                  partial_commtype=None, production_run=False,
                  mpi_tag_start=None, yaml_param=None, validate=False,
                  with_debugger=None, disable_python_c_api=False,
-                 with_asan=False):
+                 with_asan=False, overwrite=False, remove_products=False):
         kwargs_models = {'with_debugger': with_debugger,
                          'disable_python_c_api': disable_python_c_api,
-                         'with_asan': with_asan}
+                         'with_asan': with_asan,
+                         'overwrite': overwrite,
+                         'remove_products': remove_products}
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:

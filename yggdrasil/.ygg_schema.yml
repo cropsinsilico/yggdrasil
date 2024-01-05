@@ -3039,19 +3039,18 @@ definitions:
           attribute outputs_in_inputs.
         type: boolean
       overwrite:
+        default: false
         description: If True, any existing model products (compilation products, wrapper
           scripts, etc.) are removed prior to the run. If False, the products are
           not removed. Defaults to True. Setting this to False can improve the performance,
           particularly for models that take a long time to compile, but this should
           only be done once the model has been fully debugged to ensure that each
-          run is tested on a clean copy of the model. The value of this keyword also
-          determines whether or not products are removed after a run.
+          run is tested on a clean copy of the model.
         type: boolean
       preserve_cache:
-        default: false
-        description: If True model products will be kept following the run, otherwise
-          all products will be cleaned up. Defaults to False. This keyword is superceeded
-          by overwrite.
+        default: true
+        description: '[DEPRECATED] If True model products will be kept following the
+          run, otherwise all products will be cleaned up.'
         type: boolean
       products:
         default: []
@@ -3061,6 +3060,11 @@ definitions:
         items:
           type: string
         type: array
+      remove_products:
+        default: false
+        description: If True, integration products will be removed after running the
+          model.
+        type: boolean
       repository_commit:
         description: Commit that should be checked out in the model repository specified
           by repository_url. If not provided, the most recent commit on the default

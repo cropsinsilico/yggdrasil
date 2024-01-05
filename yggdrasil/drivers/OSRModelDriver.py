@@ -216,17 +216,19 @@ class OSRModelDriver(ExecutableModelDriver):
 
         """
         out = super(OSRModelDriver, self).write_wrappers(**kwargs)
-        out.append(self.wrap_xml(self.model_file_orig, self.model_file))
+        self.products.append_generated(
+            self.model_file, self.wrap_xml(self.model_file_orig))
         return out
 
-    def wrap_xml(self, src, dst):
+    def wrap_xml(self, src, dst=None):
         r"""Wrap the input XML, adding tags for the inputs/outputs specified for
         this model.
 
         Args:
             src (str): Full path to the XML file that should be wrapped.
-            dst (str): Full path to the location where the updated XML should
-                be saved.
+            dst (str, optional): Full path to the location where the
+                updated XML should be saved. If not provided, the lines
+                will be returned as a list.
 
         Returns:
             str: Full path to XML file produced.
@@ -278,6 +280,12 @@ class OSRModelDriver(ExecutableModelDriver):
             probe_directive.append(probe)
             root.extend([cask, probe_directive])
         tree = ET.ElementTree(root)
+        if dst is None:
+            with tempfile.TemporaryDirectory() as tmp:
+                dst = os.path.join(tmp, 'temporary_osr.xml')
+                tree.write(dst)
+                with open(dst, 'r') as fd:
+                    return fd.read().splitlines()
         tree.write(dst)
         return dst
 

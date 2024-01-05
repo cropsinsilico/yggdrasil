@@ -266,6 +266,15 @@ class yggrun(SubCommand):
           'help': ('ID associated with the client requesting a service. '
                    '(This should only be passed when running with '
                    '--as-service)')}),
+        (('--overwrite', ),
+         {'action': 'store_true',
+          'help': ('Overwrite existing integration products like '
+                   'compilation products and wrappers')}),
+        (('--remove-products', ),
+         {'action': 'store_true',
+          'help': ('Remove integration products like compilation '
+                   'products and wrappers on completion of the '
+                   'integration')}),
     ]
 
     @classmethod
@@ -299,7 +308,9 @@ class yggrun(SubCommand):
                 with_debugger=args.with_debugger,
                 disable_python_c_api=args.disable_python_c_api,
                 with_asan=args.with_asan,
-                as_service=args.as_service)
+                as_service=args.as_service,
+                overwrite=args.overwrite,
+                remove_products=args.remove_products)
             if args.as_service:
                 kwargs['complete_partial'] = True
                 if not args.partial_commtype:

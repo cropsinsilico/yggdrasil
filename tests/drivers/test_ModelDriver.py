@@ -6,23 +6,9 @@ import pprint
 import shutil
 import logging
 from yggdrasil import platform, constants
-from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
+from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-
-
-def test_remove_product():
-    r"""Test remove_product."""
-    test_file = os.path.join(os.path.dirname(__file__), 'remove_product_test.py')
-    with open(test_file, 'w') as fd:
-        fd.write('print(\'hello\')')
-    try:
-        with pytest.raises(RuntimeError):
-            remove_product(test_file, check_for_source=True)
-        with pytest.raises(RuntimeError):
-            remove_product(os.path.dirname(test_file), check_for_source=True)
-    finally:
-        os.remove(test_file)
 
 
 def test_ModelDriver_implementation():

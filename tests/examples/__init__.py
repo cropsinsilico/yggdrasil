@@ -265,7 +265,8 @@ class TestExample(base_class):
             mpi_tag_start = adv_global_mpi_tag(1000)
         r = runner.get_runner(yaml, namespace=namespace,
                               production_run=True,
-                              mpi_tag_start=mpi_tag_start)
+                              mpi_tag_start=mpi_tag_start,
+                              remove_products=True)
         try:
             try:
                 r.run()

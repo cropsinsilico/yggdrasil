@@ -31,7 +31,7 @@ class FortranCompilerBase(CompilerBase):
     default_linker = None
     default_executable = None
     default_archiver = None
-    product_exts = ['mod']
+    product_exts = ['.mod']
 
     @classmethod
     def get_flags(cls, **kwargs):
@@ -57,30 +57,23 @@ class FortranCompilerBase(CompilerBase):
         return out
         
     @classmethod
-    def append_product(cls, products, src, new, new_dir=None,
-                       dont_append_src=False):
+    def append_product(cls, products, new, **kwargs):
         r"""Append a product to the specified list along with additional values
         indicated by cls.product_exts.
 
         Args:
-            products (list): List of of existing products that new product
-                should be appended to.
-            src (list): Input arguments to compilation call that was used to
-                generate the output file (usually one or more source files).
+            products (tools.ManagedFileSet): List of of existing products
+                that new product should be appended to.
             new (str): New product that should be appended to the list.
-            new_dir (str, optional): Directory that should be used as base when
-                adding files listed in cls.product_files. Defaults to
-                os.path.dirname(new).
-            dont_append_src (bool, optional): If True and src is in the list of
-                products, it will be removed. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to
+                ManagedFileSet.append_compilation_product
 
         """
-        super(FortranCompilerBase, cls).append_product(
-            products, src, new, new_dir=new_dir,
-            dont_append_src=dont_append_src)
         if os.path.basename(new).startswith('YggInterface_f90'):
-            products.append(os.path.join(_top_lang_dir,
-                                         'fygg.mod'))
+            kwargs['additional_products'] = os.path.join(
+                _top_lang_dir, 'fygg.mod')
+        return super(FortranCompilerBase, cls).append_product(
+            products, new, **kwargs)
 
 
 # class FlangCompiler(FortranCompilerBase):

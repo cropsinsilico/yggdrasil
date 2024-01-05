@@ -472,18 +472,172 @@ LANG2EXT = {
     'sbml': '.xml',
     'yaml': '.yml',
 }
+LANG2EXT_FULL = {
+    'R': [
+        '.R',
+    ],
+    'c': [
+        '.c', '.h',
+    ],
+    'c++': [
+        '.cpp', '.CPP', '.cxx', '.C', '.c++', '.cc', '.cp',
+        '.tcc', '.hpp', '.HPP', '.hxx', '.H', '.h++',
+        '.hh', '.hp', '.h',
+    ],
+    'cmake': [
+        '.c', '.h',
+    ],
+    'cpp': [
+        '.cpp', '.CPP', '.cxx', '.C', '.c++', '.cc', '.cp',
+        '.tcc', '.hpp', '.HPP', '.hxx', '.H', '.h++',
+        '.hh', '.hp', '.h',
+    ],
+    'cxx': [
+        '.cpp', '.CPP', '.cxx', '.C', '.c++', '.cc', '.cp',
+        '.tcc', '.hpp', '.HPP', '.hxx', '.H', '.h++',
+        '.hh', '.hp', '.h',
+    ],
+    'dummy': [],
+    'executable': [],
+    'fortran': [
+        '.f90', '.f77', '.f', '.h',
+    ],
+    'julia': [
+        '.jl',
+    ],
+    'lpy': [
+        '.lpy',
+    ],
+    'make': [
+        '.c', '.h',
+    ],
+    'matlab': [
+        '.m',
+    ],
+    'mpi': [],
+    'osr': [
+        '.xml',
+    ],
+    'python': [
+        '.py',
+    ],
+    'pytorch': [
+        '.py',
+    ],
+    'r': [
+        '.R',
+    ],
+    'sbml': [
+        '.xml',
+    ],
+    'timesync': [
+        '.py',
+    ],
+}
+EXT2LANG_FULL = {
+    '.C': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.CPP': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.H': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.HPP': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.R': [
+        'R', 'r',
+    ],
+    '.c': [
+        'c', 'cmake', 'make',
+    ],
+    '.c++': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.cc': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.cp': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.cpp': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.cxx': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.f': [
+        'fortran',
+    ],
+    '.f77': [
+        'fortran',
+    ],
+    '.f90': [
+        'fortran',
+    ],
+    '.h': [
+        'c', 'c++', 'cmake', 'cpp', 'cxx', 'fortran',
+        'make',
+    ],
+    '.h++': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.hh': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.hp': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.hpp': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.hxx': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.jl': [
+        'julia',
+    ],
+    '.lpy': [
+        'lpy',
+    ],
+    '.m': [
+        'matlab',
+    ],
+    '.py': [
+        'python', 'pytorch', 'timesync',
+    ],
+    '.tcc': [
+        'c++', 'cpp', 'cxx',
+    ],
+    '.xml': [
+        'osr', 'sbml',
+    ],
+}
 EXT2LANG = {v: k for k, v in LANG2EXT.items()}
+ALL_LANGUAGE_EXTS = [
+    '.C', '.CPP', '.H', '.HPP', '.R', '.c', '.c++',
+    '.cc', '.cp', '.cpp', '.cxx', '.f', '.f77', '.f90',
+    '.h', '.h++', '.hh', '.hp', '.hpp', '.hxx', '.jl',
+    '.lpy', '.m', '.py', '.tcc', '.xml',
+]
 LANGUAGES = {
     'compiled': [
-        'c', 'c++', 'fortran'],
+        'c', 'c++', 'fortran',
+    ],
     'interpreted': [
-        'R', 'julia', 'matlab', 'python'],
+        'R', 'julia', 'matlab', 'python',
+    ],
     'build': [
-        'cmake', 'make'],
+        'cmake', 'make',
+    ],
     'dsl': [
-        'lpy', 'osr', 'pytorch', 'sbml'],
+        'lpy', 'osr', 'pytorch', 'sbml',
+    ],
     'other': [
-        'dummy', 'executable', 'mpi', 'timesync'],
+        'dummy', 'executable', 'mpi', 'timesync',
+    ],
 }
 LANGUAGES['all'] = (
     LANGUAGES['compiled']
@@ -493,15 +647,20 @@ LANGUAGES['all'] = (
     + LANGUAGES['other'])
 LANGUAGES_WITH_ALIASES = {
     'compiled': [
-        'c', 'c++', 'cpp', 'cxx', 'fortran'],
+        'c', 'c++', 'cpp', 'cxx', 'fortran',
+    ],
     'interpreted': [
-        'R', 'julia', 'matlab', 'python', 'r'],
+        'R', 'julia', 'matlab', 'python', 'r',
+    ],
     'build': [
-        'cmake', 'make'],
+        'cmake', 'make',
+    ],
     'dsl': [
-        'lpy', 'osr', 'pytorch', 'sbml'],
+        'lpy', 'osr', 'pytorch', 'sbml',
+    ],
     'other': [
-        'dummy', 'executable', 'mpi', 'timesync'],
+        'dummy', 'executable', 'mpi', 'timesync',
+    ],
 }
 LANGUAGES_WITH_ALIASES['all'] = (
     LANGUAGES_WITH_ALIASES['compiled']
@@ -511,9 +670,11 @@ LANGUAGES_WITH_ALIASES['all'] = (
     + LANGUAGES_WITH_ALIASES['other'])
 ALIASED_LANGUAGES = {
     'R': [
-        'R', 'r'],
+        'R', 'r',
+    ],
     'c++': [
-        'c++', 'cpp', 'cxx'],
+        'c++', 'cpp', 'cxx',
+    ],
 }
 COMPILER_ENV_VARS = {
     'c': {

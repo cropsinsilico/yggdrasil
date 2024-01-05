@@ -19,65 +19,6 @@ from queue import Empty
 logger = logging.getLogger(__name__)
 
 
-_map_language_ext = OrderedDict()
-
-
-def remove_product(product, check_for_source=False, **kwargs):
-    r"""Delete a single product after checking that the product is not (or
-    does not contain, in the case of directories), source files.
-
-    Args:
-        product (str): Full path to a file or directory that should be
-            removed.
-        check_for_source (bool, optional): If True, the specified product
-            will be checked to ensure that no source files are present. If
-            a source file is present, a RuntimeError will be raised.
-            Defaults to False.
-        **kwargs: Additional keyword arguments are passed to tools.remove_path.
-
-    Raises:
-        RuntimeError: If the specified product is a source file and
-            check_for_source is False.
-        RuntimeError: If the specified product is a directory that contains
-            a source file and check_for_source is False.
-        RuntimeError: If the product cannot be removed.
-
-    """
-    tools.import_all_modules('yggdrasil.drivers')
-    source_keys = list(_map_language_ext.keys())
-    if '.exe' in source_keys:  # pragma: windows
-        source_keys.remove('.exe')
-    if check_for_source:
-        if os.path.isdir(product):
-            ext_tuple = tuple(source_keys)
-            for root, dirs, files in os.walk(product):
-                for f in files:
-                    if f.endswith(ext_tuple):
-                        raise RuntimeError(("%s contains a source file "
-                                            "(%s)") % (product, f))
-        elif os.path.isfile(product):
-            ext = os.path.splitext(product)[-1]
-            if ext in source_keys:
-                raise RuntimeError("%s is a source file." % product)
-    tools.remove_path(product, **kwargs)
-        
-
-def remove_products(products, source_products):
-    r"""Delete products produced during the process of running the model.
-
-    Args:
-        products (list): List of products that should be removed after
-            checking that they are not source files.
-        source_products (list): List of products that should be removed
-            without checking that they are not source files.
-
-    """
-    for p in source_products:
-        remove_product(p)
-    for p in products:
-        remove_product(p, check_for_source=True)
-
-
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -138,11 +79,12 @@ class ModelDriver(Driver):
             Setting this to False can improve the performance, particularly for
             models that take a long time to compile, but this should only be
             done once the model has been fully debugged to ensure that each run
-            is tested on a clean copy of the model. The value of this keyword
-            also determines whether or not products are removed after a run.
-        preserve_cache (bool, optional): If True model products will be kept
-            following the run, otherwise all products will be cleaned up.
-            Defaults to False. This keyword is superceeded by overwrite.
+            is tested on a clean copy of the model.
+        remove_products (bool, optional): If True, integration products
+            will be removed after running the model.
+        preserve_cache (bool, optional): [DEPRECATED] If True model
+            products will be kept following the run, otherwise all
+            products will be cleaned up.
         with_strace (bool, optional): If True, the command is run with strace (on
             Linux) or dtrace (on MacOS). Defaults to False.
         strace_flags (list, optional): Flags to pass to strace (or dtrace).
@@ -265,17 +207,16 @@ class ModelDriver(Driver):
             languages, this will be the same as model_file.
         model_function_info (dict): Parameters recovered by parsing the
             provided model function definition.
-        overwrite (bool): If True, any existing compilation products will be
-            overwritten by compilation and cleaned up following the run.
-            Otherwise, existing products will be used and will remain after
-            the run.
-        products (list): Files created by running the model. This includes
-            compilation products such as executables and/or object files.
-        source_products (list): Files created by running the model that
-            are source files. These files will be removed without checking
-            their extension so users should avoid adding files to this list
-            unless they are sure they should be deleted.
-        wrapper_products (list): Files created in order to wrap the model.
+        overwrite (bool): If True, any existing integration products will
+            be removed prior to running the model.
+        remove_products (bool): If True, integration products will be
+            removed after running the model.
+        preserve_cache (bool): If True model products will be kept
+            following the run, otherwise all products will be cleaned up.
+        products (tools.IntegrationPathSet): Files created by running the
+            model. This includes compilation products such as executables
+            and/or object files, wrapper files created by yggdrasil, and
+            source_products provided by the user.
         process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
         function (str): The name of the model function that should be wrapped.
@@ -383,8 +324,9 @@ class ModelDriver(Driver):
         'source_products': {'type': 'array', 'default': [],
                             'items': {'type': 'string'}},
         'working_dir': {'type': 'string'},
-        'overwrite': {'type': 'boolean'},
-        'preserve_cache': {'type': 'boolean', 'default': False},
+        'overwrite': {'type': 'boolean', 'default': False},
+        'remove_products': {'type': 'boolean', 'default': False},
+        'preserve_cache': {'type': 'boolean', 'default': True},
         'function': {'type': 'string'},
         'iter_function_over': {'type': 'array', 'default': [],
                                'items': {'type': 'string'}},
@@ -532,8 +474,13 @@ class ModelDriver(Driver):
         self.preparsed_function = preparsed_function
         kwargs['additional_component_properties'] = {'args': args}
         super(ModelDriver, self).__init__(name, **kwargs)
-        if self.overwrite is None:
-            self.overwrite = (not self.preserve_cache)
+        if not self.preserve_cache:
+            self.remove_products = True
+        self.products = tools.IntegrationPathSet(products=self.products,
+                                                 overwrite=self.overwrite)
+        for x in self.source_products:
+            self.products.append(x, skip_source_check=True)
+        # TODO: Pass removable_source_exts used by Compiled drivers
         # Setup process things
         self.model_process = None
         self.queue = multitasking.Queue()
@@ -581,7 +528,6 @@ class ModelDriver(Driver):
         self.model_src = None
         self.args = args
         self.modified_files = []
-        self.wrapper_products = []
         self._mpi_comm = False
         self._mpi_rank = 0
         self._mpi_size = 1
@@ -601,13 +547,9 @@ class ModelDriver(Driver):
         self.debug(str(args))
         self.parse_arguments(args)
         assert self.model_file is not None
-        # Remove products
-        if self.overwrite:
-            self.remove_products()
-        # Write wrapper
-        if self.function:
-            self.wrapper_products.append(args[0])
-        self.wrapper_products += self.write_wrappers()
+        # Add wrappers to products and initialize products
+        self.write_wrappers()
+        self.products.setup()
         # Install dependencies
         if self.dependencies:
             self.install_model_dependencies(self.dependencies)
@@ -662,11 +604,7 @@ class ModelDriver(Driver):
     def finalize_registration(cls):
         r"""Operations that should be performed after a class has been fully
         initialized and registered."""
-        global _map_language_ext
-        for x in cls.get_language_ext():
-            if x not in _map_language_ext:
-                _map_language_ext[x] = []
-            _map_language_ext[x].append(cls.language)
+        pass
 
     @classmethod
     def mpi_partner_init(cls, self):
@@ -729,21 +667,11 @@ class ModelDriver(Driver):
                 return max(lang_dict, key=lang_dict.get)
         else:
             ext = os.path.splitext(fname)[-1]
-            for ilang in cls.get_map_language_ext().get(ext, []):
+            for ilang in constants.EXT2LANG_FULL.get(ext, []):
                 if (languages is None) or (ilang in languages):
                     return ilang
         raise ValueError("Cannot determine language for file(s): '%s'" % fname)
                 
-    @classmethod
-    def get_map_language_ext(cls):
-        r"""Return the mapping of all language extensions."""
-        return _map_language_ext
-
-    @classmethod
-    def get_all_language_ext(cls):
-        r"""Return the list of all language extensions."""
-        return list(_map_language_ext.keys())
-
     @classmethod
     def get_language_dir(cls):
         r"""Return the langauge directory."""
@@ -814,10 +742,7 @@ class ModelDriver(Driver):
                                                       self.language_ext[0]))
         lines = self.write_model_wrapper(model_name=self.name,
                                          **self.preparsed_function)
-        # Write file
-        if (not os.path.isfile(wrapper_fname)) or self.overwrite:
-            with open(wrapper_fname, 'w') as fd:
-                fd.write('\n'.join(lines))
+        self.products.append_generated(wrapper_fname, lines)
         return wrapper_fname
 
     @property
@@ -1248,7 +1173,7 @@ class ModelDriver(Driver):
             if (((not cls.is_source_file(src))
                  and (cls.language_ext is not None)
                  and (os.path.splitext(src)[-1]
-                      not in cls.get_all_language_ext()))):
+                      not in constants.ALL_LANGUAGE_EXTS))):
                 src = os.path.splitext(src)[0] + cls.language_ext[0]
             if working_dir and (not os.path.isabs(src)):
                 src = os.path.normpath(os.path.join(working_dir, src))
@@ -1931,38 +1856,18 @@ class ModelDriver(Driver):
             self.wait_process(self.timeout, key_suffix='.graceful_stop')
         super(ModelDriver, self).graceful_stop()
 
-    def cleanup_products(self):
-        r"""Remove products created in order to run the model."""
-        if self.overwrite and (not self.preserve_cache):
-            self.remove_products()
-        self.restore_files()
-
     def cleanup(self):
         r"""Remove compile executable."""
-        self.cleanup_products()
+        if self.remove_products:
+            self.products.teardown()
+        self.products.restore_modified()
         super(ModelDriver, self).cleanup()
 
-    def restore_files(self):
-        r"""Restore modified files to their original form."""
-        for (original, modified) in self.modified_files:
-            if os.path.isfile(original):
-                os.remove(modified)
-                shutil.move(original, modified)
-
-    def remove_products(self):
-        r"""Delete products produced during the process of running the model."""
-        products = self.products
-        source_products = self.source_products + self.wrapper_products
-        remove_products(products, source_products)
-            
     @classmethod
-    def cleanup_dependencies(cls, products=[], verbose=False, **kws):
+    def cleanup_dependencies(cls, products=None, **kws):
         r"""Cleanup dependencies."""
-        for x in products:
-            if os.path.isfile(x):
-                if verbose:  # pragma: debug
-                    print("Removing %s" % x)
-                os.remove(x)
+        if products is not None:
+            products.teardown()
                 
     # Methods for automated model wrapping
     @classmethod
