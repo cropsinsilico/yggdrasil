@@ -512,7 +512,8 @@ class BuildModelDriver(CompiledModelDriver):
         
     def cleanup(self):
         r"""Remove compiled executable."""
-        if (self.model_file is not None) and os.path.isfile(self.model_file):
+        if ((self.remove_products and self.model_file is not None
+             and os.path.isfile(self.model_file))):
             self.compile_model(target='clean')
         super(BuildModelDriver, self).cleanup()
 
