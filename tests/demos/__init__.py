@@ -61,9 +61,10 @@ class DemoTstBase(base_class):
         check_required_languages(languages)
         # Run
         r = runner.get_runner(yamls, namespace=run_name,
-                              production_run=True)
+                              production_run=True,
+                              remove_products=True)
         r.run()
-        assert(not r.error_flag)
+        assert not r.error_flag
         del r
 
     @pytest.fixture(scope="class", autouse=True)

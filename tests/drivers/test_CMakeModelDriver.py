@@ -216,7 +216,8 @@ class TestCMakeModelDriver_wd(TestCMakeModelDriver):
                     namespace=namespace, env_compiler='CXX',
                     env_compiler_flags='CXXFLAGS',
                     sourcedir='.', builddir='build',
-                    compiler_flags=['-Wdev'], skip_compiler=True)
+                    compiler_flags=['-Wdev'], skip_compiler=True,
+                    remove_products=True)
     
     # Disable instance args?
 
@@ -235,6 +236,7 @@ class TestCMakeModelDriver_wd(TestCMakeModelDriver):
                                'Debug',
                                os.path.basename(out))
         compiler = CPPModelDriver.get_tool('compiler')
+        print("COMPILER", compiler.tool_version())
         python_class.call_compiler(instance.source_files,
                                    out=out,
                                    builddir='build',

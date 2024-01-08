@@ -4083,7 +4083,8 @@ class CompiledModelDriver(ModelDriver):
             if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
                  and (not kwargs['overwrite']))):
                 kwargs['products'].append(kwargs['out'])
-                self.debug("Result already exists: %s", kwargs['out'])
+                self.debug(f"Result already exists, skipping "
+                           f"compilation: {kwargs['out']}")
                 return kwargs['out']
             suffix_kws = self.select_suffix_kwargs(kwargs)
             if 'env' not in kwargs:

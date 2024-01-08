@@ -2067,20 +2067,41 @@ class IntegrationPathSet(object):
         kwargs['cls'] = CompilationProduct
         return self.append(*args, **kwargs)
 
-    def setup(self):
-        r"""Perform actions on the paths before an integration run."""
-        for x in self.paths:
-            x.setup()
+    def setup(self, tag=None):
+        r"""Perform actions on the paths before an integration run.
 
-    def teardown(self):
-        r"""Perform actions to cleanup the paths after an integration run."""
-        for x in self.paths:
-            x.teardown()
+        Args:
+            tag (str, optional): Only perform actions for paths with the
+                provided tag.
 
-    def restore_modified(self):
-        r"""Restore modified original files."""
+        """
         for x in self.paths:
-            x.restore_modified()
+            if x.tag == tag:
+                x.setup()
+
+    def teardown(self, tag=None):
+        r"""Perform actions to cleanup the paths after an integration run.
+
+        Args:
+            tag (str, optional): Only perform actions for paths with the
+                provided tag.
+
+        """
+        for x in self.paths:
+            if x.tag == tag:
+                x.teardown()
+
+    def restore_modified(self, tag=None):
+        r"""Restore modified original files.
+
+        Args:
+            tag (str, optional): Only perform actions for paths with the
+                provided tag.
+
+        """
+        for x in self.paths:
+            if x.tag == tag:
+                x.restore_modified()
 
     @property
     def last(self):
@@ -2108,18 +2129,21 @@ class IntegrationPath(object):
             should also be managed.
         skip_source_check (bool, optional): If True, the products will
             not be checked for source files prior to be removed.
+        tag (str, optional): Tag that should be added to the path for
+            performing tags on subsets of files.
 
     """
 
     def __init__(self, name, overwrite=False, additional_products=None,
                  removable_source_exts=None, generalized_suffix=None,
-                 skip_source_check=False):
+                 skip_source_check=False, tag=None):
         self.name = name
         self.overwrite = overwrite
         self.additional_products = additional_products
         self.removable_source_exts = removable_source_exts
         self.generalized_suffix = generalized_suffix
         self.skip_source_check = skip_source_check
+        self.tag = tag
         if self.additional_products is None:
             self.additional_products = []
         if self.removable_source_exts is None:
@@ -2248,6 +2272,9 @@ class GeneratedFile(IntegrationPath):
         cache_dir (str, optional): Directory where the original file
             should be cached if replaces is True. Defaults to a _ygg_cache
             subdirectory in the directory containing name if not provided.
+        delayed (bool, optional): If True, the file will not be
+            generated or replaced until setup is called with the
+            delayed keyword set to True.
         verbose (bool, optional): If True, log information will be
             displayed when the file is generated.
         **kwargs: Additional keyword arguments are passed to the
@@ -2256,13 +2283,14 @@ class GeneratedFile(IntegrationPath):
     """
 
     def __init__(self, name, lines, replaces=False, cache_dir=None,
-                 verbose=False, **kwargs):
+                 delayed=False, verbose=False, **kwargs):
         kwargs.setdefault('skip_source_check', True)
         super(GeneratedFile, self).__init__(name, **kwargs)
         self.replaces = replaces
         self.lines = lines
         self.generated = False
         self.cache_dir = cache_dir
+        self.delayed = delayed
         self.verbose = verbose
         self.created_cache_dir = False
         if self.cache_dir is None:
@@ -2285,6 +2313,8 @@ class GeneratedFile(IntegrationPath):
             if not os.path.isdir(self.cache_dir):
                 self.created_cache_dir = True
                 os.mkdir(self.cache_dir)
+            if not os.path.isfile(self.name):
+                raise RuntimeError(f"Original file does not exist: {self.name}")
             shutil.move(self.name, self.replaces)
         
     def restore_modified(self):

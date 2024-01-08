@@ -8,7 +8,7 @@ from yggdrasil.drivers.MakeModelDriver import MakeModelDriver, MakeCompiler
 @pytest.mark.related_language('make')
 def test_MakeCompiler():
     r"""Test MakeCompiler class."""
-    assert(MakeCompiler.get_output_file(None, target='clean') == 'clean')
+    assert MakeCompiler.get_output_file(None, target='clean') == 'clean'
 
 
 @pytest.mark.absent_language('make')
@@ -54,7 +54,8 @@ class TestMakeModelDriver(base_class):
         return dict(testing_options.get('kwargs', {}),
                     yml={'working_dir': working_dir},
                     timeout=timeout, sleeptime=polling_interval,
-                    namespace=namespace, makefile=makefile)
+                    namespace=namespace, makefile=makefile,
+                    remove_products=True)
 
 
 class TestMakeModelDriver_wd(TestMakeModelDriver):
@@ -67,16 +68,18 @@ class TestMakeModelDriver_wd(TestMakeModelDriver):
         return dict(testing_options.get('kwargs', {}),
                     yml={'working_dir': sourcedir},
                     timeout=timeout, sleeptime=polling_interval,
-                    namespace=namespace)
+                    namespace=namespace,
+                    remove_products=True)
 
     def test_compile_model(self, target, instance):
         r"""Test compile model with alternate set of input arguments."""
         src = [target + '.c']
-        instance.compile_model(target=target)
-        instance.compile_model(source_files=src)
+        instance.compile_model(target=target, overwrite=True)
+        instance.compile_model(source_files=src, overwrite=True)
         with pytest.raises(RuntimeError):
             instance.compile_model(source_files=src,
-                                   target=target + 'invalid')
+                                   target=target + 'invalid',
+                                   overwrite=True)
         
 
 class TestMakeModelDriver_wd_rel(TestMakeModelDriver):
@@ -91,4 +94,5 @@ class TestMakeModelDriver_wd_rel(TestMakeModelDriver):
                     yml={'working_dir': working_dir},
                     timeout=timeout, sleeptime=polling_interval,
                     namespace=namespace, working_dir=makedir_parts[0],
-                    makedir=makedir_parts[1])
+                    makedir=makedir_parts[1],
+                    remove_products=True)

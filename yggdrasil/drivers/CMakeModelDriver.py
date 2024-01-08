@@ -812,7 +812,7 @@ class CMakeModelDriver(BuildModelDriver):
         # Create copy of cmakelists and modify
         newlines_after = []
         self.products.append_generated(
-            self.buildfile, [], replaces=True,
+            self.buildfile, [], replaces=True, tag='compile_time',
             verbose=kwargs.get('verbose', False))
         build_product = self.products.last
         orig_buildfile = build_product.name
@@ -1028,6 +1028,8 @@ class CMakeModelDriver(BuildModelDriver):
                                     allow_error=True, **kwargs)
         out = None
         with self.buildfile_locked(kwargs.get('dry_run', False)):
+            if not kwargs.get('dry_run', False):
+                self.products.setup(tag='compile_time')
             kwargs['dont_lock_buildfile'] = True
             default_kwargs = dict(target=target,
                                   sourcedir=self.sourcedir,
@@ -1037,6 +1039,8 @@ class CMakeModelDriver(BuildModelDriver):
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
             out = super(CMakeModelDriver, self).compile_model(**kwargs)
+            if not kwargs.get('dry_run', False):
+                self.products.teardown(tag='compile_time')
         return out
 
     @classmethod
