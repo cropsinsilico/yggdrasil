@@ -297,7 +297,9 @@ class CMakeConfigure(BuildToolBase):
                  and (not generator.endswith(('Win64', 'ARM')))
                  and platform._is_64bit)):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
-        if target_compiler in ['cl', 'cl++']:
+        logger.info(f"TARGET_COMPILER = {target_compiler}")
+        if target_compiler:
+            # if target_compiler in ['cl', 'cl++']:
             compiler = get_compilation_tool('compiler', target_compiler)
             if target_linker is None:
                 linker = compiler.linker()
@@ -316,12 +318,12 @@ class CMakeConfigure(BuildToolBase):
                     continue
                 if not itool.is_installed():  # pragma: debug
                     continue
-                if itool.toolname in ['cl', 'cl++']:
-                    out.append('-D%s:FILEPATH=%s' % (
-                        cmake_vars['%s_compiler' % k],
-                        itool.get_executable(full_path=True)))
-                    out.append('-D%s=%s' % (
-                        cmake_vars['%s_flags' % k], ''))
+                # if itool.toolname in ['cl', 'cl++']:
+                out.append('-D%s:FILEPATH=%s' % (
+                    cmake_vars['%s_compiler' % k],
+                    itool.get_executable(full_path=True)))
+                out.append('-D%s=%s' % (
+                    cmake_vars['%s_flags' % k], ''))
             out.append('-DCMAKE_LINKER=%s' % linker.get_executable(full_path=True))
         return out
 
