@@ -183,7 +183,8 @@ class TestCMakeModelDriver(base_class):
                         reason="GNU compiler not installed.")
     def test_run_model_gcc(self, run_model_instance):
         r"""Test compiling/running test model with gcc."""
-        run_model_instance(target_compiler='gcc')
+        run_model_instance(target_compiler='gcc',
+                           remove_products=True)
 
     def test_sbdir(self, instance, sourcedir, builddir):
         r"""Test that source/build directories set correctly."""

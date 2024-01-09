@@ -211,6 +211,7 @@ class CMakeConfigure(BuildToolBase):
                 True, produced file otherwise.
 
         """
+        kwargs['verbose'] = True
         try:
             out = super(CMakeConfigure, cls).call(args, **kwargs)
         except RuntimeError as e:
@@ -325,6 +326,7 @@ class CMakeConfigure(BuildToolBase):
                 out.append('-D%s=%s' % (
                     cmake_vars['%s_flags' % k], ''))
             out.append('-DCMAKE_LINKER=%s' % linker.get_executable(full_path=True))
+            logger.info(f"CMAKE FLAGS: {out}")
         return out
 
     @classmethod

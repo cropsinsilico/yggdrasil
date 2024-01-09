@@ -1168,7 +1168,7 @@ class CompilationToolBase(object):
     def call(cls, args, language=None, toolname=None, skip_flags=False,
              dry_run=False, out=None, overwrite=False, products=None,
              allow_error=False, working_dir=None, additional_args=None,
-             suffix='', cache_key=None, **kwargs):
+             suffix='', cache_key=None, verbose=False, **kwargs):
         r"""Call the tool with the provided arguments. If the first argument
         resembles the name of the tool executable, the executable will not be
         added.
@@ -1212,6 +1212,8 @@ class CompilationToolBase(object):
             cache_key (str, optional): Key that should be used to
                 cache results so that they may be used multiple
                 times. Defaults to None and is ignored.
+            verbose (bool, optional): If True, the call command and
+                and output will be logged as info.
             **kwargs: Additional keyword arguments are passed to
                 cls.get_executable_command. and tools.popen_nobuffer.
 
@@ -1278,7 +1280,10 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            logger.debug('Command: "%s"' % ' '.join(cmd))
+            if verbose:
+                logger.info('Command: "%s"' % ' '.join(cmd))
+            else:
+                logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = output.decode("utf-8")
@@ -1286,7 +1291,10 @@ class CompilationToolBase(object):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))
             try:
-                logger.debug(' '.join(cmd) + '\n' + output)
+                if verbose:
+                    logger.info(' '.join(cmd) + '\n' + output)
+                else:
+                    logger.debug(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(output)
         except (subprocess.CalledProcessError, OSError) as e:
