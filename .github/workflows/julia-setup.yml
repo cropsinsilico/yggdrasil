@@ -48,6 +48,9 @@ jobs:
     - name: Check Julia version
       shell: bash -l {0}
       run: julia -v
+    - name: Check Julia location
+      shell: bash -l {0}
+      run: which julia
     - name: Install PyCall (no mamba)
       if: matrix.install-method == 'pip'
       run: julia -e "using Pkg; Pkg.add(\"PyCall\")"
