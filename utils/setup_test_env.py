@@ -2044,52 +2044,6 @@ if __name__ == "__main__":
         'install-recipe', help="Install a package from a conda recipe.")
     SetupParam.add_parser_args(
         parser_rcp,
-        skip=['target_os', 'use_mamba', 'method'],
-        skip_types=['install'],
-        include=['user', 'build_method'],
-        build_method_choices=['mamba', 'conda'],
-        build_method_default='mamba',
-        additional_args=[
-            (('--recipe', ),
-             {'type': str, 'default': 'recipe',
-              'help': "Location of conda recipe to build and install."}),
-            (('--packages', ),
-             {'nargs': '*',
-              'help': ("One or more packages to install from the "
-                       "recipe. Defaults to all of the package in the "
-                       "recipe.")}),
-            (('--dont-test', ),
-             {'action': 'store_true',
-              'help': "Don't run tests as part of the build process."}),
-        ])
-    # Install recipe
-    parser_rcp = subparsers.add_parser(
-        'install-recipe', help="Install a package from a conda recipe.")
-    SetupParam.add_parser_args(
-        parser_rcp,
-        skip=['target_os', 'use_mamba', 'method'],
-        skip_types=['install'],
-        include=['user', 'build_method'],
-        build_method_choices=['mamba', 'conda'],
-        build_method_default='mamba',
-        additional_args=[
-            (('--recipe', ),
-             {'type': str, 'default': 'recipe',
-              'help': "Location of conda recipe to build and install."}),
-            (('--packages', ),
-             {'nargs': '*',
-              'help': ("One or more packages to install from the "
-                       "recipe. Defaults to all of the package in the "
-                       "recipe.")}),
-            (('--dont-test', ),
-             {'action': 'store_true',
-              'help': "Don't run tests as part of the build process."}),
-        ])
-    # Install recipe
-    parser_rcp = subparsers.add_parser(
-        'install-recipe', help="Install a package from a conda recipe.")
-    SetupParam.add_parser_args(
-        parser_rcp,
         skip=['target_os', 'use_mamba'],
         skip_types=['install'],
         include=['user'],

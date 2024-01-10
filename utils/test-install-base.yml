@@ -383,20 +383,20 @@ jobs:
             install-sbml: false
           - os-base: ubuntu
             python-version: 3.9
-            install-method: conda
-            test-flags1: --long-running
-            test-flags2: ""
-            install-c: true
-            install-mpi: false
-            install-sbml: false
-          - os-base: ubuntu
-            python-version: "3.10"
-            install-method: conda
             test-flags1: --long-running --remote-service
             test-flags2: --suites examples --parametrize-language=sbml
             install-c: true
             install-mpi: false
             install-sbml: true
+          - os-base: ubuntu
+            python-version: "3.10"
+            install-method: conda
+            test-flags1: --long-running
+            test-flags2: ""
+            install-method: conda
+            install-c: true
+            install-mpi: false
+            install-sbml: false
           - os-base: ubuntu
             python-version: "3.11"
             install-method: conda
