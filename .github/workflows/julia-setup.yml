@@ -27,14 +27,14 @@ jobs:
       if: matrix.install-method == 'mamba'
       shell: bash -l {0}
       run: |
-        mamba install -y python==3.7 juliaup r-base
+        mamba install -y python==3.8 juliaup r-base
 
     # Non-mamba steps
     - name: Install Python
       if: matrix.install-method == 'pip'
       uses: actions/setup-python@v4
       with:
-        python-version: '3.7'
+        python-version: '3.8'
     - name: Install R
       if: matrix.install-method == 'pip'
       uses: r-lib/actions/setup-r@v2

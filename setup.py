@@ -110,11 +110,11 @@ setup(
         "Programming Language :: ML",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
@@ -126,6 +126,6 @@ setup(
         'console_scripts': console_scripts,
     },
     license="BSD",
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     **kwargs
 )
