@@ -1142,16 +1142,17 @@ def build_conda_recipe(recipe='recipe', param=None,
     cmds = []
     conda_env = CONDA_ENV
     conda_idx = CONDA_INDEX
-    if param.use_mamba:
-        conda_build = f"{CONDA_CMD} mambabuild"
-        build_pkgs = ["boa"]
-    else:
-        conda_build = f"{CONDA_CMD} build"
-        build_pkgs = ["conda-build", "conda-verify"]
     if param.verbose:
         build_flags = ''
     else:
         build_flags = '-q'
+    if param.use_mamba:
+        conda_build = f"{CONDA_CMD} mambabuild"
+        build_pkgs = ["boa"]
+        build_flags += ' -c conda-forge'
+    else:
+        conda_build = f"{CONDA_CMD} build"
+        build_pkgs = ["conda-build", "conda-verify"]
     # Must always build in base to avoid errors (and don't change the
     # version of Python used in the environment)
     # https://github.com/conda/conda/issues/9124
