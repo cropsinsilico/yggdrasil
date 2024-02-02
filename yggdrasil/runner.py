@@ -52,21 +52,98 @@ class YggFunction(YggClass):
     
     def __init__(self, model_yaml, service_address=None, **kwargs):
         import uuid
-        from yggdrasil.languages.Python.YggInterface import (
-            YggInput, YggOutput, YggRpcClient)
         super(YggFunction, self).__init__()
         # Create and start runner in another process
         self.dummy_name = 'func' + str(uuid.uuid4()).split('-')[0]
-        kwargs['complete_partial'] = self.dummy_name
+        self.model_yaml = model_yaml
+        self.service_address = service_address
+        self.runner_kwargs = kwargs
+        self.runner_kwargs['complete_partial'] = self.dummy_name
         if service_address:
             # Temporary YAML describing the service
             contents = (f'service:\n'
                         f'    name: {model_yaml}\n'
                         f'    address: {service_address}\n')
-            model_yaml = os.path.join(os.getcwd(), self.dummy_name + '.yml')
+            self.model_yaml = os.path.join(os.getcwd(),
+                                           self.dummy_name + '.yml')
             with open(model_yaml, 'w') as fd:
                 fd.write(contents)
-        self.runner = YggRunner(model_yaml, **kwargs)
+        self.runner = None
+        self.run()
+
+    # def widget_function(self, *args, **kwargs):
+    #     # import matplotlib.pyplot as plt
+    #     # ncols = min(3, len(arguments))
+    #     # nrows = int(ceil(float(len(arguments))/float(ncols)))
+    #     # plt.show()
+    #     out = self(*args, **kwargs)
+    #     return out
+
+    # def widget(self, *args, **kwargs):
+    #     from ipywidgets import interact_manual
+    #     return interact_manual(self.widget_function, *args, **kwargs)
+        
+    def __call__(self, *args, **kwargs):
+        r"""Call the model as a function by sending variables.
+
+        Args:
+           *args: Any positional arguments are expected to be input variables
+               in the correct order.
+           **kwargs: Any keyword arguments are expected to be named input
+               variables for the model.
+
+        Raises:
+            RuntimeError: If an input argument is missing.
+            RuntimeError: If sending an input argument to a model fails.
+            RuntimeError: If receiving an output value from a model fails.
+
+        Returns:
+            dict: Returned values for each return variable.
+
+        """
+        try:
+            self.runner.resume()
+            # Check for arguments
+            for a, arg in zip(self.arguments, args):
+                assert a not in kwargs
+                kwargs[a] = arg
+            for a in self.arguments:
+                if a not in kwargs:  # pragma: debug
+                    raise RuntimeError("Required argument %s not provided." % a)
+            # Send
+            for k, v in self.inputs.items():
+                flag = v['comm'].send([kwargs[a] for a in v['vars']])
+                if not flag:  # pragma: debug
+                    raise RuntimeError("Failed to send %s" % k)
+            # Receive
+            out = {}
+            for k, v in self.outputs.items():
+                flag, data = v['comm'].recv(timeout=60.0)
+                if not flag:  # pragma: debug
+                    raise RuntimeError("Failed to receive variable %s" % v)
+                ivars = v['vars']
+                if ((isinstance(data, (list, tuple))
+                     and (len(ivars) > 1 or len(data) == len(ivars)))):
+                    assert len(data) == len(ivars)
+                    for a, d in zip(ivars, data):
+                        out[a] = d
+                else:
+                    assert len(ivars) == 1
+                    out[ivars[0]] = data
+            self.runner.pause()
+            return out
+        except BaseException:
+            self.stop(error=True)
+            raise
+
+    def run(self):
+        r"""Run the model"""
+        if self.runner is not None:
+            self.info("Model already running")
+            return
+        from yggdrasil.languages.Python.YggInterface import (
+            YggInput, YggOutput, YggRpcClient)
+        self.runner = YggRunner(self.model_yaml, **self.runner_kwargs)
         # Start the drivers
         self.runner.run()
         self.model_driver = self.runner.modeldrivers[self.dummy_name]
@@ -138,93 +215,37 @@ class YggFunction(YggClass):
             self.returns += v['vars']
         self.debug("arguments: %s, returns: %s", self.arguments, self.returns)
         self.runner.pause()
-        if service_address:
-            os.remove(model_yaml)
+        if self.service_address:
+            os.remove(self.model_yaml)
 
-    # def widget_function(self, *args, **kwargs):
-    #     # import matplotlib.pyplot as plt
-    #     # ncols = min(3, len(arguments))
-    #     # nrows = int(ceil(float(len(arguments))/float(ncols)))
-    #     # plt.show()
-    #     out = self(*args, **kwargs)
-    #     return out
-
-    # def widget(self, *args, **kwargs):
-    #     from ipywidgets import interact_manual
-    #     return interact_manual(self.widget_function, *args, **kwargs)
-        
-    def __call__(self, *args, **kwargs):
-        r"""Call the model as a function by sending variables.
-
-        Args:
-           *args: Any positional arguments are expected to be input variables
-               in the correct order.
-           **kwargs: Any keyword arguments are expected to be named input
-               variables for the model.
-
-        Raises:
-            RuntimeError: If an input argument is missing.
-            RuntimeError: If sending an input argument to a model fails.
-            RuntimeError: If receiving an output value from a model fails.
-
-        Returns:
-            dict: Returned values for each return variable.
-
-        """
-        try:
-            self.runner.resume()
-            # Check for arguments
-            for a, arg in zip(self.arguments, args):
-                assert a not in kwargs
-                kwargs[a] = arg
-            for a in self.arguments:
-                if a not in kwargs:  # pragma: debug
-                    raise RuntimeError("Required argument %s not provided." % a)
-            # Send
-            for k, v in self.inputs.items():
-                flag = v['comm'].send([kwargs[a] for a in v['vars']])
-                if not flag:  # pragma: debug
-                    raise RuntimeError("Failed to send %s" % k)
-            # Receive
-            out = {}
-            for k, v in self.outputs.items():
-                flag, data = v['comm'].recv(timeout=60.0)
-                if not flag:  # pragma: debug
-                    raise RuntimeError("Failed to receive variable %s" % v)
-                ivars = v['vars']
-                if ((isinstance(data, (list, tuple))
-                     and (len(ivars) > 1 or len(data) == len(ivars)))):
-                    assert len(data) == len(ivars)
-                    for a, d in zip(ivars, data):
-                        out[a] = d
-                else:
-                    assert len(ivars) == 1
-                    out[ivars[0]] = data
-            self.runner.pause()
-            return out
-        except BaseException:
-            self.stop(error=True)
-            raise
+    def reload(self):
+        r"""Reload the model"""
+        self.stop()
+        self.run()
 
     def stop(self, error=False):
         r"""Stop the model(s) from running."""
-        self.runner.resume()
-        if self._stop_called:
+        if self.runner is None:
+            self.info("Model already stopped")
             return
-        self._stop_called = True
-        if not error:
+        self.runner.resume()
+        if not self._stop_called:
+            self._stop_called = True
+            if not error:
+                for x in self.inputs.values():
+                    x['comm'].send_eof()
+            self.model_driver['instance'].set_break_flag()
+            self.runner.waitModels(timeout=10)
             for x in self.inputs.values():
-                x['comm'].send_eof()
-        self.model_driver['instance'].set_break_flag()
-        self.runner.waitModels(timeout=10)
-        for x in self.inputs.values():
-            x['comm'].close()
-        for x in self.outputs.values():
-            x['comm'].close()
-        self.runner.terminate()
-        self.runner.atexit()
-        os.environ.clear()
-        os.environ.update(self.old_environ)
+                x['comm'].close()
+            for x in self.outputs.values():
+                x['comm'].close()
+            self.runner.terminate()
+            self.runner.atexit()
+            os.environ.clear()
+            os.environ.update(self.old_environ)
+            self.runner = None
+            self._stop_called = False
 
     def model_info(self):
         r"""Display information about the wrapped model(s)."""

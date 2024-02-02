@@ -95,7 +95,7 @@
     "pyzmq",
     "requests",
     {
-      "scikit_build_core": {
+      "scikit-build-core": {
         "flags": {
           "build": true,
           "build_only": true

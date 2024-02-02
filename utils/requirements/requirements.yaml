@@ -54,7 +54,7 @@ general:
   - pyyaml
   - pyzmq
   - requests
-  - scikit_build_core:
+  - scikit-build-core:
       flags:
         build: True
         build_only: True

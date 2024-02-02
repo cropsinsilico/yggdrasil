@@ -98,6 +98,11 @@ def test_import_as_function():
     result = fmodel(*list(input_args.values()))
     for x in fmodel.returns:
         assert x in result
+    fmodel.reload()
+    fmodel.run()
+    result = fmodel(**input_args)
+    for x in fmodel.returns:
+        assert x in result
     fmodel.stop()
     fmodel.stop()
 
