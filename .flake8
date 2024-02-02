@@ -6,4 +6,4 @@ ignore = W293, W503, E203
 # Raise the default 79 limit
 max-line-length = 90
 # Ignore some well known paths
-exclude = .venv,.tox,dist,doc,build,*.egg,./yggdrasil/rapidjson/,./yggdrasil/interface/YggInterface.py,./yggdrasil/interface/CisInterface.py,./yggdrasil/demos
+exclude = .venv,.tox,dist,doc,build,*.egg,./yggdrasil/rapidjson/,./yggdrasil/interface/YggInterface.py,./yggdrasil/interface/CisInterface.py,./yggdrasil/demos,./yggdrasil/python-rapidjson,./yggdrasil/core
