@@ -95,14 +95,6 @@
     "pyzmq",
     "requests",
     {
-      "scikit-build-core": {
-        "flags": {
-          "build": true,
-          "build_only": true
-        }
-      }
-    },
-    {
       "scipy": {
         "flags": {
           "method_in_setup": "conda"

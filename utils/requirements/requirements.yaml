@@ -54,10 +54,6 @@ general:
   - pyyaml
   - pyzmq
   - requests
-  - scikit-build-core:
-      flags:
-        build: True
-        build_only: True
   - scipy:
       flags:
         method_in_setup: conda
