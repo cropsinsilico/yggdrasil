@@ -108,8 +108,16 @@ class YggFunction(YggClass):
                 assert a not in kwargs
                 kwargs[a] = arg
             for a in self.arguments:
-                if a not in kwargs:  # pragma: debug
-                    raise RuntimeError("Required argument %s not provided." % a)
+                if a not in kwargs:
+                    a_dtype = self.argument_datatypes.get(a, {})
+                    if ((len(args) == 0 and len(self.arguments) == 1
+                         and a_dtype.get('type', '') == 'object')):
+                        a_kws = list(kwargs.keys())
+                        if not a_dtype.get('additionalProperties', True):
+                            a_kws = list(a_dtype.get('properties', {}).keys())
+                        kwargs[a] = {k: kwargs[k] for k in a_kws}
+                    else:  # pragma: debug
+                        raise RuntimeError("Required argument %s not provided." % a)
             # Send
             for k, v in self.inputs.items():
                 flag = v['comm'].send([kwargs[a] for a in v['vars']])
@@ -155,13 +163,16 @@ class YggFunction(YggClass):
         # Create input/output channels
         self.inputs = {}
         self.outputs = {}
+        self.argument_datatypes = {}
         # import zmq; ctx = zmq.Context()
         self.old_environ = os.environ.copy()
         for drv in self.model_driver['input_drivers']:
             for env in drv['instance'].model_env.values():
                 os.environ.update(env)
             channel_name = drv['instance'].ocomm.name
-            var_name = drv['name'].split('function_')[-1]
+            # var_name = drv['name'].split('function_')[-1]
+            var_name = drv['inputs'][0]['name'].split(
+                drv['inputs'][0]['partner_model'] + ':')[-1]
             self.outputs[var_name] = drv.copy()
             self.outputs[var_name]['comm'] = YggInput(
                 channel_name, no_suffix=True)  # context=ctx)
@@ -173,7 +184,9 @@ class YggFunction(YggClass):
             for env in drv['instance'].model_env.values():
                 os.environ.update(env)
             channel_name = drv['instance'].icomm.name
-            var_name = drv['name'].split('function_')[-1]
+            var_name = drv['outputs'][0]['name'].split(
+                drv['outputs'][0]['partner_model'] + ':')[-1]
+            # var_name = drv['name'].split('function_')[-1]
             self.inputs[var_name] = drv.copy()
             if drv['instance']._connection_type == 'rpc_request':
                 self.inputs[var_name]['comm'] = YggRpcClient(
@@ -189,8 +202,14 @@ class YggFunction(YggClass):
                     channel_name, no_suffix=True)  # context=ctx)
                 if 'vars' in drv['outputs'][0]:
                     self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
+                    for v in self.inputs[var_name]['vars']:
+                        if isinstance(v, dict) and 'datatype' in v:
+                            self.argument_datatypes.setdefault(
+                                v['name'], v['datatype'])
                 else:
                     self.inputs[var_name]['vars'] = [var_name]
+                    self.argument_datatypes.setdefault(
+                        var_name, drv['outputs'][0].get("datatype", {}))
         self.debug('inputs: %s, outputs: %s',
                    list(self.inputs.keys()),
                    list(self.outputs.keys()))
