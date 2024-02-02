@@ -1,4 +1,8 @@
 general:
+  - build:
+      flags:
+        build: True
+        build_only: True
   - chevron
   - "cross-python_{{ target_platform }}":
       method: conda_recipe
@@ -351,7 +355,7 @@ extras:
     requirements:
     - conda-tree:
         method: conda
-    - coverage
+    - coverage[toml]
     - flake8
     - flaky
     - pytest

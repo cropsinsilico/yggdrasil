@@ -1,6 +1,6 @@
 ccache; platform_system != 'Windows'  # [conda]
 conda-tree       # [conda]
-coverage
+coverage[toml]
 flake8
 flaky
 pytest

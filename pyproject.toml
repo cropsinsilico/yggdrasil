@@ -1,11 +1,190 @@
 [build-system]
 requires = [
-    "setuptools >= 40.6.0",
-    "wheel",
-    "numpy==1.13.3; python_version<'3.5'",
-    "oldest-supported-numpy; python_version>='3.5'",
+  "scikit-build-core",
+  "setuptools_scm",
+  "hatch-fancy-pypi-readme",
+  "numpy",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "yggdrasil-framework"
+dynamic = [
+  "version",
+  "readme",
+  "dependencies",
+  "optional-dependencies",
+  "scripts",
+]
+description = "A framework for combining interdependent models from multiple languages."
+license = {file = "LICENSE.txt"}
+keywords = [
+  "yggdrasil", "plants", "simulation", "models", "framework"
+]
+authors = [
+  { name="Meagan Lang", email="langmm.astro@gmail.com" },
+  { name="Doug Friedel" },
+]
+maintainers = [
+  { name="Meagan Lang", email="langmm.astro@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: C",
+    "Programming Language :: C++",
+    "Programming Language :: ML",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering",
+]
+python_requires = ">=3.7"
+
+[project.entry-points]
+console_scripts = {file = "console_scripts.txt"}
+
+[project.urls]
+Homepage = "https://github.com/cropsinsilico/yggdrasil"
+Documentation = "https://cropsinsilico.github.io/yggdrasil/"
+Repository = "https://github.com/cropsinsilico/yggdrasil"
+Issues = "https://github.com/cropsinsilico/yggdrasil/issues"
+Changelog = "https://github.com/cropsinsilico/yggdrasil/blob/main/HISTORY.rst"
+
+[tool.scikit-build]
+experimental=true
+sdist.exclude = [
+  ".git*",
+  ".run",
+  "yggdrasil/core/environment.yml",
+  "yggdrasil/core/setup.py",
+  "yggdrasil/core/NOTES.txt",
+  "yggdrasil/core/TODO.txt",
+  "yggdrasil/core/gdb_commands.txt",
+  "yggdrasil/core/requirements*.txt",
+  "yggdrasil/core/copy_seri.py",
+  "yggdrasil/core/*.sh",
+  "yggdrasil/core/pyproject.toml",
+  "yggdrasil/core/*.patch",
+  "yggdrasil/core/tests",
+  "yggdrasil/core/thirdparty",
+  "yggdrasil/core/cpp/rapidjson",
+]
+sdist.include = [
+  "yggdrasil/_version.py",
+]
+wheel.exclude = [
+  "CMakeLists.txt",
+  "__pycache__",
+  "yggdrasil/python-rapidjson",
+  "yggdrasil/core/cmake",
+  "yggdrasil/core/YggInterfaceConfig.cmake.in",
+  "yggdrasil/core/Doxyfile.in",
+  "yggdrasil/core/cpp/src/",
+  "yggdrasil/core/python/*.cpp",
+  "yggdrasil/core/python/*.hpp",
+  "yggdrasil/core/fortran/*.F90",
+  "yggdrasil/core/fortran/*.c",
+  "yggdrasil/core/fortran/*.h",
+]
+wheel.packages = ["yggdrasil"]
+wheel.install-dir = "yggdrasil"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+metadata.readme.provider = "scikit_build_core.metadata.fancy_pypi_readme"
+metadata.dependencies.provider = "yggdrasil_metadata"
+metadata.dependencies.provider-path = "."
+metadata.optional-dependencies.provider = "yggdrasil_metadata"
+metadata.optional-dependencies.provider-path = "."
+metadata.scripts.provider = "yggdrasil_metadata"
+metadata.scripts.provider-path = "."
+
+[tool.setuptools_scm]
+version_file = "yggdrasil/_version.py"
+git_describe_command = "git describe --tags --abbrev=0"
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/x-rst"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.rst"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+norecursedirs = [
+  ".*", "build", "dist", "CVS", "_darcs", "{arch}", "*.egg",
+  "rapidjson", "tests/helpers", "scripts"
+]
+python_files = [
+  "test_*.py",
+  "__init__.py",
+]
+
+[tool.coverage.run]
+omit = [
+  # "*/python?.?/*",
+  "*/lib-python/?.?/*.py",
+  "*/lib_pypy/_*.py",
+  "*/site-packages/ordereddict.py",
+  "*/site-packages/nose/*",
+  "*/unittest2/*",
+  "*/yggdrasil/tests/scripts/python_model.py",
+  "*/yggdrasil/command_line.py",
+  "*/yggdrasil/scanf.py",
+  "*/yggdrasil/languages/*/install.py",
+  "*/yggdrasil/languages/LPy/lpy_model.py",
+  "*/yggdrasil/languages/Python/CisInterface.py",
+  "*/yggdrasil/_version.py",
+  "*/yggdrasil/rapidjson/*",
+  "*/yggdrasil/examples/*/src/*.py",
+  "*/yggdrasil/examples/transforms/transforms.py",
+  "*/yggdrasil/doctools.py",
+  "*/yggdrasil/demos/*",
+  "*/yggdrasil/__main__.py",
+]
+
+[tool.coverage.report]
+sort = "Cover"
+ignore_errors = true
+show_missing = true
+exclude_lines = [
+  "pragma: Python 3.8",
+  "pragma: no cover",
+  "pragma: debug",
+  "pragma: in progress",
+  "pragma: config",
+  "pragma: completion",
+  "pragma: testing",
+  "pragma: version",
+  "pragma: intermittent",
+  "pragma: deprecated",
+  "pragma: extern",
+  "def __repr__",
+  "def description_prefix",
+  "if 0:",
+  "if False:",
+  "if __name__ == .__main__.:",
+]
+
+# [tool.flake8]
+# # W293: whitespace on blank lines is ok
+# # W503: new convention says line breaks should happen before operators
+# # E203: No space before colon, not pep8 compliant
+# ignore = ["W293", "W503", "E203"]
+# # Raise the default 79 limit
+# max-line-length = 90
+# # Ignore some well known paths
+# exclude = [
+#   ".venv", ".tox", "dist", "doc", "build", "*.egg",
+#   "./yggdrasil/rapidjson/", "./yggdrasil/interface/YggInterface.py",
+#   "./yggdrasil/interface/CisInterface.py", "./yggdrasil/demos",
+#   "./_vendor/python_rapidjson/pyrj_setup.py"
+# ]
 
 [tool.cibuildwheel]
 skip = "pp* cp2* cp33* cp34* cp35* cp36* *musllinux* cp310-manylinux_ppc64le cp311-manylinux_ppc64le"

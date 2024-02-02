@@ -1,5 +1,13 @@
 {
   "general": [
+    {
+      "build": {
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
     "chevron",
     {
       "cross-python_{{ target_platform }}": {
@@ -603,7 +611,7 @@
             "method": "conda"
           }
         },
-        "coverage",
+        "coverage[toml]",
         "flake8",
         "flaky",
         "pytest",

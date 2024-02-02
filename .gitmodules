@@ -9,3 +9,7 @@
 [submodule "yggdrasil/demos/CiS2021-hackathon"]
 	path = yggdrasil/demos/CiS2021-hackathon
 	url = https://github.com/cropsinsilico/CiS2021-hackathon
+[submodule "python-rapidjson"]
+	path = yggdrasil/python-rapidjson
+	url = git@github.com:cropsinsilico/python-rapidjson.git
+	branch = yggdrasil

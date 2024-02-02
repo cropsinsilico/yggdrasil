@@ -3,15 +3,13 @@ import numpy as np
 import pandas as pd
 import deprecation
 from collections import OrderedDict
-from ._version import get_versions
+from ._version import __version__  # prevent circular import
 from yggdrasil import tools, constants
 from yggdrasil.rapidjson import units as units_
-# Use get_versions to prevent circular import from importing it
-#   from yggdrasil's __init__
-__version__ = get_versions()['version']
 # TODO: This import fails saying yggdrasil.rapidjson is not a package so
 # we need to find a work around
-# from yggdrasil.rapidjson.units import Quantity, QuantityArray, Units, UnitsError
+# from yggdrasil.rapidjson.units import Quantity, QuantityArray, Units,
+# UnitsError
 Quantity = units_.Quantity
 QuantityArray = units_.QuantityArray
 Units = units_.Units
@@ -180,7 +178,7 @@ def get_units(obj, for_language=None):
 
     Returns:
         str: Units, empty if input object has none.
-        
+
     """
     if has_units(obj):
         out = str(obj.units)
@@ -215,7 +213,8 @@ def add_units(arr, unit_str, **kwargs):
     Args:
         arr (np.ndarray, float, int): Scalar or array of data to add units to.
         unit_str (str): Unit string.
-        **kwargs: Additional keyword arguments are passed to the unit constructor.
+        **kwargs: Additional keyword arguments are passed to the unit
+          constructor.
 
     Returns:
         Quantity ro QuantityArray: Scalar or array with units.

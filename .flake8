@@ -1,0 +1,9 @@
+[flake8]
+# W293: whitespace on blank lines is ok
+# W503: new convention says line breaks should happen before operators
+# E203: No space before colon, not pep8 compliant
+ignore = W293, W503, E203
+# Raise the default 79 limit
+max-line-length = 90
+# Ignore some well known paths
+exclude = .venv,.tox,dist,doc,build,*.egg,./yggdrasil/rapidjson/,./yggdrasil/interface/YggInterface.py,./yggdrasil/interface/CisInterface.py,./yggdrasil/demos

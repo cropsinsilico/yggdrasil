@@ -383,6 +383,7 @@ jobs:
             install-sbml: false
           - os-base: ubuntu
             python-version: 3.9
+            install-method: conda
             test-flags1: --long-running --remote-service
             test-flags2: --suites examples --parametrize-language=sbml
             install-c: true

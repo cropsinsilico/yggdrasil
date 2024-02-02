@@ -9,6 +9,9 @@ History
 * Add command line arguments to the yggrun CLI for overwriting or removing integration products (--overwrite & --remove-products)
 * Remove Python 3.6 from list of supported versions
 * Change majority of GHA jobs to use Python 3.8 as 3.7 is EOL
+* Migrate from using versioneer to setuptools_scm
+* Migrate from setup.py + setup.cfg to pyproject.toml
+* Migrate build system to scikit-build-core
 
 1.10.2 (2023-10-12) Minor bug fixes and dependency updates
 -------------------

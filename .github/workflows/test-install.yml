@@ -533,6 +533,7 @@ jobs:
           test-flags1: --long-running
           test-flags2: ''
         - install-c: true
+          install-method: conda
           install-mpi: false
           install-sbml: true
           os-base: ubuntu

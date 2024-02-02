@@ -24,7 +24,7 @@
     "pandas"
   ],
   "testing": [
-    "coverage",
+    "coverage[toml]",
     "flake8",
     "flaky",
     "pytest",

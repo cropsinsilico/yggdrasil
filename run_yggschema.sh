@@ -1,11 +1,11 @@
 set -e
-python utils/vendor.py ../python-rapidjson/
-python setup.py build_ext --inplace --rj-include-dir=../rapidjson/include/
-# --with-asan
-# python setup.py develop --rj-include-dir=../rapidjson/include/
-# pip install -e .
+pip install \
+    --config-settings=cmake.define.RAPIDJSON_INCLUDE_DIRS=../rapidjson/include/ \
+    -v .
+    # --config-settings=cmake.define.YGG_BUILD_ASAN:BOOL=ON \
+    # --config-settings=cmake.define.YGG_BUILD_UBSAN:BOOL=ON \
 export PYTHONFAULTHANDLER=1
-# DYLD_INSERT_LIBRARIES=$(clang -print-file-name=libclang_rt.asan_osx_dynamic.dylib)
+export DYLD_INSERT_LIBRARIES=$(clang -print-file-name=libclang_rt.asan_osx_dynamic.dylib)
 yggschema
 yggcompile c cpp fortran  # --with-asan
 # export CMAKE_SOURCE_DIR=/Users/langmm/rapidjson/

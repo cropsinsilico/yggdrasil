@@ -105,7 +105,7 @@ class SetupParam(object):
             'help': ("Method that should be used to create an "
                      "environment")}),
         (('--build-method', ), ['auto'], {
-            'choices': ['conda', 'mamba', 'sdist', 'bdist',
+            'choices': ['conda', 'mamba', 'sdist',
                         'wheel', 'bdist_wheel', 'direct', None],
             'default': None,
             'help': ("Method that should be used to build "
@@ -220,7 +220,7 @@ class SetupParam(object):
                 self.method = 'pip'
             elif self.build_method in ('conda', 'mamba'):
                 self.method = self.build_method
-            elif self.build_method in ('sdist', 'bdist', 'wheel',
+            elif self.build_method in ('sdist', 'wheel',
                                        'bdist_wheel'):
                 self.method = 'pip'
             elif CONDA_ENV:
@@ -974,6 +974,9 @@ def create_env(env_method, python, param=None, name=None, packages=None,
     existing_env = False
     env_removed = False
     if param.env_method in ('conda', 'mamba'):
+        # Force early installation of pytorch to prevent conflict
+        if param.install_opts['pytorch'] and 'pytorch' not in packages:
+            packages.append('pytorch')
         use_mamba = (param.use_mamba and shutil.which('mamba'))
         existing_env = conda_env_exists(name, use_mamba=use_mamba)
         if remove_existing and existing_env:
@@ -1208,7 +1211,7 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
                             return_commands=True,
                             skip_update=(_is_win and _on_gha))
     # Upgrade pip and setuptools and wheel to get clean install
-    upgrade_pkgs = ['wheel', 'setuptools']
+    upgrade_pkgs = ['wheel', 'setuptools', 'scikit-build-core', 'build']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
     if param.build_method == 'direct':
@@ -1218,12 +1221,11 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
         cmds += build_conda_recipe(param=param, return_commands=True,
                                    dont_test=_on_gha)
         # (_is_win and _on_gha))
-    elif param.build_method in ('sdist', 'bdist',
-                                'wheel', 'bdist_wheel'):
+    elif param.build_method in ('sdist', 'wheel', 'bdist_wheel'):
         build_method = param.build_method
-        if build_method == 'wheel':
+        if build_method == 'bdist_wheel':
             # pip wheel . --no-deps
-            build_method = 'bdist_wheel'
+            build_method = 'wheel'
         if param.verbose:
             build_flags = ''
         else:
@@ -1232,10 +1234,10 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
         # Install from source dist
         cmds += [f"{param.python_cmd} -m pip install --upgrade "
                  + ' '.join(upgrade_pkgs)]
-        cmds += [f"{param.python_cmd} setup.py {build_flags} {build_method}"]
+        cmds += [f"{param.python_cmd} -m build {build_flags} --{build_method}"]
     else:  # pragma: debug
         raise ValueError(f"Method must be 'conda', 'mamba', 'sdist',"
-                         f" 'bdist', or 'wheel', not"
+                         f" or 'wheel', not"
                          f" '{param.build_method}'")
     summary_cmds = get_summary_commands(param)
     if cmds:
@@ -1638,7 +1640,7 @@ def install_pkg(method, param=None, without_build=False,
         if param.install_opts[x]]
     # Install yggdrasil
     if param.for_development or param.build_method == 'direct':
-        # Call setup.py in separate process from the package directory
+        # Call install in separate process from the package directory
         pass
     elif param.build_method in ('conda', 'mamba'):
         ygg_pkgs = ['yggdrasil']
@@ -1647,11 +1649,10 @@ def install_pkg(method, param=None, without_build=False,
                                     return_commands=True,
                                     allow_fail=('mpi' in extras))
         cmds += summary_cmds
-    elif param.build_method in ('sdist', 'bdist',
-                                'wheel', 'bdist_wheel'):
+    elif param.build_method in ('sdist', 'wheel', 'bdist_wheel'):
         build_ext = None
         build_dir = 'dist'
-        if param.build_method in ('sdist', 'bdist'):
+        if param.build_method in ('sdist'):
             build_ext = '.tar.gz'
         elif param.build_method in ('bdist_wheel', 'wheel'):
             build_ext = '.whl'

@@ -3,6 +3,10 @@
 tests/scripts/gcc_model.out
 tests/scripts/Makefile
 
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
 # Jupyter notebook things
 .ipynb_checkpoints
 
@@ -64,6 +68,7 @@ tmp/
 *.pdb
 *.lib
 *.exe
+_version.py
 
 yggdrasil/examples/pytorch1/Input/data/
 
