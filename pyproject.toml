@@ -108,7 +108,8 @@ metadata.scripts.provider = "yggdrasil_metadata"
 metadata.scripts.provider-path = "."
 
 [tool.setuptools_scm]
-version_file = "yggdrasil/_version.py"
+# version_file = "yggdrasil/_version.py"
+write_to = "yggdrasil/_version.py"
 git_describe_command = "git describe --tags --abbrev=0"
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]

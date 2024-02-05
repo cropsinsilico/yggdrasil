@@ -67,7 +67,7 @@ general:
   - scipy:
       flags:
         method_in_setup: conda
-  - setuptools_scm>=8:
+  - setuptools_scm:
       host: True
       flags:
         build: True

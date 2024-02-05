@@ -1564,7 +1564,7 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
         coverage_flags += (
             f" --filename={os.path.join(os.getcwd(), '.coveragerc')}")
         coverage_flags += (
-            f" --setup-cfg={os.path.join(_pkg_dir, 'setup.cfg')}")
+            f" --config-file={os.path.join(_pkg_dir, 'pyproject.toml')}")
         cmds += [
             f"{param.python_cmd} -m yggdrasil coveragerc{coverage_flags}"]
     cmds += [f"cd {os.getcwd()}"]
@@ -1740,7 +1740,7 @@ def verify_pkg(install_opts=None):
                            os.path.dirname(os.path.dirname(__file__)))
     src_version = subprocess.check_output(
         ["python", "-c",
-         "'import versioneer; print(versioneer.get_version())'"],
+         "'import setuptools_scm; print(setuptools_scm.get_version())'"],
         cwd=src_dir)
     bld_version = subprocess.check_output(
         ["python", "-c",

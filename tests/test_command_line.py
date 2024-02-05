@@ -29,7 +29,7 @@ def test_create_coveragerc():
         assert contents2 == contents1
         os.remove(fname)
         create_coveragerc(covered_languages, filename=fname,
-                          setup_cfg=False)
+                          config_file=False)
         covered_languages.pop('cpp', None)
         covered_languages['c++'] = False
         create_coveragerc(covered_languages, filename=fname)

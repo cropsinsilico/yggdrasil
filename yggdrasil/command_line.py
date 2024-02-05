@@ -1623,9 +1623,10 @@ class coveragerc(SubCommand):
         (('--filename', ),
          {'type': str, 'default': None,
           'help': "File to save coveragerc to"}),
-        (('--setup-cfg', ),
+        (('--config-file', ),
          {'type': str, 'default': None,
-          'help': "setup.cfg file containing coverage options"}),
+          'help': ("setup.cfg or pyproject.toml file containing "
+                   "coverage options")}),
     ]
 
     @classmethod
@@ -1650,7 +1651,7 @@ class coveragerc(SubCommand):
         for k in LANGUAGES['all']:
             covered_languages.setdefault(k, True)
         create_coveragerc(covered_languages, filename=args.filename,
-                          setup_cfg=args.setup_cfg)
+                          config_file=args.config_file)
 
 
 class file_converter(SubCommand):

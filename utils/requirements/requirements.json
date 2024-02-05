@@ -120,7 +120,7 @@
       }
     },
     {
-      "setuptools_scm>=8": {
+      "setuptools_scm": {
         "host": true,
         "flags": {
           "build": true,

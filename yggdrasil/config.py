@@ -713,11 +713,12 @@ def rm_excl_rule(excl_list, new_rule):
     return excl_list
 
 
-def create_coveragerc(installed_languages, filename=None, setup_cfg=None):
+def create_coveragerc(installed_languages, filename=None,
+                      config_file=None):
     r"""Create the coveragerc to reflect the OS, Python version, and
-    availability of matlab. Parameters from the setup.cfg file will be
-    added. If the .coveragerc file already exists, it will be read first
-    before adding setup.cfg options.
+    availability of matlab. Parameters from the provided config_file will
+    be added. If the .coveragerc file already exists, it will be read
+    first before adding config_file options.
 
     Args:
         installed_languages (dict): Dictionary of language/boolean
@@ -725,9 +726,9 @@ def create_coveragerc(installed_languages, filename=None, setup_cfg=None):
             of installation.
         filename (str, optional): File where coveragerc should be saved.
             Defaults to '.coveragerc' in the current directory.
-        setup_cfg (str, optional): setup.cfg file containing coverage
-            options. If not provided, the current directory will be
-            checked.
+        config_file (str, optional): setup.cfg or pyproject.toml file
+            containing coverage options. If not provided, the current
+            directory will be checked.
 
     Returns:
         bool: True if the file was created/updated successfully, False
@@ -740,36 +741,60 @@ def create_coveragerc(installed_languages, filename=None, setup_cfg=None):
     # Read from existing .coveragerc
     if os.path.isfile(filename):
         cp.read(filename)
-    # Read options from setup.cfg
-    if setup_cfg is None:
-        for x in ['setup.cfg',
+    # Read options from config_file
+    if config_file is None:
+        for x in ['setup.cfg', 'pyproject.toml',
                   os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                               'setup.cfg')]:
+                               'setup.cfg'),
+                  os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                               'pyproject.toml')]:
             if os.path.isfile(x):
-                setup_cfg = x
+                config_file = x
                 break
-    if setup_cfg:
-        cp_cfg = configparser.RawConfigParser("")
-        cp_cfg.read(setup_cfg)
-        # Transfer options
-        for x in cp_cfg.sections():
-            if x.startswith('coverage:'):
-                sect_cp = x.split('coverage:')[-1]
-                if not cp.has_section(sect_cp):
-                    cp.add_section(sect_cp)
-                for opt in cp_cfg.options(x):
-                    if cp.has_option(sect_cp, opt):
-                        val_old = [line.strip() for line in
-                                   cp.get(sect_cp, opt).split('\n')]
-                        val_new = [line.strip() for line in
-                                   cp_cfg.get(x, opt).split('\n')]
-                        for v in val_new:
-                            if v not in val_old:
-                                val_old.append(v)
-                        opt_new = '\n'.join(val_old)
+    if config_file:
+        config_file_opts = {}
+        if config_file.endswith('.toml'):
+            try:
+                import tomllib
+                with open("pyproject.toml", "rb") as f:
+                    data = tomllib.load(f)
+            except ImportError:
+                import toml as toml
+                with open("pyproject.toml", "r") as f:
+                    data = toml.load(f)
+            for k, v in data.get('tool', {}).get('coverage', {}).items():
+                config_file_opts.setdefault(k, {})
+                for kk, vv in v.items():
+                    if isinstance(vv, list):
+                        config_file_opts[k][kk] = '\n'.join(vv)
                     else:
-                        opt_new = cp_cfg.get(x, opt)
-                    cp.set(sect_cp, opt, opt_new)
+                        config_file_opts[k][kk] = str(vv)
+        else:  # pragma: deprecated
+            cp_cfg = configparser.RawConfigParser("")
+            cp_cfg.read(config_file)
+            # Transfer options
+            for x in cp_cfg.sections():
+                if x.startswith('coverage:'):
+                    sect_cp = x.split('coverage:')[-1]
+                    config_file_opts.setdefault(sect_cp, {})
+                    for opt in cp_cfg.options(x):
+                        config_file_opts[sect_cp].setdefault(
+                            opt, cp_cfg.get(x, opt))
+        for sect_cp, sect_opts in config_file_opts.items():
+            if not cp.has_section(sect_cp):
+                cp.add_section(sect_cp)
+            for opt, val in sect_opts.items():
+                if cp.has_option(sect_cp, opt):
+                    val_old = [line.strip() for line in
+                               cp.get(sect_cp, opt).split('\n')]
+                    val_new = [line.strip() for line in val.split('\n')]
+                    for v in val_new:
+                        if v not in val_old:
+                            val_old.append(v)
+                    opt_new = '\n'.join(val_old)
+                else:
+                    opt_new = val
+                cp.set(sect_cp, opt, opt_new)
     # Exclude rules for all files
     if not cp.has_section('report'):
         cp.add_section('report')

@@ -133,8 +133,8 @@ def setup_ci(args):
     if not os.path.isfile('pyproject.toml'):
         raise RuntimeError("The CI tests must be run from the root "
                            "directory of the yggdrasil git repository.")
-    src_cmd = ('python -c \"import versioneer; '
-               'print(versioneer.get_version())\"')
+    src_cmd = ('python -c \"import setuptools_scm; '
+               'print(setuptools_scm.get_version())\"')
     dst_cmd = ('python -c \"import yggdrasil; '
                'print(yggdrasil.__version__)\"')
     src_ver = subprocess.check_output(src_cmd, shell=True)

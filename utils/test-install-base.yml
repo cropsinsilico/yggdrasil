@@ -260,7 +260,9 @@ jobs:
     # ========================================================
 
     - name: Verify installation
-      run: python utils/setup_test_env.py verify
+      run: |
+        python -m pip install setuptools_scm -y
+        python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
     - name: Run cmake test in command prompt (CONDA)
@@ -517,7 +519,9 @@ jobs:
     - name: Install dependencies
       run: python utils/setup_test_env.py install pip
     - name: Verify installation
-      run: python utils/setup_test_env.py verify
+      run: |
+        python -m pip install setuptools_scm -y
+        python utils/setup_test_env.py verify
     - name: Build the docs
       run: |
         cd docs
@@ -602,9 +606,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
+      - name: Install build utilities
+        run: |
+          python -m pip install build
       - name: Build sdist
         run: |
-          python setup.py sdist
+          python -m build --sdist
       - name: Install sdist
         run: |
           python -m pip install dist/*.gz
@@ -694,6 +701,8 @@ jobs:
         python -m pip install PyGithub
         python utils/setup_test_env.py install pip
     - name: Verify installation
-      run: python utils/setup_test_env.py verify
+      run: |
+        python -m pip install setuptools_scm -y
+        python utils/setup_test_env.py verify
     - name: Update the form
       run: python utils/update_form_schema.py --token=${{ secrets.YGGDRASIL_UPDATE_TOKEN }}
