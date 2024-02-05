@@ -15,7 +15,7 @@ build:
   string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
   run_exports:
     - {{ pin_subpackage('yggdrasil', max_pin='x.x.x') }}
-  script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv --no-build-isolation'
+  script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation'
   skip: true  # [(win and vc<14) or py<35]
   entry_points:
     - yggdrasil = yggdrasil.command_line:main

@@ -53,7 +53,7 @@ jobs:
     - name: Check R version & location
       shell: bash -l {0}
       run: |
-        R -v
+        R --version
         which R
     - name: Check Julia version & location
       shell: bash -l {0}
