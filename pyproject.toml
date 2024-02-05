@@ -50,6 +50,9 @@ python_requires = ">=3.7"
 [project.entry-points]
 console_scripts = {file = "console_scripts.txt"}
 
+[project.entry-points.pytest11]
+pytest-yggdrasil = "yggdrasil.pytest_plugin"
+
 [project.urls]
 Homepage = "https://github.com/cropsinsilico/yggdrasil"
 Documentation = "https://cropsinsilico.github.io/yggdrasil/"

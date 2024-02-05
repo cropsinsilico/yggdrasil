@@ -1352,7 +1352,7 @@ def import_all_modules(base=None, exclude=None, do_first=None):
     assert base.startswith('yggdrasil')
     for x in do_first:
         import_all_modules(x, exclude=exclude)
-    exclude = exclude + do_first
+    exclude = exclude + do_first + ['yggdrasil.pytest_plugin']
     directory = os.path.dirname(__file__)
     parts = base.split('.')[1:]
     if parts:
