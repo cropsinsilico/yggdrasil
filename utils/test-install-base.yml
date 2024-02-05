@@ -261,7 +261,7 @@ jobs:
 
     - name: Verify installation
       run: |
-        python -m pip install setuptools_scm -y
+        python -m pip install setuptools_scm
         python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
@@ -520,7 +520,7 @@ jobs:
       run: python utils/setup_test_env.py install pip
     - name: Verify installation
       run: |
-        python -m pip install setuptools_scm -y
+        python -m pip install setuptools_scm
         python utils/setup_test_env.py verify
     - name: Build the docs
       run: |
@@ -702,7 +702,7 @@ jobs:
         python utils/setup_test_env.py install pip
     - name: Verify installation
       run: |
-        python -m pip install setuptools_scm -y
+        python -m pip install setuptools_scm
         python utils/setup_test_env.py verify
     - name: Update the form
       run: python utils/update_form_schema.py --token=${{ secrets.YGGDRASIL_UPDATE_TOKEN }}
