@@ -666,6 +666,12 @@ class ygginfo(SubCommand):
                     vardict.append(
                         (curr_prefix + "Language Installed",
                          drv.is_language_installed()))
+                    if drv.is_language_installed():
+                        exec_name = drv.language_executable()
+                        if not os.path.isabs(exec_name):
+                            exec_name = shutil.which(exec_name)
+                        vardict.append((curr_prefix + 'Location',
+                                        exec_name))
                     if drv.executable_type == 'compiler':
                         curr_prefix += prefix
                         vardict += [

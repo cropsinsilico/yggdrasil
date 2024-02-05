@@ -69,3 +69,12 @@ jobs:
       if: matrix.install-method == 'mamba'
       shell: bash -l {0}
       run: julia -e "using Pkg; Pkg.add(\"PyCall\")"
+
+    # Check for PyCall
+    - name: Check for PyCall
+      if: matrix.install-method == 'pip'
+      run: julia -e "using PyCall"
+    - name: Check for PyCall
+      if: matrix.install-method == 'mamba'
+      shell: bash -l {0}
+      run: julia -e "using PyCall"

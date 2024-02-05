@@ -870,8 +870,8 @@ def write_package_extras_table(**kwargs):
 
     """
     from yggdrasil import tools
-    utils_dir = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), 'utils')
+    utils_dir = os.path.join(os.getcwd(), 'utils')
+    print(f"utils_dir = {utils_dir}")
     try:
         sys.path.insert(0, utils_dir)
         from manage_requirements import YggRequirements
