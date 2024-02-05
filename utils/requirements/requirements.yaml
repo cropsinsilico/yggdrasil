@@ -24,6 +24,11 @@ general:
   - flask
   - git:
       method: conda
+  - hatch-fancy-pypi-readme:
+      host: True
+      flags:
+        build: True
+        build_only: True
   - matplotlib:
       flags:
         from_env: MATPLOTLIB
@@ -55,12 +60,18 @@ general:
   - pyzmq
   - requests
   - scikit-build-core:
+      host: True
       flags:
         build: True
         build_only: True
   - scipy:
       flags:
         method_in_setup: conda
+  - setuptools_scm:
+      host: True
+      flags:
+        build: True
+        build_only: True
   - six
   - toml
   - unyt
@@ -135,7 +146,8 @@ extras:
     - r-base:
         executable: R
         options:
-        - method: conda
+        - name: r-base>3.5
+          method: conda
           host: True
         - method: apt
           add: [r-base-dev]

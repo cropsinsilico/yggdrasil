@@ -203,7 +203,7 @@ jobs:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
-        use-only-tar-bz2: true
+        # use-only-tar-bz2: true
         channel-priority: strict
         miniforge-variant: Mambaforge
         use-mamba: true

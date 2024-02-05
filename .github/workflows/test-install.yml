@@ -368,7 +368,6 @@ jobs:
         miniforge-variant: Mambaforge
         python-version: ${{ matrix.python-version }}
         use-mamba: true
-        use-only-tar-bz2: true
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -721,7 +720,6 @@ jobs:
         miniforge-variant: Mambaforge
         python-version: ${{ matrix.python-version }}
         use-mamba: true
-        use-only-tar-bz2: true
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -1058,7 +1056,6 @@ jobs:
         miniforge-variant: Mambaforge
         python-version: ${{ matrix.python-version }}
         use-mamba: true
-        use-only-tar-bz2: true
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -1378,7 +1375,6 @@ jobs:
         miniforge-variant: Mambaforge
         python-version: ${{ matrix.python-version }}
         use-mamba: true
-        use-only-tar-bz2: true
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
@@ -1697,7 +1693,6 @@ jobs:
         miniforge-variant: Mambaforge
         python-version: ${{ matrix.python-version }}
         use-mamba: true
-        use-only-tar-bz2: true
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') &&
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler

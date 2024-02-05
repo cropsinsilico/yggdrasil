@@ -95,7 +95,17 @@
     "pyzmq",
     "requests",
     {
+      "hatch-fancy-pypi-readme": {
+        "host": true,
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
+    {
       "scikit-build-core": {
+        "host": true,
         "flags": {
           "build": true,
           "build_only": true
@@ -106,6 +116,15 @@
       "scipy": {
         "flags": {
           "method_in_setup": "conda"
+        }
+      }
+    },
+    {
+      "setuptools_scm": {
+        "host": true,
+        "flags": {
+          "build": true,
+          "build_only": true
         }
       }
     },
@@ -218,6 +237,7 @@
             "executable": "R",
             "options": [
               {
+                "name": "r-base>3.5",
                 "method": "conda",
                 "host": true
               },
