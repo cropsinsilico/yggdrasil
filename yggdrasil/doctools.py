@@ -870,7 +870,8 @@ def write_package_extras_table(**kwargs):
 
     """
     from yggdrasil import tools
-    utils_dir = os.path.join(os.getcwd(), 'utils')
+    utils_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.getcwd())), 'utils')
     print(f"utils_dir = {utils_dir}")
     try:
         sys.path.insert(0, utils_dir)

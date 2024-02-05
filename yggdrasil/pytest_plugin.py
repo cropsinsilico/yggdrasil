@@ -123,14 +123,14 @@ def setup_ci(args):
     args += ['-v',
              '--import-mode=importlib',
              f'--cov={package_dir}',
-             '-c', 'setup.cfg',
+             '-c', 'pyproject.toml',
              '--cov-config=.coveragerc',
              '--ignore=yggdrasil/rapidjson/']
     # f'--rootdir={package_dir}']
     # if not any(x.startswith('--with-mpi') for x in args):
     #     args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
     # Additional checks
-    if not os.path.isfile('setup.cfg'):
+    if not os.path.isfile('pyproject.toml'):
         raise RuntimeError("The CI tests must be run from the root "
                            "directory of the yggdrasil git repository.")
     src_cmd = ('python -c \"import versioneer; '
@@ -145,7 +145,7 @@ def setup_ci(args):
                             "\tBuild  version: %s\n")
                            % (src_ver, dst_ver))
     subprocess.check_call(
-        ["flake8", "yggdrasil", "--append-config", "setup.cfg"])
+        ["flake8", "yggdrasil"])  # , "--append-config", "setup.cfg"])
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:

@@ -45,6 +45,15 @@
       }
     },
     {
+      "hatch-fancy-pypi-readme": {
+        "host": true,
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
+    {
       "matplotlib": {
         "flags": {
           "from_env": "MATPLOTLIB"
@@ -95,15 +104,6 @@
     "pyzmq",
     "requests",
     {
-      "hatch-fancy-pypi-readme": {
-        "host": true,
-        "flags": {
-          "build": true,
-          "build_only": true
-        }
-      }
-    },
-    {
       "scikit-build-core": {
         "host": true,
         "flags": {
@@ -120,7 +120,7 @@
       }
     },
     {
-      "setuptools_scm": {
+      "setuptools_scm>=8": {
         "host": true,
         "flags": {
           "build": true,

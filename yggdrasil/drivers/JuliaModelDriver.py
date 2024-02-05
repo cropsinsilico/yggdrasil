@@ -1,6 +1,8 @@
 from yggdrasil import platform
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
+import shutil
+import os
 
 
 class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
@@ -126,6 +128,20 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         """
         out = super(JuliaModelDriver, cls).set_env_class(**kwargs)
         out['PYTHON'] = PythonModelDriver.get_interpreter()
+        julia_exe = shutil.which('julia')
+        if ((julia_exe and out.get('CONDA_PREFIX', None)
+             and julia_exe.startswith(out['CONDA_PREFIX'])
+             and not out.get('JULIA_DEPOT_PATH', None))):
+            out['JULIA_DEPOT_PATH'] = os.pathsep.join(
+                [os.path.join(out['CONDA_PREFIX'], 'share', 'julia'), ''])
+            out['JULIA_PROJECT'] = (
+                f"@{os.path.basename(out['CONDA_PREFIX'])}")
+            out['JULIA_LOAD_PATH'] = os.pathsep.join(
+                ["@", out['JULIA_PROJECT'], "@stdlib"])
+            out['CONDA_JL_HOME'] = out['CONDA_PREFIX']
+            out['CONDA_JL_CONDA_EXE'] = out['CONDA_EXE']
+            out['JULIA_SSL_CA_ROOTS_PATH'] = os.path.join(
+                out['CONDA_PREFIX'], 'ssl', 'cacert.pem')
         return out
 
     @classmethod
