@@ -756,11 +756,11 @@ def create_coveragerc(installed_languages, filename=None,
         if config_file.endswith('.toml'):
             try:
                 import tomllib
-                with open("pyproject.toml", "rb") as f:
+                with open(config_file, "rb") as f:
                     data = tomllib.load(f)
             except ImportError:
                 import toml as toml
-                with open("pyproject.toml", "r") as f:
+                with open(config_file, "r") as f:
                     data = toml.load(f)
             for k, v in data.get('tool', {}).get('coverage', {}).items():
                 config_file_opts.setdefault(k, {})
