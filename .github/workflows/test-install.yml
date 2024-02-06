@@ -63,7 +63,7 @@ jobs:
     - name: Test sdist
       run: 'ygginfo
 
-        pytest -m subset_rapidjson --import-mode=importlib tests
+        pytest -m subset_rapidjson tests
 
         '
     - name: Upload artifacts
@@ -444,27 +444,25 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
-        --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: conda activate test && pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
-        --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }} --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
@@ -480,13 +478,12 @@ jobs:
       id: test2
       if: ${{ matrix.test-flags2 != '' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
@@ -800,27 +797,25 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
-        --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: conda activate test && pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
-        --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }} --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
@@ -836,13 +831,12 @@ jobs:
       id: test2
       if: ${{ matrix.test-flags2 != '' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
@@ -1140,27 +1134,25 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
-        --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: conda activate test && pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
-        --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }} --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
@@ -1176,13 +1168,12 @@ jobs:
       id: test2
       if: ${{ matrix.test-flags2 != '' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
@@ -1463,27 +1454,25 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
-        --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: conda activate test && pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
-        --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }} --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
@@ -1499,13 +1488,12 @@ jobs:
       id: test2
       if: ${{ matrix.test-flags2 != '' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
@@ -1785,27 +1773,25 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: conda activate test && pytest --import-mode=importlib --ci --cov-append
-        --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: conda activate test && pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --import-mode=importlib --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
-        --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags1 }} ${{ env.TEST_FLAGS1_SUFFIX
+        }} --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
@@ -1821,13 +1807,12 @@ jobs:
       id: test2
       if: ${{ matrix.test-flags2 != '' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=all
+        --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
