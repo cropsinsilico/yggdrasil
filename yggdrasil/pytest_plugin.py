@@ -120,14 +120,9 @@ def setup_ci(opts):
         if os.path.isdir(package_dir):
             break
     assert os.path.isdir(package_dir)
-    # options.verbose = 'all'
-    # options.importmode = 'importlib'
-    # options.showcapture = True
-    # options.cov_source.append(package_dir)
-    # options.cov_config = '.coveragerc'
-    # options.ignore = 'yggdrasil/rapidjson/'
     opts += ['-v',
-             '--import-mode=importlib',
+             # '--import-mode=importlib',
+             '--import-mode=append',
              f'--cov={package_dir}',
              '--config-file=pyproject.toml',
              '--cov-config=.coveragerc',
@@ -207,11 +202,13 @@ class ArgsWrapper(object):
         return option, add_flags
 
     def _norm(self, option):
+        if '=' in option:
+            option = option.split('=')[0]
         details = self.get_option_details(option)
         flag = details['flag']
         option = details['option']
         # if details['default'] is None:
-        # if details['option'] == 'verbose':
+        # if details['option'] == 'mpi_nproc':
         #     pprint.pprint(details)
         #     import pdb
         #     pdb.set_trace()
@@ -229,6 +226,10 @@ class ArgsWrapper(object):
 
     def find_argument(self, option):
         is_flag = option.startswith('-')
+        if not hasattr(self.parser, '_groups'):
+            pprint.pprint(dir(self.parser))
+            import pdb
+            pdb.set_trace()
         for g in self.parser._groups + [self.parser._anonymous]:
             for arg in g.options:
                 if (((is_flag and option in (arg._long_opts
@@ -241,34 +242,34 @@ class ArgsWrapper(object):
     def get_option_details(self, option):
         arg = self.find_argument(option)
         out = {"option": arg.dest,
-               "flag": arg._long_opts[0],
-               "opts": arg._short_opts + arg._long_opts,
+               "opts": arg._long_opts + arg._short_opts,
                "default": getattr(arg, 'default', None),
                "is_unique": True,
                "attr": arg._attrs,
                "arg": arg}
-        if out['default'] is None:
-            action = arg._attrs.get('action', None)
-            nargs = arg._attrs.get('nargs', None)
-            if action == 'store_true':
-                out['default'] = False
-            elif action == 'store_false':
-                out['default'] = True
-            elif action == 'append':
-                out['default'] = []
-                out['is_unique'] = False
-                out['is_list'] = True
-            elif nargs == '*':
-                out['default'] = []
-                out['is_unique'] = False
-                out['is_list'] = True
-            elif action == 'count':
-                out['is_unique'] = False
+        out['flag'] = out['opts'][0]
+        action = arg._attrs.get('action', None)
+        nargs = arg._attrs.get('nargs', None)
+        if action == 'store_true':
+            out['default'] = False
+        elif action == 'store_false':
+            out['default'] = True
+        elif action == 'append':
+            out['default'] = []
+            out['is_unique'] = False
+            out['is_list'] = True
+        elif nargs == '*':
+            out['default'] = []
+            out['is_unique'] = False
+            out['is_list'] = True
+        elif action == 'count':
+            out['is_unique'] = False
         return out
 
-    def get_default(self, option):
-        # TODO: Determine default from option
-        return None
+    def update(self, args):
+        self.args = args
+        self.options = self.parser.parse_known_and_unknown_args(
+            self.args)[0]
 
     def append(self, option, value=None, overwrite=False):
         add_files = []
@@ -289,7 +290,10 @@ class ArgsWrapper(object):
                                  f"multiple values:\n"
                                  f"{pprint.pformat(details)}")
         if value is not None:
-            flag += f"={value}"
+            if flag.startswith('--'):
+                flag += f"={value}"
+            else:
+                add_flags.insert(0, value)
         if not (details['is_unique'] and flag in self.args):
             self.args += [flag] + add_flags
         if add_files:
@@ -344,27 +348,11 @@ class ArgsWrapper(object):
         self.args += [x for x in args_copy if x in remaining]
         if not self.options:
             return
-        setattr(self.options, option,
-                self.get_default(details['default']))
-
-
-def remove_option(args, options, remove_file_or_dir=False):
-    if isinstance(options, str):
-        options = [options]
-    args_copy = copy.copy(args)
-    # print("BEFORE", args)
-    parser = DummyParser(isolate_options=options)
-    parsed_args, remaining = parser.parse_known_and_unknown_args(args)
-    if not remove_file_or_dir:
-        remaining += parsed_args.file_or_dir
-    args.clear()
-    args += [x for x in args_copy if x in remaining]
-    # print("AFTER ", args, set(args_copy) - set(args))
+        setattr(self.options, option, details['default'])
 
 
 @pytest.hookimpl(tryfirst=True)
-def pytest_load_initial_conftests(early_config, parser, args,
-                                  dont_exit=False):
+def pytest_load_initial_conftests(early_config, parser, args):
     r"""Adjust the pytest arguments before testing."""
     # Check for run in separate process before adding CI args
     options = early_config.known_args_namespace
@@ -376,35 +364,42 @@ def pytest_load_initial_conftests(early_config, parser, args,
     # if not test_directory:
     test_directory = os.path.join(os.getcwd(), "tests")
     options.yggdrasil_tests_rootdir = test_directory
-    run_process = False
-    prefix = []
     for k in ['separate_tests', 'suite']:
         if getattr(options, k, None) is None:
             setattr(options, k, [])
     opts = ArgsWrapper(args, options, parser)
+    do_yggdrasil_mods(opts)
+
+
+def do_yggdrasil_mods(opts, dont_exit=False):
+    run_process = False
+    prefix = []
+    options = opts.options
+    test_directory = options.yggdrasil_tests_rootdir
     # Disable output capture
     if options.nocapture:
         opts.remove('nocapture')
         # TODO: Handle -o
         opts += ['--showcapture=all', '-o', 'log_cli=true']
     # MPI script
+    mpi_nproc = options.mpi_nproc
+    if options.mpi_nproc > 1:
+        opts.remove('mpi_nproc')
     if options.mpi_script:
         mpi_test_args = [
             '--suite=mpi', f'--write-script={options.mpi_script}']
         opts.remove('mpi_script')
-        if options.mpi_nproc > 1:
-            mpi_test_args.append(f'--mpi-nproc={options.mpi_nproc}')
-            opts.remove('mpi_nproc')
+        if mpi_nproc > 1:
+            mpi_test_args.append(f'--mpi-nproc={mpi_nproc}')
         mpi_test_args = " ".join(mpi_test_args)
         opts.append('separate_tests', mpi_test_args)
     # MPI process should be started
-    if ('mpi' in options.suite) and (options.mpi_nproc <= 1) and (not _on_mpi):
-        options.mpi_nproc = 2
-    if options.mpi_nproc > 1:
+    if ('mpi' in options.suite) and (mpi_nproc <= 1) and (not _on_mpi):
+        mpi_nproc = 2
+    if mpi_nproc > 1:
         run_process = True
-        prefix = ['mpiexec', '-n', str(options.mpi_nproc)]
-        opts.remove('mpi_nproc')
-        print(mpi_flavor())
+        prefix = ['mpiexec', '-n', str(mpi_nproc)]
+        print(f"mpi_flavor = {mpi_flavor()}")
         if ((os.environ.get('CI', False) and platform._is_linux
              and mpi_flavor() == 'openmpi')):
             prefix.append('--oversubscribe')
@@ -416,41 +411,45 @@ def pytest_load_initial_conftests(early_config, parser, args,
         setup_ci(opts)
         opts.args.remove('--ci')  # Much faster
         # Must launch in separate process so that pytest recognizes
-        # the added --cov={install_dir} and --import-mode=importlib flags
+        # the added --cov={install_dir} and --import-mode flags
         run_process = True
     # Write a script to call later
     if options.write_script:
-        if not os.path.isabs(options.write_script):
-            options.write_script = os.path.abspath(options.write_script)
-        write_pytest_script(options.write_script,
-                            prefix + ['pytest'] + args)
+        print(f"Writing script to call tests {options.write_script}")
+        write_script = options.write_script
+        opts.remove('write_script')
+        if not os.path.isabs(write_script):
+            write_script = os.path.abspath(write_script)
+        write_pytest_script(write_script,
+                            prefix + ['pytest'] + opts.args)
         opts.remove('write_script')
         if dont_exit:
             return 0
         sys.exit(0)
     # Check for separate tests
+    separate_tests = options.separate_tests
     if options.separate_tests:
-        remove_option(args, 'separate_tests')
-    for x in options.separate_tests:
-        x_args = x.split()
-        opts_copy = ArgsWrapper(copy.copy(args), None, parser)
+        opts.remove('separate_tests')
+    for x in separate_tests:
+        opts_copy = ArgsWrapper(copy.copy(opts.args), False, opts.parser)
         excluded = ([m[1] for m in _markers if m[1]]
                     + ['suite', 'language', 'skip_language', 'default_comm']
                     + [f'parametrize_{k}' for k in _params.keys()])
         opts_copy.remove_args(excluded, remove_file_or_dir=True)
-        x_args = x.split() + opts_copy.args
-        # x_args_keys = [k.split('=')[0] for k in x_args if k.startswith('-')]
+        opts_copy.update(x.split() + opts_copy.args)
+        # x_args_keys = [k.split('=')[0] for k in opts_copy.args
+        #                if k.startswith('-')]
         # for k in x_args_copy:
         #     if k.split('=')[0] not in x_args_keys:
         #         x_args.append(k)
-        assert (any((k.split('=', 1)[0] == '--write-script') for k in x_args))
+        assert (any((k.split('=', 1)[0] == '--write-script')
+                    for k in opts_copy.args))
         if not options.second_attempt:
-            pytest_load_initial_conftests(early_config, parser,
-                                          x_args, dont_exit=True)
+            do_yggdrasil_mods(opts_copy, dont_exit=True)
     # Run test in separate process
     if run_process:
-        print(f"Calling subprocess: {prefix + ['pytest'] + args}")
-        flag = subprocess.call(prefix + ['pytest'] + args)
+        print(f"Calling subprocess: {prefix + ['pytest'] + opts.args}")
+        flag = subprocess.call(prefix + ['pytest'] + opts.args)
         if dont_exit:
             return flag
         sys.exit(flag)
@@ -468,7 +467,7 @@ def pytest_load_initial_conftests(early_config, parser, args,
     elif not options.file_or_dir:
         opts += ['--end-yggdrasil-opts'] + ["tests"]
     print(f"Update paths: {options.file_or_dir}")
-    print(f"Updated args: {args}")
+    print(f"Updated args: {opts.args}")
 
 
 def pytest_addoption(parser):
@@ -1660,7 +1659,6 @@ def mpi_flavor():
     if shutil.which('mpicc'):
         result = subprocess.check_output("mpicc -v", shell=True).decode(
             "utf-8")
-        print('mpi_flavor', result)
         if "MPICH" in result:
             return 'mpich'
         # elif "Open MPI" in result:
