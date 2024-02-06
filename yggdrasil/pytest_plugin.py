@@ -362,8 +362,6 @@ def pytest_load_initial_conftests(early_config, parser, args):
     # test_directory = options.yggdrasil_tests_rootdir
     # test_directory = options.rootdir
     # if not test_directory:
-    test_directory = os.path.join(os.getcwd(), "tests")
-    options.yggdrasil_tests_rootdir = test_directory
     for k in ['separate_tests', 'suite']:
         if getattr(options, k, None) is None:
             setattr(options, k, [])
@@ -375,7 +373,8 @@ def do_yggdrasil_mods(opts, dont_exit=False):
     run_process = False
     prefix = []
     options = opts.options
-    test_directory = options.yggdrasil_tests_rootdir
+    test_directory = os.path.join(os.getcwd(), "tests")
+    options.yggdrasil_tests_rootdir = test_directory
     # Disable output capture
     if options.nocapture:
         opts.remove('nocapture')
