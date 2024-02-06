@@ -122,7 +122,7 @@ path = "README.rst"
 minversion = "6.0"
 norecursedirs = [
   ".*", "build", "dist", "CVS", "_darcs", "{arch}", "*.egg",
-  "rapidjson", "tests/helpers", "scripts"
+  "rapidjson", "tests/helpers", "scripts", "python-rapidjson"
 ]
 python_files = [
   "test_*.py",
