@@ -8,7 +8,7 @@ import copy
 import types
 import functools
 import subprocess
-from yggdrasil import platform
+# from tests import communication, demos, drivers, examples, languages
 
 
 # Test data
@@ -89,6 +89,7 @@ def timeout_decorator(*args, allow_arguments=False, **kwargs):
 
 
     """
+    from yggdrasil import platform
     env_flag = 'YGG_IN_TIMEOUT_PROCESS'
     if platform._is_win:
         kwargs['method'] = 'thread'

@@ -1064,9 +1064,7 @@ def safe_eval(statement, **kwargs):
             'uint8', 'uint16', 'uint32', 'uint64',
             'float16', 'float32', 'float64'],
         'yggdrasil.units': [
-            'get_data', 'add_units'],
-        'yggdrasil.rapidjson.units': [
-            'Quantity', 'QuantityArray']}
+            'get_data', 'add_units', 'Quantity', 'QuantityArray']}
     for mod_name, func_list in _safe_lists.items():
         mod = importlib.import_module(mod_name)
         for func in func_list:

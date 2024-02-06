@@ -10,6 +10,7 @@ import logging
 import argparse
 import subprocess
 import contextlib
+import importlib
 import numpy as np
 import pprint
 from yggdrasil import platform, constants, rapidjson
@@ -121,8 +122,8 @@ def setup_ci(opts):
             break
     assert os.path.isdir(package_dir)
     opts += ['-v',
-             # '--import-mode=importlib',
-             '--import-mode=append',
+             '--import-mode=importlib',
+             # '--import-mode=append',
              f'--cov={package_dir}',
              '--config-file=pyproject.toml',
              '--cov-config=.coveragerc',
@@ -143,11 +144,11 @@ def setup_ci(opts):
                'print(yggdrasil.__file__)\"')
     src_ver = subprocess.check_output(src_cmd, shell=True)
     dst_ver = subprocess.check_output(dst_cmd, shell=True, cwd=top_dir)
-    if src_ver != dst_ver:  # pragma: debug
-        src_dir = subprocess.check_output(dir_cmd, shell=True)
-        dst_dir = subprocess.check_output(dir_cmd, shell=True,
-                                          cwd=top_dir)
-        raise RuntimeError(f"Versions do not match:\n"
+    src_dir = subprocess.check_output(dir_cmd, shell=True)
+    dst_dir = subprocess.check_output(dir_cmd, shell=True,
+                                      cwd=top_dir)
+    if src_ver != dst_ver or src_dir == dst_dir:  # pragma: debug
+        raise RuntimeError(f"Versions do not match or local yggdrasil loaded:\n"
                            f"\tSource version: {src_ver}\n"
                            f"\tBuild  version: {dst_ver}\n"
                            f"\tSource directory: {src_dir}\n"
@@ -356,12 +357,6 @@ def pytest_load_initial_conftests(early_config, parser, args):
     r"""Adjust the pytest arguments before testing."""
     # Check for run in separate process before adding CI args
     options = early_config.known_args_namespace
-    # pprint.pprint(dir(options))
-    # import pdb
-    # pdb.set_trace()
-    # test_directory = options.yggdrasil_tests_rootdir
-    # test_directory = options.rootdir
-    # if not test_directory:
     for k in ['separate_tests', 'suite']:
         if getattr(options, k, None) is None:
             setattr(options, k, [])
@@ -372,14 +367,22 @@ def pytest_load_initial_conftests(early_config, parser, args):
 def do_yggdrasil_mods(opts, dont_exit=False):
     run_process = False
     prefix = []
+    prefix_pytest = ['pytest']
+    # prefix_pytest = ['python', '-m', 'pytest']
     options = opts.options
-    test_directory = os.path.join(os.getcwd(), "tests")
+    rootdir = os.getcwd()
+    if options.file_or_dir:
+        test_split = os.path.join("yggdrasil", "tests")
+        for x in options.file_or_dir:
+            if test_split in x:
+                rootdir = x.split(test_split)[0] + "yggdrasil"
+    print(f"rootdir = {options.rootdir}")
+    test_directory = os.path.join(rootdir, "tests")
     options.yggdrasil_tests_rootdir = test_directory
     # Disable output capture
     if options.nocapture:
         opts.remove('nocapture')
-        # TODO: Handle -o
-        opts += ['--showcapture=all', '-o', 'log_cli=true']
+        opts += ['--capture=no', '-o', 'log_cli=true']
     # MPI script
     mpi_nproc = options.mpi_nproc
     if options.mpi_nproc > 1:
@@ -390,6 +393,7 @@ def do_yggdrasil_mods(opts, dont_exit=False):
         opts.remove('mpi_script')
         if mpi_nproc > 1:
             mpi_test_args.append(f'--mpi-nproc={mpi_nproc}')
+            mpi_nproc = 1  # Prevent calling remaining args with mpi
         mpi_test_args = " ".join(mpi_test_args)
         opts.append('separate_tests', mpi_test_args)
     # MPI process should be started
@@ -420,7 +424,7 @@ def do_yggdrasil_mods(opts, dont_exit=False):
         if not os.path.isabs(write_script):
             write_script = os.path.abspath(write_script)
         write_pytest_script(write_script,
-                            prefix + ['pytest'] + opts.args)
+                            prefix + prefix_pytest + opts.args)
         opts.remove('write_script')
         if dont_exit:
             return 0
@@ -447,8 +451,8 @@ def do_yggdrasil_mods(opts, dont_exit=False):
             do_yggdrasil_mods(opts_copy, dont_exit=True)
     # Run test in separate process
     if run_process:
-        print(f"Calling subprocess: {prefix + ['pytest'] + opts.args}")
-        flag = subprocess.call(prefix + ['pytest'] + opts.args)
+        print(f"Calling subprocess: {prefix + prefix_pytest + opts.args}")
+        flag = subprocess.call(prefix + prefix_pytest + opts.args)
         if dont_exit:
             return flag
         sys.exit(flag)
@@ -464,7 +468,16 @@ def do_yggdrasil_mods(opts, dont_exit=False):
         if not options.file_or_dir:
             opts += ['--end-yggdrasil-opts'] + sorted(suite_files)
     elif not options.file_or_dir:
-        opts += ['--end-yggdrasil-opts'] + ["tests"]
+        opts += ['--end-yggdrasil-opts'] + [test_directory]
+    if test_directory not in sys.path:
+        sys.path.append(test_directory)
+    added_root = False
+    if rootdir not in sys.path:
+        sys.path.append(rootdir)
+        added_root = True
+    sys.modules["tests"] = importlib.import_module("tests")
+    if added_root:
+        sys.path.pop()
     print(f"Update paths: {options.file_or_dir}")
     print(f"Updated args: {opts.args}")
 
@@ -1821,3 +1834,70 @@ def geom_dict():
         'faces': np.array([[0, 0, 7, 0, 1, 2, 3],
                            [1, 2, 6, 4, 5, 6, 7],
                            [2, 3, 5, 5, 6, 7, 4]], 'int32').T}
+
+
+# Type utlities
+class ExampleClass(object):
+
+    def __init__(self, *args, **kwargs):
+        self._input_args = args
+        self._input_kwargs = kwargs
+
+    def __str__(self):
+        return str((self._input_args, self._input_kwargs))
+
+    def __eq__(self, solf):
+        if not isinstance(solf, ExampleClass):
+            return False
+        if not self._input_kwargs == solf._input_kwargs:
+            return False
+        return self._input_args == solf._input_args
+
+
+def get_test_data(typename):
+    r"""Determine a test data set for the specified type.
+
+    Args:
+        typename (str): Name of datatype.
+
+    Returns:
+        object: Example of specified datatype.
+
+    """
+    x = {'type': typename}
+    prop_names = 'abcdefghijklmnopqrstuvwxyg'
+    prop_types = [{'type': 'number'}, {'type': 'string'}]
+    if typename == 'array':
+        x['items'] = prop_types
+    elif typename == 'object':
+        x['properties'] = {
+            k: xx for k, xx in zip(prop_names, prop_types)}
+    elif typename == 'class':
+        return ExampleClass
+    elif typename == 'instance':
+        return ExampleClass(1, 'b', c=2, d='d')
+    return rapidjson.generate_data(x)
+
+
+def check_received_data(typename, x_recv):
+    r"""Check that the received message is equivalent to the
+    test data for the specified type.
+
+    Args:
+        typename (str): Name of datatype.
+        x_recv (object): Received object.
+
+    Raises:
+        AssertionError: If the received message is not equivalent
+            to the received message.
+
+    """
+    x_sent = get_test_data(typename)
+    print('RECEIVED:')
+    pprint.pprint(x_recv)
+    print('EXPECTED:')
+    pprint.pprint(x_sent)
+    if isinstance(x_sent, np.ndarray):
+        np.testing.assert_array_equal(x_recv, x_sent)
+    else:
+        assert x_recv == x_sent

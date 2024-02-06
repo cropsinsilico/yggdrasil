@@ -38,12 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
     - name: Install build utilities
@@ -84,7 +84,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: true
     - if: runner.os == 'Linux'
@@ -144,11 +144,11 @@ jobs:
     - docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
     - name: Login to DockerHub
@@ -166,11 +166,11 @@ jobs:
     name: Build the Docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
     - name: Install dependencies
@@ -217,11 +217,11 @@ jobs:
     - docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
     - name: Install dependencies
@@ -250,7 +250,7 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
@@ -297,7 +297,7 @@ jobs:
       uses: mpi4py/setup-mpi@v1
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/.cache/pip
@@ -306,7 +306,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/Library/Caches/pip
@@ -315,7 +315,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~\AppData\Local\pip\Cache
@@ -325,13 +325,13 @@ jobs:
     - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
@@ -372,7 +372,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -518,7 +518,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -603,7 +603,7 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
@@ -650,7 +650,7 @@ jobs:
       uses: mpi4py/setup-mpi@v1
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/.cache/pip
@@ -659,7 +659,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/Library/Caches/pip
@@ -668,7 +668,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~\AppData\Local\pip\Cache
@@ -678,13 +678,13 @@ jobs:
     - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
@@ -725,7 +725,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -871,7 +871,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -940,7 +940,7 @@ jobs:
         ports:
         - 5672:5672
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
@@ -987,7 +987,7 @@ jobs:
       uses: mpi4py/setup-mpi@v1
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/.cache/pip
@@ -996,7 +996,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/Library/Caches/pip
@@ -1005,7 +1005,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~\AppData\Local\pip\Cache
@@ -1015,13 +1015,13 @@ jobs:
     - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
@@ -1062,7 +1062,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1208,7 +1208,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -1260,7 +1260,7 @@ jobs:
         ports:
         - 5672:5672
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
@@ -1307,7 +1307,7 @@ jobs:
       uses: mpi4py/setup-mpi@v1
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/.cache/pip
@@ -1316,7 +1316,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/Library/Caches/pip
@@ -1325,7 +1325,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~\AppData\Local\pip\Cache
@@ -1335,13 +1335,13 @@ jobs:
     - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
@@ -1382,7 +1382,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1528,7 +1528,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -1579,7 +1579,7 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
@@ -1626,7 +1626,7 @@ jobs:
       uses: mpi4py/setup-mpi@v1
     - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/.cache/pip
@@ -1635,7 +1635,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~/Library/Caches/pip
@@ -1644,7 +1644,7 @@ jobs:
           '
     - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         path: ~\AppData\Local\pip\Cache
@@ -1654,13 +1654,13 @@ jobs:
     - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.7.16
     - if: matrix.install-method == 'pip' && env.INSTALLJULIA == 1
@@ -1701,7 +1701,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1847,7 +1847,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}

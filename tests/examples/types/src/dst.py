@@ -1,5 +1,5 @@
 import os
-from tests.examples.types import check_received_data
+from yggdrasil.pytest_plugin import check_received_data
 
 
 def dst(received_data):

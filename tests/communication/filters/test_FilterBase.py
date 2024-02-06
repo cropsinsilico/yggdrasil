@@ -30,9 +30,9 @@ class TestFilterBase(base_class):
         for x in testing_options:
             inst = python_class(**x.get('kwargs', {}))
             for msg in x.get('pass', []):
-                assert(inst(msg) is True)
+                assert inst(msg) is True
             for msg in x.get('fail', []):
-                assert(inst(msg) is False)
+                assert inst(msg) is False
             for msg, err in x.get('error', []):
                 with pytest.raises(err):
                     inst(msg)

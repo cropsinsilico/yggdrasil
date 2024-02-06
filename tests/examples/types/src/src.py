@@ -1,6 +1,6 @@
 import os
 import pprint
-from tests.examples.types import get_test_data
+from yggdrasil.pytest_plugin import get_test_data
 
 
 def src():
