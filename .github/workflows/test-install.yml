@@ -42,6 +42,12 @@ jobs:
       with:
         fetch-depth: 0
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -87,6 +93,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - if: runner.os == 'Linux'
       name: (LINUX) Set up QEMU
       uses: docker/setup-qemu-action@v1
@@ -147,6 +159,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -169,6 +187,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -220,6 +244,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -253,6 +283,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Set C installation based on matrix value
@@ -606,6 +642,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Set C installation based on matrix value
@@ -943,6 +985,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Set C installation based on matrix value
@@ -1263,6 +1311,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Set C installation based on matrix value
@@ -1582,6 +1636,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Get tags required by setuptools_scm to generate version
+      run: 'git fetch --prune --unshallow
+
+        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+        '
     - if: matrix.install-c != true && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Set C installation based on matrix value
