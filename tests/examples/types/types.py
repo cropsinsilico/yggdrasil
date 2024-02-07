@@ -1,12 +1,12 @@
 import os
 import argparse
-from tests.examples.test_types import TestExampleTypes
 from yggdrasil.languages import get_language_ext
 from yggdrasil.runner import run
 _this_dir = os.path.dirname(__file__)
 
 
 def main(language, typename, language_ext=None):
+    from tests.examples.test_types import TestExampleTypes
     yamlfile = os.path.join(_this_dir, 'types.yml')
     modelfile = TestExampleTypes.setup_model(
         language, typename, language_ext=language_ext)

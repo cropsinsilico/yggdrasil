@@ -27,7 +27,7 @@ class TestExampleTypes(base_class):
     def example_module(self, example_name):
         r"""Python module associated with the test."""
         try:
-            return importlib.import_module(f'tests.examples.{example_name}')
+            return importlib.import_module('yggdrasil.dev.pytest_plugin')
         except ImportError:
             return None
 

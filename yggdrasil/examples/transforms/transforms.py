@@ -1,12 +1,12 @@
 import os
 import argparse
-from tests.examples.test_transforms import TestExampleTransforms
 from yggdrasil.languages import get_language_ext
 from yggdrasil.runner import run
 _this_dir = os.path.dirname(__file__)
 
 
 def main(language, transform, language_ext=None):
+    from tests.examples.test_transforms import TestExampleTransforms
     yamlfile = os.path.join(_this_dir, 'transforms.yml')
     modelfile, env = TestExampleTransforms.setup_model(
         language, transform, language_ext=language_ext)
