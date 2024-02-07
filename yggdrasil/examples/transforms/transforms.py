@@ -1,6 +1,6 @@
 import os
 import argparse
-from tests.test_transforms import TestExampleTransforms
+from tests.examples.test_transforms import TestExampleTransforms
 from yggdrasil.languages import get_language_ext
 from yggdrasil.runner import run
 _this_dir = os.path.dirname(__file__)
