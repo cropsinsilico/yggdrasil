@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "scikit-build-core",
-  "setuptools_scm<8; python_version<'3.8'",
+  "setuptools_scm>=7.1; python_version<'3.8'",
   "setuptools_scm>=8; python_version>='3.8'",
   "hatch-fancy-pypi-readme",
   "numpy",

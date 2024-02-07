@@ -863,9 +863,9 @@ def languages():
 
 
 @pytest.fixture(scope="session")
-def testdir(pytestconfig):
+def testdir():
     r"""Test directory."""
-    return pytestconfig.known_args_namespace.yggdrasil_tests_rootdir
+    return _test_directory
 
 
 @pytest.fixture(scope="session")

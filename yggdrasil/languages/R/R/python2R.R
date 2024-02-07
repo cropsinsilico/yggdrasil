@@ -37,7 +37,11 @@ python2R <- function(pyobj) {
              || is(pyobj, "unyt.array.unyt_quantity")
              || is(pyobj, "unyt.array.unyt_array")
 	     || is(pyobj, "yggdrasil.rapidjson.units.Quantity")
-	     || is(pyobj, "yggdrasil.rapidjson.units.QuantityArray")) {
+	     || is(pyobj, "yggdrasil.rapidjson.units.QuantityArray")
+	     || is(pyobj, "yggdrasil.units.Quantity")
+	     || is(pyobj, "yggdrasil.units.QuantityArray")
+	     || is(pyobj, "rapidjson.units.Quantity")
+	     || is(pyobj, "rapidjson.units.QuantityArray")) {
     ygg_units <- reticulate::import('yggdrasil.units', convert=FALSE)
     robj_data <- python2R(ygg_units$get_data(pyobj))
     robj_units <- python2R(ygg_units$get_units(pyobj, for_language="R"))

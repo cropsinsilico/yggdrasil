@@ -815,8 +815,11 @@ class CMakeModelDriver(BuildModelDriver):
             include_file, self.target, products=self.products, **kws)
         # Create copy of cmakelists and modify
         newlines_after = []
+        abs_buildfile = self.buildfile
+        if not os.path.isabs(abs_buildfile):
+            abs_buildfile = os.path.join(self.sourcedir, abs_buildfile)
         self.products.append_generated(
-            self.buildfile, [], replaces=True, tag='compile_time',
+            abs_buildfile, [], replaces=True, tag='compile_time',
             verbose=kwargs.get('verbose', False))
         build_product = self.products.last
         orig_buildfile = build_product.name
