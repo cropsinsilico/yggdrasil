@@ -19,13 +19,9 @@ _typed_lang = sorted([k for k, v in constants.LANGUAGE_PROPERTIES.items()
 class TestExampleTypes(base_class):
     r"""Test the Types example."""
 
+    parametrize_example_name = ["types"]
     parametrize_language = _full_lang
     # iter_flaky = [('c', 'instance', '*'), ('cpp', 'instance', '*')]
-
-    @pytest.fixture(scope="class")
-    def example_name(self):
-        r"""str: Name of example being tested."""
-        return "types"
 
     @pytest.fixture(scope="class")
     def example_module(self, example_name):

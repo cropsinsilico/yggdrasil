@@ -5,7 +5,7 @@ import importlib
 import contextlib
 import weakref
 from collections import OrderedDict
-from yggdrasil.doctools import docs2args
+from yggdrasil.dev.doctools import docs2args
 
 
 _registry = {}

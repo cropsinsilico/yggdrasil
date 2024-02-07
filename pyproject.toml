@@ -51,7 +51,7 @@ python_requires = ">=3.7"
 console_scripts = {file = "console_scripts.txt"}
 
 [project.entry-points.pytest11]
-pytest-yggdrasil = "yggdrasil.pytest_plugin"
+pytest-yggdrasil = "yggdrasil.dev.pytest_plugin"
 
 [project.urls]
 Homepage = "https://github.com/cropsinsilico/yggdrasil"
@@ -147,7 +147,7 @@ omit = [
   "*/yggdrasil/rapidjson/*",
   "*/yggdrasil/examples/*/src/*.py",
   "*/yggdrasil/examples/transforms/transforms.py",
-  "*/yggdrasil/doctools.py",
+  "*/yggdrasil/dev/*",
   "*/yggdrasil/demos/*",
   "*/yggdrasil/__main__.py",
 ]

@@ -7,11 +7,8 @@ from tests.examples import TestExample as base_class
 class TestExampleRpcFib(base_class):
     r"""Test the rpcFib example."""
 
-    @pytest.fixture(scope="class")
-    def example_name(self):
-        r"""str: Name of example being tested."""
-        return "rpcFib"
-    
+    parametrize_example_name = ["rpcFib"]
+
     @pytest.fixture(scope="class")
     def env(self):
         r"""dict: Environment variables set for the test."""

@@ -7,12 +7,8 @@ from tests.examples import TestExample as base_class
 class TestExampleRPC1(base_class):
     r"""Test the rpc_lesson1 example."""
 
+    parametrize_example_name = ["rpc_lesson1"]
     niter = 3
-
-    @pytest.fixture(scope="class")
-    def example_name(self):
-        r"""str: Name of example being tested."""
-        return "rpc_lesson1"
 
     @pytest.fixture
     def results(self):

@@ -1,11 +1,11 @@
 import os
 import pprint
-from yggdrasil.pytest_plugin import get_test_data
+from yggdrasil.dev.pytest_plugin import get_test_data
 
 
 def src():
     typename = os.environ.get('TEST_TYPENAME', None)
-    assert(typename is not None)
+    assert typename is not None
     test_data = get_test_data(typename)
     print('SENDING: %s' % typename)
     pprint.pprint(test_data)

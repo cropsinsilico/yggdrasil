@@ -1,6 +1,6 @@
 import os
 from yggdrasil.examples import source, yamls
-from yggdrasil import doctools
+from yggdrasil.dev import doctools
 
 
 rst_dir = os.path.dirname(os.path.abspath(__file__))

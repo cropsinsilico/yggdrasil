@@ -10,7 +10,6 @@ import logging
 import argparse
 import subprocess
 import contextlib
-import importlib
 import numpy as np
 import pprint
 from yggdrasil import platform, constants, rapidjson
@@ -24,6 +23,9 @@ from yggdrasil.multitasking import _on_mpi
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+pytest_plugins = 'pytest-yggdrasil'
+_test_directory = os.path.abspath(os.path.dirname(__file__))
+_update_args_in_cmdline = False
 
 _test_registry = []
 _weakref_registry = []
@@ -113,7 +115,7 @@ class DummyParser(argparse.ArgumentParser):
         return self.parse_known_args(*args, **kwargs)
 
 
-def setup_ci(opts):
+def setup_ci(opts, disable_extra=False):
     import site
     top_dir = os.path.dirname(os.getcwd())
     for x in site.getsitepackages():
@@ -131,6 +133,8 @@ def setup_ci(opts):
     # f'--rootdir={package_dir}']
     # if not any(x.startswith('--with-mpi') for x in args):
     #     args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+    if disable_extra:
+        return
     # Additional checks
     if not os.path.isfile('pyproject.toml'):
         raise RuntimeError("The CI tests must be run from the root "
@@ -147,14 +151,15 @@ def setup_ci(opts):
     src_dir = subprocess.check_output(dir_cmd, shell=True)
     dst_dir = subprocess.check_output(dir_cmd, shell=True,
                                       cwd=top_dir)
+    message = (f"Versions do not match or local yggdrasil loaded:\n"
+               f"\tSource version: {src_ver}\n"
+               f"\tBuild  version: {dst_ver}\n"
+               f"\tSource directory: {src_dir}\n"
+               f"\tBuild  directory: {dst_dir}\n"
+               f"\tCurr   directory: {os.getcwd()}\n"
+               f"\tTop    directory: {top_dir}\n")
     if src_ver != dst_ver or src_dir == dst_dir:  # pragma: debug
-        raise RuntimeError(f"Versions do not match or local yggdrasil loaded:\n"
-                           f"\tSource version: {src_ver}\n"
-                           f"\tBuild  version: {dst_ver}\n"
-                           f"\tSource directory: {src_dir}\n"
-                           f"\tBuild  directory: {dst_dir}\n"
-                           f"\tCurr   directory: {os.getcwd()}\n"
-                           f"\tTop    directory: {top_dir}\n")
+        raise RuntimeError(message)
     subprocess.check_call(
         ["flake8", "yggdrasil"])  # , "--append-config", "setup.cfg"])
     if not os.path.isfile(".coveragerc"):
@@ -172,6 +177,25 @@ class ArgsWrapper(object):
         self.args = args
         self.options = options
         self.parser = parser
+        self.modified = False
+        self.orig_args = copy.deepcopy(args)
+        if self.options:
+            for k in ['separate_tests', 'suite', 'file_or_dir']:
+                if getattr(self.options, k, None) is None:
+                    setattr(self.options, k, [])
+
+    @classmethod
+    def from_config(cls, config):
+        known_options = config.known_args_namespace
+        assert (_test_directory == known_options._yggdrasil_tests_directory)
+        args = known_options._yggdrasil_args
+        parser = known_options._yggdrasil_parser
+        options = config.option
+        if not hasattr(options, 'end_yggdrasil_opts'):
+            options = parser.parse(args)
+            config.option = options
+            assert hasattr(options, 'end_yggdrasil_opts')
+        return cls(args, options, parser)
 
     def isolate_options(self, options):
         if isinstance(options, str):
@@ -227,10 +251,10 @@ class ArgsWrapper(object):
 
     def find_argument(self, option):
         is_flag = option.startswith('-')
-        if not hasattr(self.parser, '_groups'):
-            pprint.pprint(dir(self.parser))
-            import pdb
-            pdb.set_trace()
+        # if not hasattr(self.parser, '_groups'):
+        #     pprint.pprint(dir(self.parser))
+        #     import pdb
+        #     pdb.set_trace()
         for g in self.parser._groups + [self.parser._anonymous]:
             for arg in g.options:
                 if (((is_flag and option in (arg._long_opts
@@ -271,6 +295,8 @@ class ArgsWrapper(object):
         self.args = args
         self.options = self.parser.parse_known_and_unknown_args(
             self.args)[0]
+        self.modified = False
+        self.orig_args = copy.deepcopy(args)
 
     def append(self, option, value=None, overwrite=False):
         add_files = []
@@ -296,8 +322,10 @@ class ArgsWrapper(object):
             else:
                 add_flags.insert(0, value)
         if not (details['is_unique'] and flag in self.args):
+            self.modified = True
             self.args += [flag] + add_flags
         if add_files:
+            self.modified = True
             self.args += add_files
         if not self.options:
             return
@@ -322,11 +350,14 @@ class ArgsWrapper(object):
         if is_list:
             value = [value]
         if is_list and not overwrite:
+            self.modified = True
             dst = getattr(self.options, option)
             dst += value
         else:
+            self.modified = True
             setattr(self.options, option, value)
         if add_files:
+            self.modified = True
             self.options.file_or_dir += add_files
 
     def remove_args(self, options, remove_file_or_dir=False):
@@ -334,6 +365,9 @@ class ArgsWrapper(object):
         parsed_args, remaining = self.isolate_options(options)
         if not remove_file_or_dir:
             remaining += parsed_args.file_or_dir
+        if len(self.args) == len(remaining) and self.args == remaining:
+            return
+        self.modified = True
         args_copy = copy.copy(self.args)
         self.args.clear()
         self.args += [x for x in args_copy if x in remaining]
@@ -344,6 +378,9 @@ class ArgsWrapper(object):
         parsed_args, remaining = self.isolate_options(option)
         if not remove_file_or_dir:
             remaining += parsed_args.file_or_dir
+        if len(self.args) == len(remaining) and self.args == remaining:
+            return
+        self.modified = True
         args_copy = copy.copy(self.args)
         self.args.clear()
         self.args += [x for x in args_copy if x in remaining]
@@ -352,33 +389,13 @@ class ArgsWrapper(object):
         setattr(self.options, option, details['default'])
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_load_initial_conftests(early_config, parser, args):
-    r"""Adjust the pytest arguments before testing."""
-    # Check for run in separate process before adding CI args
-    options = early_config.known_args_namespace
-    for k in ['separate_tests', 'suite']:
-        if getattr(options, k, None) is None:
-            setattr(options, k, [])
-    opts = ArgsWrapper(args, options, parser)
-    do_yggdrasil_mods(opts)
-
-
 def do_yggdrasil_mods(opts, dont_exit=False):
     run_process = False
     prefix = []
     prefix_pytest = ['pytest']
     # prefix_pytest = ['python', '-m', 'pytest']
     options = opts.options
-    rootdir = os.getcwd()
-    if options.file_or_dir:
-        test_split = os.path.join("yggdrasil", "tests")
-        for x in options.file_or_dir:
-            if test_split in x:
-                rootdir = x.split(test_split)[0] + "yggdrasil"
-    print(f"rootdir = {options.rootdir}")
-    test_directory = os.path.join(rootdir, "tests")
-    options.yggdrasil_tests_rootdir = test_directory
+    options.yggdrasil_tests_rootdir = _test_directory
     # Disable output capture
     if options.nocapture:
         opts.remove('nocapture')
@@ -461,25 +478,24 @@ def do_yggdrasil_mods(opts, dont_exit=False):
     suite_files = []
     for suite in options.suite:
         for f in suite_map[suite][0]:
-            suite_files += glob.glob(os.path.join(test_directory, f))
+            suite_files += glob.glob(os.path.join(_test_directory, f))
         opts += suite_map[suite][1]
     opts._norm('--suite')
     if suite_files:
         if not options.file_or_dir:
             opts += ['--end-yggdrasil-opts'] + sorted(suite_files)
     elif not options.file_or_dir:
-        opts += ['--end-yggdrasil-opts'] + [test_directory]
-    if test_directory not in sys.path:
-        sys.path.append(test_directory)
-    added_root = False
-    if rootdir not in sys.path:
-        sys.path.append(rootdir)
-        added_root = True
-    sys.modules["tests"] = importlib.import_module("tests")
-    if added_root:
-        sys.path.pop()
+        opts += ['--end-yggdrasil-opts'] + [_test_directory]
     print(f"Update paths: {options.file_or_dir}")
     print(f"Updated args: {opts.args}")
+    # if opts.modified:
+    #     print(f"Arguments modified, so tests will be run in an"
+    #           f" external process:\n"
+    #           f"  old: {opts.orig_args}\n"
+    #           f"  new: {opts.args}")
+    #     flag = subprocess.call(prefix_pytest + opts.args)
+    #     assert flag
+    #     sys.exit(flag)
 
 
 def pytest_addoption(parser):
@@ -548,7 +564,22 @@ def add_options_to_parser(parser):
                      help="Re-run flaky tests.")
 
 
+if _update_args_in_cmdline:
+    def pytest_cmdline_preparse(config, args):
+        opts = ArgsWrapper.from_config(config)
+        do_yggdrasil_mods(opts)
+
+
+def pytest_cmdline_main(config):
+    r"""Adjust the pytest arguments before testing."""
+    # Check for run in separate process before adding CI args
+    if not _update_args_in_cmdline:
+        opts = ArgsWrapper.from_config(config)
+        do_yggdrasil_mods(opts)
+
+
 def pytest_configure(config):
+    # Add markers to configuration
     for x in _markers:
         config.addinivalue_line("markers", f"{x[0]}: {x[2]}")
     config.addinivalue_line(
@@ -1834,70 +1865,3 @@ def geom_dict():
         'faces': np.array([[0, 0, 7, 0, 1, 2, 3],
                            [1, 2, 6, 4, 5, 6, 7],
                            [2, 3, 5, 5, 6, 7, 4]], 'int32').T}
-
-
-# Type utlities
-class ExampleClass(object):
-
-    def __init__(self, *args, **kwargs):
-        self._input_args = args
-        self._input_kwargs = kwargs
-
-    def __str__(self):
-        return str((self._input_args, self._input_kwargs))
-
-    def __eq__(self, solf):
-        if not isinstance(solf, ExampleClass):
-            return False
-        if not self._input_kwargs == solf._input_kwargs:
-            return False
-        return self._input_args == solf._input_args
-
-
-def get_test_data(typename):
-    r"""Determine a test data set for the specified type.
-
-    Args:
-        typename (str): Name of datatype.
-
-    Returns:
-        object: Example of specified datatype.
-
-    """
-    x = {'type': typename}
-    prop_names = 'abcdefghijklmnopqrstuvwxyg'
-    prop_types = [{'type': 'number'}, {'type': 'string'}]
-    if typename == 'array':
-        x['items'] = prop_types
-    elif typename == 'object':
-        x['properties'] = {
-            k: xx for k, xx in zip(prop_names, prop_types)}
-    elif typename == 'class':
-        return ExampleClass
-    elif typename == 'instance':
-        return ExampleClass(1, 'b', c=2, d='d')
-    return rapidjson.generate_data(x)
-
-
-def check_received_data(typename, x_recv):
-    r"""Check that the received message is equivalent to the
-    test data for the specified type.
-
-    Args:
-        typename (str): Name of datatype.
-        x_recv (object): Received object.
-
-    Raises:
-        AssertionError: If the received message is not equivalent
-            to the received message.
-
-    """
-    x_sent = get_test_data(typename)
-    print('RECEIVED:')
-    pprint.pprint(x_recv)
-    print('EXPECTED:')
-    pprint.pprint(x_sent)
-    if isinstance(x_sent, np.ndarray):
-        np.testing.assert_array_equal(x_recv, x_sent)
-    else:
-        assert x_recv == x_sent

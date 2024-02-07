@@ -1,5 +1,5 @@
 import os
-from yggdrasil import doctools
+from yggdrasil.dev import doctools
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (

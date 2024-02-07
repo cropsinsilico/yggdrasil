@@ -1,5 +1,5 @@
 import os
-from yggdrasil import doctools
+from yggdrasil.dev import doctools
 
 
 fname = os.path.join(os.path.dirname(__file__), "cli.rst")

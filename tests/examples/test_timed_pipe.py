@@ -6,10 +6,7 @@ from tests.examples import TestExample as base_class
 class TestTimedPipeBase(base_class):
     r"""Base class for testing TimedPipe example with various comm types."""
 
-    @pytest.fixture(scope="class")
-    def example_name(self):
-        r"""str: Name of example being tested."""
-        return "timed_pipe"
+    parametrize_example_name = ["timed_pipe"]
 
     @pytest.fixture(scope="class")
     def env(self):
