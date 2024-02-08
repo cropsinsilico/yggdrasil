@@ -61,8 +61,7 @@ requirements:
     - pip
     - python
     - scikit-build-core
-    - setuptools_scm >=7.1.0  # [py<38]
-    - setuptools_scm >=8  # [py>=38]
+    - setuptools_scm
     - sysv_ipc  # [not win]
   run:
     - GitPython
