@@ -1076,22 +1076,20 @@ def running_service(pytestconfig, check_service_manager_settings,
             process_kws['cwd'] = project_dir
             if platform._is_win:  # pragma: windows
                 process_kws['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP
-            lines = [
-                'from yggdrasil.services import IntegrationServiceManager',
-                'srv = IntegrationServiceManager(']
+            opts = []
             if service_type is not None:
-                lines[-1] += f'service_type=\'{service_type}\''
-                if partial_commtype is not None:
-                    lines[-1] += ', '
+                opts.append(f'service_type=\'{service_type}\'')
             if partial_commtype is not None:
-                lines[-1] += f'commtype=\'{partial_commtype}\''
-            lines[-1] += ')'
-            lines += ['assert not srv.is_running',
-                      f'srv.start_server(with_coverage={with_coverage},',
-                      f'                 log_level={log_level},',
-                      f'                 model_repository=\'{model_repo}\',',
-                      f'                 track_memory={track_memory},',
-                      f'                 debug={debug})']
+                opts.append(f'commtype=\'{partial_commtype}\'')
+            opts.append(f'debug={debug}')
+            lines = [
+                "from yggdrasil.services import IntegrationServiceManager",
+                f"srv = IntegrationServiceManager({', '.join(opts)})",
+                'assert not srv.is_running',
+                f'srv.start_server(with_coverage={with_coverage},',
+                f'                 log_level={log_level},',
+                f'                 model_repository=\'{model_repo}\',',
+                f'                 track_memory={track_memory})']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))
             args = [sys.executable, script_path]
