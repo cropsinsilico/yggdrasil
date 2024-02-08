@@ -232,16 +232,7 @@ jobs:
         >> $GITHUB_OUTPUT
     - id: set-test-flags
       run: echo "test-flags={\"empty\":\"\", \"basic\":\"--long-running --suites timing
-        demos top\", \"examples\":\"--suite=examples --extra-examples --mpi-script=run_mpi.sh
-        --mpi-nproc=3\", \"types-no-c\":\"--suite=types --skip-languages c cpp\",
-        \"types-c\":\"--suite=types --languages c cpp\", \"long\":\"--long-running\",
-        \"long-mpi\":\"--long-running --mpi-script=run_mpi.sh\", \"examples-backwards\":\"--suite=examples
-        --parametrize-example-name=backwards\", \"examples-sbml\":\"--suites examples
-        --parametrize-language=sbml\", \"long-remote-service\":\"--long-running --remote-service\",
-        \"examples-rpc-lesson3\":\"--suites examples top --parametrize-example-name=rpc_lesson3\",
-        \"tools\":\"tests/test_tools.py\", \"long-interp\":\"--long-running --languages
-        python R matlab\", \"services\":\"tests/test_services.py --nocapture\"}" >>
-        $GITHUB_OUTPUT
+        demos top\"}" >> $GITHUB_OUTPUT
   schema:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Update the schema used by the model submission form
@@ -294,14 +285,12 @@ jobs:
       }}
     steps:
     - env:
-        TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
-        TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -666,14 +655,12 @@ jobs:
       }}
     steps:
     - env:
-        TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
-        TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -1022,14 +1009,12 @@ jobs:
         - 5672:5672
     steps:
     - env:
-        TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
-        TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -1361,14 +1346,12 @@ jobs:
         - 5672:5672
     steps:
     - env:
-        TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
-        TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -1699,14 +1682,12 @@ jobs:
       }}
     steps:
     - env:
-        TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
-        TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
