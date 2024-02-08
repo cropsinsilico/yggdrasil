@@ -59,7 +59,7 @@ jobs:
     - name: Test sdist
       run: 'ygginfo
 
-        pytest -m subset_rapidjson --import-mode=importlib tests
+        pytest -m subset_rapidjson tests
 
         '
     - name: Upload artifacts
@@ -192,11 +192,24 @@ jobs:
     name: Prepare test parameters
     outputs:
       os-versions: ${{ steps.set-os-versions.outputs.versions }}
+      test-flags: ${{ steps.set-test-flags.outputs.testflags }}
     runs-on: ubuntu-latest
     steps:
     - id: set-os-versions
       run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}"
         >> $GITHUB_OUTPUT
+    - id: set-test-flags
+      run: echo "testflags={\"empty\":\"\", \"basic\":\"--long-running --suites timing
+        demos top\", \"examples\":\"--suite=examples --extra-examples --mpi-script=run_mpi.sh
+        --mpi-nproc=3\", \"types-no-c\":\"--suite=types --skip-languages c cpp\",
+        \"types-c\":\"--suite=types --languages c cpp\", \"long\":\"--long-running\",
+        \"long-mpi\":\"--long-running --mpi-script=run_mpi.sh\", \"examples-backwards\":\"--suite=examples
+        --parametrize-example-name=backwards\", \"examples-sbml\":\"--suites examples
+        --parametrize-language=sbml\", \"long-remote-service\":\"--long-running --remote-service\",
+        \"examples-rpc-lesson3\":\"--suites examples top --parametrize-example-name=rpc_lesson3\",
+        \"tools\":\"tests/test_tools.py\", \"long-interp\":\"--long-running --languages
+        python R matlab\", \"services\":\"tests/test_services.py --nocapture\"}" >>
+        $GITHUB_OUTPUT
   schema:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Update the schema used by the model submission form
@@ -238,6 +251,16 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
+    - env:
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
+      name: Set test-flags1
+      run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - env:
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
+      name: Set test-flags2
+      run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
+      shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
         submodules: true
@@ -257,7 +280,8 @@ jobs:
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
         matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+        env.YGG_GHA_JOB_ID_SUFFIX }}-${{ matrix.test-flags1 }}-${{ matrix.test-flags2
+        }}" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: runner.os == 'Windows'
       name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -267,7 +291,7 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, 'examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
       run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
 
@@ -360,7 +384,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -442,18 +466,18 @@ jobs:
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
         --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      if: ${{ contains(env.TEST_FLAGS1, '--mpi-script') }}
       name: Run generated test script (1st)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -463,19 +487,18 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ matrix.test-flags2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
+        --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -530,32 +553,32 @@ jobs:
           install-sbml: false
           os-base: ubuntu
           python-version: 3.6
-          test-flags1: --long-running
-          test-flags2: ''
+          test-flags1: long
+          test-flags2: empty
         - install-c: true
           install-method: conda
           install-mpi: false
           install-sbml: false
           os-base: ubuntu
           python-version: 3.8
-          test-flags1: --long-running
-          test-flags2: ''
+          test-flags1: long
+          test-flags2: empty
         - install-c: true
           install-method: conda
           install-mpi: false
           install-sbml: true
           os-base: ubuntu
           python-version: 3.9
-          test-flags1: --long-running --remote-service
-          test-flags2: --suites examples --parametrize-language=sbml
+          test-flags1: long-remote-service
+          test-flags2: examples-sbml
         - install-c: true
           install-method: conda
           install-mpi: false
           install-sbml: false
           os-base: macos
           python-version: 3.8
-          test-flags1: --suites examples top --parametrize-example-name=rpc_lesson3
-          test-flags2: tests/test_tools.py
+          test-flags1: examples-rpc-lesson3
+          test-flags2: tools
         install-c:
         - true
         install-method:
@@ -571,9 +594,9 @@ jobs:
         python-version:
         - 3.8
         test-flags1:
-        - --long-running --mpi-script=run_mpi.sh
+        - long-mpi
         test-flags2:
-        - --suite=examples --parametrize-example-name=backwards
+        - examples-backwards
       max-parallel: 20
   test_pip:
     name: Test (${{ matrix.python-version }}, ${{ matrix.os-base }}, ${{ matrix.install-method
@@ -583,6 +606,16 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
+    - env:
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
+      name: Set test-flags1
+      run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - env:
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
+      name: Set test-flags2
+      run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
+      shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
         submodules: true
@@ -602,7 +635,8 @@ jobs:
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
         matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+        env.YGG_GHA_JOB_ID_SUFFIX }}-${{ matrix.test-flags1 }}-${{ matrix.test-flags2
+        }}" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: runner.os == 'Windows'
       name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -612,7 +646,7 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, 'examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
       run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
 
@@ -705,7 +739,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -787,18 +821,18 @@ jobs:
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
         --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      if: ${{ contains(env.TEST_FLAGS1, '--mpi-script') }}
       name: Run generated test script (1st)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -808,19 +842,18 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ matrix.test-flags2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
+        --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -875,8 +908,8 @@ jobs:
           install-sbml: false
           os-base: windows
           python-version: 3.7
-          test-flags1: --long-running
-          test-flags2: ''
+          test-flags1: long
+          test-flags2: empty
         install-c:
         - true
         install-method:
@@ -892,12 +925,12 @@ jobs:
         python-version:
         - 3.7
         test-flags1:
-        - --long-running --suites timing demos top
-        - --suite=examples --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3
-        - --suite=types --skip-languages c cpp
-        - --suite=types --languages c cpp
+        - basic
+        - examples
+        - types-no-c
+        - types-c
         test-flags2:
-        - ''
+        - empty
       max-parallel: 20
   test_rmq_conda:
     defaults:
@@ -920,6 +953,16 @@ jobs:
         ports:
         - 5672:5672
     steps:
+    - env:
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
+      name: Set test-flags1
+      run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - env:
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
+      name: Set test-flags2
+      run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
+      shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
         submodules: true
@@ -939,7 +982,8 @@ jobs:
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
         matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+        env.YGG_GHA_JOB_ID_SUFFIX }}-${{ matrix.test-flags1 }}-${{ matrix.test-flags2
+        }}" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: runner.os == 'Windows'
       name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -949,7 +993,7 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, 'examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
       run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
 
@@ -1042,7 +1086,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1124,18 +1168,18 @@ jobs:
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
         --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      if: ${{ contains(env.TEST_FLAGS1, '--mpi-script') }}
       name: Run generated test script (1st)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -1145,19 +1189,18 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ matrix.test-flags2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
+        --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -1218,9 +1261,9 @@ jobs:
         python-version:
         - 3.7
         test-flags1:
-        - --long-running --languages python R matlab
+        - long-interp
         test-flags2:
-        - tests/test_services.py --nocapture
+        - services
   test_rmq_pip:
     env:
       INSTALLAPY: 1
@@ -1240,6 +1283,16 @@ jobs:
         ports:
         - 5672:5672
     steps:
+    - env:
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
+      name: Set test-flags1
+      run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - env:
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
+      name: Set test-flags2
+      run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
+      shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
         submodules: true
@@ -1259,7 +1312,8 @@ jobs:
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
         matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+        env.YGG_GHA_JOB_ID_SUFFIX }}-${{ matrix.test-flags1 }}-${{ matrix.test-flags2
+        }}" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: runner.os == 'Windows'
       name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -1269,7 +1323,7 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, 'examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
       run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
 
@@ -1362,7 +1416,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1444,18 +1498,18 @@ jobs:
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
         --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      if: ${{ contains(env.TEST_FLAGS1, '--mpi-script') }}
       name: Run generated test script (1st)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -1465,19 +1519,18 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ matrix.test-flags2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
+        --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -1538,9 +1591,9 @@ jobs:
         python-version:
         - 3.7
         test-flags1:
-        - --long-running --languages python R matlab
+        - long-interp
         test-flags2:
-        - ''
+        - empty
   test_stripped:
     env:
       INSTALLC: 0
@@ -1559,6 +1612,16 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
+    - env:
+        TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
+      name: Set test-flags1
+      run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - env:
+        TEST_FLAGS2: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]}}
+      name: Set test-flags2
+      run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
+      shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
         submodules: true
@@ -1578,7 +1641,8 @@ jobs:
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{
         matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{
-        env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
+        env.YGG_GHA_JOB_ID_SUFFIX }}-${{ matrix.test-flags1 }}-${{ matrix.test-flags2
+        }}" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: runner.os == 'Windows'
       name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -1588,7 +1652,7 @@ jobs:
 
         '
       shell: bash -l {0}
-    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, '--suite=examples')
+    - if: runner.os == 'Windows' && startsWith(matrix.test-flags1, 'examples')
       name: (WINDOWS) Disable interpreted language example on Windows for speed
       run: 'echo "TEST_FLAGS1_SUFFIX=--skip-languages python R julia" >> $GITHUB_ENV
 
@@ -1681,7 +1745,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1763,18 +1827,18 @@ jobs:
     - continue-on-error: true
       id: test1
       name: Run tests (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }}
       timeout-minutes: 180
     - if: ${{ steps.test1.outcome == 'failure' }}
       name: Re-run test failures (1st)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags1
-        }} ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS1 }}
+        ${{ env.TEST_FLAGS1_SUFFIX }} --last-failed --last-failed-no-failures=all
         --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test1_script
-      if: ${{ contains(matrix.test-flags1, '--mpi-script') }}
+      if: ${{ contains(env.TEST_FLAGS1, '--mpi-script') }}
       name: Run generated test script (1st)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -1784,19 +1848,18 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ matrix.test-flags2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }}
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
     - if: ${{ steps.test2.outcome == 'failure' }}
       name: Re-run test failures (2nd)
-      run: pytest --import-mode=importlib --ci --cov-append ${{ matrix.test-flags2
-        }} --last-failed --last-failed-no-failures=all --second-attempt
+      run: pytest --import-mode=importlib --ci --cov-append ${{ env.TEST_FLAGS2 }}
+        --last-failed --last-failed-no-failures=all --second-attempt
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ matrix.test-flags2 != '' && contains(matrix.test-flags2, '--mpi-script')
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -1859,9 +1922,9 @@ jobs:
         python-version:
         - 3.7
         test-flags1:
-        - --long-running
+        - long
         test-flags2:
-        - ''
+        - empty
   upload_sdist:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Upload sdist
