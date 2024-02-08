@@ -295,13 +295,13 @@ jobs:
     steps:
     - env:
         TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}"
+          }}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
         TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}"
+          }}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -667,13 +667,13 @@ jobs:
     steps:
     - env:
         TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}"
+          }}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
         TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}"
+          }}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -1023,13 +1023,13 @@ jobs:
     steps:
     - env:
         TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}"
+          }}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
         TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}"
+          }}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -1362,13 +1362,13 @@ jobs:
     steps:
     - env:
         TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}"
+          }}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
         TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}"
+          }}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
@@ -1700,13 +1700,13 @@ jobs:
     steps:
     - env:
         TEST_FLAGS1: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
-          }}"
+          }}
       name: Set test-flags1
       run: echo "TEST_FLAGS1=$TEST_FLAGS1" >> $GITHUB_ENV
       shell: bash -l {0}
     - env:
         TEST_FLAGS2: ${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
-          }}"
+          }}
       name: Set test-flags2
       run: echo "TEST_FLAGS2=$TEST_FLAGS2" >> $GITHUB_ENV
       shell: bash -l {0}
