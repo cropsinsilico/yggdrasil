@@ -79,11 +79,13 @@ sdist.exclude = [
   "yggdrasil/core/tests",
   "yggdrasil/core/thirdparty",
   "yggdrasil/core/cpp/rapidjson",
+  "yggdrasil/examples/transforms/run_transforms.py",
 ]
 sdist.include = [
   "yggdrasil/_version.py",
   "yggdrasil/examples/convert_file/mesh.obj",
   "yggdrasil/examples/formatted_io6/Input/input.obj",
+  "yggdrasil/examples/*/src/CMakeLists.txt",
 ]
 wheel.exclude = [
   "CMakeLists.txt",
@@ -98,6 +100,7 @@ wheel.exclude = [
   "yggdrasil/core/fortran/*.F90",
   "yggdrasil/core/fortran/*.c",
   "yggdrasil/core/fortran/*.h",
+  "yggdrasil/examples/transforms/run_transforms.py",
 ]
 wheel.packages = ["yggdrasil"]
 wheel.install-dir = "yggdrasil"

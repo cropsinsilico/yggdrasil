@@ -1059,7 +1059,7 @@ class YggRequirement(object):
         return out
 
     def conda_requirement(self, for_build=False, padding=0,
-                          dont_isolate=False):
+                          dont_isolate=False, varients=None):
         r"""Get the formatted conda requirement string.
 
         Args:
@@ -1071,14 +1071,17 @@ class YggRequirement(object):
                before varients.
             dont_isolate (bool, optional): If True, don't isolate the
                package name. Defaults to False.
+            varients (list, optional): Selectors that should be used
 
         Returns:
             str: Conda requirement.
 
         """
-        varients = []
+        if varients is None:
+            varients = []
         if self.flags.get("cross_build", False) and for_build:
             varients.append("build_platform != target_platform")
+        varients += self.flags.get("conda_selectors", [])
         if self.os is not None:
             if self.os == 'unix':
                 varients.append('not win')

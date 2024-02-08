@@ -341,7 +341,7 @@ jobs:
         # ls .*
         coverage xml -i
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -357,7 +357,7 @@ jobs:
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if: ${{ success() }}
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}

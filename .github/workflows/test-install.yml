@@ -547,7 +547,7 @@ jobs:
 
         '
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -564,7 +564,7 @@ jobs:
       name: Create a log of Python package versions
       run: python utils/setup_test_env.py log
     - if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
@@ -906,7 +906,7 @@ jobs:
 
         '
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -923,7 +923,7 @@ jobs:
       name: Create a log of Python package versions
       run: python utils/setup_test_env.py log
     - if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
@@ -1249,7 +1249,7 @@ jobs:
 
         '
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -1266,7 +1266,7 @@ jobs:
       name: Create a log of Python package versions
       run: python utils/setup_test_env.py log
     - if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
@@ -1575,7 +1575,7 @@ jobs:
 
         '
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -1592,7 +1592,7 @@ jobs:
       name: Create a log of Python package versions
       run: python utils/setup_test_env.py log
     - if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
@@ -1900,7 +1900,7 @@ jobs:
 
         '
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -1917,7 +1917,7 @@ jobs:
       name: Create a log of Python package versions
       run: python utils/setup_test_env.py log
     - if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt

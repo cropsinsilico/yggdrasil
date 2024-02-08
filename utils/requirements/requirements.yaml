@@ -67,9 +67,18 @@ general:
   - scipy:
       flags:
         method_in_setup: conda
-  - setuptools_scm:
+  - setuptools_scm>=8:
+      method: conda_recipe
       host: True
       flags:
+        conda_selectors: [py>=38]
+        build: True
+        build_only: True
+  - setuptools_scm>=7.1.0:
+      method: conda_recipe
+      host: True
+      flags:
+        conda_selectors: [py<38]
         build: True
         build_only: True
   - six
