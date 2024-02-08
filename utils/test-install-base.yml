@@ -70,7 +70,7 @@ jobs:
       fail-fast: false
 
     steps: &steps
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - name: Set C installation based on matrix value
@@ -111,14 +111,14 @@ jobs:
     - name: (WINDOWS,PIP) Set up MSMPI
       uses: mpi4py/setup-mpi@v1
       if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI == 1
-    - name: Install R
-      uses: r-lib/actions/setup-r@v2
-      if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR == 1
-      with:
-        r-version: '4.2.3'
-        # windows-path-include-rtools: false
+    # - name: Install R
+    #   uses: r-lib/actions/setup-r@v2
+    #   if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLR == 1
+    #   with:
+    #     r-version: '4.2.3'
+    #     # windows-path-include-rtools: false
     - name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       with:
         path: ~/.cache/pip
@@ -126,7 +126,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       with:
         path: ~/Library/Caches/pip
@@ -134,7 +134,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       with:
         path: ~\AppData\Local\pip\Cache
@@ -142,12 +142,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: (PIP) Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os != 'macOS')
       with:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Python 3.7
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os == 'macOS'
       with:
         python-version: 3.7.16
@@ -186,7 +186,7 @@ jobs:
     # Conda/Mamba specific installation steps
     # ========================================================
     # - name: (CONDA) Cache conda
-    #   uses: actions/cache@v3
+    #   uses: actions/cache@v4
     #   if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
     #   env:
     #     # Increase this value to reset cache if file not changed
@@ -197,7 +197,7 @@ jobs:
     #       ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
     #       hashFiles('recipe/meta.yaml') }}
     - name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         auto-update-conda: true
@@ -335,14 +335,14 @@ jobs:
         # ls .*
         coverage xml -i
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
         token: ${{ secrets.CODECOV_TOKEN }}
     - name: Download the last successful workflow environment log
       if: ${{ always() }}
       continue-on-error: true
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: test-install.yml
@@ -351,7 +351,7 @@ jobs:
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if: ${{ success() }}
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -365,7 +365,7 @@ jobs:
       max-parallel: 20
       matrix:
         os-base: [ubuntu, macos, windows]
-        python-version: [3.7]
+        python-version: [3.8]
         install-method: [conda]
         test-flags1: [--long-running --mpi-script=run_mpi.sh]
         test-flags2: [--suite=examples --parametrize-example-name=backwards]
@@ -506,11 +506,11 @@ jobs:
     env:
       BUILDDOCS: 1
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
     - name: Install dependencies
@@ -557,7 +557,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -582,7 +582,7 @@ jobs:
           CIBW_ARCHS_WINDOWS: ${{ matrix.windows_arch }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/*.whl
   
@@ -593,12 +593,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
       - name: Build sdist
@@ -613,7 +613,7 @@ jobs:
           ygginfo
           pytest -m subset_rapidjson --import-mode=importlib tests
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sdist
           path: ./dist/*
@@ -658,11 +658,11 @@ jobs:
     if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) || github.event.schedule == '0 10 1 * *'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.9
     - name: Login to DockerHub
@@ -681,11 +681,11 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
     - name: Install dependencies
