@@ -294,10 +294,10 @@ jobs:
       }}
     steps:
     - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags1]
+      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
 
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags2]
+        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
 
         '
@@ -662,10 +662,10 @@ jobs:
       }}
     steps:
     - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags1]
+      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
 
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags2]
+        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
 
         '
@@ -1014,10 +1014,10 @@ jobs:
         - 5672:5672
     steps:
     - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags1]
+      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
 
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags2]
+        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
 
         '
@@ -1349,10 +1349,10 @@ jobs:
         - 5672:5672
     steps:
     - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags1]
+      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
 
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags2]
+        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
 
         '
@@ -1683,10 +1683,10 @@ jobs:
       }}
     steps:
     - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags1]
+      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
 
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags[matrix.test-flags2]
+        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
 
         '
