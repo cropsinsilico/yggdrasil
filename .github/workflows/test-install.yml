@@ -231,7 +231,7 @@ jobs:
       run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}"
         >> $GITHUB_OUTPUT
     - id: set-test-flags
-      run: echo "test-flags={\"\":\"\", \"basic\":\"--long-running --suites timing
+      run: echo "test-flags={\"empty\":\"\", \"basic\":\"--long-running --suites timing
         demos top\", \"examples\":\"--suite=examples --extra-examples --mpi-script=run_mpi.sh
         --mpi-nproc=3\", \"types-no-c\":\"--suite=types --skip-languages c cpp\",
         \"types-c\":\"--suite=types --languages c cpp\", \"long\":\"--long-running\",
@@ -293,14 +293,13 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
-    - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
+    - name: Set test-flags1
+      run: echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
-
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
+      shell: bash -l {0}
+    - name: Set test-flags2
+      run: echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
-
-        '
       shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
@@ -535,7 +534,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.TEST_FLAGS2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -546,7 +545,8 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.TEST_FLAGS2 != '' && contains(env.TEST_FLAGS2, '--mpi-script') }}
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+        }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -601,7 +601,7 @@ jobs:
           os-base: ubuntu
           python-version: 3.7
           test-flags1: long
-          test-flags2: ''
+          test-flags2: empty
         - install-c: true
           install-method: conda
           install-mpi: false
@@ -617,7 +617,7 @@ jobs:
           os-base: ubuntu
           python-version: '3.10'
           test-flags1: long
-          test-flags2: ''
+          test-flags2: empty
         - install-c: true
           install-method: conda
           install-mpi: false
@@ -625,7 +625,7 @@ jobs:
           os-base: ubuntu
           python-version: '3.11'
           test-flags1: long
-          test-flags2: ''
+          test-flags2: empty
         - install-c: true
           install-method: conda
           install-mpi: false
@@ -661,14 +661,13 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
-    - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
+    - name: Set test-flags1
+      run: echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
-
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
+      shell: bash -l {0}
+    - name: Set test-flags2
+      run: echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
-
-        '
       shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
@@ -903,7 +902,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.TEST_FLAGS2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -914,7 +913,8 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.TEST_FLAGS2 != '' && contains(env.TEST_FLAGS2, '--mpi-script') }}
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+        }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -969,7 +969,7 @@ jobs:
           os-base: windows
           python-version: 3.8
           test-flags1: long
-          test-flags2: ''
+          test-flags2: empty
         install-c:
         - true
         install-method:
@@ -990,7 +990,7 @@ jobs:
         - types-no-c
         - types-c
         test-flags2:
-        - ''
+        - empty
       max-parallel: 20
   test_rmq_conda:
     defaults:
@@ -1013,14 +1013,13 @@ jobs:
         ports:
         - 5672:5672
     steps:
-    - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
+    - name: Set test-flags1
+      run: echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
-
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
+      shell: bash -l {0}
+    - name: Set test-flags2
+      run: echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
-
-        '
       shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
@@ -1255,7 +1254,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.TEST_FLAGS2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -1266,7 +1265,8 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.TEST_FLAGS2 != '' && contains(env.TEST_FLAGS2, '--mpi-script') }}
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+        }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -1348,14 +1348,13 @@ jobs:
         ports:
         - 5672:5672
     steps:
-    - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
+    - name: Set test-flags1
+      run: echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
-
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
+      shell: bash -l {0}
+    - name: Set test-flags2
+      run: echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
-
-        '
       shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
@@ -1590,7 +1589,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.TEST_FLAGS2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -1601,7 +1600,8 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.TEST_FLAGS2 != '' && contains(env.TEST_FLAGS2, '--mpi-script') }}
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+        }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -1663,7 +1663,7 @@ jobs:
         test-flags1:
         - long-interp
         test-flags2:
-        - ''
+        - empty
   test_stripped:
     env:
       INSTALLC: 0
@@ -1682,14 +1682,13 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
-    - name: Set test flags
-      run: 'echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
+    - name: Set test-flags1
+      run: echo "TEST_FLAGS1=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]
         }}" >> $GITHUB_ENV
-
-        echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
+      shell: bash -l {0}
+    - name: Set test-flags2
+      run: echo "TEST_FLAGS2=${{ fromJSON(needs.params.outputs.test-flags)[matrix.test-flags2]
         }}" >> $GITHUB_ENV
-
-        '
       shell: bash -l {0}
     - uses: actions/checkout@v4
       with:
@@ -1924,7 +1923,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.TEST_FLAGS2 != '' }}
+      if: ${{ env.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -1935,7 +1934,8 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.TEST_FLAGS2 != '' && contains(env.TEST_FLAGS2, '--mpi-script') }}
+      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+        }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
       timeout-minutes: 180
@@ -1999,7 +1999,7 @@ jobs:
         test-flags1:
         - long
         test-flags2:
-        - ''
+        - empty
   upload_sdist:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Upload sdist
