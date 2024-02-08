@@ -8,6 +8,8 @@ from yggdrasil import rapidjson
 
 
 def add_tests_to_modules(rootdir):
+    if not os.path.isdir(os.path.join(rootdir, "tests")):
+        return
     print(f"Adding test directory to the loaded modules {rootdir}")
     added_root = False
     if rootdir not in sys.path:
