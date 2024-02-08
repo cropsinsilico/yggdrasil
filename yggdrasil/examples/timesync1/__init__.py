@@ -1,6 +1,6 @@
 def get_testing_options(example_name='timesync1'):
     r"""Get testing parameters for this example."""
-    def validation_function():
+    def validation_function(rootdir=None):
         import os
         import tempfile
         from yggdrasil.examples.timesync1.plot_timesync import main

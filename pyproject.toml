@@ -85,6 +85,8 @@ sdist.include = [
   "yggdrasil/_version.py",
   "yggdrasil/examples/convert_file/mesh.obj",
   "yggdrasil/examples/formatted_io6/Input/input.obj",
+  "yggdrasil/demos/fspm2020/meshes/*.obj",
+  "yggdrasil/demos/CiS2021-hackathon/meshes/*.obj",
   "yggdrasil/examples/*/src/CMakeLists.txt",
 ]
 wheel.exclude = [

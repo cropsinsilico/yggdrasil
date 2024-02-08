@@ -214,11 +214,12 @@ class TestExample(base_class):
 
     @pytest.fixture
     def check_results(self, results, output_files, check_file_exists,
-                      check_file_size, check_file_contents, testing_options):
+                      check_file_size, check_file_contents,
+                      testing_options, yamldir):
         r"""This should be overridden with checks for the result."""
         def check_results_w():
             if testing_options.get('validation_function', False):
-                testing_options['validation_function']()
+                testing_options['validation_function'](rootdir=yamldir)
             if testing_options.get('skip_check_results', False):
                 return
             res_list = results

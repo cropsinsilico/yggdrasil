@@ -52,6 +52,7 @@ class ServiceBase(YggClass):
         address (str, optional): The address that the service can be accessed
             from. Defaults to ('services', 'address') configuration option, if
             set, and None if not.
+        debug (bool, optional): If true, debugging will be turned on.
         *args: Additional arguments are used to initialize the client/server
             connection.
         **kwargs: Additional keyword arguments are used to initialize the
@@ -66,6 +67,7 @@ class ServiceBase(YggClass):
         self.for_request = kwargs.pop('for_request', False)
         self.address = kwargs.pop('address', None)
         self.port = kwargs.pop('port', None)
+        self.enable_debugging = kwargs.pop('debug', False)
         if self.address is None:
             self.address = _default_address
         if self.address is None:
@@ -96,20 +98,21 @@ class ServiceBase(YggClass):
         else:
             return self._is_running
     
-    def wait_for_server(self, timeout=15.0):
+    def wait_for_server(self, **kwargs):
         r"""Wait for a service to start running.
 
         Args:
-            timeout (float, optional): Time (in seconds) that should be waited
-                for the server to start. Defaults to 15.
+            **kwargs: Additional keyword arguments are passed to
+                yggdrasil.multitasking.wait_on_function
 
         Raises:
             RuntimeError: If the time limit is reached and the server still
                 hasn't started.
 
         """
-        wait_on_function(lambda: self.is_running, timeout=timeout,
-                         on_timeout="Server never started")
+        kwargs.setdefault("on_timeout", "Server never started")
+        kwargs.setdefault("timeout", 15)
+        wait_on_function(lambda: self.is_running, **kwargs)
 
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests."""
@@ -160,6 +163,8 @@ class ServiceBase(YggClass):
             repo_dir = self.registry.add_from_repository(model_repository)
             os.environ.setdefault(_service_repo_dir, repo_dir)
         os.environ.setdefault(_service_host_env, remote_url)
+        if self.enable_debugging:
+            log_level = logging.DEBUG
         if log_level is not None:
             self.set_log_level(log_level)
         if with_coverage:  # pragma: testing
@@ -372,10 +377,12 @@ class FlaskService(ServiceBase):
         default_handler.setLevel(level=log_level)
         self.app.logger.setLevel(level=log_level)
         werkzeug_logger.setLevel(level=log_level)
+        self.logger.setLevel(level=log_level)
         
     def run_server(self):
         r"""Begin listening for requests."""
-        self.app.run(host='0.0.0.0', port=self.port)
+        self.app.run(host='0.0.0.0', port=self.port,
+                     debug=self.enable_debugging)
 
     def shutdown(self):
         r"""Shutdown the process from the server."""

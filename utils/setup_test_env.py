@@ -523,7 +523,8 @@ class SetupParam(object):
 
 def prune_windows_path():
     to_remove = (
-        'C:\\Program Files\\Microsoft SQL Server', )
+        'C:\\Program Files\\Microsoft SQL Server',
+        'C:\\Strawberry')
     # to_remove = [
     #     'C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn',
     #     'C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn',
@@ -539,8 +540,13 @@ def prune_windows_path():
     #     if x in path_list:
     #         path_list.remove(x)
     new_path = os.pathsep.join(path_list)
-    print(f"PRUNED PATH ({len(os.environ['PATH'])}): {new_path}")
-    cmds = [f"set \"PATH={new_path}\""]
+    cmds = []
+    if len(new_path) == len(os.environ['PATH']):
+        print("PRUNED PATH not any shorter")
+    else:
+        print(f"PRUNED PATH ({len(os.environ['PATH'])}):\n"
+              f"{pprint.pformat(new_path.split(os.pathsep))}\n")
+        cmds += [f"set \"PATH={new_path}\""]
     return cmds
     
 
@@ -1150,7 +1156,7 @@ def build_conda_recipe(recipe='recipe', param=None,
         conda_build = f"{CONDA_CMD} mambabuild"
         build_pkgs = ["boa"]
         if _is_win and _on_gha:
-            build_pkgs.append("\"conda-build<24.1.0\"")
+            build_pkgs.append("\"conda-build<3.23.0\"")
         build_flags += ' -c conda-forge'
     else:
         conda_build = f"{CONDA_CMD} build"

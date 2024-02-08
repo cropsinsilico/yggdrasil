@@ -6,11 +6,13 @@ def get_testing_options():
     file_exp = os.path.join('Output', 'expected.txt')
     file_act = 'output.txt'
 
-    def validation_function():
+    def validation_function(rootdir=None):
         from yggdrasil import serialize
         import numpy as np
-        fname_exp = os.path.join(os.path.dirname(__file__), file_exp)
-        fname_act = os.path.join(os.path.dirname(__file__), file_act)
+        if rootdir is None:
+            rootdir = os.path.dirname(__file__)
+        fname_exp = os.path.join(rootdir, file_exp)
+        fname_act = os.path.join(rootdir, file_act)
         with open(fname_exp, 'rb') as fd:
             exp = serialize.table_to_array(fd.read(), comment='#')
         with open(fname_act, 'rb') as fd:

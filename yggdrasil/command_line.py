@@ -411,7 +411,10 @@ class integration_service_manager(SubCommand):
                          {'type': int,
                           'help': ('Level of logging that should be '
                                    'performed for the service manager '
-                                   'application.')})]),
+                                   'application.')}),
+                        (('--debug', ),
+                         {'action': 'store_true',
+                          'help': 'Turn on debugging'})]),
                 ArgumentParser(
                     name='stop',
                     help=('Stop an integration service manager or '
@@ -482,7 +485,8 @@ class integration_service_manager(SubCommand):
                                       commtype=args.commtype,
                                       address=args.address,
                                       port=args.port,
-                                      for_request=for_request)
+                                      for_request=for_request,
+                                      debug=args.debug)
         if args.action in ['start', None]:
             if integration_name is None:
                 if not x.is_running:

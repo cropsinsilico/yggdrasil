@@ -139,6 +139,7 @@ class TestServices(object):
             pytest.skip("redundent test")
         cli = running_service
         test_yml = ex_yamls['fakeplant']['python']
+        assert not os.path.isfile('test')
         with pytest.raises(KeyError):
             cli.registry.remove('test')
         with pytest.raises(ServerError):

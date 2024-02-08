@@ -62,11 +62,11 @@ class YggFunction(YggClass):
         if service_address:
             # Temporary YAML describing the service
             contents = (f'service:\n'
-                        f'    name: {model_yaml}\n'
+                        f'    name: {self.model_yaml}\n'
                         f'    address: {service_address}\n')
             self.model_yaml = os.path.join(os.getcwd(),
                                            self.dummy_name + '.yml')
-            with open(model_yaml, 'w') as fd:
+            with open(self.model_yaml, 'w') as fd:
                 fd.write(contents)
         self.runner = None
         self.run()

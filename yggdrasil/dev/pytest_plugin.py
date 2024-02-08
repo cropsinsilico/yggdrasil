@@ -31,7 +31,8 @@ def pytest_load_initial_conftests(early_config, parser, args):
         for x in options.file_or_dir:
             if test_split in x:
                 rootdir = x.split(test_split)[0] + "yggdrasil"
-    options._yggdrasil_tests_directory = os.path.join(rootdir, "tests")
+    options._yggdrasil_tests_directory = os.path.abspath(
+        os.path.join(rootdir, "tests"))
     add_tests_to_modules(rootdir)
 
 
