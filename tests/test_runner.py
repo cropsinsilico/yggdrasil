@@ -21,7 +21,7 @@ def test_run_compilation_opt(requires_asan):
     namespace = f"test_run_compilation_opt_{uuid.uuid4()}"
     runner.run([ex_yamls['gs_lesson3']['cpp']],
                with_asan=True, disable_python_c_api=True,
-               namespace=namespace)
+               namespace=namespace, overwrite=True)
 
 
 def test_get_run():

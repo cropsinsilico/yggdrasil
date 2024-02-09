@@ -498,7 +498,9 @@ LANG2EXT_FULL = {
         '.hh', '.hp', '.h',
     ],
     'dummy': [],
-    'executable': [],
+    'executable': [
+        '.exe',
+    ],
     'fortran': [
         '.f90', '.f77', '.f', '.h',
     ],
@@ -568,6 +570,9 @@ EXT2LANG_FULL = {
     '.cxx': [
         'c++', 'cpp', 'cxx',
     ],
+    '.exe': [
+        'executable',
+    ],
     '.f': [
         'fortran',
     ],
@@ -618,9 +623,9 @@ EXT2LANG_FULL = {
 EXT2LANG = {v: k for k, v in LANG2EXT.items()}
 ALL_LANGUAGE_EXTS = [
     '.C', '.CPP', '.H', '.HPP', '.R', '.c', '.c++',
-    '.cc', '.cp', '.cpp', '.cxx', '.f', '.f77', '.f90',
-    '.h', '.h++', '.hh', '.hp', '.hpp', '.hxx', '.jl',
-    '.lpy', '.m', '.py', '.tcc', '.xml',
+    '.cc', '.cp', '.cpp', '.cxx', '.exe', '.f', '.f77',
+    '.f90', '.h', '.h++', '.hh', '.hp', '.hpp', '.hxx',
+    '.jl', '.lpy', '.m', '.py', '.tcc', '.xml',
 ]
 LANGUAGES = {
     'compiled': [

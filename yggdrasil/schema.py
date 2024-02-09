@@ -312,6 +312,8 @@ def update_constants(schema=None):
         else:
             if k not in lang2ext_full:
                 lang2ext_full[k] = drv.get_language_ext()
+                if k in lang2ext and lang2ext[k] not in lang2ext_full[k]:
+                    lang2ext_full[k].append(lang2ext[k])
             for ka in drv.language_aliases:
                 lang2ext_full[ka] = lang2ext_full[k]
         languages.setdefault(drv_type, [])

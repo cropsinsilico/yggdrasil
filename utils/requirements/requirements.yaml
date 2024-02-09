@@ -72,19 +72,12 @@ general:
   - scipy:
       flags:
         method_in_setup: conda
-  - setuptools_scm>=7.1.0:
+  - setuptools_scm:
       method: conda_recipe
       host: True
       flags:
+        build: True
         build_only: True
-  - setuptools_scm>=8:
-      method: conda_recipe
-      flags:
-        conda_selectors: [py>=38]
-  - setuptools_scm>=7.1.0:
-      method: conda_recipe
-      flags:
-        conda_selectors: [py<38]
   - six
   - toml
   - unyt

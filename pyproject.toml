@@ -1,8 +1,7 @@
 [build-system]
 requires = [
   "scikit-build-core",
-  "setuptools_scm>=7.1; python_version<'3.8'",
-  "setuptools_scm>=8; python_version>='3.8'",
+  "setuptools_scm",
   "hatch-fancy-pypi-readme",
   "numpy",
 ]
@@ -118,7 +117,7 @@ metadata.scripts.provider-path = "."
 [tool.setuptools_scm]
 # version_file = "yggdrasil/_version.py"
 write_to = "yggdrasil/_version.py"
-git_describe_command = "git describe --tags --abbrev=0"
+git_describe_command = "git describe --tags --long"
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
 content-type = "text/x-rst"

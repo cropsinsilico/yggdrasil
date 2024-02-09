@@ -120,31 +120,12 @@
       }
     },
     {
-      "setuptools_scm>=7.1.0": {
+      "setuptools_scm": {
         "method": "conda_recipe",
         "host": true,
         "flags": {
+          "build": true,
           "build_only": true
-        }
-      }
-    },
-    {
-      "setuptools_scm>=8": {
-        "method": "conda_recipe",
-        "flags": {
-          "conda_selectors": [
-            "py>=38"
-          ]
-        }
-      }
-    },
-    {
-      "setuptools_scm>=7.1.0": {
-        "method": "conda_recipe",
-        "flags": {
-          "conda_selectors": [
-            "py<38"
-          ]
         }
       }
     },
