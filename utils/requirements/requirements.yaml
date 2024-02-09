@@ -72,7 +72,7 @@ general:
   - scipy:
       flags:
         method_in_setup: conda
-  - setuptools_scm:
+  - setuptools_scm>=7.1.0:
       method: conda_recipe
       host: True
       flags:

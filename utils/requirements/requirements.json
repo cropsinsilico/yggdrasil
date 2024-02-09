@@ -120,7 +120,7 @@
       }
     },
     {
-      "setuptools_scm": {
+      "setuptools_scm>=7.1.0": {
         "method": "conda_recipe",
         "host": true,
         "flags": {

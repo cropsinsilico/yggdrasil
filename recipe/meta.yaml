@@ -59,7 +59,7 @@ requirements:
     - pip
     - python
     - scikit-build-core
-    - setuptools_scm
+    - setuptools_scm >=7.1.0
     - sysv_ipc  # [not win]
   run:
     - GitPython
