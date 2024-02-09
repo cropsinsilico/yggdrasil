@@ -3,6 +3,8 @@ from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 import shutil
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 
 class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
@@ -142,6 +144,10 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
             out['CONDA_JL_CONDA_EXE'] = out['CONDA_EXE']
             out['JULIA_SSL_CA_ROOTS_PATH'] = os.path.join(
                 out['CONDA_PREFIX'], 'ssl', 'cacert.pem')
+            if not os.path.isfile(out['JULIA_SSL_CA_ROOTS_PATH']):
+                logger.info(f"Guess at JULIA_SSL_CA_ROOTS_PATH does not "
+                            f"exist ({out['JULIA_SSL_CA_ROOTS_PATH']})")
+                out['JULIA_SSL_CA_ROOTS_PATH'] = ""
         return out
 
     @classmethod

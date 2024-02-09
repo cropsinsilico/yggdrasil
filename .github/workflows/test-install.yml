@@ -432,7 +432,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -536,7 +536,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.test-flags2 != 'empty' }}
+      if: ${{ matrix.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -547,7 +547,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+      if: ${{ matrix.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -802,7 +802,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -906,7 +906,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.test-flags2 != 'empty' }}
+      if: ${{ matrix.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -917,7 +917,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+      if: ${{ matrix.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -1156,7 +1156,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1260,7 +1260,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.test-flags2 != 'empty' }}
+      if: ${{ matrix.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -1271,7 +1271,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+      if: ${{ matrix.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -1493,7 +1493,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1597,7 +1597,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.test-flags2 != 'empty' }}
+      if: ${{ matrix.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -1608,7 +1608,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+      if: ${{ matrix.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh
@@ -1829,7 +1829,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1933,7 +1933,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2
-      if: ${{ env.test-flags2 != 'empty' }}
+      if: ${{ matrix.test-flags2 != 'empty' }}
       name: Run tests (2nd)
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       timeout-minutes: 180
@@ -1944,7 +1944,7 @@ jobs:
       timeout-minutes: 180
     - continue-on-error: true
       id: test2_script
-      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
+      if: ${{ matrix.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script')
         }}
       name: Run generated test script (2nd)
       run: ./run_mpi.sh

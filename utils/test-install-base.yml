@@ -215,7 +215,7 @@ jobs:
     #       ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
     #       hashFiles('recipe/meta.yaml') }}
     - name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         auto-update-conda: true
@@ -318,7 +318,7 @@ jobs:
 
     - name: Run tests (2nd)
       timeout-minutes: 180
-      if: ${{ env.test-flags2 != 'empty' }}
+      if: ${{ matrix.test-flags2 != 'empty' }}
       id: test2
       run: pytest --ci --cov-append ${{ env.TEST_FLAGS2 }}
       continue-on-error: true
@@ -329,7 +329,7 @@ jobs:
 
     - name: Run generated test script (2nd)
       timeout-minutes: 180
-      if: ${{ env.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script') }}
+      if: ${{ matrix.test-flags2 != 'empty' && contains(env.TEST_FLAGS2, '--mpi-script') }}
       id: test2_script
       run: ./run_mpi.sh
       continue-on-error: true

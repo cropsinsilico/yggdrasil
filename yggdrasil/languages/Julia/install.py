@@ -126,6 +126,7 @@ def call_julia(julia_cmd, **kwargs):
     with open(julia_script, 'w') as fd:
         fd.write('\n'.join(julia_cmd))
         logger.info('Running:\n    ' + '\n    '.join(julia_cmd))
+    display_env('Running with env')
     try:
         julia_exe = shutil.which('julia')
         if not julia_exe:
@@ -163,7 +164,22 @@ def set_env(env=None):
         env['CONDA_JL_CONDA_EXE'] = env['CONDA_EXE']
         env['JULIA_SSL_CA_ROOTS_PATH'] = os.path.join(
             env['CONDA_PREFIX'], 'ssl', 'cacert.pem')
+        if not os.path.isfile(env['JULIA_SSL_CA_ROOTS_PATH']):
+            logger.info(f"Guess at JULIA_SSL_CA_ROOTS_PATH does not "
+                        f"exist ({env['JULIA_SSL_CA_ROOTS_PATH']})")
+            env['JULIA_SSL_CA_ROOTS_PATH'] = ""
     return env
+
+
+def display_env(prefix, env=None):
+    if env is None:
+        env = os.environ
+    msg = f"{prefix}:\n"
+    for k in ['CONDA_PREFIX', 'CONDA_JL_HOME', 'CONDA_JL_CONDA_EXE',
+              'JULIA_DEPOT_PATH', 'JULIA_LOAD_PATH', 'JULIA_PROJECT',
+              'JULIA_SSL_CA_ROOTS_PATH']:
+        msg += f"    {k} = {env.get(k, None)}\n"
+    logger.info(msg)
 
 
 def make_call(julia_cmd, with_sudo=False, **kwargs):
@@ -240,10 +256,7 @@ def install(args=None, skip_requirements=None, update_requirements=None):
     if update_requirements:
         skip_requirements = False
     kwargs = {'cwd': lang_dir}
-    for k in ['CONDA_PREFIX', 'CONDA_JL_HOME', 'CONDA_JL_CONDA_EXE',
-              'JULIA_DEPOT_PATH', 'JULIA_LOAD_PATH', 'JULIA_PROJECT',
-              'JULIA_SSL_CA_ROOTS_PATH']:
-        print(f"Julia install: {k} = {os.environ.get(k, None)}")
+    display_env("Julia install")
     # Install requirements
     # TODO: Determine if develop calls install for deps
     requirements = requirements_from_project_toml()

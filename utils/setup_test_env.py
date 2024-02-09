@@ -1155,8 +1155,8 @@ def build_conda_recipe(recipe='recipe', param=None,
     if param.use_mamba:
         conda_build = f"{CONDA_CMD} mambabuild"
         build_pkgs = ["boa"]
-        if _is_win and _on_gha:
-            build_pkgs.append("\"conda-build<3.23.0\"")
+        # if _is_win and _on_gha:
+        #     build_pkgs.append("\"conda-build<3.23.0\"")
         build_flags += ' -c conda-forge'
     else:
         conda_build = f"{CONDA_CMD} build"
