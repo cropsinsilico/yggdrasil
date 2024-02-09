@@ -26,9 +26,9 @@ class TestUnits(base_class):
     def test_has_units(self, vars_nounits, vars_units):
         r"""Test has_units."""
         for v in vars_nounits:
-            assert(not units.has_units(v))
+            assert not units.has_units(v)
         for v in vars_units:
-            assert(units.has_units(v))
+            assert units.has_units(v)
 
     def test_invalid_unit(self):
         r"""Test error when an invalid unit is added."""
@@ -38,30 +38,30 @@ class TestUnits(base_class):
     def test_get_data(self, vars_units, vars_nounits, nested_approx):
         r"""Test get_data."""
         for v in vars_nounits:
-            assert(units.get_data(v) == nested_approx(v))
+            assert units.get_data(v) == nested_approx(v)
         for vno, v in zip(vars_nounits, vars_units):
-            assert(units.get_data(v) == nested_approx(vno))
+            assert units.get_data(v) == nested_approx(vno)
 
     def test_get_units(self, vars_units, vars_nounits):
         r"""Test get_units."""
         for v in vars_nounits:
-            assert(units.get_units(v) == '')
+            assert units.get_units(v) == ''
         for v in vars_units:
-            assert(units.get_units(v) == str(units.as_unit('cm')))
+            assert units.get_units(v) == str(units.as_unit('cm'))
 
     def test_add_units(self, vars_nounits):
         r"""Test add_units."""
         for v in vars_nounits:
             x = units.add_units(v, 'cm')
-            assert(units.has_units(x))
-        assert(units.add_units(1.0, '') == 1.0)
-        assert(units.add_units(1.0, 'n/a') == 1.0)
+            assert units.has_units(x)
+        assert units.add_units(1.0, '') == 1.0
+        assert units.add_units(1.0, 'n/a') == 1.0
 
     def test_is_null_unit(self):
         r"""Test is_null_unit."""
-        assert(units.is_null_unit('n/a'))
-        assert(units.is_null_unit(''))
-        assert(not units.is_null_unit('cm'))
+        assert units.is_null_unit('n/a')
+        assert units.is_null_unit('')
+        assert not units.is_null_unit('cm')
 
     def test_as_unit(self):
         r"""Test as_unit."""
@@ -71,14 +71,14 @@ class TestUnits(base_class):
 
     def test_is_unit(self):
         r"""Test is_unit."""
-        assert(units.is_unit('n/a'))
-        assert(units.is_unit(''))
-        assert(units.is_unit('cm/s**2'))
+        assert units.is_unit('n/a')
+        assert units.is_unit('')
+        assert units.is_unit('cm/s**2')
         # Not supported by unyt
-        assert(units.is_unit('cm/s^2'))
-        assert(units.is_unit('umol'))
-        assert(units.is_unit('mmol'))
-        assert(not units.is_unit('invalid'))
+        assert units.is_unit('cm/s^2')
+        assert units.is_unit('umol')
+        assert units.is_unit('mmol')
+        assert not units.is_unit('invalid')
 
     def test_convert_to(self, vars_units):
         r"""Test convert_to."""
@@ -92,12 +92,12 @@ class TestUnits(base_class):
 
     def test_are_compatible(self):
         r"""Test are_compatible."""
-        assert(units.are_compatible('cm', 'm'))
-        assert(units.are_compatible('cm', ''))
-        assert(not units.are_compatible('cm', 's'))
-        assert(not units.are_compatible('cm', 'invalid'))
-        assert(units.are_compatible('d', 'hr'))
-        assert(units.are_compatible('hr', 'd'))
+        assert units.are_compatible('cm', 'm')
+        assert units.are_compatible('cm', '')
+        assert not units.are_compatible('cm', 's')
+        assert not units.are_compatible('cm', 'invalid')
+        assert units.are_compatible('d', 'hr')
+        assert units.are_compatible('hr', 'd')
 
     def test_convert_R_unit_string(self):
         r"""Test convert_R_unit_string."""
@@ -111,6 +111,38 @@ class TestUnits(base_class):
                  ('', ''),
                  ('cm**(-2)', 'cm**-2')]
         for x, y in pairs:
-            assert(str(units.Units(x)) == y)
-            assert(str(units.Units(y)) == y)
+            assert str(units.Units(x)) == y
+            assert str(units.Units(y)) == y
             units.add_units(1.0, x)
+
+    def test_serialization_units(self):
+        r"""Test rapidjson serialization of rapidjson.Units"""
+        from yggdrasil import rapidjson
+        x = units.Units("cm")
+        print(units.Units.__module__)
+        print(rapidjson.dumps(x))
+        assert rapidjson.dumps(x) == "\"cm\""
+
+    def test_pickle_units(self):
+        r"""Test pickling of rapidjson.Units"""
+        import pickle
+        x = units.Units("cm")
+        dumped = pickle.dumps(x)
+        loaded = pickle.loads(dumped)
+        assert loaded == x
+
+    def test_pickle_quantity(self):
+        r"""Test pickling of rapidjson.Quantity"""
+        import pickle
+        x = units.Quantity(1, "cm")
+        dumped = pickle.dumps(x)
+        loaded = pickle.loads(dumped)
+        assert loaded == x
+
+    def test_pickle_quantity_array(self):
+        r"""Test pickling of rapidjson.QuantityArray"""
+        import pickle
+        x = units.QuantityArray([1, 1, 1], "cm")
+        dumped = pickle.dumps(x)
+        loaded = pickle.loads(dumped)
+        assert np.array_equal(loaded, x)

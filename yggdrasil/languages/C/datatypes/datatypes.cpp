@@ -2306,7 +2306,10 @@ extern "C" {
     try {
       Header* head_ = (Header*)(head.head);
       head_->finalize_recv();
-      return update_dtype(dtype, header_schema(head));
+      void* schema = header_schema(head);
+      if (schema == NULL)
+	return 1;
+      return update_dtype(dtype, schema);
     } catch(...) {
       ygglog_error("parse_type_in_data: C++ exception thrown.");
       return -1;

@@ -1,6 +1,5 @@
 import os
 import copy
-import six
 import importlib
 import contextlib
 import weakref
@@ -450,8 +449,7 @@ class ComponentBaseUnregistered(object):
                 getattr(self, k).disconnect()
 
 
-@six.add_metaclass(ComponentMeta)
-class ComponentBase(ComponentBaseUnregistered):
+class ComponentBase(ComponentBaseUnregistered, metaclass=ComponentMeta):
     r"""Base class for schema components.
 
     Args:

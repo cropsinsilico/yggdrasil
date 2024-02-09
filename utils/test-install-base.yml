@@ -45,7 +45,6 @@ jobs:
       - id: set-os-versions
         run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}" >> $GITHUB_OUTPUT
       - id: set-test-flags
-        # run: echo "testflags={\"empty\":\"\", \"basic\":\"--long-running --suites timing demos top\"}" >> $GITHUB_OUTPUT
         run: echo "testflags={\"empty\":\"\", \"basic\":\"--long-running --suites timing demos top\", \"examples\":\"--suite=examples --extra-examples --mpi-script=run_mpi.sh --mpi-nproc=3\", \"types-no-c\":\"--suite=types --skip-languages c cpp\", \"types-c\":\"--suite=types --languages c cpp\", \"long\":\"--long-running\", \"long-mpi\":\"--long-running --mpi-script=run_mpi.sh\", \"examples-backwards\":\"--suite=examples --parametrize-example-name=backwards\", \"examples-sbml\":\"--suites examples --parametrize-language=sbml\", \"long-remote-service\":\"--long-running --remote-service\", \"examples-rpc-lesson3\":\"--suites examples top --parametrize-example-name=rpc_lesson3\", \"tools\":\"tests/test_tools.py\", \"long-interp\":\"--long-running --languages python R matlab\", \"services\":\"tests/test_services.py --nocapture\"}" >> $GITHUB_OUTPUT
   test_pip:
     needs: params

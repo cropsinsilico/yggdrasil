@@ -1,5 +1,8 @@
 # TODO: Access utils/manage_requirements.py directly
 import json
+import logging
+import pprint
+logger = logging.getLogger(__name__)
 
 
 def dynamic_metadata(field, settings=None):
@@ -20,4 +23,6 @@ def dynamic_metadata(field, settings=None):
         with open("console_scripts.txt", "r") as fd:
             out = {k: v for k, v in
                    [x.split('=') for x in fd.read().splitlines()]}
+    logger.info(f"Generated dynamic metadata {field} ="
+                f" {pprint.pformat(out)}")
     return out
