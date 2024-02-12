@@ -544,7 +544,7 @@ def prune_windows_path():
     if len(new_path) == len(os.environ['PATH']):
         print("PRUNED PATH not any shorter")
     else:
-        print(f"PRUNED PATH ({len(os.environ['PATH'])}):\n"
+        print(f"PRUNED PATH ({len(new_path)}):\n"
               f"{pprint.pformat(new_path.split(os.pathsep))}\n")
         cmds += [f"set \"PATH={new_path}\""]
     return cmds

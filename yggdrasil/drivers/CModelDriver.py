@@ -415,7 +415,7 @@ class ClangLinker(LDLinker):
                                **{'linker-version': '-mlinker-version=%s',
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
-    asan_flags = ['-fsanitize=address', '-shared-libasan']
+    asan_flags = ['-fsanitize=address']
 
     @staticmethod
     def before_registration(cls):
@@ -467,6 +467,9 @@ class ClangLinker(LDLinker):
                 # as existing installs still have this mismatch
                 kwargs['linker-version'] = ld_version
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
+        if kwargs.get('with_asan', False):
+            if kwargs.get('build_library', False):
+                out.append('-shared-libasan')
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
             if 'conda' not in cls.get_executable(full_path=True):

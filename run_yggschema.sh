@@ -60,7 +60,9 @@ if [ -n "$OUTSIDE_DIR" ]; then
     cd ..
     PREFIX_PATH="yggdrasil/"
 fi
-pytest -svx --ygg-debug --suite=demos ${PREFIX_PATH}tests/demos/test_fspm2020.py::TestFSPM2020Demo::test_run[plant_v1_cpp]
+pytest -svx --ygg-debug ${PREFIX_PATH}tests/test_runner.py::test_run_compilation_opt
+# pytest -svx --suite=mpi --mpi-script=run_mpi.sh
+# pytest -svx --ygg-debug --suite=demos ${PREFIX_PATH}tests/demos/test_fspm2020.py::TestFSPM2020Demo::test_run[plant_v1_cpp]
 # pytest -svx tests/communication/transforms/test_TransformBase.py
 export PYTHONFAULTHANDLER=0
 unset PYTHONFAULTHANDLER

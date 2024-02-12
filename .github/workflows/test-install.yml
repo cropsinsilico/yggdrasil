@@ -440,7 +440,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -458,7 +458,9 @@ jobs:
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       name: (CONDA) Build package in base environment
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -467,7 +469,9 @@ jobs:
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       name: (CONDA) Build package in base environment (re-attempt)
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -512,8 +516,7 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: CALL "%CONDA_BAT%" activate test && pytest --ci --cov-append --nocapture
-        tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
@@ -833,7 +836,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -851,7 +854,9 @@ jobs:
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       name: (CONDA) Build package in base environment
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -860,7 +865,9 @@ jobs:
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       name: (CONDA) Build package in base environment (re-attempt)
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -905,8 +912,7 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: CALL "%CONDA_BAT%" activate test && pytest --ci --cov-append --nocapture
-        tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
@@ -1202,7 +1208,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1220,7 +1226,9 @@ jobs:
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       name: (CONDA) Build package in base environment
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -1229,7 +1237,9 @@ jobs:
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       name: (CONDA) Build package in base environment (re-attempt)
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -1274,8 +1284,7 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: CALL "%CONDA_BAT%" activate test && pytest --ci --cov-append --nocapture
-        tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
@@ -1552,7 +1561,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1570,7 +1579,9 @@ jobs:
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       name: (CONDA) Build package in base environment
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -1579,7 +1590,9 @@ jobs:
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       name: (CONDA) Build package in base environment (re-attempt)
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -1624,8 +1637,7 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: CALL "%CONDA_BAT%" activate test && pytest --ci --cov-append --nocapture
-        tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
@@ -1901,7 +1913,7 @@ jobs:
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         channel-priority: strict
@@ -1919,7 +1931,9 @@ jobs:
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
       name: (CONDA) Build package in base environment
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -1928,7 +1942,9 @@ jobs:
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
         'conda' || matrix.install-method == 'mamba')}}
       name: (CONDA) Build package in base environment (re-attempt)
-      run: 'conda activate base
+      run: 'conda deactivate
+
+        conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }} --use-mamba
@@ -1973,8 +1989,7 @@ jobs:
     - if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method
         == 'mamba')
       name: Run cmake test in command prompt (CONDA)
-      run: CALL "%CONDA_BAT%" activate test && pytest --ci --cov-append --nocapture
-        tests/drivers/test_CMakeModelDriver.py
+      run: pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
