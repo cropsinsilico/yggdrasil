@@ -141,7 +141,7 @@ def setup_ci(opts, disable_extra=False):
                            "directory of the yggdrasil git repository.")
     src_cmd = ('python -c \"import setuptools_scm; '
                'print(setuptools_scm.get_version('
-               'git_describe_command = \\\"git describe --tags --abbrev=0\\\"))\"')
+               'git_describe_command = \\\"git describe --tags --long\\\"))\"')
     dst_cmd = ('python -c \"import yggdrasil; '
                'print(yggdrasil.__version__)\"')
     dir_cmd = ('python -c \"import yggdrasil; '
