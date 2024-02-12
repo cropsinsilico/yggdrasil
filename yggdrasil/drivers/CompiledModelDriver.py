@@ -3438,7 +3438,7 @@ class CompiledModelDriver(ModelDriver):
             include_dirs += cls.get_dependency_include_dirs(dep, toolname=toolname)
         # Add flags for included directories
         if directory is not None:
-            include_dirs.insert(0, directory)
+            include_dirs.insert(0, os.path.abspath(directory))
         # Update kwargs
         if include_dirs:
             kwargs['include_dirs'] = include_dirs

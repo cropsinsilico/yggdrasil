@@ -139,9 +139,19 @@ def setup_ci(opts, disable_extra=False):
     if not os.path.isfile('pyproject.toml'):
         raise RuntimeError("The CI tests must be run from the root "
                            "directory of the yggdrasil git repository.")
-    src_cmd = ('python -c \"import setuptools_scm; '
-               'print(setuptools_scm.get_version('
-               'git_describe_command = \\\"git describe --tags --long\\\"))\"')
+    try:
+        import tomllib
+        with open('pyproject.toml', "rb") as f:
+            pyproject_data = tomllib.load(f)
+    except ImportError:
+        import toml as toml
+        with open('pyproject.toml', "r") as f:
+            pyproject_data = toml.load(f)
+    git_version = pyproject_data['tool']['setuptools_scm']['git_describe_command']
+    src_cmd = (
+        f'python -c \"import setuptools_scm; '
+        f'print(setuptools_scm.get_version('
+        f'git_describe_command = \\\"{git_version}\\\"))\"')
     dst_cmd = ('python -c \"import yggdrasil; '
                'print(yggdrasil.__version__)\"')
     dir_cmd = ('python -c \"import yggdrasil; '

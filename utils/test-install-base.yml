@@ -59,8 +59,10 @@ jobs:
         test-flags1: [basic, examples, types-no-c, types-c]
         test-flags2: [empty]
         install-c: [true]
+        install-r: [true]
         install-mpi: [true]
         install-sbml: [false]
+        install-pytorch: [true]
         include:
           - os-base: windows
             python-version: 3.8
@@ -68,8 +70,10 @@ jobs:
             test-flags1: long
             test-flags2: empty
             install-c: false
+            install-r: false
             install-mpi: false
             install-sbml: false
+            install-pytorch: true
       fail-fast: false
 
     steps: &steps
@@ -101,6 +105,14 @@ jobs:
     - name: Set SBML installation based on matrix value
       if: matrix.install-sbml == true
       run: echo "INSTALLSBML=1" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set R installation based on matrix value
+      if: matrix.install-r != true
+      run: echo "INSTALLR=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set Pytorch installation based on matrix value
+      if: matrix.install-pytorch != true
+      run: echo "INSTALLPYTORCH=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ runner.os }}-${{ matrix.install-method }}-py${{ matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}-${{ matrix.test-flags1 }}-${{ matrix.test-flags2 }}" >> $GITHUB_ENV
@@ -287,7 +299,7 @@ jobs:
       if: runner.os == 'Windows' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       shell: cmd /C CALL {0}
       run: >-
-        CALL "%CONDA_BAT%" activate base && CALL "%CONDA_BAT%" activate test && pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
+        CALL "%CONDA_BAT%" activate test && pytest --ci --cov-append --nocapture tests/drivers/test_CMakeModelDriver.py
     - name: Run cmake test in command prompt (PIP)
       timeout-minutes: 180
       if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method != 'mamba'
@@ -389,8 +401,10 @@ jobs:
         test-flags1: [long-mpi]
         test-flags2: [examples-backwards]
         install-c: [true]
+        install-r: [true]
         install-mpi: [true]
         install-sbml: [false]
+        install-pytorch: [true]
         include:
           - os-base: ubuntu
             python-version: 3.7
@@ -398,16 +412,20 @@ jobs:
             test-flags1: long
             test-flags2: empty
             install-c: true
+            install-r: false
             install-mpi: false
             install-sbml: false
+            install-pytorch: false
           - os-base: ubuntu
             python-version: 3.9
             install-method: conda
             test-flags1: long-remote-service
             test-flags2: examples-sbml
             install-c: true
+            install-r: true
             install-mpi: false
             install-sbml: true
+            install-pytorch: true
           - os-base: ubuntu
             python-version: "3.10"
             install-method: conda
@@ -415,24 +433,30 @@ jobs:
             test-flags2: empty
             install-method: conda
             install-c: true
+            install-r: true
             install-mpi: false
             install-sbml: false
+            install-pytorch: true
           - os-base: ubuntu
             python-version: "3.11"
             install-method: conda
             test-flags1: long
             test-flags2: empty
             install-c: true
+            install-r: true
             install-mpi: false
             install-sbml: false
+            install-pytorch: true
           - os-base: macos
             python-version: 3.8
             install-method: conda
             test-flags1: examples-rpc-lesson3
             test-flags2: tools
             install-c: true
+            install-r: true
             install-mpi: false
             install-sbml: false
+            install-pytorch: true
       fail-fast: false
     defaults:
       run:
@@ -456,8 +480,10 @@ jobs:
         test-flags1: [long-interp]
         test-flags2: [empty]
         install-c: [true]
+        install-r: [true]
         install-mpi: [false]
         install-sbml: [false]
+        install-pytorch: [true]
       fail-fast: false
     services: &rmq_services
       rabbitmq:
@@ -483,8 +509,10 @@ jobs:
         test-flags1: [long-interp]
         test-flags2: [services]
         install-c: [true]
+        install-r: [true]
         install-mpi: [false]
         install-sbml: [false]
+        install-pytorch: [true]
       fail-fast: false
     services: *rmq_services
     defaults:
@@ -515,8 +543,10 @@ jobs:
         test-flags1: [long]
         test-flags2: [empty]
         install-c: [false]
+        install-r: [true]
         install-mpi: [false]
         install-sbml: [false]
+        install-pytorch: [true]
       fail-fast: false
     steps: *steps
 
