@@ -2003,10 +2003,12 @@ class LinkerBase(CompilationToolBase):
             if k in kwargs:
                 kwargs_link[k] = kwargs[k]
         if compiler and kwargs.get('with_asan', False) and cls.asan_flags:
-            # kwargs_link.setdefault('libraries', [])
-            # kwargs_link['libraries'].append(compiler.asan_library())
-            if compiler.asan_library():
-                asan_dir = os.path.dirname(compiler.asan_library())
+            asan_lib = compiler.asan_library()
+            logger.info(f"ASAN_LIBRARY: {asan_lib}")
+            if asan_lib:
+                kwargs_link.setdefault('libraries', [])
+                kwargs_link['libraries'].append(asan_lib)
+                asan_dir = os.path.dirname(asan_lib)
                 kwargs_link.setdefault('library_dirs', [])
                 kwargs_link['library_dirs'].append(asan_dir)
                 if ((cls.tooltype == 'linker'

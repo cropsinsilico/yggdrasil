@@ -524,7 +524,9 @@ class SetupParam(object):
 def prune_windows_path():
     to_remove = (
         'C:\\Program Files\\Microsoft SQL Server',
-        'C:\\Strawberry')
+        'C:\\Strawberry',
+        'C:\\Program Files\\Amazon',
+        'C:\\SeleniumWebDrivers')
     # to_remove = [
     #     'C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn',
     #     'C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn',
@@ -534,7 +536,7 @@ def prune_windows_path():
     old_path_list = os.environ['PATH'].split(os.pathsep)
     path_list = []
     for x in old_path_list:
-        if not x.startswith(to_remove):
+        if not (x.startswith(to_remove) or x in path_list):
             path_list.append(x)
     # for x in to_remove:
     #     if x in path_list:
