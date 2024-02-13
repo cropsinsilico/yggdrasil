@@ -403,7 +403,7 @@ class CompilationToolBase(object):
         for k in attr_list:
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
-        if cls.toolname.startswith('clang'):
+        if isinstance(cls.toolname, str) and cls.toolname.startswith('clang'):
             logger.info(
                 f"{cls.toolname} before_registration:\n"
                 f"  cls.default_executable = {cls.default_executable}\n"
