@@ -403,6 +403,13 @@ class CompilationToolBase(object):
         for k in attr_list:
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
+        if cls.toolname.startswith('clang'):
+            logger.info(
+                f"{cls.toolname} before_registration:\n"
+                f"  cls.default_executable = {cls.default_executable}\n"
+                f"  cls.env_matches_tool() = {cls.env_matches_tool()}\n"
+                f"  cls.env_matches_tool(use_sysconfig=True) = "
+                f"{cls.env_matches_tool(use_sysconfig=True)}")
         # Set attributes based on environment variables or sysconfig
         if cls.default_executable is None:
             cls.default_executable = cls.env_matches_tool()
@@ -855,6 +862,15 @@ class CompilationToolBase(object):
             str: Name of (or path to) the tool executable.
 
         """
+        if cls.toolname == 'clang++':
+            from yggdrasil.config import ygg_cfg
+            logger.info(
+                f"clang++ get_executable:\n"
+                f"  cls.languages = {cls.languages}\n"
+                f"  cls.executable = {getattr(cls, 'executable', None)}\n"
+                f"  cls.default_executable = {cls.default_executable}\n"
+                f"  yggcfg({cls.languages[0]}, clang++_executable) = "
+                f"{ygg_cfg.get(cls.languages[0], 'clang++_executable', None)}")
         out = getattr(cls, 'executable', None)
         if out is None:
             from yggdrasil.config import ygg_cfg
