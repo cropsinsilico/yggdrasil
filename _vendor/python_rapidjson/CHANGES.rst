@@ -1,6 +1,42 @@
 Changes
 -------
 
+1.14 (2023-12-14)
+~~~~~~~~~~~~~~~~~
+
+* Produce binary wheels for macOS/arm64, thanks to timothyjlaurent (`PR #195`__)
+
+  __ https://github.com/python-rapidjson/python-rapidjson/pull/170
+
+
+1.13 (2023-10-29)
+~~~~~~~~~~~~~~~~~
+
+* Fix handling of write_mode in dump functions (problem emerged discussing `issue #191`__)
+
+  __ https://github.com/python-rapidjson/python-rapidjson/issues/191
+
+
+1.12 (2023-10-07)
+~~~~~~~~~~~~~~~~~
+
+* Generate wheels on PyPI using final Python 3.12 release, thanks to cibuildwheel `2.16.2`__
+
+  __ https://cibuildwheel.readthedocs.io/en/stable/changelog/#v2162
+
+
+1.11 (2023-09-11)
+~~~~~~~~~~~~~~~~~
+
+* Use `current master`__ version of rapidjson
+
+  __ https://github.com/Tencent/rapidjson/compare/083f359f5c36198accc2b9360ce1e32a333231d9...5e17dbed34eef33af8f3e734820b5dc547a2a3aa9
+
+* Use cibuildwheel `2.15.0`__
+
+  __ https://cibuildwheel.readthedocs.io/en/stable/changelog/#v2150
+
+
 1.10 (2023-03-15)
 ~~~~~~~~~~~~~~~~~
 
@@ -12,7 +48,7 @@ Changes
 
   __ https://github.com/python-rapidjson/python-rapidjson/pull/170
 
-* Use cibuildwheel `2.21.1`__
+* Use cibuildwheel `2.12.1`__
 
   __ https://cibuildwheel.readthedocs.io/en/stable/changelog/#v2121
 

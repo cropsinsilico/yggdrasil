@@ -15,7 +15,6 @@ def vendor(srcdir):
         os.mkdir(PYRJ_DIR)
     
     files_to_copy = [
-        'version.txt',
         'README.rst',
         'CHANGES.rst',
         'rapidjson.cpp',
@@ -32,10 +31,11 @@ def vendor(srcdir):
                                         '"yggdrasil.rapidjson.')
             with open(os.path.join(ROOT_DIR, 'yggdrasil', x), 'w') as fd:
                 fd.write(contents)
-    setup_lines = open(os.path.join(srcdir, 'setup.py'), 'r').read().split(
-        '\nsetup(')[0]
-    open(os.path.join(PYRJ_DIR, 'pyrj_setup.py'), 'w').write(
-        '# flake8: noqa\n' + setup_lines)
+    if os.path.isfile(os.path.join(srcdir, 'setup.py')):
+        setup_lines = open(os.path.join(srcdir, 'setup.py'), 'r').read().split(
+            '\nsetup(')[0]
+        open(os.path.join(PYRJ_DIR, 'pyrj_setup.py'), 'w').write(
+            '# flake8: noqa\n' + setup_lines)
     
 
 if __name__ == "__main__":

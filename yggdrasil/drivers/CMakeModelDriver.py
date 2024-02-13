@@ -1087,6 +1087,9 @@ class CMakeModelDriver(BuildModelDriver):
                 break
             if k not in gcc.lower():
                 paths = path.split(os.pathsep)
+                logger.info(f"Pruning directory containing "
+                            f"sh from path that conflicts with located "
+                            f"gcc (gcc={gcc}, pruned sh={sh_path})")
                 paths.remove(os.path.dirname(sh_path))
                 path = os.pathsep.join(paths)
                 sh_path = shutil.which('sh', path=path)
@@ -1118,16 +1121,19 @@ class CMakeModelDriver(BuildModelDriver):
                     kwargs['env']['PATH'],
                     gcc.get_executable(full_path=True))
                 kwargs['env']['PATH'] = path
-                if not shutil.which('sh', path=path):  # pragma: appveyor
-                    # This will not be run on Github actions where
-                    # the shell is always set
-                    kwargs.setdefault('generator', 'MinGW Makefiles')
-                elif shutil.which('make', path=path):
+                # if not shutil.which('sh', path=path):  # pragma: appveyor
+                #     # This will not be run on Github actions where
+                #     # the shell is always set
+                #     kwargs.setdefault('generator', 'MinGW Makefiles')
+                if shutil.which('make', path=path):
                     kwargs.setdefault('generator', 'Unix Makefiles')
                 # This is not currently tested
                 # else:
                 #     kwargs.setdefault('generator', 'MSYS Makefiles')
+                logger.info(f"Selected generator "
+                            f"{kwargs.get('generator', None)} for "
+                            f"gcc = {gcc}")
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         out.setdefault('definitions', [])
-        out['definitions'].append('PYTHON_EXECUTABLE=%s' % sys.executable)
+        out['definitions'].append(f'PYTHON_EXECUTABLE={sys.executable}')
         return out

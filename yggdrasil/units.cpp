@@ -186,6 +186,12 @@ PyDoc_STRVAR(units_doc,
              " `expression` string.");
 
 
+#ifdef __GNUC__
+#if !defined(__MINGW64_VERSION_MAJOR) || (defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR > 5)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+#endif
 static PyMethodDef units_methods[] = {
     {"is_compatible", (PyCFunction) units_is_compatible, METH_VARARGS,
      "Check if a set of units are compatible with another set."},
@@ -197,8 +203,13 @@ static PyMethodDef units_methods[] = {
     {"__setstate__", (PyCFunction) units__setstate__,
      METH_O,
      "Set the instance state."},
-    {NULL}  /* Sentinel */
+    {NULL, NULL, 0, NULL} /* sentinel */
 };
+#ifdef __GNUC__
+#if !defined(__MINGW64_VERSION_MAJOR) || (defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR > 5)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 
 static PyNumberMethods units_number_methods = {
@@ -251,7 +262,7 @@ static PyTypeObject Units_Type = {
     sizeof(UnitsObject),            /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor) units_dealloc,     /* tp_dealloc */
-    0,                              /* tp_print */
+    0,                              /* tp_print or tp_vectorcall_offset */
     0,                              /* tp_getattr */
     0,                              /* tp_setattr */
     0,                              /* tp_compare */
@@ -285,6 +296,21 @@ static PyTypeObject Units_Type = {
     0,                              /* tp_alloc */
     units_new,                      /* tp_new */
     PyObject_Del,                   /* tp_free */
+    NULL,                           /* tp_is_gc */
+    NULL,                           /* tp_bases */
+    NULL,                           /* tp_mro */
+    NULL,                           /* tp_cache */
+    NULL,                           /* tp_subclasses */
+    NULL,                           /* tp_weaklist */
+    0,                              /* tp_del */
+    0,                              /* tp_version_tag */
+    0,                              /* tp_finalize */
+#if (PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 8))
+    0,                              /* tp_vectorcall */
+#endif
+#if (PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 12))
+    0,                              /* tp_watched */
+#endif
 };
 
 
@@ -334,16 +360,23 @@ static void units_dealloc(PyObject* self)
 
 static PyObject* units_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 {
-    PyObject* exprObject;
+    PyObject* exprObject = NULL;
+    static char const* kwlist[] = {
+	"units",
+	NULL
+    };
 
-    if (!PyArg_ParseTuple(args, "O:Units", &exprObject))
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O:Units",
+				     (char**) kwlist, &exprObject))
 	return NULL;
 
     std::string exprStr_;
     const char* exprStr = 0;
-    const UnitsObject* other;
+    const UnitsObject* other = NULL;
 
-    if (PyBytes_Check(exprObject)) {
+    if (exprObject == NULL) {
+	exprStr = "";
+    } else if (PyBytes_Check(exprObject)) {
         exprStr = PyBytes_AsString(exprObject);
         if (exprStr == NULL)
             return NULL;
@@ -366,7 +399,7 @@ static PyObject* units_new(PyTypeObject* type, PyObject* args, PyObject* kwargs)
 
     if (exprStr) {
 	v->units = new Units(exprStr);
-    } else {
+    } else if (other) {
 	exprStr_ = other->units->str();
 	exprStr = exprStr_.c_str();
 	v->units = new Units(*other->units);
@@ -387,7 +420,7 @@ static PyObject* units_str(PyObject* self) {
     return PyUnicode_FromString(s.c_str());
 }
 
-static PyObject* units_is_compatible(PyObject* self, PyObject* args, PyObject* kwargs) {
+static PyObject* units_is_compatible(PyObject* self, PyObject* args, PyObject*) {
     PyObject* otherObject;
     const UnitsObject* other;
     
@@ -416,7 +449,7 @@ static PyObject* units_is_compatible(PyObject* self, PyObject* args, PyObject* k
 }
 
 
-static PyObject* units_is_dimensionless(PyObject* self, PyObject* args) {
+static PyObject* units_is_dimensionless(PyObject* self, PyObject*) {
     UnitsObject* v = (UnitsObject*) self;
     bool result = v->units->is_dimensionless();
     if (result) {
@@ -586,6 +619,12 @@ PyDoc_STRVAR(quantity_array_doc,
              " `value` and `units` string or Units instance.");
 
 
+#ifdef __GNUC__
+#if !defined(__MINGW64_VERSION_MAJOR) || (defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR > 5)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+#endif
 static PyMethodDef quantity_array_methods[] = {
     {"is_compatible", (PyCFunction) quantity_array_is_compatible, METH_VARARGS,
      "Check if a set of units or quantity is compatible with another set."},
@@ -612,16 +651,21 @@ static PyMethodDef quantity_array_methods[] = {
     {"__setstate__", (PyCFunction) quantity_array__setstate__,
      METH_O,
      "Set the instance state."},
-    {NULL}  /* Sentinel */
+    {NULL, NULL, 0, NULL} /* sentinel */
 };
+#ifdef __GNUC__
+#if !defined(__MINGW64_VERSION_MAJOR) || (defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR > 5)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 
 static PyGetSetDef quantity_array_properties[] = {
     {"units", quantity_array_units_get, quantity_array_units_set,
      "The rapidjson.units.Units units for the quantity.", NULL},
     {"value", quantity_array_value_get, quantity_array_value_set,
-     "The quantity's value (in the current unit system)."},
-    {NULL}
+     "The quantity's value (in the current unit system).", NULL},
+    {NULL, NULL, NULL, NULL, NULL} /* Sentinel */
 };
 
 
@@ -638,7 +682,7 @@ static PyTypeObject QuantityArray_Type = {
     sizeof(QuantityArrayObject),          /* tp_basicsize */
     0,                                    /* tp_itemsize */
     (destructor) quantity_array_dealloc,  /* tp_dealloc */
-    0,                                    /* tp_print */
+    0,                                    /* tp_print or tp_vectorcall_offset */
     0,                                    /* tp_getattr */
     0,                                    /* tp_setattr */
     0,                                    /* tp_compare */
@@ -672,6 +716,21 @@ static PyTypeObject QuantityArray_Type = {
     0,                                    /* tp_alloc */
     quantity_array_new,                   /* tp_new */
     PyObject_Del,                         /* tp_free */
+    NULL,                                 /* tp_is_gc */
+    NULL,                                 /* tp_bases */
+    NULL,                                 /* tp_mro */
+    NULL,                                 /* tp_cache */
+    NULL,                                 /* tp_subclasses */
+    NULL,                                 /* tp_weaklist */
+    0,                                    /* tp_del */
+    0,                                    /* tp_version_tag */
+    0,                                    /* tp_finalize */
+#if (PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 8))
+    0,                                    /* tp_vectorcall */
+#endif
+#if (PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 12))
+    0,                                    /* tp_watched */
+#endif
 };
 
 
@@ -697,7 +756,7 @@ static PyTypeObject Quantity_Type = {
     sizeof(QuantityObject),         /* tp_basicsize */
     0,                              /* tp_itemsize */
     0,                              /* tp_dealloc */
-    0,                              /* tp_print */
+    0,                              /* tp_print or tp_vectorcall_offset */
     0,                              /* tp_getattr */
     0,                              /* tp_setattr */
     0,                              /* tp_compare */
@@ -731,6 +790,21 @@ static PyTypeObject Quantity_Type = {
     0,                              /* tp_alloc */
     quantity_new,                   /* tp_new */
     PyObject_Del,                   /* tp_free */
+    NULL,                           /* tp_is_gc */
+    NULL,                           /* tp_bases */
+    NULL,                           /* tp_mro */
+    NULL,                           /* tp_cache */
+    NULL,                           /* tp_subclasses */
+    NULL,                           /* tp_weaklist */
+    0,                              /* tp_del */
+    0,                              /* tp_version_tag */
+    0,                              /* tp_finalize */
+#if (PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 8))
+    0,                              /* tp_vectorcall */
+#endif
+#if (PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 12))
+    0,                              /* tp_watched */
+#endif
 };
 
 /////////////////////////////
@@ -1126,7 +1200,7 @@ static int quantity_array_value_set(PyObject* self, PyObject* value, void*) {
 }
 
 
-static PyObject* quantity_array_is_compatible(PyObject* self, PyObject* args, PyObject* kwargs) {
+static PyObject* quantity_array_is_compatible(PyObject* self, PyObject* args, PyObject*) {
     PyObject* otherObject;
     const UnitsObject* other;
     
@@ -1157,7 +1231,7 @@ static PyObject* quantity_array_is_compatible(PyObject* self, PyObject* args, Py
 }
 
 
-static PyObject* quantity_array_is_dimensionless(PyObject* self, PyObject* args) {
+static PyObject* quantity_array_is_dimensionless(PyObject* self, PyObject*) {
     QuantityArrayObject* v = (QuantityArrayObject*) self;
     bool result = v->units->units->is_dimensionless();
     if (result) {
@@ -1760,7 +1834,7 @@ static PyObject* quantity_array__array_finalize__(PyObject* self, PyObject* args
 }
 
 
-static PyObject* quantity_array__array_wrap__(PyObject* self, PyObject* args) {
+static PyObject* quantity_array__array_wrap__(PyObject*, PyObject* args) {
     PyObject *array = NULL, *context = NULL;
     if (!PyArg_ParseTuple(args, "OO", array, context)) {
 	return NULL;
@@ -2353,8 +2427,8 @@ static int _copy_array_into(PyObject* dst, PyObject* src, bool copyFlags) {
     PyObject *arr = NULL;
     PyArrayObject* arr_cast = NULL;
     PyArray_Descr *dtype = NULL;
-    int ndim = 0, flags = NPY_ARRAY_DEFAULT, old_flags = 0, nbytes = 1;
-    npy_intp *dims = NULL, *strides = NULL;
+    int ndim = 0, flags = NPY_ARRAY_DEFAULT, old_flags = 0;
+    npy_intp *dims = NULL, *strides = NULL, nbytes = 1;
     PyArrayObject_fields* fa = NULL;
     char* data = NULL;
     arr = _get_array(src);
@@ -2577,10 +2651,12 @@ units_module_exec(PyObject* m)
 }
 
 
+#ifdef PYRJ_TWO_PHASE_INIT
 static struct PyModuleDef_Slot units_slots[] = {
     {Py_mod_exec, (void*) units_module_exec},
     {0, NULL}
 };
+#endif
 
 
 static PyModuleDef units_module = {
@@ -2589,7 +2665,11 @@ static PyModuleDef units_module = {
     PyDoc_STR("Fast, simple units library developed for yggdrasil."),
     0,                          /* m_size */
     units_functions,            /* m_methods */
+#ifdef PYRJ_TWO_PHASE_INIT
     units_slots,                /* m_slots */
+#else
+    NULL,                       /* m_slots */
+#endif
     NULL,                       /* m_traverse */
     NULL,                       /* m_clear */
     NULL                        /* m_free */
@@ -2599,5 +2679,15 @@ static PyModuleDef units_module = {
 PyMODINIT_FUNC
 PyInit_units()
 {
+#ifdef PYRJ_TWO_PHASE_INIT
     return PyModuleDef_Init(&units_module);
+#else
+    PyObject *module = PyModule_Create(&units_module);
+    if (module == NULL) return NULL;
+    if (units_module_exec(module) != 0) {
+	Py_DECREF(module);
+	return NULL;
+    }
+    return module;
+#endif
 }
