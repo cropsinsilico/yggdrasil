@@ -906,7 +906,7 @@ class ygginfo(SubCommand):
                             env=env_reticulate).strip()
                         vardict.append(
                             (curr_prefix
-                             + "R reticulate::py_versions_windows():",
+                             + "R reticulate::conda_binary info --json:",
                              "\n%s%s" % (
                                  curr_prefix + prefix,
                                  ("\n" + curr_prefix + prefix).join(

@@ -211,7 +211,6 @@ class CMakeConfigure(BuildToolBase):
                 True, produced file otherwise.
 
         """
-        kwargs['verbose'] = True
         try:
             out = super(CMakeConfigure, cls).call(args, **kwargs)
         except RuntimeError as e:

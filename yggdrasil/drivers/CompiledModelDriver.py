@@ -208,11 +208,13 @@ def get_compilation_tool(tooltype, name, default=False):
             break
     if out is None:
         if default is False:
-            raise ValueError("Could not locate a %s tool with name '%s'"
-                             % (tooltype, name))
+            raise ValueError(f"Could not locate a {tooltype} tool with "
+                             f"name '{name}'")
         out = default
-    if ((isinstance(out, CompilationToolMeta) and (out.toolname != name)
-         and (os.path.isfile(name) or shutil.which(name)))):
+    elif ((isinstance(out, CompilationToolMeta) and (out.toolname != name)
+           and (os.path.isfile(name) or shutil.which(name)))):
+        logger.info(f"Setting executable for toolname = {out.toolname} to"
+                    f" {name}")
         out.executable = name
     return out
 
@@ -385,6 +387,9 @@ class CompilationToolBase(object):
                 setattr(self, k, v)
         if len(kwargs) > 0:
             raise RuntimeError("Unused keyword arguments: %s" % kwargs.keys())
+        if getattr(self, 'executable', None):
+            logger.info(f"Creating {self.toolname} {self.tooltype}: "
+                        f"{getattr(self, 'executable', None)}")
         super(CompilationToolBase, self).__init__(**kwargs)
 
     @staticmethod
@@ -1297,26 +1302,30 @@ class CompilationToolBase(object):
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
             if verbose:
-                logger.info('Command: "%s"' % ' '.join(cmd))
+                logger.info(f"Command: \"{' '.join(cmd)}\"")
             else:
-                logger.debug('Command: "%s"' % ' '.join(cmd))
+                logger.debug(f"Command: \"{' '.join(cmd)}\"")
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = output.decode("utf-8")
+            err = err.decode("utf-8") if err else ''
+            message = (f"Command '{' '.join(cmd)}' resulted in code "
+                       f"{proc.returncode}:\n"
+                       f"out = {output}\n"
+                       f"err = {err}\n")
             if (proc.returncode != 0) and (not allow_error):
-                raise RuntimeError("Command '%s' failed with code %d:\n%s."
-                                   % (' '.join(cmd), proc.returncode, output))
+                raise RuntimeError(message)
             try:
                 if verbose:
-                    logger.info(' '.join(cmd) + '\n' + output)
+                    logger.info(message)
                 else:
-                    logger.debug(' '.join(cmd) + '\n' + output)
+                    logger.debug(message)
             except UnicodeDecodeError:  # pragma: debug
-                tools.print_encoded(output)
+                tools.print_encoded(message)
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
-                raise RuntimeError("Could not call command '%s': %s"
-                                   % (' '.join(cmd), e))
+                raise RuntimeError(f"Could not call command "
+                                   f"'{' '.join(cmd)}': {e}")
         except BaseException as e:
             try:
                 print(f"Unexpected call error {type(e)}: {e}")
@@ -1327,7 +1336,7 @@ class CompilationToolBase(object):
         if (not skip_flags):
             if (out != 'clean'):
                 if not products.last.exists:  # pragma: debug
-                    logger.error('%s\n%s' % (' '.join(cmd), output))
+                    logger.error(f"{' '.join(cmd)}\n{output}")
                     raise RuntimeError(
                         f"{cls.tooltype.title()} tool, {cls.toolname}"
                         f", failed to produce result \'{out}\'")
@@ -2436,23 +2445,23 @@ class CompiledModelDriver(ModelDriver):
                 else:
                     libtype = [libtype]
                 for t in libtype:
-                    libfile = cls.cfg.get(cls.language,
-                                          '%s_%s' % (k, t), None)
+                    libfile = cls.cfg.get(cls.language, f'{k}_{t}', None)
                     if libfile is not None:
                         v[t] = libfile
         for k in ['compiler', 'linker', 'archiver']:
             # Set default linker/archiver based on compiler
-            default_tool_name = getattr(cls, 'default_%s' % k, None)
+            default_tool_name = getattr(cls, f'default_{k}', None)
             if default_tool_name:
                 default_tool = get_compilation_tool(k, default_tool_name,
                                                     default=None)
                 if (((default_tool is None)
                      or (not default_tool.is_installed()))):  # pragma: debug
                     if not tools.is_subprocess():
-                        logger.debug(('Default %s for %s (%s) not installed. '
-                                      'Attempting to locate an alternative .')
-                                     % (k, cls.language, default_tool_name))
-                    setattr(cls, 'default_%s' % k, None)
+                        logger.debug(f'Default {k} for {cls.language} '
+                                     f'({default_tool_name}) is not '
+                                     f'installed. Attempting to locate '
+                                     f'an alternative .')
+                    setattr(cls, f'default_{k}', None)
 
     @classmethod
     def select_suffix_kwargs(cls, kwargs):
@@ -2782,7 +2791,7 @@ class CompiledModelDriver(ModelDriver):
             kwargs = {'flags': tool_flags}
             kwargs['executable'] = cls.cfg.get(cls.language,
                                                f'{toolname}_executable',
-                                               toolname)
+                                               None)
             if tooltype == 'compiler':
                 kwargs.update(
                     linker=cls.get_tool(
@@ -2807,10 +2816,10 @@ class CompiledModelDriver(ModelDriver):
                 # Github Actions images now include GNU compilers by default
                 if default is False:
                     raise NotImplementedError(
-                        "%s not set for language '%s' (toolname=%s)."
-                        % (tooltype.title(), cls.language, toolname))
-                logger.debug("%s not set for language '%s' (toolname=%s)."
-                             % (tooltype.title(), cls.language, toolname))
+                        f"{tooltype.title()} not set for language "
+                        f"'{cls.language}' (toolname={toolname}).")
+                logger.debug(f"{tooltype.title()} not set for language "
+                             f"'{cls.language}' (toolname={toolname}).")
                 out = default
             if isinstance(out, type):
                 out = out(**kwargs)
@@ -2822,7 +2831,7 @@ class CompiledModelDriver(ModelDriver):
         elif return_prop == 'flags':  # pragma: no cover
             return out.flags
         else:
-            raise ValueError("Invalid return_prop: '%s'" % return_prop)
+            raise ValueError(f"Invalid return_prop: '{return_prop}'")
 
     def get_tool_instance(self, *args, **kwargs):
         r"""Get tool from a driver instance.
@@ -3620,7 +3629,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         compiler = cls.get_tool('compiler', toolname=toolname)
-        return compiler.tool_version(**kwargs).strip()
+        return compiler.tool_version(**kwargs).splitlines()[0].strip()
         
     def run_model(self, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
@@ -3820,24 +3829,24 @@ class CompiledModelDriver(ModelDriver):
         for k in ['compiler', 'linker', 'archiver']:
             # Set default linker/archiver based on compiler
             default_tool_name = cfg.get(
-                cls.language, k, getattr(cls, 'default_%s' % k, None))
+                cls.language, k, getattr(cls, f'default_{k}', None))
             if (((default_tool_name is None) and (compiler is not None)
                  and (k in ['linker', 'archiver']))):
-                default_tool_name = getattr(compiler, 'default_%s' % k, None)
+                default_tool_name = getattr(compiler, f'default_{k}', None)
             # Check default tool to make sure it is installed
             if default_tool_name:
                 default_tool = get_compilation_tool(k, default_tool_name)
                 if not default_tool.is_installed():  # pragma: debug
-                    logger.debug(('Default %s for %s (%s) not installed. '
-                                  'Attempting to locate an alternative .')
-                                 % (k, cls.language, default_tool_name))
+                    logger.debug(f'Default {k} for {cls.language} '
+                                 f'({default_tool_name}) not installed. '
+                                 f'Attempting to locate an alternative.')
                     default_tool_name = None
             # Determine compilation tools based on language/platform
             if default_tool_name is None:  # pragma: no cover
-                default_tool_name = find_compilation_tool(k, cls.language,
-                                                          allow_failure=True)
+                default_tool_name = find_compilation_tool(
+                    k, cls.language, allow_failure=True)
             # Set default tool attribute & record compiler tool if set
-            setattr(cls, 'default_%s' % k, default_tool_name)
+            setattr(cls, f'default_{k}', default_tool_name)
             if default_tool_name:
                 cfg.set(cls.language, k, default_tool_name)
                 if k == 'compiler':

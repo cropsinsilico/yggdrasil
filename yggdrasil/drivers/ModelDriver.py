@@ -991,24 +991,23 @@ class ModelDriver(Driver):
                 unused_kwargs.setdefault('cwd', unused_kwargs.pop('working_dir'))
             unused_kwargs.setdefault('shell', platform._is_win)
             # Call command
-            logger.debug("Running '%s' from %s"
-                         % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
+            logger.debug(f"Running '{' '.join(cmd)}' from "
+                         f"{unused_kwargs.get('cwd', os.getcwd())}")
             logger.debug("Process keyword arguments:\n%s\n",
                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
-            print(' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             if return_process:
                 return proc
             out, err = proc.communicate()
+            out = out.decode("utf-8") if out else ''
+            err = err.decode("utf-8") if err else ''
+            message = (f"Command '{' '.join(cmd)}' returned "
+                       f"{proc.returncode}:\n"
+                       f"out = {out}\n"
+                       f"err = {err}\n")
             if proc.returncode != 0:
-                if out:
-                    logger.info('\n%s' % out.decode('utf-8'))
-                if err:  # pragma: debug
-                    logger.info('\n%s' % err.decode('utf-8'))
-                raise RuntimeError("Command '%s' failed with code %d."
-                                   % (' '.join(cmd), proc.returncode))
-            out = out.decode("utf-8")
-            logger.debug('%s\n%s' % (' '.join(cmd), out))
+                raise RuntimeError(message)
+            logger.debug(message)
             return out
         except (subprocess.CalledProcessError, OSError) as e:  # pragma: debug
             raise RuntimeError("Could not call command '%s': %s"

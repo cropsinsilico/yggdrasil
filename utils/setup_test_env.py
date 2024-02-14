@@ -521,7 +521,15 @@ class SetupParam(object):
                     help=("Install %s" % k))
 
 
-def prune_windows_path():
+def prune_windows_path(permanent=False):
+    r"""Prune directories not required by yggdrasil from the windows path
+    on a GHA runner to make room to avoid the command limit.
+
+    Args:
+        permanent (bool, optional): If True, the path will be permanently
+            modified via the GITHUB_ENV variable.
+    
+    """
     to_remove = (
         'C:\\Program Files\\Microsoft SQL Server',
         'C:\\Strawberry',
@@ -549,6 +557,8 @@ def prune_windows_path():
         print(f"PRUNED PATH ({len(new_path)}):\n"
               f"{pprint.pformat(new_path.split(os.pathsep))}\n")
         cmds += [f"set \"PATH={new_path}\""]
+        if permanent and _on_gha:
+            cmds.append("echo \"PATH=$PATH\" >> $GITHUB_ENV")
     return cmds
     
 
@@ -1170,7 +1180,7 @@ def build_conda_recipe(recipe='recipe', param=None,
     assert conda_env == 'base' or param.dry_run
     assert conda_idx
     if _is_win and _on_gha:
-        cmds += prune_windows_path()
+        cmds += prune_windows_path(permanent=True)
     # Might invalidate cache
     cmds += [f"{CONDA_CMD} clean --all {param.conda_flags_general}"]
     cmds += setup_conda(param=param, conda_env=conda_env,
