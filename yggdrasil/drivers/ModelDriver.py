@@ -1826,10 +1826,7 @@ class ModelDriver(Driver):
             assert self.model_process_complete
             if (((self.model_process_returncode != 0)
                  and (not ignore_error_code))):
-                self.error(("return code of %s indicates model error. "
-                            "(sent messages: %s)"),
-                           str(self.model_process_returncode),
-                           self.n_sent_messages)
+                self.on_error_code(self.model_process_returncode)
             self.event_process_kill_complete.set()
             if self.queue_thread is not None:
                 if not self.was_break:  # pragma: debug
@@ -1861,6 +1858,17 @@ class ModelDriver(Driver):
             self.products.teardown()
         self.products.restore_modified()
         super(ModelDriver, self).cleanup()
+
+    def on_error_code(self, code):
+        r"""Perform actions in response to an error code returned by
+        the model.
+
+        Args:
+            code (int): Integer return code.
+
+        """
+        self.error(f"return code of {code} indicates model error. "
+                   f"(sent messages: {self.n_sent_messages})")
 
     @classmethod
     def cleanup_dependencies(cls, products=None, **kws):

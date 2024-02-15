@@ -387,6 +387,11 @@ class FortranModelDriver(CompiledModelDriver):
     global_scope_macro = ('#define WITH_GLOBAL_SCOPE(COMM) call '
                           'set_global_comm(); COMM; call unset_global_comm()')
     locked_buildfile = 'fygg.mod'
+
+    def __init__(self, *args, **kwargs):
+        if platform._is_win:
+            kwargs['logging_level'] = "DEBUG"
+        super(FortranModelDriver, self).__init__(*args, **kwargs)
     
     @staticmethod
     def before_registration(cls):
@@ -493,6 +498,19 @@ class FortranModelDriver(CompiledModelDriver):
         out += '_%s' % commtype[:3].lower()
         return out
 
+    # def on_error_code(self, code):
+    #     r"""Perform actions in response to an error code returned by
+    #     the model.
+
+    #     Args:
+    #         code (int): Integer return code.
+
+    #     """
+    #     out = super(FortranModelDriver, cls).on_error_code(code)
+    #     if code == 3221226356:
+    #         pass
+    #     return out
+        
     @classmethod
     def get_inverse_type_map(cls):
         r"""Get the inverse type map.

@@ -438,6 +438,12 @@ jobs:
     - if: matrix.install-method == 'pip' && runner.os == 'macOS'
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: runner.os == 'Windows'
+      name: (WINDOWS,CONDA) Prune the PATH variable
+      run: 'echo "PATH=$(python utils/setup_test_env.py prune-path)" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v3
@@ -834,6 +840,12 @@ jobs:
     - if: matrix.install-method == 'pip' && runner.os == 'macOS'
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: runner.os == 'Windows'
+      name: (WINDOWS,CONDA) Prune the PATH variable
+      run: 'echo "PATH=$(python utils/setup_test_env.py prune-path)" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v3
@@ -1206,6 +1218,12 @@ jobs:
     - if: matrix.install-method == 'pip' && runner.os == 'macOS'
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: runner.os == 'Windows'
+      name: (WINDOWS,CONDA) Prune the PATH variable
+      run: 'echo "PATH=$(python utils/setup_test_env.py prune-path)" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v3
@@ -1559,6 +1577,12 @@ jobs:
     - if: matrix.install-method == 'pip' && runner.os == 'macOS'
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: runner.os == 'Windows'
+      name: (WINDOWS,CONDA) Prune the PATH variable
+      run: 'echo "PATH=$(python utils/setup_test_env.py prune-path)" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v3
@@ -1911,6 +1935,12 @@ jobs:
     - if: matrix.install-method == 'pip' && runner.os == 'macOS'
       name: (MACOS,PIP) Set C compiler to llvm clang
       run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+    - if: runner.os == 'Windows'
+      name: (WINDOWS,CONDA) Prune the PATH variable
+      run: 'echo "PATH=$(python utils/setup_test_env.py prune-path)" >> $GITHUB_ENV
+
+        '
+      shell: bash -l {0}
     - if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v3

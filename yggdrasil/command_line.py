@@ -765,8 +765,8 @@ class ygginfo(SubCommand):
                 for k in path_vars:
                     if os.environ.get(k, ''):
                         vardict.append(
-                            (curr_prefix + k, '\n%s%s'
-                             % (curr_prefix + prefix,
+                            (curr_prefix + k, ' [%d chars]\n%s%s'
+                             % (len(os.environ[k]), curr_prefix + prefix,
                                 ("\n" + curr_prefix + prefix).join(
                                     os.environ[k].split(os.pathsep)))))
                     else:

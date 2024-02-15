@@ -521,7 +521,7 @@ class SetupParam(object):
                     help=("Install %s" % k))
 
 
-def prune_windows_path(permanent=False):
+def prune_windows_path(permanent=False, for_cli=False):
     r"""Prune directories not required by yggdrasil from the windows path
     on a GHA runner to make room to avoid the command limit.
 
@@ -539,8 +539,9 @@ def prune_windows_path(permanent=False):
     #     'C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn',
     #     'C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn',
     #     'C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn']
-    print(f"PRUNING PATH ({len(os.environ['PATH'])}): "
-          f"{os.environ['PATH']}")
+    if not for_cli:
+        print(f"PRUNING PATH ({len(os.environ['PATH'])}): "
+              f"{os.environ['PATH']}")
     old_path_list = os.environ['PATH'].split(os.pathsep)
     path_list = []
     for x in old_path_list:
@@ -550,6 +551,8 @@ def prune_windows_path(permanent=False):
     #     if x in path_list:
     #         path_list.remove(x)
     new_path = os.pathsep.join(path_list)
+    if for_cli:
+        return new_path
     cmds = []
     if len(new_path) == len(os.environ['PATH']):
         print("PRUNED PATH not any shorter")
@@ -2128,6 +2131,10 @@ if __name__ == "__main__":
              {'type': str,
               'help': "Directory where the integration repo is cloned."}),
         ])
+    # Prune paths
+    parser_prune_path = subparsers.add_parser(
+        'prune-path',
+        help="Return a pruned path")
     # Call methods
     args = parser.parse_args()
     if args.operation in ['env', 'setup']:
@@ -2201,3 +2208,5 @@ if __name__ == "__main__":
             args.integration_dir, param=param,
             allow_missing=args.allow_missing,
             remove_existing=args.remove_existing)
+    elif args.operation == 'prune-path':
+        print(prune_windows_path(for_cli=True))

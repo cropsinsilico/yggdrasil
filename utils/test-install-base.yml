@@ -225,6 +225,12 @@ jobs:
     #     key:
     #       ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
     #       hashFiles('recipe/meta.yaml') }}
+    - name: (WINDOWS,CONDA) Prune the PATH variable
+      # if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'Windows'
+      if: runner.os == 'Windows'
+      run: |
+        echo "PATH=$(python utils/setup_test_env.py prune-path)" >> $GITHUB_ENV
+      shell: bash -l {0}
     - name: (CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v3
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
