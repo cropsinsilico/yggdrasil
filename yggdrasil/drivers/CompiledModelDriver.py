@@ -216,6 +216,8 @@ def get_compilation_tool(tooltype, name, default=False):
         logger.info(f"Setting executable for toolname = {out.toolname} to"
                     f" {name}")
         out.executable = name
+        if out.toolname == 'clang++' and not platform._is_win:
+            assert out.toolname in name
     return out
 
 
@@ -390,6 +392,8 @@ class CompilationToolBase(object):
         if getattr(self, 'executable', None):
             logger.info(f"Creating {self.toolname} {self.tooltype}: "
                         f"{getattr(self, 'executable', None)}")
+            if self.toolname == 'clang++' and not platform._is_win:
+                assert self.toolname in self.executable
         super(CompilationToolBase, self).__init__(**kwargs)
 
     @staticmethod
@@ -890,6 +894,8 @@ class CompilationToolBase(object):
                                       f"'{cls.tooltype}'.")
         if full_path:
             out = shutil.which(out)
+        if cls.toolname == 'clang++' and not platform._is_win:
+            assert cls.toolname in out
         return out
 
     @classmethod
