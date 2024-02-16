@@ -214,9 +214,10 @@ def get_compilation_tool(tooltype, name, default=False):
     elif ((isinstance(out, CompilationToolMeta) and (out.toolname != name)
            and (os.path.isfile(name) or shutil.which(name)))):
         logger.info(f"Setting executable for toolname = {out.toolname} to"
-                    f" {name}")
-        out.executable = name
-        if out.toolname == 'clang++' and not platform._is_win:
+                    f" {name} ({out})")
+        out = out(executable=name)
+        if ((out.toolname == 'clang++' and not platform._is_win
+             and getattr(out, 'executable', None))):
             assert out.toolname in name
     return out
 
