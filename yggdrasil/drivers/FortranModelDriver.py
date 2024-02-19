@@ -102,7 +102,7 @@ class GFortranCompiler(FortranCompilerBase):
                                   ('module-search-path', '-I%s'),
                                   ('standard', '-std=%s')])
     toolset = 'gnu'
-    compatible_toolsets = ['llvm']
+    compatible_toolsets = ['llvm', 'msvc']
     default_archiver = 'ar'
     # GNU ASAN not currently installed with gfortran on osx
     # asan_flags = ['-fsanitize=address']
@@ -110,6 +110,18 @@ class GFortranCompiler(FortranCompilerBase):
     #     FortranCompilerBase.linker_attributes,
     #     asan_flags=['-fsanitize=address', '-shared-libasan'])
     # f'-l{CModelDriver.ClangCompiler.asan_library()}'])
+
+    @staticmethod
+    def before_registration(cls, **kwargs):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        # Put gnu at end of compatible toolset list on windows so that
+        # msvc libraries are preferred (Python assumes MSVC)
+        if platform._is_win and cls.toolset not in cls.compatible_toolsets:
+            cls.compatible_toolsets.append(cls.toolset)
+        FortranCompilerBase.before_registration(cls, **kwargs)
 
 
 # class IFortCompiler(FortranCompilerBase):

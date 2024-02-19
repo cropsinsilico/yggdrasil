@@ -34,6 +34,16 @@ _buildfile_locks = {}
 _library_types = ['include', 'static', 'shared', 'windows_import']
 
 
+class CompilationToolError(Exception):
+    r"""Class for errors related to compilation tools"""
+    pass
+
+
+class InvalidCompilationTool(CompilationToolError):
+    r"""Class for invalid compilation tools"""
+    pass
+
+
 class LockedFile(object):
     r"""Class for locking files during compilation."""
 
@@ -80,9 +90,9 @@ def get_compatible_tool(tool, tooltype, language, default=False):
         if out is None:
             if default is not False:
                 return default
-            raise ValueError(("Could not locate %s for %s language "
-                              "associated with a tool named %s")
-                             % (tooltype, language, tool))
+            raise InvalidCompilationTool(
+                f"Could not locate {tooltype} for {language} language "
+                f"associated with a tool named {tool}")
         tool = out
     if isinstance(tool, bool):  # pragma: debug
         return tool
@@ -100,10 +110,10 @@ def get_compatible_tool(tool, tooltype, language, default=False):
                     return ix
     if default is not False:
         return default
-    raise ValueError(("Could not locate %s for %s language "
-                      "that is compatible with the %s %s.")
-                     % (tooltype, language, tool.toolname,
-                        tool.tooltype))
+    raise InvalidCompilationTool(f"Could not locate {tooltype} for "
+                                 f"{language} language that is compatible"
+                                 f" with the {tool.toolname} "
+                                 f"{tool.tooltype}.")
 
 
 def get_compilation_tool_registry(tooltype, init_languages=None):
@@ -121,8 +131,8 @@ def get_compilation_tool_registry(tooltype, init_languages=None):
         collections.OrderedDict: Registry for specified type.
 
     Raises:
-        ValueError: If tooltype is not a valid value (i.e. 'compiler', 'linker',
-            or 'archiver').
+        InvalidCompilationTool: If tooltype is not a valid value (i.e.
+            'compiler', 'linker', or 'archiver').
 
     """
     if tooltype == 'compiler':
@@ -135,9 +145,10 @@ def get_compilation_tool_registry(tooltype, init_languages=None):
         global _archiver_registry
         reg = _archiver_registry
     else:
-        raise ValueError(("tooltype '%s' is not supported. This keyword must "
-                          "be one of 'compiler', 'linker', or 'archiver'.")
-                         % tooltype)
+        raise InvalidCompilationTool(f"tooltype '{tooltype}' is not "
+                                     f"supported. This keyword must "
+                                     f"be one of 'compiler', 'linker', "
+                                     f"or 'archiver'.")
     if isinstance(init_languages, list):
         for x in init_languages:
             if x not in reg.get('by_language', {}):
@@ -201,7 +212,8 @@ def get_compilation_tool(tooltype, name, default=False,
         CompilationToolBase: Class providing access to the specified tool.
 
     Raises:
-        ValueError: If a tool with the provided name cannot be located.
+        InvalidCompilationTool: If a tool with the provided name cannot
+            be located.
 
     """
     names_to_try = [name, os.path.basename(name),
@@ -216,19 +228,25 @@ def get_compilation_tool(tooltype, name, default=False,
             break
     if out is None:
         if default is False:
-            raise ValueError(f"Could not locate a {tooltype} tool with "
-                             f"name '{name}'")
+            raise InvalidCompilationTool(f"Could not locate a {tooltype} "
+                                         f"tool with name '{name}'")
         out = default
     elif ((isinstance(out, CompilationToolMeta)
            and (os.path.isfile(name) or shutil.which(name))
-           and (out.toolname != name)
-           and (out.get_executable(full_path=True) != name)
-           and (out.get_executable() != name))):
+           and (name not in [out.toolname,
+                             out.get_executable(),
+                             out.get_executable(full_path=True)])
+           and (not (platform._is_win
+                     and name.lower() in [
+                         out.toolname.lower(),
+                         out.get_executable().lower(),
+                         out.get_executable(full_path=True).lower()])))):
         if not return_instance:
-            raise ValueError(f"Provided executable ({name}) conflicts "
-                             f"with the class-defined executable "
-                             f"({out.get_executable()}) and a class is "
-                             f"required.")
+            raise CompilationToolError(f"Provided executable ({name})  "
+                                       f"conflicts with the class-defined"
+                                       f" executable "
+                                       f"({out.get_executable()}) and "
+                                       f"a class is required.")
         kwargs['executable'] = name
     if return_instance and isinstance(out, CompilationToolMeta):
         out = out(**kwargs)
@@ -252,9 +270,9 @@ class CompilationToolMeta(type):
                 languages = cls.languages
             assert len(languages) > 0
             if cls.toolname in cls.aliases:  # pragma: debug
-                raise ValueError(("The name '%s' for class %s is also in "
-                                  "its list of aliases: %s")
-                                 % (cls.toolname, name, cls.aliases))
+                raise CompilationToolError(
+                    f"The name '{cls.toolname}' for class {name} is also "
+                    f"in its list of aliases: {cls.aliases}")
             # Register by toolname & language
             reg = get_compilation_tool_registry(cls.tooltype)
             if 'by_language' not in reg:
@@ -264,18 +282,17 @@ class CompilationToolMeta(type):
             for x in [cls.toolname] + cls.aliases:
                 # Register by toolname
                 if (x in reg) and (str(reg[x]) != str(cls)):  # pragma: debug
-                    raise ValueError(
-                        ("%s toolname '%s' already registered "
-                         "(class = %s, existing = %s).")
-                        % (cls.tooltype.title(), x, cls, reg[x]))
+                    raise CompilationToolError(
+                        f"{cls.tooltype.title()} toolname '{x}' already "
+                        f"registered (class = {cls}, existing = {reg[x]})")
                 reg[x] = cls
                 # Register by language
                 for lang in languages:
                     reg['by_language'].setdefault(lang, OrderedDict())
                     if x in reg['by_language'][lang]:  # pragma: debug
-                        raise ValueError(("%s toolname '%s' already registered for "
-                                          "%s language.")
-                                         % (cls.tooltype.title(), x, lang))
+                        raise CompilationToolError(
+                            f"{cls.tooltype.title()} toolname '{x}' "
+                            f"already registered for {lang} language.")
                     reg['by_language'][lang][x] = cls
                 # Register by toolset
                 for t in cls.compatible_toolsets:
@@ -412,7 +429,7 @@ class CompilationToolBase(object):
         checking environment variables for default settings.
         """
         if cls.toolname is None:  # pragma: debug
-            raise ValueError("Registering unnamed compilation tool.")
+            raise CompilationToolError("Registering unnamed compilation tool.")
         cls.is_gnu = (cls.toolset == 'gnu')
         if (cls.toolset is not None) and (cls.toolset not in cls.compatible_toolsets):
             cls.compatible_toolsets = [cls.toolset] + cls.compatible_toolsets
@@ -3794,15 +3811,16 @@ class CompiledModelDriver(ModelDriver):
                 raise ValueError(f"Unexpected configuration option: '{k}'")
             vtool = None
             try:
-                vtool = get_compilation_tool(k, v)
-            except ValueError:  # pragma: debug
+                vtool = get_compilation_tool(k, v, return_instance=True)
+            except InvalidCompilationTool:  # pragma: debug
                 reg = get_compilation_tool_registry(k)
                 for kreg, vreg in reg.items():
                     if kreg in v:
                         vtool = vreg
                         break
             if not vtool:  # pragma: debug
-                raise ValueError(f"Could not locate a {k} tool '{v}'.")
+                raise InvalidCompilationTool(
+                    f"Could not locate a {k} tool '{v}'.")
             cfg.set(cls.language, k, vtool.toolname)
             if os.path.isfile(v):
                 cfg.set(cls.language, f'{vtool.toolname}_executable', v)

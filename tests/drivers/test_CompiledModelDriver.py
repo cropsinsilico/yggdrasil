@@ -12,7 +12,7 @@ from yggdrasil.components import import_component
 
 def test_get_compatible_tool():
     r"""Test get_compatible_tool when default provided."""
-    with pytest.raises(ValueError):
+    with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
         CompiledModelDriver.get_compatible_tool('invalid', 'compiler', 'c')
     assert (CompiledModelDriver.get_compatible_tool(
         'invalid', 'compiler', 'c', default=None) is None)
@@ -20,7 +20,7 @@ def test_get_compatible_tool():
 
 def test_get_compilation_tool_registry():
     r"""Test errors raised by get_compilation_tool_registry."""
-    with pytest.raises(ValueError):
+    with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
         CompiledModelDriver.get_compilation_tool_registry('invalid')
 
     
@@ -51,7 +51,7 @@ def test_get_compilation_tool():
             vals += [toolname.upper(), toolfile.upper()]
         for v in vals:
             assert CompiledModelDriver.get_compilation_tool(tooltype, v) == out
-        with pytest.raises(ValueError):
+        with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
             CompiledModelDriver.get_compilation_tool('compiler', 'invalid')
     else:
         with pytest.raises(NotImplementedError):

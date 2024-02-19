@@ -56,6 +56,7 @@ requirements:
     - {{ compiler('cxx') }}
   host:
     - hatch-fancy-pypi-readme
+    - libxcrypt  # [py<38]
     - numpy >=1.13.0
     - pip
     - python

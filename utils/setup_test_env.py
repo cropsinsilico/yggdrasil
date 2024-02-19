@@ -569,6 +569,8 @@ def prune_windows_path(scope='batch'):
             if scope == 'gha':
                 cmds.append("echo \"PATH=$PATH\" >> $GITHUB_ENV")
             return cmds
+        elif scope == 'local':
+            os.environ['PATH'] = new_path
     return new_path
     
 

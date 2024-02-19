@@ -78,6 +78,12 @@ general:
       flags:
         build: True
         build_only: True
+  - libxcrypt:
+      method: conda_recipe
+      host: True
+      host_only: True
+      flags:
+        conda_selectors: [py<38]
   - six
   - toml
   - unyt

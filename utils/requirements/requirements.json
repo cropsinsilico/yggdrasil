@@ -129,6 +129,18 @@
         }
       }
     },
+    {
+      "libxcrypt": {
+        "method": "conda_recipe",
+        "host": true,
+        "host_only": true,
+        "flags": {
+          "conda_selectors": [
+            "py<38"
+          ]
+        }
+      }
+    },
     "six",
     "toml",
     "unyt",
