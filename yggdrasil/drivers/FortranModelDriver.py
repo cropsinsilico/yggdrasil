@@ -12,6 +12,8 @@ from yggdrasil.drivers.CompiledModelDriver import (
 
 
 logger = logging.getLogger(__name__)
+if platform._is_win:
+    logger.setLevel(level=logging.DEBUG)
 _top_lang_dir = get_language_dir('fortran')
 _incl_interface = _top_lang_dir
 _c_internal_libs = copy.deepcopy(CModelDriver.CModelDriver.internal_libraries)
@@ -392,6 +394,8 @@ class FortranModelDriver(CompiledModelDriver):
         if platform._is_win:
             kwargs['logging_level'] = "DEBUG"
         super(FortranModelDriver, self).__init__(*args, **kwargs)
+        if platform._is_win:
+            self.logger.setLevel(level=logging.DEBUG)
     
     @staticmethod
     def before_registration(cls):

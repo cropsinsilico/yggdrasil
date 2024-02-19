@@ -521,13 +521,19 @@ class SetupParam(object):
                     help=("Install %s" % k))
 
 
-def prune_windows_path(permanent=False, for_cli=False):
+def prune_windows_path(scope='batch'):
     r"""Prune directories not required by yggdrasil from the windows path
     on a GHA runner to make room to avoid the command limit.
 
     Args:
-        permanent (bool, optional): If True, the path will be permanently
-            modified via the GITHUB_ENV variable.
+        scope (str, optional): Scope in which PATH should be pruned.
+            Options include:
+              'batch' - Return the batch commands that should be used to
+                 update the path.
+              'gha'   - Same as 'batch', but the updated PATH will also
+                 be set via GITHUB_ENV
+              'local' - Update PATH within the local python environment.
+              'cli'   - Print the new path so it can be used by the CLI.
     
     """
     to_remove = (
@@ -539,10 +545,10 @@ def prune_windows_path(permanent=False, for_cli=False):
     #     'C:\\Program Files\\Microsoft SQL Server\\140\\DTS\\Binn',
     #     'C:\\Program Files\\Microsoft SQL Server\\150\\DTS\\Binn',
     #     'C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn']
-    if not for_cli:
-        print(f"PRUNING PATH ({len(os.environ['PATH'])}): "
-              f"{os.environ['PATH']}")
     old_path_list = os.environ['PATH'].split(os.pathsep)
+    if scope != 'cli':
+        print(f"PRUNING PATH ({len(os.environ['PATH'])}):\n"
+              f"{pprint.pformat(old_path_list)}\n")
     path_list = []
     for x in old_path_list:
         if not (x.startswith(to_remove) or x in path_list):
@@ -551,18 +557,19 @@ def prune_windows_path(permanent=False, for_cli=False):
     #     if x in path_list:
     #         path_list.remove(x)
     new_path = os.pathsep.join(path_list)
-    if for_cli:
+    if scope == 'cli':
         return new_path
-    cmds = []
     if len(new_path) == len(os.environ['PATH']):
         print("PRUNED PATH not any shorter")
     else:
         print(f"PRUNED PATH ({len(new_path)}):\n"
               f"{pprint.pformat(new_path.split(os.pathsep))}\n")
-        cmds += [f"set \"PATH={new_path}\""]
-        if permanent and _on_gha:
-            cmds.append("echo \"PATH=$PATH\" >> $GITHUB_ENV")
-    return cmds
+        if scope == 'batch' or scope == 'gha':
+            cmds = [f"set \"PATH={new_path}\""]
+            if scope == 'gha':
+                cmds.append("echo \"PATH=$PATH\" >> $GITHUB_ENV")
+            return cmds
+    return new_path
     
 
 def get_summary_commands(param=None, conda_env=None,
@@ -1183,7 +1190,7 @@ def build_conda_recipe(recipe='recipe', param=None,
     assert conda_env == 'base' or param.dry_run
     assert conda_idx
     if _is_win and _on_gha:
-        cmds += prune_windows_path(permanent=True)
+        cmds += prune_windows_path(scope='gha')
     # Might invalidate cache
     cmds += [f"{CONDA_CMD} clean --all {param.conda_flags_general}"]
     cmds += setup_conda(param=param, conda_env=conda_env,
@@ -2209,4 +2216,4 @@ if __name__ == "__main__":
             allow_missing=args.allow_missing,
             remove_existing=args.remove_existing)
     elif args.operation == 'prune-path':
-        print(prune_windows_path(for_cli=True))
+        print(prune_windows_path(scope='cli'))

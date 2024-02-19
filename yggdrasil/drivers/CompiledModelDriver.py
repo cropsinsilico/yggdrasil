@@ -16,6 +16,8 @@ from yggdrasil.components import import_component
 
 
 logger = logging.getLogger(__name__)
+if platform._is_win:
+    logger.setLevel(level=logging.DEBUG)
 _compiler_registry = OrderedDict()
 _linker_registry = OrderedDict()
 _archiver_registry = OrderedDict()
@@ -178,16 +180,22 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
     return out
 
 
-def get_compilation_tool(tooltype, name, default=False):
+def get_compilation_tool(tooltype, name, default=False,
+                         return_instance=False, **kwargs):
     r"""Return the class providing information about a compilation tool.
 
     Args:
-        tooltype (str): Type of tool. Valid values include 'compiler', 'linker',
-            and 'archiver'.
+        tooltype (str): Type of tool. Valid values include 'compiler',
+            'linker', and 'archiver'.
         name (str): Name or path to the desired compilation tool.
-        default (object, optional): Value that should be returned if a tool
-            cannot be located. If False, an error will be raised. Defaults to
+        default (object, optional): Value that should be returned if a
+            tool cannot be located. If False, an error will be raised.
+            Defaults to False.
+        return_instance (bool, optional): If True, an instance of the
+            located class is returned instead of the class. Defaults to
             False.
+        **kwargs: Additional keyword arguments are passed to the class
+            constructor if return_instance is True.
 
     Returns:
         CompilationToolBase: Class providing access to the specified tool.
@@ -211,14 +219,19 @@ def get_compilation_tool(tooltype, name, default=False):
             raise ValueError(f"Could not locate a {tooltype} tool with "
                              f"name '{name}'")
         out = default
-    elif ((isinstance(out, CompilationToolMeta) and (out.toolname != name)
-           and (os.path.isfile(name) or shutil.which(name)))):
-        logger.info(f"Setting executable for toolname = {out.toolname} to"
-                    f" {name} ({out})")
-        out = out(executable=name)
-        if ((out.toolname == 'clang++' and not platform._is_win
-             and getattr(out, 'executable', None))):
-            assert out.toolname in name
+    elif ((isinstance(out, CompilationToolMeta)
+           and (os.path.isfile(name) or shutil.which(name))
+           and (out.toolname != name)
+           and (out.get_executable(full_path=True) != name)
+           and (out.get_executable() != name))):
+        if not return_instance:
+            raise ValueError(f"Provided executable ({name}) conflicts "
+                             f"with the class-defined executable "
+                             f"({out.get_executable()}) and a class is "
+                             f"required.")
+        kwargs['executable'] = name
+    if return_instance and isinstance(out, CompilationToolMeta):
+        out = out(**kwargs)
     return out
 
 
@@ -390,11 +403,6 @@ class CompilationToolBase(object):
                 setattr(self, k, v)
         if len(kwargs) > 0:
             raise RuntimeError("Unused keyword arguments: %s" % kwargs.keys())
-        if getattr(self, 'executable', None):
-            logger.info(f"Creating {self.toolname} {self.tooltype}: "
-                        f"{getattr(self, 'executable', None)}")
-            if self.toolname == 'clang++' and not platform._is_win:
-                assert self.toolname in self.executable
         super(CompilationToolBase, self).__init__(**kwargs)
 
     @staticmethod
@@ -413,13 +421,6 @@ class CompilationToolBase(object):
         for k in attr_list:
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
-        if isinstance(cls.toolname, str) and cls.toolname.startswith('clang'):
-            logger.info(
-                f"{cls.toolname} before_registration:\n"
-                f"  cls.default_executable = {cls.default_executable}\n"
-                f"  cls.env_matches_tool() = {cls.env_matches_tool()}\n"
-                f"  cls.env_matches_tool(use_sysconfig=True) = "
-                f"{cls.env_matches_tool(use_sysconfig=True)}")
         # Set attributes based on environment variables or sysconfig
         if cls.default_executable is None:
             cls.default_executable = cls.env_matches_tool()
@@ -872,15 +873,6 @@ class CompilationToolBase(object):
             str: Name of (or path to) the tool executable.
 
         """
-        if cls.toolname == 'clang++':
-            from yggdrasil.config import ygg_cfg
-            logger.info(
-                f"clang++ get_executable:\n"
-                f"  cls.languages = {cls.languages}\n"
-                f"  cls.executable = {getattr(cls, 'executable', None)}\n"
-                f"  cls.default_executable = {cls.default_executable}\n"
-                f"  yggcfg({cls.languages[0]}, clang++_executable) = "
-                f"{ygg_cfg.get(cls.languages[0], 'clang++_executable', None)}")
         out = getattr(cls, 'executable', None)
         if out is None:
             from yggdrasil.config import ygg_cfg
@@ -895,8 +887,6 @@ class CompilationToolBase(object):
                                       f"'{cls.tooltype}'.")
         if full_path:
             out = shutil.which(out)
-        if cls.toolname == 'clang++' and not platform._is_win:
-            assert cls.toolname in out
         return out
 
     @classmethod
@@ -1484,8 +1474,10 @@ class CompilerBase(CompilationToolBase):
         if linker is None:
             linker = find_compilation_tool('linker', cls.languages[0])
         if linker:
-            out = get_compilation_tool('linker', linker)(flags=linker_flags,
-                                                         executable=linker)
+            out = get_compilation_tool('linker', linker,
+                                       return_instance=True,
+                                       flags=linker_flags,
+                                       executable=linker)
             assert out.is_installed()
         else:
             out = linker
@@ -1505,10 +1497,13 @@ class CompilerBase(CompilationToolBase):
             archiver = find_compilation_tool('archiver', cls.languages[0])
         out = archiver
         if archiver:
-            out = get_compilation_tool('archiver', archiver)(flags=archiver_flags,
-                                                             executable=archiver)
+            out = get_compilation_tool('archiver', archiver,
+                                       return_instance=True,
+                                       flags=archiver_flags,
+                                       executable=archiver)
             if not out.is_installed():
-                out = get_compatible_tool(cls, 'archiver', language=cls.languages[0])
+                out = get_compatible_tool(cls, 'archiver',
+                                          language=cls.languages[0])
         return out
 
     @classmethod
@@ -2036,7 +2031,6 @@ class LinkerBase(CompilationToolBase):
                 kwargs_link[k] = kwargs[k]
         if compiler and kwargs.get('with_asan', False) and cls.asan_flags:
             asan_lib = compiler.asan_library()
-            logger.info(f"ASAN_LIBRARY: {asan_lib}")
             if asan_lib:
                 kwargs_link.setdefault('libraries', [])
                 kwargs_link['libraries'].append(asan_lib)
@@ -3803,7 +3797,7 @@ class CompiledModelDriver(ModelDriver):
                 vtool = get_compilation_tool(k, v)
             except ValueError:  # pragma: debug
                 reg = get_compilation_tool_registry(k)
-                for kreg, vreg in reg.keys():
+                for kreg, vreg in reg.items():
                     if kreg in v:
                         vtool = vreg
                         break

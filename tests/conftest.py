@@ -25,6 +25,8 @@ logger.setLevel(logging.DEBUG)
 
 pytest_plugins = 'pytest-yggdrasil'
 _test_directory = os.path.abspath(os.path.dirname(__file__))
+_repo_directory = os.path.dirname(_test_directory)
+_util_directory = os.path.join(_repo_directory, "utils")
 _update_args_in_cmdline = False
 
 _test_registry = []
@@ -133,9 +135,16 @@ def setup_ci(opts, disable_extra=False):
     # f'--rootdir={package_dir}']
     # if not any(x.startswith('--with-mpi') for x in args):
     #     args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+    # Skip additional package checks
     if disable_extra:
         return
-    # Additional checks
+    # Prune the path
+    if platform._is_win:
+        sys.path.append(_util_directory)
+        from setup_test_env import prune_windows_path
+        prune_windows_path(scope='local')
+        sys.path.pop()
+    # Load settings from pyporject.toml
     if not os.path.isfile('pyproject.toml'):
         raise RuntimeError("The CI tests must be run from the root "
                            "directory of the yggdrasil git repository.")
@@ -147,6 +156,7 @@ def setup_ci(opts, disable_extra=False):
         import toml as toml
         with open('pyproject.toml', "r") as f:
             pyproject_data = toml.load(f)
+    # Check that the tests are loading the installed package
     git_version = pyproject_data['tool']['setuptools_scm']['git_describe_command']
     src_cmd = (
         f'python -c \"import setuptools_scm; '
@@ -170,14 +180,17 @@ def setup_ci(opts, disable_extra=False):
                f"\tTop    directory: {top_dir}\n")
     if src_ver != dst_ver or src_dir == dst_dir:  # pragma: debug
         raise RuntimeError(message)
+    # Lint
     subprocess.check_call(
         ["flake8", "yggdrasil"])  # , "--append-config", "setup.cfg"])
+    # Check coverage
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
         contents = fd.read()
         print(f".coveragerc (cwd={os.getcwd()}):\n{contents}")
         assert contents
+    # Get package info
     subprocess.check_call(["yggdrasil", "info", "--verbose"])
 
 
