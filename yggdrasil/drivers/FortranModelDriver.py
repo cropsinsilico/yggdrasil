@@ -102,7 +102,7 @@ class GFortranCompiler(FortranCompilerBase):
                                   ('module-search-path', '-I%s'),
                                   ('standard', '-std=%s')])
     toolset = 'gnu'
-    compatible_toolsets = ['msvc', 'llvm']
+    compatible_toolsets = ['llvm', 'msvc']
     default_archiver = 'ar'
     # GNU ASAN not currently installed with gfortran on osx
     # asan_flags = ['-fsanitize=address']
@@ -119,8 +119,8 @@ class GFortranCompiler(FortranCompilerBase):
         """
         # Put gnu at end of compatible toolset list on windows so that
         # msvc libraries are preferred (Python assumes MSVC)
-        if platform._is_win and cls.toolset not in cls.compatible_toolsets:
-            cls.compatible_toolsets.append(cls.toolset)
+        if platform._is_win:
+            cls.compatible_toolsets = ['msvc', 'cl', 'llvm']
         FortranCompilerBase.before_registration(cls, **kwargs)
 
 
