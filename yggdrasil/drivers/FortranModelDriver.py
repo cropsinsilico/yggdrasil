@@ -120,7 +120,7 @@ class GFortranCompiler(FortranCompilerBase):
         # Put gnu at end of compatible toolset list on windows so that
         # msvc libraries are preferred (Python assumes MSVC)
         if platform._is_win:
-            cls.compatible_toolsets = ['msvc', 'cl', 'llvm']
+            cls.compatible_toolsets = ['msvc', 'gnu', 'llvm']
         FortranCompilerBase.before_registration(cls, **kwargs)
 
 
