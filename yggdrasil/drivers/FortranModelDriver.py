@@ -170,9 +170,9 @@ class FortranModelDriver(CompiledModelDriver):
                                      'YggInterface.f90'),
               'libtype': 'static',
               'internal_dependencies': (
-                  [('c', x) for x in
-                   _c_internal_libs['ygg']['internal_dependencies']]
-                  + [('c', 'ygg'), 'c_wrappers']),
+                  # [('c', x) for x in
+                  #  _c_internal_libs['ygg']['internal_dependencies']]
+                  [('c', 'ygg'), 'c_wrappers']),
               'external_dependencies': (
                   [('c', x) for x in
                    _c_internal_libs['ygg']['external_dependencies']]),
