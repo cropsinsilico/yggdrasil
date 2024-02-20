@@ -102,7 +102,7 @@ class GFortranCompiler(FortranCompilerBase):
                                   ('module-search-path', '-I%s'),
                                   ('standard', '-std=%s')])
     toolset = 'gnu'
-    compatible_toolsets = ['llvm', 'msvc']
+    compatible_toolsets = ['msvc', 'llvm']
     default_archiver = 'ar'
     # GNU ASAN not currently installed with gfortran on osx
     # asan_flags = ['-fsanitize=address']
