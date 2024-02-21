@@ -971,6 +971,7 @@ module fygg
      class(*), dimension(:), pointer :: item_array => null() !< Fortran pointer to 1D array
      class(*), dimension(:, :), pointer :: item_array_2d => null() !< Fortran pointer to 2D array
      class(*), dimension(:, :, :), pointer :: item_array_3d => null() !< Fortran pointer to 3D array
+     character(len=:), dimension(:), pointer :: item_array_char => null() !< Explicit pointer to 1D character array
      character, dimension(:), pointer :: data_character_unit => null() !< Fortran pointer to array of characters
      character(kind=ucs4), dimension(:), &
           pointer :: data_unicode_unit => null() !< Fortran array to array of unicode characters
@@ -994,7 +995,7 @@ module fygg
   end type yggptr_map
   !> @brief Wrapper for a C generic object.
   type, bind(c) :: ygggeneric
-     type(c_ptr) :: obj !< Pointer to C generic object
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to C generic object
   end type ygggeneric
   !> @brief Wrapper for C NULL object.
   type :: yggnull
@@ -1005,35 +1006,35 @@ module fygg
   end type yggnull
   !> @brief Wrapper for an array of generic objects (stored in a generic object).
   type, bind(c) :: yggarr
-     type(c_ptr) :: obj !< Pointer to wrapped array.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped array.
   end type yggarr
   !> @brief Wrapper for a mapping of generic objects (stored in a generic object).
   type, bind(c) :: yggmap
-     type(c_ptr) :: obj !< Pointer to wrapped mapping.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped mapping.
   end type yggmap
   !> @brief Wrapper for a schema (stored in a generic object).
   type, bind(c) :: yggschema
-     type(c_ptr) :: obj !< Pointer to wrapped schema.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped schema.
   end type yggschema
   !> @brief  Wrapper for a Python instance (stored in a generic object).
   type, bind(c) :: yggpyinst
-     type(c_ptr) :: obj !< Pointer to wrapped Python instance.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped Python instance.
   end type yggpyinst
   !> @brief Wrapper for a Python function.
   type, bind(c) :: yggpyfunc
-     type(c_ptr) :: obj !< Pointer to wrapped Python instance.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped Python instance.
   end type yggpyfunc
   !> @brief Wrapper for a Python object.
   type, bind(c) :: yggpython
-     type(c_ptr) :: obj !< Pointer to wrapped Python instance.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped Python instance.
   end type yggpython
   !> @brief Ply structure.
   type, bind(c) :: yggply
-     type(c_ptr) :: obj !< Pointer to wrapped rapidjson::Ply instance.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped rapidjson::Ply instance.
   end type yggply
   !> @brief Obj structure.
   type, bind(c) :: yggobj
-     type(c_ptr) :: obj !< Pointer to wrapped rapidjson::ObjWavefront instance.
+     type(c_ptr) :: obj = c_null_ptr !< Pointer to wrapped rapidjson::ObjWavefront instance.
   end type yggobj
   !> @brief Wrapper for a 1 byte unsigned integer.
   type ygguint1
@@ -1275,18 +1276,20 @@ contains
   subroutine ygglog_info(fmt)
     implicit none
     character(len=*), intent(in) :: fmt
-    character(len=len_trim(fmt)+1) :: c_fmt
-    c_fmt = trim(fmt)//c_null_char
+    character(kind=c_char), allocatable :: c_fmt(:)
+    c_fmt = convert_string_f2c(fmt)
     call ygglog_info_c(c_fmt)
+    deallocate(c_fmt)
   end subroutine ygglog_info
   !> @brief Write a log message at the DEBUG level.
   !> @param[in] fmt Log message.
   subroutine ygglog_debug(fmt)
     implicit none
     character(len=*), intent(in) :: fmt
-    character(len=len_trim(fmt)+1) :: c_fmt
-    c_fmt = trim(fmt)//c_null_char
+    character(kind=c_char), allocatable :: c_fmt(:)
+    c_fmt = convert_string_f2c(fmt)
     call ygglog_debug_c(c_fmt)
+    deallocate(c_fmt)
   end subroutine ygglog_debug
   !> @brief Write a log message at the ERROR level. This will also cause
   !>   the calling model to return an error code on exit.
@@ -1294,9 +1297,10 @@ contains
   subroutine ygglog_error(fmt)
     implicit none
     character(len=*), intent(in) :: fmt
-    character(len=len_trim(fmt)+1) :: c_fmt
-    c_fmt = trim(fmt)//c_null_char
+    character(kind=c_char), allocatable :: c_fmt(:)
+    c_fmt = convert_string_f2c(fmt)
     call ygglog_error_c(c_fmt)
+    deallocate(c_fmt)
   end subroutine ygglog_error
 
   ! Methods for initializing channels
@@ -1340,10 +1344,11 @@ contains
   function ygg_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_output_c(c_name)
+    deallocate(c_name)
   end function ygg_output
   
   !> @brief Constructor for an input comm.
@@ -1355,10 +1360,11 @@ contains
   function ygg_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_input_c(c_name)
+    deallocate(c_name)
   end function ygg_input
 
   !> @brief Constructor for an output comm that will send a specific data 
@@ -1373,12 +1379,13 @@ contains
     implicit none
     character(len=*), intent(in) :: name
     type(yggdtype) :: datatype
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(c_ptr) :: c_datatype
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     c_datatype = datatype%ptr
     channel%comm = ygg_output_type_c(c_name, c_datatype)
+    deallocate(c_name)
   end function ygg_output_type
   
   !> @brief Constructor for an input comm that will receive a specific data 
@@ -1393,12 +1400,13 @@ contains
     implicit none
     character(len=*), intent(in) :: name
     type(yggdtype) :: datatype
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(c_ptr) :: c_datatype
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     c_datatype = datatype%ptr
     channel%comm = ygg_input_type_c(c_name, c_datatype)
+    deallocate(c_name)
   end function ygg_input_type
   
   !> @brief Constructor for an output comm with a type specified via a 
@@ -1413,13 +1421,14 @@ contains
     implicit none
     character(len=*), intent(in) :: name
     character(len=*), intent(in) :: fmt
-    character(len=len_trim(name)+1) :: c_name
-    character(len=len_trim(fmt)+1) :: c_fmt
+    character(kind=c_char), allocatable :: c_name(:)
+    character(kind=c_char), allocatable :: c_fmt(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
-    c_fmt = trim(fmt)//c_null_char
-    call fix_format_str(c_fmt)
+    c_name = convert_string_f2c(name)
+    c_fmt = convert_format_f2c(fmt)
     channel%comm = ygg_output_fmt_c(c_name, c_fmt)
+    deallocate(c_name)
+    deallocate(c_fmt)
   end function ygg_output_fmt
   
   !> @brief Constructor for an input comm with a type specified via a C-style 
@@ -1434,13 +1443,14 @@ contains
     implicit none
     character(len=*), intent(in) :: name
     character(len=*), intent(in) :: fmt
-    character(len=len_trim(name)+1) :: c_name
-    character(len=len_trim(fmt)+1) :: c_fmt
+    character(kind=c_char), allocatable :: c_name(:)
+    character(kind=c_char), allocatable :: c_fmt(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
-    c_fmt = trim(fmt)//c_null_char
-    call fix_format_str(c_fmt)
+    c_name = convert_string_f2c(name)
+    c_fmt = convert_format_f2c(fmt)
     channel%comm = ygg_input_fmt_c(c_name, c_fmt)
+    deallocate(c_name)
+    deallocate(c_fmt)
   end function ygg_input_fmt
   
   !> @brief Constructor for an ASCII file output comm.
@@ -1453,10 +1463,11 @@ contains
   function ygg_ascii_file_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_ascii_file_output_c(c_name)
+    deallocate(c_name)
   end function ygg_ascii_file_output
   
   !> @brief Constructor for an ASCII file input comm.
@@ -1469,10 +1480,11 @@ contains
   function ygg_ascii_file_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_ascii_file_input_c(c_name)
+    deallocate(c_name)
   end function ygg_ascii_file_input
   
   !> @brief Constructor for an ASCII table output comm.
@@ -1480,22 +1492,23 @@ contains
   !>   name that is used to locate a particular comm address stored in an 
   !>   environment variable and a format string. This type of comm outputs 
   !>   table rows one at a time and formats them using the provided
-  !>   format_str.
+  !>   fmt.
   !> @param[in] name Name of the channel.
-  !> @param[in] format_str C-style format string that should be used to format
+  !> @param[in] fmt C-style format string that should be used to format
   !>   table rows.
   !> @returns Output comm structure.
-  function ygg_ascii_table_output(name, format_str) result(channel)
+  function ygg_ascii_table_output(name, fmt) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: format_str
-    character(len=len_trim(name)+1) :: c_name
-    character(len=len_trim(format_str)+1) :: c_format_str
+    character(len=*), intent(in) :: fmt
+    character(kind=c_char), allocatable :: c_name(:)
+    character(kind=c_char), allocatable :: c_fmt(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
-    c_format_str = trim(format_str)//c_null_char
-    call fix_format_str(c_format_str)
-    channel%comm = ygg_ascii_table_output_c(c_name, c_format_str)
+    c_name = convert_string_f2c(name)
+    c_fmt = convert_format_f2c(fmt)
+    channel%comm = ygg_ascii_table_output_c(c_name, c_fmt)
+    deallocate(c_name)
+    deallocate(c_fmt)
   end function ygg_ascii_table_output
   
   !> @brief Constructor for an ASCII table input comm.
@@ -1508,32 +1521,34 @@ contains
   function ygg_ascii_table_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_ascii_table_input_c(c_name)
+    deallocate(c_name)
   end function ygg_ascii_table_input
   
   !> @brief Constructor for an ASCII table array output comm.
   !>   Create a yggcomm structure for an output channel based on a provided 
   !>   name that is used to locate a particular comm address stored in an 
   !>   environment variable and a format string. This type of comm outputs 
-  !>   table columns as arrays and formats rows using the provided format_str.
+  !>   table columns as arrays and formats rows using the provided fmt.
   !> @param[in] name Name of the channel.
-  !> @param[in] format_str C-style format string that should be used to format
+  !> @param[in] fmt C-style format string that should be used to format
   !>   table rows.
   !> @returns Output comm structure.
-  function ygg_ascii_array_output(name, format_str) result(channel)
+  function ygg_ascii_array_output(name, fmt) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: format_str
-    character(len=len_trim(name)+1) :: c_name
-    character(len=len_trim(format_str)+1) :: c_format_str
+    character(len=*), intent(in) :: fmt
+    character(kind=c_char), allocatable :: c_name(:)
+    character(kind=c_char), allocatable :: c_fmt(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
-    c_format_str = trim(format_str)//c_null_char
-    call fix_format_str(c_format_str)
-    channel%comm = ygg_ascii_array_output_c(c_name, c_format_str)
+    c_name = convert_string_f2c(name)
+    c_fmt = convert_format_f2c(fmt)
+    channel%comm = ygg_ascii_array_output_c(c_name, c_fmt)
+    deallocate(c_name)
+    deallocate(c_fmt)
   end function ygg_ascii_array_output
   
   !> @brief Constructor for an ASCII table array input comm.
@@ -1546,10 +1561,11 @@ contains
   function ygg_ascii_array_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_ascii_array_input_c(c_name)
+    deallocate(c_name)
   end function ygg_ascii_array_input
   
   !> @brief Constructor for an output comm that sends Ply data.
@@ -1562,10 +1578,11 @@ contains
   function ygg_ply_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_ply_output_c(c_name)
+    deallocate(c_name)
   end function ygg_ply_output
   
   !> @brief Constructor for an input comm that receives Ply data.
@@ -1578,10 +1595,11 @@ contains
   function ygg_ply_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_ply_input_c(c_name)
+    deallocate(c_name)
   end function ygg_ply_input
   
   !> @brief Constructor for an output comm that sends Obj data.
@@ -1594,10 +1612,11 @@ contains
   function ygg_obj_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_obj_output_c(c_name)
+    deallocate(c_name)
   end function ygg_obj_output
   
   !> @brief Constructor for an input comm that receives Obj data.
@@ -1610,10 +1629,11 @@ contains
   function ygg_obj_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_obj_input_c(c_name)
+    deallocate(c_name)
   end function ygg_obj_input
 
   !> @brief Constructor for an output comm that sends generic data.
@@ -1626,10 +1646,11 @@ contains
   function ygg_generic_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_generic_output_c(c_name)
+    deallocate(c_name)
   end function ygg_generic_output
   
   !> @brief Constructor for an input comm that receives generic data.
@@ -1642,10 +1663,11 @@ contains
   function ygg_generic_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_generic_input_c(c_name)
+    deallocate(c_name)
   end function ygg_generic_input
 
   !> @brief Constructor for an output comm that sends generic data.
@@ -1658,10 +1680,11 @@ contains
   function ygg_any_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_any_output_c(c_name)
+    deallocate(c_name)
   end function ygg_any_output
   
   !> @brief Constructor for an input comm that receives generic data.
@@ -1674,10 +1697,11 @@ contains
   function ygg_any_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_any_input_c(c_name)
+    deallocate(c_name)
   end function ygg_any_input
 
   !> @brief Constructor for an output comm that sends JSON arrays of generic
@@ -1690,10 +1714,11 @@ contains
   function ygg_json_array_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_json_array_output_c(c_name)
+    deallocate(c_name)
   end function ygg_json_array_output
   
   !> @brief Constructor for an input comm that receives JSON arrays of 
@@ -1706,10 +1731,11 @@ contains
   function ygg_json_array_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_json_array_input_c(c_name)
+    deallocate(c_name)
   end function ygg_json_array_input
 
   !> @brief Constructor for an output comm that sends JSON objects of generic 
@@ -1722,10 +1748,11 @@ contains
   function ygg_json_object_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_json_object_output_c(c_name)
+    deallocate(c_name)
   end function ygg_json_object_output
   
   !> @brief Constructor for an input comm that receives JSON objects of 
@@ -1738,10 +1765,11 @@ contains
   function ygg_json_object_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_json_object_input_c(c_name)
+    deallocate(c_name)
   end function ygg_json_object_input
 
   !> @brief Constructor for a client-side RPC comm.
@@ -1760,30 +1788,31 @@ contains
     character(len=*), intent(in) :: name
     character(len=*), intent(in), optional :: out_fmt_in
     character(len=*), intent(in), optional :: in_fmt_in
-    character(len=len_trim(name)+1) :: c_name
-    character(len=:), allocatable :: c_out_fmt
-    character(len=:), allocatable :: c_in_fmt
+    character(kind=c_char), allocatable :: c_name(:)
+    character(kind=c_char), allocatable :: c_out_fmt(:)
+    character(kind=c_char), allocatable :: c_in_fmt(:)
     type(yggcomm) :: channel
     if (present(out_fmt_in)) then
-       allocate(character(len=len_trim(out_fmt_in)+1) :: c_out_fmt)
-       c_out_fmt = trim(out_fmt_in)//c_null_char
+       c_out_fmt = convert_format_f2c(out_fmt_in)
     else
-       allocate(character(len=3) :: c_out_fmt)
-       c_out_fmt(1:2) = '%s'
-       c_out_fmt(3:3) = c_null_char
+       allocate(c_out_fmt(3))
+       c_out_fmt(1) = '%'
+       c_out_fmt(2) = 's'
+       c_out_fmt(3) = c_null_char
     end if
     if (present(in_fmt_in)) then
-       allocate(character(len=len_trim(in_fmt_in)+1) :: c_in_fmt)
-       c_in_fmt = trim(in_fmt_in)//c_null_char
+       c_in_fmt = convert_format_f2c(in_fmt_in)
     else
-       allocate(character(len=3) :: c_in_fmt)
-       c_in_fmt(1:2) = '%s'
-       c_in_fmt(3:3) = c_null_char
+       allocate(c_in_fmt(3))
+       c_in_fmt(1) = '%'
+       c_in_fmt(2) = 's'
+       c_in_fmt(3) = c_null_char
     end if
-    c_name = trim(name)//c_null_char
-    call fix_format_str(c_out_fmt)
-    call fix_format_str(c_in_fmt)
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_rpc_client_c(c_name, c_out_fmt, c_in_fmt)
+    deallocate(c_out_fmt)
+    deallocate(c_in_fmt)
+    deallocate(c_name)
   end function ygg_rpc_client
 
   !> @brief Constructor for a server-side RPC comm.
@@ -1802,30 +1831,31 @@ contains
     character(len=*), intent(in) :: name
     character(len=*), intent(in), optional :: in_fmt_in
     character(len=*), intent(in), optional :: out_fmt_in
-    character(len=len_trim(name)+1) :: c_name
-    character(len=:), allocatable :: c_in_fmt
-    character(len=:), allocatable :: c_out_fmt
+    character(kind=c_char), allocatable :: c_name(:)
+    character(kind=c_char), allocatable :: c_out_fmt(:)
+    character(kind=c_char), allocatable :: c_in_fmt(:)
     type(yggcomm) :: channel
-    if (present(in_fmt_in)) then
-       allocate(character(len=len_trim(in_fmt_in)+1) :: c_in_fmt)
-       c_in_fmt = trim(in_fmt_in)//c_null_char
-    else
-       allocate(character(len=3) :: c_in_fmt)
-       c_in_fmt(1:2) = '%s'
-       c_in_fmt(3:3) = c_null_char
-    end if
     if (present(out_fmt_in)) then
-       allocate(character(len=len_trim(out_fmt_in)+1) :: c_out_fmt)
-       c_out_fmt = trim(out_fmt_in)//c_null_char
+       c_out_fmt = convert_format_f2c(out_fmt_in)
     else
-       allocate(character(len=3) :: c_out_fmt)
-       c_out_fmt(1:2) = '%s'
-       c_out_fmt(3:3) = c_null_char
+       allocate(c_out_fmt(3))
+       c_out_fmt(1) = '%'
+       c_out_fmt(2) = 's'
+       c_out_fmt(3) = c_null_char
     end if
-    c_name = trim(name)//c_null_char
-    call fix_format_str(c_in_fmt)
-    call fix_format_str(c_out_fmt)
+    if (present(in_fmt_in)) then
+       c_in_fmt = convert_format_f2c(in_fmt_in)
+    else
+       allocate(c_in_fmt(3))
+       c_in_fmt(1) = '%'
+       c_in_fmt(2) = 's'
+       c_in_fmt(3) = c_null_char
+    end if
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_rpc_server_c(c_name, c_in_fmt, c_out_fmt)
+    deallocate(c_out_fmt)
+    deallocate(c_in_fmt)
+    deallocate(c_name)
   end function ygg_rpc_server
 
   !> @brief Constructor for a client-side RPC comm with explicit datatypes.
@@ -1846,7 +1876,7 @@ contains
     type(yggdtype), optional :: in_type_in
     type(c_ptr) :: c_out_type
     type(c_ptr) :: c_in_type
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
     if (present(out_type_in)) then
        c_out_type = out_type_in%ptr
@@ -1858,8 +1888,9 @@ contains
     else
        c_in_type = c_null_ptr
     end if
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_rpc_client_type_c(c_name, c_out_type, c_in_type)
+    deallocate(c_name)
   end function ygg_rpc_client_type
 
   !> @brief Constructor for a server-side RPC comm with explicit datatypes.
@@ -1880,7 +1911,7 @@ contains
     type(yggdtype), optional :: out_type_in
     type(c_ptr) :: c_in_type
     type(c_ptr) :: c_out_type
-    character(len=len_trim(name)+1) :: c_name
+    character(kind=c_char), allocatable :: c_name(:)
     type(yggcomm) :: channel
     if (present(in_type_in)) then
        c_in_type = in_type_in%ptr
@@ -1892,8 +1923,9 @@ contains
     else
        c_out_type = c_null_ptr
     end if
-    c_name = trim(name)//c_null_char
+    c_name = convert_string_f2c(name)
     channel%comm = ygg_rpc_server_type_c(c_name, c_in_type, c_out_type)
+    deallocate(c_name)
   end function ygg_rpc_server_type
 
   !> @brief Constructor for a timesync comm.
@@ -1907,12 +1939,14 @@ contains
     implicit none
     character(len=*), intent(in) :: name
     character(len=*), intent(in) :: units
-    character(len=len_trim(name)+1) :: c_name
-    character(len=len_trim(units)+1) :: c_units
+    character(kind=c_char), allocatable :: c_name(:)
+    character(kind=c_char), allocatable :: c_units(:)
     type(yggcomm) :: channel
-    c_name = trim(name)//c_null_char
-    c_units = trim(units)//c_null_char
+    c_name = convert_string_f2c(name)
+    c_units = convert_string_f2c(units)
     channel%comm = ygg_timesync_c(c_name, c_units)
+    deallocate(c_name)
+    deallocate(c_units)
   end function ygg_timesync
 
   ! Method for constructing data types
@@ -1943,10 +1977,11 @@ contains
     character(len=*), intent(in) :: schema
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    character(len=len_trim(schema)+1) :: c_schema
-    c_schema = trim(schema)//c_null_char
+    character(kind=c_char), allocatable :: c_schema(:)
+    c_schema = convert_string_f2c(schema)
     out%ptr = create_dtype_from_schema_c(c_schema, &
          logical(use_generic, kind=1))
+    deallocate(c_schema)
   end function create_dtype_from_schema
 
   !> @brief Create an empty data type.
@@ -1996,9 +2031,10 @@ contains
     character(len=*), intent(in) :: typename
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    character(len=len_trim(typename)+1) :: c_typename
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_typename = convert_string_f2c(typename)
     out%ptr = create_dtype_default_c(c_typename, logical(use_generic, kind=1))
+    deallocate(c_typename)
   end function create_dtype_default
 
   !> @brief Create a data type for handling scalars with fixed precision.
@@ -2017,14 +2053,16 @@ contains
     character(len=*), intent(in) :: units
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    character(len=len_trim(subtype)+1) :: c_subtype
+    character(kind=c_char), allocatable :: c_subtype(:)
     integer(kind=c_size_t) :: c_precision
-    character(len=len_trim(units)+1) :: c_units
-    c_subtype = trim(subtype)//c_null_char
+    character(kind=c_char), allocatable :: c_units(:)
+    c_subtype = convert_string_f2c(subtype)
     c_precision = precision
-    c_units = trim(units)//c_null_char
+    c_units = convert_string_f2c(units)
     out%ptr = create_dtype_scalar_c(c_subtype, c_precision, c_units, &
          logical(use_generic, kind=1))
+    deallocate(c_subtype)
+    deallocate(c_units)
   end function create_dtype_scalar
 
   !> @brief Create a data type for handling 1D arrays with fixed precision.
@@ -2045,16 +2083,18 @@ contains
     character(len=*), intent(in) :: units
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    character(len=len_trim(subtype)+1) :: c_subtype
+    character(kind=c_char), allocatable :: c_subtype(:)
     integer(kind=c_size_t) :: c_precision
     integer(kind=c_size_t) :: c_length
-    character(len=len_trim(units)+1) :: c_units
-    c_subtype = trim(subtype)//c_null_char
+    character(kind=c_char), allocatable :: c_units(:)
+    c_subtype = convert_string_f2c(subtype)
     c_precision = precision
     c_length = length
-    c_units = trim(units)//c_null_char
+    c_units = convert_string_f2c(units)
     out%ptr = create_dtype_1darray_c(c_subtype, c_precision, c_length, &
          c_units, logical(use_generic, kind=1))
+    deallocate(c_subtype)
+    deallocate(c_units)
   end function create_dtype_1darray
 
   !> @brief Create a data type for handling 1D arrays with fixed precision.
@@ -2078,19 +2118,21 @@ contains
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
     integer(kind=c_size_t), dimension(:), pointer :: pshape
-    character(len=len_trim(subtype)+1) :: c_subtype
+    character(kind=c_char), allocatable :: c_subtype(:)
     integer(kind=c_size_t) :: c_precision
     integer(kind=c_size_t) :: c_ndim
     type(c_ptr) :: c_shape
-    character(len=len_trim(units)+1) :: c_units
+    character(kind=c_char), allocatable :: c_units(:)
     pshape => shape
-    c_subtype = trim(subtype)//c_null_char
+    c_subtype = convert_string_f2c(subtype)
     c_precision = precision
     c_ndim = ndim
     c_shape = c_loc(shape(1))
-    c_units = trim(units)//c_null_char
+    c_units = convert_string_f2c(units)
     out%ptr = create_dtype_ndarray_c(c_subtype, c_precision, c_ndim, &
          c_shape, c_units, logical(use_generic, kind=1))
+    deallocate(c_subtype)
+    deallocate(c_units)
   end function create_dtype_ndarray
 
   !> @brief Create a data type for handling JSON arrays.
@@ -2190,10 +2232,10 @@ contains
     integer, intent(in) :: as_array
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    character(len=len_trim(format_str)+1) :: c_format_str
-    c_format_str = trim(format_str)//c_null_char
-    call fix_format_str(c_format_str)
+    character(kind=c_char), allocatable :: c_format_str(:)
+    c_format_str = convert_format_f2c(format_str)
     out%ptr = create_dtype_format_c(c_format_str, as_array, logical(use_generic, kind=1))
+    deallocate(c_format_str)
   end function create_dtype_format
 
   !> @brief Create a data type for handling Python objects.
@@ -2206,9 +2248,10 @@ contains
     character(len=*), intent(in) :: typename
     logical, intent(in) :: use_generic
     type(yggdtype) :: out
-    character(len=len_trim(typename)+1) :: c_typename
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_typename = convert_string_f2c(typename)
     out%ptr = create_dtype_pyobj_c(c_typename, logical(use_generic, kind=1))
+    deallocate(c_typename)
   end function create_dtype_pyobj
 
   !> @brief Create a data type for handling schemas.
@@ -2246,7 +2289,7 @@ contains
     character(len=*), intent(in) :: data
     character(len=len(data)+1) :: c_data
     integer, intent(in) :: data_len
-    integer(kind=c_int) :: c_data_len
+    integer(kind=c_size_t) :: c_data_len
     logical :: flag
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
@@ -2274,7 +2317,7 @@ contains
     character(len=*) :: data
     character(len=len(data)+1) :: c_data
     integer :: data_len
-    integer(kind=c_int) :: c_data_len
+    integer(kind=c_size_t) :: c_data_len
     logical :: flag
     integer(kind=c_int) :: c_flag
     c_ygg_q = ygg_q%comm
@@ -3277,9 +3320,10 @@ contains
     character(len=*), intent(in) :: k
     type(ygggeneric), intent(in) :: x
     integer(kind=c_int) :: out
-    character(len=len_trim(k)+1) :: c_k
-    c_k = trim(k)//c_null_char
+    character(kind=c_char), allocatable :: c_k(:)
+    c_k = convert_string_f2c(k)
     out = set_generic_object_c(arr, c_k, x)
+    deallocate(c_k)
   end function set_generic_object
   !> @brief Get an element from an object.
   !> @param[in] arr Object to get element from.
@@ -3292,12 +3336,13 @@ contains
     character(len=*), intent(in) :: k
     type(ygggeneric), pointer, intent(out) :: x
     integer(kind=c_int) :: out
-    character(len=len_trim(k)+1) :: c_k
+    character(kind=c_char), allocatable :: c_k(:)
     type(c_ptr) :: c_x
     allocate(x);
-    c_k = trim(k)//c_null_char
+    c_k = convert_string_f2c(k)
     c_x = c_loc(x) ! Maybe use first element in type
     out = get_generic_object_c(arr, c_k, c_x)
+    deallocate(c_k)
   end function get_generic_object
   !> @brief Get a reference to an element from an object.
   !> @param[in] arr Object to get element from.
@@ -3310,12 +3355,13 @@ contains
     character(len=*), intent(in) :: k
     type(ygggeneric), pointer, intent(out) :: x
     integer(kind=c_int) :: out
-    character(len=len_trim(k)+1) :: c_k
+    character(kind=c_char), allocatable :: c_k(:)
     type(c_ptr) :: c_x
     allocate(x);
-    c_k = trim(k)//c_null_char
+    c_k = convert_string_f2c(k)
     c_x = c_loc(x) ! Maybe use first element in type
     out = get_generic_object_ref_c(arr, c_k, c_x)
+    deallocate(c_k)
   end function get_generic_object_ref
 
   ! Python interface
@@ -3378,9 +3424,10 @@ contains
     integer, intent(in) :: index
     character(len=*), intent(in) :: typename
     type(c_ptr) :: out
-    character(len=len_trim(typename)+1) :: c_typename
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_typename = convert_string_f2c(typename)
     out = generic_array_get_item_c(x, int(index-1, c_size_t), c_typename)
+    deallocate(c_typename)
   end function generic_array_get_item
   !> @brief Get the size of an item from an array in bytes.
   !> @param[in] x Generic object that is presumed to contain an array.
@@ -3393,12 +3440,13 @@ contains
     integer, intent(in) :: index
     character(len=*), intent(in) :: typename
     integer(kind=c_int) :: out
-    character(len=len_trim(typename)+1) :: c_typename
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_typename = convert_string_f2c(typename)
     out = generic_array_get_item_nbytes_c(x, int(index-1, c_size_t), c_typename)
     if (out.lt.0) then
        stop "Error getting number of bytes in array item."
     end if
+    deallocate(c_typename)
   end function generic_array_get_item_nbytes
   !> @brief Get a scalar item from an array.
   !> @param[in] x Generic object that is presumed to contain an array.
@@ -3413,10 +3461,11 @@ contains
     character(len=*), intent(in) :: subtype
     integer, intent(in) :: precision
     type(c_ptr) :: out
-    character(len=len_trim(subtype)+1) :: c_subtype
-    c_subtype = trim(subtype)//c_null_char
+    character(kind=c_char), allocatable :: c_subtype(:)
+    c_subtype = convert_string_f2c(subtype)
     out = generic_array_get_scalar_c(x, int(index-1, c_size_t), &
          c_subtype, int(precision, c_size_t))
+    deallocate(c_subtype)
   end function generic_array_get_scalar
   !> @brief Get a 1D array item from an array.
   !> @param[in] x Generic object that is presumed to contain an array.
@@ -3435,10 +3484,11 @@ contains
     integer, intent(in) :: precision
     type(c_ptr), value :: data
     integer(kind=c_size_t) :: out
-    character(len=len_trim(subtype)+1) :: c_subtype
-    c_subtype = trim(subtype)//c_null_char
+    character(kind=c_char), allocatable :: c_subtype(:)
+    c_subtype = convert_string_f2c(subtype)
     out = generic_array_get_1darray_c(x, int(index-1, c_size_t), &
          c_subtype, int(precision, c_size_t), data)
+    deallocate(c_subtype)
   end function generic_array_get_1darray
   !> @brief Get an ND array item from an array.
   !> @param[in] x Generic object that is presumed to contain an array.
@@ -3458,12 +3508,13 @@ contains
     type(c_ptr), value :: data
     integer(kind=c_size_t), dimension(:), pointer :: shape
     integer(kind=c_size_t) :: ndim
-    character(len=len_trim(subtype)+1) :: c_subtype
+    character(kind=c_char), allocatable :: c_subtype(:)
     type(c_ptr), target :: c_shape
-    c_subtype = trim(subtype)//c_null_char
+    c_subtype = convert_string_f2c(subtype)
     ndim = generic_array_get_ndarray_c(x, int(index-1, c_size_t), &
-         subtype, int(precision, c_size_t), data, c_loc(c_shape))
+         c_subtype, int(precision, c_size_t), data, c_loc(c_shape))
     call c_f_pointer(c_shape, shape, [ndim])
+    deallocate(c_subtype)
   end function generic_array_get_ndarray
   ! Set
   !> @brief Set an item in an array for types that don't require additional
@@ -3479,13 +3530,14 @@ contains
     character(len=*), intent(in) :: typename
     type(c_ptr) :: val
     integer(kind=c_int) :: c_out
-    character(len=len_trim(typename)+1) :: c_typename
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_typename = convert_string_f2c(typename)
     c_out = generic_array_set_item_c(x, int(index-1, c_size_t), &
          c_typename, val)
     if (c_out.lt.0) then
        stop "Error setting element in array."
     end if
+    deallocate(c_typename)
   end subroutine generic_array_set_item
   !> @brief Set a scalar value in an array.
   !> @param[in] x Generic object that is presumed to contain an array.
@@ -3504,18 +3556,19 @@ contains
     integer, intent(in) :: precision
     character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
-    character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), pointer :: c_units
+    character(kind=c_char), allocatable :: c_subtype(:)
+    character(kind=c_char), allocatable :: c_units(:)
+    c_subtype = convert_string_f2c(subtype)
     if (present(units_in)) then
-       allocate(character(len=len_trim(units_in)+1) :: c_units)
-       c_units = trim(units_in)//c_null_char
+       c_units = convert_string_f2c(units_in)
     else
-       allocate(character(len=1)  :: c_units)
-       c_units(1:1) = c_null_char
+       allocate(c_units(1))
+       c_units(1) = c_null_char
     end if
-    c_subtype = trim(subtype)//c_null_char
     c_out = generic_array_set_scalar_c(x, int(index-1, c_size_t), &
          val, c_subtype, int(precision, c_size_t), c_units)
+    deallocate(c_subtype)
+    deallocate(c_units)
     if (c_out.lt.0) then
        stop "Error setting scalar element in array."
     end if
@@ -3539,19 +3592,20 @@ contains
     integer, intent(in) :: length
     character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
-    character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), pointer :: c_units
+    character(kind=c_char), allocatable :: c_subtype(:)
+    character(kind=c_char), allocatable :: c_units(:)
+    c_subtype = convert_string_f2c(subtype)
     if (present(units_in)) then
-       allocate(character(len=len_trim(units_in)+1) :: c_units)
-       c_units = trim(units_in)//c_null_char
+       c_units = convert_string_f2c(units_in)
     else
-       allocate(character(len=1)  :: c_units)
-       c_units(1:1) = c_null_char
+       allocate(c_units(1))
+       c_units(1) = c_null_char
     end if
-    c_subtype = trim(subtype)//c_null_char
     c_out = generic_array_set_1darray_c(x, int(index-1, c_size_t), &
          val, c_subtype, int(precision, c_size_t), &
          int(length, c_size_t), c_units)
+    deallocate(c_subtype)
+    deallocate(c_units)
     if (c_out.lt.0) then
        stop "Error setting 1darray element in array."
     end if
@@ -3576,19 +3630,20 @@ contains
     integer(kind=c_size_t), dimension(:), intent(in), target :: shape
     character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
-    character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), pointer :: c_units
+    character(kind=c_char), allocatable :: c_subtype(:)
+    character(kind=c_char), allocatable :: c_units(:)
+    c_subtype = convert_string_f2c(subtype)
     if (present(units_in)) then
-       allocate(character(len=len_trim(units_in)+1) :: c_units)
-       c_units = trim(units_in)//c_null_char
+       c_units = convert_string_f2c(units_in)
     else
-       allocate(character(len=1)  :: c_units)
-       c_units(1:1) = c_null_char
+       allocate(c_units(1))
+       c_units(1) = c_null_char
     end if
-    c_subtype = trim(subtype)//c_null_char
     c_out = generic_array_set_ndarray_c(x, int(index-1, c_size_t), &
          data, c_subtype, int(precision, c_size_t), &
          int(size(shape), c_size_t), c_loc(shape), c_units)
+    deallocate(c_subtype)
+    deallocate(c_units)
     if (c_out.lt.0) then
        stop "Error setting ndarray element in array."
     end if
@@ -3655,11 +3710,13 @@ contains
     character(len=*) :: key
     character(len=*) :: typename
     type(c_ptr) :: out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(typename)+1) :: c_typename
-    c_key = trim(key)//c_null_char
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_key = convert_string_f2c(trim(key))
+    c_typename = convert_string_f2c(typename)
     out = generic_map_get_item_c(x, c_key, c_typename)
+    deallocate(c_key)
+    deallocate(c_typename)
   end function generic_map_get_item
   !> @brief Get the size of an item from a map in bytes.
   !> @param[in] x Generic object that is presumed to contain a map.
@@ -3672,11 +3729,13 @@ contains
     character(len=*) :: key
     character(len=*) :: typename
     integer(kind=c_int) :: out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(typename)+1) :: c_typename
-    c_key = trim(key)//c_null_char
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_key = convert_string_f2c(trim(key))
+    c_typename = convert_string_f2c(typename)
     out = generic_map_get_item_nbytes_c(x, c_key, c_typename)
+    deallocate(c_key)
+    deallocate(c_typename)
     if (out.lt.0) then
        stop "Error getting number of bytes in map item."
     end if
@@ -3694,12 +3753,14 @@ contains
     character(len=*) :: subtype
     integer, intent(in) :: precision
     type(c_ptr) :: out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(subtype)+1) :: c_subtype
-    c_key = trim(key)//c_null_char
-    c_subtype = trim(subtype)//c_null_char
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_subtype(:)
+    c_key = convert_string_f2c(trim(key))
+    c_subtype = convert_string_f2c(subtype)
     out = generic_map_get_scalar_c(x, c_key, c_subtype, &
          int(precision, c_size_t))
+    deallocate(c_key)
+    deallocate(c_subtype)
   end function generic_map_get_scalar
   !> @brief Get a 1d array value from a map.
   !> @param[in] x Generic object that is presumed to contain a map.
@@ -3718,12 +3779,14 @@ contains
     integer, intent(in) :: precision
     type(c_ptr) :: data
     integer(kind=c_size_t) :: out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(subtype)+1) :: c_subtype
-    c_key = trim(key)//c_null_char
-    c_subtype = trim(subtype)//c_null_char
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_subtype(:)
+    c_key = convert_string_f2c(trim(key))
+    c_subtype = convert_string_f2c(subtype)
     out = generic_map_get_1darray_c(x, c_key, c_subtype, &
          int(precision, c_size_t), data)
+    deallocate(c_key)
+    deallocate(c_subtype)
   end function generic_map_get_1darray
   !> @brief Get a nd array value from a map.
   !> @param[in] x Generic object that is presumed to contain a map.
@@ -3743,14 +3806,16 @@ contains
     type(c_ptr) :: data
     integer(kind=c_size_t), dimension(:), pointer :: shape
     integer(kind=c_size_t) :: ndim
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(subtype)+1) :: c_subtype
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_subtype(:)
     type(c_ptr), target :: c_shape
-    c_key = trim(key)//c_null_char
-    c_subtype = trim(subtype)//c_null_char
+    c_key = convert_string_f2c(trim(key))
+    c_subtype = convert_string_f2c(subtype)
     ndim = generic_map_get_ndarray_c(x, c_key, c_subtype, &
          int(precision, c_size_t), data, c_loc(c_shape))
     call c_f_pointer(c_shape, shape, [ndim])
+    deallocate(c_key)
+    deallocate(c_subtype)
   end function generic_map_get_ndarray
   ! Set
   !> @brief Set an item from a map for types that don't require additional
@@ -3766,11 +3831,13 @@ contains
     character(len=*) :: typename
     type(c_ptr) :: val
     integer(kind=c_int) :: c_out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(typename)+1) :: c_typename
-    c_key = trim(key)//c_null_char
-    c_typename = trim(typename)//c_null_char
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_typename(:)
+    c_key = convert_string_f2c(trim(key))
+    c_typename = convert_string_f2c(typename)
     c_out = generic_map_set_item_c(x, c_key, c_typename, val)
+    deallocate(c_key)
+    deallocate(c_typename)
     if (c_out.lt.0) then
        stop "Error setting element in map."
     end if
@@ -3791,26 +3858,25 @@ contains
     character(len=*) :: subtype
     integer, intent(in) :: precision
     character(len=*), intent(in), optional, target :: units_in
-    character(len=:), pointer :: units
     integer(kind=c_int) :: c_out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), pointer :: c_units
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_subtype(:)
+    character(kind=c_char), allocatable :: c_units(:)
+    c_key = convert_string_f2c(trim(key))
+    c_subtype = convert_string_f2c(subtype)
     if (present(units_in)) then
-       units => units_in
+       c_units = convert_string_f2c(units_in)
     else
-       allocate(character(len=0) :: units)
-       units = ""
+       allocate(c_units(1))
+       c_units(1) = c_null_char
     end if
-    allocate(character(len=len_trim(units)+1) :: c_units)
-    c_key = trim(key)//c_null_char
-    c_subtype = trim(subtype)//c_null_char
-    c_units = trim(units)//c_null_char
     c_out = generic_map_set_scalar_c(x, c_key, val, c_subtype, &
          int(precision, c_size_t), c_units)
     if (c_out.lt.0) then
        stop "Error setting scalar element in map."
     end if
+    deallocate(c_key)
+    deallocate(c_subtype)
     deallocate(c_units)
   end subroutine generic_map_set_scalar
   !> @brief Set a 1d array value in a map.
@@ -3832,20 +3898,22 @@ contains
     integer, intent(in) :: length
     character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), allocatable :: c_units
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_subtype(:)
+    character(kind=c_char), allocatable :: c_units(:)
     if (present(units_in)) then
-       allocate(character(len=len_trim(units_in)+1) :: c_units)
-       c_units = trim(units_in)//c_null_char
+       c_units = convert_string_f2c(units_in)
     else
-       allocate(character(len=1)  :: c_units)
-       c_units(1:1) = c_null_char
+       allocate(c_units(1))
+       c_units(1) = c_null_char
     end if
-    c_key = trim(key)//c_null_char
-    c_subtype = trim(subtype)//c_null_char
+    c_key = convert_string_f2c(trim(key))
+    c_subtype = convert_string_f2c(subtype)
     c_out = generic_map_set_1darray_c(x, c_key, val, c_subtype, &
          int(precision, c_size_t), int(length, c_size_t), c_units)
+    deallocate(c_key)
+    deallocate(c_subtype)
+    deallocate(c_units)
     if (c_out.lt.0) then
        stop "Error setting 1darray element in map."
     end if
@@ -3870,21 +3938,23 @@ contains
     integer(kind=c_size_t), dimension(:), intent(in), target :: shape
     character(len=*), intent(in), optional :: units_in
     integer(kind=c_int) :: c_out
-    character(len=len_trim(key)+1) :: c_key
-    character(len=len_trim(subtype)+1) :: c_subtype
-    character(len=:), allocatable :: c_units
+    character(kind=c_char), allocatable :: c_key(:)
+    character(kind=c_char), allocatable :: c_subtype(:)
+    character(kind=c_char), allocatable :: c_units(:)
     if (present(units_in)) then
-       allocate(character(len=len_trim(units_in)+1) :: c_units)
-       c_units = trim(units_in)//c_null_char
+       c_units = convert_string_f2c(units_in)
     else
-       allocate(character(len=1)  :: c_units)
-       c_units(1:1) = c_null_char
+       allocate(c_units(1))
+       c_units(1) = c_null_char
     end if
-    c_key = trim(key)//c_null_char
-    c_subtype = trim(subtype)//c_null_char
+    c_key = convert_string_f2c(trim(key))
+    c_subtype = convert_string_f2c(subtype)
     c_out = generic_map_set_ndarray_c(x, c_key, data, c_subtype, &
          int(precision, c_size_t), int(size(shape), c_size_t), &
          c_loc(shape), c_units)
+    deallocate(c_key)
+    deallocate(c_subtype)
+    deallocate(c_units)
     if (c_out.lt.0) then
        stop "Error setting ndarray element in map."
     end if

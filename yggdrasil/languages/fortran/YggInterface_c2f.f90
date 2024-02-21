@@ -1,3 +1,46 @@
+function convert_string_f2c(f_message) result(c_message)
+  implicit none
+  character(len=*), intent(in) :: f_message
+  character(kind=c_char), allocatable :: c_message(:)
+  integer :: i
+  allocate(c_message(len(f_message)+1))
+  do i = 1, len(f_message)
+     c_message(i) = f_message(i:i)
+  end do
+  c_message(len(f_message)+1) = c_null_char
+end function convert_string_f2c
+function convert_format_f2c(f_fmt) result(c_fmt)
+  implicit none
+  character(len=*), intent(in) :: f_fmt
+  character(kind=c_char), allocatable :: c_fmt(:)
+  integer :: i, j, length
+  allocate(c_fmt(len(f_fmt)+1))
+  length = len(f_fmt)
+  j = 1
+  i = 1
+  do while ((i.LE.length).AND.(j.LE.len(f_fmt)))
+     if (j.LT.len(f_fmt)) then
+        if (f_fmt(j:(j+1)).EQ."\t") then
+           c_fmt(i) = char(9)
+           j = j + 1
+           length = length - 1
+        else if (f_fmt(j:(j+1)).EQ."\n") then
+           c_fmt(i) = NEW_LINE('c')
+           j = j + 1
+           length = length - 1
+        else
+           c_fmt(i) = f_fmt(j:j)
+        end if
+     else if (j.EQ.len(f_fmt)) then
+        c_fmt(i) = f_fmt(j:j)
+     end if
+     i = i + 1
+     j = j + 1
+  end do
+  do i = (length+1), (len(f_fmt)+1)
+     c_fmt(i) = c_null_char
+  end do
+end function convert_format_f2c
 function yggptr_c2f(x, realloc) result(flag)
   implicit none
   type(yggptr) :: x
@@ -334,24 +377,28 @@ end subroutine yggptr_c2f_scalar_character
 subroutine yggptr_c2f_array_character(x)
   implicit none
   type(yggptr) :: x
-  character, dimension(:), pointer :: xarr_character
-  integer(kind=8) :: i, j
-  select type(item=>x%item_array)
-  type is (character(*))
-     xarr_character => item
-     do i = 1, x%len
-        do j = 1, x%prec
-           xarr_character(i)(j:j) = x%data_character_unit(i)
-        end do
-        do j = (x%prec + 1), len(xarr_character(i))
-           xarr_character(i)(j:j) = ' '
-        end do
-     end do
+  character(len=x%prec), dimension(:), pointer :: item
+  ! integer(kind=8) :: i, j, k
+  item => x%item_array_char
+  ! select type(item=>x%item_array)
+  ! type is (character(*))
+  if ((size(item).GT.0).AND.(len(item).GT.0)) then
+     item = transfer(x%data_character_unit, item)
+  end if
+  ! do i = 1, x%len
+  !    do j = 1, x%prec
+  !       k = (i - 1) * x%prec + j
+  !       item(i)(j:j) = x%data_character_unit(k)
+  !    end do
+  !    do j = (x%prec + 1), len(item(i))
+  !       item(i)(j:j) = ' '
+  !    end do
+  ! end do
      deallocate(x%data_character_unit)
-  class default
-     call ygglog_error("yggptr_c2f_array_character: Unexpected type.")
-     stop "ERROR"
-  end select
+  ! class default
+  !    call ygglog_error("yggptr_c2f_array_character: Unexpected type.")
+  !    stop "ERROR"
+  ! end select
 end subroutine yggptr_c2f_array_character
 
 

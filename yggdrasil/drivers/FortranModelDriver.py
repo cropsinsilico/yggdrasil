@@ -117,8 +117,8 @@ class GFortranCompiler(FortranCompilerBase):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        # Put gnu at end of compatible toolset list on windows so that
-        # msvc libraries are preferred (Python assumes MSVC)
+        # Full specify preferred toolset order on windows so that
+        # msvc libraries are selected first (Python assumes MSVC)
         if platform._is_win:
             cls.compatible_toolsets = ['msvc', 'gnu', 'llvm']
         FortranCompilerBase.before_registration(cls, **kwargs)

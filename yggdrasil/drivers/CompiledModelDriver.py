@@ -3165,6 +3165,8 @@ class CompiledModelDriver(ModelDriver):
                     tool = cls.get_tool('compiler', language=dep_lang,
                                         toolname=toolname)
                 if tool.is_gnu:
+                    logger.info(f"Creating GNU compatible import library "
+                                f"for {out}")
                     dll = cls.get_dependency_library(
                         dep, libtype='shared', toolname=toolname,
                         **suffix_kws)

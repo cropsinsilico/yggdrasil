@@ -903,13 +903,14 @@ function yggarg_1darray_character(x, x_shape) result (y)
   else
      y = yggarg_ndarray_init(x)
   end if
+  y%item_array_char => x
   y%type = "character"
   y%prec = len(xp(1))
   do i = 1, size(xp)
      ilength = len_trim(xp(i))
-     if (ilength.lt.y%prec) then
-        xp(i)((ilength+1):(ilength+1)) = c_null_char
-     end if
+     ! if (ilength.lt.y%prec) then
+     !    xp(i)((ilength+1):(ilength+1)) = c_null_char
+     ! end if
   end do
   allocate(y%data_character_unit(y%len * y%prec))
   y%data_character_unit = transfer(x, y%data_character_unit)

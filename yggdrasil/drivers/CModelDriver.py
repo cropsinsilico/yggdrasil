@@ -6,12 +6,16 @@ import shutil
 import subprocess
 import numpy as np
 import sysconfig
+import logging
 from collections import OrderedDict
 from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
 from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
+logger = logging.getLogger(__name__)
+if platform._is_win:
+    logger.setLevel(level=logging.DEBUG)
 
 
 _default_internal_libtype = 'object'
@@ -216,16 +220,18 @@ class GCCCompiler(CCompilerBase):
                 libbase = 'lib' + libbase
             libdir = os.path.dirname(dll)
             dst = os.path.join(libdir, libbase + '.dll.a')
+        logger.info(f"dll2a: Creating a {dst} from {dll}")
         if (not os.path.isfile(dst)) or overwrite:
             gendef = shutil.which("gendef")
             dlltool = shutil.which("dlltool")
             if gendef and dlltool:
                 subprocess.check_call([gendef, dll])
                 subprocess.check_call(
-                    [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
+                    [dlltool, '-D', dll, '-d', f'{base}.def', '-l', dst])
             else:
                 dst = dll
         assert os.path.isfile(dst)
+        logger.info(f"dll2a: Created {dst}")
         return dst
 
 
