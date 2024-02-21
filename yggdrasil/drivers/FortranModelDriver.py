@@ -36,6 +36,15 @@ class FortranCompilerBase(CompilerBase):
     product_exts = ['.mod']
 
     @classmethod
+    def call(cls, args, **kwargs):
+        r"""Call the compiler with the provided arguments. For |yggdrasil| C
+        models will always be linked using the C++ linker since some parts of
+        the interface library are written in C++."""
+        if not kwargs.get('dont_link', False):
+            kwargs.setdefault('linker_language', 'c++')
+        return super(FortranCompilerBase, cls).call(args, **kwargs)
+    
+    @classmethod
     def get_flags(cls, **kwargs):
         r"""Get a list of flags for the tool.
 
@@ -161,7 +170,7 @@ class FortranModelDriver(CompiledModelDriver):
         zmq={'libraries': [('c', x) for x in
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
-    standard_libraries = []
+    standard_libraries = ['c', 'gfortran']
     external_libraries = {'cxx': {'include': 'stdlib.h',
                                   'libtype': 'shared',
                                   'language': 'c'}}
@@ -175,7 +184,8 @@ class FortranModelDriver(CompiledModelDriver):
                   [('c', 'ygg'), 'c_wrappers']),
               'external_dependencies': (
                   [('c', x) for x in
-                   _c_internal_libs['ygg']['external_dependencies']]),
+                   _c_internal_libs['ygg']['external_dependencies']]
+                  + ['c', 'gfortran']),
               'include_dirs': (
                   _c_internal_libs['ygg']['include_dirs'])},
         c_wrappers={'source': os.path.join(_incl_interface,

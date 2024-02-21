@@ -1262,7 +1262,7 @@ class CompilationToolBase(object):
         
         """
         # Call from another tool if the language dosn't match
-        language = kwargs.pop('%s_language' % cls.tooltype, language)
+        language = kwargs.pop(f'{cls.tooltype}_language', language)
         cls = cls.get_alternate_class(toolname=toolname,
                                       language=language)
         # Add additional arguments
