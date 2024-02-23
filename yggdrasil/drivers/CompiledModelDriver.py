@@ -1489,7 +1489,10 @@ class CompilerBase(CompilationToolBase):
         linker = getattr(cls, '_linker', cls.default_linker)
         linker_flags = getattr(cls, '_linker_flags', cls.default_linker_flags)
         if linker is None:
-            linker = find_compilation_tool('linker', cls.languages[0])
+            linker_language = getattr(cls, 'default_linker_language', None)
+            if linker_language is None:
+                linker_language = cls.languages[0]
+            linker = find_compilation_tool('linker', linker_language)
         if linker:
             out = get_compilation_tool('linker', linker,
                                        return_instance=True,
@@ -1511,7 +1514,10 @@ class CompilerBase(CompilationToolBase):
         archiver = getattr(cls, '_archiver', cls.default_archiver)
         archiver_flags = getattr(cls, '_archiver_flags', cls.default_archiver_flags)
         if archiver is None:
-            archiver = find_compilation_tool('archiver', cls.languages[0])
+            archiver_language = getattr(cls, 'default_archiver_language', None)
+            if archiver_language is None:
+                archiver_language = cls.languages[0]
+            archiver = find_compilation_tool('archiver', archiver_language)
         out = archiver
         if archiver:
             out = get_compilation_tool('archiver', archiver,

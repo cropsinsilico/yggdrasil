@@ -34,14 +34,16 @@ class FortranCompilerBase(CompilerBase):
     default_executable = None
     default_archiver = None
     product_exts = ['.mod']
+    default_linker_language = 'c++'
 
     @classmethod
     def call(cls, args, **kwargs):
         r"""Call the compiler with the provided arguments. For |yggdrasil| C
         models will always be linked using the C++ linker since some parts of
         the interface library are written in C++."""
-        if not kwargs.get('dont_link', False):
-            kwargs.setdefault('linker_language', 'c++')
+        if (((not kwargs.get('dont_link', False))
+             and cls.default_linker_language is not None)):
+            kwargs.setdefault('linker_language', cls.default_linker_language)
         return super(FortranCompilerBase, cls).call(args, **kwargs)
     
     @classmethod
@@ -170,7 +172,7 @@ class FortranModelDriver(CompiledModelDriver):
         zmq={'libraries': [('c', x) for x in
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
-    standard_libraries = ['c', 'gfortran']
+    standard_libraries = []
     external_libraries = {'cxx': {'include': 'stdlib.h',
                                   'libtype': 'shared',
                                   'language': 'c'}}
@@ -184,8 +186,7 @@ class FortranModelDriver(CompiledModelDriver):
                   [('c', 'ygg'), 'c_wrappers']),
               'external_dependencies': (
                   [('c', x) for x in
-                   _c_internal_libs['ygg']['external_dependencies']]
-                  + ['c', 'gfortran']),
+                   _c_internal_libs['ygg']['external_dependencies']]),
               'include_dirs': (
                   _c_internal_libs['ygg']['include_dirs'])},
         c_wrappers={'source': os.path.join(_incl_interface,
@@ -431,28 +432,33 @@ class FortranModelDriver(CompiledModelDriver):
         #     elif platform._is_win:  # pragma: windows
         #         cls.default_compiler = 'flang'
         CompiledModelDriver.before_registration(cls)
-        cxx_orig = cls.external_libraries.pop('cxx', None)
-        if cxx_orig is not None:
+        orig_standards = {}
+        orig_standards['c++'] = cls.external_libraries.pop('cxx', None)
+        add_standard_libraries = {}
+        if FortranCompilerBase.default_linker_language == 'c++':
+            if cls.default_compiler == 'gfortran':
+                add_standard_libraries['fortran'] = 'gfortran'
+        elif orig_standards['c++'] is not None:
+            # add_standard_libraries['c'] = 'c'
             c_compilers = get_compilation_tool_registry(
                 'compiler', init_languages=['c++'])['by_language'].get('c++', {})
-            add_cxx_lib = None
             for k, v in c_compilers.items():
                 if not v.is_installed():
                     continue
                 if k == 'clang++':
-                    if not add_cxx_lib:
-                        add_cxx_lib = 'c++'
+                    if not add_standard_libraries.get('c++', None):
+                        add_standard_libraries['c++'] = 'c++'
                 else:
-                    # GNU takes precedence when present
-                    add_cxx_lib = 'stdc++'
-            if add_cxx_lib and (add_cxx_lib not in cls.standard_libraries):
-                cls.standard_libraries.append(add_cxx_lib)
-                cls.internal_libraries['fygg']['external_dependencies'].append(
-                    add_cxx_lib)
-            # if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
-            #     cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
-            #     cls.internal_libraries['fygg']['external_dependencies'].append(
-            #         add_cxx_lib)
+                    # GNU takes precedence when present even if already
+                    # set from clang
+                    add_standard_libraries['c++'] = 'stdc++'
+        for k, v in add_standard_libraries.items():
+            # if v not in cls.external_libraries:
+            #     cls.external_libraries[v] = copy.deepcopy(orig_standards.get(k, v))
+            #     cls.internal_libraries['fygg']['external_dependencies'].append(v)
+            if v not in cls.standard_libraries:
+                cls.standard_libraries.append(v)
+                cls.internal_libraries['fygg']['external_dependencies'].append(v)
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
