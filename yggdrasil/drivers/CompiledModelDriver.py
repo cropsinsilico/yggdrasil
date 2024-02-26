@@ -157,7 +157,8 @@ def get_compilation_tool_registry(tooltype, init_languages=None):
 
 
 def find_compilation_tool(tooltype, language, allow_failure=False,
-                          dont_check_installation=False):
+                          dont_check_installation=False,
+                          return_type='name'):
     r"""Return the prioritized class for a compilation tool of a certain type
     that can handle the specified language.
 
@@ -170,6 +171,10 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
         dont_check_installation (bool, optional): If True, the first tool
             in the registry will be returned even if it is not installed.
             Defaults to False.
+        return_type (str, optional): Type of values that should be returned:
+              'name': Name of the determined tool.
+              'class': Class for the determined tool.
+              'instance': Instance of the determined tool.
 
     Returns:
         str: Name of the determined tool type.
@@ -180,7 +185,8 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
 
     """
     out = None
-    reg = get_compilation_tool_registry(tooltype).get('by_language', {})
+    reg = get_compilation_tool_registry(
+        tooltype, init_languages=[language]).get('by_language', {})
     for kname, v in reg.get(language, {}).items():
         if ((dont_check_installation
              or ((platform._platform in v.platforms) and v.is_installed()))):
@@ -188,6 +194,9 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
             break
     if (out is None) and (not allow_failure):
         raise RuntimeError("Could not locate a %s tool." % tooltype)
+    if return_type in ['class', 'instance']:
+        out = get_compilation_tool(
+            tooltype, out, return_instance=(return_type == 'instance'))
     return out
 
 
@@ -1864,6 +1873,11 @@ class CompilerBase(CompilationToolBase):
             asan_options += 'verify_asan_link_order=0'
             out['ASAN_OPTIONS'] = asan_options
             logger.debug(f"ASAN_OPTIONS: {asan_options}")
+        elif cls.default_linker_language not in cls.languages:
+            alt = find_compilation_tool(
+                'compiler', cls.default_linker_language,
+                return_type='class')
+            out = alt.init_asan_env(out)
         return out
 
     @classmethod
