@@ -158,19 +158,22 @@ def get_compilation_tool_registry(tooltype, init_languages=None):
 
 def find_compilation_tool(tooltype, language, allow_failure=False,
                           dont_check_installation=False,
-                          return_type='name'):
+                          from_driver=False, return_type='name'):
     r"""Return the prioritized class for a compilation tool of a certain type
     that can handle the specified language.
 
     Args:
         tooltype (str): Type of tool. Valid values include 'compiler', 'linker',
             and 'archiver'.
+        language (str): Language that compilation tool handles.
         allow_failure (bool, optional): If True and a tool cannot be located,
             None will be returned. Otherwise, an error will be raised if a tool
             cannot be located. Defaults to False.
         dont_check_installation (bool, optional): If True, the first tool
             in the registry will be returned even if it is not installed.
             Defaults to False.
+        from_driver (bool, optional): If True, get the compilation tool
+            used by the driver associated with the requested language.
         return_type (str, optional): Type of values that should be returned:
               'name': Name of the determined tool.
               'class': Class for the determined tool.
@@ -185,13 +188,18 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
 
     """
     out = None
-    reg = get_compilation_tool_registry(
-        tooltype, init_languages=[language]).get('by_language', {})
-    for kname, v in reg.get(language, {}).items():
-        if ((dont_check_installation
-             or ((platform._platform in v.platforms) and v.is_installed()))):
-            out = kname
-            break
+    if from_driver:
+        drv = import_component('model', language)
+        out = drv.get_tool(tooltype, return_prop='name', default=None)
+    else:
+        reg = get_compilation_tool_registry(
+            tooltype, init_languages=[language]).get('by_language', {})
+        for kname, v in reg.get(language, {}).items():
+            if ((dont_check_installation
+                 or ((platform._platform in v.platforms)
+                     and v.is_installed()))):
+                out = kname
+                break
     if (out is None) and (not allow_failure):
         raise RuntimeError("Could not locate a %s tool." % tooltype)
     if return_type in ['class', 'instance']:
@@ -1877,7 +1885,7 @@ class CompilerBase(CompilationToolBase):
               not in cls.languages):
             alt = find_compilation_tool(
                 'compiler', cls.default_linker_language,
-                return_type='class')
+                from_driver=True, return_type='class')
             out = alt.init_asan_env(out)
         return out
 
