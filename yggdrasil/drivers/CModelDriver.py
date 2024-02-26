@@ -297,39 +297,9 @@ class MSVCCompiler(CCompilerBase):
     product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters',
                     '.exp', '.lib']
     combine_with_linker = True  # Must be explicit; linker is separate .exe
-    linker_attributes = dict(GCCCompiler.linker_attributes,
-                             default_executable=None,
-                             default_executable_env='LINK',
-                             output_key='/OUT:%s',
-                             output_first=True,
-                             output_first_library=False,
-                             flag_options=OrderedDict(
-                                 [('library_libs', ''),
-                                  ('library_libs_nonstd', ''),
-                                  ('library_dirs', '/LIBPATH:%s'),
-                                  ('import_lib', '/IMPLIB:%s')]),
-                             shared_library_flag='/DLL',
-                             search_path_envvar=['LIB'],
-                             search_path_flags=None)
+    is_linker = False
     toolset = 'msvc'
     
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration including things like platform dependent properties and
-        checking environment variables for default settings.
-        """
-        compiler_path = shutil.which('cl.exe')
-        linker_path = shutil.which('link.exe')
-        if (((compiler_path and linker_path)
-             and (os.path.dirname(compiler_path).lower()
-                  != os.path.dirname(linker_path).lower()))):
-            cls.linker_attributes['default_executable'] = os.path.join(
-                os.path.dirname(compiler_path), os.path.basename(linker_path))
-            assert os.path.isfile(
-                cls.linker_attributes['default_executable'])
-        CCompilerBase.before_registration(cls)
-        
     @classmethod
     def tool_version(cls, **kwargs):  # pragma: windows
         r"""Determine the version of this tool.
@@ -488,6 +458,41 @@ class ClangLinker(LDLinker):
                         out.append(f'-L{x_dir}')
                         break
         return out
+
+
+class MSVCLinker(LinkerBase):
+    r"""Microsoft Visual Studio Linker"""
+    toolname = 'LINK'
+    platforms = MSVCCompiler.platforms
+    languages = MSVCCompiler.languages
+    toolset = MSVCCompiler.toolset
+    output_key = '/OUT:%s'
+    output_first = True
+    output_first_library = False
+    flag_options = OrderedDict([
+        ('library_libs', ''),
+        ('library_libs_nonstd', ''),
+        ('library_dirs', '/LIBPATH:%s'),
+        ('import_lib', '/IMPLIB:%s')])
+    shared_library_flag = '/DLL'
+    search_path_envvar = ['LIB']
+    search_path_flags = None
+
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        compiler_path = shutil.which('cl.exe')
+        linker_path = shutil.which('link.exe')
+        if (((compiler_path and linker_path)
+             and (os.path.dirname(compiler_path).lower()
+                  != os.path.dirname(linker_path).lower()))):
+            cls.default_executable = os.path.join(
+                os.path.dirname(compiler_path), os.path.basename(linker_path))
+            assert os.path.isfile(cls.default_executable)
+        LinkerBase.before_registration(cls)
 
 
 # C Archivers

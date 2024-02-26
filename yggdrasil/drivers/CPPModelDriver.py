@@ -4,7 +4,7 @@ import logging
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
     CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler, MSVCCompiler,
-    GCCLinker, ClangLinker)
+    GCCLinker, ClangLinker, MSVCLinker)
 logger = logging.getLogger(__name__)
 
 
@@ -175,6 +175,12 @@ class ClangPPLinker(ClangLinker):
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
     toolset = ClangPPCompiler.toolset
+
+
+class MSVCPPLinker(MSVCLinker):
+    r"""Interface class for MSVC C++ linker."""
+    toolname = 'LINK++'
+    languages = MSVCPPCompiler.languages
 
 
 class CPPModelDriver(CModelDriver):

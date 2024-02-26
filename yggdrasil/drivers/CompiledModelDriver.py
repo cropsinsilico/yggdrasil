@@ -1873,7 +1873,8 @@ class CompilerBase(CompilationToolBase):
             asan_options += 'verify_asan_link_order=0'
             out['ASAN_OPTIONS'] = asan_options
             logger.debug(f"ASAN_OPTIONS: {asan_options}")
-        elif cls.default_linker_language not in cls.languages:
+        elif (getattr(cls, 'default_linker_language', cls.languages[0])
+              not in cls.languages):
             alt = find_compilation_tool(
                 'compiler', cls.default_linker_language,
                 return_type='class')
