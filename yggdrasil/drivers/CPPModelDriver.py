@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class CPPCompilerBase(CCompilerBase):
     r"""Base class for C++ compilers."""
     languages = ['c++']
+    source_exts = ['.cpp', '.cxx']
     default_executable_env = 'CXX'
     default_flags_env = 'CXXFLAGS'
     cpp_std = 'c++14'
@@ -48,7 +49,7 @@ class CPPCompilerBase(CCompilerBase):
         if skip_standard_flag and (std_flag_idx != -1):
             del flags[std_flag_idx]
         elif (not skip_standard_flag) and (std_flag_idx == -1):
-            flags.append('-std=%s' % cls.cpp_std)
+            flags.append(f'-std={cls.cpp_std}')
         return flags
 
 
@@ -58,6 +59,7 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     aliases = ['gnu-c++']
     default_linker = 'g++'
     is_linker = False
+    standard_library = 'stdc++'
 
     @classmethod
     def get_flags(cls, skip_standard_flag=False, **kwargs):
@@ -86,6 +88,7 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
     is_linker = False
+    standard_library = 'c++'
 
     @staticmethod
     def before_registration(cls):
@@ -147,6 +150,7 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
     default_linker = MSVCCompiler.default_linker
     default_archiver = MSVCCompiler.default_archiver
     default_executable = MSVCCompiler.default_executable
+    default_disassembler = MSVCCompiler.default_disassembler
     search_path_flags = None
     dont_create_linker = True
     

@@ -18,9 +18,9 @@ from yggdrasil.components import import_component
 logger = logging.getLogger(__name__)
 if platform._is_win:
     logger.setLevel(level=logging.DEBUG)
-_compiler_registry = OrderedDict()
-_linker_registry = OrderedDict()
-_archiver_registry = OrderedDict()
+_tool_registry = OrderedDict([
+    (x, OrderedDict()) for x in
+    ['compiler', 'linker', 'archiver', 'disassembler']])
 _default_libtype = 'static'
 _conda_prefix = tools.get_conda_prefix()
 _venv_prefix = tools.get_venv_prefix()
@@ -81,7 +81,7 @@ def get_compatible_tool(tool, tooltype, language, default=False):
     if isinstance(tool, str):
         out = get_compilation_tool(tooltype, tool, default=None)
         if out is None:
-            for k in ['compiler', 'linker', 'archiver']:
+            for k in _tool_registry.keys():
                 if k == tooltype:
                     continue
                 out = get_compilation_tool(k, tool, default=None)
@@ -120,8 +120,8 @@ def get_compilation_tool_registry(tooltype, init_languages=None):
     r"""Return the registry containing compilation tools of the specified type.
 
     Args:
-        tooltype (str): Type of tool. Valid values include 'compiler', 'linker',
-            and 'archiver'.
+        tooltype (str): Type of tool. Valid values include 'compiler',
+            'linker', 'archiver', and 'disassembler'.
         init_languages (list, optional): List of languages that should be
             imported prior to returning the registry, thereby populating the
             compilation tools for that language. Defaults to None and is
@@ -132,23 +132,16 @@ def get_compilation_tool_registry(tooltype, init_languages=None):
 
     Raises:
         InvalidCompilationTool: If tooltype is not a valid value (i.e.
-            'compiler', 'linker', or 'archiver').
+            'compiler', 'linker', 'archiver', or 'disassembler').
 
     """
-    if tooltype == 'compiler':
-        global _compiler_registry
-        reg = _compiler_registry
-    elif tooltype == 'linker':
-        global _linker_registry
-        reg = _linker_registry
-    elif tooltype == 'archiver':
-        global _archiver_registry
-        reg = _archiver_registry
-    else:
+    global _tool_registry
+    if tooltype not in _tool_registry:
         raise InvalidCompilationTool(f"tooltype '{tooltype}' is not "
                                      f"supported. This keyword must "
                                      f"be one of 'compiler', 'linker', "
-                                     f"or 'archiver'.")
+                                     f"'archiver', or 'disassembler'.")
+    reg = _tool_registry[tooltype]
     if isinstance(init_languages, list):
         for x in init_languages:
             if x not in reg.get('by_language', {}):
@@ -158,7 +151,7 @@ def get_compilation_tool_registry(tooltype, init_languages=None):
 
 def find_compilation_tool(tooltype, language, allow_failure=False,
                           dont_check_installation=False,
-                          from_driver=False, return_type='name'):
+                          skip_driver=False, return_type='name'):
     r"""Return the prioritized class for a compilation tool of a certain type
     that can handle the specified language.
 
@@ -172,8 +165,9 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
         dont_check_installation (bool, optional): If True, the first tool
             in the registry will be returned even if it is not installed.
             Defaults to False.
-        from_driver (bool, optional): If True, get the compilation tool
-            used by the driver associated with the requested language.
+        skip_driver (bool, optional): If True, ignore the driver (and
+            configuration options) for a language to determine what tool
+            should be used.
         return_type (str, optional): Type of values that should be returned:
               'name': Name of the determined tool.
               'class': Class for the determined tool.
@@ -188,10 +182,7 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
 
     """
     out = None
-    if from_driver:
-        drv = import_component('model', language)
-        out = drv.get_tool(tooltype, return_prop='name', default=None)
-    else:
+    if skip_driver:
         reg = get_compilation_tool_registry(
             tooltype, init_languages=[language]).get('by_language', {})
         for kname, v in reg.get(language, {}).items():
@@ -200,6 +191,9 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
                      and v.is_installed()))):
                 out = kname
                 break
+    else:
+        drv = import_component('model', language)
+        out = drv.get_tool(tooltype, return_prop='name', default=None)
     if (out is None) and (not allow_failure):
         raise RuntimeError("Could not locate a %s tool." % tooltype)
     if return_type in ['class', 'instance']:
@@ -209,7 +203,8 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
 
 
 def get_compilation_tool(tooltype, name, default=False,
-                         return_instance=False, **kwargs):
+                         return_instance=False, init_languages=None,
+                         **kwargs):
     r"""Return the class providing information about a compilation tool.
 
     Args:
@@ -222,6 +217,10 @@ def get_compilation_tool(tooltype, name, default=False,
         return_instance (bool, optional): If True, an instance of the
             located class is returned instead of the class. Defaults to
             False.
+        init_languages (list, optional): List of languages that should be
+            imported prior to locating the tool, thereby populating the
+            compilation tools for that language. Defaults to None and is
+            ignored.
         **kwargs: Additional keyword arguments are passed to the class
             constructor if return_instance is True.
 
@@ -238,7 +237,8 @@ def get_compilation_tool(tooltype, name, default=False,
     if platform._is_win:
         names_to_try += [x.lower() for x in names_to_try.copy()]
     out = None
-    reg = get_compilation_tool_registry(tooltype)
+    reg = get_compilation_tool_registry(tooltype,
+                                        init_languages=init_languages)
     for x in names_to_try:
         if x in reg:
             out = reg[x]
@@ -426,7 +426,7 @@ class CompilationToolBase(object):
     is_build_tool = False
     tool_suffix_format = '_%sx'
     asan_flags = None
-    object_tool = None
+    no_output_file = False
     _language_ext = None  # only update once per class
     _language_cache = {}
     
@@ -1184,7 +1184,7 @@ class CompilationToolBase(object):
                 that additional products produced by the compilation
                 should be appended to.
             new (str): New product that should be appended to the list.
-            sources (list, optional): Sources files associated with the
+            sources (list, optional): Source files associated with the
                 new product.
             exclude_sources (bool, optional): If True, the sources will
                 be excluded from the removable files.
@@ -1289,7 +1289,7 @@ class CompilationToolBase(object):
         if additional_args is not None:
             args = args + additional_args
         # Process arguments only valid if skip_flags is False
-        if (not skip_flags):
+        if not (skip_flags or cls.no_output_file):
             if products is None:
                 # TODO: cache_dir?
                 products = tools.IntegrationPathSet(overwrite=overwrite)
@@ -1346,6 +1346,8 @@ class CompilationToolBase(object):
                        f"err = {err}\n")
             if (proc.returncode != 0) and (not allow_error):
                 raise RuntimeError(message)
+            if cls.no_output_file:
+                out = output
             try:
                 if verbose:
                     logger.info(message)
@@ -1364,7 +1366,7 @@ class CompilationToolBase(object):
                 tools.print_encoded(e)
             raise
         # Check for output
-        if (not skip_flags):
+        if not (skip_flags or cls.no_output_file):
             if (out != 'clean'):
                 if not products.last.exists:  # pragma: debug
                     logger.error(f"{' '.join(cmd)}\n{output}")
@@ -1397,22 +1399,39 @@ class CompilerBase(CompilationToolBase):
             default_archiver_flags if not provided.
 
     Class Attributes:
-        compile_only_flag (str): Flag that should prepended to compiler/linker
-            combination tool arguments to indicate that only compilation should
-            be performed.
-        default_linker (str): Name of linker that should be used after compiling
-            with this compiler. If not set, it is assumed that this compiler is
+        compile_only_flag (str): Flag that should prepended to
+            compiler/linker combination tool arguments to indicate that
+            only compilation should be performed.
+        default_linker (str): Name of linker that should be used after
+            compiling with this compiler. If not set, it is assumed that
+            this compiler is also a linker.
+        default_archiver (str): Name of archiver that should be used to
+            create a static library after compiling with this compiler.
+            If not set, it is assumed that this compiler is also a linker.
+        default_disassembler (str): Name of disassembler that should be
+            used to create a static library after compiling with this
+            compiler. If not set, it is assumed that this compiler is
             also a linker.
-        default_archiver (str): Name of archiver that should be used to create
-            a static library after compiling with this compiler. If not set,
-            it is assumed that this compiler is also a linker.
-        default_linker_flags (list): Flags that should be used with the linker
-            if no other flags are provided.
+        default_linker_flags (list): Flags that should be used with the
+            linker if no other flags are provided.
         default_archiver_flags (list): Flags that should be used with the
             archiver if no other flags are provided.
-        linker_switch (str): Flag to indicate beginning of flags that should be
-            passed to the linker from a call to a compiler/linker combination
-            tools (e.g. /link on Windows).
+        default_disassembler_flags (list): Flags that should be used with
+            the disassembler if no other flags are provided.
+        default_linker_language (str): Language of linker that should be
+            used be default if the linker is not explicitly specified via
+            linker keyword argument or default_linker class attribute.
+        default_archiver_language (str): Language of archiver that should
+            be used be default if the archiver is not explicitly specified
+            via archiver keyword argument or default_archiver class
+            attribute.
+        default_disassembler_language (str): Language of disassembler that
+            should be used be default if the disassembler is not
+            explicitly specified via disassembler keyword argument or
+            default_disassembler class attribute.
+        linker_switch (str): Flag to indicate beginning of flags that
+            should be passed to the linker from a call to a
+            compiler/linker combination tools (e.g. /link on Windows).
         object_ext (str): Extension that should be used for object files.
         is_linker (bool): If True, the tool also serves as a linker and a
             separate linker class will be automatically generating from the
@@ -1426,21 +1445,33 @@ class CompilerBase(CompilationToolBase):
             the default linker from the compiler tool. If None, (LinkerBase, )
             is used if no_separate_linking is False and (DummyLinkerBase, )
             is used if no_separate_linking is True.
-        combine_with_linker (bool): If True, the compiler and linker flags can
-            be combined and passed to the compiler executable to perform both
-            operations in succession. If False, the compilation and linking
-            steps must be performed separately. If None, this is determined by
-            checking if the compiler and linker names match.
+        combine_with_linker (str): Linker that this compiler can be
+            combined with on the command line where linker arguments are
+            passed to the compiler executable to perform both
+            operations in succession. If not provided, the compilation
+            can only be combined with linking for a linker with the
+            same name as the compiler.
+        source_dummy (str): Code that should be used to generate a dummy
+            shared library using this compiler that can be used to
+            located linked shared/dynamic libraries.
+        standard_library (str): Standard library automatically included
+            by the linker.
 
     """
     tooltype = 'compiler'
+    source_exts = []
     flag_options = OrderedDict([('definitions', '-D%s'),
                                 ('include_dirs', '-I%s')])
     compile_only_flag = '-c'
     default_linker = None
     default_archiver = None
+    default_disassembler = None
     default_linker_flags = None
     default_archiver_flags = None
+    default_disassembler_flags = None
+    default_linker_language = None
+    default_archiver_language = None
+    default_disassembler_language = None
     linker_switch = None
     object_ext = '.o'
     is_linker = True  # Most compiler's also perform linking
@@ -1449,6 +1480,8 @@ class CompilerBase(CompilationToolBase):
     linker_base_classes = None
     combine_with_linker = None
     search_path_env = ['include']
+    source_dummy = ''
+    standard_library = None
 
     def __init__(self, **kwargs):
         for k in ['linker', 'archiver', 'linker_flags', 'archiver_flags']:
@@ -1472,15 +1505,13 @@ class CompilerBase(CompilationToolBase):
             cls.is_linker = True
             cls.compile_only_flag = None
         if cls.is_linker and (not getattr(cls, 'dont_create_linker', False)):
-            if cls.default_linker is None:
-                cls.default_linker = cls.toolname
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
                          'default_executable', 'default_executable_env',
                          'toolset']
             # 'product_exts', 'product_files']
             linker_name = '%sLinker' % cls.__name__.split('Compiler')[0]
             linker_attr = copy.deepcopy(cls.linker_attributes)
-            linker_attr.setdefault('toolname', cls.default_linker)
+            linker_attr.setdefault('toolname', cls.toolname)
             for k in copy_attr:
                 linker_attr.setdefault(k, getattr(cls, k))
             linker_base_cls = cls.linker_base_classes
@@ -1492,59 +1523,110 @@ class CompilerBase(CompilationToolBase):
             linker_cls = type(linker_name, linker_base_cls, linker_attr)
             globals()[linker_cls.__name__] = linker_cls
             del linker_cls
-        if cls.combine_with_linker is None:
-            cls.combine_with_linker = (cls.toolname == cls.default_linker)
 
     @classmethod
-    def linker(cls):
-        r"""Get the associated linker class.
+    def get_tool(cls, tooltype, **kwargs):
+        r"""Get the associate class for the required tool type.
+
+        Args:
+            tooltype (str): Type of tool to return.
 
         Returns:
             CompilationToolBase: Linker class associated with this compiler.
 
         """
-        linker = getattr(cls, '_linker', cls.default_linker)
-        linker_flags = getattr(cls, '_linker_flags', cls.default_linker_flags)
-        if linker is None:
-            linker_language = getattr(cls, 'default_linker_language', None)
-            if linker_language is None:
-                linker_language = cls.languages[0]
-            linker = find_compilation_tool('linker', linker_language)
-        if linker:
-            out = get_compilation_tool('linker', linker,
+        kwargs.setdefault(
+            tooltype,
+            getattr(cls, f'_{tooltype}',
+                    getattr(cls, f'default_{tooltype}')))
+        kwargs.setdefault(
+            f'{tooltype}_flags',
+            getattr(cls, f'_{tooltype}_flags',
+                    getattr(cls, f'default_{tooltype}_flags')))
+        kwargs.setdefault(
+            f'{tooltype}_language',
+            getattr(cls, f'default_{tooltype}_language'))
+        tool = kwargs[tooltype]
+        tool_flags = kwargs[f"{tooltype}_flags"]
+        tool_language = kwargs[f'{tooltype}_language']
+        if tool is None:
+            if tool_language is None:
+                tool_language = cls.languages[0]
+            if tool_language in cls.languages and cls.is_linker:
+                tool = cls.toolname
+            else:
+                tool = find_compilation_tool(tooltype, tool_language)
+        if tool:
+            out = get_compilation_tool(tooltype, tool,
                                        return_instance=True,
-                                       flags=linker_flags,
-                                       executable=linker)
+                                       flags=tool_flags,
+                                       executable=tool)
             assert out.is_installed()
         else:
-            out = linker
+            out = tool
+        return out
+
+    # @classmethod
+    # def allow_combine_with_linker(cls):
+    #     r"""Determine if the compiler can be combined with a linker."""
+    #     return (cls.linker().toolname in [cls.toolname,
+    #                                       cls.combine_with_linker])
+        
+    @classmethod
+    def linker(cls, force_simultaneous_link=False, **kwargs):
+        r"""Get the associated linker class.
+
+        Args:
+            force_simultaneous_link (bool, optional): If True, the
+                returned linker will allow simultaneous linking.
+            **kwargs: Additional keyword arguments are passed to
+                get_tool.
+
+        Returns:
+            CompilationToolBase: Linker class associated with this compiler.
+
+        """
+        out = cls.get_tool('linker', **kwargs)
+        if ((force_simultaneous_link
+             and ((not out)
+                  or out.toolname not in [cls.toolname,
+                                          cls.combine_with_linker]))):
+            out = get_compilation_tool('linker', cls.toolname)
         return out
 
     @classmethod
-    def archiver(cls):
+    def archiver(cls, **kwargs):
         r"""Get the associated archiver class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to
+                get_tool.
 
         Returns:
             ArchiverToolBase: Archiver class associated with this compiler.
 
         """
-        archiver = getattr(cls, '_archiver', cls.default_archiver)
-        archiver_flags = getattr(cls, '_archiver_flags', cls.default_archiver_flags)
-        if archiver is None:
-            archiver_language = getattr(cls, 'default_archiver_language', None)
-            if archiver_language is None:
-                archiver_language = cls.languages[0]
-            archiver = find_compilation_tool('archiver', archiver_language)
-        out = archiver
-        if archiver:
-            out = get_compilation_tool('archiver', archiver,
-                                       return_instance=True,
-                                       flags=archiver_flags,
-                                       executable=archiver)
-            if not out.is_installed():
-                out = get_compatible_tool(cls, 'archiver',
-                                          language=cls.languages[0])
+        try:
+            out = cls.get_tool('archiver', **kwargs)
+        except AssertionError:
+            out = get_compatible_tool(cls, 'archiver',
+                                      language=cls.languages[0])
         return out
+
+    @classmethod
+    def disassembler(cls, **kwargs):
+        r"""Get the associated disassembler class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to
+                get_tool.
+
+        Returns:
+            CompilationToolBase: Disassembler class associated with this
+                compiler.
+
+        """
+        return cls.get_tool('disassembler', **kwargs)
 
     @classmethod
     def get_library_tool(cls, libtype=None, **kwargs):
@@ -1552,26 +1634,27 @@ class CompilerBase(CompilationToolBase):
         arguments.
 
         Args:
-            libtype (str, optional): Library type that should be created by the
-                linker/archiver. If 'static', the archiver is returned. If
-                'shared' or any other value, the linker is returned. Defaults to
-                None.
-            **kwargs: Additional keyword arguments are ignored.
+            libtype (str, optional): Library type that should be created
+                by the linker/archiver. If 'static', the archiver is
+                returned. If 'shared' or any other value, the linker is
+                returned. Defaults to None.
+            **kwargs: Additional keyword arguments are passed to the
+                appropriate linker/archiver method.
 
         Returns:
             CompilationToolBase: Linker/archiver that should be used.
 
         """
         if libtype == 'static':
-            tool = cls.archiver()
+            tool = cls.archiver(**kwargs)
         else:
-            tool = cls.linker()
+            tool = cls.linker(**kwargs)
         return tool
 
     @classmethod
     def get_flags(cls, dont_link=None, add_linker_switch=False,
                   libtype=None, logging_level=None, disable_python_c_api=False,
-                  **kwargs):
+                  force_simultaneous_link=False, **kwargs):
         r"""Get a list of compiler flags.
 
         Args:
@@ -1589,6 +1672,9 @@ class CompilerBase(CompilationToolBase):
                 ignored.
             disable_python_c_api (bool, optional): If True, the Python C API will
                 be disabled. Defaults to False.
+            force_simultaneous_link (bool, optional): If True, force the
+                link step to be performed by the same command as the
+                compilation.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method and get_linker_flags if dont_link is False.
 
@@ -1596,8 +1682,8 @@ class CompilerBase(CompilationToolBase):
             list: Compiler flags.
 
         Raises:
-            ValueError: If dont_link is False and cls.combine_with_linker is
-                False.
+            ValueError: If dont_link is False and the linking step
+                cannot be combined with the compilation step.
 
         """
         # Turn off linking if it is part of the compilation call
@@ -1645,15 +1731,24 @@ class CompilerBase(CompilationToolBase):
                     out.append(cls.linker_switch)
         # Add linker flags
         if (not dont_link):
-            if (not cls.combine_with_linker):
-                raise ValueError("Cannot combine linker and compiler flags.")
-            logger.debug('The returned flags will contain linker flags that '
-                         'may need to follow the list of source files.')
             unused_kwargs_comp = kwargs.pop('unused_kwargs', {})
             unused_kwargs_link = {}
-            tool = cls.get_library_tool(libtype=libtype, **unused_kwargs_comp)
+            build_library = (libtype in ['static', 'shared'])
+            tool = cls.get_library_tool(
+                libtype=libtype,
+                force_simultaneous_link=force_simultaneous_link,
+                **unused_kwargs_comp)
+            if tool.toolname not in [cls.toolname,
+                                     cls.combine_with_linker]:
+                raise ValueError(
+                    f"Cannot combine linker ({tool.toolname}) and "
+                    f"compiler ({cls.toolname}) flags.")
+            logger.debug('The returned flags will contain linker flags '
+                         'that may need to follow the list of source '
+                         'files.')
             out += tool.get_flags(outfile=outfile_link,
                                   unused_kwargs=unused_kwargs_link,
+                                  build_library=build_library,
                                   **unused_kwargs_comp)
             for k in copy.deepcopy(list(unused_kwargs_comp.keys())):
                 if k not in unused_kwargs_link:
@@ -1726,7 +1821,8 @@ class CompilerBase(CompilationToolBase):
 
     @classmethod
     def call(cls, args, dont_link=None, skip_flags=False, out=None,
-             libtype=None, additional_objs=None, **kwargs):
+             libtype=None, additional_objs=None,
+             force_simultaneous_link=False, **kwargs):
         r"""Call the tool with the provided arguments. If the first argument
         resembles the name of the tool executable, the executable will not be
         added.
@@ -1750,6 +1846,9 @@ class CompilerBase(CompilationToolBase):
             additional_objs (list, optional): Additional linkable object files
                 that should be supplied to the linker/archiver if dont_link is
                 False. Defaults to None and is ignored.
+            force_simultaneous_link (bool, optional): If True, force the
+                link step to be performed by the same command as the
+                compilation.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method and the associated linker/archiver's call method
                 if dont_link is False.
@@ -1775,10 +1874,16 @@ class CompilerBase(CompilationToolBase):
                 dont_link = False
         # Get appropriate tool
         tool = None
-        if not (dont_link or skip_flags):
+        if not (dont_link or skip_flags or force_simultaneous_link):
             tool = cls.get_library_tool(libtype=libtype, **kwargs)
+            if libtype != 'static' and tool.languages[0] != cls.languages[0]:
+                stdlib = cls.find_standard_library()
+                if stdlib is not None and stdlib not in kwargs.get('libraries', []):
+                    kwargs.setdefault('libraries', [])
+                    kwargs['libraries'].append(stdlib)
         # Handle list of sources
-        if (not skip_flags) and isinstance(args, list) and (len(args) > 1):
+        if (((not (skip_flags or force_simultaneous_link))
+             and isinstance(args, list) and (len(args) > 1))):
             if dont_link:
                 out_comp = out
             else:
@@ -1806,9 +1911,12 @@ class CompilerBase(CompilationToolBase):
             return tool.call(obj_list, out=out, additional_args=additional_objs,
                              **kwargs_link)
         # Call without linking/archiving
-        if skip_flags or dont_link:
+        if skip_flags or dont_link or force_simultaneous_link:
             if not skip_flags:
                 kwargs['dont_link'] = dont_link
+            if force_simultaneous_link:
+                kwargs['libtype'] = libtype
+                kwargs['force_simultaneous_link'] = force_simultaneous_link
             kwargs.pop('linker_language', None)
             return super(CompilerBase, cls).call(args, skip_flags=skip_flags,
                                                  out=out, **kwargs)
@@ -1881,51 +1989,95 @@ class CompilerBase(CompilationToolBase):
             asan_options += 'verify_asan_link_order=0'
             out['ASAN_OPTIONS'] = asan_options
             logger.debug(f"ASAN_OPTIONS: {asan_options}")
-        elif (getattr(cls, 'default_linker_language', cls.languages[0])
-              not in cls.languages):
+        elif (cls.default_linker_language is not None
+              and cls.default_linker_language not in cls.languages):
             alt = find_compilation_tool(
                 'compiler', cls.default_linker_language,
-                from_driver=True, return_type='class')
+                return_type='class')
             out = alt.init_asan_env(out)
         return out
 
     @classmethod
-    def asan_library(cls):
-        r"""Return the address sanitizer library."""
-        if not (cls.asan_flags and cls.object_tool):
+    def find_standard_library(cls, name=None, flags=None, verbose=False,
+                              dont_cache=False):
+        r"""Determine the location of a library
+
+        Args:
+            name (str, optional): Name of the library to locate. If not
+                provided, the class's standard_library will be used (if
+                it is not None).
+            flags (list, optional): Flags that should be added to a test
+                compilation in order for the desired library to be linked.
+            verbose (bool, optional): If True, all commands used to locate
+                the library will be verbose.
+            dont_cache (bool, optional): If True, any cached value for the
+                specified library will be ignored and the result will not
+                be added to the cache.
+
+        Returns:
+            str: Full path to library if one can be located, None if not
+
+        """
+        if name is None:
+            name = cls.standard_library
+        if name is None:
             return None
-        if 'asan_library' in cls._language_cache:
-            return cls._language_cache['asan_library']
+        if (not dont_cache) and f"{name}_library" in cls._language_cache:
+            return cls._language_cache[f"{name}_library"]
+        if not (cls.source_exts and cls.source_dummy):
+            return None
+        if flags is None:
+            flags = []
+        fname = os.path.join(os.getcwd(), f'a{cls.linker().library_ext}')
+        fname_src = os.path.join(os.getcwd(), f"a{cls.source_exts[0]}")
+        products = tools.IntegrationPathSet(overwrite=True)
+        assert not (os.path.isfile(fname_src) or os.path.isfile(fname))
         try:
-            fname = 'a.out'
-            fname_src = 'a.c'
-            with open(fname_src, 'w') as fd:
-                fd.write('void foo() {}')
-            cmds = [' '.join(cls.get_executable_command(
-                ['-x', 'c', '-fPIC', '-shared', '-o', fname]
-                + cls.asan_flags + [fname_src], skip_flags=True))]
-            cmds += [f"{cls.object_tool} {fname} | grep asan | "
-                     f"awk '{{print $1}}'"]
-            subprocess.check_call(cmds[0], shell=True)
-            lib = subprocess.check_output(cmds[1], shell=True).decode('utf-8').strip()
-            if not os.path.isabs(lib):
-                lib = os.path.basename(lib)
-                lib = subprocess.check_output(
-                    [cls.get_executable(),
-                     f'-print-file-name={lib}']).decode('utf-8').strip()
-            if os.path.isfile(lib):
-                lib = os.path.abspath(lib)
-            else:
-                lib = None
+            products.append_generated(fname_src, [cls.source_dummy])
+            products.setup()
+            disassembler = cls.disassembler()
+            cls.call([fname_src], libtype='shared', out=fname,
+                     additional_args=flags, products=products,
+                     verbose=verbose, force_simultaneous_link=True)
+            lines = disassembler.call(
+                [fname], components='shared_libraries',
+                verbose=verbose).splitlines()
+            lib = None
+            for x in lines:
+                if name not in x:
+                    continue
+                for xx in x.strip().split():
+                    if name in xx:
+                        libx = xx
+                        break
+                if ((not (os.path.isabs(libx) and os.path.isfile(libx))
+                     and cls.toolset in ['llvm', 'gnu'])):
+                    libx = os.path.basename(libx)
+                    libx = subprocess.check_output(
+                        [cls.get_executable(),
+                         f'-print-file-name={libx}']
+                    ).decode('utf-8').strip()
+                if not (os.path.isabs(libx) and os.path.isfile(libx)):
+                    libx = cls.locate_file(libx, libtype='shared',
+                                           verbose=verbose)
+                if os.path.isfile(libx):
+                    lib = os.path.abspath(libx)
+                    break
         except subprocess.CalledProcessError:
             lib = None
         finally:
-            for x in [fname, fname_src]:
-                if os.path.isfile(x):
-                    os.remove(x)
-        logger.debug(f"ASAN Library: {lib}")
-        cls._language_cache['asan_library'] = lib
+            products.teardown()
+        logger.debug(f"{name} Library: {lib}")
+        if not dont_cache:
+            cls._language_cache[f'{name}_library'] = lib
         return lib
+
+    @classmethod
+    def asan_library(cls):
+        r"""Return the address sanitizer library."""
+        if not cls.asan_flags:
+            return None
+        return cls.find_standard_library('asan', flags=cls.asan_flags)
 
         
 class LinkerBase(CompilationToolBase):
@@ -2315,6 +2467,86 @@ class ArchiverBase(LinkerBase):
         kwargs['build_library'] = True
         return super(ArchiverBase, cls).get_output_file(obj, **kwargs)
 
+
+class DisassemblerBase(CompilationToolBase):
+    r"""Base class for binary inspection tools."""
+    tooltype = 'disassembler'
+    languages = ['c', 'c++', 'fortran']
+    component_options = {}
+    component_filters = {}
+    no_output_file = True
+
+    @classmethod
+    def call(cls, args, components=None, **kwargs):
+        r"""Call the tool with the provided arguments.
+
+        Args:
+            args (list): The arguments that should be passed to the tool.
+            components (str, list, optional): Type of component(s) that
+                should be selected.
+            **kwargs: Additional keyword arguments are passed to
+                CompilationToolBase.call.
+        
+        """
+        flags = []
+        filters = []
+        if isinstance(components, str):
+            components = [components]
+        if components is not None:
+            flags = [cls.component_options[x] for x in
+                     components if cls.component_options[x]]
+            filters = [cls.component_filters.get(x, '') for x in
+                       components if x in cls.component_filters]
+        out = super(DisassemblerBase, cls).call(flags + args, **kwargs)
+        if filters:
+            lines = out.splitlines()
+            lines_filtered = []
+            for x in lines:
+                if any(xf in x for xf in filters):
+                    lines_filtered.append(x)
+            out = '\n'.join(lines_filtered)
+        return out
+
+
+# class LDDDisassembler(DisassemblerBase):
+#     r"""Class for ldd inspection"""
+#     toolname = 'ldd'
+#     toolset = 'gnu'
+#     component_options = {
+#         'shared_libraries': ''
+#     }
+
+
+class OToolDisassembler(DisassemblerBase):
+    r"""Class for otool inspection"""
+    toolname = 'otool'
+    toolset = 'llvm'
+    component_options = {
+        'shared_libraries': '-L'
+    }
+
+    
+class ObjDumpDisassembler(DisassemblerBase):
+    r"""Class for objdump inspection"""
+    toolname = 'objdump'
+    toolset = 'gnu'
+    compatible_toolsets = ['llvm', 'msvc']
+    component_options = {
+        'shared_libraries': '-p'
+    }
+    # component_filters = {
+    #     'shared_libraries': 'NEEDED'
+    # }
+
+
+class DumpBinDisassembler(DisassemblerBase):
+    r"""Class for dumpbin inspector"""
+    toolname = 'dumpbin'
+    toolset = 'msvc'
+    component_options = {
+        'shared_libraries': '/dependents'
+    }
+
     
 class BuildToolBase(CompilerBase):  # pragma: in progress
     r"""Base class for build tools which are used to coordinate compilation.
@@ -2407,6 +2639,14 @@ class CompiledModelDriver(ModelDriver):
             set explictly by instance or config file
         default_linker_flags (list): Flags that should be passed to the
             linker by default for this language.
+        default_archiver (str): Name of archiver that will be used if not
+            set explictly by instance or config file
+        default_archiver_flags (list): Flags that should be passed to the
+            archiver by default for this language.
+        default_disassembler (str): Name of disassembler that will be used
+            if not set explictly by instance or config file
+        default_disassembler_flags (list): Flags that should be passed to
+            the disassembler by default for this language.
         allow_parallel_build (bool): If True, a file can be compiled by
             two processes simultaneously. If False, it cannot and an
             MPI barrier will be used to prevent simultaneous compilation.
@@ -2418,8 +2658,16 @@ class CompiledModelDriver(ModelDriver):
         compiler_flags (list): Compiler flags.
         linker (str): Name or path to the linker that should be used.
         linker_flags (list): Linker flags.
+        archiver (str): Name or path to the archiver that should be used.
+        archiver_flags (list): Archiver flags.
+        disassembler (str): Name or path to the disassembler that should
+            be used.
+        disassembler_flags (list): Disassembler flags.
         compiler_tool (CompilerBase): Compiler tool that will be used.
         linker_tool (LinkerBase): Linker tool that will be used.
+        archiver_tool (ArchiverBase): Archiver tool that will be used.
+        disassembler_tool (DisassemblerBase): Disassembler tool that will
+            be used.
 
     """
 
@@ -2432,6 +2680,13 @@ class CompiledModelDriver(ModelDriver):
         'linker': {'type': 'string'},
         'linker_flags': {'type': 'array', 'items': {'type': 'string'},
                          'default': []},
+        'archiver': {'type': 'string'},
+        'archiver_flags': {'type': 'array', 'items': {'type': 'string'},
+                           'default': []},
+        'disassembler': {'type': 'string'},
+        'disassembler_flags': {'type': 'array',
+                               'items': {'type': 'string'},
+                               'default': []},
         'disable_python_c_api': {'type': 'boolean'},
         'with_asan': {'type': 'boolean'}}
     executable_type = 'compiler'
@@ -2441,22 +2696,15 @@ class CompiledModelDriver(ModelDriver):
     default_linker_flags = None
     default_archiver = None
     default_archiver_flags = None
-    _config_keys = ['compiler', 'linker', 'archiver']
-    _config_attr_map = [{'attr': 'default_compiler',
-                         'key': 'compiler'},
-                        {'attr': 'default_compiler_flags',
-                         'key': 'compiler_flags',
-                         'type': list},
-                        {'attr': 'default_linker',
-                         'key': 'linker'},
-                        {'attr': 'default_linker_flags',
-                         'key': 'linker_flags',
-                         'type': list},
-                        {'attr': 'default_archiver',
-                         'key': 'archiver'},
-                        {'attr': 'default_archiver_flags',
-                         'key': 'archiver_flags',
-                         'type': list}]
+    default_disassembler = None
+    default_disassembler_flags = None
+    _config_keys = list(_tool_registry.keys())
+    _config_attr_map = (
+        [{'attr': f'default_{k}', 'key': k}
+         for k in _tool_registry.keys()]
+        + [{'attr': f'default_{k}_flags',
+            'key': f'{k}_flags', 'type': list}
+           for k in _tool_registry.keys()])
     is_build_tool = False
     allow_parallel_build = False
     locked_buildfile = None
@@ -2495,7 +2743,7 @@ class CompiledModelDriver(ModelDriver):
                     libfile = cls.cfg.get(cls.language, f'{k}_{t}', None)
                     if libfile is not None:
                         v[t] = libfile
-        for k in ['compiler', 'linker', 'archiver']:
+        for k in _tool_registry.keys():
             # Set default linker/archiver based on compiler
             default_tool_name = getattr(cls, f'default_{k}', None)
             if default_tool_name:
@@ -2534,17 +2782,17 @@ class CompiledModelDriver(ModelDriver):
 
         """
         # Set defaults from attributes
-        for k0 in ['compiler', 'linker', 'archiver']:
-            for k in [k0, '%s_flags' % k0]:
+        for k0 in _tool_registry.keys():
+            for k in [k0, f'{k0}_flags']:
                 v = getattr(self, k, None)
                 if v is None:
-                    setattr(self, k, getattr(self, 'default_%s' % k))
+                    setattr(self, k, getattr(self, f'default_{k}'))
         # Set tools so that they are cached
-        for k in ['compiler', 'linker', 'archiver']:
-            if self.is_build_tool and (k == 'archiver'):
-                setattr(self, '%s_tool' % k, False)
+        for k in _tool_registry.keys():
+            if self.is_build_tool and k in ['archiver', 'disassembler']:
+                setattr(self, f'{k}_tool', False)
             else:
-                setattr(self, '%s_tool' % k, self.get_tool_instance(k))
+                setattr(self, f'{k}_tool', self.get_tool_instance(k))
         # Ensure source files are absolute paths
         source_files = []
         for src in self.source_files:
@@ -2818,6 +3066,7 @@ class CompiledModelDriver(ModelDriver):
                 toolname = getattr(cls, 'default_%s' % tooltype, None)
             if toolname is None:
                 toolname = find_compilation_tool(tooltype, cls.language,
+                                                 skip_driver=True,
                                                  allow_failure=True)
             if toolname is None:
                 if default is False:
@@ -3193,7 +3442,7 @@ class CompiledModelDriver(ModelDriver):
                 if tool is None:
                     tool = cls.get_tool('compiler', language=dep_lang,
                                         toolname=toolname)
-                if tool.is_gnu:
+                if tool.linker().is_gnu:
                     logger.info(f"Creating GNU compatible import library "
                                 f"for {out}")
                     dll = cls.get_dependency_library(
@@ -3474,6 +3723,9 @@ class CompiledModelDriver(ModelDriver):
             definitions = []
         internal_dependencies = kwargs.pop('internal_dependencies', [])
         external_dependencies = kwargs.pop('external_dependencies', [])
+        # Link with C++
+        if (for_model or for_api) and not cls.is_build_tool:
+            kwargs.setdefault('linker_language', 'c++')
         # Communication specific compilation flags
         if (for_model or for_api) and (not skip_interface_flags):
             for c in tools.get_installed_comm(language=cls.language):
@@ -3584,6 +3836,10 @@ class CompiledModelDriver(ModelDriver):
         libraries = kwargs.pop('libraries', [])
         internal_dependencies = kwargs.pop('internal_dependencies', [])
         external_dependencies = kwargs.pop('external_dependencies', [])
+        # Link with C++
+        if (((for_model or for_api) and libtype != 'static'
+             and not cls.is_build_tool)):
+            kwargs.setdefault('linker_language', 'c++')
         # Communication specific compilation flags
         if (for_model or for_api) and (not skip_interface_flags):
             for c in tools.get_installed_comm(language=cls.language):
@@ -3838,7 +4094,7 @@ class CompiledModelDriver(ModelDriver):
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)
         for k, v in kwargs.items():
-            if k not in ['compiler', 'linker', 'archiver']:  # pragma: debug
+            if k not in _tool_registry:  # pragma: debug
                 raise ValueError(f"Unexpected configuration option: '{k}'")
             vtool = None
             try:
@@ -3876,7 +4132,7 @@ class CompiledModelDriver(ModelDriver):
         compiler = None
         linker = None
         archiver = None
-        for k in ['compiler', 'linker', 'archiver']:
+        for k in _tool_registry.keys():
             # Set default linker/archiver based on compiler
             default_tool_name = cfg.get(
                 cls.language, k, getattr(cls, f'default_{k}', None))
@@ -3894,7 +4150,8 @@ class CompiledModelDriver(ModelDriver):
             # Determine compilation tools based on language/platform
             if default_tool_name is None:  # pragma: no cover
                 default_tool_name = find_compilation_tool(
-                    k, cls.language, allow_failure=True)
+                    k, cls.language, allow_failure=True,
+                    skip_driver=True)
             # Set default tool attribute & record compiler tool if set
             setattr(cls, f'default_{k}', default_tool_name)
             if default_tool_name:

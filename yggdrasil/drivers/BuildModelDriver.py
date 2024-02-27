@@ -156,7 +156,7 @@ class BuildModelDriver(CompiledModelDriver):
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
         """
-        for k in ['linker', 'archiver']:
+        for k in ['linker', 'archiver', 'disassembler']:
             if k in cls._config_keys:
                 cls._config_keys.remove(k)
         if getattr(cls, 'default_compiler', None) is None:

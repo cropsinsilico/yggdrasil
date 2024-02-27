@@ -67,6 +67,7 @@ _osx_sysroot = get_OSX_SYSROOT()
 class CCompilerBase(CompilerBase):
     r"""Base class for C compilers."""
     languages = ['c']
+    source_exts = ['.c']
     default_executable_env = 'CC'
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
@@ -80,6 +81,7 @@ class CCompilerBase(CompilerBase):
     search_regex_end = 'End of search list.'
     search_regex = [r'(?:#include <...> search starts here:)|'
                     r'(?: ([^\n]+?)(?: \(framework directory\))?)\n']
+    source_dummy = 'void foo() {}'
 
     # This is only needed if one of the linkers is created from the compiler
     # @staticmethod
@@ -124,14 +126,14 @@ class CCompilerBase(CompilerBase):
                 out['MACOSX_DEPLOYMENT_TARGET'] = grp['target']
         return out
     
-    @classmethod
-    def call(cls, args, **kwargs):
-        r"""Call the compiler with the provided arguments. For |yggdrasil| C
-        models will always be linked using the C++ linker since some parts of
-        the interface library are written in C++."""
-        if not kwargs.get('dont_link', False):
-            kwargs.setdefault('linker_language', 'c++')
-        return super(CCompilerBase, cls).call(args, **kwargs)
+    # @classmethod
+    # def call(cls, args, **kwargs):
+    #     r"""Call the compiler with the provided arguments. For |yggdrasil| C
+    #     models will always be linked using the C++ linker since some parts of
+    #     the interface library are written in C++."""
+    #     if not kwargs.get('dont_link', False):
+    #         kwargs.setdefault('linker_language', 'c++')
+    #     return super(CCompilerBase, cls).call(args, **kwargs)
     
     @classmethod
     def get_search_path(cls, *args, **kwargs):
@@ -156,18 +158,12 @@ class GCCCompiler(CCompilerBase):
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
     default_linker = 'gcc'
+    default_disassembler = 'objdump'
     is_linker = False
-    # linker_attributes = dict(
-    #     CCompilerBase.linker_attributes,
-    #     flag_options=OrderedDict(
-    #         list(LinkerBase.flag_options.items())
-    #         + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
-    #         + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
     asan_flags = ['-fsanitize=address']
     preload_envvar = 'LD_PRELOAD'
-    object_tool = "ldd"
 
     @classmethod
     def is_installed(cls):
@@ -241,6 +237,7 @@ class ClangCompiler(CCompilerBase):
     platforms = ['MacOS', 'Linux', 'Windows']
     default_linker = 'clang'
     default_archiver = 'libtool'
+    default_disassembler = 'otool'
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
                                + [('sysroot', '--sysroot'),
                                   ('isysroot', {'key': '-isysroot',
@@ -249,7 +246,7 @@ class ClangCompiler(CCompilerBase):
                                    '-mmacosx-version-min=%s')])
     asan_flags = ['-fsanitize=address']
     preload_envvar = 'DYLD_INSERT_LIBRARIES'
-    object_tool = "otool -L"
+    product_exts = ['.dSYM']
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
     is_linker = False
@@ -290,12 +287,13 @@ class MSVCCompiler(CCompilerBase):
     output_first = True
     default_linker = 'LINK'
     default_archiver = 'LIB'
+    default_disassembler = 'dumpbin'
     linker_switch = '/link'
     search_path_envvar = ['INCLUDE']
     search_path_flags = None
     version_flags = []
-    product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters',
-                    '.exp', '.lib']
+    product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
+                    '.vcxproj.filters', '.exp', '.lib']
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     is_linker = False
     toolset = 'msvc'
@@ -353,13 +351,13 @@ class LDLinker(LinkerBase):
             raise RuntimeError(f"Could not locate version in string: {out}")
         return match.group('version')
 
-    @classmethod
-    def get_flags(cls, *args, **kwargs):
-        r"""Get a list of linker flags."""
-        out = super(LDLinker, cls).get_flags(*args, **kwargs)
-        if '-lstdc++' not in out:
-            out.append('-lstdc++')
-        return out
+    # @classmethod
+    # def get_flags(cls, *args, **kwargs):
+    #     r"""Get a list of linker flags."""
+    #     out = super(LDLinker, cls).get_flags(*args, **kwargs)
+    #     if '-lstdc++' not in out:
+    #         out.append('-lstdc++')
+    #     return out
 
 
 class GCCLinker(LDLinker):
@@ -1039,8 +1037,10 @@ class CModelDriver(CompiledModelDriver):
         if platform._is_win:  # pragma: windows
             env.setdefault('PYTHONHOME', sysconfig.get_config_var('prefix'))
             env.setdefault('PYTHONPATH', os.pathsep.join([
-                sysconfig.get_path('stdlib'), sysconfig.get_path('purelib'),
-                os.path.join(sysconfig.get_config_var('prefix'), 'DLLs')]))
+                sysconfig.get_path('stdlib'),
+                sysconfig.get_path('purelib'),
+                os.path.join(sysconfig.get_config_var('prefix'),
+                             'DLLs')]))
         return env
 
     @classmethod

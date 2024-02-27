@@ -12,6 +12,7 @@ History
 * Migrate from using versioneer to setuptools_scm
 * Migrate from setup.py + setup.cfg to pyproject.toml
 * Migrate build system to scikit-build-core
+* Introduce disassembler compilation tool class for dissecting compiled binaries
 
 1.10.2 (2023-10-12) Minor bug fixes and dependency updates
 -------------------

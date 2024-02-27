@@ -2384,6 +2384,9 @@ class CompilationProduct(IntegrationPath):
             inew = base + x
             if inew not in self._products:
                 self._products.append(inew)
+            inew = self.name + x
+            if inew not in self._products:
+                self._products.append(inew)
         for x in self.files:
             inew = os.path.join(self.directory, x)
             if inew not in self._products:

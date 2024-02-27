@@ -87,6 +87,29 @@ def test_locate_library_file():
                 == files['shared'])
 
 
+@pytest.mark.parametrize('lang,toolname,lib', [
+    ('fortran', 'gfortran', True),
+    ('c++', 'clang++', True),
+    ('c++', 'g++', True),
+    ('c++', 'cl++', False),
+])
+def test_find_standard_library(lang, toolname, lib):
+    r"""Test find_standard_library"""
+    compiler = CompiledModelDriver.get_compilation_tool(
+        'compiler', toolname, allow_failure=True,
+        return_type='class', init_languages=[lang])
+    if not (compiler and compiler.is_installed()):
+        pytest.skip(f"No compiler for {toolname}")
+    out = compiler.find_standard_library(dont_cache=True)
+    print(out, type(out))
+    if lib:
+        if out is None:
+            out = compiler.find_standard_library(verbose=True)
+        assert isinstance(out, str) and os.path.isfile(out)
+    else:
+        assert out is None
+
+
 def test_CompilationToolBase():
     r"""Test error in CompilationToolBase."""
     with pytest.raises(RuntimeError):
@@ -189,7 +212,7 @@ class TestDummyCompiler(TestCompilationTool):
 
     def test_archiver(self, python_class):
         r"""Test archiver."""
-        with pytest.raises(RuntimeError):
+        with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
             python_class.archiver()
         
     def test_get_flags(self, python_class):
@@ -353,8 +376,9 @@ class TestCompiledModelDriver(model_base_class):
         r"""Test get_flags."""
         compiler = python_class.get_tool('compiler')
         if compiler:
-            if ((compiler.combine_with_linker
-                 or compiler.no_separate_linking)):
+            if ((compiler.no_separate_linking
+                 or compiler.linker().toolname in
+                 [compiler.toolname, compiler.combine_with_linker])):
                 print(compiler, compiler.get_flags(invalid_kw=True,
                                                    unused_kwargs={},
                                                    libraries=[]))

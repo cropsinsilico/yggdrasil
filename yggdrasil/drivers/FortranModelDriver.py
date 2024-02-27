@@ -8,7 +8,7 @@ from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
     CompilerBase, CompiledModelDriver, get_compilation_tool,
-    get_compilation_tool_registry)
+    find_compilation_tool)
 
 
 logger = logging.getLogger(__name__)
@@ -24,9 +24,11 @@ _c_internal_libs = copy.deepcopy(CModelDriver.CModelDriver.internal_libraries)
 class FortranCompilerBase(CompilerBase):
     r"""Base class for Fortran compilers."""
     languages = ['fortran']
+    source_exts = ['.F90', '.f90', '.F77', '.f77', '.F', '.f']
     default_executable_env = 'FC'
     default_flags_env = 'FFLAGS'
     default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors', '-ffree-line-length-0']
+    default_ext = '.F90'
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_envvar = []
@@ -34,8 +36,19 @@ class FortranCompilerBase(CompilerBase):
     default_executable = None
     default_archiver = None
     product_exts = ['.mod']
-    default_linker_language = 'c++'
+    source_dummy = 'program main\nend program main'
+    # default_linker_language = 'c++'
 
+    # @staticmethod
+    # def before_registration(cls):
+    #     r"""Operations that should be performed to modify class attributes prior
+    #     to registration including things like platform dependent properties and
+    #     checking environment variables for default settings.
+    #     """
+    #     if platform._is_win:
+    #         cls.default_linker_language = 'c++'
+    #     CompilerBase.before_registration(cls)
+        
     @classmethod
     def call(cls, args, **kwargs):
         r"""Call the compiler with the provided arguments. For |yggdrasil| C
@@ -115,6 +128,8 @@ class GFortranCompiler(FortranCompilerBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm', 'msvc']
     default_archiver = 'ar'
+    default_disassembler = 'objdump'
+    standard_library = 'gfortran'
     # GNU ASAN not currently installed with gfortran on osx
     # asan_flags = ['-fsanitize=address']
     # linker_attributes = dict(
@@ -173,16 +188,14 @@ class FortranModelDriver(CompiledModelDriver):
                            CModelDriver.CModelDriver.supported_comm_options[
                                'zmq']['libraries']]})
     standard_libraries = []
-    external_libraries = {'cxx': {'include': 'stdlib.h',
-                                  'libtype': 'shared',
-                                  'language': 'c'}}
+    # external_libraries = {'cxx': {'include': 'stdlib.h',
+    #                               'libtype': 'shared',
+    #                               'language': 'c'}}
     internal_libraries = dict(
         fygg={'source': os.path.join(_incl_interface,
                                      'YggInterface.f90'),
               'libtype': 'static',
               'internal_dependencies': (
-                  # [('c', x) for x in
-                  #  _c_internal_libs['ygg']['internal_dependencies']]
                   [('c', 'ygg'), 'c_wrappers']),
               'external_dependencies': (
                   [('c', x) for x in
@@ -426,50 +439,40 @@ class FortranModelDriver(CompiledModelDriver):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        # if cls.default_compiler is None:
-        #     if platform._is_linux or platform._is_mac:
-        #         cls.default_compiler = 'gfortran'
-        #     elif platform._is_win:  # pragma: windows
-        #         cls.default_compiler = 'flang'
         CompiledModelDriver.before_registration(cls)
-        orig_standards = {}
-        orig_standards['c++'] = cls.external_libraries.pop('cxx', None)
-        add_standard_libraries = {}
-        if FortranCompilerBase.default_linker_language == 'c++':
-            if cls.default_compiler == 'gfortran':
-                add_standard_libraries['fortran'] = 'gfortran'
-        elif orig_standards['c++'] is not None:
-            # add_standard_libraries['c'] = 'c'
-            c_compilers = get_compilation_tool_registry(
-                'compiler', init_languages=['c++'])['by_language'].get('c++', {})
-            for k, v in c_compilers.items():
-                if not v.is_installed():
-                    continue
-                if k == 'clang++':
-                    if not add_standard_libraries.get('c++', None):
-                        add_standard_libraries['c++'] = 'c++'
-                else:
-                    # GNU takes precedence when present even if already
-                    # set from clang
-                    add_standard_libraries['c++'] = 'stdc++'
-        for k, v in add_standard_libraries.items():
-            # if v not in cls.external_libraries:
-            #     cls.external_libraries[v] = copy.deepcopy(orig_standards.get(k, v))
-            #     cls.internal_libraries['fygg']['external_dependencies'].append(v)
-            if v not in cls.standard_libraries:
-                cls.standard_libraries.append(v)
-                cls.internal_libraries['fygg']['external_dependencies'].append(v)
-        if platform._is_win:  # pragma: windows
-            cl_compiler = get_compilation_tool('compiler', 'cl')
-            if not cl_compiler.is_installed():  # pragma: debug
+        # orig_standards = {}
+        # orig_standards['c++'] = cls.external_libraries.pop('cxx', None)
+        cxx_compiler = find_compilation_tool('compiler', 'c++',
+                                             allow_failure=True)
+        # add_standard_libraries = {}
+        # if FortranCompilerBase.default_linker_language == 'c++':
+        #     if cls.default_compiler == 'gfortran':
+        #         add_standard_libraries['fortran'] = 'gfortran'
+        # elif orig_standards['c++'] is not None:
+        #     if cxx_compiler == 'clang++':
+        #         add_standard_libraries['c++'] = 'c++'
+        #     elif cxx_compiler is not None:
+        #         add_standard_libraries['c++'] = 'stdc++'
+        # for k, v in add_standard_libraries.items():
+        #     if v not in cls.standard_libraries:
+        #         cls.standard_libraries.append(v)
+        #         cls.internal_libraries['fygg']['external_dependencies'].append(v)
+        if platform._is_win and cxx_compiler:  # pragma: debug
+            msg_error = None
+            cxx_compiler = get_compilation_tool('compiler', cxx_compiler)
+            if cxx_compiler.toolname != 'cl++':
+                msg_error = "The MSVC compiler is not selected for C/C++"
+            elif not cxx_compiler.is_installed():
+                msg_error = "The MSVC compiler is not installed"
+            if msg_error is not None:
                 logger.info(
-                    "The MSVC compiler could not be located. The Python C API "
-                    "assumes the MSVC CRT will be used on windows so there may "
-                    "be errors when accessing some behavior of the Python C API. "
-                    "In particular, segfaults are known to occur when trying to "
-                    "call display_python due to differences in the internal "
-                    "structure of FILE* objects between MSVC and other "
-                    "standards.")
+                    f"{msg_error}. The Python C API assumes the MSVC "
+                    f"CRT will be used on windows so there may be "
+                    f"errors when accessing some behavior of the Python "
+                    f"C API. In particular, segfaults are known to "
+                    f"occur when trying to call display_python due to "
+                    f"differences in the internal structure of FILE* "
+                    f"objects between MSVC and other standards.")
 
     @classmethod
     def set_env_class(cls, **kwargs):
