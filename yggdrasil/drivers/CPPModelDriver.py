@@ -61,6 +61,18 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     is_linker = False
     standard_library = 'stdc++'
 
+    @staticmethod
+    def after_registration(cls, **kwargs):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+        """
+        GCCCompiler.after_registration(cls, **kwargs)
+        if cls.is_mingw or cls.is_msys:
+            cls.standard_library_type = 'static'
+        
     @classmethod
     def get_flags(cls, skip_standard_flag=False, **kwargs):
         r"""Get a list of compiler flags.

@@ -130,6 +130,8 @@ class GFortranCompiler(FortranCompilerBase):
     default_archiver = 'ar'
     default_disassembler = 'objdump'
     standard_library = 'gfortran'
+    is_mingw = False
+    is_msys = False
     # GNU ASAN not currently installed with gfortran on osx
     # asan_flags = ['-fsanitize=address']
     # linker_attributes = dict(
@@ -148,6 +150,21 @@ class GFortranCompiler(FortranCompilerBase):
         if platform._is_win:
             cls.compatible_toolsets = ['msvc', 'gnu', 'llvm']
         FortranCompilerBase.before_registration(cls, **kwargs)
+
+    @staticmethod
+    def after_registration(cls, **kwargs):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
+        default compiler. The order of precedence is the config file 'compiler'
+        option for the language, followed by the environment variable set by
+        _compiler_env, followed by the existing class attribute.
+        """
+        FortranCompilerBase.after_registration(cls, **kwargs)
+        ver = cls.tool_version()
+        cls.is_mingw = 'mingw' in ver.lower()
+        cls.is_msys = 'msys' in ver.lower()
+        if cls.is_mingw or cls.is_msys:
+            cls.standard_library_type = 'static'
 
 
 # class IFortCompiler(FortranCompilerBase):

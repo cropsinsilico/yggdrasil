@@ -98,7 +98,8 @@ def test_find_standard_library(lang, toolname, lib):
     compiler = CompiledModelDriver.get_compilation_tool(
         'compiler', toolname, allow_failure=True,
         return_type='class', init_languages=[lang])
-    if not (compiler and compiler.is_installed()):
+    if not (compiler and compiler.is_installed()
+            and compiler.disassembler(allow_uninstalled=True).is_installed()):
         pytest.skip(f"No compiler for {toolname}")
     out = compiler.find_standard_library(dont_cache=True)
     print(out, type(out))

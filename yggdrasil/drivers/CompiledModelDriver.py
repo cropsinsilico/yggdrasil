@@ -1108,6 +1108,8 @@ class CompilationToolBase(object):
             for exts in ext_sets:
                 if fname.endswith(exts):
                     base = fname.split('.', 1)[0]
+                    if base.startswith('lib'):
+                        base = base.split('lib', 1)[-1]
                     assert not base.startswith('lib')
                     fname = []
                     for ext in exts:
@@ -1482,6 +1484,7 @@ class CompilerBase(CompilationToolBase):
     search_path_env = ['include']
     source_dummy = ''
     standard_library = None
+    standard_library_type = 'shared'
 
     def __init__(self, **kwargs):
         for k in ['linker', 'archiver', 'linker_flags', 'archiver_flags']:
@@ -1525,11 +1528,15 @@ class CompilerBase(CompilationToolBase):
             del linker_cls
 
     @classmethod
-    def get_tool(cls, tooltype, **kwargs):
+    def get_tool(cls, tooltype, allow_uninstalled=False, **kwargs):
         r"""Get the associate class for the required tool type.
 
         Args:
             tooltype (str): Type of tool to return.
+            allow_uninstalled (bool, optional): If True, the returned
+                tool may not be installed.
+            **kwargs: Additional keyword arguments may contain variables
+                controlling the returned tool, tool flags, or language.
 
         Returns:
             CompilationToolBase: Linker class associated with this compiler.
@@ -1561,7 +1568,8 @@ class CompilerBase(CompilationToolBase):
                                        return_instance=True,
                                        flags=tool_flags,
                                        executable=tool)
-            assert out.is_installed()
+            if not allow_uninstalled:
+                assert out.is_installed()
         else:
             out = tool
         return out
@@ -1989,17 +1997,11 @@ class CompilerBase(CompilationToolBase):
             asan_options += 'verify_asan_link_order=0'
             out['ASAN_OPTIONS'] = asan_options
             logger.debug(f"ASAN_OPTIONS: {asan_options}")
-        elif (cls.default_linker_language is not None
-              and cls.default_linker_language not in cls.languages):
-            alt = find_compilation_tool(
-                'compiler', cls.default_linker_language,
-                return_type='class')
-            out = alt.init_asan_env(out)
         return out
 
     @classmethod
-    def find_standard_library(cls, name=None, flags=None, verbose=False,
-                              dont_cache=False):
+    def find_standard_library(cls, name=None, flags=None, libtype=None,
+                              verbose=False, dont_cache=False):
         r"""Determine the location of a library
 
         Args:
@@ -2007,12 +2009,17 @@ class CompilerBase(CompilationToolBase):
                 provided, the class's standard_library will be used (if
                 it is not None).
             flags (list, optional): Flags that should be added to a test
-                compilation in order for the desired library to be linked.
-            verbose (bool, optional): If True, all commands used to locate
-                the library will be verbose.
-            dont_cache (bool, optional): If True, any cached value for the
-                specified library will be ignored and the result will not
-                be added to the cache.
+                compilation in order for the desired library to be
+                linked.
+            libtype (str, optional): Type of library being searched for.
+                Defaults to standard_library_type for the standard
+                library, 'shared' for libraries on unix OSs, and
+                'windows_import' for libraries on windows.
+            verbose (bool, optional): If True, all commands used to
+                locate the library will be verbose.
+            dont_cache (bool, optional): If True, any cached value for
+                the specified library will be ignored and the result will
+                not be added to the cache.
 
         Returns:
             str: Full path to library if one can be located, None if not
@@ -2022,48 +2029,67 @@ class CompilerBase(CompilationToolBase):
             name = cls.standard_library
         if name is None:
             return None
+        if libtype is None:
+            if name == cls.standard_library:
+                libtype = cls.standard_library_type
+            elif platform._is_win:  # pragma: windows
+                libtype = 'windows_import'
+            else:
+                libtype = 'shared'
         if (not dont_cache) and f"{name}_library" in cls._language_cache:
             return cls._language_cache[f"{name}_library"]
         if not (cls.source_exts and cls.source_dummy):
             return None
         if flags is None:
             flags = []
-        fname = os.path.join(os.getcwd(), f'a{cls.linker().library_ext}')
-        fname_src = os.path.join(os.getcwd(), f"a{cls.source_exts[0]}")
         products = tools.IntegrationPathSet(overwrite=True)
-        assert not (os.path.isfile(fname_src) or os.path.isfile(fname))
+        lib = None
+        libx = ''
+        libx_options = [name]
         try:
-            products.append_generated(fname_src, [cls.source_dummy])
-            products.setup()
-            disassembler = cls.disassembler()
-            cls.call([fname_src], libtype='shared', out=fname,
-                     additional_args=flags, products=products,
-                     verbose=verbose, force_simultaneous_link=True)
-            lines = disassembler.call(
-                [fname], components='shared_libraries',
-                verbose=verbose).splitlines()
-            lib = None
-            libx = ''
-            for x in lines:
-                if name not in x:
-                    continue
-                for xx in x.strip().split():
-                    if name in xx:
-                        libx = xx
-                        break
-                if libx.endswith('.dll'):
-                    libx = os.path.splitext(libx)[0] + '.lib'
-                if ((not (os.path.isabs(libx) and os.path.isfile(libx))
-                     and cls.toolset in ['llvm', 'gnu'])):
-                    libx = os.path.basename(libx)
-                    libx = subprocess.check_output(
-                        [cls.get_executable(),
-                         f'-print-file-name={libx}']
-                    ).decode('utf-8').strip()
+            if libtype in ['shared', 'windows_import']:
+                linker = cls.linker()
+                disassembler = cls.disassembler()
+                fname = os.path.join(os.getcwd(),
+                                     f'a{linker.library_ext}')
+                fname_src = os.path.join(os.getcwd(),
+                                         f"a{cls.source_exts[0]}")
+                assert not (os.path.isfile(fname_src)
+                            or os.path.isfile(fname))
+                products.append_generated(fname_src, [cls.source_dummy])
+                products.setup()
+                cls.call([fname_src], libtype='shared', out=fname,
+                         additional_args=flags, products=products,
+                         verbose=verbose, force_simultaneous_link=True)
+                lines = disassembler.call(
+                    [fname], components='shared_libraries',
+                    verbose=verbose).splitlines()
+                for x in lines:
+                    if name not in x:
+                        continue
+                    for xx in x.strip().split():
+                        if name in xx:
+                            libx = xx
+                            break
+                    if ((not (os.path.isabs(libx)
+                              and os.path.isfile(libx))
+                         and cls.toolset in ['llvm', 'gnu'])):
+                        libx = os.path.basename(libx)
+                        libx = subprocess.check_output(
+                            [cls.get_executable(),
+                             f'-print-file-name={libx}']
+                        ).decode('utf-8').strip()
+                    if libx:
+                        libx_options.insert(0, libx)
+                        if os.path.isfile(libx):
+                            break
+                if libtype == 'windows_import':
+                    libx = libx.replace('.dll', '.lib')
+            for libx in libx_options:
                 if not (os.path.isabs(libx) and os.path.isfile(libx)):
-                    libx = cls.locate_file(libx, libtype='shared',
+                    libx = cls.locate_file(libx, libtype=libtype,
                                            verbose=verbose)
-                if os.path.isfile(libx):
+                if libx and os.path.isfile(libx):
                     lib = os.path.abspath(libx)
                     break
         except subprocess.CalledProcessError:
@@ -4136,6 +4162,8 @@ class CompiledModelDriver(ModelDriver):
         linker = None
         archiver = None
         for k in _tool_registry.keys():
+            if cls.is_build_tool and k in ['archiver', 'disassembler']:
+                continue
             # Set default linker/archiver based on compiler
             default_tool_name = cfg.get(
                 cls.language, k, getattr(cls, f'default_{k}', None))
@@ -4325,8 +4353,15 @@ class CompiledModelDriver(ModelDriver):
                 logging_level=self.numeric_logging_level,
                 **compile_kwargs)
         elif self.with_asan:
-            compiler = self.get_tool_instance('compiler', toolname=toolname)
-            compiler.init_asan_env(out)
+            compiler = self.get_tool_instance(
+                'compiler', toolname=toolname)
+            out = compiler.init_asan_env(out)
+            if not ('ASAN_OPTIONS' in out
+                    or 'c++' in compiler.languages
+                    or compiler.is_build_tool):
+                alt = find_compilation_tool(
+                    'compiler', 'c++', return_type='class')
+                out = alt.init_asan_env(out)
         return out
 
     def compile_dependencies_instance(self, *args, **kwargs):
