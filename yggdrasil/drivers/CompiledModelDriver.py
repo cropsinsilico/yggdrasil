@@ -2043,6 +2043,7 @@ class CompilerBase(CompilationToolBase):
                 [fname], components='shared_libraries',
                 verbose=verbose).splitlines()
             lib = None
+            libx = ''
             for x in lines:
                 if name not in x:
                     continue
@@ -2050,6 +2051,8 @@ class CompilerBase(CompilationToolBase):
                     if name in xx:
                         libx = xx
                         break
+                if libx.endswith('.dll'):
+                    libx = os.path.splitext(libx)[0] + '.lib'
                 if ((not (os.path.isabs(libx) and os.path.isfile(libx))
                      and cls.toolset in ['llvm', 'gnu'])):
                     libx = os.path.basename(libx)

@@ -701,8 +701,12 @@ COMPILATION_TOOL_VARS = {
         'flags': None,
     },
     'LINK': {
-        'exec': 'LINK',
-        'flags': 'LDFLAGS',
+        'exec': None,
+        'flags': None,
+    },
+    'LINK++': {
+        'exec': None,
+        'flags': None,
     },
     'ar': {
         'exec': 'AR',
