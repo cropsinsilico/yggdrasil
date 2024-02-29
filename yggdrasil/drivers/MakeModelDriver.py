@@ -51,7 +51,8 @@ class MakeCompiler(BuildToolBase):
 
         """
         out = cls.call(cls.version_flags, skip_flags=True,
-                       allow_error=True, **kwargs)
+                       allow_error=True, for_version=True,
+                       **kwargs)
         if 'Copyright' not in out:  # pragma: debug
             raise RuntimeError("Version call failed: %s" % out)
         for x in (out.split('Copyright')[0]).splitlines():

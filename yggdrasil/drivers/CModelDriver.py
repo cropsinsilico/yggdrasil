@@ -164,22 +164,8 @@ class GCCCompiler(CCompilerBase):
     aliases = ['gnu-cc', 'gnu-gcc']
     asan_flags = ['-fsanitize=address']
     preload_envvar = 'LD_PRELOAD'
-    is_mingw = False
-    is_msys = False
+    _is_mingw = None
 
-    @staticmethod
-    def after_registration(cls, **kwargs):
-        r"""Operations that should be performed to modify class attributes after
-        registration. For compiled languages this includes selecting the
-        default compiler. The order of precedence is the config file 'compiler'
-        option for the language, followed by the environment variable set by
-        _compiler_env, followed by the existing class attribute.
-        """
-        CCompilerBase.after_registration(cls, **kwargs)
-        ver = cls.tool_version()
-        cls.is_mingw = 'mingw' in ver.lower()
-        cls.is_msys = 'msys' in ver.lower()
-        
     @classmethod
     def is_installed(cls):
         r"""Determine if this tool is installed by looking for the executable.
@@ -201,9 +187,18 @@ class GCCCompiler(CCompilerBase):
         r"""Get a list of compiler flags."""
         out = super(GCCCompiler, cls).get_flags(*args, **kwargs)
         if platform._is_win:  # pragma: windows
-            if cls.is_mingw or cls.is_msys:
+            if cls.is_mingw():
                 out.append('-Wa,-mbig-obj')
         return out
+        
+    @classmethod
+    def is_mingw(cls):
+        r"""Check if the class provides access to a mingw/msys compiler"""
+        if cls._is_mingw is None:
+            ver = cls.tool_version()
+            cls._is_mingw = ('mingw' in ver.lower()
+                             or 'msys' in ver.lower())
+        return cls._is_mingw
         
     def dll2a(cls, dll, dst=None, overwrite=False):
         r"""Convert a window's .dll library into a static library.

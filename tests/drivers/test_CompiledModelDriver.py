@@ -26,7 +26,7 @@ def test_get_compilation_tool_registry():
     
 def test_find_compilation_tool():
     r"""Test errors raised by find_compilation_tool."""
-    with pytest.raises(RuntimeError):
+    with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
         CompiledModelDriver.find_compilation_tool('archiver', 'cmake')
 
 

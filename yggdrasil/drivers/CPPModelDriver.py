@@ -70,7 +70,7 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
         _compiler_env, followed by the existing class attribute.
         """
         GCCCompiler.after_registration(cls, **kwargs)
-        if cls.is_mingw or cls.is_msys:
+        if cls.is_mingw():
             cls.standard_library_type = 'static'
         
     @classmethod

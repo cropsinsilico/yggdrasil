@@ -142,6 +142,7 @@ class BuildModelDriver(CompiledModelDriver):
     is_build_tool = True
     buildfile_base = None
     allow_parallel_build = False
+    invalid_tools = ['archiver', 'disassembler']
 
     def __init__(self, *args, **kwargs):
         self.target_language_driver = None

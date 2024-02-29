@@ -193,10 +193,11 @@ def find_compilation_tool(tooltype, language, allow_failure=False,
                 break
     else:
         drv = import_component('model', language)
-        out = drv.get_tool(tooltype, return_prop='name', default=None)
+        if tooltype not in drv.invalid_tools:
+            out = drv.get_tool(tooltype, return_prop='name', default=None)
     if (out is None) and (not allow_failure):
-        raise RuntimeError("Could not locate a %s tool." % tooltype)
-    if return_type in ['class', 'instance']:
+        raise InvalidCompilationTool(f"Could not locate a {tooltype} tool.")
+    if (out is not None) and (return_type in ['class', 'instance']):
         out = get_compilation_tool(
             tooltype, out, return_instance=(return_type == 'instance'))
     return out
@@ -436,7 +437,7 @@ class CompilationToolBase(object):
             if v is not None:
                 setattr(self, k, v)
         if len(kwargs) > 0:
-            raise RuntimeError("Unused keyword arguments: %s" % kwargs.keys())
+            raise RuntimeError(f"Unused keyword arguments: {kwargs.keys()}")
         super(CompilationToolBase, self).__init__(**kwargs)
 
     @staticmethod
@@ -1000,7 +1001,8 @@ class CompilationToolBase(object):
                     raise RuntimeError(f"vcpkg_dir is not valid: '{vcpkg_dir}'")
                 typ2dir = {'include': 'include',
                            'shared': 'bin',
-                           'static': 'lib'}
+                           'static': 'lib',
+                           'windows_import': 'lib'}
                 if platform._is_64bit:
                     arch = 'x64-windows'
                 else:  # pragma: debug
@@ -1084,19 +1086,22 @@ class CompilationToolBase(object):
             return fname
         fname = os.path.basename(fname)
         libtype2tool = {'shared': 'linker',
+                        'windows_import': 'linker',
                         'static': 'archiver',
                         'include': 'compiler'}
         if libtype is None:
             tool2libtype = {v: k for k, v in libtype2tool.items()}
             libtype = tool2libtype[cls.tooltype]
-        elif libtype == 'windows_import':
-            libtype = 'shared'
         assert libtype2tool[libtype] == cls.tooltype
         if '.' not in fname:
             kws_out = {'no_tool_suffix': True}
-            if libtype == 'shared':
+            if libtype in ['shared', 'windows_import']:
                 kws_out['build_library'] = True
             fname = cls.get_output_file(fname, **kws_out)
+        if libtype == 'windows_import' and fname.endswith('.dll'):
+            fname = os.path.splitext(fname)[0] + '.lib'
+            if fname.startswith('lib'):
+                fname = fname[3:]
         fname = '*'.join(os.path.splitext(fname))
         search_list = cls.get_search_path(libtype=libtype, **kwargs)
         # On windows search for both gnu and msvc library
@@ -1215,6 +1220,7 @@ class CompilationToolBase(object):
         """
         kwargs.setdefault('cache_key', True)
         kwargs.setdefault('allow_error', True)
+        kwargs.setdefault('for_version', True)
         return cls.call(cls.version_flags, skip_flags=True,
                         **kwargs)
 
@@ -1222,7 +1228,8 @@ class CompilationToolBase(object):
     def call(cls, args, language=None, toolname=None, skip_flags=False,
              dry_run=False, out=None, overwrite=False, products=None,
              allow_error=False, working_dir=None, additional_args=None,
-             suffix='', cache_key=None, verbose=False, **kwargs):
+             suffix='', cache_key=None, verbose=False, for_version=False,
+             **kwargs):
         r"""Call the tool with the provided arguments. If the first argument
         resembles the name of the tool executable, the executable will not be
         added.
@@ -1268,6 +1275,9 @@ class CompilationToolBase(object):
                 times. Defaults to None and is ignored.
             verbose (bool, optional): If True, the call command and
                 and output will be logged as info.
+            for_version (bool, optional): If True, the call is used to
+                determine the tool version and version info shouldn't
+                be included in log messages.
             **kwargs: Additional keyword arguments are passed to
                 cls.get_executable_command. and tools.popen_nobuffer.
 
@@ -1334,15 +1344,21 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
+            message_before = (
+                f"Executable: {cls.get_executable(full_path=True)}\n"
+                f"Command: \"{' '.join(cmd)}\"")
+            if not for_version:
+                message_before = (
+                    f"Version: {cls.tool_version()}\n{message_before}")
             if verbose:
-                logger.info(f"Command: \"{' '.join(cmd)}\"")
+                logger.info(message_before)
             else:
-                logger.debug(f"Command: \"{' '.join(cmd)}\"")
+                logger.debug(message_before)
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = output.decode("utf-8")
             err = err.decode("utf-8") if err else ''
-            message = (f"Command '{' '.join(cmd)}' resulted in code "
+            message = (f"{message_before} resulted in code "
                        f"{proc.returncode}:\n"
                        f"out = {output}\n"
                        f"err = {err}\n")
@@ -1487,10 +1503,13 @@ class CompilerBase(CompilationToolBase):
     standard_library_type = 'shared'
 
     def __init__(self, **kwargs):
-        for k in ['linker', 'archiver', 'linker_flags', 'archiver_flags']:
-            v = kwargs.pop(k, None)
-            if v is not None:
-                setattr(self, '_%s' % k, v)
+        for k in _tool_registry.keys():
+            if k == 'compiler':
+                continue
+            for key in [k, f'{k}_flags']:
+                v = kwargs.pop(key, None)
+                if v is not None:
+                    setattr(self, f'_{key}', v)
         super(CompilerBase, self).__init__(**kwargs)
 
     @staticmethod
@@ -1885,7 +1904,7 @@ class CompilerBase(CompilationToolBase):
         if not (dont_link or skip_flags or force_simultaneous_link):
             tool = cls.get_library_tool(libtype=libtype, **kwargs)
             if libtype != 'static' and tool.languages[0] != cls.languages[0]:
-                stdlib = cls.find_standard_library()
+                stdlib = cls.find_standard_library(verbose=True)
                 if stdlib is not None and stdlib not in kwargs.get('libraries', []):
                     kwargs.setdefault('libraries', [])
                     kwargs['libraries'].append(stdlib)
@@ -2080,11 +2099,11 @@ class CompilerBase(CompilationToolBase):
                              f'-print-file-name={libx}']
                         ).decode('utf-8').strip()
                     if libx:
+                        if libtype == 'windows_import':
+                            libx = libx.replace('.dll', '.lib')
                         libx_options.insert(0, libx)
                         if os.path.isfile(libx):
                             break
-                if libtype == 'windows_import':
-                    libx = libx.replace('.dll', '.lib')
             for libx in libx_options:
                 if not (os.path.isabs(libx) and os.path.isfile(libx)):
                     libx = cls.locate_file(libx, libtype=libtype,
@@ -2741,6 +2760,7 @@ class CompiledModelDriver(ModelDriver):
     standard_libraries = []
     external_libraries = {}
     internal_libraries = {}
+    invalid_tools = []
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
         self.buildfile_lock = None
@@ -2752,6 +2772,19 @@ class CompiledModelDriver(ModelDriver):
             assert os.path.isfile(self.model_file)
             self.debug("Compiled %s", self.model_file)
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        if cls.invalid_tools:
+            cls._schema_properties = copy.deepcopy(cls._schema_properties)
+            for k in cls.invalid_tools:
+                cls._schema_properties.pop(k, None)
+                cls._schema_properties.pop(f"{k}_flags")
+        ModelDriver.before_registration(cls)
+        
     @staticmethod
     def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
@@ -2818,7 +2851,7 @@ class CompiledModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, f'default_{k}'))
         # Set tools so that they are cached
         for k in _tool_registry.keys():
-            if self.is_build_tool and k in ['archiver', 'disassembler']:
+            if k in self.invalid_tools:
                 setattr(self, f'{k}_tool', False)
             else:
                 setattr(self, f'{k}_tool', self.get_tool_instance(k))
@@ -3081,8 +3114,9 @@ class CompiledModelDriver(ModelDriver):
             return drv.get_tool(tooltype, toolname=toolname,
                                 return_prop=return_prop,
                                 default=default)
-        out = getattr(cls, '%s_tool' % tooltype, None)
-        if (out is None) or ((toolname is not None) and (toolname != out.toolname)):
+        assert tooltype not in cls.invalid_tools
+        out = getattr(cls, f'{tooltype}_tool', None)
+        if (out is None) or (toolname not in [None, out.toolname]):
             # Associate linker & archiver with compiler so that it can be
             # used to retrieve them
             # Get tool name by checking:
@@ -3092,24 +3126,24 @@ class CompiledModelDriver(ModelDriver):
             if toolname is None:
                 toolname = getattr(cls, tooltype, None)
             if toolname is None:
-                toolname = getattr(cls, 'default_%s' % tooltype, None)
+                toolname = getattr(cls, f'default_{tooltype}', None)
             if toolname is None:
                 toolname = find_compilation_tool(tooltype, cls.language,
                                                  skip_driver=True,
                                                  allow_failure=True)
             if toolname is None:
+                msg = (f"{tooltype.title()} not set for language "
+                       f"'{cls.language}'.")
                 if default is False:
-                    raise NotImplementedError("%s not set for language '%s'."
-                                              % (tooltype.title(), cls.language))
-                logger.debug("%s not set for language '%s'."
-                             % (tooltype.title(), cls.language))
+                    raise NotImplementedError(msg)
+                logger.debug(msg)
                 return default
             if return_prop == 'name':
                 return toolname
             # Get flags
-            tool_flags = getattr(cls, '%s_flags' % tooltype, None)
+            tool_flags = getattr(cls, f'{tooltype}_flags', None)
             if tool_flags is None:
-                tool_flags = getattr(cls, 'default_%s_flags' % tooltype, None)
+                tool_flags = getattr(cls, f'default_{tooltype}_flags', None)
             if return_prop == 'flags':
                 return tool_flags
             # Get tool
@@ -3118,15 +3152,13 @@ class CompiledModelDriver(ModelDriver):
                                                f'{toolname}_executable',
                                                None)
             if tooltype == 'compiler':
-                kwargs.update(
-                    linker=cls.get_tool(
-                        'linker', return_prop='name', default=None),
-                    linker_flags=cls.get_tool(
-                        'linker', return_prop='flags', default=None),
-                    archiver=cls.get_tool(
-                        'archiver', return_prop='name', default=None),
-                    archiver_flags=cls.get_tool(
-                        'archiver', return_prop='flags', default=None))
+                for k in _tool_registry.keys():
+                    if k in cls.invalid_tools + ['compiler']:
+                        continue
+                    kwargs[k] = cls.get_tool(
+                        k, return_prop='name', default=None)
+                    kwargs[f'{k}_flags'] = cls.get_tool(
+                        k, return_prop='flags', default=None)
             out = get_compatible_tool(toolname, tooltype, cls.language,
                                       default=None)
             if (out is None) and (tooltype != 'compiler'):
@@ -4162,7 +4194,7 @@ class CompiledModelDriver(ModelDriver):
         linker = None
         archiver = None
         for k in _tool_registry.keys():
-            if cls.is_build_tool and k in ['archiver', 'disassembler']:
+            if k in cls.invalid_tools:
                 continue
             # Set default linker/archiver based on compiler
             default_tool_name = cfg.get(
