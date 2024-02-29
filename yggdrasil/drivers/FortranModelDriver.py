@@ -130,8 +130,6 @@ class GFortranCompiler(FortranCompilerBase):
     default_archiver = 'ar'
     default_disassembler = 'objdump'
     standard_library = 'gfortran'
-    is_mingw = False
-    is_msys = False
     # GNU ASAN not currently installed with gfortran on osx
     # asan_flags = ['-fsanitize=address']
     # linker_attributes = dict(
@@ -160,11 +158,19 @@ class GFortranCompiler(FortranCompilerBase):
         _compiler_env, followed by the existing class attribute.
         """
         FortranCompilerBase.after_registration(cls, **kwargs)
-        ver = cls.tool_version()
-        cls.is_mingw = 'mingw' in ver.lower()
-        cls.is_msys = 'msys' in ver.lower()
-        if cls.is_mingw or cls.is_msys:
+        if cls.is_mingw():
             cls.standard_library_type = 'static'
+
+    @classmethod
+    def is_mingw(cls):
+        r"""Check if the class provides access to a mingw/msys compiler"""
+        if cls._is_mingw is None:
+            ver = cls.tool_version()
+            cls._is_mingw = ('mingw' in ver.lower()
+                             or 'msys' in ver.lower())
+            logger.info(f"Setting is_mingw to {cls._is_mingw}: "
+                        f"ver = {ver}")
+        return cls._is_mingw
 
 
 # class IFortCompiler(FortranCompilerBase):

@@ -977,7 +977,7 @@ class CompilationToolBase(object):
         # Get flags based on path
         if (cls.search_path_flags is not None) and (not env_only):
             output = cls.call(cls.search_path_flags, skip_flags=True,
-                              allow_error=True)
+                              allow_error=True, for_version=True)
             # Split on beginning & ending regexes if they exist
             if cls.search_regex_begin is not None:
                 output = re.split(cls.search_regex_begin, output)[-1]
@@ -1107,7 +1107,8 @@ class CompilationToolBase(object):
         # On windows search for both gnu and msvc library
         # naming conventions
         if platform._is_win:  # pragma: windows
-            logger.info("Searching for base: %s" % fname)
+            logger.info(f"Searching for base (libtype={libtype}): "
+                        f"{fname}")
             ext_sets = (('.dll', '.dll.a'),
                         ('.lib', ))
             for exts in ext_sets:
@@ -1348,8 +1349,11 @@ class CompilationToolBase(object):
                 f"Executable: {cls.get_executable(full_path=True)}\n"
                 f"Command: \"{' '.join(cmd)}\"")
             if not for_version:
-                message_before = (
-                    f"Version: {cls.tool_version()}\n{message_before}")
+                try:
+                    message_before = (
+                        f"Version: {cls.tool_version()}\n{message_before}")
+                except BaseException:  # pragma: debug
+                    pass
             if verbose:
                 logger.info(message_before)
             else:
@@ -2057,8 +2061,6 @@ class CompilerBase(CompilationToolBase):
                 libtype = 'shared'
         if (not dont_cache) and f"{name}_library" in cls._language_cache:
             return cls._language_cache[f"{name}_library"]
-        if not (cls.source_exts and cls.source_dummy):
-            return None
         if flags is None:
             flags = []
         products = tools.IntegrationPathSet(overwrite=True)
@@ -2066,7 +2068,8 @@ class CompilerBase(CompilationToolBase):
         libx = ''
         libx_options = [name]
         try:
-            if libtype in ['shared', 'windows_import']:
+            if ((libtype in ['shared', 'windows_import']
+                 and cls.source_exts and cls.source_dummy)):
                 linker = cls.linker()
                 disassembler = cls.disassembler()
                 fname = os.path.join(os.getcwd(),
