@@ -149,29 +149,6 @@ class GFortranCompiler(FortranCompilerBase):
             cls.compatible_toolsets = ['msvc', 'gnu', 'llvm']
         FortranCompilerBase.before_registration(cls, **kwargs)
 
-    @staticmethod
-    def after_registration(cls, **kwargs):
-        r"""Operations that should be performed to modify class attributes after
-        registration. For compiled languages this includes selecting the
-        default compiler. The order of precedence is the config file 'compiler'
-        option for the language, followed by the environment variable set by
-        _compiler_env, followed by the existing class attribute.
-        """
-        FortranCompilerBase.after_registration(cls, **kwargs)
-        if cls.is_mingw():
-            cls.standard_library_type = 'static'
-
-    @classmethod
-    def is_mingw(cls):
-        r"""Check if the class provides access to a mingw/msys compiler"""
-        if cls._is_mingw is None:
-            ver = cls.tool_version()
-            cls._is_mingw = ('mingw' in ver.lower()
-                             or 'msys' in ver.lower())
-            logger.info(f"Setting is_mingw to {cls._is_mingw}: "
-                        f"ver = {ver}")
-        return cls._is_mingw
-
 
 # class IFortCompiler(FortranCompilerBase):
 #     r"""Interface class for ifort compiler/linker."""

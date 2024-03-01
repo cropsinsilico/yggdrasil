@@ -164,7 +164,6 @@ class GCCCompiler(CCompilerBase):
     aliases = ['gnu-cc', 'gnu-gcc']
     asan_flags = ['-fsanitize=address']
     preload_envvar = 'LD_PRELOAD'
-    _is_mingw = None
 
     @classmethod
     def is_installed(cls):
@@ -190,15 +189,6 @@ class GCCCompiler(CCompilerBase):
             if cls.is_mingw():
                 out.append('-Wa,-mbig-obj')
         return out
-        
-    @classmethod
-    def is_mingw(cls):
-        r"""Check if the class provides access to a mingw/msys compiler"""
-        if cls._is_mingw is None:
-            ver = cls.tool_version()
-            cls._is_mingw = ('mingw' in ver.lower()
-                             or 'msys' in ver.lower())
-        return cls._is_mingw
         
     def dll2a(cls, dll, dst=None, overwrite=False):
         r"""Convert a window's .dll library into a static library.

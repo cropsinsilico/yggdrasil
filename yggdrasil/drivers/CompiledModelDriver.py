@@ -430,6 +430,7 @@ class CompilationToolBase(object):
     no_output_file = False
     _language_ext = None  # only update once per class
     _language_cache = {}
+    _is_mingw = None
     
     def __init__(self, **kwargs):
         for k in ['executable', 'flags']:
@@ -470,6 +471,17 @@ class CompilationToolBase(object):
             if not cls.default_executable.endswith('.exe'):
                 cls.default_executable += '.exe'
 
+    @classmethod
+    def is_mingw(cls):
+        r"""Check if the class provides access to a mingw/msys compiler"""
+        if cls._is_mingw is None:
+            ver = cls.tool_version()
+            cls._is_mingw = ('mingw' in ver.lower()
+                             or 'msys' in ver.lower())
+            logger.info(f"Setting is_mingw to {cls._is_mingw}: "
+                        f"ver = {ver}")
+        return cls._is_mingw
+    
     @classmethod
     def get_language_ext(cls):
         r"""Get the extensions associated with the language that this tool can
@@ -1090,7 +1102,8 @@ class CompilationToolBase(object):
                         'static': 'archiver',
                         'include': 'compiler'}
         if libtype is None:
-            tool2libtype = {v: k for k, v in libtype2tool.items()}
+            tool2libtype = {v: k for k, v in libtype2tool.items()
+                            if k != 'windows_import'}
             libtype = tool2libtype[cls.tooltype]
         assert libtype2tool[libtype] == cls.tooltype
         if '.' not in fname:
@@ -2054,7 +2067,10 @@ class CompilerBase(CompilationToolBase):
             return None
         if libtype is None:
             if name == cls.standard_library:
-                libtype = cls.standard_library_type
+                if cls.is_mingw():
+                    libtype = 'static'
+                else:
+                    libtype = cls.standard_library_type
             elif platform._is_win:  # pragma: windows
                 libtype = 'windows_import'
             else:

@@ -3431,13 +3431,6 @@ definitions:
     additionalProperties: true
     description: Schema for model component ['cmake'] subtype.
     properties:
-      archiver:
-        type: string
-      archiver_flags:
-        default: []
-        items:
-          type: string
-        type: array
       args:
         allowSingular: true
         description: The path to the file containing the model program that will be
@@ -3477,13 +3470,6 @@ definitions:
       disable_python_c_api:
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
-      disassembler:
-        type: string
-      disassembler_flags:
-        default: []
-        items:
-          type: string
-        type: array
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -3969,13 +3955,6 @@ definitions:
     additionalProperties: true
     description: Schema for model component ['make'] subtype.
     properties:
-      archiver:
-        type: string
-      archiver_flags:
-        default: []
-        items:
-          type: string
-        type: array
       args:
         allowSingular: true
         description: The path to the file containing the model program that will be
@@ -4009,13 +3988,6 @@ definitions:
       disable_python_c_api:
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
-      disassembler:
-        type: string
-      disassembler_flags:
-        default: []
-        items:
-          type: string
-        type: array
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
