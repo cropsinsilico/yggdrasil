@@ -189,45 +189,6 @@ class GCCCompiler(CCompilerBase):
             if cls.is_mingw():
                 out.append('-Wa,-mbig-obj')
         return out
-        
-    def dll2a(cls, dll, dst=None, overwrite=False):
-        r"""Convert a window's .dll library into a static library.
-
-        Args:
-            dll (str): Full path to .dll library to convert.
-            dst (str, optional): Full path to location where the new
-                library should be saved. Defaults to None and will be
-                set based on lib or will be placed in the same directory
-                as dll.
-            overwrite (bool, optional): If True, the static file will
-                be created even if it already exists. Defaults to False.
-
-        Returns:
-            str: Full path to new .a static library.
-
-        """
-        # https://sourceforge.net/p/mingw-w64/wiki2/
-        # Answer%20generation%20of%20DLL%20import%20library/
-        base = os.path.splitext(os.path.basename(dll))[0]
-        if dst is None:
-            libbase = base
-            if not libbase.startswith('lib'):
-                libbase = 'lib' + libbase
-            libdir = os.path.dirname(dll)
-            dst = os.path.join(libdir, libbase + '.dll.a')
-        logger.info(f"dll2a: Creating a {dst} from {dll}")
-        if (not os.path.isfile(dst)) or overwrite:
-            gendef = shutil.which("gendef")
-            dlltool = shutil.which("dlltool")
-            if gendef and dlltool:
-                subprocess.check_call([gendef, dll])
-                subprocess.check_call(
-                    [dlltool, '-D', dll, '-d', f'{base}.def', '-l', dst])
-            else:
-                dst = dll
-        assert os.path.isfile(dst)
-        logger.info(f"dll2a: Created {dst}")
-        return dst
 
 
 class ClangCompiler(CCompilerBase):

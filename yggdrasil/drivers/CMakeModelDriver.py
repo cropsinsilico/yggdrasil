@@ -528,7 +528,7 @@ class CMakeConfigure(BuildToolBase):
                 lines += ['    SET_TARGET_PROPERTIES(',
                           f'        {xl} PROPERTIES']
                 # Untested on appveyor, but required when using dynamic
-                # library directly (if dll2a not used).
+                # library directly (if create_windows_import not used).
                 # if xe.lower() == '.dll':
                 #     lines.append('        IMPORTED_IMPLIB %s'
                 #                  % x.replace('.dll', '.lib'))

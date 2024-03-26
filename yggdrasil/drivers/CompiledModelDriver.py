@@ -271,6 +271,50 @@ def get_compilation_tool(tooltype, name, default=False,
     return out
 
 
+def create_windows_import(dll, ext, dst=None, overwrite=False):
+    r"""Convert a window's .dll library into a static library.
+
+    Args:
+        dll (str): Full path to .dll library to convert.
+        ext (str): Extension of the file to create.
+        dst (str, optional): Full path to location where the new
+            library should be saved. Defaults to None and will be
+            set based on lib or will be placed in the same directory
+            as dll.
+        overwrite (bool, optional): If True, the static file will
+            be created even if it already exists. Defaults to False.
+
+    Returns:
+        str: Full path to new .a static library.
+
+    """
+    # https://sourceforge.net/p/mingw-w64/wiki2/
+    # Answer%20generation%20of%20DLL%20import%20library/
+    assert ext in ['.dll.a', '.lib']
+    base = os.path.splitext(os.path.basename(dll))[0]
+    if dst is None:
+        libbase = base
+        if ext == '.dll.a' and not libbase.startswith('lib'):
+            libbase = 'lib' + libbase
+        elif ext == '.lib' and libbase.startswith('lib'):
+            libbase = libbase[3:]
+        libdir = os.path.dirname(dll)
+        dst = os.path.join(libdir, libbase + ext)
+    logger.info(f"create_windows_import: Creating a {dst} from {dll}")
+    if (not os.path.isfile(dst)) or overwrite:
+        gendef = shutil.which("gendef")
+        dlltool = shutil.which("dlltool")
+        if gendef and dlltool:
+            subprocess.check_call([gendef, dll])
+            subprocess.check_call(
+                [dlltool, '-D', dll, '-d', f'{base}.def', '-l', dst])
+        else:
+            dst = dll
+    assert os.path.isfile(dst)
+    logger.info(f"create_windows_import: Created {dst}")
+    return dst
+
+
 # TODO: Cannot currently make compilation tools components because
 # of circular imports
 class CompilationToolMeta(type):
@@ -1122,8 +1166,8 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             logger.info(f"Searching for base (libtype={libtype}): "
                         f"{fname}")
-            ext_sets = (('.dll', '.dll.a'),
-                        ('.lib', ))
+            ext_sets = (('.dll', ),
+                        ('.lib', '.dll.a'))
             for exts in ext_sets:
                 if fname.endswith(exts):
                     base = fname.split('.', 1)[0]
@@ -1136,6 +1180,11 @@ class CompilationToolBase(object):
                     break
         out = tools.locate_file(fname, directory_list=search_list,
                                 environment_variable=None)
+        # if (not out) and (libtype == 'windows_import'):
+        #     out_dll = cls.locate_file(
+        #         os.path.splitext(os.path.basename(fname))[0],
+        #         libtype='shared', verbose=verbose, **kwargs)
+        #     if out_dll:
         if verbose:
             if out:
                 logger.info(f'Located {fname}: {out}')
@@ -3518,24 +3567,35 @@ class CompiledModelDriver(ModelDriver):
                                      f"one or more libraries of types "
                                      f"{libtype_found} were found.")
             # TODO: CLEANUP
-            if platform._is_win and out and out.endswith('.lib'):  # pragma: windows
+            if ((platform._is_win and out
+                 and out.endswith(('.lib', '.dll.a')))):  # pragma: windows
                 if tool is None:
                     tool = cls.get_tool('compiler', language=dep_lang,
                                         toolname=toolname)
-                if tool.linker().is_gnu:
-                    logger.info(f"Creating GNU compatible import library "
-                                f"for {out}")
+                linker = tool.linker()
+                import_ext = None
+                if linker.is_gnu and out.endswith('.lib'):
+                    logger.info(f"Creating GNU compatible import "
+                                f"library for {out}")
+                    import_ext = '.dll.a'
+                elif (not linker.is_gnu) and out.endswith('.dll.a'):
+                    logger.info(f"Creating MSVC compatible import "
+                                f"library for {out}")
+                    import_ext = '.lib'
+                if import_ext is not None:
                     dll = cls.get_dependency_library(
                         dep, libtype='shared', toolname=toolname,
                         **suffix_kws)
-                    out = tool.dll2a(dll)
+                    out = create_windows_import(dll, import_ext)
         elif libclass == 'internal':
             src = cls.get_dependency_source(dep, toolname=toolname)
             suffix = cls.get_internal_suffix(**suffix_kws)
             dep_lang = cls.get_dependency_info(dep, toolname=toolname).get(
                 'language', cls.language)
-            tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
-            out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
+            tool = cls.get_tool('compiler', language=dep_lang,
+                                toolname=toolname)
+            out = tool.get_output_file(dep, libtype=libtype,
+                                       no_src_ext=True,
                                        build_library=True,
                                        suffix=suffix,
                                        working_dir=os.path.dirname(src))

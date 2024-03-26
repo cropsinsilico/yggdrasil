@@ -82,9 +82,9 @@ def test_locate_library_file():
             assert compiler.archiver().locate_file('zmq') == fname
         if libtype == 'shared':
             assert compiler.linker().locate_file('zmq') == fname
-    if platform._is_win and 'shared' in files:
+    if platform._is_win and 'static' in files:
         assert (compiler.locate_file('zmq', libtype='windows_import')
-                == files['shared'])
+                == files['static'])
 
 
 @pytest.mark.parametrize('lang,toolname,lib', [
@@ -109,6 +109,23 @@ def test_find_standard_library(lang, toolname, lib):
         assert isinstance(out, str) and os.path.isfile(out)
     else:
         assert out is None
+
+
+def test_create_windows_import_gcc():
+    r"""Test create_windows_import for GNU"""
+    from yggdrasil.drivers.CModelDriver import CModelDriver
+    gcc = CModelDriver.get_tool('compiler', toolname='gcc',
+                                default=None)
+    if gcc:
+        kws = {'toolname': 'gcc'}
+        if platform._is_win:
+            kws['libtype'] = 'shared'
+        dll = CModelDriver.get_dependency_library('python', **kws)
+        CompiledModelDriver.create_windows_import(dll, '.dll.a',
+                                                  overwrite=True)
+    else:
+        with pytest.raises(NotImplementedError):
+            CModelDriver.get_tool('compiler', toolname='gcc')
 
 
 def test_CompilationToolBase():
