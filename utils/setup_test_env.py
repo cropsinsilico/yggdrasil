@@ -1213,7 +1213,7 @@ def build_conda_recipe(recipe='recipe', param=None,
     ]
     # Mamba index not available
     # cmds.append(f"{param.conda_exe} index {conda_idx}")
-    cmds.append("conda index {conda_idx}")
+    cmds.append(f"conda index {conda_idx}")
     if return_commands:
         return cmds
     if cmds:

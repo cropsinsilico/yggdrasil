@@ -450,7 +450,7 @@ def do_yggdrasil_mods(opts, dont_exit=False):
         opts += ['-p', 'no:flaky']
         opts -= ['--reruns=2', '--reruns-delay=1', '--timeout=900']
         # TODO: Remove these once MPI debugged
-        opts += ['-svx']
+        prefix_pytest += ['-svx']
     # Continuous integration
     if options.ci and (not _on_mpi):
         setup_ci(opts)
