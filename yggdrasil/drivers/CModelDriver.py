@@ -1,6 +1,5 @@
 import os
 import re
-import warnings
 import copy
 import shutil
 import subprocess
@@ -435,6 +434,7 @@ class MSVCLinker(LinkerBase):
     shared_library_flag = '/DLL'
     search_path_envvar = ['LIB']
     search_path_flags = None
+    version_flags = []
 
     @staticmethod
     def before_registration(cls):
@@ -516,32 +516,6 @@ class MSVCArchiver(ArchiverBase):
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
-_python_inc = ygg_cfg.get('c', 'python_include', None)
-if (_python_inc is None) or (not os.path.isfile(_python_inc)):  # pragma: no cover
-    _python_inc = sysconfig.get_paths()['include']
-else:
-    _python_inc = os.path.dirname(_python_inc)
-try:
-    if platform._is_win:  # pragma: windows
-        libtype_order = ['static', 'shared']
-    else:
-        libtype_order = ['shared', 'static']
-    _python_lib = ygg_cfg.get('c', f'python_{libtype_order[0]}',
-                              ygg_cfg.get('c', f'python_{libtype_order[1]}', None))
-    for _python_libtype in libtype_order:
-        if (_python_lib is not None) and os.path.isfile(_python_lib):
-            break
-        _python_lib = tools.get_python_c_library(  # pragma: no cover
-            allow_failure=True, libtype=_python_libtype)
-except BaseException as e:  # pragma: debug
-    warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
-    _python_lib = None
-try:
-    _numpy_inc = [np.get_include()]
-except AttributeError:  # pragma: debug
-    from numpy import distutils as numpy_distutils
-    _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
-_numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
 
 
 class CModelDriver(CompiledModelDriver):
@@ -566,17 +540,14 @@ class CModelDriver(CompiledModelDriver):
                       'libtype': 'header_only',
                       'language': 'c'},
         'zmq': {'include': 'zmq.h',
-                'libtype': 'shared',
                 'language': 'c'},
         'czmq': {'include': 'czmq.h',
-                 'libtype': 'shared',
                  'language': 'c'},
-        'numpy': {'include': os.path.join(_numpy_inc[0], 'numpy',
-                                          'arrayobject.h'),
+        'numpy': {'include': 'arrayobject.h',
                   'libtype': 'header_only',
                   'language': 'c',
                   'for_python_api': True},
-        'python': {'include': os.path.join(_python_inc, 'Python.h'),
+        'python': {'include': 'Python.h',
                    'language': 'c',
                    'for_python_api': True,
                    'standard': True}}
@@ -797,23 +768,6 @@ class CModelDriver(CompiledModelDriver):
         CompiledModelDriver.after_registration(cls, **kwargs)
         if kwargs.get('second_pass', False):
             return
-        if _python_lib:
-            if ((_python_lib.endswith(('.lib', '.a'))
-                 and not _python_lib.endswith('.dll.a'))):
-                cls.external_libraries['python']['libtype'] = 'static'
-                cls.external_libraries['python']['static'] = _python_lib
-            else:
-                cls.external_libraries['python']['libtype'] = 'shared'
-                cls.external_libraries['python']['shared'] = _python_lib
-        if platform._is_win:  # pragma: windows
-            for libtype in ['static', 'shared']:
-                if libtype in cls.external_libraries['python']:
-                    continue
-                cls.external_libraries['python'][libtype] = tools.get_python_c_library(
-                    allow_failure=True, libtype=libtype)
-            for x in ['zmq', 'czmq', 'python']:
-                if x in cls.external_libraries:
-                    cls.external_libraries[x]['libtype'] = 'windows_import'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -862,8 +816,8 @@ class CModelDriver(CompiledModelDriver):
         if vcpkg_dir is None:
             vcpkg_dir = os.environ.get('VCPKG_ROOT', None)
         if vcpkg_dir is not None:
-            print(f"Setting vcpkg_dir to {vcpkg_dir}"
-                  f" ({os.path.abspath(vcpkg_dir)})")
+            logger.debug(f"Setting vcpkg_dir to {vcpkg_dir}"
+                         f" ({os.path.abspath(vcpkg_dir)})")
             vcpkg_dir = os.path.abspath(vcpkg_dir)
             if not os.path.isdir(vcpkg_dir):  # pragma: debug
                 raise ValueError("Path to vcpkg root directory "

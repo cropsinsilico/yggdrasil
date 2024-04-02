@@ -194,7 +194,8 @@ class FortranModelDriver(CompiledModelDriver):
     internal_libraries = dict(
         fygg={'source': os.path.join(_incl_interface,
                                      'YggInterface.f90'),
-              'libtype': 'static',
+              # 'libtype': 'static',
+              'libtype': 'shared',
               'internal_dependencies': (
                   [('c', 'ygg'), 'c_wrappers']),
               'external_dependencies': (

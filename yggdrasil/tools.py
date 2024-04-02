@@ -342,6 +342,36 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     return (os.environ.get(name, '').lower() in valid_values)
 
 
+def get_numpy_c_library(allow_failure=False, libtype=None):
+    r"""Determine the location of the Numpy C API library.
+    assert libtype in ['include']
+
+    Args:
+        allow_failure (bool, optional): If True, the base name will be
+            returned if the file cannot be located. Defaults to False.
+        libtype (str, optional): Type of library that should be located.
+            Valid values include 'include'. Defaults to 'include'.
+
+    Returns:
+        str: Full path to the library.
+
+    Raises:
+        ValueError: If libtype is not 'include'
+
+    """
+    import numpy as np
+    if libtype not in ['include']:  # pragma: debug
+        raise ValueError(f"libtype must be 'include', "
+                         f"'{libtype}' not supported.")
+    np_dir = None
+    try:
+        np_dir = np.get_include()
+    except AttributeError:  # pragma: debug
+        from numpy import distutils as numpy_distutils
+        np_dir = numpy_distutils.misc_util.get_numpy_include_dirs()[0]
+    return os.path.join(np_dir, 'numpy', 'arrayobject.h')
+
+
 def get_python_c_library(allow_failure=False, libtype=None):
     r"""Determine the location of the Python C API library.
 
@@ -361,27 +391,28 @@ def get_python_c_library(allow_failure=False, libtype=None):
         RuntimeError: If the library cannot be located.
 
     """
-    if libtype not in ['static', 'shared', None]:  # pragma: debug
+    if libtype not in ['static', 'shared', 'windows_import',
+                       'include', None]:  # pragma: debug
         raise ValueError("libtype must be 'shared' or 'static', "
                          "'%s' not supported." % libtype)
     paths = sysconfig.get_paths()
     cvars = sysconfig.get_config_vars()
+    if libtype is None:
+        libtype = 'shared'
+    if libtype == 'include':
+        return os.path.join(paths['include'], 'Python.h')
     if platform._is_win:  # pragma: windows
-        libtype2ext = {'shared': '.dll', 'static': '.lib'}
+        libtype2ext = {'shared': '.dll',
+                       'static': '.lib',
+                       'windows_import': '.lib'}
         prefix = ''
-        if libtype is None:
-            libtype = 'shared'
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_nodot'],
                                  libtype2ext[libtype])
     elif sys.version_info[:2] < (3, 8):
-        if libtype is None:
-            libtype = 'shared'
         libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
         base = cvars.get(libtype2key[libtype], None)
     else:
-        if libtype is None:
-            libtype = 'shared'
         if platform._is_mac:
             libtype2ext = {'shared': '.dylib', 'static': '.a'}
         else:
@@ -1010,16 +1041,13 @@ def kill(pid, signum):
 
             signal.signal(signum, handler_set_event)
             try:
-                print("calling interrupt", pid)
                 os.kill(pid, sigmap[signum])
                 # busy wait because we can't block in the main
                 # thread, else the signal handler can't execute.
                 while not event.is_set():
                     pass
-                print("after interrupt")
             finally:
                 signal.signal(signum, handler)
-                print("in finally")
         else:
             os.kill(pid, sigmap.get(signum, signum))
     else:

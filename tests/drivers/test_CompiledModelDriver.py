@@ -121,7 +121,7 @@ def test_create_windows_import_gcc():
         if platform._is_win:
             kws['libtype'] = 'shared'
         dll = CModelDriver.get_dependency_library('python', **kws)
-        CompiledModelDriver.create_windows_import(dll, '.dll.a',
+        CompiledModelDriver.create_windows_import(dll, for_gnu=True,
                                                   overwrite=True)
     else:
         with pytest.raises(NotImplementedError):

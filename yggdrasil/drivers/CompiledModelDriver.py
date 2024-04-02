@@ -271,7 +271,7 @@ def get_compilation_tool(tooltype, name, default=False,
     return out
 
 
-def create_windows_import(dll, ext, dst=None, overwrite=False):
+def create_windows_import(dll, dst=None, for_gnu=False, overwrite=False):
     r"""Convert a window's .dll library into a static library.
 
     Args:
@@ -281,6 +281,9 @@ def create_windows_import(dll, ext, dst=None, overwrite=False):
             library should be saved. Defaults to None and will be
             set based on lib or will be placed in the same directory
             as dll.
+        for_gnu (bool, optional): If True, a GNU compatible windows import
+            library with extension .dll.a will be created. Defaults to
+            False.
         overwrite (bool, optional): If True, the static file will
             be created even if it already exists. Defaults to False.
 
@@ -290,6 +293,10 @@ def create_windows_import(dll, ext, dst=None, overwrite=False):
     """
     # https://sourceforge.net/p/mingw-w64/wiki2/
     # Answer%20generation%20of%20DLL%20import%20library/
+    if for_gnu:
+        ext = '.dll.a'
+    else:
+        ext = '.lib'
     assert ext in ['.dll.a', '.lib']
     base = os.path.splitext(os.path.basename(dll))[0]
     if dst is None:
@@ -514,6 +521,81 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             if not cls.default_executable.endswith('.exe'):
                 cls.default_executable += '.exe'
+
+    @classmethod
+    def get_tool(cls, tooltype, **kwargs):
+        r"""Get the associate class for the required tool type.
+
+        Args:
+            tooltype (str): Type of tool to return.
+            **kwargs: Additional keyword arguments are passed to
+                get_compatible_tool.
+
+        Returns:
+            CompilationToolBase: Tool class associated with this compiler.
+
+        """
+        if tooltype == cls.tooltype:
+            return cls
+        return get_compatible_tool(cls, tooltype,
+                                   cls.languages[0], **kwargs)
+
+    @classmethod
+    def compiler(cls, **kwargs):
+        r"""Get the associated compiler class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to
+                get_tool.
+
+        Returns:
+            CompilationToolBase: Compiler class associated with this compiler.
+
+        """
+        return cls.get_tool('compiler', **kwargs)
+
+    @classmethod
+    def linker(cls, **kwargs):
+        r"""Get the associated linker class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to
+                get_tool.
+
+        Returns:
+            CompilationToolBase: Linker class associated with this compiler.
+
+        """
+        return cls.get_tool('linker', **kwargs)
+
+    @classmethod
+    def archiver(cls, **kwargs):
+        r"""Get the associated archiver class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to
+                get_tool.
+
+        Returns:
+            ArchiverToolBase: Archiver class associated with this compiler.
+
+        """
+        return cls.get_tool('archiver', **kwargs)
+
+    @classmethod
+    def disassembler(cls, **kwargs):
+        r"""Get the associated disassembler class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to
+                get_tool.
+
+        Returns:
+            CompilationToolBase: Disassembler class associated with this
+                compiler.
+
+        """
+        return cls.get_tool('disassembler', **kwargs)
 
     @classmethod
     def is_mingw(cls):
@@ -1014,16 +1096,16 @@ class CompilationToolBase(object):
         if (cls.search_path_flags is None) and (cls.search_path_envvar is None):
             raise NotImplementedError("get_search_path method not implemented for "
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))
+        if libtype == 'include':
+            suffix = 'include'
+        else:
+            suffix = 'lib'
         paths = []
         # Add path based on executable
         exec_file = cls.get_executable(full_path=True)
         if exec_file is not None:
             prefix, exec_dir = os.path.split(os.path.dirname(exec_file))
             if exec_dir == 'bin':
-                if libtype == 'include':
-                    suffix = 'include'
-                else:
-                    suffix = 'lib'
                 paths.append(os.path.join(prefix, suffix))
         # Get search paths from environment variable
         if (cls.search_path_envvar is not None) and (not env_only):
@@ -1051,30 +1133,27 @@ class CompilationToolBase(object):
         # Get libtype specific search paths
         if platform._is_win:  # pragma: windows
             base_paths = []
+            vcpkg_suffix = 'bin' if libtype == 'shared' else suffix
             vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
             if vcpkg_dir is not None:
                 if not os.path.isdir(vcpkg_dir):  # pragma: debug
                     raise RuntimeError(f"vcpkg_dir is not valid: '{vcpkg_dir}'")
-                typ2dir = {'include': 'include',
-                           'shared': 'bin',
-                           'static': 'lib',
-                           'windows_import': 'lib'}
                 if platform._is_64bit:
                     arch = 'x64-windows'
                 else:  # pragma: debug
                     arch = 'x86-windows'
                     raise NotImplementedError("Not yet tested on 32bit Python")
-                if (libtype in typ2dir) and os.path.isdir(os.path.join(vcpkg_dir,
-                                                                       'installed')):
-                    paths.append(os.path.join(vcpkg_dir, 'installed', arch,
-                                              typ2dir[libtype]))
+                if os.path.isdir(os.path.join(vcpkg_dir, 'installed')):
+                    paths.append(os.path.join(vcpkg_dir, 'installed',
+                                              arch, vcpkg_suffix))
                     if not os.path.isdir(paths[-1]):  # pragma: debug
                         partial = vcpkg_dir
-                        for x in ['installed', arch, typ2dir[libtype]]:
+                        for x in ['installed', arch, vcpkg_suffix]:
                             next_partial = os.path.join(partial, x)
                             if not os.path.isdir(next_partial):
                                 files = glob.glob(os.path.join(partial, '*'))
-                                print(f'missing {next_partial}: {files}')
+                                logger.error(f'missing {next_partial}: '
+                                             f'{files}')
                                 break
                             partial = next_partial
                         raise RuntimeError(r"vcpkg subdirectory does not "
@@ -1098,10 +1177,6 @@ class CompilationToolBase(object):
                         os.path.join(
                             macos_sdkroot.split('/Platforms', 1)[0],
                             'Toolchains/XcodeDefault.xctoolchain/usr'))
-        if libtype == 'include':
-            suffix = 'include'
-        else:
-            suffix = 'lib'
         for base in base_paths:
             paths.append(os.path.join(base, suffix))
         if platform._is_mac:
@@ -1122,7 +1197,9 @@ class CompilationToolBase(object):
         return out
 
     @classmethod
-    def locate_file(cls, fname, libtype=None, verbose=False, **kwargs):
+    def locate_file(cls, fname, libtype=None, verbose=False,
+                    dont_cache=False, cache_key=None,
+                    dont_check_windows_import=False, **kwargs):
         r"""Locate a library file.
 
         Args:
@@ -1131,6 +1208,16 @@ class CompilationToolBase(object):
                 Defaults to None.
             verbose (bool, optional): If True, display information about
                 the success or failure of the search. Defaults to False.
+            dont_cache (bool, optional): If True, any cached value for
+                the specified library will be ignored and the result will
+                not be added to the cache.
+            cache_key (str, optional): Key that should be used to cache
+                the file location. Defaults to "{fname}_{libtype}" if
+                not provided.
+            dont_check_windows_import (bool, optional): If True, a
+                located windows import library will not be tested to
+                check if the file is an import library or actually a
+                static library.
             **kwargs: Additional keyword arguments are passed to
                 get_search_path.
 
@@ -1138,9 +1225,6 @@ class CompilationToolBase(object):
             str: Full path to located library file.
 
         """
-        if os.path.isfile(fname):
-            return fname
-        fname = os.path.basename(fname)
         libtype2tool = {'shared': 'linker',
                         'windows_import': 'linker',
                         'static': 'archiver',
@@ -1150,47 +1234,65 @@ class CompilationToolBase(object):
                             if k != 'windows_import'}
             libtype = tool2libtype[cls.tooltype]
         assert libtype2tool[libtype] == cls.tooltype
+        if cache_key is None:
+            cache_key = f"{fname}_{libtype}"
+        if (not dont_cache) and cache_key in cls._language_cache:
+            return cls._language_cache[cache_key]
+        if fname in ['python', 'Python.h']:
+            fname = tools.get_python_c_library(allow_failure=True,
+                                               libtype=libtype)
+        elif fname in ['numpy', 'arrayobject.h']:
+            fname = tools.get_numpy_c_library(allow_failure=True,
+                                              libtype=libtype)
         if '.' not in fname:
             kws_out = {'no_tool_suffix': True}
             if libtype in ['shared', 'windows_import']:
-                kws_out['build_library'] = True
+                kws_out['build_library'] = libtype
             fname = cls.get_output_file(fname, **kws_out)
-        if libtype == 'windows_import' and fname.endswith('.dll'):
-            fname = os.path.splitext(fname)[0] + '.lib'
-            if fname.startswith('lib'):
-                fname = fname[3:]
-        fname = '*'.join(os.path.splitext(fname))
-        search_list = cls.get_search_path(libtype=libtype, **kwargs)
-        # On windows search for both gnu and msvc library
-        # naming conventions
-        if platform._is_win:  # pragma: windows
-            logger.info(f"Searching for base (libtype={libtype}): "
-                        f"{fname}")
-            ext_sets = (('.dll', ),
-                        ('.lib', '.dll.a'))
-            for exts in ext_sets:
-                if fname.endswith(exts):
-                    base = fname.split('.', 1)[0]
-                    if base.startswith('lib'):
-                        base = base.split('lib', 1)[-1]
-                    assert not base.startswith('lib')
-                    fname = []
-                    for ext in exts:
-                        fname += [base + ext, 'lib' + base + ext]
-                    break
-        out = tools.locate_file(fname, directory_list=search_list,
-                                environment_variable=None)
-        # if (not out) and (libtype == 'windows_import'):
-        #     out_dll = cls.locate_file(
-        #         os.path.splitext(os.path.basename(fname))[0],
-        #         libtype='shared', verbose=verbose, **kwargs)
-        #     if out_dll:
+        out = None
+        if os.path.isfile(fname):
+            out = fname
+        else:
+            fname = '*'.join(os.path.splitext(os.path.basename(fname)))
+            search_list = cls.get_search_path(libtype=libtype, **kwargs)
+            # On windows search for both gnu and msvc library
+            # naming conventions
+            # if platform._is_win:  # pragma: windows
+            #     logger.info(f"Searching for base (libtype={libtype}): "
+            #                 f"{fname}")
+            #     ext_sets = (('.dll', ),
+            #                 ('.lib', '.dll.a'))
+            #     for exts in ext_sets:
+            #         if fname.endswith(exts):
+            #             base = fname.split('.', 1)[0]
+            #             if base.startswith('lib'):
+            #                 base = base.split('lib', 1)[-1]
+            #             assert not base.startswith('lib')
+            #             fname = []
+            #             for ext in exts:
+            #                 fname += [base + ext, 'lib' + base + ext]
+            #             break
+            out = tools.locate_file(fname, directory_list=search_list,
+                                    environment_variable=None)
+            if ((out and not dont_check_windows_import
+                 and libtype in ['static', 'windows_import']
+                 and platform._is_win)):  # pragma: windows
+                is_wimp = cls.disassembler().is_windows_import(out)
+                if is_wimp != (libtype == 'windows_import'):
+                    if verbose:
+                        logger.info(f"Located {out} is not a "
+                                    f"{libtype} library")
+                    out = None
+        if out:
+            out = os.path.abspath(out)
         if verbose:
             if out:
                 logger.info(f'Located {fname}: {out}')
             else:
                 logger.info(f"Could not locate {fname} (search_list = "
                             f"\n\t" + '\n\t'.join(search_list) + ')')
+        if not dont_cache:
+            cls._language_cache[cache_key] = out
         return out
 
     @classmethod
@@ -1445,7 +1547,7 @@ class CompilationToolBase(object):
                                    f"'{' '.join(cmd)}': {e}")
         except BaseException as e:
             try:
-                print(f"Unexpected call error {type(e)}: {e}")
+                logger.error(f"Unexpected call error {type(e)}: {e}")
             except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(e)
             raise
@@ -1620,8 +1722,8 @@ class CompilerBase(CompilationToolBase):
             tooltype (str): Type of tool to return.
             allow_uninstalled (bool, optional): If True, the returned
                 tool may not be installed.
-            **kwargs: Additional keyword arguments may contain variables
-                controlling the returned tool, tool flags, or language.
+            **kwargs: Additional keyword arguments are passed to the base
+                class's method.
 
         Returns:
             CompilationToolBase: Linker class associated with this compiler.
@@ -1705,21 +1807,6 @@ class CompilerBase(CompilationToolBase):
             out = get_compatible_tool(cls, 'archiver',
                                       language=cls.languages[0])
         return out
-
-    @classmethod
-    def disassembler(cls, **kwargs):
-        r"""Get the associated disassembler class.
-
-        Args:
-            **kwargs: Additional keyword arguments are passed to
-                get_tool.
-
-        Returns:
-            CompilationToolBase: Disassembler class associated with this
-                compiler.
-
-        """
-        return cls.get_tool('disassembler', **kwargs)
 
     @classmethod
     def get_library_tool(cls, libtype=None, **kwargs):
@@ -1970,7 +2057,8 @@ class CompilerBase(CompilationToolBase):
         if not (dont_link or skip_flags or force_simultaneous_link):
             tool = cls.get_library_tool(libtype=libtype, **kwargs)
             if libtype != 'static' and tool.languages[0] != cls.languages[0]:
-                stdlib = cls.find_standard_library(verbose=True)
+                stdlib = cls.find_standard_library(verbose=True,
+                                                   compatible_linker=tool)
                 if stdlib is not None and stdlib not in kwargs.get('libraries', []):
                     kwargs.setdefault('libraries', [])
                     kwargs['libraries'].append(stdlib)
@@ -2024,11 +2112,78 @@ class CompilerBase(CompilationToolBase):
                              **kwargs_link)
 
     @classmethod
-    def locate_file(cls, fname, **kwargs):
+    def locate_linked_library(cls, fname, libtype='shared', flags=None,
+                              verbose=False, linker=None, **kwargs):
+        r"""Locate a library file by compiling a test library.
+
+        Args:
+            fname (str): Name of library.
+            libtype (str, optional): Type of library that should be
+                located.
+            flags (list, optional): Flags that should be used to compile
+                the test library.
+            verbose (bool, optional): If True, display information about
+                the success or failure of the search. Defaults to False.
+            linker (LinkerBase, optional): Linker that the returned
+                library should be compatible with.
+            **kwargs: Additional keyword arguments are passed to
+                locate_file if it is called.
+
+        Returns:
+            str: Full path to located library file.
+
+        """
+        assert libtype == 'shared'
+        if linker is None:
+            linker = cls.linker()
+        products = tools.IntegrationPathSet(overwrite=True)
+        ftest = os.path.join(os.getcwd(),
+                             f'a{linker.library_ext}')
+        ftest_src = os.path.join(os.getcwd(),
+                                 f"a{cls.source_exts[0]}")
+        assert not (os.path.isfile(ftest_src)
+                    or os.path.isfile(ftest))
+        products.append_generated(ftest_src, [cls.source_dummy])
+        products.setup()
+        try:
+            cls.call([ftest_src], libtype='shared', out=ftest,
+                     additional_args=flags,
+                     products=products, verbose=verbose,
+                     force_simultaneous_link=True)
+            for lib in cls.disassembler().find_component(
+                    ftest, fname, component_types='shared_libraries',
+                    verbose=verbose):
+                if ((not (os.path.isabs(lib)
+                          and os.path.isfile(lib))
+                     and cls.toolset in ['llvm', 'gnu'])):
+                    lib = os.path.basename(lib)
+                    lib = subprocess.check_output(
+                        [cls.get_executable(),
+                         f'-print-file-name={lib}']
+                    ).decode('utf-8').strip()
+                if lib:
+                    lib = linker.locate_file(lib, verbose=verbose,
+                                             libtype='shared', **kwargs)
+                    if lib and os.path.isfile(lib):
+                        return lib
+                    
+        finally:
+            products.teardown()
+        return None
+
+    @classmethod
+    def locate_file(cls, fname, libtype=None, library_flags=None,
+                    linker=None, **kwargs):
         r"""Locate a library file.
 
         Args:
             fname (str): Name of library.
+            libtype (str, optional): Library type to locate.
+            library_flags (list, optional): If provided, these flags are
+                used to compile a test library that can be inspected to
+                determine the path to the desired library.
+            linker (LinkerBase, optional): Linker that the returned
+                library should be compatible with.
             **kwargs: Additional keyword arguments are passed to
                 get_search_path.
 
@@ -2036,11 +2191,71 @@ class CompilerBase(CompilationToolBase):
             str: Full path to located library file.
 
         """
-        if kwargs.get('libtype', None) in ['shared', 'windows_import']:
-            return cls.linker().locate_file(fname, **kwargs)
-        elif kwargs.get('libtype', None) in ['static']:
+        if libtype in ['shared', 'windows_import']:
+            if linker is None:
+                linker = cls.linker()
+            kwargs.setdefault('cache_key', f"{fname}_{libtype}")
+            cache_key = kwargs['cache_key']
+            out = linker.locate_file(fname, libtype=libtype, **kwargs)
+            if not (out and os.path.isfile(out)):
+                if libtype == 'windows_import':
+                    del kwargs['cache_key']
+                if ((library_flags is not None
+                     and cls.source_exts and cls.source_dummy
+                     and not (out and os.path.isfile(out)))):
+                    out = cls.locate_linked_library(
+                        fname, libtype='shared', flags=library_flags,
+                        linker=linker, **kwargs)
+                elif libtype == 'windows_import':
+                    out = linker.locate_file(
+                        fname, libtype='shared', **kwargs)
+                if out and os.path.isfile(out) and libtype == 'windows_import':
+                    dll = out
+                    out = linker.locate_file(
+                        dll.replace('.dll', linker.windows_import_ext),
+                        libtype=libtype, cache_key=cache_key, **kwargs)
+                    # TODO: Cleanup generated import library or put it
+                    # in a directory that will be cleaned up by yggclean
+                    if not (out and os.path.isfile(out)):
+                        out = create_windows_import(
+                            dll, for_gnu=linker.is_gnu)
+                if out and not kwargs.get('dont_cache', False):
+                    linker._language_cache[cache_key] = out
+            return out
+        elif libtype in ['static']:
             return cls.archiver().locate_file(fname, **kwargs)
+        kwargs['libtype'] = libtype
         return super(CompilerBase, cls).locate_file(fname, **kwargs)
+
+    @classmethod
+    def select_library(cls, fname, search_order=['static', 'shared'],
+                       **kwargs):
+        r"""Select the version of the library that is available.
+
+        Args:
+            fname (str): Name of library.
+            search_order (list, optional): Order in which different
+                library types should be searched for.
+            **kwargs: Additional keyword arguments are passed to the
+                locate_file method.
+
+        Returns:
+            tuple(str, str): Library type first encountered and the
+                path to that library.
+
+        """
+        for k in search_order:
+            fpath = cls.locate_file(fname, libtype=k,
+                                    dont_check_windows_import=True,
+                                    **kwargs)
+            if not fpath:
+                continue
+            if platform._is_win:  # pragma: windows
+                if ((k == 'static'
+                     and cls.disassembler().is_windows_import(fpath))):
+                    return 'windows_import', fpath
+            return k, fpath
+        return None, None
         
     @classmethod
     def preload_env(cls, libs, env):
@@ -2086,7 +2301,7 @@ class CompilerBase(CompilationToolBase):
 
     @classmethod
     def find_standard_library(cls, name=None, flags=None, libtype=None,
-                              verbose=False, dont_cache=False):
+                              compatible_linker=None, **kwargs):
         r"""Determine the location of a library
 
         Args:
@@ -2100,11 +2315,9 @@ class CompilerBase(CompilationToolBase):
                 Defaults to standard_library_type for the standard
                 library, 'shared' for libraries on unix OSs, and
                 'windows_import' for libraries on windows.
-            verbose (bool, optional): If True, all commands used to
-                locate the library will be verbose.
-            dont_cache (bool, optional): If True, any cached value for
-                the specified library will be ignored and the result will
-                not be added to the cache.
+            compatible_linker (LinkerBase, optional): Linker that the
+                returned library should be compatible with.
+            **kwargs: Additional keyword arguments are passed to locate_file.
 
         Returns:
             str: Full path to library if one can be located, None if not
@@ -2115,77 +2328,23 @@ class CompilerBase(CompilationToolBase):
         if name is None:
             return None
         if libtype is None:
-            if name == cls.standard_library:
-                if cls.is_mingw():
-                    libtype = 'static'
-                else:
-                    libtype = cls.standard_library_type
-            elif platform._is_win:  # pragma: windows
+            # if platform._is_win:  # pragma: windows
+            #     libtype_order = ['windows_import', 'static', 'shared']
+            # if name == cls.standard_library:
+            #     if cls.is_mingw():
+            #         libtype = 'static'
+            #     else:
+            #         libtype = cls.standard_library_type
+            if platform._is_win:  # pragma: windows
                 libtype = 'windows_import'
             else:
                 libtype = 'shared'
-        if (not dont_cache) and f"{name}_library" in cls._language_cache:
-            return cls._language_cache[f"{name}_library"]
         if flags is None:
             flags = []
-        products = tools.IntegrationPathSet(overwrite=True)
-        lib = None
-        libx = ''
-        libx_options = [name]
-        try:
-            if ((libtype in ['shared', 'windows_import']
-                 and cls.source_exts and cls.source_dummy)):
-                linker = cls.linker()
-                disassembler = cls.disassembler()
-                fname = os.path.join(os.getcwd(),
-                                     f'a{linker.library_ext}')
-                fname_src = os.path.join(os.getcwd(),
-                                         f"a{cls.source_exts[0]}")
-                assert not (os.path.isfile(fname_src)
-                            or os.path.isfile(fname))
-                products.append_generated(fname_src, [cls.source_dummy])
-                products.setup()
-                cls.call([fname_src], libtype='shared', out=fname,
-                         additional_args=flags, products=products,
-                         verbose=verbose, force_simultaneous_link=True)
-                lines = disassembler.call(
-                    [fname], components='shared_libraries',
-                    verbose=verbose).splitlines()
-                for x in lines:
-                    if name not in x:
-                        continue
-                    for xx in x.strip().split():
-                        if name in xx:
-                            libx = xx
-                            break
-                    if ((not (os.path.isabs(libx)
-                              and os.path.isfile(libx))
-                         and cls.toolset in ['llvm', 'gnu'])):
-                        libx = os.path.basename(libx)
-                        libx = subprocess.check_output(
-                            [cls.get_executable(),
-                             f'-print-file-name={libx}']
-                        ).decode('utf-8').strip()
-                    if libx:
-                        if libtype == 'windows_import':
-                            libx = libx.replace('.dll', '.lib')
-                        libx_options.insert(0, libx)
-                        if os.path.isfile(libx):
-                            break
-            for libx in libx_options:
-                if not (os.path.isabs(libx) and os.path.isfile(libx)):
-                    libx = cls.locate_file(libx, libtype=libtype,
-                                           verbose=verbose)
-                if libx and os.path.isfile(libx):
-                    lib = os.path.abspath(libx)
-                    break
-        except subprocess.CalledProcessError:
-            lib = None
-        finally:
-            products.teardown()
+        kwargs.setdefault('cache_key', f"{name}_{libtype}_library")
+        lib = cls.locate_file(name, libtype=libtype, library_flags=flags,
+                              linker=compatible_linker, **kwargs)
         logger.debug(f"{name} Library: {lib}")
-        if not dont_cache:
-            cls._language_cache[f'{name}_library'] = lib
         return lib
 
     @classmethod
@@ -2210,6 +2369,8 @@ class LinkerBase(CompilationToolBase):
         library_prefix (str): Prefix that should be added to library paths.
         library_ext (str): Extension that should be used for shared libraries.
         executable_ext (str): Extension that should be used for executables.
+        windows_import_ext (str): Extension that should be used for
+            windows import libraries.
         output_first_library (bool): If True, the output key (and its value) are
             put in front of the other flags when building a library. A value of
             None causes the output_first attribute to be used (unless explicitly
@@ -2230,6 +2391,8 @@ class LinkerBase(CompilationToolBase):
     library_prefix = 'lib'
     library_ext = None  # depends on the OS
     executable_ext = '.out'
+    windows_import_prefix = ''
+    windows_import_ext = '.lib'
     output_first_library = None
     search_path_env = ['lib']
     all_library_ext = ['.so', '.a']
@@ -2255,6 +2418,9 @@ class LinkerBase(CompilationToolBase):
             cls.library_ext = '.dylib'
         else:
             cls.library_ext = '.so'
+        if cls.is_gnu:
+            # cls.windows_import_prefix = 'lib'
+            cls.windows_import_ext = '.dll.a'
         if cls.library_ext not in cls.all_library_ext:
             cls.all_library_ext = cls.all_library_ext + [cls.library_ext]
 
@@ -2470,9 +2636,10 @@ class LinkerBase(CompilationToolBase):
         Args:
             obj (str): Object file being linked that name base will be taken
                 from.
-            build_library (bool, optional): If True, a shared library path is
-                returned. If False, an executable file name is returned.
-                Defaults to False.
+            build_library (bool, str, optional): If True, a shared library
+                path is returned. If 'windows_import', a windows import
+                library path is returned. If False, an executable file
+                name is returned. Defaults to False.
             working_dir (str, optional): Working directory where output file
                 should be located. Defaults to None and is ignored.
             suffix (str, optional): Suffix that should be added to the
@@ -2489,7 +2656,10 @@ class LinkerBase(CompilationToolBase):
             return [cls.get_output_file(obj[0], build_library=build_library,
                                         working_dir=working_dir,
                                         suffix=suffix, **kwargs)]
-        if build_library:
+        if build_library == 'windows_import':
+            prefix = cls.windows_import_prefix
+            out_ext = cls.windows_import_ext
+        elif build_library:
             prefix = cls.library_prefix
             out_ext = cls.library_ext
         else:
@@ -2505,8 +2675,8 @@ class LinkerBase(CompilationToolBase):
         if (not os.path.isabs(out)) and (working_dir is not None):
             out = os.path.normpath(os.path.join(working_dir, out))
         return out
-    
-    
+
+
 class ArchiverBase(LinkerBase):
     r"""Base class for archivers.
 
@@ -2589,8 +2759,52 @@ class DisassemblerBase(CompilationToolBase):
     tooltype = 'disassembler'
     languages = ['c', 'c++', 'fortran']
     component_options = {}
-    component_filters = {}
     no_output_file = True
+
+    @classmethod
+    def find_component(cls, fname, component, component_types=None,
+                       **kwargs):
+        r"""Locate components in a binary file that match.
+
+        Args:
+            fname (str): Full path to the file containing the binary to
+                search.
+            component (str): Name of component to search for.
+            component_types ((str, list, optional): Type of component(s)
+                that should be searched for.
+            **kwargs: Additional keyword arguments are passed to
+                CompilationToolBase.call.
+
+        Returns:
+            list: Matching components.
+
+        """
+        regex = re.compile(
+            r"(?:(?:^)|(?:\s))"
+            + component.replace('.', '\\.')
+            + r"(?:(?:$)|(?:[^a-zA-Z]))")
+        result = cls.call([fname], components=component_types, **kwargs)
+        return [x.strip() for x in regex.findall(result)]
+
+    @classmethod
+    def is_windows_import(cls, fname, **kwargs):
+        r"""Check if a library is a windows import library.
+
+        Args:
+            fname (str): Full path to file to check.
+
+        Returns:
+            bool: True if fname is a windows import, False otherwise.
+
+        """
+        assert os.path.isfile(fname)
+        if not fname.endswith('.lib'):
+            return fname.endswith('.dll.a')
+        base = (
+            '(?:lib)?'
+            + os.path.splitext(os.path.basename(fname))[0] + '.dll')
+        return bool(cls.find_component(
+            fname, base, component_types='imported_libraries', **kwargs))
 
     @classmethod
     def call(cls, args, components=None, **kwargs):
@@ -2609,10 +2823,10 @@ class DisassemblerBase(CompilationToolBase):
         if isinstance(components, str):
             components = [components]
         if components is not None:
-            flags = [cls.component_options[x] for x in
-                     components if cls.component_options[x]]
-            filters = [cls.component_filters.get(x, '') for x in
-                       components if x in cls.component_filters]
+            for x in components:
+                if cls.component_options[x]:
+                    flags += cls.component_options[x].get('flags', [])
+                    filters += cls.component_options[x].get('filters', [])
         out = super(DisassemblerBase, cls).call(flags + args, **kwargs)
         if filters:
             lines = out.splitlines()
@@ -2629,7 +2843,7 @@ class DisassemblerBase(CompilationToolBase):
 #     toolname = 'ldd'
 #     toolset = 'gnu'
 #     component_options = {
-#         'shared_libraries': ''
+#         'shared_libraries': {}
 #     }
 
 
@@ -2638,7 +2852,8 @@ class OToolDisassembler(DisassemblerBase):
     toolname = 'otool'
     toolset = 'llvm'
     component_options = {
-        'shared_libraries': '-L'
+        'shared_libraries': {
+            'flags': ['-L']},
     }
 
     
@@ -2648,11 +2863,11 @@ class ObjDumpDisassembler(DisassemblerBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm', 'msvc']
     component_options = {
-        'shared_libraries': '-p'
+        'shared_libraries': {
+            'flags': ['-p'],
+            # 'filters': ['NEEDED'],
+        },
     }
-    # component_filters = {
-    #     'shared_libraries': 'NEEDED'
-    # }
 
 
 class DumpBinDisassembler(DisassemblerBase):
@@ -2660,7 +2875,11 @@ class DumpBinDisassembler(DisassemblerBase):
     toolname = 'dumpbin'
     toolset = 'msvc'
     component_options = {
-        'shared_libraries': '/dependents'
+        'shared_libraries': {
+            'flags': ['/dependents']},
+        'imported_libraries': {
+            'flags': ['/all'],
+            'filters': ['DLL name']},
     }
 
     
@@ -2863,16 +3082,10 @@ class CompiledModelDriver(ModelDriver):
         """
         ModelDriver.after_registration(cls, **kwargs)
         for k, v in cls.external_libraries.items():
-            libtype = v.get('libtype', None)
-            if (libtype is not None) and (libtype not in v):
-                if libtype == 'windows_import':
-                    libtype = ['shared', 'static']
-                else:
-                    libtype = [libtype]
-                for t in libtype:
-                    libfile = cls.cfg.get(cls.language, f'{k}_{t}', None)
-                    if libfile is not None:
-                        v[t] = libfile
+            for t in ['libtype'] + _library_types:
+                libfile = cls.cfg.get(cls.language, f'{k}_{t}', None)
+                if libfile is not None:
+                    v[t] = libfile
         for k in _tool_registry.keys():
             # Set default linker/archiver based on compiler
             default_tool_name = getattr(cls, f'default_{k}', None)
@@ -3540,9 +3753,9 @@ class CompiledModelDriver(ModelDriver):
         if libtype == 'windows_import':
             libtype = 'static'
         # Check that libtype is valid
-        libtype_list = ['static', 'shared']
+        libtype_list = ['static', 'shared', 'windows_import']
         if libtype not in libtype_list:
-            raise ValueError("libtype must be one of %s" % libtype_list)
+            raise ValueError(f"libtype must be one of {libtype_list}")
         # Determine output
         out = None
         tool = None
@@ -3566,27 +3779,6 @@ class CompiledModelDriver(ModelDriver):
                                      f"located for dependency '{dep}', but "
                                      f"one or more libraries of types "
                                      f"{libtype_found} were found.")
-            # TODO: CLEANUP
-            if ((platform._is_win and out
-                 and out.endswith(('.lib', '.dll.a')))):  # pragma: windows
-                if tool is None:
-                    tool = cls.get_tool('compiler', language=dep_lang,
-                                        toolname=toolname)
-                linker = tool.linker()
-                import_ext = None
-                if linker.is_gnu and out.endswith('.lib'):
-                    logger.info(f"Creating GNU compatible import "
-                                f"library for {out}")
-                    import_ext = '.dll.a'
-                elif (not linker.is_gnu) and out.endswith('.dll.a'):
-                    logger.info(f"Creating MSVC compatible import "
-                                f"library for {out}")
-                    import_ext = '.lib'
-                if import_ext is not None:
-                    dll = cls.get_dependency_library(
-                        dep, libtype='shared', toolname=toolname,
-                        **suffix_kws)
-                    out = create_windows_import(dll, import_ext)
         elif libclass == 'internal':
             src = cls.get_dependency_source(dep, toolname=toolname)
             suffix = cls.get_internal_suffix(**suffix_kws)
@@ -4014,10 +4206,10 @@ class CompiledModelDriver(ModelDriver):
                             cls.compile_dependencies(
                                 dep=dep, toolname=toolname, **suffix_kws)
                         except RecursionError:  # pragma: debug
-                            print(f"dependency: {dep}\n"
-                                  f"library:    {dep_lib}\n",
-                                  f"suffix_kws: {suffix_kws}\n",
-                                  f"toolname:   {toolname}")
+                            logger.error(f"dependency: {dep}\n"
+                                         f"library:    {dep_lib}\n",
+                                         f"suffix_kws: {suffix_kws}\n",
+                                         f"toolname:   {toolname}")
                             raise
                     if not os.path.isfile(dep_lib):  # pragma: debug
                         raise RuntimeError(
@@ -4329,6 +4521,7 @@ class CompiledModelDriver(ModelDriver):
 
         Args:
             cfg (YggConfigParser): Config class that options should be set for.
+            k (str): Name of the library to configure.
         
         Returns:
             list: Section, option, description tuples for options that could not
@@ -4338,38 +4531,53 @@ class CompiledModelDriver(ModelDriver):
         v = cls.external_libraries[k]
         out = []
         k_lang = v.get('language', cls.language)
-        for t in v.keys():
+        required_libtypes = ['include']
+        opt = f'{k}_libtype'
+        libtype = cfg.get(k_lang, opt, v.get('libtype', None))
+        if libtype is None:
+            libtype = cls.get_tool(
+                'compiler', language=k_lang).select_library(
+                    k, cfg=cfg, verbose=True)[0]
+            if libtype == 'shared' and platform._is_win:  # pragma: windows
+                libtype = 'windows_import'
+        if libtype is None:
+            required_libtypes += ['static', 'shared']
+            out.append((k_lang, opt, f"Library type to use for {k}"))
+        else:
+            required_libtypes += [libtype]
+            if not cfg.has_option(k_lang, opt):
+                cfg.set(k_lang, opt, libtype)
+        if platform._is_win:  # pragma: windows
+            linked_libtypes = ['shared', 'windows_import']
+            if any(x in required_libtypes for x in linked_libtypes):
+                required_libtypes += [x for x in linked_libtypes
+                                      if x not in required_libtypes]
+        for t in required_libtypes:
             if t not in _library_types:
                 continue
-            fname = v[t]
+            fname = v.get(t, k)
             assert isinstance(fname, str)
             opt = f'{k}_{t}'
             if t in ['include']:
                 desc_end = f'{k} headers'
-            elif t in ['static', 'shared']:
+            elif t in ['static', 'shared', 'windows_import']:
                 desc_end = f'{k} {t} library'
             else:  # pragma: completion
                 desc_end = f'{k} {t}'
-            desc = f'The full path to the directory containing {desc_end}.'
+            desc = f'The full path to the {desc_end}.'
             if cfg.has_option(k_lang, opt):
                 continue
-            if os.path.isabs(fname):
-                fpath = fname
-            else:
-                fpath = os.path.join(os.getcwd(), fname)
+            fpath = fname
             if not os.path.isfile(fpath):
                 # Search the compiler/linker's search path, then the
                 # PATH environment variable.
                 try:
                     if t == 'include':
-                        tool = cls.get_tool('compiler', default=None,
-                                            language=v.get('language', None))
-                    elif t == 'shared':
-                        tool = cls.get_tool('linker', default=None,
-                                            language=v.get('language', None))
+                        tool = cls.get_tool('compiler', language=k_lang)
+                    elif t in ['shared', 'windows_import']:
+                        tool = cls.get_tool('linker', language=k_lang)
                     else:  # pragma: completion
-                        tool = cls.get_tool('archiver', default=None,
-                                            language=v.get('language', None))
+                        tool = cls.get_tool('archiver', language=k_lang)
                     fpath = tool.locate_file(fpath, libtype=t, cfg=cfg,
                                              verbose=True)
                 except NotImplementedError:  # pragma: debug
@@ -4382,6 +4590,7 @@ class CompiledModelDriver(ModelDriver):
                 #     if not os.path.isfile(fpath):
                 #         os.symlink(fpath_orig, fpath)
                 cfg.set(k_lang, opt, fpath)
+                v[t] = fpath
             else:
                 out.append((k_lang, opt, desc))
         return out
