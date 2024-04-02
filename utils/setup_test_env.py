@@ -1211,7 +1211,9 @@ def build_conda_recipe(recipe='recipe', param=None,
         f"{param.conda_flags_general} {' '.join(build_pkgs)}",
         f"{conda_build} recipe --python {param.python} {build_flags}"
     ]
-    cmds.append(f"{param.conda_exe} index {conda_idx}")
+    # Mamba index not available
+    # cmds.append(f"{param.conda_exe} index {conda_idx}")
+    cmds.append("conda index {conda_idx}")
     if return_commands:
         return cmds
     if cmds:
