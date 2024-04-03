@@ -64,6 +64,24 @@ def apply_recurse(x, func, **kwargs):
     return out
 
 
+def safe_decode(x):
+    r"""Decode bytes, allowing for possiblity of invalid bytes.
+
+    Args:
+        x (bytes): Bytes to decode.
+
+    Returns:
+        str: Decoded string version of x.
+    
+    """
+    if isinstance(x, str):
+        return x
+    try:
+        return x.decode("utf-8") if x else ''
+    except UnicodeDecodeError:
+        return str(x)
+
+
 def bytes2str(x, recurse=False):
     r"""Convert bytes type to string type.
 

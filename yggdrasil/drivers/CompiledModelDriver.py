@@ -1274,6 +1274,14 @@ class CompilationToolBase(object):
             #             break
             out = tools.locate_file(fname, directory_list=search_list,
                                     environment_variable=None)
+            if (((not out) and platform._is_win
+                 and libtype in ['static', 'shared', 'windows_import'])):
+                if fname.startswith('lib'):
+                    alt = fname[3:]
+                else:
+                    alt = 'lib' + fname
+                out = tools.locate_file(alt, directory_list=search_list,
+                                        environment_variable=None)
             if ((out and not dont_check_windows_import
                  and libtype in ['static', 'windows_import']
                  and platform._is_win)):  # pragma: windows
@@ -1524,8 +1532,8 @@ class CompilationToolBase(object):
                 logger.debug(message_before)
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
-            output = output.decode("utf-8")
-            err = err.decode("utf-8") if err else ''
+            output = tools.safe_decode(output)
+            err = tools.safe_decode(err)
             message = (f"{message_before} resulted in code "
                        f"{proc.returncode}:\n"
                        f"out = {output}\n"
@@ -2228,7 +2236,7 @@ class CompilerBase(CompilationToolBase):
         return super(CompilerBase, cls).locate_file(fname, **kwargs)
 
     @classmethod
-    def select_library(cls, fname, search_order=['static', 'shared'],
+    def select_library(cls, fname, search_order=['shared', 'static'],
                        **kwargs):
         r"""Select the version of the library that is available.
 
