@@ -27,6 +27,10 @@ from yggdrasil import platform, constants
 from yggdrasil.components import import_component, ComponentBase
 
 
+class InvalidDefault:
+    pass
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -581,7 +585,24 @@ def is_subprocess():
     return check_environ_bool('YGG_SUBPROCESS')
 
 
-def find_all(name, path, verification_func=None):
+def escape_regex(name):
+    r"""Escape special characters in name that would be interpreted as
+    regexes.
+
+    Args:
+        name (str): String to escape.
+
+    Returns:
+        str: Escaped string.
+
+    """
+    out = name
+    for k in '\\.+*[]()^$?:':
+        out = out.replace(k, '\\' + k)
+    return out
+
+
+def find_all(name, path, verification_func=None, use_regex=False):
     r"""Find all instances of a file with a given name within the directory
     tree starting at a given path.
 
@@ -593,6 +614,8 @@ def find_all(name, path, verification_func=None):
         verification_func (function, optional): Function that returns
             True when a file is valid and should be returned and False
             otherwise. Defaults to None and is ignored.
+        use_regex (bool, optional): If True, use full regex to interpret
+            name and locate files.
 
     Returns:
         list: All instances of the specified file.
@@ -601,6 +624,7 @@ def find_all(name, path, verification_func=None):
     result = []
     try:
         if platform._is_win:  # pragma: windows
+            assert not use_regex
             if path is None:
                 out = subprocess.check_output(["where", name],
                                               env=os.environ,
@@ -610,7 +634,11 @@ def find_all(name, path, verification_func=None):
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
         else:
-            args = ["find", "-L", path, "-type", "f", "-name", name]
+            args = ["find", "-L", path, "-type", "f"]
+            if use_regex:
+                args += ["-regex", '.*' + name]
+            else:
+                args += ["-name", name]
             pfind = subprocess.Popen(args, env=os.environ,
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE)
@@ -633,7 +661,7 @@ def find_all(name, path, verification_func=None):
 
 
 def locate_file(fname, environment_variable='PATH', directory_list=None,
-                show_alternates=False, verification_func=None):
+                show_alternates=False, **kwargs):
     r"""Locate a file within a set of paths defined by a list or environment
     variable.
 
@@ -654,9 +682,7 @@ def locate_file(fname, environment_variable='PATH', directory_list=None,
         show_alternates (bool, optional): If True and there is more
             than one match, the alternate matches will be printed in
             a warning message. Defaults to False.
-        verification_func (function, optional): Function that returns
-            True when a file is valid and should be returned and False
-            otherwise. Defaults to None and is ignored.
+        **kwargs: Additional keyword arguments are passed to find_all.
 
     Returns:
         bool, str: Full path to the located file if it was located, False
@@ -668,16 +694,14 @@ def locate_file(fname, environment_variable='PATH', directory_list=None,
         for ifname in fname:
             out = locate_file(ifname, environment_variable=environment_variable,
                               directory_list=directory_list,
-                              show_alternates=show_alternates,
-                              verification_func=verification_func)
+                              show_alternates=show_alternates, **kwargs)
             if out:
                 break
         return out
     out = []
     if ((platform._is_win and (environment_variable == 'PATH')
          and (directory_list is None))):  # pragma: windows
-        out += find_all(fname, None,
-                        verification_func=verification_func)
+        out += find_all(fname, None, **kwargs)
     else:
         if directory_list is None:
             directory_list = []
@@ -688,8 +712,7 @@ def locate_file(fname, environment_variable='PATH', directory_list=None,
                 directory_list += os.environ.get(x, '').split(os.pathsep)
         for path in directory_list:
             if path:
-                out += find_all(fname, path,
-                                verification_func=verification_func)
+                out += find_all(fname, path, **kwargs)
             if out and (not show_alternates):
                 break
     if not out:

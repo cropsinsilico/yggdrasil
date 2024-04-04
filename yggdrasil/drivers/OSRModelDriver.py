@@ -13,6 +13,7 @@ from yggdrasil import tools, platform
 from yggdrasil.components import import_component
 from yggdrasil.drivers.ExecutableModelDriver import ExecutableModelDriver
 from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
+from yggdrasil.drivers.CompiledModelDriver import DependencySpecialization
 
 
 logger = logging.getLogger(__name__)
@@ -62,6 +63,7 @@ class OSRModelDriver(ExecutableModelDriver):
     _config_keys = ['repository']
     _config_attr_map = [{'attr': 'repository',
                          'key': 'repository'}]
+    command_line_specification = ['with_asan', 'disable_python_c_api']
 
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -98,10 +100,8 @@ class OSRModelDriver(ExecutableModelDriver):
                 os.path.basename(self.model_file))
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
-        compile_kwargs = {}
-        for k in CPPModelDriver.kwargs_in_suffix:
-            if hasattr(self, k):
-                compile_kwargs[k] = getattr(self, k)
+        compile_kwargs = DependencySpecialization.select_attr(
+            self, no_tools=True)
         self.compile_dependencies(**compile_kwargs)
         assert os.path.isfile(self.executable_path)
 
@@ -182,9 +182,8 @@ class OSRModelDriver(ExecutableModelDriver):
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
             flag_options = ''
-            for k in CPPModelDriver.kwargs_in_suffix:
-                if k in ['commtype'] or not kwargs.get(k, False):
-                    continue
+            for k in cls.command_line_specification:
+                assert k in DependencySpecialization.defaults
                 # if k in ['commtype']:
                 #     flag_options += f" --{k.replace('_', '-')}={kwargs[k]}"
                 # else:

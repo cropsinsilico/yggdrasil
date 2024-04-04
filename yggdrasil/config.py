@@ -6,6 +6,7 @@ This module imports the configuration for yggdrasil.
 
 """
 import os
+import re
 import sys
 import json
 import shutil
@@ -191,6 +192,39 @@ class YggConfigParser(configparser.ConfigParser, object):
                 out = val.strip("'")
             else:
                 out = val
+        return out
+
+    def get_regex(self, section, option, default=None, return_all=False,
+                  **kwargs):
+        r"""Check for an option by regex.
+
+        Args:
+            section (str): Name of section.
+            option (str): Name of option in section.
+            default (obj, optional): Value that should be returned if the
+                section and/or option are not found or are an empty string.
+                Defaults to None.
+            return_all (bool, optional): If True, return a mapping of
+                all options that match the regex. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's get.
+
+        Returns:
+            obj: String entry if the section & option exist, otherwise default.
+
+        """
+        out = default
+        if return_all:
+            out = {}
+        if self.has_section(section):
+            regex = re.compile(option)
+            for k in self[section]:
+                if regex.match(k):
+                    val = self.get(section, k, **kwargs)
+                    if return_all:
+                        out[k] = val
+                    else:
+                        return val
         return out
 
     def get(self, section, option, default=None, **kwargs):

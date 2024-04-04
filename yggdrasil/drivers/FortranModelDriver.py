@@ -15,8 +15,6 @@ logger = logging.getLogger(__name__)
 if platform._is_win:
     logger.setLevel(level=logging.DEBUG)
 _top_lang_dir = get_language_dir('fortran')
-_incl_interface = _top_lang_dir
-_c_internal_libs = copy.deepcopy(CModelDriver.CModelDriver.internal_libraries)
 
 
 # TODO: Add support for f77: e.g.
@@ -25,6 +23,7 @@ class FortranCompilerBase(CompilerBase):
     r"""Base class for Fortran compilers."""
     languages = ['fortran']
     source_exts = ['.F90', '.f90', '.F77', '.f77', '.F', '.f']
+    include_exts = ['.mod', '.MOD']
     default_executable_env = 'FC'
     default_flags_env = 'FFLAGS'
     default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors', '-ffree-line-length-0']
@@ -75,7 +74,8 @@ class FortranCompilerBase(CompilerBase):
             kwargs.setdefault('module-dir', _top_lang_dir)
         if 'module-search-path' in cls.flag_options:
             kwargs.setdefault('module-search-path', _top_lang_dir)
-        kwargs.setdefault('include_dirs', cls.get_search_path())
+        if 'include_dirs' not in kwargs:
+            kwargs.setdefault('include_dirs', cls.get_search_path())
         out = super(FortranCompilerBase, cls).get_flags(**kwargs)
         for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:  # pragma: debug
             if x in out:
@@ -182,36 +182,19 @@ class FortranModelDriver(CompiledModelDriver):
     # To prevent inheritance
     default_compiler = 'gfortran'
     default_linker = None
-    supported_comm_options = dict(
-        CModelDriver.CModelDriver.supported_comm_options,
-        zmq={'libraries': [('c', x) for x in
-                           CModelDriver.CModelDriver.supported_comm_options[
-                               'zmq']['libraries']]})
-    standard_libraries = []
-    # external_libraries = {'cxx': {'include': 'stdlib.h',
-    #                               'libtype': 'shared',
-    #                               'language': 'c'}}
-    internal_libraries = dict(
-        fygg={'source': os.path.join(_incl_interface,
-                                     'YggInterface.f90'),
-              'libtype': 'static',
-              # 'libtype': 'shared',
-              'internal_dependencies': (
-                  [('c', 'ygg'), 'c_wrappers']),
-              'external_dependencies': (
-                  [('c', x) for x in
-                   _c_internal_libs['ygg']['external_dependencies']]),
-              'include_dirs': (
-                  _c_internal_libs['ygg']['include_dirs'])},
-        c_wrappers={'source': os.path.join(_incl_interface,
-                                           'c_wrappers.c'),
-                    'language': 'c',
-                    'libtype': 'object',
-                    'internal_dependencies': [('c', 'ygg')],
-                    'external_dependencies': (
-                        [('c', x) for x in
-                         _c_internal_libs['ygg']['external_dependencies']]),
-                    'include_dirs': [_incl_interface]})
+    supported_comm_options = copy.deepcopy(
+        CModelDriver.CModelDriver.supported_comm_options)
+    internal_libraries = {
+        'fygg': {
+            'source': 'YggInterface.f90',
+            'libtype': 'static',
+            'internal_dependencies': (
+                [('c', 'ygg'), 'c_wrappers'])},
+        'c_wrappers': {
+            'source': 'c_wrappers.c',
+            'language': 'c',
+            'libtype': 'object',
+            'internal_dependencies': [('c', 'ygg')]}}
     type_map = {
         'comm': 'yggcomm',
         'dtype': 'yggdtype',
@@ -441,23 +424,8 @@ class FortranModelDriver(CompiledModelDriver):
         checking environment variables for default settings.
         """
         CompiledModelDriver.before_registration(cls)
-        # orig_standards = {}
-        # orig_standards['c++'] = cls.external_libraries.pop('cxx', None)
         cxx_compiler = find_compilation_tool('compiler', 'c++',
                                              allow_failure=True)
-        # add_standard_libraries = {}
-        # if FortranCompilerBase.default_linker_language == 'c++':
-        #     if cls.default_compiler == 'gfortran':
-        #         add_standard_libraries['fortran'] = 'gfortran'
-        # elif orig_standards['c++'] is not None:
-        #     if cxx_compiler == 'clang++':
-        #         add_standard_libraries['c++'] = 'c++'
-        #     elif cxx_compiler is not None:
-        #         add_standard_libraries['c++'] = 'stdc++'
-        # for k, v in add_standard_libraries.items():
-        #     if v not in cls.standard_libraries:
-        #         cls.standard_libraries.append(v)
-        #         cls.internal_libraries['fygg']['external_dependencies'].append(v)
         if platform._is_win and cxx_compiler:  # pragma: debug
             msg_error = None
             cxx_compiler = get_compilation_tool('compiler', cxx_compiler)
@@ -510,29 +478,6 @@ class FortranModelDriver(CompiledModelDriver):
         """
         kwargs.setdefault('standard', self.standard)
         return super(FortranModelDriver, self).compile_model(**kwargs)
-
-    @classmethod
-    def get_internal_suffix(cls, commtype=None, **kwargs):
-        r"""Determine the suffix that should be used for internal libraries.
-
-        Args:
-            commtype (str, optional): If provided, this is the communication
-                type that should be used for the model. If None, the
-                default comm is used.
-            **kwargs: Additional keyword arguments will be passed to the
-                parent class's method.
-
-        Returns:
-            str: Suffix that should be added to internal libraries to
-                differentiate between different dependencies.
-
-        """
-        out = super(FortranModelDriver, cls).get_internal_suffix(
-            commtype=commtype, **kwargs)
-        if commtype is None:
-            commtype = tools.get_default_comm()
-        out += '_%s' % commtype[:3].lower()
-        return out
 
     # def on_error_code(self, code):
     #     r"""Perform actions in response to an error code returned by

@@ -67,6 +67,7 @@ class CCompilerBase(CompilerBase):
     r"""Base class for C compilers."""
     languages = ['c']
     source_exts = ['.c']
+    include_exts = ['.h']
     default_executable_env = 'CC'
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
@@ -162,7 +163,15 @@ class GCCCompiler(CCompilerBase):
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
     asan_flags = ['-fsanitize=address']
-    preload_envvar = 'LD_PRELOAD'
+    libraries = {
+        'asan': {'executable_flags': ['-fsanitize=address'],
+                 'library_flags': ['-fsanitize=address'],
+                 'preload': True,
+                 'env': {'ASAN_OPTIONS': {
+                     'value': 'verify_asan_link_order=0',
+                     'append': ':'}},
+                 'specialization': 'with_asan'},
+    }
 
     @classmethod
     def is_installed(cls):
@@ -204,12 +213,21 @@ class ClangCompiler(CCompilerBase):
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
     asan_flags = ['-fsanitize=address']
-    preload_envvar = 'DYLD_INSERT_LIBRARIES'
     product_exts = ['.dSYM']
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
     is_linker = False
     toolset = 'llvm'
+    libraries = {
+        'asan': {'executable_flags': ['-fsanitize=address'],
+                 'library_flags': ['-fsanitize=address',
+                                   '-shared-libasan'],
+                 'preload': True,
+                 'env': {'ASAN_OPTIONS': {
+                     'value': 'verify_asan_link_order=0',
+                     'append': ':'}},
+                 'specialization': 'with_asan'},
+    }
 
     @classmethod
     def get_flags(cls, *args, **kwargs):
@@ -331,6 +349,7 @@ class GCCLinker(LDLinker):
     search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
     flag_options = OrderedDict(LDLinker.flag_options,
                                **{'library_rpath': '-Wl,-rpath'})
+    preload_envvar = 'LD_PRELOAD'
 
 
 class ClangLinker(LDLinker):
@@ -349,6 +368,7 @@ class ClangLinker(LDLinker):
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
     asan_flags = ['-fsanitize=address']
+    preload_envvar = 'DYLD_INSERT_LIBRARIES'
 
     @staticmethod
     def before_registration(cls):
@@ -475,7 +495,7 @@ class LibtoolArchiver(ArchiverBase):
     languages = ['c', 'c++']
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
-    toolset = 'clang'
+    toolset = 'llvm'
     search_path_envvar = ['LIBRARY_PATH']
     asan_flags = []
     
@@ -529,10 +549,13 @@ class CModelDriver(CompiledModelDriver):
     supported_comms = ['ipc', 'zmq']
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux']},
-        'zmq': {'libraries': ['zmq', 'czmq']}}
+        'zmq': {'libraries': [('c', 'zmq'), ('c', 'czmq')]}}
     interface_dependencies = ['rapidjson']
     interface_directories = [_incl_interface]
-    standard_libraries = ['m']
+    standard_libraries = {
+        'm': {'language': 'c',
+              'toolsets': ['gnu']}
+    }
     external_libraries = {
         'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
                                               'rapidjson', 'include',
@@ -552,33 +575,50 @@ class CModelDriver(CompiledModelDriver):
                    'for_python_api': True,
                    'standard': True}}
     internal_libraries = {
-        'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
+        'ygg': {'source': 'YggInterface.c',
                 'language': 'c',
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['regex', 'datatypes'],
                 'external_dependencies': ['rapidjson',
                                           'python', 'numpy'],
-                'include_dirs': [_incl_comm, _incl_seri],
-                'compiler_flags': []},
-        'regex_win32': {'source': 'regex_win32.cpp',
-                        'directory': os.path.join(_top_lang_dir, 'regex'),
+                'include_dirs': ['communication', 'serialize'],
+                'compiler_flags': [],
+                'platform_specifics': {
+                    'Linux': {
+                        'compiler_flags': ['-fPIC'],
+                        'external_dependencies': ['m'],
+                    }}},
+        'regex_win32': {'name': 'regex',
+                        'source': 'regex_win32.cpp',
+                        'platforms': ['Windows'],
+                        'directory': 'regex',
                         'language': 'c++',
                         'libtype': _default_internal_libtype,
                         'internal_dependencies': [],
                         'external_dependencies': []},
-        'regex_posix': {'source': 'regex_posix.h',
-                        'directory': os.path.join(_top_lang_dir, 'regex'),
+        'regex_posix': {'name': 'regex',
+                        'source': 'regex_posix.h',
+                        'platforms': ['MacOS', 'Linux'],
+                        'directory': 'regex',
                         'language': 'c',
                         'libtype': 'header_only',
                         'internal_dependencies': [],
                         'external_dependencies': []},
-        'datatypes': {'directory': os.path.join(_top_lang_dir, 'datatypes'),
+        'datatypes': {'directory': 'datatypes',
                       'language': 'c++',
                       'libtype': _default_internal_libtype,
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson',
                                                 'python', 'numpy'],
-                      'include_dirs': []}}
+                      'include_dirs': [],
+                      'platform_specifics': {
+                          'Linux': {
+                              'compiler_flags': ['-fPIC'],
+                              'external_dependencies': ['m'],
+                          },
+                          'Windows': {
+                              'include_dirs': [_top_lang_dir],
+                          }}}}
     type_map = {
         'comm': 'comm_t*',
         'dtype': 'dtype_t*',
@@ -766,26 +806,6 @@ class CModelDriver(CompiledModelDriver):
             elif platform._is_win:  # pragma: windows
                 cls.default_compiler = 'cl'
         CompiledModelDriver.after_registration(cls, **kwargs)
-        if kwargs.get('second_pass', False):
-            return
-        # Platform specific regex internal library
-        if platform._is_win:  # pragma: windows
-            regex_lib = cls.internal_libraries['regex_win32']
-        else:
-            regex_lib = cls.internal_libraries['regex_posix']
-        cls.internal_libraries['regex'] = regex_lib
-        # Platform specific internal library options
-        cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
-        if platform._is_win:  # pragma: windows
-            cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
-        if platform._is_linux:
-            for x in ['ygg', 'datatypes']:
-                if 'compiler_flags' not in cls.internal_libraries[x]:
-                    cls.internal_libraries[x]['compiler_flags'] = []
-                if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
-                    cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
-                if 'm' not in cls.internal_libraries[x]['external_dependencies']:
-                    cls.internal_libraries[x]['external_dependencies'].append('m')
         
     @classmethod
     def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None, **kwargs):
@@ -903,7 +923,7 @@ class CModelDriver(CompiledModelDriver):
             paths_to_add = []
         paths_to_add = paths_to_add + [cls.get_language_dir()]
         if add_libpython_dir:
-            python_lib = cls.get_dependency_library(
+            python_lib = cls.libraries.getfile(
                 'python', toolname=toolname)
             if os.path.isfile(python_lib):
                 paths_to_add.append(os.path.dirname(python_lib))

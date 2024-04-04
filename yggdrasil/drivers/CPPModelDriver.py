@@ -1,5 +1,3 @@
-import os
-import copy
 import logging
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
@@ -12,6 +10,7 @@ class CPPCompilerBase(CCompilerBase):
     r"""Base class for C++ compilers."""
     languages = ['c++']
     source_exts = ['.cpp', '.cxx']
+    include_exts = ['.h', '.hpp', '.hxx']
     default_executable_env = 'CXX'
     default_flags_env = 'CXXFLAGS'
     cpp_std = 'c++14'
@@ -196,9 +195,20 @@ class CPPModelDriver(CModelDriver):
     language_aliases = ['cpp', 'cxx']
     base_languages = ['c']
     interface_library = 'ygg++'
+    interface_dependencies = []
+    internal_libraries = {
+        'ygg++': {'source': 'YggInterface.cpp',
+                  'language': 'c++',
+                  'internal_dependencies': [('c', 'ygg')],
+                  'platform_specifics': {
+                      'Linux': {
+                          'compiler_flags': ['-fPIC'],
+                      }}}}
     # To prevent inheritance
     default_compiler = None
     default_linker = None
+    standard_libraries = {}
+    external_libraries = {}
     interface_map = {
         'import': '#include "YggInterface.hpp"',
         'input': 'YggInput {channel_obj}("{channel_name}")',
@@ -289,20 +299,8 @@ class CPPModelDriver(CModelDriver):
             cls.function_param[f'copy_{k}'] = (
                 '{name}.CopyFrom({value}, {name}.GetAllocator(), true);')
         CModelDriver.after_registration(cls, **kwargs)
-        if kwargs.get('second_pass', False):
-            return
-        internal_libs = copy.deepcopy(cls.internal_libraries)
-        internal_libs[cls.interface_library] = internal_libs.pop(
-            CModelDriver.interface_library)
-        internal_libs[cls.interface_library]['source'] = os.path.join(
-            cls.get_language_dir(),
-            os.path.splitext(os.path.basename(
-                internal_libs[cls.interface_library]['source']))[0]
-            + cls.language_ext[0])
-        internal_libs[cls.interface_library]['include_dirs'].append(
-            cls.get_language_dir())
-        internal_libs[cls.interface_library]['language'] = cls.language
-        cls.internal_libraries = internal_libs
+        # if kwargs.get('second_pass', False):
+        #     return
 
     @classmethod
     def set_env_class(cls, **kwargs):

@@ -70,7 +70,7 @@ def test_locate_library_file():
     compiler = CModelDriver.get_tool('compiler').__class__
     files = {}
     for k in ['shared', 'static']:
-        fname = CModelDriver.external_libraries['zmq'].get(k, '')
+        fname = CModelDriver.libraries['zmq'].get(k, '', compiler=compiler)
         if os.path.isfile(fname):
             files[k] = fname
     if not files:
@@ -102,7 +102,6 @@ def test_find_standard_library(lang, toolname, lib):
             and compiler.disassembler(allow_uninstalled=True).is_installed()):
         pytest.skip(f"No compiler for {toolname}")
     out = compiler.find_standard_library(dont_cache=True)
-    print(out, type(out))
     if lib:
         if out is None:
             out = compiler.find_standard_library(verbose=True)
@@ -120,7 +119,7 @@ def test_create_windows_import_gcc():
         kws = {'toolname': 'gcc'}
         if platform._is_win:
             kws['libtype'] = 'shared'
-        dll = CModelDriver.get_dependency_library('python', **kws)
+        dll = CModelDriver.libraries.getfile('python', 'library', **kws)
         CompiledModelDriver.create_windows_import(dll, for_gnu=True,
                                                   overwrite=True)
     else:
@@ -300,12 +299,13 @@ class TestCompiledModelDriver(model_base_class):
         order = ['shared', 'object', 'static']
         order.remove(CompiledModelDriver._default_libtype)
         order.append(CompiledModelDriver._default_libtype)
-        for libtype in ['shared', 'object', 'static']:
+        for libtype in order:
             python_class.compile_dependencies(
                 libtype=libtype, overwrite=True)
-            if libtype == 'shared':
+            if libtype == CompiledModelDriver._default_libtype:
                 python_class.compile_dependencies(
                     libtype=libtype, overwrite=False)
+                break
             python_class.cleanup_dependencies(libtype=libtype)
 
     def test_get_tool(self, python_class):
@@ -315,52 +315,44 @@ class TestCompiledModelDriver(model_base_class):
         with pytest.raises(ValueError):
             python_class.get_tool('compiler', return_prop='invalid')
 
-    def test_get_dependency_info(self, python_class):
-        r"""Test get_dependency_info."""
-        dep_list = (
-            python_class.get_dependency_order(
-                python_class.interface_library)
-            + list(python_class.external_libraries.keys()))
+    def test_libraries_get(self, python_class):
+        r"""Test libraries.get."""
+        dep_list = python_class.libraries.keys()
         for dep in dep_list:
-            python_class.get_dependency_info(dep, default='default')
+            python_class.libraries.get(dep, default='default')
         with pytest.raises(KeyError):
-            python_class.get_dependency_info('invalid')
-        assert (python_class.get_dependency_info('invalid', default='default')
+            python_class.libraries.get('invalid')
+        assert (python_class.libraries.get('invalid', default='default')
                 == 'default')
 
-    def test_get_dependency_source(self, python_class):
-        r"""Test get_dependency_source."""
-        dep_list = (
-            python_class.get_dependency_order(
-                python_class.interface_library)
-            + list(python_class.external_libraries.keys()))
+    def test_libraries_getfile_source(self, python_class):
+        r"""Test libraries.getfile for source."""
+        dep_list = python_class.libraries.keys()
         for dep in dep_list:
-            python_class.get_dependency_source(dep, default='default')
-        with pytest.raises(ValueError):
-            python_class.get_dependency_source('invalid')
-        assert python_class.get_dependency_source(__file__) == __file__
-        assert (python_class.get_dependency_source(
-            'invalid', default='default') == 'default')
+            python_class.libraries.getfile(dep, 'source',
+                                           default='default')
+        with pytest.raises(KeyError):
+            python_class.libraries.getfile('invalid', 'source')
+        assert (python_class.libraries.getfile(
+            'invalid', 'source', default='default') == 'default')
 
-    def test_get_dependency_object(self, python_class):
-        r"""Test get_dependency_object."""
-        dep_list = (
-            python_class.get_dependency_order(
-                python_class.interface_library)
-            + list(python_class.external_libraries.keys()))
+    def test_libraries_getfile_object(self, python_class):
+        r"""Test libraries.getfile for object.."""
+        dep_list = python_class.libraries.keys()
         for dep in dep_list:
-            python_class.get_dependency_object(dep, default='default')
-        with pytest.raises(ValueError):
-            python_class.get_dependency_object('invalid')
-        assert python_class.get_dependency_object(__file__) == __file__
-        assert (python_class.get_dependency_object(
-            'invalid', default='default') == 'default')
+            python_class.libraries.getfile(dep, 'object',
+                                           default='default')
+        with pytest.raises(KeyError):
+            python_class.libraries.getfile('invalid', 'object')
+        assert (python_class.libraries.getfile(
+            'invalid', 'object', default='default') == 'default')
 
-    def test_get_dependency_library(self, python_class):
-        r"""Test get_dependency_library."""
-        with pytest.raises(ValueError):
-            python_class.get_dependency_library('invalid', libtype='invalid')
-        for dep, info in python_class.external_libraries.items():
+    def test_libraries_getfile_library(self, python_class):
+        r"""Test libraries.getfile for library."""
+        with pytest.raises(KeyError):
+            python_class.libraries.getfile(
+                'invalid', 'library', libtype='invalid')
+        for dep, info in python_class.libraries.external.items():
             libtype_orig = info.get('libtype', None)
             if libtype_orig not in ['static', 'shared']:
                 continue
@@ -368,27 +360,24 @@ class TestCompiledModelDriver(model_base_class):
                 libtype = 'shared'
             else:
                 libtype = 'static'
-            with pytest.raises(ValueError):
-                python_class.get_dependency_library(dep, libtype=libtype)
-        with pytest.raises(ValueError):
-            python_class.get_dependency_library('invalid')
-        assert python_class.get_dependency_library(__file__) == __file__
-        assert (python_class.get_dependency_library(
-            'invalid', default='default') == 'default')
+            with pytest.raises(KeyError):
+                python_class.libraries.getfile(dep, libtype)
+        with pytest.raises(KeyError):
+            python_class.libraries.getfile('invalid', 'library')
+        assert (python_class.libraries.getfile(
+            'invalid', 'library', default='default') == 'default')
 
-    def test_get_dependency_include_dirs(self, python_class):
-        r"""Test get_dependency_include_dirs."""
-        with pytest.raises(ValueError):
-            python_class.get_dependency_include_dirs('invalid')
-        assert (python_class.get_dependency_include_dirs(__file__)
-                == [os.path.dirname(__file__)])
-        assert (python_class.get_dependency_include_dirs(
-            'invalid', default='default') == ['default'])
+    def test_libraries_getfile_include_dirs(self, python_class):
+        r"""Test libraries.getfile for include_dirs."""
+        with pytest.raises(KeyError):
+            python_class.libraries.getfile('invalid', 'include_dirs')
+        assert (python_class.libraries.getfile(
+            'invalid', 'include_dirs', default=['default']) == ['default'])
 
-    def test_get_dependency_order(self, python_class):
-        r"""Test get_dependency_order."""
-        deps = list(python_class.internal_libraries.keys())
-        python_class.get_dependency_order(deps)
+    def test_dependency_order(self, python_class):
+        r"""Test dependency_order."""
+        dep = python_class.libraries.get(python_class.interface_library)
+        dep.dependency_order()
 
     def test_get_flags(self, python_class):
         r"""Test get_flags."""

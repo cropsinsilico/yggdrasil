@@ -2786,6 +2786,7 @@ definitions:
           model repository or when providing the model as a service.
         type: string
       disable_python_c_api:
+        default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
@@ -3298,6 +3299,7 @@ definitions:
         description: Path to file where model weights are saved
         type: string
       with_asan:
+        default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
         type: boolean
@@ -3373,6 +3375,7 @@ definitions:
           type: string
         type: array
       disable_python_c_api:
+        default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
@@ -3419,6 +3422,7 @@ definitions:
           type: string
         type: array
       with_asan:
+        default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
         type: boolean
@@ -3468,6 +3472,7 @@ definitions:
         description: Build type/configuration that should be built. Defaults to 'Release'.
         type: string
       disable_python_c_api:
+        default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       driver:
@@ -3559,6 +3564,7 @@ definitions:
           type: string
         type: array
       with_asan:
+        default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
         type: boolean
@@ -3605,6 +3611,7 @@ definitions:
           type: string
         type: array
       disable_python_c_api:
+        default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
@@ -3653,6 +3660,7 @@ definitions:
           type: string
         type: array
       with_asan:
+        default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
         type: boolean
@@ -3785,6 +3793,7 @@ definitions:
           type: string
         type: array
       disable_python_c_api:
+        default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
@@ -3837,6 +3846,7 @@ definitions:
         - f2008
         type: string
       with_asan:
+        default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
         type: boolean
@@ -3986,6 +3996,7 @@ definitions:
           type: string
         type: array
       disable_python_c_api:
+        default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       driver:
@@ -4082,6 +4093,7 @@ definitions:
           type: string
         type: array
       with_asan:
+        default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
         type: boolean

@@ -1080,7 +1080,8 @@ class ModelDriver(Driver):
         return (cls.is_language_installed()
                 and cls.are_base_languages_installed()
                 and cls.are_dependencies_installed()
-                and cls.is_interface_installed() and cls.is_comm_installed()
+                and cls.is_interface_installed()
+                and cls.is_comm_installed()
                 and cls.is_configured() and (not cls.is_disabled()))
 
     @classmethod
