@@ -131,11 +131,15 @@ class GFortranCompiler(FortranCompilerBase):
     default_disassembler = 'objdump'
     standard_library = 'gfortran'
     # GNU ASAN not currently installed with gfortran on osx
-    # asan_flags = ['-fsanitize=address']
-    # linker_attributes = dict(
-    #     FortranCompilerBase.linker_attributes,
-    #     asan_flags=['-fsanitize=address', '-shared-libasan'])
-    # f'-l{CModelDriver.ClangCompiler.asan_library()}'])
+    # libraries = {
+    #     'asan': {'dep_executable_flags': ['-fsanitize=address'],
+    #              'dep_shared_flags': ['-fsanitize=address'],
+    #              'preload': True,
+    #              'env': {'ASAN_OPTIONS': {
+    #                  'value': 'verify_asan_link_order=0',
+    #                  'append': ':'}},
+    #              'specialization': 'with_asan'},
+    # }
 
     @staticmethod
     def before_registration(cls, **kwargs):

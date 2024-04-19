@@ -365,7 +365,7 @@ class DependencyRegistry(object):
         self.specialization = DependencySpecialization()
         self.language = language
         self.cfg = kwargs.get('cfg', None)
-        self.stdlib = None
+        self.stdlib = False
         self.libraries = OrderedDict()
         self._driver = kwargs.get('driver', None)
         self._compiler = kwargs.get('compiler', None)
@@ -498,10 +498,10 @@ class DependencyRegistry(object):
             key = (language, key)
             drv = import_component('model', language)
             return drv.libraries.get(key[1], default=default)
+        if self.add_compiler_libraries():
+            return self.get(name, default=default)
         if not isinstance(default, tools.InvalidDefault):
             return default
-        if self.add_compiler_libraries() == key:
-            return self.libraries[key]
         raise KeyError(f"Could not locate a {self.language} dependency "
                        f"with the name {key} (libraries = "
                        f"{list(self.libraries.keys())})")
@@ -584,19 +584,27 @@ class DependencyRegistry(object):
         return self._compiler
 
     def add_compiler_libraries(self):
-        r"""Add the standard library for a compiler."""
-        if (not self.stdlib) and self.compiler:
+        r"""Add the standard library for a compiler.
+
+        Returns:
+            bool: True if any libraries are added, False otherwise.
+
+        """
+        libs_added = False
+        if self.stdlib is False and self.compiler:
             self.stdlib = self.compiler.standard_library
             if self.stdlib and self.stdlib not in self:
                 self[self.stdlib] = CompilationDependency(
                     self.stdlib, 'language', self.language,
                     cfg=self.cfg, driver=self.driver,
                     libtype=self.compiler.standard_library_type)
+                libs_added = True
             for k, v in self.compiler.libraries.items():
                 if v.get("name", k) not in self:
                     v.setdefault('origin', 'standard')
                     self[k] = v
-        return self.stdlib
+                    libs_added = True
+        return libs_added
 
     def specialized(self, **kwargs):
         r"""Return a copy of this record specialized to a specific tool.
@@ -637,11 +645,12 @@ class DependencySpecialization(object):
         ('archiver', None),
         ('with_asan', False),
         ('disable_python_c_api', False),
+        ('logging_level', False),
         ('commtype', None),
         ('generalized_suffix', False),
         ('libtype', None),
     ])
-    tools = ['compiler', 'linker', 'archiver']
+    tooltypes = ['compiler', 'linker', 'archiver']
 
     def __init__(self, base=None, toolname=None, **kwargs):
         if isinstance(base, CompilationDependency):
@@ -694,10 +703,25 @@ class DependencySpecialization(object):
     def compspec(self):
         r"""dict: Specialization parameters for compilation."""
         return {k: v for k, v in self.values.items()
-                if k not in self.tools}
+                if k not in self.tooltypes}
 
     def __getitem__(self, key):
         return self.values.get(key, self.defaults[key])
+
+    def get(self, key, default=tools.InvalidDefault()):
+        r"""Get a specialization value.
+
+        Args:
+            key (str): Specialization parameter to return.
+            default (object, optional): Value that should be returned if
+                a parameter does not exist and the standard default should
+                not be used.
+
+        """
+        if ((key not in self.values
+             and (not isinstance(default, tools.InvalidDefault)))):
+            return default
+        return self[key]
 
     def settool(self, key, value, dep=None):
         r"""Initialize a tool parameter.
@@ -797,7 +821,8 @@ class DependencySpecialization(object):
                 pprint.pprint(rem)
             assert not cls.remainder(kwargs)
         out = {k: kwargs[k] for k in cls.defaults.keys()
-               if k in kwargs and ((not no_tools) or k not in cls.tools)}
+               if k in kwargs and ((not no_tools)
+                                   or k not in cls.tooltypes)}
         if (not no_tools) and 'toolname' in kwargs:
             assert 'compiler' not in kwargs
             out['compiler'] = kwargs['toolname']
@@ -816,9 +841,9 @@ class DependencySpecialization(object):
 
         """
         out = {k: getattr(obj, k, None) for k in cls.defaults.keys()
-               if hasattr(obj, k) and k not in cls.tools}
+               if hasattr(obj, k) and k not in cls.tooltypes}
         if not no_tools:
-            for k in cls.tools:
+            for k in cls.tooltypes:
                 out[k] = obj.get_tool_instance(k)
         return out
 
@@ -980,26 +1005,34 @@ class DependencyList(DependencyRegistry):
                                   driver=self.driver)
         return super(DependencyList, self).__getitem__(key)
 
-    def getall(self, key, **kwargs):
+    def getall(self, key, to_update=None, **kwargs):
         r"""Get a type of key for all dependencies in the list.
 
         Args:
             key (str): Type of parameter to get.
+            to_update (list, dict, optional): Existing list or dictionary
+                that should be updated with values for each dependency.
+            **kwargs: Additional keyword arguments are passed to get for
+                each dependency.
 
         Returns:
             list, dict: Accumulated properties for all dependencies.
 
         """
         out = []
+        kwargs['default'] = None
         for v in self:
-            iout = v.get(key, default=None, **kwargs)
+            iout = v.get(key, to_update=to_update, **kwargs)
             if iout:
                 out.append(iout)
-        if all(isinstance(x, dict) for x in out):
-            alt = {}
+        if isinstance(to_update, dict):
             for x in out:
-                alt.update(x)
-            return alt
+                to_update.update(x)
+            return to_update
+        elif isinstance(to_update, list):
+            for x in out:
+                to_update += x
+            return to_update
         return out
 
     def specialized(self, **kwargs):
@@ -1050,8 +1083,6 @@ class CompilationDependency(object):
             root for generated path names.
         include_dirs (str, optional): Additional directories that should
             be included for compilation.
-        for_python_api (bool, optional): If True, the library is part of
-            the Python API.
         platforms (list, optional): The operating systems that the
             library is available on.
         standard (bool, optional): If True, the library can be treated as
@@ -1070,6 +1101,10 @@ class CompilationDependency(object):
             archiver during build.
         linker_language (str, optional): Language that should be used for
             linking if different from the compilation language.
+        specialization (str, optional): Specialization key that must be
+            True for the dependency to be enabled.
+        exclude_specialization (str, optional): Specialization key that
+            must be False for the dependency to be enabled.
 
     """
 
@@ -1079,6 +1114,9 @@ class CompilationDependency(object):
     built_files = [
         'object', 'static', 'shared', 'windows_import', 'library',
         'dependency_order', 'library_base', 'executable',
+    ]
+    always_generated = [
+        'dep_compiler_kwargs', 'dep_libtool_kwargs',
     ]
     tool2libtype = {'linker': ['shared', 'windows_import'],
                     'archiver': ['static']}
@@ -1121,7 +1159,7 @@ class CompilationDependency(object):
         if self.origin == 'internal':
             kwargs.setdefault('linker_language', 'c++')
         for k in ['internal_dependencies', 'external_dependencies',
-                  'for_python_api', 'platforms', 'standard']:
+                  'platforms', 'standard']:
             setattr(self, k, kwargs.pop(k, None))
         self.parameters = kwargs
         if self.internal_dependencies is None:
@@ -1169,7 +1207,7 @@ class CompilationDependency(object):
     def compilation_parameters(self):
         r"""list: Compilation parameters"""
         out = []
-        for tool in self.specialization.tools:
+        for tool in self.specialization.tooltypes:
             out += [f"{tool}_{k}" for k in self.tool_parameters]
         return out
 
@@ -1245,10 +1283,11 @@ class CompilationDependency(object):
     def is_disabled(self):
         r"""bool: True if the library is disabled by specialization."""
         # TODO: Check toolset
-        return ((self.name == 'asan'
-                 and not self.specialization['with_asan'])
-                or (self.for_python_api
-                    and self.specialization['disable_python_c_api']))
+        return (
+            (not self.specialization.get(
+                self.parameters.get('specialization', None), True))
+            or self.specialization.get(
+                self.parameters.get('exclude_specialization', None), False))
 
     @property
     def is_rebuildable(self):
@@ -1498,10 +1537,19 @@ class CompilationDependency(object):
         if filetype is None:
             filetype = self.get('libtype')
         key = self.key(filetype)
-        if (not dont_generate) and key not in self.files:
+        if (((not dont_generate)
+             and ((key not in self.files)
+                  or (key in self.always_generated)))):
             self.generate(filetype, **kwargs)
         if key in self.files and self.files[key] not in [None, False]:
             if isinstance(self.files[key], (list, dict, DependencyList)):
+                if isinstance(kwargs.get('to_update', None),
+                              (list, dict, DependencyList)):
+                    if isinstance(self.files[key], dict):
+                        kwargs['to_update'].update(self.files[key])
+                    else:
+                        kwargs['to_update'] += self.files[key]
+                    return kwargs['to_update']
                 return type(self.files[key])(self.files[key])
             assert isinstance(self.files[key], (str, bool))
             return self.files[key]
@@ -1552,9 +1600,11 @@ class CompilationDependency(object):
         """
         if filetype == 'header_only':
             filetype = 'include'
-        if self.is_rebuildable:
-            if filetype in ['library', 'libtype', 'dependency_order']:
-                return (filetype, self.specialization._tuple)
+        if (((self.is_rebuildable
+              and filetype in ['library', 'libtype', 'dependency_order',
+                               'definitions'])
+             or filetype in ['runtime_env'])):
+            return (filetype, self.specialization._tuple)
         key = filetype
         if use_regex:
             key = tools.escape_regex(key)
@@ -1671,6 +1721,8 @@ class CompilationDependency(object):
             for k in self.required_files:
                 self.generate(k, overwrite=overwrite, **kwargs)
             return
+        if filetype in self.always_generated:
+            overwrite = True
         key = self.key(filetype)
         if key in self.files and not overwrite:
             return self.files[key]
@@ -1682,6 +1734,8 @@ class CompilationDependency(object):
             out = self._include(**kwargs)
         elif filetype == 'include_dirs':
             out = self._include_dirs(**kwargs)
+        elif filetype == 'definitions':
+            out = self._definitions(**kwargs)
         elif filetype == 'object' and self.is_rebuildable:
             out = self._object(**kwargs)
         elif filetype == 'directory':
@@ -1699,12 +1753,20 @@ class CompilationDependency(object):
         elif filetype in ['shared', 'static', 'windows_import',
                           'executable']:
             out = self._library(filetype, **kwargs)
-        elif filetype in self.compilation_parameters:
+        elif filetype in (self.compilation_parameters
+                          + ['dep_compiler_flags',
+                             'dep_executable_flags',
+                             'dep_shared_flags',
+                             'dep_static_flags']):
             out = self.parameters.get(filetype, None)
         elif filetype == 'dependency_order':
             out = self._dependency_order(**kwargs)
         elif filetype == 'runtime_env':
             out = self._runtime_env(**kwargs)
+        elif filetype == 'dep_compiler_kwargs':
+            out = self._dep_compiler_kwargs(**kwargs)
+        elif filetype == 'dep_libtool_kwargs':
+            out = self._dep_libtool_kwargs(**kwargs)
         else:
             warnings.warn(f"Invalid file type '{filetype}' for "
                           f"{self.origin} dependency {self.name}")
@@ -1787,6 +1849,30 @@ class CompilationDependency(object):
             out = [x if os.path.isabs(x) else os.path.join(root, x)
                    for x in out]
         return list(set(out))
+
+    def _definitions(self, **kwargs):
+        out = copy.copy(self.parameters.get('definitions', []))
+        if self.origin == 'internal':
+            out += [
+                f'{c[:3].upper()}INSTALLED' for c in
+                tools.get_installed_comm(
+                    language=self.parent_driver.language)]
+            commtype = self.specialization['commtype']
+            if commtype is None:
+                commtype = tools.get_default_comm()
+            out.append(f'{commtype[:3].upper()}DEF')
+        if self.is_interface:
+            out += ['WITH_YGGDRASIL', '_USE_MATH_DEFINES']
+            from yggdrasil import __version__
+            yggver = __version__.split('+')[0].split('v')[-1].split('.')
+            if len(yggver) > 0:
+                out.append(f'YGGVER_MAJOR={yggver[0]}')
+            logging_level = self.specialization['logging_level']
+            if logging_level is not None:
+                out.append(f'YGG_DEBUG={logging_level}')
+            if self.specialization['disable_python_c_api']:
+                out.append('YGGDRASIL_DISABLE_PYTHON_C_API')
+        return out
 
     def _source(self, **kwargs):
         if not self.is_rebuildable:
@@ -1945,7 +2031,8 @@ class CompilationDependency(object):
                   'language': self.language,
                   'dependencies': self.dependency_order(for_build=True),
                   'libtype': libtype,
-                  'out': self.get(libtype)}
+                  'out': self.get(libtype),
+                  'definitions': self['definitions']}
         tools = ['compiler']
         libtool = self.libtype2tool.get(libtype, None)
         if libtool:
@@ -1956,14 +2043,14 @@ class CompilationDependency(object):
                 v = self.get(f"{tool}_{k}", False)
                 if v:
                     kwargs[f"{tool}_{k}"] = v
-        kwargs.update(self.specialization.compspec)
+        # kwargs.update(self.specialization.compspec)
         kwargs['toolname'] = kwargs.pop('compiler')
-        additional_objs = []
-        for x in kwargs['dependencies']:
-            if x.is_rebuildable and x.libtype == 'object':
-                additional_objs.append(x['object'])
-        if additional_objs:
-            kwargs['additional_objs'] = additional_objs
+        # additional_objs = []
+        # for x in kwargs['dependencies']:
+        #     if x.is_rebuildable and x.libtype == 'object':
+        #         additional_objs.append(x['object'])
+        # if additional_objs:
+        #     kwargs['additional_objs'] = additional_objs
         keymap = {'directory': 'working_dir'}
         for k in ['include_dirs', 'directory']:
             v = self.get(k, False)
@@ -1998,9 +2085,9 @@ class CompilationDependency(object):
             #     remainder_kwargs}
             kwargs = dict(remainder_kwargs,
                           **self.compilation_kwargs())  # **preserved_kwargs))
-            for dep in kwargs['dependencies']:
-                if dep.is_rebuildable:
-                    dep.compile(**remainder_kwargs)
+            # for dep in kwargs['dependencies']:
+            #     if dep.is_rebuildable:
+            #         dep.compile(**remainder_kwargs)
             out = self.parent_driver.call_compiler(src, **kwargs)
             if (not kwargs.get('dry_run', False)):
                 assert os.path.isfile(kwargs['out'])
@@ -2016,24 +2103,89 @@ class CompilationDependency(object):
                          f"archiver:   {self.toolname('archiver')}")
             raise
 
-    def _runtime_env(self, env=None):
-        if env is None:
-            env = {}
+    def _dep_compiler_kwargs(self, to_update=None):
+        if to_update is None:
+            to_update = {}
+        out = {}
+        keymap = {'dep_compiler_flags': 'compiler_flags'}
+        for k in ['include_dirs', 'definitions', 'dep_compiler_flags']:
+            kd = keymap.get(k, k)
+            out[kd] = []
+            out[kd] += to_update.get(kd, [])
+            out[kd] += [x for x in self.get(k, []) if x not in out[kd]]
+        # TODO: subdeps
+        return out
+
+    def _dep_libtool_kwargs(self, to_update=None, dep_libtype=None,
+                            use_library_path_internal=False):
+        if to_update is None:
+            to_update = {}
+        out = {}
+        if dep_libtype is None:
+            dep_libtype = 'executable'
+        elif dep_libtype == 'windows_import':
+            dep_libtype = 'shared'
+        if ((self['libtype'] in ['shared', 'static', 'windows_import',
+                                 'object']
+             and self.requires_fullpath
+             and not to_update.get('dry_run', False))):
+            dep_lib = self['library']
+            if self.is_rebuildable and not os.path.isfile(dep_lib):
+                dep_lib_result = self.compile()
+                assert dep_lib == dep_lib_result
+            if not os.path.isfile(dep_lib):
+                raise RuntimeError(f"Library for {self.name} dependency "
+                                   f"does not exist: '{dep_lib}'.")
+        if self['libtype'] in ['shared', 'static', 'windows_import']:
+            libkey = 'libraries'
+            if use_library_path_internal and self.origin == 'internal':
+                if to_update.get('skip_library_libs', False):
+                    if isinstance(use_library_path_internal, bool):
+                        libkey = 'library_flags'
+                    else:
+                        libkey = use_library_path_internal
+                else:
+                    libkey = 'flags'
+            out[libkey] = []
+            out[libkey] += to_update.get(libkey, [])
+            if self['library'] not in out[libkey]:
+                out[libkey].append(self['library'])
+        elif self['libtype'] in ['object']:
+            out['additional_objs'] = []
+            out['additional_objs'] += to_update.get('additional_objs', [])
+            if self['object'] not in out['additional_objs']:
+                out['additional_objs'].append(self['object'])
+        tooltype = self.libtype2tool.get(dep_libtype, None)
+        if tooltype:
+            keymap = {f'dep_{dep_libtype}_flags': f'{tooltype}_flags'}
+            for k in [f'dep_{dep_libtype}_flags']:
+                kd = keymap.get(k, k)
+                out[kd] = []
+                out[kd] += to_update.get(kd, [])
+                out[kd] += [x for x in self.get(k, [])
+                            if x not in out[kd]]
+        # TODO: subdeps
+        return out
+
+    def _runtime_env(self, to_update=None):
+        if to_update is None:
+            to_update = {}
+        out = {}
         preload = self.parameters.get('preload', False)
         for k, v in self.parameters.get('env', {}).items():
             append_char = None
             if isinstance(v, dict):
                 append_char = v.get('append', None)
                 v = v['value']
-            if k in env and append_char:
-                env[k] += append_char + v
+            if k in to_update and append_char:
+                out[k] = to_update[k] + append_char + v
             else:
-                env[k] = v
+                out[k] = v
         if preload:
             lib = self['shared']
             if lib:
-                self.linker.preload_env(lib, env)
-        return env
+                self.linker.preload_env(lib, out)
+        return out
 
     def _search(self, filetype, **kwargs):
         if filetype == 'header_only':
@@ -2063,7 +2215,7 @@ class CompilationDependency(object):
             if dll:
                 out = self._search_brute(dll, libtype=filetype, **kwargs)
             return out
-        flags = self.parameters.get('library_flags', [])
+        flags = self.get('dep_shared_flags', [])
         if (not flags) and self.origin == 'standard':
             flags.append(f'-l{self.name}')
         for lib in self.compiler.find_component(
@@ -2282,7 +2434,6 @@ class CompilationToolBase(object):
         remove_product_exts (list): List of extensions or directories matching
             entries in product_exts and product_files that should be removed
             during cleanup. Be careful when adding files to this list.
-        asan_flags (list): Flags added when with_asan is specified.
 
     """
 
@@ -2320,7 +2471,6 @@ class CompilationToolBase(object):
     compatible_toolsets = []
     is_build_tool = False
     tool_suffix_format = '_%sx'
-    asan_flags = None
     no_output_file = False
     _language_ext = None  # only update once per class
     _language_cache = {}
@@ -2806,8 +2956,7 @@ class CompilationToolBase(object):
     @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
                   unused_kwargs=None, skip_defaults=False,
-                  dont_skip_env_defaults=False,  # remove_flags=None,
-                  with_asan=False, **kwargs):
+                  dont_skip_env_defaults=False, **kwargs):
         r"""Get a list of flags for the tool.
 
         Args:
@@ -2867,8 +3016,6 @@ class CompilationToolBase(object):
         if (outfile is not None) and (cls.output_key is not None):
             cls.append_flags(out, cls.output_key, outfile,
                              prepend=output_first, no_duplicates=True)
-        if with_asan and cls.asan_flags:
-            out += cls.asan_flags
         # Handle unused keyword argumetns
         if isinstance(unused_kwargs, dict):
             unused_kwargs.update(kwargs)
@@ -3087,187 +3234,6 @@ class CompilationToolBase(object):
         if libtype == 'windows_import' or cache_toolname:
             cache_key += f"_{cls.toolname}"
         return cache_key
-
-    @classmethod
-    def check_cache(cls, fname, libtype, cfg=None,
-                    dont_cache=False, overwrite_cache=False, **kwargs):
-        r"""Check if a library path has been cached.
-
-        Args:
-            fname (str): Name of library.
-            libtype (str): Library type being searched for.
-            cfg (YggConfigParser, optional): Configuration object currently
-                being updated. Defaults to the global configuration.
-            dont_cache (bool, optional): If True, False will be returned.
-                Defaults to False.
-            overwrite_cache (bool, optional): If True, the cache will not
-                be checked.
-            **kwargs: Additional keywords are passed to cache_key
-
-        Returns:
-            str, bool: Full path to cached library file or False if it
-                has not been cached.
-
-        """
-        if dont_cache or overwrite_cache:
-            return False
-        cache_key = cls.cache_key(fname, libtype, **kwargs)
-        if cache_key in cls._language_cache:
-            return cls._language_cache[cache_key]
-        if cfg is None:
-            from yggdrasil.config import ygg_cfg
-            cfg = ygg_cfg
-        out = cfg.get(cls.languages[0], cache_key, False)
-        if out:
-            cls._language_cache[cache_key] = out
-        return out
-
-    @classmethod
-    def cache_file(cls, fname, libtype, result, cfg=None,
-                   dont_cache=False, **kwargs):
-        r"""Cache a library path.
-
-        Args:
-            fname (str): Name of library.
-            libtype (str): Library type being cached.
-            result (str): Library path being cached.
-            cfg (YggConfigParser, optional): Configuration object currently
-                being updated. Defaults to the global configuration.
-            dont_cache (bool, optional): If True, the entry will not be
-                cached. Defaults to False.
-            **kwargs: Additional keywords are passed to cache_key
-
-        """
-        if dont_cache:
-            return False
-        cache_key = cls.cache_key(fname, libtype, **kwargs)
-        cls._language_cache[cache_key] = result
-        if result:
-            if cfg is None:
-                from yggdrasil.config import ygg_cfg
-                cfg = ygg_cfg
-            cfg.set(cls.languages[0], cache_key, result)
-
-    @classmethod
-    def locate_file(cls, fname, libtype=None, verbose=False,
-                    dont_check_windows_import=False, default=None,
-                    **kwargs):
-        r"""Locate a library file.
-
-        Args:
-            fname (str): Name of library.
-            libtype (str, optional): Library type being searched for.
-                Defaults to None.
-            verbose (bool, optional): If True, display information about
-                the success or failure of the search. Defaults to False.
-            dont_check_windows_import (bool, optional): If True, a
-                located windows import library will not be tested to
-                check if the file is an import library or actually a
-                static library.
-            default (str, optional): Default that should be returned if a
-                file cannot be located.
-            **kwargs: Additional keyword arguments are passed to
-                get_search_path.
-
-        Returns:
-            str, bool: Full path to located library file or False if it
-                cannot be located.
-
-        """
-        out = False
-        libtype2tool = {'shared': 'linker',
-                        'windows_import': 'linker',
-                        'static': 'archiver',
-                        'include': 'compiler'}
-        if libtype is None:
-            tool2libtype = {v: k for k, v in libtype2tool.items()
-                            if k != 'windows_import'}
-            libtype = tool2libtype[cls.tooltype]
-        assert libtype2tool[libtype] == cls.tooltype
-        fname_orig = fname
-        cached = cls.check_cache(fname, libtype, **kwargs)
-        if cached:
-            return cached
-        if fname in ['python', 'Python.h']:
-            fname = tools.get_python_c_library(allow_failure=True,
-                                               libtype=libtype)
-        elif fname in ['numpy', 'arrayobject.h']:
-            fname = tools.get_numpy_c_library(allow_failure=True,
-                                              libtype=libtype)
-        dll = False
-        fname_base, fname_ext = cls.splitext(fname)
-        dep = CompilationDependency(fname, 'external', cls.languages[0],
-                                    libtype=libtype, compiler=cls)
-        if not fname_ext:
-            fname = dep['library_base']
-            fname_base, fname_ext = cls.splitext(fname)
-        else:
-            expected_ext = dep.extension(libtype, return_all=True)
-            if fname_ext not in expected_ext:
-                fname = fname_base + expected_ext[0]
-                fname_ext = expected_ext[0]
-        if os.path.isfile(fname):
-            out = fname
-        else:
-            use_regex = (not platform._is_win)
-            if use_regex:
-                fname = (
-                    '[^a-zA-Z]'
-                    + tools.escape_regex(fname_base)
-                    + '[^a-zA-Z].*'
-                    + tools.escape_regex(fname_ext))
-            else:
-                fname = fname_base + '*' + fname_ext
-            search_list = cls.get_search_path(libtype=libtype, **kwargs)
-            out = tools.locate_file(fname, directory_list=search_list,
-                                    environment_variable=None,
-                                    use_regex=use_regex)
-            if (((not out) and platform._is_win
-                 and libtype in ['static', 'shared', 'windows_import'])):
-                if fname.startswith('lib'):
-                    alt = fname[3:]
-                else:
-                    alt = 'lib' + fname
-                out = tools.locate_file(alt, directory_list=search_list,
-                                        environment_variable=None)
-            if ((out and not dont_check_windows_import
-                 and libtype in ['static', 'windows_import']
-                 and platform._is_win)):  # pragma: windows
-                is_wimp = is_windows_import(out)
-                if is_wimp != (libtype == 'windows_import'):
-                    if verbose:
-                        logger.info(f"Located {out} is not a "
-                                    f"{libtype} library")
-                        if libtype == 'windows_import':
-                            alt_libtype = 'static'
-                        else:
-                            alt_libtype = 'windows_import'
-                        cls.cache_file(fname_orig, alt_libtype, out, **kwargs)
-                    out = False
-        if out:
-            assert os.path.isfile(out)
-            out = os.path.abspath(out)
-        if (not out) and libtype == 'windows_import':
-            if fname_orig.endswith('.dll') and os.path.isfile(fname_orig):
-                dll = fname_orig
-            else:
-                dll = cls.locate_file(
-                    cls.splitext(fname)[0] + '.dll',
-                    libtype='shared', verbose=verbose, **kwargs)
-            if dll:
-                # TODO: Cleanup generated import library or put it
-                # in a directory that will be cleaned up by yggclean
-                out = create_windows_import(dll, for_gnu=cls.is_gnu)
-        if (not out) and default is not None:
-            out = default
-        if verbose:
-            if out:
-                logger.info(f'Located {fname}: {out}')
-            else:
-                logger.info(f"Could not locate {fname} (search_list = "
-                            f"\n\t" + '\n\t'.join(search_list) + ')')
-        cls.cache_file(fname_orig, libtype, out, **kwargs)
-        return out
 
     @classmethod
     def get_executable_command(cls, args, skip_flags=False, unused_kwargs=None,
@@ -3809,8 +3775,7 @@ class CompilerBase(CompilationToolBase):
 
     @classmethod
     def get_flags(cls, dont_link=None, add_linker_switch=False,
-                  libtype=None, logging_level=None, disable_python_c_api=False,
-                  force_simultaneous_link=False, **kwargs):
+                  libtype=None, force_simultaneous_link=False, **kwargs):
         r"""Get a list of compiler flags.
 
         Args:
@@ -3823,11 +3788,6 @@ class CompilerBase(CompilationToolBase):
                 as the flag is not None. Defaults to False.
             libtype (str, optional): Library type that should be created by the
                 linker/archiver. Defaults to None.
-            logging_level (int, optional): Logging level that should be passed
-                as a definition to the C compiler. Defaults to None and will be
-                ignored.
-            disable_python_c_api (bool, optional): If True, the Python C API will
-                be disabled. Defaults to False.
             force_simultaneous_link (bool, optional): If True, force the
                 link step to be performed by the same command as the
                 compilation.
@@ -3851,25 +3811,6 @@ class CompilerBase(CompilationToolBase):
                 dont_link = True
             else:
                 dont_link = False
-        # Add flag that model is yggdrasil and set yggdrasil version
-        if not cls.is_build_tool:
-            from yggdrasil import __version__
-            kwargs.setdefault('definitions', [])
-            kwargs['definitions'].append('WITH_YGGDRASIL')
-            kwargs['definitions'].append('_USE_MATH_DEFINES')
-            yggver = __version__.split('+')[0].split('v')[-1].split('.')
-            if len(yggver) > 0:
-                kwargs['definitions'] += [f'YGGVER_MAJOR={yggver[0]}']
-            # if len(yggver) > 1:
-            #     kwargs['definitions'] += [f'YGGVER_MINOR={yggver[1]}']
-        # Add logging level as a definition
-        if logging_level is not None:
-            kwargs.setdefault('definitions', [])
-            kwargs['definitions'].append('YGG_DEBUG=%d' % logging_level)
-        # Disable Python C API
-        if disable_python_c_api:
-            kwargs.setdefault('definitions', [])
-            kwargs['definitions'].append('YGGDRASIL_DISABLE_PYTHON_C_API')
         # Call parent class
         outfile_link = None
         if not dont_link:
@@ -4149,232 +4090,6 @@ class CompilerBase(CompilationToolBase):
         finally:
             products.teardown()
 
-    @classmethod
-    def locate_linked_library(cls, fname, libtype='shared', flags=None,
-                              verbose=False, linker=None, default=None,
-                              **kwargs):
-        r"""Locate a library file by compiling a test library.
-
-        Args:
-            fname (str): Name of library.
-            libtype (str, optional): Type of library that should be
-                located.
-            flags (list, optional): Flags that should be used to compile
-                the test library.
-            verbose (bool, optional): If True, display information about
-                the success or failure of the search. Defaults to False.
-            linker (LinkerBase, optional): Linker that the returned
-                library should be compatible with.
-            dont_check_windows_import (bool, optional): If True, a
-                located windows import library will not be tested to
-                check if the file is an import library or actually a
-                static library.
-            default (str, optional): Default that should be returned if a
-                file cannot be located.
-            **kwargs: Additional keyword arguments are passed to
-                locate_file if it is called.
-
-        Returns:
-            str: Full path to located library file.
-
-        """
-        assert libtype in ['shared', 'windows_import']
-        fname_orig = fname
-        cached = cls.check_cache(fname, libtype, **kwargs)
-        if cached:
-            return cached
-        kwargs.update(verbose=verbose)
-        if linker is None:
-            linker = cls.linker()
-        if libtype == 'windows_import':
-            dll = cls.locate_linked_library(
-                fname, libtype='shared', flags=flags,
-                linker=linker, **kwargs)
-            out = False
-            if dll:
-                out = linker.locate_file(dll, libtype=libtype, **kwargs)
-            cls.cache_file(fname_orig, libtype, out, **kwargs)
-            return out
-        products = tools.IntegrationPathSet(overwrite=True)
-        ftest = os.path.join(os.getcwd(),
-                             f'a{linker.library_ext}')
-        ftest_src = os.path.join(os.getcwd(),
-                                 f"a{cls.source_exts[0]}")
-        assert not (os.path.isfile(ftest_src)
-                    or os.path.isfile(ftest))
-        products.append_generated(ftest_src, [cls.source_dummy])
-        products.setup()
-        out = False
-        try:
-            cls.call([ftest_src], libtype='shared', out=ftest,
-                     additional_args=flags,
-                     products=products, verbose=verbose,
-                     include_dirs=cls.get_search_path(cfg=kwargs.get('cfg', None)),
-                     force_simultaneous_link=True)
-            for lib in cls.disassembler().find_component(
-                    ftest, fname, component_types='shared_libraries',
-                    verbose=verbose):
-                if ((not (os.path.isabs(lib)
-                          and os.path.isfile(lib))
-                     and cls.toolset in ['llvm', 'gnu'])):
-                    lib = os.path.basename(lib)
-                    lib = subprocess.check_output(
-                        [cls.get_executable(),
-                         f'-print-file-name={lib}']
-                    ).decode('utf-8').strip()
-                if lib:
-                    lib = linker.locate_file(
-                        lib, libtype='shared', **kwargs)
-                    if lib:
-                        out = lib
-                        break
-        finally:
-            products.teardown()
-        if (not out) and default is not None:
-            out = default
-        cls.cache_file(fname_orig, libtype, out, **kwargs)
-        return out
-
-    @classmethod
-    def cache_key(cls, fname, libtype, **kwargs):
-        r"""Get a key to use for a cached library path.
-
-        Args:
-            fname (str): Name of library.
-            libtype (str): Library type being searched for.
-            **kwargs: Additional keyword arguments will be passed to the
-                parent class.
-
-        Returns:
-            str: Cache key.
-        
-        """
-        if fname == cls.standard_library:
-            kwargs['cache_toolname'] = True
-        if libtype in ['shared', 'windows_import']:
-            return cls.linker().cache_key(fname, libtype, **kwargs)
-        elif libtype in ['static']:
-            return cls.archiver().cache_key(fname, libtype, **kwargs)
-        return super(CompilerBase, cls).cache_key(fname, libtype, **kwargs)
-        
-    @classmethod
-    def locate_file(cls, fname, libtype=None, default=None,
-                    check_linked_first=False, **kwargs):
-        r"""Locate a library file.
-
-        Args:
-            fname (str): Name of library.
-            libtype (str, optional): Library type to locate.
-            check_linked_first (bool, optional): If True, search for the
-                library using locate_linked_library first. Defaults to
-                False.
-            default (str, optional): Default that should be returned if a
-                file cannot be located.
-            **kwargs: Additional keyword arguments are passed to
-                locate_file for the appropriate tool.
-
-        Returns:
-            str: Full path to located library file.
-
-        """
-        if isinstance(libtype, list):
-            out = False
-            for k in libtype:
-                out = cls.locate_file(fname, libtype=k, **kwargs)
-                if out:
-                    break
-            if (not out) and default is not None:
-                out = default
-            return out
-        kwargs.update(libtype=libtype, default=default)
-        if libtype in ['shared', 'windows_import', None]:
-            if check_linked_first:
-                kwargs.setdefault('flags', [])
-                out = cls.locate_linked_library(fname, **kwargs)
-                if out:
-                    return out
-            return cls.linker().locate_file(fname, **kwargs)
-        elif libtype in ['static']:
-            return cls.archiver().locate_file(fname, **kwargs)
-        return super(CompilerBase, cls).locate_file(fname, **kwargs)
-
-    @classmethod
-    def init_asan_env(cls, out):
-        r"""Add environment variables to preload the ASAN libraries."""
-        if cls.asan_flags:
-            lib = cls.asan_library()
-            if lib:
-                cls.linker().preload_env(lib, out)
-            asan_options = out.get('ASAN_OPTIONS', '')
-            if asan_options:
-                asan_options += ':'
-            asan_options += 'verify_asan_link_order=0'
-            out['ASAN_OPTIONS'] = asan_options
-            logger.debug(f"ASAN_OPTIONS: {asan_options}")
-        return out
-
-    @classmethod
-    def find_standard_library(cls, name=None, flags=None, libtype=None,
-                              compatible_linker=None, return_libtype=False,
-                              **kwargs):
-        r"""Determine the location of a library
-
-        Args:
-            name (str, optional): Name of the library to locate. If not
-                provided, the class's standard_library will be used (if
-                it is not None).
-            flags (list, optional): Flags that should be added to a test
-                compilation in order for the desired library to be
-                linked.
-            libtype (str, optional): Type of library being searched for.
-                Defaults to standard_library_type for the standard
-                library, 'shared' for libraries on unix OSs, and
-                'windows_import' for libraries on windows.
-            compatible_linker (LinkerBase, optional): Linker that the
-                returned library should be compatible with.
-            return_libtype (bool, optional): If True, return the libtype
-                with the library.
-            **kwargs: Additional keyword arguments are passed to locate_file.
-
-        Returns:
-            str: Full path to library if one can be located, None if not
-
-        """
-        if name is None:
-            name = cls.standard_library
-        if name is None:
-            return None
-        if libtype is None:
-            # if platform._is_win:  # pragma: windows
-            #     libtype_order = ['windows_import', 'static', 'shared']
-            # if name == cls.standard_library:
-            #     if cls.is_mingw():
-            #         libtype = 'static'
-            #     else:
-            #         libtype = cls.standard_library_type
-            if platform._is_win:  # pragma: windows
-                libtype = 'windows_import'
-            else:
-                libtype = 'shared'
-        if flags is None:
-            flags = []
-        lib = cls.locate_file(name, libtype=libtype, flags=flags,
-                              check_linked_first=True,
-                              linker=compatible_linker,
-                              cache_toolname=True, **kwargs)
-        logger.debug(f"{name} Library: {lib}")
-        if return_libtype:
-            return libtype, lib
-        return lib
-
-    @classmethod
-    def asan_library(cls, **kwargs):
-        r"""Return the address sanitizer library."""
-        if not cls.asan_flags:
-            return None
-        return cls.find_standard_library('asan', flags=cls.asan_flags,
-                                         **kwargs)
-
         
 class LinkerBase(CompilationToolBase):
     r"""Base class for linkers.
@@ -4509,7 +4224,7 @@ class LinkerBase(CompilationToolBase):
                     'libraries', 'library_dirs', 'library_libs',
                     'library_libs_nonstd', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
-                    'working_dir', 'env', 'with_asan']
+                    'working_dir', 'env']
         kws_link += add_kws_link
         kws_both += add_kws_both
         kwargs_link = {}
@@ -4533,18 +4248,6 @@ class LinkerBase(CompilationToolBase):
             if k in kwargs:
                 kwargs_link[k] = kwargs[k]
         assert kwargs_link.pop(cls.tooltype, cls.toolname) == cls.toolname
-        if compiler and kwargs.get('with_asan', False) and cls.asan_flags:
-            asan_lib = compiler.asan_library()
-            if asan_lib:
-                kwargs_link.setdefault('libraries', [])
-                kwargs_link['libraries'].append(asan_lib)
-                asan_dir = os.path.dirname(asan_lib)
-                kwargs_link.setdefault('library_dirs', [])
-                kwargs_link['library_dirs'].append(asan_dir)
-                if ((cls.tooltype == 'linker'
-                     and 'library_rpath' in cls.flag_options)):
-                    kwargs_link.setdefault('library_rpath', [])
-                    kwargs_link['library_rpath'].append(asan_dir)
         return kwargs_link
 
     @classmethod
@@ -5011,34 +4714,34 @@ class CompiledModelDriver(ModelDriver):
 
     Args:
         name (str): Driver name.
-        args (str or list): The model executable and any arguments that should
-            be passed to the model executable.
-        source_files (list, optional): Source files that should be compiled
-            into an executable. Defaults to an empty list and the driver will
-            search for a source file based on the model executable (the first
-            model argument).
-        compiler (str, optional): Command or path to executable that should be
-            used to compile the model. If not provided, the compiler will be
-            determined based on configuration options for the language (if
-            present) and the registered compilers that are available on the
-            current operating system.
-        compiler_flags (list, optional): Flags that should be passed to the
-            compiler during compilation. If nto provided, the compiler flags
-            will be determined based on configuration options for the language
-            (if present), the compiler defaults, and the default_compiler_flags
-            class attribute.
-        linker (str, optional): Command or path to executable that should be
-            used to link the model. If not provided, the linker will be
+        args (str or list): The model executable and any arguments that
+            should be passed to the model executable.
+        source_files (list, optional): Source files that should be
+            compiled into an executable. Defaults to an empty list and the
+            driver will search for a source file based on the model
+            executable (the first model argument).
+        compiler (str, optional): Command or path to executable that
+            should be used to compile the model. If not provided, the
+            compiler will be determined based on configuration options for
+            the language (if present) and the registered compilers that
+            are available on the current operating system.
+        compiler_flags (list, optional): Flags that should be passed to
+            the compiler during compilation. If nto provided, the compiler
+            flags will be determined based on configuration options for
+            the language (if present), the compiler defaults, and the
+            default_compiler_flags class attribute.
+        linker (str, optional): Command or path to executable that should
+            be used to link the model. If not provided, the linker will be
             determined based on configuration options for the language (if
             present) and the registered linkers that are available on the
             current operating system
         linker_flags (list, optional): Flags that should be passed to the
             linker during compilation. If not provided, the linker flags
-            will be determined based on configuration options for the language
-            (if present), the linker defaults, and the default_linker_flags
-            class attribute.
-        disable_python_c_api (bool, optional): If True, the Python C API will
-            be disabled. Defaults to False.
+            will be determined based on configuration options for the
+            language (if present), the linker defaults, and the
+            default_linker_flags class attribute.
+        disable_python_c_api (bool, optional): If True, the Python C API
+            will be disabled. Defaults to False.
         with_asan (bool, optional): If True, the model will be compiled
             and linked with the address sanitizer enabled (if there is one
             available for the selected compiler).
@@ -5619,9 +5322,8 @@ class CompiledModelDriver(ModelDriver):
 
     @classmethod
     def update_compiler_kwargs(cls, for_api=False, for_model=False,
-                               commtype=None, directory=None,
-                               include_dirs=None, definitions=None,
-                               skip_interface_flags=False, **kwargs):
+                               directory=None, skip_interface_flags=False,
+                               **kwargs):
         r"""Update keyword arguments supplied to the compiler get_flags method
         for various options.
 
@@ -5634,17 +5336,6 @@ class CompiledModelDriver(ModelDriver):
                 includes external communication libraries. Defaults to False.
             for_model (bool, optional): If True, flags are added that are
                 required for including the interface library. Defaults to False.
-            commtype (str, optional): If provided, this is the communication
-                type that should be used for the model and flags for just that
-                comm type will be included. If None, flags for all installed
-                comm types will be included. Default to None. This keyword is
-                only used if for_model is True.
-            include_dirs (list, optional): If provided, each list element will
-                be added as an included directory flag. Defaults to None and
-                is initialized as an empty list.
-            definitions (list, optional): If provided, each list element will be
-                added as a defintion. Defaults to None and is initialized to an
-                empty list.
             skip_interface_flags (bool, optional): If True, interface flags will
                 not be added. Defaults to False.
             dependencies (DependencyList, optional): If provided, a list
@@ -5658,57 +5349,41 @@ class CompiledModelDriver(ModelDriver):
                 flags.
 
         """
-        if include_dirs is None:
-            include_dirs = []
-        if definitions is None:
-            definitions = []
+        libtype = kwargs.get('libtype', None)
         dependencies = kwargs.pop('dependencies', DependencyList(cls))
         # Link with C++
         if (for_model or for_api) and not cls.is_build_tool:
             kwargs.setdefault('linker_language', 'c++')
-        # Communication specific compilation flags
-        if (for_model or for_api) and (not skip_interface_flags):
-            for c in tools.get_installed_comm(language=cls.language):
-                definitions.append('%sINSTALLED' % c[:3].upper())
-            if commtype is None:
-                commtype = tools.get_default_comm()
-            definitions.append('%sDEF' % commtype[:3].upper())
         # Add interface as dependency for models
-        all_dependencies = dependencies.specialized(
-            commtype=commtype, **kwargs)
+        all_dependencies = dependencies.specialized(**kwargs)
         if ((for_model and (not skip_interface_flags)
              and cls.interface_library is not None)):
             all_dependencies.append(cls.interface_library,
                                     with_dependencies=True,
                                     only_enabled=True)
-        # Add directories for internal/external dependencies
-        for dep in all_dependencies:
-            include_dirs += [x for x in dep.get('include_dirs')
-                             if x not in include_dirs]
         # Add flags for included directories
         if directory is not None:
-            include_dirs.insert(0, os.path.abspath(directory))
+            kwargs.setdefault('include_dirs', [])
+            kwargs['include_dirs'].insert(0, os.path.abspath(directory))
+        # Add parameters from dependencies
+        kwargs = all_dependencies.getall('dep_compiler_kwargs',
+                                         to_update=kwargs)
         # Update kwargs
-        if include_dirs:
-            kwargs['include_dirs'] = include_dirs
-        if definitions:
-            kwargs['definitions'] = definitions
         if not kwargs.get('dont_link', False):
-            libtype = kwargs.get('libtype', None)
             if libtype != 'object':
                 kwargs = cls.update_linker_kwargs(
                     for_api=for_api, for_model=for_model,
-                    commtype=commtype,
                     skip_interface_flags=skip_interface_flags,
                     dependencies=all_dependencies, **kwargs)
+        kwargs = DependencySpecialization.remainder(kwargs)
+        if not kwargs.get('dont_link', False):
             if libtype is not None:
                 kwargs['libtype'] = libtype
         return kwargs
 
     @classmethod
     def update_linker_kwargs(cls, for_api=False, for_model=False,
-                             commtype=None, libtype='object',
-                             skip_interface_flags=False,
+                             libtype='object', skip_interface_flags=False,
                              use_library_path_internal=False, **kwargs):
         r"""Update keyword arguments supplied to the linker/archiver get_flags
         method for various options.
@@ -5719,11 +5394,6 @@ class CompiledModelDriver(ModelDriver):
                 includes external communication libraries. Defaults to False.
             for_model (bool, optional): If True, flags are added that are
                 required for including the interface library. Defaults to False.
-            commtype (str, optional): If provided, this is the communication
-                type that should be used for the model and flags for just that
-                comm type will be included. If None, flags for all installed
-                comm types will be included. Default to None. This keyword is
-                only used if for_model is True.
             libtype (str, optional): Library type that should be created by the
                 linker/archiver. Valid values are 'static', 'shared', or
                 'object'. Defaults to 'object'.
@@ -5744,52 +5414,24 @@ class CompiledModelDriver(ModelDriver):
 
         """
         # Copy/Pop so that empty default dosn't get appended to
-        libraries = kwargs.pop('libraries', [])
         dependencies = kwargs.pop('dependencies', DependencyList(cls))
         # Link with C++
         if (((for_model or for_api) and libtype != 'static'
              and not cls.is_build_tool)):
             kwargs.setdefault('linker_language', 'c++')
         # Add interface as dependency for models
-        all_dependencies = dependencies.specialized(
-            commtype=commtype, **kwargs)
+        all_dependencies = dependencies.specialized(**kwargs)
         if for_model and (not skip_interface_flags):
             if cls.interface_library is not None:
                 all_dependencies.append(cls.interface_library,
                                         with_dependencies=True,
                                         only_enabled=True)
         # Add flags for internal/external depenencies
-        for dep in all_dependencies:
-            if dep['libtype'] in ['shared', 'static', 'windows_import',
-                                  'object']:
-                dep_lib = dep['library']
-                if ((dep.requires_fullpath
-                     and (not kwargs.get('dry_run', False))
-                     and (not os.path.isfile(dep_lib)))):
-                    if dep.is_rebuildable:
-                        dep_lib_result = dep.compile()
-                        assert dep_lib == dep_lib_result
-                    if not (kwargs.get('dry_run', False)
-                            or os.path.isfile(dep_lib)):  # pragma: debug
-                        raise RuntimeError(
-                            f"Library for {dep.name} dependency "
-                            f"does not exist: '{dep_lib}'.")
-            if dep['libtype'] in ['shared', 'static', 'windows_import']:
-                if use_library_path_internal and dep.origin == 'internal':
-                    if kwargs.get('skip_library_libs', False):
-                        if isinstance(use_library_path_internal, bool):
-                            libkey = 'library_flags'
-                        else:
-                            libkey = use_library_path_internal
-                    else:
-                        libkey = 'flags'
-                    kwargs.setdefault(libkey, [])
-                    kwargs[libkey].append(dep_lib)
-                else:
-                    libraries.append(dep_lib)
+        kwargs = all_dependencies.getall(
+            'dep_libtool_kwargs', to_update=kwargs, dep_libtype=libtype,
+            use_library_path_internal=use_library_path_internal)
+        kwargs = DependencySpecialization.remainder(kwargs)
         # Update kwargs
-        if libraries:
-            kwargs['libraries'] = libraries
         if libtype in ['static', 'shared', 'windows_import']:
             kwargs['build_library'] = True
         return kwargs
@@ -5897,7 +5539,8 @@ class CompiledModelDriver(ModelDriver):
             bool: True if the library is installed, False otherwise.
 
         """
-        return cls.libraries[lib].is_installed
+        dep = cls.libraries.get(lib, None)
+        return dep and dep.is_installed
         
     @classmethod
     def configuration_steps(cls):
@@ -6135,21 +5778,11 @@ class CompiledModelDriver(ModelDriver):
                 compiler=compiler, existing=out,
                 logging_level=self.numeric_logging_level,
                 **compile_kwargs)
-        elif self.with_asan:
-            compiler = self.get_tool_instance(
-                'compiler', toolname=toolname)
-            out = compiler.init_asan_env(out)
-            if not ('ASAN_OPTIONS' in out
-                    or 'c++' in compiler.languages
-                    or compiler.is_build_tool):
-                alt = find_compilation_tool(
-                    'compiler', 'c++', return_type='class')
-                out = alt.init_asan_env(out)
         elif self.interface_library:
             libs = self.libraries_instance(
                 toolname=toolname, **compile_kwargs)
             out = libs[self.interface_library].dependency_order().getall(
-                'runtime_env', env=out)
+                'runtime_env', to_update=out)
         return out
 
     def libraries_instance(self, **kwargs):
@@ -6272,8 +5905,8 @@ class CompiledModelDriver(ModelDriver):
                 kwargs['products'].restore_modified()
 
     @classmethod
-    def call_compiler(cls, src, language=None, toolname=None, dont_build=None,
-                      **kwargs):
+    def call_compiler(cls, src, language=None, toolname=None,
+                      dont_build=None, **kwargs):
         r"""Compile a source file into an executable or linkable object file,
         checking for errors.
 

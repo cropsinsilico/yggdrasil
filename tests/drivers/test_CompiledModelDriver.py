@@ -63,53 +63,6 @@ def test_get_compilation_tool():
             == 'invalid')
 
 
-@pytest.mark.language('c')
-def test_locate_library_file():
-    r"""Test locate_file method for compiler."""
-    from yggdrasil.drivers.CModelDriver import CModelDriver
-    compiler = CModelDriver.get_tool('compiler').__class__
-    files = {}
-    for k in ['shared', 'static']:
-        fname = CModelDriver.libraries['zmq'].get(k, '', compiler=compiler)
-        if os.path.isfile(fname):
-            files[k] = fname
-    if not files:
-        pytest.skip("Test library (zmq) doesn't exist")
-    for libtype, fname in files.items():
-        assert compiler.locate_file(fname) == fname
-        assert compiler.locate_file('zmq', libtype=libtype) == fname
-        if libtype == 'static':
-            assert compiler.archiver().locate_file('zmq') == fname
-        if libtype == 'shared':
-            assert compiler.linker().locate_file('zmq') == fname
-    if platform._is_win and 'static' in files:
-        assert (compiler.locate_file('zmq', libtype='windows_import')
-                == files['static'])
-
-
-@pytest.mark.parametrize('lang,toolname,lib', [
-    ('fortran', 'gfortran', True),
-    ('c++', 'clang++', True),
-    ('c++', 'g++', True),
-    ('c++', 'cl++', False),
-])
-def test_find_standard_library(lang, toolname, lib):
-    r"""Test find_standard_library"""
-    compiler = CompiledModelDriver.get_compilation_tool(
-        'compiler', toolname, allow_failure=True,
-        return_type='class', init_languages=[lang])
-    if not (compiler and compiler.is_installed()
-            and compiler.disassembler(allow_uninstalled=True).is_installed()):
-        pytest.skip(f"No compiler for {toolname}")
-    out = compiler.find_standard_library(dont_cache=True)
-    if lib:
-        if out is None:
-            out = compiler.find_standard_library(verbose=True)
-        assert isinstance(out, str) and os.path.isfile(out)
-    else:
-        assert out is None
-
-
 def test_create_windows_import_gcc():
     r"""Test create_windows_import for GNU"""
     from yggdrasil.drivers.CModelDriver import CModelDriver
@@ -237,8 +190,7 @@ class TestDummyCompiler(TestCompilationTool):
         from yggdrasil import __version__ as yggver
         yggver = yggver.split('+')[0].split('v')[-1].split('.')
         assert (python_class.get_flags(flags='hello', libtype='object')
-                == ['hello', '-DWITH_YGGDRASIL', '-D_USE_MATH_DEFINES',
-                    f'-DYGGVER_MAJOR={yggver[0]}'])
+                == ['hello'])
         
     def test_get_executable_command(self, python_class):
         r"""Test get_executable_command."""

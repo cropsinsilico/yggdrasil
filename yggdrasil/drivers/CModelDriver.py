@@ -126,15 +126,6 @@ class CCompilerBase(CompilerBase):
                 out['MACOSX_DEPLOYMENT_TARGET'] = grp['target']
         return out
     
-    # @classmethod
-    # def call(cls, args, **kwargs):
-    #     r"""Call the compiler with the provided arguments. For |yggdrasil| C
-    #     models will always be linked using the C++ linker since some parts of
-    #     the interface library are written in C++."""
-    #     if not kwargs.get('dont_link', False):
-    #         kwargs.setdefault('linker_language', 'c++')
-    #     return super(CCompilerBase, cls).call(args, **kwargs)
-    
     @classmethod
     def get_search_path(cls, *args, **kwargs):
         r"""Determine the paths searched by the tool for external library files.
@@ -162,10 +153,9 @@ class GCCCompiler(CCompilerBase):
     is_linker = False
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
-    asan_flags = ['-fsanitize=address']
     libraries = {
-        'asan': {'executable_flags': ['-fsanitize=address'],
-                 'library_flags': ['-fsanitize=address'],
+        'asan': {'dep_executable_flags': ['-fsanitize=address'],
+                 'dep_shared_flags': ['-fsanitize=address'],
                  'preload': True,
                  'env': {'ASAN_OPTIONS': {
                      'value': 'verify_asan_link_order=0',
@@ -212,16 +202,15 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
-    asan_flags = ['-fsanitize=address']
     product_exts = ['.dSYM']
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
     is_linker = False
     toolset = 'llvm'
     libraries = {
-        'asan': {'executable_flags': ['-fsanitize=address'],
-                 'library_flags': ['-fsanitize=address',
-                                   '-shared-libasan'],
+        'asan': {'dep_executable_flags': ['-fsanitize=address'],
+                 'dep_shared_flags': ['-fsanitize=address',
+                                      '-shared-libasan'],
                  'preload': True,
                  'env': {'ASAN_OPTIONS': {
                      'value': 'verify_asan_link_order=0',
@@ -304,7 +293,6 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
-    asan_flags = ['-fsanitize=address']
 
     @classmethod
     def tool_version(cls, **kwargs):
@@ -367,7 +355,6 @@ class ClangLinker(LDLinker):
                                **{'linker-version': '-mlinker-version=%s',
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
-    asan_flags = ['-fsanitize=address']
     preload_envvar = 'DYLD_INSERT_LIBRARIES'
 
     @staticmethod
@@ -420,9 +407,6 @@ class ClangLinker(LDLinker):
                 # as existing installs still have this mismatch
                 kwargs['linker-version'] = ld_version
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
-        if kwargs.get('with_asan', False):
-            if kwargs.get('build_library', False):
-                out.append('-shared-libasan')
         if '-fopenmp' in out:
             out[out.index('-fopenmp')] = '-lomp'
             if 'conda' not in cls.get_executable(full_path=True):
@@ -486,7 +470,6 @@ class ARArchiver(ArchiverBase):
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIBRARY_PATH']
-    asan_flags = []
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -497,7 +480,6 @@ class LibtoolArchiver(ArchiverBase):
     static_library_flag = '-static'  # This is the default
     toolset = 'llvm'
     search_path_envvar = ['LIBRARY_PATH']
-    asan_flags = []
     
 
 class MSVCArchiver(ArchiverBase):
@@ -569,10 +551,10 @@ class CModelDriver(CompiledModelDriver):
         'numpy': {'include': 'arrayobject.h',
                   'libtype': 'header_only',
                   'language': 'c',
-                  'for_python_api': True},
+                  'exclude_specialization': 'disable_python_c_api'},
         'python': {'include': 'Python.h',
                    'language': 'c',
-                   'for_python_api': True,
+                   'exclude_specialization': 'disable_python_c_api',
                    'standard': True}}
     internal_libraries = {
         'ygg': {'source': 'YggInterface.c',

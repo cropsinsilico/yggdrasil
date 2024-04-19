@@ -1484,12 +1484,8 @@ def init_zmq():
 @pytest.fixture(scope="session")
 def asan_installed():
     r"""Determine if ASAN is available."""
-    from yggdrasil.drivers.CompiledModelDriver import (
-        find_compilation_tool, get_compilation_tool)
-    compiler = find_compilation_tool('compiler', 'c', allow_failure=True)
-    if compiler:
-        compiler = get_compilation_tool('compiler', compiler)
-    return compiler and compiler.asan_library()
+    from yggdrasil.drivers.CModelDriver import CModelDriver
+    return CModelDriver.is_library_installed('asan')
 
 
 @pytest.fixture
