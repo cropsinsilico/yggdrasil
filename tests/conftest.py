@@ -901,8 +901,8 @@ def scripts(testdir):
     script_list = [
         ('c', ['gcc_model.c', 'hellofunc.c']),
         ('c++', ['gcc_model.cpp', 'hellofunc.c']),
-        ('make', 'gcc_model'),
-        ('cmake', 'gcc_model'),
+        ('make', 'gcc_model.c'),
+        ('cmake', 'gcc_model.c'),
         ('matlab', 'matlab_model.m'),
         ('matlab_error', 'matlab_error_model.m'),
         ('python', 'python_model.py'),
@@ -1887,3 +1887,13 @@ def geom_dict():
         'faces': np.array([[0, 0, 7, 0, 1, 2, 3],
                            [1, 2, 6, 4, 5, 6, 7],
                            [2, 3, 5, 5, 6, 7, 4]], 'int32').T}
+
+
+@pytest.fixture
+def temporary_products():
+    from yggdrasil import tools
+    products = tools.IntegrationPathSet()
+    try:
+        yield products
+    finally:
+        products.teardown()

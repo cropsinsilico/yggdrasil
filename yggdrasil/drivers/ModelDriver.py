@@ -693,9 +693,6 @@ class ModelDriver(Driver):
 
         Args:
             args (list): List of arguments provided.
-            default_model_dir (str, optional): Path to directory that should be
-                used to normalize the model file path if it is not absolute.
-                Defaults to None and is set to the working_dir.
 
         """
         if isinstance(args, (str, bytes)):
@@ -708,13 +705,15 @@ class ModelDriver(Driver):
         self.raw_model_file = args[0]
         self.model_file = self.raw_model_file
         self.model_args = args[1:]
-        if (self.language != 'executable') and (not os.path.isabs(self.model_file)):
+        if (((self.language != 'executable')
+             and (not os.path.isabs(self.model_file)))):
             model_file = os.path.normpath(os.path.join(default_model_dir,
                                                        self.model_file))
             self.model_file = model_file
         self.model_dir = os.path.dirname(self.model_file)
-        self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",
-                   self.model_file, self.model_dir, self.model_args)
+        self.debug(f"model_file = '{self.model_file}', "
+                   f"model_dir = '{self.model_dir}', "
+                   f"model_args = '{self.model_args}'")
 
     def init_from_function(self, args):
         r"""Initialize model parameters based on the wrapped function."""
@@ -737,9 +736,9 @@ class ModelDriver(Driver):
         self.model_outputs_in_inputs = self.preparsed_function['outputs_in_inputs']
         model_dir, model_base = os.path.split(self.model_function_file)
         model_base = os.path.splitext(model_base)[0]
-        wrapper_fname = os.path.join(model_dir,
-                                     'ygg_%s_%s%s' % (model_base, self.name,
-                                                      self.language_ext[0]))
+        wrapper_fname = os.path.join(
+            model_dir,
+            f'ygg_{model_base}_{self.name}{self.language_ext[0]}')
         lines = self.write_model_wrapper(model_name=self.name,
                                          **self.preparsed_function)
         self.products.append_generated(wrapper_fname, lines)
@@ -1038,7 +1037,7 @@ class ModelDriver(Driver):
             command = self.model_command()
         if self.with_debugger:
             kwargs.setdefault('debug_flags', self.with_debugger.split())
-        self.debug('Working directory: %s', self.working_dir)
+        self.debug(f'Working directory: {self.working_dir}')
         self.debug('Command: %s', ' '.join(command))
         self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
         # Update keywords
@@ -1463,13 +1462,15 @@ class ModelDriver(Driver):
     #     return env
 
     @classmethod
-    def set_env_class(cls, existing=None, **kwargs):
+    def set_env_class(cls, existing=None, instance=None, **kwargs):
         r"""Set environment variables that are instance independent.
 
         Args:
             existing (dict, optional): Existing dictionary of environment
                 variables that new variables should be added to. Defaults
                 to a copy of os.environ.
+            instance (ModelDriver, optional): Instance that should be
+                used to set environment variables.
             **kwargs: Additional keyword arguments are ignored.
 
         Returns:
@@ -1501,7 +1502,8 @@ class ModelDriver(Driver):
             existing = {}
         existing.update(copy.deepcopy(self.env))
         existing.update(self.get_io_env())
-        env = self.set_env_class(existing=existing, **kwargs)
+        env = self.set_env_class(existing=existing, instance=self,
+                                 **kwargs)
         env.update(YGG_SUBPROCESS="True",
                    YGG_MODEL_INDEX=str(self.model_index),
                    YGG_MODEL_LANGUAGE=self.language,

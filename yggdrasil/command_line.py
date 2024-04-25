@@ -9,6 +9,7 @@ import pprint
 import shutil
 import sysconfig
 from yggdrasil import constants
+from yggdrasil.drivers.CompiledModelDriver import DependencySpecialization
 LANGUAGES = getattr(constants, 'LANGUAGES', {})
 LANGUAGES_WITH_ALIASES = getattr(constants, 'LANGUAGES_WITH_ALIASES', {})
 
@@ -248,12 +249,6 @@ class yggrun(SubCommand):
          {'type': str,
           'help': ('Run all models with a specific debuggin tool. If '
                    'quoted, this can also include flags for the tool.')}),
-        (('--disable-python-c-api', ),
-         {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'}),
-        (('--with-asan', ),
-         {'action': 'store_true',
-          'help': 'Compile models with the address sanitizer enabled.'}),
         (('--as-service', ),
          {'action': 'store_true',
           'help': 'Run the provided YAMLs as a service.'}),
@@ -275,6 +270,9 @@ class yggrun(SubCommand):
           'help': ('Remove integration products like compilation '
                    'products and wrappers on completion of the '
                    'integration')}),
+    ] + [
+        x for x in DependencySpecialization.command_line_options
+        if x[0][0] != '--dry-run'
     ]
 
     @classmethod
@@ -306,11 +304,12 @@ class yggrun(SubCommand):
                 mpi_tag_start=args.mpi_tag_start,
                 validate=args.validate,
                 with_debugger=args.with_debugger,
-                disable_python_c_api=args.disable_python_c_api,
-                with_asan=args.with_asan,
                 as_service=args.as_service,
                 overwrite=args.overwrite,
                 remove_products=args.remove_products)
+            kwargs.update(
+                DependencySpecialization.from_command_args(
+                    args, ignore='dry_run'))
             if args.as_service:
                 kwargs['complete_partial'] = True
                 if not args.partial_commtype:
@@ -556,13 +555,7 @@ class ygginfo(SubCommand):
                 (('--fullpath', ),
                  {'action': 'store_true',
                   'help': 'Get the full path to the tool exectuable.'}),
-                (('--disable-python-c-api', ),
-                 {'action': 'store_true',
-                  'help': 'Disable access to the Python C API from yggdrasil.'}),
-                (('--with-asan', ),
-                 {'action': 'store_true',
-                  'help': "Compile with Clang ASAN if available."}),
-            ],
+            ] + DependencySpecialization.command_line_options,
             parsers=[
                 ArgumentParser(
                     name='compiler',
@@ -585,29 +578,24 @@ class ygginfo(SubCommand):
         if args.tool:
             drv = import_component('model', args.language)
             if args.flags:
+                kws = {'for_model': True,
+                       args.tool: args.toolname}
+                kws.update(
+                    DependencySpecialization.from_command_args(args))
                 if args.tool == 'compiler':
-                    flags = drv.get_compiler_flags(
-                        for_model=True, toolname=args.toolname,
-                        dry_run=True, dont_link=True,
-                        disable_python_c_api=args.disable_python_c_api,
-                        with_asan=args.with_asan)
-                    if '/link' in flags:  # pragma: windows
-                        flags = flags[:flags.index('/link')]
-                    for k in ['-c']:
-                        if k in flags:
-                            flags.remove(k)
-                else:
-                    if args.tool == 'archiver':
-                        libtype = 'static'
-                    elif getattr(args, 'library', False):
-                        libtype = 'shared'
+                    kws['libtype'] = 'object'
+                elif args.tool == 'archiver':
+                    kws['libtype'] = 'static'
+                elif args.tool == 'linker':
+                    if getattr(args, 'library', False):
+                        kws['libtype'] = 'shared'
                     else:
-                        libtype = 'object'
-                    flags = drv.get_linker_flags(
-                        for_model=True, toolname=args.toolname,
-                        dry_run=True, libtype=libtype,
-                        disable_python_c_api=args.disable_python_c_api,
-                        with_asan=args.with_asan)
+                        kws['libtype'] = 'executable'
+                dep = drv.create_dep(**kws)
+                flags = dep.tool_flags(
+                    args.tool, no_additional_stages=True,
+                    skip_no_additional_stages_flag=True,
+                    dry_run=args.dry_run)
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
                     out = out.replace('/', '-')
@@ -1006,12 +994,7 @@ class yggcc(SubCommand):
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
                    "(only used if the specified language is R).")}),
-        (('--disable-python-c-api', ),
-         {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'}),
-        (('--with-asan', ),
-         {'action': 'store_true',
-          'help': "Compile with Clang ASAN if available."})]
+    ] + DependencySpecialization.command_line_options
 
     @classmethod
     def func(cls, args):
@@ -1025,9 +1008,8 @@ class yggcc(SubCommand):
                 args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
         drv = import_component('model', args.language)
         kws = {'toolname': args.toolname, 'flags': args.flags,
-               'use_ccache': args.use_ccache,
-               'disable_python_c_api': args.disable_python_c_api,
-               'with_asan': args.with_asan}
+               'use_ccache': args.use_ccache}
+        kws.update(DependencySpecialization.from_command_args(args))
         if (args.language in ['r', 'R']) and args.Rpkg_language:
             kws['language'] = args.Rpkg_language
         print("executable: %s" % drv.call_compiler(args.source, **kws))
@@ -1049,12 +1031,6 @@ class yggcompile(SubCommand):
                    "or the directory containing an R package.")}),
         (('--toolname', ),
          {'help': "Name of compilation tool that should be used"}),
-        (('--disable-python-c-api', ),
-         {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'}),
-        (('--with-asan', ),
-         {'action': 'store_true',
-          'help': "Compile with Clang ASAN if available."}),
         (('--force-source', ),
          {'action': 'store_true',
           'help': ("Force all arguments passed to the language parameter "
@@ -1074,7 +1050,8 @@ class yggcompile(SubCommand):
           'help': "Run source compilation with ccache."}),
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
-                   "(only used if the provided source language is R).")})]
+                   "(only used if the provided source language is R).")}),
+    ] + DependencySpecialization.command_line_options
 
     @classmethod
     def func(cls, args):
@@ -1092,25 +1069,21 @@ class yggcompile(SubCommand):
         if languages:
             args.languages = languages
             yggclean.func(args, verbose=False)
+        kwargs = DependencySpecialization.from_command_args(args)
         for lang in list(languages):
             drv = import_component('model', lang)
-            drv.cleanup_dependencies(
-                disable_python_c_api=args.disable_python_c_api,
-                with_asan=args.with_asan)
+            drv.cleanup_dependencies(**kwargs)
             # Prevent language from being recompiled more than
             # once as a dependency
             for base_lang in drv.base_languages:
                 if base_lang in languages:
                     languages.remove(base_lang)
-        kwargs = {'toolname': args.toolname,
-                  'disable_python_c_api': args.disable_python_c_api,
-                  'with_asan': args.with_asan}
         for lang in languages:
             drv = import_component('model', lang)
-            if ((hasattr(drv, 'compile_dependencies')
-                 and (not getattr(drv, 'is_build_tool', False)))):
+            if hasattr(drv, 'compile_dependencies'):
                 if drv.is_installed():
-                    drv.compile_dependencies(**kwargs)
+                    drv.compile_dependencies(toolname=args.toolname,
+                                             **kwargs)
                 else:
                     missing.append(lang)
         if error_on_missing and missing:  # pragma: debug
@@ -1222,13 +1195,7 @@ class cc_flags(cc_toolname):
         (('--toolname', ),
          {'default': None,
           'help': 'Name of the tool that associated flags be returned for.'}),
-        (('--disable-python-c-api', ),
-         {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'}),
-        (('--with-asan', ),
-         {'action': 'store_true',
-          'help': "Compile with Clang ASAN if available."}),
-    ]
+    ] + DependencySpecialization.command_line_options
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -1250,13 +1217,7 @@ class ld_flags(cc_toolname):
         (('--toolname', ),
          {'default': None,
           'help': 'Name of the tool that associated flags be returned for.'}),
-        (('--disable-python-c-api', ),
-         {'action': 'store_true',
-          'help': 'Disable access to the Python C API from yggdrasil.'}),
-        (('--with-asan', ),
-         {'action': 'store_true',
-          'help': "Compile with Clang ASAN if available."}),
-    ]
+    ] + DependencySpecialization.command_line_options
 
     @classmethod
     def parse_args(cls, *args, **kwargs):

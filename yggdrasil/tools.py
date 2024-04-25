@@ -2037,7 +2037,46 @@ class YggClass(ComponentBase):
         del self._timeouts[key]
 
 
-class IntegrationPathSet(object):
+class CacheDirMixin:
+    r"""Base class for managing the cache_dir.
+
+    Args:
+        cache_dir (str, optional): Directory where the original file or
+            directory should be cached for generated files that replace
+            existing files or directories. Defaults to a _ygg_cache
+            subdirectory in the directory containing the original if not
+            provided.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.cache_dir = kwargs.pop('cache_dir', None)
+        self.inherited_cache_dir = isinstance(self.cache_dir,
+                                              GeneratedDirectory)
+        self.init_cache_dir()
+        super().__init__(*args, **kwargs)
+
+    def init_cache_dir(self, *args):
+        r"""Initialize the cache directory."""
+        if self.cache_dir is None and args:
+            self.cache_dir = os.path.join(
+                os.path.dirname(args[0]), '_ygg_cache')
+        if isinstance(self.cache_dir, str):
+            self.cache_dir = GeneratedDirectory(self.cache_dir)
+        return bool(self.cache_dir)
+
+    def setup_cache_dir(self):
+        r"""Create the cache directory if it doesn't exist."""
+        if self.init_cache_dir():
+            self.cache_dir.setup()
+
+    def teardown_cache_dir(self):
+        r"""Remove the cache directory if it was created."""
+        if (not self.inherited_cache_dir) and self.init_cache_dir():
+            self.cache_dir.teardown()
+
+
+class IntegrationPathSet(CacheDirMixin):
     r"""Class for managing a set of files or directories created during an
     integration.
 
@@ -2063,8 +2102,8 @@ class IntegrationPathSet(object):
 
     def __init__(self, products=None, overwrite=False, cache_dir=None,
                  removable_source_exts=None, generalized_suffix=None):
+        super(IntegrationPathSet, self).__init__(cache_dir=cache_dir)
         self.overwrite = overwrite
-        self.cache_dir = cache_dir
         self.removable_source_exts = removable_source_exts
         self._generalized_suffix = generalized_suffix
         if self.removable_source_exts is None:
@@ -2073,7 +2112,7 @@ class IntegrationPathSet(object):
         self.last_idx = -1
         if products:
             for x in products:
-                self.append(products)
+                self.append(x)
 
     def __str__(self):
         return 'IntegrationPathSet([' + ', '.join(
@@ -2108,6 +2147,7 @@ class IntegrationPathSet(object):
 
     def append(self, name, *args, **kwargs):
         r"""Append a IntegrationPath to this set."""
+        move_existing = kwargs.pop('move_existing', False)
         assert isinstance(name, str)
         idx = self.index(name)
         cls = kwargs.pop('cls', IntegrationPath)
@@ -2115,7 +2155,12 @@ class IntegrationPathSet(object):
         kwargs.setdefault('removable_source_exts',
                           self.removable_source_exts)
         kwargs.setdefault('generalized_suffix', self.generalized_suffix)
-        path = cls(name, *args, **kwargs)
+        if move_existing and idx != -1:
+            path = self.paths[idx]
+            del self.paths[idx]
+            idx = -1
+        else:
+            path = cls(name, *args, **kwargs)
         if idx == -1:
             self.last_idx = len(self.paths)
             self.paths.append(path)
@@ -2126,6 +2171,7 @@ class IntegrationPathSet(object):
     def append_generated(self, *args, **kwargs):
         r"""Append a GeneratedFile to this path set."""
         kwargs['cls'] = GeneratedFile
+        self.init_cache_dir(*args)
         kwargs.setdefault('cache_dir', self.cache_dir)
         return self.append(*args, **kwargs)
 
@@ -2142,6 +2188,7 @@ class IntegrationPathSet(object):
                 provided tag.
 
         """
+        self.setup_cache_dir()
         for x in self.paths:
             if x.tag == tag:
                 x.setup()
@@ -2157,6 +2204,7 @@ class IntegrationPathSet(object):
         for x in self.paths:
             if x.tag == tag:
                 x.teardown()
+        self.teardown_cache_dir()
 
     def restore_modified(self, tag=None):
         r"""Restore modified original files.
@@ -2169,6 +2217,7 @@ class IntegrationPathSet(object):
         for x in self.paths:
             if x.tag == tag:
                 x.restore_modified()
+        self.teardown_cache_dir()
 
     @property
     def last(self):
@@ -2198,12 +2247,13 @@ class IntegrationPath(object):
             not be checked for source files prior to be removed.
         tag (str, optional): Tag that should be added to the path for
             performing tags on subsets of files.
+        **kwargs: Additional keyword arguments are ignored.
 
     """
 
     def __init__(self, name, overwrite=False, additional_products=None,
                  removable_source_exts=None, generalized_suffix=None,
-                 skip_source_check=False, tag=None):
+                 skip_source_check=False, tag=None, **kwargs):
         self.name = name
         self.overwrite = overwrite
         self.additional_products = additional_products
@@ -2324,7 +2374,38 @@ class IntegrationPath(object):
         return out
 
 
-class GeneratedFile(IntegrationPath):
+class GeneratedDirectory(IntegrationPath):
+    r"""Class for handling generation of directories associated with an
+    integration.
+
+    Args:
+        name (str): Root path for the directory.
+        **kwargs: Additional keyword arguments are passed to the
+            IntegrationPath constructor.
+
+    """
+
+    def __init__(self, name, **kwargs):
+        kwargs.setdefault('skip_source_check', True)
+        super(GeneratedDirectory, self).__init__(name, **kwargs)
+        self.generated = False
+
+    def setup(self):
+        r"""Create the directory if it doesn't exist."""
+        super(GeneratedDirectory, self).setup()
+        if not os.path.isdir(self.name):
+            self.generated = True
+            os.mkdir(self.name)
+
+    def remove_products(self):
+        r"""Remove the directory if it was created."""
+        if self.generated:
+            assert not (self.exists and os.listdir(self.name))
+            super(GeneratedDirectory, self).remove_products()
+            self.generated = False
+
+
+class GeneratedFile(CacheDirMixin, IntegrationPath):
     r"""Class for handling generation of files associated with integrations.
 
     Args:
@@ -2336,12 +2417,6 @@ class GeneratedFile(IntegrationPath):
         replaces (bool, optional): If True, the file replaces any existing
             file that will be preserved and restored when the generated
             file is removed.
-        cache_dir (str, optional): Directory where the original file
-            should be cached if replaces is True. Defaults to a _ygg_cache
-            subdirectory in the directory containing name if not provided.
-        delayed (bool, optional): If True, the file will not be
-            generated or replaced until setup is called with the
-            delayed keyword set to True.
         verbose (bool, optional): If True, log information will be
             displayed when the file is generated.
         **kwargs: Additional keyword arguments are passed to the
@@ -2349,22 +2424,16 @@ class GeneratedFile(IntegrationPath):
     
     """
 
-    def __init__(self, name, lines, replaces=False, cache_dir=None,
-                 delayed=False, verbose=False, **kwargs):
+    def __init__(self, name, lines, replaces=False,
+                 verbose=False, **kwargs):
         kwargs.setdefault('skip_source_check', True)
-        super(GeneratedFile, self).__init__(name, **kwargs)
+        super().__init__(name, **kwargs)
         self.replaces = replaces
         self.lines = lines
         self.generated = False
-        self.cache_dir = cache_dir
-        self.delayed = delayed
         self.verbose = verbose
-        self.created_cache_dir = False
-        if self.cache_dir is None:
-            self.cache_dir = os.path.join(
-                os.path.dirname(name), '_ygg_cache')
         if self.replaces:
-            self.replaces = os.path.join(self.cache_dir,
+            self.replaces = os.path.join(self.cache_dir.name,
                                          os.path.basename(name))
 
     def remove_products(self):
@@ -2377,9 +2446,7 @@ class GeneratedFile(IntegrationPath):
     def cache_original(self):
         r"""Cache the original file."""
         if self.replaces and not os.path.isfile(self.replaces):
-            if not os.path.isdir(self.cache_dir):
-                self.created_cache_dir = True
-                os.mkdir(self.cache_dir)
+            self.setup_cache_dir()
             if not os.path.isfile(self.name):
                 raise RuntimeError(f"Original file does not exist: {self.name}")
             shutil.move(self.name, self.replaces)
@@ -2388,8 +2455,12 @@ class GeneratedFile(IntegrationPath):
         r"""Restore modified original files."""
         if self.replaces and os.path.isfile(self.replaces):
             shutil.move(self.replaces, self.name)
-            if self.created_cache_dir:
-                os.rmdir(self.cache_dir)
+            log_msg = f"Restored original {self.name}"
+            if self.verbose:
+                logger.info(log_msg)
+            else:
+                logger.debug(log_msg)
+            self.teardown_cache_dir()
         
     def setup(self):
         r"""Perform actions on the file before an integration run
@@ -2425,6 +2496,7 @@ class CompilationProduct(IntegrationPath):
         directory (str, optional): Directory containing associated
             compilation products provided by files. Defaults to the
             directory containing name if not provided.
+        is_directory (bool, optional): If True, name is a directory.
         sources (list, optional): List of sources files to exclude from
             the product list.
         **kwargs: Additional keyword arguments are passed to the IntegrationPath
@@ -2433,21 +2505,28 @@ class CompilationProduct(IntegrationPath):
     """
 
     def __init__(self, name, extensions=None, files=None,
-                 directory=None, sources=None, **kwargs):
+                 directory=None, sources=None, is_directory=False,
+                 create_directory=False, **kwargs):
         super(CompilationProduct, self).__init__(name, **kwargs)
         self.extensions = extensions
         self.files = files
         self.directory = directory
         self.sources = sources
+        self.is_directory = is_directory
+        self.create_directory = create_directory
+        self.created_directory = False
         if self.extensions is None:
             self.extensions = []
         if self.files is None:
             self.files = []
         if self.directory is None:
-            self.directory = os.path.dirname(self.name)
+            if self.is_directory:
+                self.directory = self.name
+            else:
+                self.directory = os.path.dirname(self.name)
         if self.sources is None:
             self.sources = []
-        self._products = [self.name]
+        self._products = [self.name] + self.additional_products
         base = os.path.splitext(self.name)[0]
         for x in self.extensions:
             inew = base + x
@@ -2469,3 +2548,22 @@ class CompilationProduct(IntegrationPath):
         r"""Products to remove during setup when overwrite is set or
         during teardown."""
         return copy.copy(self._products)
+
+    @property
+    def exists(self):
+        r"""bool: True if the file or directory exists."""
+        if self.is_directory and self.create_directory:
+            contents = glob.glob(os.path.join(self.name, '*'))
+            return bool(contents)
+        return super(CompilationProduct, self).exists
+        
+    def setup(self):
+        r"""Perform actions on the file before an integration run
+        including generating the file."""
+        super(CompilationProduct, self).setup()
+        if ((self.create_directory and self.directory
+             and not os.path.isdir(self.directory))):
+            self.created_directory = True
+            os.mkdir(self.directory)
+            if self.directory not in self._products:
+                self._products.append(self.directory)

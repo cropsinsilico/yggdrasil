@@ -147,12 +147,14 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
 
         """
         if lib not in cls._library_cache:
+            cls._library_cache[lib] = False
             try:
-                cls.run_executable(['-e', 'library(%s)' % lib.split()[0]])
-                cls._library_cache[lib] = True
+                if cls.is_language_installed():
+                    cls.run_executable(
+                        ['-e', f'library({lib.split()[0]})'])
+                    cls._library_cache[lib] = True
             except RuntimeError as e:
-                logger.info('Error checking for R library %s: %s' % (lib, e))
-                cls._library_cache[lib] = False
+                logger.info(f'Error checking for R library {lib}: {e}')
         return cls._library_cache[lib]
         
     @classmethod
@@ -217,10 +219,13 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         out = super(RModelDriver, self).set_env(**kwargs)
         out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
         if CModelDriver.is_language_installed():
-            c_linker = CModelDriver.get_tool('linker')
-            search_dirs = c_linker.get_search_path(env_only=True)
-            out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
-                                                      add_to_front=True)
+            out = CModelDriver.interface_library_spec(instance=self).getall(
+                'runtime_env', add_to_front=True, add_linker_paths=True,
+                to_update=out)
+            # c_linker = CModelDriver.get_tool('linker')
+            # search_dirs = c_linker.get_search_path(env_only=True)
+            # out = CModelDriver.update_ld_library_path(out, paths_to_add=search_dirs,
+            #                                           add_to_front=True)
         # TODO: Set DYLD_INSERT_LIBRARIES to clang dynamic library
         # on OSX when with_asan is True. R_TESTS may need to be
         # modified so this variable is set when the tests are run.

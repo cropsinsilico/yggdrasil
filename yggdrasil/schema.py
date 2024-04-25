@@ -224,7 +224,7 @@ def update_constants(schema=None):
     r"""Update constants.py with info from the schema."""
     from yggdrasil.components import import_component
     from yggdrasil.drivers.CompiledModelDriver import (
-        get_compilation_tool_registry)
+        _tool_types, _tool_registry)
     if schema is None:
         schema = get_schema()
 
@@ -333,8 +333,8 @@ def update_constants(schema=None):
             ext2lang_full.setdefault(v, [])
             ext2lang_full[v].append(k)
     ext2lang_full = {k: sorted(v) for k, v in ext2lang_full.items()}
-    for x in ['compiler', 'linker', 'archiver']:
-        reg = get_compilation_tool_registry(x).get('by_language', {})
+    for x in _tool_types:
+        reg = _tool_registry.language[x]
         for lang, tools in reg.items():
             for v in tools.values():
                 k = v.toolname

@@ -17,6 +17,7 @@ class CPPCompilerBase(CCompilerBase):
     search_path_flags = ['-E', '-v', '-xc++', '/dev/null']
     default_linker = None
     default_executable = None
+    stdlib_flag = '-stdlib=%s'
 
     @classmethod
     def find_standard_flag(cls, flags):
@@ -57,8 +58,8 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     toolname = 'g++'
     aliases = ['gnu-c++']
     default_linker = 'g++'
-    is_linker = False
     standard_library = 'stdc++'
+    libraries = {}
 
     @classmethod
     def get_flags(cls, skip_standard_flag=False, **kwargs):
@@ -75,7 +76,6 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
 
         """
         out = super(GPPCompiler, cls).get_flags(**kwargs)
-        # Add/remove standard library flag
         out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
 
@@ -84,10 +84,8 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
     r"""Interface class for clang++ compiler."""
     toolname = 'clang++'
     default_linker = 'clang++'
-    # Set to False since ClangLinker has its own class to handle
-    # conflict between versions of clang and ld.
-    is_linker = False
     standard_library = 'c++'
+    libraries = {}
 
     @staticmethod
     def before_registration(cls):
@@ -114,7 +112,6 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
 
         """
         out = super(ClangPPCompiler, cls).get_flags(**kwargs)
-        # Add/remove standard library flag
         out = cls.handle_standard_flag(out, skip_standard_flag)
         return out
         
@@ -152,6 +149,7 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
     default_disassembler = MSVCCompiler.default_disassembler
     search_path_flags = None
     dont_create_linker = True
+    stdlib_flag = None
     
     @staticmethod
     def before_registration(cls):
@@ -299,25 +297,7 @@ class CPPModelDriver(CModelDriver):
             cls.function_param[f'copy_{k}'] = (
                 '{name}.CopyFrom({value}, {name}.GetAllocator(), true);')
         CModelDriver.after_registration(cls, **kwargs)
-        # if kwargs.get('second_pass', False):
-        #     return
 
-    @classmethod
-    def set_env_class(cls, **kwargs):
-        r"""Set environment variables that are instance independent.
-
-        Args:
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method and update_ld_library_path.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(CPPModelDriver, cls).set_env_class(**kwargs)
-        out = CModelDriver.update_ld_library_path(out, **kwargs)
-        return out
-        
     @classmethod
     def write_try_except(cls, try_contents, except_contents, error_var='e',
                          error_type=None, **kwargs):

@@ -767,6 +767,23 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         return cls.get_matlab_info()[1]
         
     @classmethod
+    def is_language_installed(cls):
+        r"""Determine if the interpreter/compiler for the associated programming
+        language is installed.
+
+        Returns:
+            bool: True if the language interpreter/compiler is installed.
+
+        """
+        if not super(MatlabModelDriver, cls).is_language_installed():
+            return False
+        try:
+            cls.language_version()
+            return True
+        except RuntimeError:
+            return False
+            
+    @classmethod
     def executable_command(cls, args, **kwargs):
         r"""Compose a command for running a program in this language with the
         provied arguments. If not already present, the interpreter command and

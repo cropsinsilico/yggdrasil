@@ -21,7 +21,8 @@ def test_run_compilation_opt(requires_asan):
     namespace = f"test_run_compilation_opt_{uuid.uuid4()}"
     runner.run([ex_yamls['gs_lesson3']['cpp']],
                with_asan=True, disable_python_c_api=True,
-               namespace=namespace, overwrite=True)
+               namespace=namespace, overwrite=True,
+               remove_products=True)
 
 
 def test_get_run():
@@ -53,7 +54,8 @@ def test_run_process_connections():
                     reason="Signal processing not sorted on windows")
 def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
-    cr = runner.get_runner([ex_yamls['hello']['python']])
+    cr = runner.get_runner([ex_yamls['hello']['python']],
+                           remove_products=True)
     if platform._is_win:  # pragma: debug
         cr.debug_log()
     cr.loadDrivers()
@@ -71,7 +73,8 @@ def test_Arunner_interrupt():
 
 def test_runner_terminate():
     r"""Start a runner, then stop it early."""
-    cr = runner.get_runner([ex_yamls['hello']['python']])
+    cr = runner.get_runner([ex_yamls['hello']['python']],
+                           remove_products=True)
     cr.loadDrivers()
     cr.startDrivers()
     cr.printStatus()
@@ -87,7 +90,7 @@ def test_runner_error():
 def test_import_as_function():
     r"""Test import_as_function."""
     yamlfile = ex_yamls['fakeplant']['python']
-    fmodel = import_as_function(yamlfile)
+    fmodel = import_as_function(yamlfile, remove_products=True)
     input_args = {}
     for x in fmodel.arguments:
         input_args[x] = 1.0
@@ -115,7 +118,7 @@ def test_import_as_function_server():
             yamlfile = x
             break
     assert yamlfile
-    fmodel = import_as_function(yamlfile)
+    fmodel = import_as_function(yamlfile, remove_products=True)
     input_args = {}
     for x in fmodel.arguments:
         input_args[x] = 'hello'
@@ -146,7 +149,7 @@ def test_import_as_function_C():
     with open(yamlfile, 'w') as fd:
         fd.write(contents)
     try:
-        fmodel = import_as_function(yamlfile)
+        fmodel = import_as_function(yamlfile, remove_products=True)
         fmodel.model_info()
         input_args = {}
         for x in fmodel.arguments:

@@ -63,7 +63,6 @@ class OSRModelDriver(ExecutableModelDriver):
     _config_keys = ['repository']
     _config_attr_map = [{'attr': 'repository',
                          'key': 'repository'}]
-    command_line_specification = ['with_asan', 'disable_python_c_api']
 
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -181,13 +180,9 @@ class OSRModelDriver(ExecutableModelDriver):
                 cwd = os.path.join(cwd, 'StaticBuild_win64')
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
-            flag_options = ''
-            for k in cls.command_line_specification:
-                assert k in DependencySpecialization.defaults
-                # if k in ['commtype']:
-                #     flag_options += f" --{k.replace('_', '-')}={kwargs[k]}"
-                # else:
-                flag_options += f" --{k.replace('_', '-')}"
+            if target == 'cleanygg':
+                kwargs['dry_run'] = True
+            flag_options = DependencySpecialization.as_command_flags(kwargs)
             if flag_options:
                 env['YGG_OSR_FLAG_OPTIONS'] = flag_options.strip()
             if target != 'cleanygg':
@@ -358,15 +353,16 @@ class OSRModelDriver(ExecutableModelDriver):
             fname = 'OpenSimRoot'
             fpath = tools.locate_file(fname)
             if not fpath:
-                logger.info('Could not locate %s, attempting to clone' % fname)
+                logger.info(f'Could not locate {fname}, attempting to '
+                            f'clone')
                 try:
                     fpath = cls.clone_repository()
                 except BaseException as e:  # pragma: debug
-                    logger.info('Failed to clone from %s. error = %s'
-                                % (cls.repository_url, str(e)))
+                    logger.info(f'Failed to clone from '
+                                f'{cls.repository_url}. error = {e}')
                     out.append((cls.language, opt, desc))
             if fpath:
-                logger.info('Located %s: %s' % (fname, fpath))
+                logger.info(f'Located {fname}: {fpath}')
                 cfg.set(cls.language, opt, fpath)
         return out
         

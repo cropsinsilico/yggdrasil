@@ -2686,9 +2686,12 @@ definitions:
           comms can be used by more than one thread. Defaults to False.
         type: boolean
       archiver:
+        description: Name of archiver that should be used to build the model
         type: string
       archiver_flags:
         default: []
+        description: Flags that should be passed to the archiverwhen building the
+          model
         items:
           type: string
         type: array
@@ -2704,10 +2707,25 @@ definitions:
           - number
         type: array
       builddir:
-        description: Directory where the build should be saved. Defaults to <sourcedir>/build.
-          It can be relative to working_dir or absolute.
+        description: Path to the directory that will contain build products. Can be
+          absolute or relative to the directory containing buildfile. Defaults to
+          builddir_base. If builddir is not provided to the build tool as a command
+          line flag, compile_working_dir will be set to builddir.
         type: string
+      builder:
+        description: Name of builder that should be used to build the model
+        type: string
+      builder_flags:
+        default: []
+        description: Flags that should be passed to the builderwhen building the model
+        items:
+          type: string
+        type: array
       buildfile:
+        description: Path to the file containing build instructions. Can be absolute
+          or relative to working_dir, compile_working_dir (if provided), builddir
+          (if provided), or the source directory containing the model source files
+          that will be built.
         type: string
       client_of:
         allowSingular: true
@@ -2723,18 +2741,17 @@ definitions:
         items:
           type: string
         type: array
+      compile_working_dir:
+        description: Directory where compilation should be invoked from if it is not
+          the same as the provided working_dir.
+        type: string
       compiler:
-        description: Command or path to executable that should be used to compile
-          the model. If not provided, the compiler will be determined based on configuration
-          options for the language (if present) and the registered compilers that
-          are available on the current operating system.
+        description: Name of compiler that should be used to build the model
         type: string
       compiler_flags:
         default: []
-        description: Flags that should be passed to the compiler during compilation.
-          If nto provided, the compiler flags will be determined based on configuration
-          options for the language (if present), the compiler defaults, and the default_compiler_flags
-          class attribute.
+        description: Flags that should be passed to the compilerwhen building the
+          model
         items:
           type: string
         type: array
@@ -2742,6 +2759,16 @@ definitions:
         default: Release
         description: Build type/configuration that should be built. Defaults to 'Release'.
         type: string
+      configurer:
+        description: Name of configurer that should be used to build the model
+        type: string
+      configurer_flags:
+        default: []
+        description: Flags that should be passed to the configurerwhen building the
+          model
+        items:
+          type: string
+        type: array
       contact_email:
         description: Email address that should be used to contact the maintainer of
           the model. This parameter is only used in the model repository.
@@ -2790,9 +2817,12 @@ definitions:
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
+        description: Name of disassembler that should be used to build the model
         type: string
       disassembler_flags:
         default: []
+        description: Flags that should be passed to the disassemblerwhen building
+          the model
         items:
           type: string
         type: array
@@ -2826,25 +2856,29 @@ definitions:
         description: Dictionary of environment variables that should be set when the
           driver starts. Defaults to {}.
         type: object
+      env_archiver:
+        description: Environment variable that the archiver executable path should
+          be stored in when building the model
+        type: string
+      env_archiver_flags:
+        description: Environment variable that the archiver flags should be stored
+          in when building the model
+        type: string
       env_compiler:
-        description: Environment variable where the compiler executable should be
-          stored for use within the Makefile. If not provided, this will be determined
-          by the target language driver.
+        description: Environment variable that the compiler executable path should
+          be stored in when building the model
         type: string
       env_compiler_flags:
-        description: Environment variable where the compiler flags should be stored
-          (including those required to compile against the |yggdrasil| interface).
-          If not provided, this will be determined by the target language driver.
+        description: Environment variable that the compiler flags should be stored
+          in when building the model
         type: string
       env_linker:
-        description: Environment variable where the linker executable should be stored
-          for use within the Makefile. If not provided, this will be determined by
-          the target language driver.
+        description: Environment variable that the linker executable path should be
+          stored in when building the model
         type: string
       env_linker_flags:
-        description: Environment variable where the linker flags should be stored
-          (including those required to link against the |yggdrasil| interface). If
-          not provided, this will be determined by the target language driver.
+        description: Environment variable that the linker flags should be stored in
+          when building the model
         type: string
       function:
         description: If provided, an integrated model is created by wrapping the function
@@ -2983,17 +3017,11 @@ definitions:
         - timesync
         type: string
       linker:
-        description: Command or path to executable that should be used to link the
-          model. If not provided, the linker will be determined based on configuration
-          options for the language (if present) and the registered linkers that are
-          available on the current operating system
+        description: Name of linker that should be used to build the model
         type: string
       linker_flags:
         default: []
-        description: Flags that should be passed to the linker during compilation.
-          If not provided, the linker flags will be determined based on configuration
-          options for the language (if present), the linker defaults, and the default_linker_flags
-          class attribute.
+        description: Flags that should be passed to the linkerwhen building the model
         items:
           type: string
         type: array
@@ -3002,16 +3030,6 @@ definitions:
         description: The level of logging messages that should be displayed by the
           model. Defaults to the logging level as determined by the configuration
           file and environment variables.
-        type: string
-      makedir:
-        description: Directory where make should be invoked from if it is not the
-          same as the directory containing the makefile. Defaults to directory containing
-          makefile if provided, otherwise working_dir.
-        type: string
-      makefile:
-        default: Makefile
-        description: Path to make file either absolute, relative to makedir (if provided),
-          or relative to working_dir. Defaults to Makefile.
         type: string
       name:
         description: Name used for component in log messages.
@@ -3131,9 +3149,6 @@ definitions:
           type: string
         type: array
       sourcedir:
-        description: Source directory to call cmake on. If not provided it is set
-          to working_dir. This should be the directory containing the CMakeLists.txt
-          file. It can be relative to working_dir or absolute.
         type: string
       standard:
         default: f2003
@@ -3205,30 +3220,35 @@ definitions:
           the keys:'
         type: object
       target:
-        description: Make target that should be built to create the model executable.
-          Defaults to None.
         type: string
+      target_archiver:
+        description: Name of archiver that should be used to build the model
+        type: string
+      target_archiver_flags:
+        default: []
+        description: Flags that should be passed to the archiver when building the
+          model
+        items:
+          type: string
+        type: array
       target_compiler:
-        description: Compilation tool that should be used to compile the target language.
-          Defaults to None and will be set based on the selected language driver.
+        description: Name of compiler that should be used to build the model
         type: string
       target_compiler_flags:
-        description: Compilation flags that should be passed to the target language
-          compiler. Defaults to [].
+        default: []
+        description: Flags that should be passed to the compiler when building the
+          model
         items:
           type: string
         type: array
       target_language:
-        description: Language that the target is written in. Defaults to None and
-          will be set based on the source files provided.
         type: string
       target_linker:
-        description: Compilation tool that should be used to link the target language.
-          Defaults to None and will be set based on the selected language driver.
+        description: Name of linker that should be used to build the model
         type: string
       target_linker_flags:
-        description: Linking flags that should be passed to the target language linker.
-          Defaults to [].
+        default: []
+        description: Flags that should be passed to the linker when building the model
         items:
           type: string
         type: array
@@ -3342,9 +3362,12 @@ definitions:
     description: Schema for model component ['c'] subtype.
     properties:
       archiver:
+        description: Name of archiver that should be used to build the model
         type: string
       archiver_flags:
         default: []
+        description: Flags that should be passed to the archiverwhen building the
+          model
         items:
           type: string
         type: array
@@ -3359,18 +3382,17 @@ definitions:
           - string
           - number
         type: array
+      compile_working_dir:
+        description: Directory where compilation should be invoked from if it is not
+          the same as the provided working_dir.
+        type: string
       compiler:
-        description: Command or path to executable that should be used to compile
-          the model. If not provided, the compiler will be determined based on configuration
-          options for the language (if present) and the registered compilers that
-          are available on the current operating system.
+        description: Name of compiler that should be used to build the model
         type: string
       compiler_flags:
         default: []
-        description: Flags that should be passed to the compiler during compilation.
-          If nto provided, the compiler flags will be determined based on configuration
-          options for the language (if present), the compiler defaults, and the default_compiler_flags
-          class attribute.
+        description: Flags that should be passed to the compilerwhen building the
+          model
         items:
           type: string
         type: array
@@ -3379,9 +3401,12 @@ definitions:
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
+        description: Name of disassembler that should be used to build the model
         type: string
       disassembler_flags:
         default: []
+        description: Flags that should be passed to the disassemblerwhen building
+          the model
         items:
           type: string
         type: array
@@ -3399,17 +3424,11 @@ definitions:
         - c
         type: string
       linker:
-        description: Command or path to executable that should be used to link the
-          model. If not provided, the linker will be determined based on configuration
-          options for the language (if present) and the registered linkers that are
-          available on the current operating system
+        description: Name of linker that should be used to build the model
         type: string
       linker_flags:
         default: []
-        description: Flags that should be passed to the linker during compilation.
-          If not provided, the linker flags will be determined based on configuration
-          options for the language (if present), the linker defaults, and the default_linker_flags
-          class attribute.
+        description: Flags that should be passed to the linkerwhen building the model
         items:
           type: string
         type: array
@@ -3447,30 +3466,44 @@ definitions:
           - number
         type: array
       builddir:
-        description: Directory where the build should be saved. Defaults to <sourcedir>/build.
-          It can be relative to working_dir or absolute.
+        description: Path to the directory that will contain build products. Can be
+          absolute or relative to the directory containing buildfile. Defaults to
+          builddir_base. If builddir is not provided to the build tool as a command
+          line flag, compile_working_dir will be set to builddir.
         type: string
-      buildfile:
+      builder:
+        description: Name of builder that should be used to build the model
         type: string
-      compiler:
-        description: Command or path to executable that should be used to compile
-          the model. If not provided, the compiler will be determined based on configuration
-          options for the language (if present) and the registered compilers that
-          are available on the current operating system.
-        type: string
-      compiler_flags:
+      builder_flags:
         default: []
-        description: Flags that should be passed to the compiler during compilation.
-          If nto provided, the compiler flags will be determined based on configuration
-          options for the language (if present), the compiler defaults, and the default_compiler_flags
-          class attribute.
+        description: Flags that should be passed to the builderwhen building the model
         items:
           type: string
         type: array
+      buildfile:
+        description: Path to the file containing build instructions. Can be absolute
+          or relative to working_dir, compile_working_dir (if provided), builddir
+          (if provided), or the source directory containing the model source files
+          that will be built.
+        type: string
+      compile_working_dir:
+        description: Directory where compilation should be invoked from if it is not
+          the same as the provided working_dir.
+        type: string
       configuration:
         default: Release
         description: Build type/configuration that should be built. Defaults to 'Release'.
         type: string
+      configurer:
+        description: Name of configurer that should be used to build the model
+        type: string
+      configurer_flags:
+        default: []
+        description: Flags that should be passed to the configurerwhen building the
+          model
+        items:
+          type: string
+        type: array
       disable_python_c_api:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
@@ -3481,25 +3514,29 @@ definitions:
         enum:
         - CMakeModelDriver
         type: string
+      env_archiver:
+        description: Environment variable that the archiver executable path should
+          be stored in when building the model
+        type: string
+      env_archiver_flags:
+        description: Environment variable that the archiver flags should be stored
+          in when building the model
+        type: string
       env_compiler:
-        description: Environment variable where the compiler executable should be
-          stored for use within the Makefile. If not provided, this will be determined
-          by the target language driver.
+        description: Environment variable that the compiler executable path should
+          be stored in when building the model
         type: string
       env_compiler_flags:
-        description: Environment variable where the compiler flags should be stored
-          (including those required to compile against the |yggdrasil| interface).
-          If not provided, this will be determined by the target language driver.
+        description: Environment variable that the compiler flags should be stored
+          in when building the model
         type: string
       env_linker:
-        description: Environment variable where the linker executable should be stored
-          for use within the Makefile. If not provided, this will be determined by
-          the target language driver.
+        description: Environment variable that the linker executable path should be
+          stored in when building the model
         type: string
       env_linker_flags:
-        description: Environment variable where the linker flags should be stored
-          (including those required to link against the |yggdrasil| interface). If
-          not provided, this will be determined by the target language driver.
+        description: Environment variable that the linker flags should be stored in
+          when building the model
         type: string
       language:
         default: cmake
@@ -3507,21 +3544,6 @@ definitions:
         enum:
         - cmake
         type: string
-      linker:
-        description: Command or path to executable that should be used to link the
-          model. If not provided, the linker will be determined based on configuration
-          options for the language (if present) and the registered linkers that are
-          available on the current operating system
-        type: string
-      linker_flags:
-        default: []
-        description: Flags that should be passed to the linker during compilation.
-          If not provided, the linker flags will be determined based on configuration
-          options for the language (if present), the linker defaults, and the default_linker_flags
-          class attribute.
-        items:
-          type: string
-        type: array
       source_files:
         default: []
         description: Source files that should be compiled into an executable. Defaults
@@ -3531,35 +3553,37 @@ definitions:
           type: string
         type: array
       sourcedir:
-        description: Source directory to call cmake on. If not provided it is set
-          to working_dir. This should be the directory containing the CMakeLists.txt
-          file. It can be relative to working_dir or absolute.
         type: string
       target:
-        description: Make target that should be built to create the model executable.
-          Defaults to None.
         type: string
+      target_archiver:
+        description: Name of archiver that should be used to build the model
+        type: string
+      target_archiver_flags:
+        default: []
+        description: Flags that should be passed to the archiver when building the
+          model
+        items:
+          type: string
+        type: array
       target_compiler:
-        description: Compilation tool that should be used to compile the target language.
-          Defaults to None and will be set based on the selected language driver.
+        description: Name of compiler that should be used to build the model
         type: string
       target_compiler_flags:
-        description: Compilation flags that should be passed to the target language
-          compiler. Defaults to [].
+        default: []
+        description: Flags that should be passed to the compiler when building the
+          model
         items:
           type: string
         type: array
       target_language:
-        description: Language that the target is written in. Defaults to None and
-          will be set based on the source files provided.
         type: string
       target_linker:
-        description: Compilation tool that should be used to link the target language.
-          Defaults to None and will be set based on the selected language driver.
+        description: Name of linker that should be used to build the model
         type: string
       target_linker_flags:
-        description: Linking flags that should be passed to the target language linker.
-          Defaults to [].
+        default: []
+        description: Flags that should be passed to the linker when building the model
         items:
           type: string
         type: array
@@ -3578,9 +3602,12 @@ definitions:
     description: Schema for model component ['c++', 'cpp', 'cxx'] subtype.
     properties:
       archiver:
+        description: Name of archiver that should be used to build the model
         type: string
       archiver_flags:
         default: []
+        description: Flags that should be passed to the archiverwhen building the
+          model
         items:
           type: string
         type: array
@@ -3595,18 +3622,17 @@ definitions:
           - string
           - number
         type: array
+      compile_working_dir:
+        description: Directory where compilation should be invoked from if it is not
+          the same as the provided working_dir.
+        type: string
       compiler:
-        description: Command or path to executable that should be used to compile
-          the model. If not provided, the compiler will be determined based on configuration
-          options for the language (if present) and the registered compilers that
-          are available on the current operating system.
+        description: Name of compiler that should be used to build the model
         type: string
       compiler_flags:
         default: []
-        description: Flags that should be passed to the compiler during compilation.
-          If nto provided, the compiler flags will be determined based on configuration
-          options for the language (if present), the compiler defaults, and the default_compiler_flags
-          class attribute.
+        description: Flags that should be passed to the compilerwhen building the
+          model
         items:
           type: string
         type: array
@@ -3615,9 +3641,12 @@ definitions:
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
+        description: Name of disassembler that should be used to build the model
         type: string
       disassembler_flags:
         default: []
+        description: Flags that should be passed to the disassemblerwhen building
+          the model
         items:
           type: string
         type: array
@@ -3637,17 +3666,11 @@ definitions:
         - cxx
         type: string
       linker:
-        description: Command or path to executable that should be used to link the
-          model. If not provided, the linker will be determined based on configuration
-          options for the language (if present) and the registered linkers that are
-          available on the current operating system
+        description: Name of linker that should be used to build the model
         type: string
       linker_flags:
         default: []
-        description: Flags that should be passed to the linker during compilation.
-          If not provided, the linker flags will be determined based on configuration
-          options for the language (if present), the linker defaults, and the default_linker_flags
-          class attribute.
+        description: Flags that should be passed to the linkerwhen building the model
         items:
           type: string
         type: array
@@ -3760,9 +3783,12 @@ definitions:
     description: Schema for model component ['fortran'] subtype.
     properties:
       archiver:
+        description: Name of archiver that should be used to build the model
         type: string
       archiver_flags:
         default: []
+        description: Flags that should be passed to the archiverwhen building the
+          model
         items:
           type: string
         type: array
@@ -3777,18 +3803,17 @@ definitions:
           - string
           - number
         type: array
+      compile_working_dir:
+        description: Directory where compilation should be invoked from if it is not
+          the same as the provided working_dir.
+        type: string
       compiler:
-        description: Command or path to executable that should be used to compile
-          the model. If not provided, the compiler will be determined based on configuration
-          options for the language (if present) and the registered compilers that
-          are available on the current operating system.
+        description: Name of compiler that should be used to build the model
         type: string
       compiler_flags:
         default: []
-        description: Flags that should be passed to the compiler during compilation.
-          If nto provided, the compiler flags will be determined based on configuration
-          options for the language (if present), the compiler defaults, and the default_compiler_flags
-          class attribute.
+        description: Flags that should be passed to the compilerwhen building the
+          model
         items:
           type: string
         type: array
@@ -3797,9 +3822,12 @@ definitions:
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
       disassembler:
+        description: Name of disassembler that should be used to build the model
         type: string
       disassembler_flags:
         default: []
+        description: Flags that should be passed to the disassemblerwhen building
+          the model
         items:
           type: string
         type: array
@@ -3816,17 +3844,11 @@ definitions:
         - fortran
         type: string
       linker:
-        description: Command or path to executable that should be used to link the
-          model. If not provided, the linker will be determined based on configuration
-          options for the language (if present) and the registered linkers that are
-          available on the current operating system
+        description: Name of linker that should be used to build the model
         type: string
       linker_flags:
         default: []
-        description: Flags that should be passed to the linker during compilation.
-          If not provided, the linker flags will be determined based on configuration
-          options for the language (if present), the linker defaults, and the default_linker_flags
-          class attribute.
+        description: Flags that should be passed to the linkerwhen building the model
         items:
           type: string
         type: array
@@ -3977,24 +3999,30 @@ definitions:
           - number
         type: array
       builddir:
+        description: Path to the directory that will contain build products. Can be
+          absolute or relative to the directory containing buildfile. Defaults to
+          builddir_base. If builddir is not provided to the build tool as a command
+          line flag, compile_working_dir will be set to builddir.
         type: string
-      buildfile:
+      builder:
+        description: Name of builder that should be used to build the model
         type: string
-      compiler:
-        description: Command or path to executable that should be used to compile
-          the model. If not provided, the compiler will be determined based on configuration
-          options for the language (if present) and the registered compilers that
-          are available on the current operating system.
-        type: string
-      compiler_flags:
+      builder_flags:
         default: []
-        description: Flags that should be passed to the compiler during compilation.
-          If nto provided, the compiler flags will be determined based on configuration
-          options for the language (if present), the compiler defaults, and the default_compiler_flags
-          class attribute.
+        description: Flags that should be passed to the builderwhen building the model
         items:
           type: string
         type: array
+      buildfile:
+        description: Path to the file containing build instructions. Can be absolute
+          or relative to working_dir, compile_working_dir (if provided), builddir
+          (if provided), or the source directory containing the model source files
+          that will be built.
+        type: string
+      compile_working_dir:
+        description: Directory where compilation should be invoked from if it is not
+          the same as the provided working_dir.
+        type: string
       disable_python_c_api:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
@@ -4005,56 +4033,36 @@ definitions:
         enum:
         - MakeModelDriver
         type: string
+      env_archiver:
+        description: Environment variable that the archiver executable path should
+          be stored in when building the model
+        type: string
+      env_archiver_flags:
+        description: Environment variable that the archiver flags should be stored
+          in when building the model
+        type: string
       env_compiler:
-        description: Environment variable where the compiler executable should be
-          stored for use within the Makefile. If not provided, this will be determined
-          by the target language driver.
+        description: Environment variable that the compiler executable path should
+          be stored in when building the model
         type: string
       env_compiler_flags:
-        description: Environment variable where the compiler flags should be stored
-          (including those required to compile against the |yggdrasil| interface).
-          If not provided, this will be determined by the target language driver.
+        description: Environment variable that the compiler flags should be stored
+          in when building the model
         type: string
       env_linker:
-        description: Environment variable where the linker executable should be stored
-          for use within the Makefile. If not provided, this will be determined by
-          the target language driver.
+        description: Environment variable that the linker executable path should be
+          stored in when building the model
         type: string
       env_linker_flags:
-        description: Environment variable where the linker flags should be stored
-          (including those required to link against the |yggdrasil| interface). If
-          not provided, this will be determined by the target language driver.
+        description: Environment variable that the linker flags should be stored in
+          when building the model
         type: string
       language:
         default: make
-        description: Model is written in C/C++ and has a Makefile for compilation.
+        description: Model is written in a compiled language and has a Makefile for
+          performing compilation.
         enum:
         - make
-        type: string
-      linker:
-        description: Command or path to executable that should be used to link the
-          model. If not provided, the linker will be determined based on configuration
-          options for the language (if present) and the registered linkers that are
-          available on the current operating system
-        type: string
-      linker_flags:
-        default: []
-        description: Flags that should be passed to the linker during compilation.
-          If not provided, the linker flags will be determined based on configuration
-          options for the language (if present), the linker defaults, and the default_linker_flags
-          class attribute.
-        items:
-          type: string
-        type: array
-      makedir:
-        description: Directory where make should be invoked from if it is not the
-          same as the directory containing the makefile. Defaults to directory containing
-          makefile if provided, otherwise working_dir.
-        type: string
-      makefile:
-        default: Makefile
-        description: Path to make file either absolute, relative to makedir (if provided),
-          or relative to working_dir. Defaults to Makefile.
         type: string
       source_files:
         default: []
@@ -4064,31 +4072,38 @@ definitions:
         items:
           type: string
         type: array
-      target:
-        description: Make target that should be built to create the model executable.
-          Defaults to None.
+      sourcedir:
         type: string
+      target:
+        type: string
+      target_archiver:
+        description: Name of archiver that should be used to build the model
+        type: string
+      target_archiver_flags:
+        default: []
+        description: Flags that should be passed to the archiver when building the
+          model
+        items:
+          type: string
+        type: array
       target_compiler:
-        description: Compilation tool that should be used to compile the target language.
-          Defaults to None and will be set based on the selected language driver.
+        description: Name of compiler that should be used to build the model
         type: string
       target_compiler_flags:
-        description: Compilation flags that should be passed to the target language
-          compiler. Defaults to [].
+        default: []
+        description: Flags that should be passed to the compiler when building the
+          model
         items:
           type: string
         type: array
       target_language:
-        description: Language that the target is written in. Defaults to None and
-          will be set based on the source files provided.
         type: string
       target_linker:
-        description: Compilation tool that should be used to link the target language.
-          Defaults to None and will be set based on the selected language driver.
+        description: Name of linker that should be used to build the model
         type: string
       target_linker_flags:
-        description: Linking flags that should be passed to the target language linker.
-          Defaults to [].
+        default: []
+        description: Flags that should be passed to the linker when building the model
         items:
           type: string
         type: array

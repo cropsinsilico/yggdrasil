@@ -72,9 +72,13 @@ class CCompilerBase(CompilerBase):
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
-    linker_attributes = {'default_executable_env': 'LD',
-                         'default_flags_env': 'LDFLAGS',
-                         'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
+    # create_next_stage_tool = {
+    #     'attributes': {
+    #         'default_executable_env': 'LD',
+    #         'default_flags_env': 'LDFLAGS',
+    #         'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+    #     }
+    # }
     search_path_envvar = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
     search_regex_begin = '#include "..." search starts here:'
@@ -91,41 +95,18 @@ class CCompilerBase(CompilerBase):
     #     checking environment variables for default settings.
     #     """
     #     if platform._is_mac:
-    #         cls.linker_attributes = dict(cls.linker_attributes,
-    #                                      search_path_flags=['-Xlinker', '-v'],
-    #                                      search_regex=[r'\t([^\t\n]+)\n'],
-    #                                      search_regex_begin='Library search paths:')
+    #         cls.create_next_stage_tool['attributes'] = dict(
+    #             cls.create_next_stage_tool['attributes'],
+    #             search_path_flags=['-Xlinker', '-v'],
+    #             search_regex=[r'\t([^\t\n]+)\n'],
+    #             search_regex_begin='Library search paths:')
     #     elif platform._is_linux:
-    #         cls.linker_attributes = dict(cls.linker_attributes,
-    #                                      search_path_flags=['-Xlinker', '--verbose'],
-    #                                      search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+    #         cls.create_next_stage_tool['attributes'] = dict(
+    #             cls.create_next_stage_tool['attributes'],
+    #             search_path_flags=['-Xlinker', '--verbose'],
+    #             search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
     #     CompilerBase.before_registration(cls)
 
-    @classmethod
-    def set_env(cls, *args, **kwargs):
-        r"""Set environment variables required for compilation.
-
-        Args:
-            *args: Arguments are passed to the parent class's method.
-            **kwargs: Keyword arguments  are passed to the parent class's
-                method.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(CCompilerBase, cls).set_env(*args, **kwargs)
-        if _osx_sysroot is not None:
-            out['CONDA_BUILD_SYSROOT'] = _osx_sysroot
-            out['SDKROOT'] = _osx_sysroot
-            grp = re.search(r'MacOSX(?P<target>[0-9]+\.[0-9]+)?',
-                            _osx_sysroot).groupdict()
-            # This is only utilized on local installs where a
-            # non-default SDK is installed in addition to the default
-            if grp['target']:  # pragma: debug
-                out['MACOSX_DEPLOYMENT_TARGET'] = grp['target']
-        return out
-    
     @classmethod
     def get_search_path(cls, *args, **kwargs):
         r"""Determine the paths searched by the tool for external library files.
@@ -150,14 +131,14 @@ class GCCCompiler(CCompilerBase):
     default_archiver = 'ar'
     default_linker = 'gcc'
     default_disassembler = 'objdump'
-    is_linker = False
     toolset = 'gnu'
+    compatible_toolsets = ['llvm']
     aliases = ['gnu-cc', 'gnu-gcc']
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],
                  'dep_shared_flags': ['-fsanitize=address'],
                  'preload': True,
-                 'env': {'ASAN_OPTIONS': {
+                 'runtime_env': {'ASAN_OPTIONS': {
                      'value': 'verify_asan_link_order=0',
                      'append': ':'}},
                  'specialization': 'with_asan'},
@@ -202,17 +183,18 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
+    version_regex = r'(?P<version>(?:Apple )?clang version \d+\.\d+\.\d+)'
     product_exts = ['.dSYM']
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
-    is_linker = False
     toolset = 'llvm'
+    compatible_toolsets = ['gnu']
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],
                  'dep_shared_flags': ['-fsanitize=address',
                                       '-shared-libasan'],
                  'preload': True,
-                 'env': {'ASAN_OPTIONS': {
+                 'runtime_env': {'ASAN_OPTIONS': {
                      'value': 'verify_asan_link_order=0',
                      'append': ':'}},
                  'specialization': 'with_asan'},
@@ -229,7 +211,7 @@ class ClangCompiler(CCompilerBase):
             if (idx > 0) and (out[idx - 1] != new_flag):
                 out.insert(idx, new_flag)
         return out
-        
+
 
 class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
@@ -254,31 +236,16 @@ class MSVCCompiler(CCompilerBase):
     default_linker = 'LINK'
     default_archiver = 'LIB'
     default_disassembler = 'dumpbin'
-    linker_switch = '/link'
+    next_stage_switch = '/link'
     search_path_envvar = ['INCLUDE']
     search_path_flags = None
     version_flags = []
+    version_regex = r'(?P<version>.+)\s+Copyright'
     product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
                     '.vcxproj.filters', '.exp', '.lib']
-    combine_with_linker = True  # Must be explicit; linker is separate .exe
-    is_linker = False
+    builtin_next_stage = 'linker'
+    combine_with_next_stage = 'LINK'
     toolset = 'msvc'
-    
-    @classmethod
-    def tool_version(cls, **kwargs):  # pragma: windows
-        r"""Determine the version of this tool.
-
-        Args:
-            **kwargs: Keyword arguments are passed to cls.call.
-
-        Returns:
-            str: Version of the tool.
-
-        """
-        out = super(MSVCCompiler, cls).tool_version()
-        if 'Copyright' not in out:  # pragma: debug
-            raise RuntimeError("Version call failed: %s" % out)
-        return out.split('Copyright')[0]
 
 
 # C Linkers
@@ -292,29 +259,12 @@ class LDLinker(LinkerBase):
     default_executable_env = 'LD'
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
+    version_regex = [
+        r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
+        (r'GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
+         r'(?P<version>\d+(?:\.\d+){0,2})')
+    ]
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
-
-    @classmethod
-    def tool_version(cls, **kwargs):
-        r"""Determine the version of this tool.
-
-        Args:
-            **kwargs: Keyword arguments are passed to cls.call.
-
-        Returns:
-            str: Version of the tool.
-
-        """
-        out = super(LDLinker, cls).tool_version(**kwargs)
-        for regex in [r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
-                      (r'GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
-                       r'(?P<version>\d+(?:\.\d+){0,2})')]:
-            match = re.search(regex, out)
-            if match is not None:
-                break
-        if match is None:  # pragma: debug
-            raise RuntimeError(f"Could not locate version in string: {out}")
-        return match.group('version')
 
     # @classmethod
     # def get_flags(cls, *args, **kwargs):
@@ -333,6 +283,7 @@ class GCCLinker(LDLinker):
     platforms = GCCCompiler.platforms
     default_executable = GCCCompiler.default_executable
     toolset = GCCCompiler.toolset
+    compatible_toolsets = GCCCompiler.compatible_toolsets
     search_path_flags = ['-Xlinker', '--verbose']
     search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
     flag_options = OrderedDict(LDLinker.flag_options,
@@ -348,6 +299,8 @@ class ClangLinker(LDLinker):
     platforms = ClangCompiler.platforms
     default_executable = ClangCompiler.default_executable
     toolset = ClangCompiler.toolset
+    compatible_toolsets = ClangCompiler.compatible_toolsets
+    version_regex = ClangCompiler.version_regex
     search_path_flags = ['-Xlinker', '-v']
     search_regex = [r'\t([^\t\n]+)\n']
     search_regex_begin = 'Library search paths:'
@@ -356,6 +309,7 @@ class ClangLinker(LDLinker):
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
     preload_envvar = 'DYLD_INSERT_LIBRARIES'
+    # libtype_flags = {'shared': '-dynamiclib'}
 
     @staticmethod
     def before_registration(cls):
@@ -371,24 +325,6 @@ class ClangLinker(LDLinker):
             cls.flag_options.pop('library_rpath', None)
 
     @classmethod
-    def tool_version(cls, **kwargs):
-        r"""Determine the version of this tool.
-
-        Args:
-            **kwargs: Keyword arguments are passed to cls.call.
-
-        Returns:
-            str: Version of the tool.
-
-        """
-        out = super(LDLinker, cls).tool_version(**kwargs)
-        regex = r'clang version (?P<version>\d+\.\d+\.\d+)'
-        match = re.search(regex, out)
-        if match is None:  # pragma: debug
-            raise RuntimeError(f"Could not locate version in string: {out}")
-        return match.group('version')
-        
-    @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of linker flags."""
         # Handle case where clang (10.0.0) is trying to pass
@@ -397,7 +333,7 @@ class ClangLinker(LDLinker):
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
-        ver = cls.tool_version()
+        ver = cls.tool_version().split()[-1]
         if int(ver.split('.')[0]) >= 10:
             ld_version = LDLinker.tool_version()
             if float(ld_version.split('.')[0]) < 520:  # pragma: version
@@ -435,7 +371,8 @@ class MSVCLinker(LinkerBase):
         ('library_libs_nonstd', ''),
         ('library_dirs', '/LIBPATH:%s'),
         ('import_lib', '/IMPLIB:%s')])
-    shared_library_flag = '/DLL'
+    libtype_flags = {'shared': '/DLL',
+                     'windows_import': '/DLL'}
     search_path_envvar = ['LIB']
     search_path_flags = None
     version_flags = []
@@ -464,7 +401,7 @@ class ARArchiver(ArchiverBase):
     languages = ['c', 'c++', 'fortran']
     default_executable_env = 'AR'
     default_flags_env = None
-    static_library_flag = 'rcs'
+    libtype_flags = {'static': 'rcs'}
     output_key = ''
     output_first_library = True
     toolset = 'gnu'
@@ -477,7 +414,7 @@ class LibtoolArchiver(ArchiverBase):
     toolname = 'libtool'
     languages = ['c', 'c++']
     default_executable_env = 'LIBTOOL'
-    static_library_flag = '-static'  # This is the default
+    libtype_flags = {'static': '-static'}
     toolset = 'llvm'
     search_path_envvar = ['LIBRARY_PATH']
     
@@ -487,34 +424,13 @@ class MSVCArchiver(ArchiverBase):
     toolname = 'LIB'
     languages = ['c', 'c++']
     platforms = ['Windows']
-    static_library_flag = None
+    libtype_flags = {}
     output_key = '/OUT:%s'
     toolset = 'msvc'
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIB']
     
-    # @classmethod
-    # def is_import_lib(cls, libpath):
-    #     r"""Determine if a library is an import library or a static
-    #     library.
-        
-    #     Args:
-    #         libpath (str): Full path to library.
 
-    #     Returns:
-    #         bool: True if the library is an import library, False otherwise.
-
-    #     """
-    #     if (not os.path.isfile(libpath)) or (not libpath.endswith('.lib')):
-    #         return False
-    #     out = subprocess.check_output([cls.get_executable(full_path=True),
-    #                                    '/list', libpath])
-    #     files = set(out.splitlines())
-    #     if any([f.endswith('.obj') for f in files]):
-    #         return False
-    #     return True
-
-    
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
@@ -555,7 +471,21 @@ class CModelDriver(CompiledModelDriver):
         'python': {'include': 'Python.h',
                    'language': 'c',
                    'exclude_specialization': 'disable_python_c_api',
-                   'standard': True}}
+                   'is_standard': True,
+                   'platform_specifics': {
+                       'Windows': {
+                           'global_env': {
+                               'PYTHONHOME': sysconfig.get_config_var(
+                                   'prefix'),
+                               'PYTHONPATH': os.pathsep.join([
+                                   sysconfig.get_path('stdlib'),
+                                   sysconfig.get_path('purelib'),
+                                   os.path.join(
+                                       sysconfig.get_config_var('prefix'),
+                                       'DLLs')])
+                           }
+                       }
+                   }}}
     internal_libraries = {
         'ygg': {'source': 'YggInterface.c',
                 'language': 'c',
@@ -569,7 +499,28 @@ class CModelDriver(CompiledModelDriver):
                     'Linux': {
                         'compiler_flags': ['-fPIC'],
                         'external_dependencies': ['m'],
-                    }}},
+                    },
+                    'MacOS': {
+                        'global_env': {
+                            'CONDA_BUILD_SYSROOT': {
+                                'value': _osx_sysroot,
+                                'overwrite': True,
+                            },
+                            'SDKROOT': {
+                                'value': _osx_sysroot,
+                                'overwrite': True,
+                            },
+                            'MACOSX_DEPLOYMENT_TARGET': {
+                                'value': (
+                                    re.search(
+                                        r'MacOSX(?P<target>[0-9]+\.[0-9]+)?',
+                                        _osx_sysroot).groupdict()['target']
+                                    if _osx_sysroot else False),
+                                'overwrite': True,
+                            }
+                        }
+                    }
+                }},
         'regex_win32': {'name': 'regex',
                         'source': 'regex_win32.cpp',
                         'platforms': ['Windows'],
@@ -847,135 +798,6 @@ class CModelDriver(CompiledModelDriver):
                     os.path.dirname(os.path.dirname(nplib)))
         return out
 
-    @classmethod
-    def call_linker(cls, obj, language=None, **kwargs):
-        r"""Link several object files to create an executable or library (shared
-        or static), checking for errors.
-
-        Args:
-            obj (list): Object files that should be linked.
-            language (str, optional): Language that should be used to link
-                the files. Defaults to None and the language of the current
-                driver is used.
-            **kwargs: Additional keyword arguments are passed to run_executable.
-
-        Returns:
-            str: Full path to compiled source.
-
-        """
-        if (((cls.language == 'c') and (language is None)
-             and kwargs.get('for_model', False)
-             and (not kwargs.get('skip_interface_flags', False)))):
-            language = 'c++'
-            kwargs.update(cls.update_linker_kwargs(**kwargs))
-            kwargs['skip_interface_flags'] = True
-        return super(CModelDriver, cls).call_linker(obj, language=language,
-                                                    **kwargs)
-
-    @classmethod
-    def update_ld_library_path(cls, env, paths_to_add=None,
-                               add_to_front=False, add_libpython_dir=False,
-                               toolname=None, env_var=None, **kwargs):
-        r"""Update provided dictionary of environment variables so that
-        LD_LIBRARY_PATH includes the interface directory containing the interface
-        libraries.
-
-        Args:
-            env (dict): Dictionary of enviroment variables to be updated.
-            paths_to_add (list, optional): Paths that should be added. If not
-                provided, defaults to [cls.get_language_dir()].
-            add_to_front (bool, optional): If True, new paths are added to the
-                front, rather than the end. Defaults to False.
-            add_libpython_dir (bool, optional): If True, the directory
-                containing the Python C library will be added. Defaults
-                to False.
-            toolname (str, optional): Name of compiler tool that should be used.
-                Defaults to None and the default compiler for the language will
-                be used.
-            env_var (str, optional): Environment variable where the paths
-                should be added. Defaults to None and is only set for
-                linux (LD_LIBRARY_PATH) and windows (PATH).
-            **kwargs: Additional keyword arguments are ignored.
-
-        Returns:
-            dict: Updated dictionary of environment variables.
-
-        """
-        if paths_to_add is None:
-            paths_to_add = []
-        paths_to_add = paths_to_add + [cls.get_language_dir()]
-        if add_libpython_dir:
-            python_lib = cls.libraries.getfile(
-                'python', toolname=toolname)
-            if os.path.isfile(python_lib):
-                paths_to_add.append(os.path.dirname(python_lib))
-        if platform._is_win and ygg_cfg.get('c', 'vcpkg_dir', None):
-            if platform._is_64bit:
-                arch = 'x64-windows'
-            else:  # pragma: debug
-                arch = 'x86-windows'
-                raise NotImplementedError("Not yet tested on 32bit Python")
-            paths_to_add.append(os.path.join(ygg_cfg.get('c', 'vcpkg_dir'),
-                                             'installed', arch, 'bin'))
-        if env_var is None:
-            if platform._is_linux:
-                env_var = 'LD_LIBRARY_PATH'
-            elif platform._is_win:
-                env_var = 'PATH'
-        if env_var is not None:
-            path_list = []
-            prev_path = env.pop(env_var, '')
-            prev_path_list = prev_path.split(os.pathsep)
-            if prev_path:
-                path_list.append(prev_path)
-            for x in paths_to_add:
-                if x not in prev_path_list:
-                    if add_to_front:
-                        path_list.insert(0, x)
-                    else:
-                        path_list.append(x)
-            if path_list:
-                env[env_var] = os.pathsep.join(path_list)
-        return env
-
-    @classmethod
-    def update_python_path(cls, env):
-        r"""Update provided dictionary of environment variables so that
-        PYTHONPATH and PYTHONHOME are set as needed (primarily on windows).
-
-        Args:
-            env (dict): Dictionary of enviroment variables to be updated.
-
-        Returns:
-            dict: Updated dictionary of environment variables.
-
-        """
-        if platform._is_win:  # pragma: windows
-            env.setdefault('PYTHONHOME', sysconfig.get_config_var('prefix'))
-            env.setdefault('PYTHONPATH', os.pathsep.join([
-                sysconfig.get_path('stdlib'),
-                sysconfig.get_path('purelib'),
-                os.path.join(sysconfig.get_config_var('prefix'),
-                             'DLLs')]))
-        return env
-
-    @classmethod
-    def set_env_class(cls, **kwargs):
-        r"""Set environment variables that are instance independent.
-
-        Args:
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method and update_ld_library_path.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(CModelDriver, cls).set_env_class(**kwargs)
-        out = cls.update_ld_library_path(out, **kwargs)
-        out = cls.update_python_path(out)
-        return out
-    
     @classmethod
     def parse_var_definition(cls, io, value, **kwargs):
         r"""Extract information about input/output variables from a

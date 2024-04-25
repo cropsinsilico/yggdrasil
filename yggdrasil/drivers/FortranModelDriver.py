@@ -7,8 +7,7 @@ from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompilerBase, CompiledModelDriver, get_compilation_tool,
-    find_compilation_tool)
+    CompilerBase, CompiledModelDriver, _tool_registry)
 
 
 logger = logging.getLogger(__name__)
@@ -26,37 +25,44 @@ class FortranCompilerBase(CompilerBase):
     include_exts = ['.mod', '.MOD']
     default_executable_env = 'FC'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors', '-ffree-line-length-0']
+    default_flags = [
+        '-g', '-Wall', '-cpp', '-pedantic-errors', '-ffree-line-length-0'
+    ]
     default_ext = '.F90'
-    linker_attributes = {'default_flags_env': 'LFLAGS',
-                         'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
+    create_next_stage_tool = {
+        'attributes': {
+            'default_flags_env': 'LFLAGS',
+            'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+        }
+    }
     search_path_envvar = []
     default_linker = None
     default_executable = None
     default_archiver = None
     product_exts = ['.mod']
     source_dummy = 'program main\nend program main'
-    # default_linker_language = 'c++'
-
-    # @staticmethod
-    # def before_registration(cls):
-    #     r"""Operations that should be performed to modify class attributes prior
-    #     to registration including things like platform dependent properties and
-    #     checking environment variables for default settings.
-    #     """
-    #     if platform._is_win:
-    #         cls.default_linker_language = 'c++'
-    #     CompilerBase.before_registration(cls)
-        
+    
     @classmethod
-    def call(cls, args, **kwargs):
-        r"""Call the compiler with the provided arguments. For |yggdrasil| C
-        models will always be linked using the C++ linker since some parts of
-        the interface library are written in C++."""
-        if (((not kwargs.get('dont_link', False))
-             and cls.default_linker_language is not None)):
-            kwargs.setdefault('linker_language', cls.default_linker_language)
-        return super(FortranCompilerBase, cls).call(args, **kwargs)
+    def find_module_name(cls, src):
+        r"""Determine if a module is defined in the provided source file.
+
+        Args:
+           src (str): Path to the source file that should be parsed.
+
+        Returns:
+           str: Module name if located, None otherwise.
+
+        """
+        if src.endswith(tuple(cls.source_exts)) and os.path.isfile(src):
+            with open(src, 'r') as fd:
+                contents = fd.read()
+            match = re.search(
+                r"(?:(?:\s+)|(?:^))(?:(?:MODULE)|(?:module))"
+                r"\s+(?P<name>[a-zA-Z][a-zA-Z0-9_]*)(?:(?:\s+)|(?:$))",
+                contents)
+            if match:
+                return match.group('name').lower()
+        return None
     
     @classmethod
     def get_flags(cls, **kwargs):
@@ -95,9 +101,16 @@ class FortranCompilerBase(CompilerBase):
                 ManagedFileSet.append_compilation_product
 
         """
-        if os.path.basename(new).startswith('YggInterface_f90'):
-            kwargs['additional_products'] = os.path.join(
-                _top_lang_dir, 'fygg.mod')
+        if kwargs.get('sources', None):
+            for x in kwargs['sources']:
+                module = cls.find_module_name(x)
+                if module:
+                    fname = f'{module}.mod'
+                    if 'module-dir' in cls.flag_options:
+                        kwargs.setdefault('module-dir', _top_lang_dir)
+                        fname = os.path.join(kwargs['module-dir'], fname)
+                    kwargs.setdefault('additional_products', [])
+                    kwargs['additional_products'].append(fname)
         return super(FortranCompilerBase, cls).append_product(
             products, new, **kwargs)
 
@@ -135,7 +148,7 @@ class GFortranCompiler(FortranCompilerBase):
     #     'asan': {'dep_executable_flags': ['-fsanitize=address'],
     #              'dep_shared_flags': ['-fsanitize=address'],
     #              'preload': True,
-    #              'env': {'ASAN_OPTIONS': {
+    #              'runtime_env': {'ASAN_OPTIONS': {
     #                  'value': 'verify_asan_link_order=0',
     #                  'append': ':'}},
     #              'specialization': 'with_asan'},
@@ -191,9 +204,19 @@ class FortranModelDriver(CompiledModelDriver):
     internal_libraries = {
         'fygg': {
             'source': 'YggInterface.f90',
-            'libtype': 'static',
             'internal_dependencies': (
-                [('c', 'ygg'), 'c_wrappers'])},
+                [('c', 'ygg'), 'c_wrappers']),
+            'platform_specifics': {
+                'MacOS': {
+                    'global_env': {
+                        'DYLD_FALLBACK_LIBRARY_PATH': {
+                            'value': os.path.join(
+                                tools.get_conda_prefix(), 'lib')
+                            if tools.get_conda_prefix() else False
+                        }
+                    }
+                }
+            }},
         'c_wrappers': {
             'source': 'c_wrappers.c',
             'language': 'c',
@@ -428,11 +451,11 @@ class FortranModelDriver(CompiledModelDriver):
         checking environment variables for default settings.
         """
         CompiledModelDriver.before_registration(cls)
-        cxx_compiler = find_compilation_tool('compiler', 'c++',
-                                             allow_failure=True)
+        cxx_compiler = _tool_registry.tool('compiler', language='c++',
+                                           default=None)
         if platform._is_win and cxx_compiler:  # pragma: debug
             msg_error = None
-            cxx_compiler = get_compilation_tool('compiler', cxx_compiler)
+            cxx_compiler = _tool_registry.tool('compiler', cxx_compiler)
             if cxx_compiler.toolname != 'cl++':
                 msg_error = "The MSVC compiler is not selected for C/C++"
             elif not cxx_compiler.is_installed():
@@ -447,41 +470,21 @@ class FortranModelDriver(CompiledModelDriver):
                     f"differences in the internal structure of FILE* "
                     f"objects between MSVC and other standards.")
 
-    @classmethod
-    def set_env_class(cls, **kwargs):
-        r"""Set environment variables that are instance independent.
+    def create_model_dep(self, **kwargs):
+        r"""Get a CompilationDependency instance associated with the
+        model.
 
         Args:
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method and update_ld_library_path.
+            **kwargs: Additional keyword arguments are passed to
+                CompilationDependency.create_target with defaults set
+                based on the model's parameters.
 
         Returns:
-            dict: Environment variables for the model process.
-
-        """
-        out = super(FortranModelDriver, cls).set_env_class(**kwargs)
-        out = CModelDriver.CModelDriver.set_env_class(
-            existing=out, add_libpython_dir=True, toolname=kwargs.get('toolname', None))
-        out = CModelDriver.CCompilerBase.set_env(out)
-        conda_prefix = tools.get_conda_prefix()
-        if conda_prefix and platform._is_mac:
-            out.setdefault('DYLD_FALLBACK_LIBRARY_PATH',
-                           os.path.join(conda_prefix, 'lib'))
-        return out
-
-    def compile_model(self, **kwargs):
-        r"""Compile model executable(s).
-
-        Args:
-            **kwargs: Keyword arguments are passed to the parent class's
-            method.
-
-        Returns:
-            str: Compiled model file path.
+            CompilationDependency: New compilation target for the model.
 
         """
         kwargs.setdefault('standard', self.standard)
-        return super(FortranModelDriver, self).compile_model(**kwargs)
+        return super(FortranModelDriver, self).create_model_dep(**kwargs)
 
     # def on_error_code(self, code):
     #     r"""Perform actions in response to an error code returned by

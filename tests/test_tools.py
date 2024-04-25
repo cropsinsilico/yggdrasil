@@ -43,16 +43,20 @@ def test_ProxyObject():
     bool(x)
     hash(x)
     x(1)
-    assert(x == 1)
+    assert x == 1
     for k in ['a', 'b']:
         delattr(x, k)
-        assert(not hasattr(x, k))
+        assert not hasattr(x, k)
 
 
 def make_temp(fname_base, count=1):
     r"""Create temporary copies of same file with different extensions."""
     fname_base = fname_base.lower()
-    tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
+    tempdir = os.path.join(
+        os.path.normcase(os.path.normpath(tempfile.gettempdir())),
+        'test')
+    if not os.path.isdir(tempdir):
+        os.mkdir(tempdir)
     if (tempdir + os.pathsep) not in os.environ['PATH']:
         os.environ['PATH'] = os.pathsep.join([tempdir, os.environ.get('PATH')])
     fname_pattern = fname_base + '.*'
@@ -86,7 +90,7 @@ def test_bytes2str():
             ([b'a', b'b'], ['a', 'b']),
             ([b'a', [b'b', b'c']], ['a', ['b', 'c']])]
     for x, exp in vals:
-        assert(tools.bytes2str(x, recurse=True) == exp)
+        assert tools.bytes2str(x, recurse=True) == exp
 
 
 def test_str2bytes():
@@ -98,7 +102,7 @@ def test_str2bytes():
             (['a', 'b'], [b'a', b'b']),
             (['a', ['b', 'c']], [b'a', [b'b', b'c']])]
     for x, exp in vals:
-        assert(tools.str2bytes(x, recurse=True) == exp)
+        assert tools.str2bytes(x, recurse=True) == exp
 
 
 def test_timer_context():
@@ -166,9 +170,9 @@ def test_get_python_c_library():
 
 def test_is_language_alias():
     r"""Test is_language_alias."""
-    assert(tools.is_language_alias('c++', 'cpp'))
-    assert(tools.is_language_alias('r', 'R'))
-    assert(tools.is_language_alias('MATLAB', 'matlab'))
+    assert tools.is_language_alias('c++', 'cpp')
+    assert tools.is_language_alias('r', 'R')
+    assert tools.is_language_alias('MATLAB', 'matlab')
     
 
 def test_get_supported():
@@ -186,41 +190,41 @@ def test_get_installed():
 
 def test_is_comm_installed():
     r"""Test is_comm_installed for any."""
-    assert(tools.is_comm_installed('zmq', language='any'))
+    assert tools.is_comm_installed('zmq', language='any')
 
 
 def test_locate_file():
     r"""Test file location method."""
     # Missing file
-    assert(not tools.locate_file('missing_file.fake'))
-    assert(not tools.locate_file(['missing_file.fake']))
+    assert not tools.locate_file('missing_file.fake')
+    assert not tools.locate_file(['missing_file.fake'])
     # Single file
     sdir, spat, sans = make_temp_single()
     sout = tools.locate_file(spat, verification_func=os.path.isfile)
-    assert(isinstance(sout, (bytes, str)))
-    assert(sout == sans[0])
+    assert isinstance(sout, (bytes, str))
+    assert sout == sans[0]
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     with pytest.warns(RuntimeWarning):
         mout = tools.locate_file([mpat], show_alternates=True)
-        assert(isinstance(mout, (bytes, str)))
-        assert(mout == mans[0])
+        assert isinstance(mout, (bytes, str))
+        assert mout == mans[0]
     
 
 def test_find_all():
     r"""Test find_all."""
     # Missing file
-    assert(not tools.find_all('missing_file.fake', 'invalid'))
+    assert not tools.find_all('missing_file.fake', 'invalid')
     # Single file
     sdir, spat, sans = make_temp_single()
     sout = tools.find_all(spat, sdir)
-    assert(isinstance(sout, list))
-    assert(sout == sans)
+    assert isinstance(sout, list)
+    assert sout == sans
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     mout = tools.find_all(mpat, mdir)
-    assert(isinstance(mout, list))
-    assert(mout == mans)
+    assert isinstance(mout, list)
+    assert mout == mans
 
 
 def test_locate_path():
@@ -229,13 +233,13 @@ def test_locate_path():
     fdir, fname = os.path.split(__file__)
     basedir = os.path.dirname(fdir)
     fpath = tools.locate_path(fname, basedir=basedir)
-    assert(fpath)
-    assert(__file__ in fpath)
-    # assert(__file__ == fpath)
+    assert fpath
+    assert __file__ in fpath
+    # assert __file__ == fpath
     # Search for invalid file
     fname = 'invalid_file.ext'
     fpath = tools.locate_path(fname, basedir=basedir)
-    assert(not fpath)
+    assert not fpath
 
 
 def test_popen_nobuffer():
@@ -249,7 +253,7 @@ def test_popen_nobuffer():
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
     res = tools.bytes2str(out).splitlines()[0]
-    assert(res == ans)
+    assert res == ans
     # Test w/ shell
     if platform._is_win:  # pragma: windows
         args = 'cd'
@@ -258,17 +262,17 @@ def test_popen_nobuffer():
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
     res = tools.bytes2str(out).splitlines()[0]
-    assert(res == ans)
+    assert res == ans
 
 
 def test_eval_kwarg():
     r"""Ensure strings & objects properly evaluated."""
     vals = [None, True, False, ['one', 'two'], 'one']
     for v in vals:
-        assert(tools.eval_kwarg(v) == v)
-        assert(tools.eval_kwarg(str(v)) == v)
-    assert(tools.eval_kwarg("'one'") == 'one')
-    assert(tools.eval_kwarg('"one"') == 'one')
+        assert tools.eval_kwarg(v) == v
+        assert tools.eval_kwarg(str(v)) == v
+    assert tools.eval_kwarg("'one'") == 'one'
+    assert tools.eval_kwarg('"one"') == 'one'
 
 
 class TestYggClass(base_class):
@@ -324,7 +328,7 @@ class TestYggClass(base_class):
         r"""Test functionality of timeout."""
         # Test w/o timeout
         instance.start_timeout(10, key='fake_key')
-        assert(not instance.check_timeout(key='fake_key'))
+        assert not instance.check_timeout(key='fake_key')
         # Test errors
         with pytest.raises(KeyError):
             instance.start_timeout(0.1, key='fake_key')
@@ -339,5 +343,5 @@ class TestYggClass(base_class):
         T = instance.start_timeout(0.001)  # instance.sleeptime)
         while not T.is_out:
             instance.sleep()
-        assert(instance.check_timeout())
+        assert instance.check_timeout()
         instance.stop_timeout(quiet=True)

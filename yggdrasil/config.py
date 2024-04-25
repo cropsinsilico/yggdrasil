@@ -215,7 +215,7 @@ class YggConfigParser(configparser.ConfigParser, object):
         """
         out = default
         if return_all:
-            out = {}
+            out = OrderedDict()
         if self.has_section(section):
             regex = re.compile(option)
             for k in self[section]:

@@ -484,9 +484,7 @@ LANG2EXT_FULL = {
         '.tcc', '.hpp', '.HPP', '.hxx', '.H', '.h++',
         '.hh', '.hp', '.h',
     ],
-    'cmake': [
-        '.c', '.h',
-    ],
+    'cmake': [],
     'cpp': [
         '.cpp', '.CPP', '.cxx', '.C', '.c++', '.cc', '.cp',
         '.tcc', '.hpp', '.HPP', '.hxx', '.H', '.h++',
@@ -510,9 +508,7 @@ LANG2EXT_FULL = {
     'lpy': [
         '.lpy',
     ],
-    'make': [
-        '.c', '.h',
-    ],
+    'make': [],
     'matlab': [
         '.m',
     ],
@@ -553,7 +549,7 @@ EXT2LANG_FULL = {
         'R', 'r',
     ],
     '.c': [
-        'c', 'cmake', 'make',
+        'c',
     ],
     '.c++': [
         'c++', 'cpp', 'cxx',
@@ -583,8 +579,7 @@ EXT2LANG_FULL = {
         'fortran',
     ],
     '.h': [
-        'c', 'c++', 'cmake', 'cpp', 'cxx', 'fortran',
-        'make',
+        'c', 'c++', 'cpp', 'cxx', 'fortran',
     ],
     '.h++': [
         'c++', 'cpp', 'cxx',
@@ -728,7 +723,7 @@ COMPILATION_TOOL_VARS = {
         'exec': 'CXX',
         'flags': 'CXXFLAGS',
     },
-    'cmake': {
+    'dumpbin': {
         'exec': None,
         'flags': None,
     },
@@ -752,11 +747,11 @@ COMPILATION_TOOL_VARS = {
         'exec': 'LIBTOOL',
         'flags': None,
     },
-    'make': {
+    'objdump': {
         'exec': None,
         'flags': None,
     },
-    'nmake': {
+    'otool': {
         'exec': None,
         'flags': None,
     },

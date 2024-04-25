@@ -18,6 +18,9 @@ __pycache__/
 *.dll
 *.dylib
 yggdrasil/languages/C/stdint.h
+yggdrasil/languages/C/*.cmake
+yggdrasil/languages/CPP/*.cmake
+yggdrasil/languages/fortran/*.cmake
 
 # R build things
 yggdrasil/languages/R/..Rcheck
