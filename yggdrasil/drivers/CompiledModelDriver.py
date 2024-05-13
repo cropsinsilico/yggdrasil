@@ -5188,7 +5188,7 @@ class CompilerBase(CompilationToolBase):
 
     """
     tooltype = 'compiler'
-    associated_tooltypes = ['linker', 'archiver', 'disassembler']
+    associated_tooltypes = ['linker', 'archiver']  # , 'disassembler']
     builtin_next_stage = 'linker'  # Most compiler's also link
     no_additional_stages_flag = '-c'
     input_filetypes = ['source']
