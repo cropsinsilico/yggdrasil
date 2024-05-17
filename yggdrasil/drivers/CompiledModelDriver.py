@@ -2173,7 +2173,7 @@ class CompilationDependency(object):
             return self.tool('linker')
         elif libtype in self.archived_files:
             return self.tool('archiver')
-        elif libtype in self.compiled_files:
+        elif libtype in self.compiled_files + ['include']:
             return self.tool('compiler')
         elif libtype == 'configuration':
             return self.tool('configurer')
@@ -3644,7 +3644,7 @@ class CompilationDependency(object):
                 + tools.escape_regex(fname_ext))
         else:
             fname = fname_base + '*' + fname_ext
-        search_list = self.basetool.get_search_path(
+        search_list = self.tool(libtype).get_search_path(
             libtype=libtype, cfg=self.cfg, **kwargs)
         out = tools.locate_file(fname, directory_list=search_list,
                                 environment_variable=None,
@@ -3678,7 +3678,8 @@ class CompilationDependency(object):
             if out:
                 logger.info(f'Located {fname}: {out}')
             else:
-                logger.info(f"Could not locate {fname} (search_list = "
+                logger.info(f"Could not locate {libtype} "
+                            f"{fname} (search_list = "
                             f"\n\t" + '\n\t'.join(search_list) + ')')
         return out
 
