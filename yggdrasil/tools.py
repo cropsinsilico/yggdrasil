@@ -623,6 +623,7 @@ def find_all(name, path, verification_func=None, use_regex=False):
     """
     result = []
     try:
+        shell = False
         if platform._is_win:  # pragma: windows
             assert not use_regex
             if path is None:
@@ -636,10 +637,13 @@ def find_all(name, path, verification_func=None, use_regex=False):
         else:
             args = ["find", "-L", path, "-type", "f"]
             if use_regex:
-                args += ["-regex", '.*' + name]
+                args += ["-regex", r'.*' + name]
+                args.insert(1, "-E")
+                args = ' '.join(args)
+                shell = True
             else:
                 args += ["-name", name]
-            pfind = subprocess.Popen(args, env=os.environ,
+            pfind = subprocess.Popen(args, env=os.environ, shell=shell,
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE)
             (stdoutdata, stderrdata) = pfind.communicate()

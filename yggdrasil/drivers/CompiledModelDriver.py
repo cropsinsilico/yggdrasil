@@ -3638,9 +3638,9 @@ class CompilationDependency(object):
         use_regex = (not platform._is_win)
         if use_regex:
             fname = (
-                '[^a-zA-Z]'
+                r'[^a-zA-Z]'
                 + tools.escape_regex(fname_base)
-                + '[^a-zA-Z].*'
+                + r'\([^a-zA-Z].*\)?'
                 + tools.escape_regex(fname_ext))
         else:
             fname = fname_base + '*' + fname_ext
