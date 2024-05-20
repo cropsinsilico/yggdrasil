@@ -622,19 +622,23 @@ def find_all(name, path, verification_func=None, use_regex=False):
 
     """
     result = []
+    args = []
     try:
-        shell = False
         if platform._is_win:  # pragma: windows
             assert not use_regex
+            args = ["where"]
             if path is None:
-                out = subprocess.check_output(["where", name],
+                args += [name]
+                out = subprocess.check_output(args,
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
             else:
-                out = subprocess.check_output(["where", "/r", path, name],
+                args += ["/r", path, name]
+                out = subprocess.check_output(args,
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
         else:
+            shell = False
             args = ["find", "-L", path, "-type", "f"]
             if use_regex:
                 args += ["-regex", r'.*' + name]
@@ -646,14 +650,17 @@ def find_all(name, path, verification_func=None, use_regex=False):
             pfind = subprocess.Popen(args, env=os.environ, shell=shell,
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE)
+            if isinstance(args, list):
+                args = ' '.join(args)
             (stdoutdata, stderrdata) = pfind.communicate()
             out = stdoutdata
             for line in stderrdata.splitlines():
                 if b'Permission denied' not in line:
                     raise subprocess.CalledProcessError(pfind.returncode,
-                                                        ' '.join(args),
+                                                        args,
                                                         output=stderrdata)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        logger.info(f"Error in called process \'{args}\': {e}")
         out = ''
     if not out.isspace():
         result = sorted(out.splitlines())
