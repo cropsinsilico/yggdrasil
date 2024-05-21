@@ -803,7 +803,7 @@ class ygginfo(SubCommand):
                         '\n\t'.join(contents.splitlines()))))
                 # R and reticulate info
                 Rdrv = import_component("model", "R")
-                if Rdrv.is_installed():
+                if Rdrv.is_language_installed():
                     env_reticulate = copy.deepcopy(os.environ)
                     env_reticulate['RETICULATE_PYTHON'] = sys.executable
                     # Stack size
@@ -841,6 +841,7 @@ class ygginfo(SubCommand):
                          % (curr_prefix + prefix,
                             ("\n" + curr_prefix + prefix).join(
                                 out.splitlines(False)))))
+                if Rdrv.is_installed():
                     # Reticulate conda_list
                     if os.environ.get('CONDA_PREFIX', ''):
                         if platform._is_win:  # pragma: windows
