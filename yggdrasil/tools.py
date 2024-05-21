@@ -602,7 +602,24 @@ def escape_regex(name):
     return out
 
 
-def find_all(name, path, verification_func=None, use_regex=False):
+def convert_regex_to_find(name):
+    r"""Convert a regex pattern for fortran to the format expected by the
+    linux find command.
+
+    Args:
+        name (str): Pattern to convert.
+
+    Returns:
+        str: Converted pattern,
+
+    """
+    out = re.sub(r'(^|(?:[^\\]))\(', r'\1\(', name)
+    out = re.sub(r'(^|(?:[^\\]))\)', r'\1\)', out)
+    return out
+
+
+def find_all(name, path, verification_func=None, use_regex=False,
+             use_glob=False):
     r"""Find all instances of a file with a given name within the directory
     tree starting at a given path.
 
@@ -616,6 +633,9 @@ def find_all(name, path, verification_func=None, use_regex=False):
             otherwise. Defaults to None and is ignored.
         use_regex (bool, optional): If True, use full regex to interpret
             name and locate files.
+        use_glob (bool, str, optional): If True or string, use glob
+            to locate the file. If use_regex is True, a string must be
+            provided containing the glob search expression.
 
     Returns:
         list: All instances of the specified file.
@@ -623,47 +643,60 @@ def find_all(name, path, verification_func=None, use_regex=False):
     """
     result = []
     args = []
-    try:
-        if platform._is_win:  # pragma: windows
-            assert not use_regex
-            args = ["where"]
-            if path is None:
-                args += [name]
-                out = subprocess.check_output(args,
-                                              env=os.environ,
-                                              stderr=subprocess.STDOUT)
+    if use_glob:
+        fglob = os.path.join(path, name)
+        if use_regex:
+            assert isinstance(use_glob, str)
+            fglob = os.path.join(path, use_glob)
+        result = glob.glob(fglob)
+        if use_regex:
+            result = [
+                x for x in result
+                if re.fullmatch(r'.*' + name, x)]
+    else:
+        try:
+            if platform._is_win:  # pragma: windows
+                assert not use_regex
+                args = ["where"]
+                if path is None:
+                    args += [name]
+                    out = subprocess.check_output(
+                        args, env=os.environ,
+                        stderr=subprocess.STDOUT)
+                else:
+                    args += ["/r", path, name]
+                    out = subprocess.check_output(
+                        args, env=os.environ,
+                        stderr=subprocess.STDOUT)
             else:
-                args += ["/r", path, name]
-                out = subprocess.check_output(args,
-                                              env=os.environ,
-                                              stderr=subprocess.STDOUT)
-        else:
-            shell = False
-            args = ["find", "-L", path, "-type", "f"]
-            if use_regex:
-                args += ["-regex", r'.*' + name]
-                args.insert(1, "-E")
-                args = ' '.join(args)
-                shell = True
-            else:
-                args += ["-name", name]
-            pfind = subprocess.Popen(args, env=os.environ, shell=shell,
-                                     stderr=subprocess.PIPE,
-                                     stdout=subprocess.PIPE)
-            if isinstance(args, list):
-                args = ' '.join(args)
-            (stdoutdata, stderrdata) = pfind.communicate()
-            out = stdoutdata
-            for line in stderrdata.splitlines():
-                if b'Permission denied' not in line:
-                    raise subprocess.CalledProcessError(pfind.returncode,
-                                                        args,
-                                                        output=stderrdata)
-    except subprocess.CalledProcessError as e:
-        logger.info(f"Error in called process \'{args}\': {e}")
-        out = ''
-    if not out.isspace():
-        result = sorted(out.splitlines())
+                shell = False
+                args = ["find", "-L", path, "-type", "f"]
+                if use_regex:
+                    name = convert_regex_to_find(name)
+                    args += ["-regex", r'.*' + name]
+                    args.insert(1, "-E")
+                    args = ' '.join(args)
+                    shell = True
+                else:
+                    args += ["-name", name]
+                pfind = subprocess.Popen(
+                    args, env=os.environ, shell=shell,
+                    stderr=subprocess.PIPE,
+                    stdout=subprocess.PIPE)
+                if isinstance(args, list):
+                    args = ' '.join(args)
+                (stdoutdata, stderrdata) = pfind.communicate()
+                out = stdoutdata
+                for line in stderrdata.splitlines():
+                    if b'Permission denied' not in line:
+                        raise subprocess.CalledProcessError(
+                            pfind.returncode, args,
+                            output=stderrdata)
+        except subprocess.CalledProcessError as e:
+            logger.info(f"Error in called process \'{args}\': {e}")
+            out = ''
+        if not out.isspace():
+            result = sorted(out.splitlines())
     result = [os.path.normcase(os.path.normpath(bytes2str(m)))
               for m in result]
     if verification_func is not None:
@@ -672,7 +705,7 @@ def find_all(name, path, verification_func=None, use_regex=False):
 
 
 def locate_file(fname, environment_variable='PATH', directory_list=None,
-                show_alternates=False, **kwargs):
+                show_alternates=False, select_return='first', **kwargs):
     r"""Locate a file within a set of paths defined by a list or environment
     variable.
 
@@ -693,6 +726,12 @@ def locate_file(fname, environment_variable='PATH', directory_list=None,
         show_alternates (bool, optional): If True and there is more
             than one match, the alternate matches will be printed in
             a warning message. Defaults to False.
+        select_return (str, optional): Method that should be used to select
+            the returned value if there is more than one option.
+              'first'   : Return the first value, alphabetically sorted.
+              'last'    : Return the last value, alphabetically sorted.
+              'longest' : Return the longest value.
+              'shortest': Return the shortest value.
         **kwargs: Additional keyword arguments are passed to find_all.
 
     Returns:
@@ -705,13 +744,15 @@ def locate_file(fname, environment_variable='PATH', directory_list=None,
         for ifname in fname:
             out = locate_file(ifname, environment_variable=environment_variable,
                               directory_list=directory_list,
-                              show_alternates=show_alternates, **kwargs)
+                              show_alternates=show_alternates,
+                              select_return=select_return, **kwargs)
             if out:
                 break
         return out
     out = []
     if ((platform._is_win and (environment_variable == 'PATH')
-         and (directory_list is None))):  # pragma: windows
+         and (directory_list is None)
+         and not kwargs.get('use_glob', False))):  # pragma: windows
         out += find_all(fname, None, **kwargs)
     else:
         if directory_list is None:
@@ -728,15 +769,24 @@ def locate_file(fname, environment_variable='PATH', directory_list=None,
                 break
     if not out:
         return False
+    if len(out) > 1:
+        if select_return in ['first', 'last']:
+            out = sorted(out)
+        elif select_return in ['longest', 'shortest']:
+            out = sorted(out, key=len)
+        else:  # pragma: debug
+            raise NotImplementedError(select_return)
+        if select_return in ['last', 'longest']:
+            out = out[::-1]
     first = out[0]
     if show_alternates:  # pragma: debug
         out = set(out)
         out.remove(first)
         if len(out) > 0:
-            warnings.warn(("More than one (%d) match to %s:\n%s\n "
-                           + "Using first match (%s)") %
-                          (len(out) + 1, fname, pprint.pformat(out),
-                           first), RuntimeWarning)
+            warnings.warn(
+                f"More than one ({len(out) + 1}) match to {fname}:\n"
+                f"{pprint.pformat(out)}\n "
+                f"Using {select_return} match ({first})", RuntimeWarning)
     return first
 
 

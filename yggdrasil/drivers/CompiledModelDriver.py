@@ -3635,33 +3635,32 @@ class CompilationDependency(object):
                 fname_ext = expected_ext[0]
         if os.path.isfile(fname):
             return fname
-        use_regex = (not platform._is_win)
-        if use_regex:
-            fname = (
-                r'[^a-zA-Z]'
-                + tools.escape_regex(fname_base)
-                + r'\([^a-zA-Z].*\)?'
-                + tools.escape_regex(fname_ext))
-        else:
-            fname = fname_base + '*' + fname_ext
+        use_regex = True  # (not platform._is_win)
+        fname_try = [fname_base]
+        if platform._is_win and libtype in self.library_files:
+            if fname_base.startswith('lib'):
+                fname_try.append(fname_base[3:])
+            else:
+                fname_try.append('lib' + fname_try)
         search_list = self.tool(libtype).get_search_path(
             libtype=libtype, cfg=self.cfg, **kwargs)
-        out = tools.locate_file(fname, directory_list=search_list,
-                                environment_variable=None,
-                                use_regex=use_regex)
-        if (not out) and use_regex:
-            fname = fname_base + '*' + fname_ext
+        for fname_base in fname_try:
+            use_glob = fname_base + '*' + fname_ext
+            if use_regex:
+                fname = (
+                    r'[^a-zA-Z]'
+                    + tools.escape_regex(fname_base)
+                    + r'([^a-zA-Z].*)?'
+                    + tools.escape_regex(fname_ext))
+            else:
+                fname = use_glob
             out = tools.locate_file(fname, directory_list=search_list,
                                     environment_variable=None,
-                                    use_regex=False)
-        if (((not out) and platform._is_win
-             and libtype in self.library_files)):
-            if fname.startswith('lib'):
-                alt = fname[3:]
-            else:
-                alt = 'lib' + fname
-            out = tools.locate_file(alt, directory_list=search_list,
-                                    environment_variable=None)
+                                    use_regex=use_regex,
+                                    use_glob=use_glob,
+                                    select_return='shortest')
+            if out:
+                break
         if ((out and not dont_check_windows_import
              and libtype in ['static', 'windows_import']
              and platform._is_win)):  # pragma: windows
