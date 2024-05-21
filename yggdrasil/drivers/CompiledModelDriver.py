@@ -3649,6 +3649,11 @@ class CompilationDependency(object):
         out = tools.locate_file(fname, directory_list=search_list,
                                 environment_variable=None,
                                 use_regex=use_regex)
+        if (not out) and use_regex:
+            fname = fname_base + '*' + fname_ext
+            out = tools.locate_file(fname, directory_list=search_list,
+                                    environment_variable=None,
+                                    use_regex=False)
         if (((not out) and platform._is_win
              and libtype in self.library_files)):
             if fname.startswith('lib'):
