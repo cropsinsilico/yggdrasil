@@ -2816,16 +2816,6 @@ definitions:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
-      disassembler:
-        description: Name of disassembler that should be used to build the model
-        type: string
-      disassembler_flags:
-        default: []
-        description: Flags that should be passed to the disassemblerwhen building
-          the model
-        items:
-          type: string
-        type: array
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -3400,16 +3390,6 @@ definitions:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
-      disassembler:
-        description: Name of disassembler that should be used to build the model
-        type: string
-      disassembler_flags:
-        default: []
-        description: Flags that should be passed to the disassemblerwhen building
-          the model
-        items:
-          type: string
-        type: array
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -3640,16 +3620,6 @@ definitions:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
-      disassembler:
-        description: Name of disassembler that should be used to build the model
-        type: string
-      disassembler_flags:
-        default: []
-        description: Flags that should be passed to the disassemblerwhen building
-          the model
-        items:
-          type: string
-        type: array
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -3821,16 +3791,6 @@ definitions:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
-      disassembler:
-        description: Name of disassembler that should be used to build the model
-        type: string
-      disassembler_flags:
-        default: []
-        description: Flags that should be passed to the disassemblerwhen building
-          the model
-        items:
-          type: string
-        type: array
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
