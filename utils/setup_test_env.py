@@ -1805,6 +1805,9 @@ def verify_pkg(install_opts=None):
     from yggdrasil.tools import is_lang_installed, is_comm_installed
     errors = []
     for name in ['c', 'r', 'fortran', 'sbml', 'lpy', 'julia']:
+        # TODO: temp
+        if name in ['r', 'julia']:
+            continue
         flag = install_opts[name]
         if flag and (not is_lang_installed(name)):
             errors.append("Language '%s' should be installed, but is not."

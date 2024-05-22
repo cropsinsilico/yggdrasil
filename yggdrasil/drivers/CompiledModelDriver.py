@@ -42,6 +42,49 @@ _buildfile_locks = {}
 _library_types = ['include', 'static', 'shared', 'windows_import']
 
 
+def get_OSX_SYSROOT():
+    r"""Determin the path to the OSX SDK.
+
+    Returns:
+        str: Full path to the SDK directory if one is located. None
+            otherwise.
+
+    """
+    fname = None
+    if platform._is_mac:
+        from yggdrasil.config import ygg_cfg
+        try:
+            xcode_dir = subprocess.check_output(
+                'echo "$(xcode-select -p)"', shell=True).decode("utf-8").strip()
+        except BaseException:  # pragma: debug
+            xcode_dir = None
+        fname_try = []
+        cfg_sdkroot = ygg_cfg.get('c', 'macos_sdkroot', None)
+        if cfg_sdkroot:
+            fname_try.append(cfg_sdkroot)
+        if os.environ.get('SDKROOT', False):
+            fname_try.append(os.environ['SDKROOT'])
+        if xcode_dir is not None:
+            bases_try = [
+                os.path.join(xcode_dir, 'SDKs', 'MacOSX%s.sdk'),
+                os.path.join(xcode_dir, 'Platforms',
+                             'MacOSX.platform', 'Developer',
+                             'SDKs', 'MacOSX%s.sdk')]
+            vers_try = ['11.0', '']  # 11.0 used by conda-forge
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
+                vers_try.insert(0, os.environ['MACOSX_DEPLOYMENT_TARGET'])
+            for v in vers_try:
+                fname_try += [x % v for x in bases_try]
+        for fcheck in fname_try:
+            if os.path.isdir(fcheck):
+                fname = fcheck
+                break
+    return fname
+
+
+_osx_sysroot = get_OSX_SYSROOT()
+
+
 class CompilationToolError(Exception):
     r"""Class for errors related to compilation tools"""
     pass
@@ -3460,6 +3503,23 @@ class CompilationDependency(object):
                 out[env_var] = os.pathsep.join(path_list)
         return out
 
+    @classmethod
+    def _update_env_val(cls, k, v, out, to_update=None):
+        if to_update is None:
+            to_update = out
+        append_char = None
+        overwrite = False
+        if isinstance(v, dict):
+            append_char = v.get('append', None)
+            overwrite = v.get('overwrite', False)
+            v = v['value']
+        if not v:
+            return
+        if overwrite or k not in to_update:
+            out[k] = v
+        elif append_char:
+            out[k] = to_update[k] + append_char + v
+
     def _update_env(self, vals, to_update=None, out=None,
                     dont_update_return=False):
         if to_update is None:
@@ -3472,18 +3532,7 @@ class CompilationDependency(object):
         else:
             to_update.update(out)
         for k, v in vals.items():
-            append_char = None
-            overwrite = False
-            if isinstance(v, dict):
-                append_char = v.get('append', None)
-                overwrite = v.get('overwrite', False)
-                v = v['value']
-            if not v:
-                continue
-            if overwrite or k not in to_update:
-                out[k] = v
-            elif append_char:
-                out[k] = to_update[k] + append_char + v
+            self._update_env_val(k, v, out, to_update=to_update)
         return out
 
     def _generic_env(self, key, to_update=None, for_build=False,
@@ -3584,12 +3633,16 @@ class CompilationDependency(object):
         if not flags:
             if self.origin == 'standard':
                 flags.append(f'-l{self.name}')
-        for lib in self.basetool.find_component(
-                self.name, cfg=self.cfg, flags=flags,
-                component_types='shared_libraries', **kwargs):
-            out = self._search_brute(lib, libtype='shared', **kwargs)
-            if out:
-                break
+        try:
+            for lib in self.basetool.find_component(
+                    self.name, cfg=self.cfg, flags=flags,
+                    component_types='shared_libraries', **kwargs):
+                out = self._search_brute(lib, libtype='shared', **kwargs)
+                if out:
+                    break
+        except RuntimeError as e:
+            logger.debug(f"Error in using diassembly to locate "
+                         f"\'{self.name}\': {e}")
         return out
 
     def _search_brute(self, fname, libtype=None, verbose=False,
@@ -3635,7 +3688,7 @@ class CompilationDependency(object):
                 fname_ext = expected_ext[0]
         if os.path.isfile(fname):
             return fname
-        use_regex = True  # (not platform._is_win)
+        # use_regex = (not platform._is_win)
         fname_try = [fname_base]
         if platform._is_win and libtype in self.library_files:
             if fname_base.startswith('lib'):
@@ -3645,19 +3698,15 @@ class CompilationDependency(object):
         search_list = self.tool(libtype).get_search_path(
             libtype=libtype, cfg=self.cfg, **kwargs)
         for fname_base in fname_try:
-            use_glob = fname_base + '*' + fname_ext
-            if use_regex:
-                fname = (
-                    r'[^a-zA-Z]'
-                    + tools.escape_regex(fname_base)
-                    + r'([^a-zA-Z].*)?'
-                    + tools.escape_regex(fname_ext))
-            else:
-                fname = use_glob
+            fname = fname_base + '*' + fname_ext
+            use_regex = (
+                r'[^a-zA-Z]'
+                + tools.escape_regex(fname_base)
+                + r'([^a-zA-Z].*)?'
+                + tools.escape_regex(fname_ext))
             out = tools.locate_file(fname, directory_list=search_list,
                                     environment_variable=None,
                                     use_regex=use_regex,
-                                    use_glob=use_glob,
                                     select_return='shortest')
             if out:
                 break
@@ -3715,6 +3764,11 @@ class CompilationToolBase(object):
             [REQUIRED]
         platforms (list): Platforms that the tool is available on. Defaults to
             ['Windows', 'MacOS', 'Linux'].
+        env (dict): Environment variables that should be updated when
+            calling the tool.
+        env_platform_specific (dict): Mapping of platform specific
+            environment variables that should be updated when calling the
+            tool.
         default_executable (str): The default tool executable command if
             different than the toolname.
         default_executable_env (str): Environment variable where the executable
@@ -3824,6 +3878,27 @@ class CompilationToolBase(object):
     output_filetypes = []
     languages = []
     platforms = ['Windows', 'MacOS', 'Linux']  # all by default
+    env = {}
+    env_platform_specific = {
+        'MacOS': {
+            'CONDA_BUILD_SYSROOT': {
+                'value': _osx_sysroot,
+                'overwrite': True,
+            },
+            'SDKROOT': {
+                'value': _osx_sysroot,
+                'overwrite': True,
+            },
+            'MACOSX_DEPLOYMENT_TARGET': {
+                'value': (
+                    re.search(
+                        r'MacOSX(?P<target>[0-9]+\.[0-9]+)?',
+                        _osx_sysroot).groupdict()['target']
+                    if _osx_sysroot else False),
+                'overwrite': True,
+            },
+        }
+    }
     default_executable = None
     default_executable_env = None
     default_flags = []
@@ -4138,6 +4213,10 @@ class CompilationToolBase(object):
         if existing is None:
             existing = {}
             existing.update(os.environ)
+        for k, v in dict(cls.env, **cls.env_platform_specific.get(
+                platform._platform, {})).items():
+            CompilationDependency._update_env_val(k, v, existing,
+                                                  to_update=existing)
         if not cls.env_matches_tool():
             config_vars = {}
             cls.env_matches_tool(use_sysconfig=True, env=config_vars)

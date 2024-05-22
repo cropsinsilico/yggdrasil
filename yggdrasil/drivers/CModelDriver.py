@@ -9,9 +9,9 @@ import logging
 from collections import OrderedDict
 from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
+    _osx_sysroot)
 from yggdrasil.languages import get_language_dir
-from yggdrasil.config import ygg_cfg
 logger = logging.getLogger(__name__)
 if platform._is_win:
     logger.setLevel(level=logging.DEBUG)
@@ -19,48 +19,6 @@ if platform._is_win:
 
 _default_internal_libtype = 'object'
 _top_lang_dir = get_language_dir('c')
-
-
-def get_OSX_SYSROOT():
-    r"""Determin the path to the OSX SDK.
-
-    Returns:
-        str: Full path to the SDK directory if one is located. None
-            otherwise.
-
-    """
-    fname = None
-    if platform._is_mac:
-        try:
-            xcode_dir = subprocess.check_output(
-                'echo "$(xcode-select -p)"', shell=True).decode("utf-8").strip()
-        except BaseException:  # pragma: debug
-            xcode_dir = None
-        fname_try = []
-        cfg_sdkroot = ygg_cfg.get('c', 'macos_sdkroot', None)
-        if cfg_sdkroot:
-            fname_try.append(cfg_sdkroot)
-        if os.environ.get('SDKROOT', False):
-            fname_try.append(os.environ['SDKROOT'])
-        if xcode_dir is not None:
-            bases_try = [
-                os.path.join(xcode_dir, 'SDKs', 'MacOSX%s.sdk'),
-                os.path.join(xcode_dir, 'Platforms',
-                             'MacOSX.platform', 'Developer',
-                             'SDKs', 'MacOSX%s.sdk')]
-            vers_try = ['11.0', '']  # 11.0 used by conda-forge
-            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', False):
-                vers_try.insert(0, os.environ['MACOSX_DEPLOYMENT_TARGET'])
-            for v in vers_try:
-                fname_try += [x % v for x in bases_try]
-        for fcheck in fname_try:
-            if os.path.isdir(fcheck):
-                fname = fcheck
-                break
-    return fname
-
-
-_osx_sysroot = get_OSX_SYSROOT()
 
 
 class CCompilerBase(CompilerBase):
@@ -502,26 +460,6 @@ class CModelDriver(CompiledModelDriver):
                         'compiler_flags': ['-fPIC'],
                         'external_dependencies': ['m'],
                     },
-                    'MacOS': {
-                        'global_env': {
-                            'CONDA_BUILD_SYSROOT': {
-                                'value': _osx_sysroot,
-                                'overwrite': True,
-                            },
-                            'SDKROOT': {
-                                'value': _osx_sysroot,
-                                'overwrite': True,
-                            },
-                            'MACOSX_DEPLOYMENT_TARGET': {
-                                'value': (
-                                    re.search(
-                                        r'MacOSX(?P<target>[0-9]+\.[0-9]+)?',
-                                        _osx_sysroot).groupdict()['target']
-                                    if _osx_sysroot else False),
-                                'overwrite': True,
-                            }
-                        }
-                    }
                 }},
         'regex_win32': {'name': 'regex',
                         'source': 'regex_win32.cpp',

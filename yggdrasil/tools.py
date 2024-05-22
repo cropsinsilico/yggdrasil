@@ -619,7 +619,7 @@ def convert_regex_to_find(name):
 
 
 def find_all(name, path, verification_func=None, use_regex=False,
-             use_glob=False):
+             use_os=False):
     r"""Find all instances of a file with a given name within the directory
     tree starting at a given path.
 
@@ -631,11 +631,12 @@ def find_all(name, path, verification_func=None, use_regex=False,
         verification_func (function, optional): Function that returns
             True when a file is valid and should be returned and False
             otherwise. Defaults to None and is ignored.
-        use_regex (bool, optional): If True, use full regex to interpret
-            name and locate files.
-        use_glob (bool, str, optional): If True or string, use glob
-            to locate the file. If use_regex is True, a string must be
-            provided containing the glob search expression.
+        use_regex (bool, str, optional): If True or string, use full
+            regex to interpret name and locate files. If a string is
+            provided, it will be used as the regex pattern, otherwise
+            name will be used. A string is required unless use_os is True
+        use_os (bool, optional): If True, use a system tool to search
+            for the file (find on unix, where on windows).
 
     Returns:
         list: All instances of the specified file.
@@ -643,17 +644,9 @@ def find_all(name, path, verification_func=None, use_regex=False,
     """
     result = []
     args = []
-    if use_glob:
-        fglob = os.path.join(path, name)
-        if use_regex:
-            assert isinstance(use_glob, str)
-            fglob = os.path.join(path, use_glob)
-        result = glob.glob(fglob)
-        if use_regex:
-            result = [
-                x for x in result
-                if re.fullmatch(r'.*' + name, x)]
-    else:
+    regex_pattern = use_regex if isinstance(use_regex, str) else name
+    regex_pattern = r'.*' + regex_pattern  # to match the directory
+    if use_os:
         try:
             if platform._is_win:  # pragma: windows
                 assert not use_regex
@@ -672,8 +665,8 @@ def find_all(name, path, verification_func=None, use_regex=False,
                 shell = False
                 args = ["find", "-L", path, "-type", "f"]
                 if use_regex:
-                    name = convert_regex_to_find(name)
-                    args += ["-regex", r'.*' + name]
+                    regex_pattern = convert_regex_to_find(regex_pattern)
+                    args += ["-regex", regex_pattern]
                     args.insert(1, "-E")
                     args = ' '.join(args)
                     shell = True
@@ -697,6 +690,11 @@ def find_all(name, path, verification_func=None, use_regex=False,
             out = ''
         if not out.isspace():
             result = sorted(out.splitlines())
+    else:
+        result = glob.glob(os.path.join(path, name))
+        if use_regex:
+            result = [
+                x for x in result if re.fullmatch(regex_pattern, x)]
     result = [os.path.normcase(os.path.normpath(bytes2str(m)))
               for m in result]
     if verification_func is not None:
@@ -752,7 +750,7 @@ def locate_file(fname, environment_variable='PATH', directory_list=None,
     out = []
     if ((platform._is_win and (environment_variable == 'PATH')
          and (directory_list is None)
-         and not kwargs.get('use_glob', False))):  # pragma: windows
+         and kwargs.get('use_os', False))):  # pragma: windows
         out += find_all(fname, None, **kwargs)
     else:
         if directory_list is None:
