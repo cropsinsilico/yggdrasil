@@ -275,9 +275,9 @@ jobs:
         conda deactivate
         conda activate base
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
-    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
-      if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
-      run: ./utils/setup_old_mac_sdk.sh
+    # - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
+    #   if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
+    #   run: ./utils/setup_old_mac_sdk.sh
     - name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
       if: runner.os == 'Linux' && matrix.install-sbml == true
       run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev

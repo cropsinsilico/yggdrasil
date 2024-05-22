@@ -167,6 +167,8 @@ class GPPLinker(GCCLinker):
     languages = GPPCompiler.languages
     default_executable = GPPCompiler.default_executable
     toolset = GPPCompiler.toolset
+    standard_library = GPPCompiler.standard_library
+    libraries = {}
 
 
 class ClangPPLinker(ClangLinker):

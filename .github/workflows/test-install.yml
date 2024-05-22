@@ -488,11 +488,6 @@ jobs:
         ${{ matrix.python-version }} --use-mamba
 
         '
-    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
     - if: runner.os == 'Linux' && matrix.install-sbml == true
       name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
       run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
@@ -895,11 +890,6 @@ jobs:
         ${{ matrix.python-version }} --use-mamba
 
         '
-    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
     - if: runner.os == 'Linux' && matrix.install-sbml == true
       name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
       run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
@@ -1278,11 +1268,6 @@ jobs:
         ${{ matrix.python-version }} --use-mamba
 
         '
-    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
     - if: runner.os == 'Linux' && matrix.install-sbml == true
       name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
       run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
@@ -1642,11 +1627,6 @@ jobs:
         ${{ matrix.python-version }} --use-mamba
 
         '
-    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
     - if: runner.os == 'Linux' && matrix.install-sbml == true
       name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
       run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
@@ -2005,11 +1985,6 @@ jobs:
         ${{ matrix.python-version }} --use-mamba
 
         '
-    - if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method
-        == 'mamba')
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
     - if: runner.os == 'Linux' && matrix.install-sbml == true
       name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
       run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev

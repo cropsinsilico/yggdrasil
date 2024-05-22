@@ -29,7 +29,7 @@ _tool_types = [
 _all_toolsets = [
     'gnu', 'msvc', 'llvm',
 ]
-_default_libtype = 'shared'  # TODO: retry static'
+_default_libtype = 'static'  # TODO: retry static'
 _conda_prefix = tools.get_conda_prefix()
 _venv_prefix = tools.get_venv_prefix()
 _system_suffix = ""
@@ -924,7 +924,11 @@ class DependencyRegistry(object):
         if fname.endswith('.dll.a'):
             ext = '.dll.a'
             return fname.rsplit(ext, 1)[0], ext
-        return os.path.splitext(fname)
+        base, ext = os.path.splitext(fname)
+        while ext and ext.startswith('.') and ext[1:].isnumeric():
+            base, ext2 = os.path.splitext(base)
+            ext = ext2 + ext
+        return (base, ext)
 
     @property
     def internal(self):
@@ -3021,6 +3025,15 @@ class CompilationDependency(object):
             self.driver.libraries.add_compiler_libraries(self.basetool)
             alldeps.append((self.basetool.languages[0],
                             self.basetool.standard_library))
+        if ((self['libtype'] in self.linked_files
+             and self.tool('linker').standard_library
+             and self.is_rebuildable
+             and self.name != self.tool('linker').standard_library
+             and self.mixed_toolset)):
+            linker = self.tool('linker')
+            drv = import_component('model', linker.languages[0])
+            drv.libraries.add_compiler_libraries(linker)
+            alldeps.append((linker.languages[0], linker.standard_library))
         spec_libs = self.parent_driver.libraries.specialized(**spec_kws)
         for d in alldeps:
             dep = spec_libs.get(d)
@@ -3637,6 +3650,8 @@ class CompilationDependency(object):
             for lib in self.basetool.find_component(
                     self.name, cfg=self.cfg, flags=flags,
                     component_types='shared_libraries', **kwargs):
+                # TODO: temp
+                print(f"FIND_COMPONENT {self.name}: {lib}")
                 out = self._search_brute(lib, libtype='shared', **kwargs)
                 if out:
                     break
@@ -3683,7 +3698,8 @@ class CompilationDependency(object):
             fname = fname_base + fname_ext
         else:
             expected_ext = self.extension(libtype, return_all=True)
-            if fname_ext not in expected_ext:
+            if (((fname_ext not in expected_ext)
+                 and not fname_ext.startswith(tuple(expected_ext)))):
                 fname = fname_base + expected_ext[0]
                 fname_ext = expected_ext[0]
         if os.path.isfile(fname):
