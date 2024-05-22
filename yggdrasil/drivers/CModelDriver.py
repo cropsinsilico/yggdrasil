@@ -142,7 +142,8 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
-    version_regex = r'(?P<version>(?:Apple )?clang version \d+\.\d+\.\d+)'
+    version_regex = [
+        r'(?P<version>(?:Apple )?clang version \d+\.\d+\.\d+)']
     product_exts = ['.dSYM']
     # Set to False since ClangLinker has its own class to handle
     # conflict between versions of clang and ld.
@@ -219,7 +220,7 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     version_regex = [
-        r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)',
+        r'PROJECT:(?:(?:ld64)|(?:dyld))-(?P<version>\d+(?:\.\d+)?)',
         (r'GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
          r'(?P<version>\d+(?:\.\d+){0,2})')
     ]

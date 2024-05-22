@@ -20,7 +20,7 @@ def test_get_language_ext():
     test_lang = constants.LANGUAGES_WITH_ALIASES['all']
     for lang in test_lang:
         if ((((lang == 'executable') and (not platform._is_win))
-             or (lang in ['dummy', 'mpi']))):
+             or (lang in ['dummy', 'mpi', 'make', 'cmake']))):
             with pytest.raises(ValueError):
                 languages.get_language_ext(lang)
             languages.get_language_ext(lang, default='')

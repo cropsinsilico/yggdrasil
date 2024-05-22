@@ -522,8 +522,11 @@ class CompilationToolRegistry(object):
             if driver:
                 kwargs.setdefault('flags', self._flags(tooltype, driver))
                 if toolname and not kwargs.get('executable', None):
-                    kwargs['executable'] = driver.cfg.get(
-                        language, f'{toolname}_executable', None)
+                    if hasattr(driver, 'cfg'):
+                        kwargs['executable'] = driver.cfg.get(
+                            language, f'{toolname}_executable', None)
+                    else:
+                        kwargs['executable'] = None
                 for k in out.associated_tooltypes:
                     kwargs.setdefault(k, self._toolname(k, driver))
                     kwargs.setdefault(f'{k}_flags',
@@ -685,7 +688,7 @@ def create_windows_import(dll, dst=None, for_gnu=False, overwrite=False,
     else:
         ext = '.lib'
     assert ext in ['.dll.a', '.lib']
-    base = os.path.splitext(os.path.basename(dll))[0]
+    base = DependencyRegistry.splitext(os.path.basename(dll))[0]
     if dst is None:
         libbase = base
         if ext == '.dll.a' and not libbase.startswith('lib'):
@@ -3442,7 +3445,7 @@ class CompilationDependency(object):
             if self.is_rebuildable and not os.path.isfile(dep_lib):
                 dep_lib_result = self.build()[0]
                 assert dep_lib == dep_lib_result
-            if not os.path.isfile(dep_lib):
+            if (not os.path.isfile(dep_lib)) and (self.origin != 'language'):
                 raise RuntimeError(f"Library for {self.name} dependency "
                                    f"does not exist: '{dep_lib}'.")
         if ((self['libtype'] in self.library_files
@@ -4271,10 +4274,7 @@ class CompilationToolBase(object):
             str: File name without extension.
 
         """
-        out = os.path.splitext(os.path.basename(fname))[0]
-        if out.endswith('.dll'):
-            out = os.path.splitext(out)[0]
-        return out
+        return DependencyRegistry.splitext(os.path.basename(fname))[0]
 
     @classmethod
     def append_flags(cls, out, key, value, **kwargs):
@@ -4824,23 +4824,6 @@ class CompilationToolBase(object):
         return out
 
     @classmethod
-    def splitext(cls, fname):
-        r"""Split a file extension, taking special care for the .dll.a
-        windows import extension.
-
-        Args:
-            fname (str): File path to split extension for.
-
-        Returns:
-            tuple(str, str): File base name and extension.
-
-        """
-        if fname.endswith('.dll.a'):
-            ext = '.dll.a'
-            return fname.rsplit(ext, 1)[0], ext
-        return os.path.splitext(fname)
-
-    @classmethod
     def cache_key(cls, fname, libtype, cache_toolname=False,
                   cache_key_base=None, **kwargs):
         r"""Get a key to use for a cached library path.
@@ -4859,7 +4842,8 @@ class CompilationToolBase(object):
         
         """
         if cache_key_base is None:
-            cache_key_base = os.path.basename(cls.splitext(fname)[0])
+            cache_key_base = os.path.basename(
+                DependencyRegistry.splitext(fname)[0])
             if cache_key_base.startswith('lib'):
                 cache_key_base = cache_key_base[3:]
             if '.' in cache_key_base:
@@ -5488,8 +5472,11 @@ class LinkerBase(CompilationToolBase):
         """
         if cls.toolset == 'msvc':  # pragma: windows
             return False  # Pass all libraries w/ ext
-        return (libname.startswith(cls.libtype_prefix[cls.library_libtype])
-                and libname.endswith(tuple(cls.all_library_ext)))
+        return (
+            libname.startswith(cls.libtype_prefix[cls.library_libtype])
+            and (libname.endswith(tuple(cls.all_library_ext))
+                 or DependencyRegistry.splitext(libname).startswith(
+                     tuple(cls.all_library_ext))))
 
     @classmethod
     def libpath2libname(cls, libpath):
