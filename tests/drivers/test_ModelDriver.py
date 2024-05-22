@@ -7,7 +7,8 @@ import shutil
 import logging
 from yggdrasil import platform, constants
 from yggdrasil.drivers.ModelDriver import ModelDriver
-from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
+from yggdrasil.drivers.CompiledModelDriver import (
+    CompiledModelDriver, InvalidCompilationTool)
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
@@ -19,7 +20,7 @@ def test_ModelDriver_implementation():
         ModelDriver.executable_command(None)
     with pytest.raises(NotImplementedError):
         ModelDriver.is_library_installed(None)
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(InvalidCompilationTool):
         CompiledModelDriver.get_tool('compiler')
     with pytest.raises(NotImplementedError):
         InterpretedModelDriver.get_interpreter()

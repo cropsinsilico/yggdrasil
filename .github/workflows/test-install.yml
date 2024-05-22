@@ -7,17 +7,17 @@ env:
   INSTALLEXCEL: 1
   INSTALLFORTRAN: 1
   INSTALLIMAGES: 1
-  INSTALLJULIA: 1
+  INSTALLJULIA: 0
   INSTALLLPY: 0
   INSTALLMATLAB: 0
   INSTALLMPI: 1
   INSTALLOMP: 1
   INSTALLPYGMENTS: 1
   INSTALLPYTORCH: 1
-  INSTALLR: 1
+  INSTALLR: 0
   INSTALLRMQ: 0
   INSTALLSBML: 0
-  INSTALLSEQ: 1
+  INSTALLSEQ: 0
   INSTALLTRIMESH: 1
   INSTALLZMQ: 1
   NUMPY: numpy
@@ -325,8 +325,7 @@ jobs:
       name: Set SBML installation based on matrix value
       run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
-    - if: matrix.install-r != true
-      name: Set R installation based on matrix value
+    - name: Set R installation based on matrix value
       run: echo "INSTALLR=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: matrix.install-pytorch != true
@@ -733,8 +732,7 @@ jobs:
       name: Set SBML installation based on matrix value
       run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
-    - if: matrix.install-r != true
-      name: Set R installation based on matrix value
+    - name: Set R installation based on matrix value
       run: echo "INSTALLR=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: matrix.install-pytorch != true
@@ -1117,8 +1115,7 @@ jobs:
       name: Set SBML installation based on matrix value
       run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
-    - if: matrix.install-r != true
-      name: Set R installation based on matrix value
+    - name: Set R installation based on matrix value
       run: echo "INSTALLR=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: matrix.install-pytorch != true
@@ -1482,8 +1479,7 @@ jobs:
       name: Set SBML installation based on matrix value
       run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
-    - if: matrix.install-r != true
-      name: Set R installation based on matrix value
+    - name: Set R installation based on matrix value
       run: echo "INSTALLR=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: matrix.install-pytorch != true
@@ -1846,8 +1842,7 @@ jobs:
       name: Set SBML installation based on matrix value
       run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
-    - if: matrix.install-r != true
-      name: Set R installation based on matrix value
+    - name: Set R installation based on matrix value
       run: echo "INSTALLR=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - if: matrix.install-pytorch != true

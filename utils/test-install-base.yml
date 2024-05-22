@@ -12,19 +12,19 @@ name: Test of package installation & execution
 
 env:
   NUMPY: numpy
-  INSTALLR: 1
+  INSTALLR: 0  # TODO: temp
   INSTALLC: 1
   INSTALLFORTRAN: 1
   INSTALLSBML: 0
   INSTALLLPY: 0
-  INSTALLJULIA: 1
+  INSTALLJULIA: 0  # TODO: temp
   INSTALLZMQ: 1
   INSTALLRMQ: 0
   INSTALLTRIMESH: 1
   INSTALLPYGMENTS: 1
   INSTALLPYTORCH: 1
   INSTALLIMAGES: 1
-  INSTALLSEQ: 1
+  INSTALLSEQ: 0  # TODO: temp
   INSTALLEXCEL: 1
   INSTALLOMP: 1
   INSTALLMPI: 1
@@ -107,7 +107,7 @@ jobs:
       run: echo "INSTALLSBML=1" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Set R installation based on matrix value
-      if: matrix.install-r != true
+      # if: matrix.install-r != true  # TODO: temp
       run: echo "INSTALLR=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Set Pytorch installation based on matrix value

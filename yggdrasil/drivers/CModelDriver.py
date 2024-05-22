@@ -132,6 +132,7 @@ class GCCCompiler(CCompilerBase):
     default_linker = 'gcc'
     default_disassembler = 'objdump'
     toolset = 'gnu'
+    standard_library = 'c'
     compatible_toolsets = ['llvm']
     aliases = ['gnu-cc', 'gnu-gcc']
     libraries = {
