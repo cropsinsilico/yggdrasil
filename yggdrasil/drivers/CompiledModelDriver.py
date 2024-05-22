@@ -5475,7 +5475,7 @@ class LinkerBase(CompilationToolBase):
         return (
             libname.startswith(cls.libtype_prefix[cls.library_libtype])
             and (libname.endswith(tuple(cls.all_library_ext))
-                 or DependencyRegistry.splitext(libname).startswith(
+                 or DependencyRegistry.splitext(libname)[-1].startswith(
                      tuple(cls.all_library_ext))))
 
     @classmethod
