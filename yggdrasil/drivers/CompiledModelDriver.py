@@ -4032,10 +4032,10 @@ class CompilationToolBase(object):
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
         # Set attributes based on environment variables or sysconfig
         if cls.default_executable is None:
-            cls.default_executable = cls.env_matches_tool()
+            cls.default_executable = cls.env_matches_tool(verbose=True)
         if cls.default_executable is None:
             cls.default_executable = cls.env_matches_tool(
-                use_sysconfig=True)
+                use_sysconfig=True, verbose=True)
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
@@ -4452,7 +4452,7 @@ class CompilationToolBase(object):
 
     @classmethod
     def env_matches_tool(cls, use_sysconfig=False, env=None,
-                         with_flags=False):
+                         with_flags=False, verbose=False):
         r"""Determine if the executable pointed to by any environment
         variable matches this compilation tool.
 
@@ -4464,6 +4464,8 @@ class CompilationToolBase(object):
                 updated with variables. Defaults to None and is ignored.
             with_flags (bool, optional): If True, preserve any flags
                 included in the environment variable. Defaults to False.
+            verbose (bool, optional): If True, print out information about
+                the tools that were compared and the result.
 
         Returns:
             bool: True if the environment variable matches, False otherwise.
@@ -4490,16 +4492,39 @@ class CompilationToolBase(object):
             envi_version = CompilationToolBase.tool_version_static(
                 cls, envi_executable, require_match=True)
             if this_version and this_version and this_version == envi_version:
+                if verbose:
+                    logger.info(f"{cls.tooltype.title()} {cls.toolname} "
+                                f"matches environment variable "
+                                f"(use_sysconfig={use_sysconfig}) "
+                                f"{cls.default_executable_env}:"
+                                f"\n\t{envi_full}"
+                                f"\n\ttool_exe = {this_executable}"
+                                f"\n\tenvi_exe = {envi_executable}"
+                                f"\n\ttool_ver = {this_version}"
+                                f"\n\tenvi_ver = {envi_version}")
                 return out
             if this_executable == cls.toolname and envi_version:
+                if verbose:
+                    logger.info(f"{cls.tooltype.title()} {cls.toolname} "
+                                f"overriden from environment variable "
+                                f"(use_sysconfig={use_sysconfig}) "
+                                f"{cls.default_executable_env}:"
+                                f"\n\t{envi_full}"
+                                f"\n\ttool_exe = {this_executable}"
+                                f"\n\tenvi_exe = {envi_executable}"
+                                f"\n\ttool_ver = {this_version}"
+                                f"\n\tenvi_ver = {envi_version}")
                 return out
             if this_version and envi_version:
-                logger.info(f"{cls.tooltype.title()} {cls.toolname} "
-                            f"does not match environment:"
-                            f"\n\ttool_exe = {this_executable}"
-                            f"\n\tenvi_exe = {envi_executable}"
-                            f"\n\ttool_ver = {this_version}"
-                            f"\n\tenvi_ver = {envi_version}")
+                if verbose:
+                    logger.info(f"{cls.tooltype.title()} {cls.toolname} "
+                                f"does not match environment variable "
+                                f"(use_sysconfig={use_sysconfig}) "
+                                f"{cls.default_executable_env}:"
+                                f"\n\ttool_exe = {this_executable}"
+                                f"\n\tenvi_exe = {envi_executable}"
+                                f"\n\ttool_ver = {this_version}"
+                                f"\n\tenvi_ver = {envi_version}")
         return None
 
     @classmethod

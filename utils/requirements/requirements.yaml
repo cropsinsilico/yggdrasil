@@ -1,8 +1,13 @@
 general:
-  - build:
+  - python-build:
       flags:
         build: True
         build_only: True
+      options:
+        - name: build
+          method: pip
+        - name: python-build
+          method: conda
   - chevron
   - "cross-python_{{ target_platform }}":
       method: conda_recipe

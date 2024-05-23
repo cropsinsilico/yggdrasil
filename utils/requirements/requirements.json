@@ -1,11 +1,21 @@
 {
   "general": [
     {
-      "build": {
+      "python-build": {
         "flags": {
           "build": true,
           "build_only": true
-        }
+        },
+        "options": [
+          {
+            "name": "build",
+            "method": "pip"
+          },
+          {
+            "name": "python-build",
+            "method": "conda"
+          }
+        ]
       }
     },
     "chevron",
