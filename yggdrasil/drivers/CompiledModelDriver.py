@@ -1989,7 +1989,7 @@ class CompilationDependency(object):
     def requires_fullpath(self):
         r"""bool: True if the full path is required."""
         return (not (self.get('is_standard', False)
-                     or self.origin in ['standard']))
+                     or self.origin in ['standard', 'language']))
 
     @property
     def is_standard(self):
@@ -3445,7 +3445,7 @@ class CompilationDependency(object):
             if self.is_rebuildable and not os.path.isfile(dep_lib):
                 dep_lib_result = self.build()[0]
                 assert dep_lib == dep_lib_result
-            if (not os.path.isfile(dep_lib)) and (self.origin != 'language'):
+            if not os.path.isfile(dep_lib):
                 raise RuntimeError(f"Library for {self.name} dependency "
                                    f"does not exist: '{dep_lib}'.")
         if ((self['libtype'] in self.library_files
@@ -4482,10 +4482,11 @@ class CompilationToolBase(object):
             if not with_flags:
                 envi_full = envi_full.split(maxsplit=1)[0]
             return envi_full
-        logger.info(f"{cls.tooltype.title()} {cls.toolname} does not "
-                    f"match environment:"
-                    f"\n\ttool_base = {tool_base}"
-                    f"\n\tenvi_base = {envi_base}")
+        if tool_base and envi_base:
+            logger.info(f"{cls.tooltype.title()} {cls.toolname} does not "
+                        f"match environment:"
+                        f"\n\ttool_base = {tool_base}"
+                        f"\n\tenvi_base = {envi_base}")
         return out
 
     @classmethod
@@ -4793,6 +4794,7 @@ class CompilationToolBase(object):
                 base_paths.append(os.environ['ChocolateyInstall'])
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
+        brew_prefix = None
         if platform._is_mac:
             macos_sdkroot = cfg.get('c', 'macos_sdkroot', None)
             base_paths += [
@@ -4808,6 +4810,12 @@ class CompilationToolBase(object):
                         os.path.join(
                             macos_sdkroot.split('/Platforms', 1)[0],
                             'Toolchains/XcodeDefault.xctoolchain/usr'))
+            try:
+                brew_prefix = subprocess.check_output(
+                    ['brew', '--prefix']).decode('utf-8').strip()
+                base_paths.append(brew_prefix)
+            except (subprocess.CalledProcessError, OSError):
+                pass
         for base in base_paths:
             paths.append(os.path.join(base, suffix))
         if platform._is_mac:
@@ -4819,6 +4827,11 @@ class CompilationToolBase(object):
                 if ((('AppleTV' not in x) and ('iPhoneOS' not in x)
                      and ('WatchOS' not in x))):
                     paths.append(x)
+            if brew_prefix:
+                paths += [
+                    os.path.join(brew_prefix, 'llvm'),
+                    os.path.join(brew_prefix, suffix, 'llvm'),
+                ]
             paths += [
                 "/usr/local/Cellar/llvm/"]
         out = []
