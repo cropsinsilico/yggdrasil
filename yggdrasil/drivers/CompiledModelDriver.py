@@ -6479,7 +6479,10 @@ class CompiledModelDriver(ModelDriver):
                 to run the compiler/interpreter from the command line.
 
         """
-        return cls.get_tool('basetool', toolname=toolname).get_executable()
+        try:
+            return cls.get_tool('basetool', toolname=toolname).get_executable()
+        except InvalidCompilationTool as e:
+            raise NotImplementedError(e)
 
     @classmethod
     def language_version(cls, toolname=None, **kwargs):
@@ -6541,16 +6544,19 @@ class CompiledModelDriver(ModelDriver):
             ValueError: If exec_type is not 'compiler', 'linker', or 'direct'.
 
         """
-        if exec_type == 'direct':
-            unused_kwargs = kwargs.pop('unused_kwargs', {})
-            unused_kwargs.update(kwargs)
-            return args
-        elif exec_type == 'linker':
-            exec_cls = cls.get_tool('linker', toolname=toolname)
-        elif exec_type == 'compiler':
-            exec_cls = cls.get_tool('compiler', toolname=toolname)
-        else:
-            raise ValueError("Invalid exec_type '%s'" % exec_type)
+        try:
+            if exec_type == 'direct':
+                unused_kwargs = kwargs.pop('unused_kwargs', {})
+                unused_kwargs.update(kwargs)
+                return args
+            elif exec_type == 'linker':
+                exec_cls = cls.get_tool('linker', toolname=toolname)
+            elif exec_type == 'compiler':
+                exec_cls = cls.get_tool('compiler', toolname=toolname)
+            else:
+                raise ValueError("Invalid exec_type '%s'" % exec_type)
+        except InvalidCompilationTool as e:
+            raise NotImplementedError(e)
         return exec_cls.get_executable_command(args, **kwargs)
     
     @classmethod

@@ -10,7 +10,7 @@ from collections import OrderedDict
 from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
-    _osx_sysroot)
+    _osx_sysroot, InvalidCompilationTool)
 from yggdrasil.languages import get_language_dir
 logger = logging.getLogger(__name__)
 if platform._is_win:
@@ -104,6 +104,22 @@ class GCCCompiler(CCompilerBase):
     }
 
     @classmethod
+    def is_clang(cls):
+        r"""Determine if this tool is actually an alias for clang.
+
+        Returns:
+            bool: True if gcc actually points to clang.
+        
+        """
+        if platform._is_mac:
+            try:
+                ver = cls.tool_version()
+                return ('clang' in ver)
+            except InvalidCompilationTool:
+                pass
+        return False
+
+    @classmethod
     def is_installed(cls):
         r"""Determine if this tool is installed by looking for the executable.
 
@@ -113,10 +129,8 @@ class GCCCompiler(CCompilerBase):
         """
         out = super(GCCCompiler, cls).is_installed()
         # Disable gcc when it is an alias for clang
-        if out and platform._is_mac:  # pragma: debug
-            ver = cls.tool_version()
-            if 'clang' in ver:
-                out = False
+        if out and cls.is_clang():  # pragma: debug
+            out = False
         return out
 
     @classmethod
@@ -160,6 +174,16 @@ class ClangCompiler(CCompilerBase):
                  'specialization': 'with_asan'},
     }
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        if GCCCompiler.is_clang() and 'gcc' not in cls.aliases:
+            cls.aliases.append('gcc')
+        CCompilerBase.before_registration(cls)
+        
     @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of compiler flags."""
@@ -255,7 +279,10 @@ class GCCLinker(LDLinker):
 class ClangLinker(LDLinker):
     r"""Interface class for clang linker (calls to ld)."""
     toolname = ClangCompiler.toolname
-    aliases = ClangCompiler.aliases
+    aliases = ClangCompiler.aliases + (
+        [os.path.basename(ClangCompiler.default_executable).replace(
+            ClangCompiler.toolname, 'ld')]
+        if ClangCompiler.default_executable else [])
     languages = ClangCompiler.languages
     platforms = ClangCompiler.platforms
     default_executable = ClangCompiler.default_executable

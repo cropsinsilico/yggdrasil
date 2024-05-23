@@ -23,6 +23,10 @@ def test_ModelDriver_implementation():
     with pytest.raises(InvalidCompilationTool):
         CompiledModelDriver.get_tool('compiler')
     with pytest.raises(NotImplementedError):
+        CompiledModelDriver.language_executable()
+    with pytest.raises(NotImplementedError):
+        CompiledModelDriver.executable_command(None)
+    with pytest.raises(NotImplementedError):
         InterpretedModelDriver.get_interpreter()
 
 

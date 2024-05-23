@@ -1,3 +1,4 @@
+import os
 import logging
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
@@ -95,6 +96,8 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
         """
         if platform._is_win:  # pragma: windows
             cls.default_executable = 'clang'
+        if GPPCompiler.is_clang() and 'g++' not in cls.aliases:
+            cls.aliases.append('g++')
         CPPCompilerBase.before_registration(cls)
 
     @classmethod
@@ -174,7 +177,10 @@ class GPPLinker(GCCLinker):
 class ClangPPLinker(ClangLinker):
     r"""Interface class for clang++ linker (calls to ld)."""
     toolname = ClangPPCompiler.toolname
-    aliases = ClangPPCompiler.aliases
+    aliases = ClangPPCompiler.aliases + (
+        [os.path.basename(ClangCompiler.default_executable).replace(
+            ClangCompiler.toolname, 'ld')]
+        if ClangCompiler.default_executable else [])
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
     toolset = ClangPPCompiler.toolset
