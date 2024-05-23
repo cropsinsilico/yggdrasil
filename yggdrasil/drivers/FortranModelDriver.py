@@ -143,6 +143,7 @@ class GFortranCompiler(FortranCompilerBase):
     default_archiver = 'ar'
     default_disassembler = 'objdump'
     standard_library = 'gfortran'
+    version_regex = [r'(?P<version>GNU Fortran \(.+\) \d+\.\d+\.\d+)']
     # GNU ASAN not currently installed with gfortran on osx
     # libraries = {
     #     'asan': {'dep_executable_flags': ['-fsanitize=address'],

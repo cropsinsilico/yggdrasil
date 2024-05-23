@@ -3895,6 +3895,8 @@ class CompilationToolBase(object):
         next_stage_switch (str): Flag to indicate beginning of flags that
             should be passed to the tool for the next stage. (e.g. /link
             for MSVC cl.exe).
+        next_stage_flag_flag (str): Flag to indicate that the next flag
+            should be passed to the next stage.
         create_next_stage_tool (dict): Parameters for a tool that should
             be created for the next stage based on this tool.
         local_kws (list): Keyword arguments that are unique to this tool.
@@ -3968,11 +3970,11 @@ class CompilationToolBase(object):
     standard_library = None
     standard_library_type = None
     libraries = {}
-    no_separate_next_stage = False
     builtin_next_stage = None
     combine_with_next_stage = None
     no_additional_stages_flag = None
     next_stage_switch = None
+    next_stage_flag_flag = None
     create_next_stage_tool = None
     is_gnu = False
     toolset = None
@@ -4056,7 +4058,7 @@ class CompilationToolBase(object):
             assert cls.combine_with_next_stage
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
                          'default_executable', 'default_executable_env',
-                         'toolset']
+                         'toolset', 'version_flags', 'version_regex']
             if cls.create_next_stage_tool is True:
                 cls.create_next_stage_tool = {}
             stage_attr = copy.deepcopy(
@@ -4473,44 +4475,32 @@ class CompilationToolBase(object):
             env.update(sysconfig.get_config_vars())
         else:
             env.update(os.environ)
-        tool_base = cls.aliases.copy()
-        envi_base = ''
         envi_full = ''
-        if isinstance(cls.toolname, str):
-            tool_base.append(cls.toolname)
-        if isinstance(cls.default_executable, str):
-            tool_base.append(cls.default_executable)
         if isinstance(cls.default_executable_env, str):
             envi_full = env.get(cls.default_executable_env, '').split(
                 'ccache ')[-1]
         if envi_full:
-            envi_base = os.path.basename(envi_full.split(maxsplit=1)[0])
-        if os.environ.get('PATHEXT', ''):
-            tool_base = [x.split(os.environ['PATHEXT'])[0]
-                         for x in tool_base]
-            envi_base = envi_base.split(os.environ['PATHEXT'])[0]
-        out = None
-        regex_literal = '-+*$%#@!^&(){}[]<>,.;:'
-        regex_pathsep = r'(?:[\-\_\.0-9])'
-        if tool_base and envi_base:
-            for x in tool_base:
-                for k in regex_literal:
-                    x = x.replace(k, '\\' + k)
-                regex = r'(?:(?:^)|%s)%s(?:(?:$)|%s)' % (
-                    regex_pathsep, x, regex_pathsep)
-                if re.search(regex, envi_base):
-                    out = True
-                    break
-        if out:
-            if not with_flags:
-                envi_full = envi_full.split(maxsplit=1)[0]
-            return envi_full
-        if tool_base and envi_base:
-            logger.info(f"{cls.tooltype.title()} {cls.toolname} does not "
-                        f"match environment:"
-                        f"\n\ttool_base = {tool_base}"
-                        f"\n\tenvi_base = {envi_base}")
-        return out
+            this_executable = (cls.default_executable
+                               if cls.default_executable
+                               else cls.toolname)
+            envi_executable = envi_full.split(maxsplit=1)[0]
+            out = envi_full if with_flags else envi_full.split(maxsplit=1)[0]
+            this_version = CompilationToolBase.tool_version_static(
+                cls, this_executable, require_match=True)
+            envi_version = CompilationToolBase.tool_version_static(
+                cls, envi_executable, require_match=True)
+            if this_version and this_version and this_version == envi_version:
+                return out
+            if this_executable == cls.toolname and envi_version:
+                return out
+            if this_version and envi_version:
+                logger.info(f"{cls.tooltype.title()} {cls.toolname} "
+                            f"does not match environment:"
+                            f"\n\ttool_exe = {this_executable}"
+                            f"\n\tenvi_exe = {envi_executable}"
+                            f"\n\ttool_ver = {this_version}"
+                            f"\n\tenvi_ver = {envi_version}")
+        return None
 
     @classmethod
     def get_env_flags(cls):
@@ -4984,9 +4974,82 @@ class CompilationToolBase(object):
         products.append_compilation_product(new, **kwargs)
         return products.last
 
+    @staticmethod
+    def extract_tool_version(cls, x, require_match=False):
+        r"""Extract the tool's version from the provided string.
+
+        Args:
+            x (str): Raw version string.
+            require_match (bool, optional): If True, a match to
+                version_regex is required.
+
+        Returns:
+            str: Extracted version string.
+
+        """
+        if x and cls.version_regex:
+            match = None
+            regexes = (
+                cls.version_regex
+                if isinstance(cls.version_regex, list)
+                else [cls.version_regex])
+            for regex in regexes:
+                match = re.search(regex, x)
+                if match is not None:
+                    return match.group('version')
+            if require_match:
+                return ''
+            warnings.warn(
+                f"Could not locate version in string: {x} with "
+                f"regex {cls.version_regex}")
+        if x and require_match:
+            raise Exception(f"{cls}: {cls.tooltype.title()} "
+                            f"{cls.toolname} does not have a "
+                            f"version regex")
+        return x
+
+    @staticmethod
+    def tool_version_static(cls, executable=None, skip_regex=False,
+                            **kwargs):
+        r"""Get the version of the compilation tool using only static
+        class properties.
+
+        Args:
+            executable (str, optional): Executable that should be used
+                with the version flags for this class. If not provided
+                the default executable will be used if it is set and
+                toolname will be used if it is not set.
+            skip_regex (bool, optional): If True, don't call
+                extract_tool_version and return the raw version result.
+            **kwargs: Additional keyword arguments are pased to
+                extract_tool_version.
+
+        Returns:
+            str: Version string associated with the provided executable.
+
+        """
+        if executable is None:
+            executable = (
+                cls.default_executable
+                if cls.default_executable else cls.toolname)
+        try:
+            out = subprocess.check_output(
+                [executable] + cls.version_flags,
+                stderr=subprocess.STDOUT).decode('utf-8').strip()
+        except (subprocess.CalledProcessError, OSError):
+            out = ''
+        if skip_regex:
+            return out
+        return CompilationToolBase.extract_tool_version(cls, out, **kwargs)
+
     @classmethod
-    def tool_version(cls, **kwargs):
+    def tool_version(cls, skip_regex=False, **kwargs):
         r"""Get the version of the compilation tool.
+
+        Args:
+            skip_regex (bool, optional): If True, don't call
+                extract_tool_version and return the raw version result.
+            **kwargs: Additional keyword arguments are passed to call.
 
         Returns:
             str: Version.
@@ -4994,23 +5057,9 @@ class CompilationToolBase(object):
         """
         kwargs.setdefault('cache_key', True)
         out = cls.call(cls.version_flags, for_version=True, **kwargs)[0]
-        if cls.version_regex:
-            match = None
-            regexes = (
-                cls.version_regex
-                if isinstance(cls.version_regex, list)
-                else [cls.version_regex])
-            for regex in regexes:
-                match = re.search(regex, out)
-                if match is not None:
-                    break
-            if match is None:  # pragma: debug
-                warnings.warn(
-                    f"Could not locate version in string: {out} with "
-                    f"regex {cls.version_regex}")
-            else:
-                return match.group('version')
-        return out
+        if skip_regex:
+            return out
+        return CompilationToolBase.extract_tool_version(cls, out)
 
     @classmethod
     def run_executable_command(cls, args, skip_flags=False,
@@ -5125,9 +5174,7 @@ class CompilationToolBase(object):
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
             message_before = (
-                format_out('Executable',
-                           cls.get_executable(full_path=True))
-                + format_out('Working Dir', working_dir)
+                format_out('Working Dir', working_dir)
                 + format_out('Command', f"\"{' '.join(cmd)}\""))
             if not for_version:
                 try:

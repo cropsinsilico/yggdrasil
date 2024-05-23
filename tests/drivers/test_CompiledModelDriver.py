@@ -377,15 +377,10 @@ class TestCompiledModelDriver(model_base_class):
             basetool.get_default_libtype(), None)
         if not next_tool:
             return
-        if basetool.no_separate_next_stage:
-            with pytest.raises(RuntimeError):
-                python_class.executable_command(['test'],
-                                                exec_type=next_tool)
-        else:
-            python_class.executable_command(['test'],
-                                            no_additional_stages=True)
-            python_class.executable_command(['test'],
-                                            exec_type=next_tool)
+        python_class.executable_command(['test'],
+                                        no_additional_stages=True)
+        python_class.executable_command(['test'],
+                                        exec_type=next_tool)
 
     def test_basetool_call(self, python_class):
         r"""Test basetool call."""

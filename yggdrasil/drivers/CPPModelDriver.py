@@ -3,7 +3,7 @@ import logging
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
     CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler, MSVCCompiler,
-    GCCLinker, ClangLinker, MSVCLinker)
+    LDLinker, GCCLinker, ClangLinker, MSVCLinker)
 logger = logging.getLogger(__name__)
 
 
@@ -59,6 +59,8 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     toolname = 'g++'
     aliases = ['gnu-c++', 'gnu-g++']
     default_linker = 'g++'
+    version_regex = [
+        r'(?P<version>(?:.*gnu\-)?(?:g|c)\+\+ \(.+\) \d+\.\d+\.\d+)']
     standard_library = 'stdc++'
     libraries = {}
 
@@ -97,7 +99,7 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
         if platform._is_win:  # pragma: windows
             cls.default_executable = 'clang'
         if GPPCompiler.is_clang() and 'g++' not in cls.aliases:
-            cls.aliases.append('g++')
+            cls.aliases = cls.aliases + ['g++']
         CPPCompilerBase.before_registration(cls)
 
     @classmethod
@@ -170,6 +172,7 @@ class GPPLinker(GCCLinker):
     languages = GPPCompiler.languages
     default_executable = GPPCompiler.default_executable
     toolset = GPPCompiler.toolset
+    version_regex = LDLinker.version_regex + GPPCompiler.version_regex
     standard_library = GPPCompiler.standard_library
     libraries = {}
 
@@ -184,6 +187,7 @@ class ClangPPLinker(ClangLinker):
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
     toolset = ClangPPCompiler.toolset
+    version_regex = LDLinker.version_regex + ClangPPCompiler.version_regex
 
 
 class MSVCPPLinker(MSVCLinker):

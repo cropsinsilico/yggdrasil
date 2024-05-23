@@ -597,7 +597,7 @@ def escape_regex(name):
 
     """
     out = name
-    for k in '\\.+*[]()^$?:':
+    for k in '\\?-+*$%#@!^&(){}[]<>,.;:':
         out = out.replace(k, '\\' + k)
     return out
 

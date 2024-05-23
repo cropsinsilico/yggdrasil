@@ -91,8 +91,11 @@ class GCCCompiler(CCompilerBase):
     default_disassembler = 'objdump'
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
-    # standard_library = 'c'
     compatible_toolsets = ['llvm']
+    next_stage_flag_flag = '-Xlinker'
+    version_regex = [
+        r'(?P<version>(?:.*gnu\-)?g?cc \(.+\) \d+\.\d+\.\d+)']
+    # standard_library = 'c'
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],
                  'dep_shared_flags': ['-fsanitize=address'],
@@ -111,13 +114,11 @@ class GCCCompiler(CCompilerBase):
             bool: True if gcc actually points to clang.
         
         """
-        if platform._is_mac:
-            try:
-                ver = cls.tool_version()
-                return ('clang' in ver)
-            except InvalidCompilationTool:
-                pass
-        return False
+        try:
+            return (platform._is_mac
+                    and 'clang' in cls.tool_version(skip_regex=True))
+        except InvalidCompilationTool:
+            return False
 
     @classmethod
     def is_installed(cls):
@@ -150,19 +151,18 @@ class ClangCompiler(CCompilerBase):
     default_linker = 'clang'
     default_archiver = 'libtool'
     default_disassembler = 'otool'
+    toolset = 'llvm'
+    compatible_toolsets = ['gnu']
+    next_stage_flag_flag = '-Xlinker'
+    version_regex = [
+        r'(?P<version>(?:Apple )?clang version \d+\.\d+\.\d+)']
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
                                + [('sysroot', '--sysroot'),
                                   ('isysroot', {'key': '-isysroot',
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
-    version_regex = [
-        r'(?P<version>(?:Apple )?clang version \d+\.\d+\.\d+)']
     product_exts = ['.dSYM']
-    # Set to False since ClangLinker has its own class to handle
-    # conflict between versions of clang and ld.
-    toolset = 'llvm'
-    compatible_toolsets = ['gnu']
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],
                  'dep_shared_flags': ['-fsanitize=address',
@@ -225,7 +225,7 @@ class MSVCCompiler(CCompilerBase):
     search_path_envvar = ['INCLUDE']
     search_path_flags = None
     version_flags = []
-    version_regex = r'(?P<version>.+)\s+Copyright'
+    version_regex = [r'(?P<version>.+)\s+Copyright']
     product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
                     '.vcxproj.filters', '.exp', '.lib']
     builtin_next_stage = 'linker'
@@ -240,7 +240,7 @@ class LDLinker(LinkerBase):
     # Languages disabled for ld by default to prevent it being
     # selected instead of the default which seems to be happening
     # on the CI
-    languages = ['c']  # ['c', 'c++', 'fortran']
+    languages = ['c', 'c++', 'fortran']
     default_executable_env = 'LD'
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
@@ -250,6 +250,10 @@ class LDLinker(LinkerBase):
          r'(?P<version>\d+(?:\.\d+){0,2})')
     ]
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+    compatible_toolsets = ['gnu', 'llvm']
+    preload_envvar = ('DYLD_INSERT_LIBRARIES' if platform._is_mac
+                      else ('LD_PRELOAD' if platform._is_linux
+                            else None))
 
     # @classmethod
     # def get_flags(cls, *args, **kwargs):
@@ -269,12 +273,12 @@ class GCCLinker(LDLinker):
     default_executable = GCCCompiler.default_executable
     toolset = GCCCompiler.toolset
     compatible_toolsets = GCCCompiler.compatible_toolsets
-    version_regex = GCCCompiler.version_regex
+    version_flags = ['-Xlinker', '--verbose']
+    version_regex = LDLinker.version_regex + GCCCompiler.version_regex
     search_path_flags = ['-Xlinker', '--verbose']
     search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
     flag_options = OrderedDict(LDLinker.flag_options,
                                **{'library_rpath': '-Wl,-rpath'})
-    preload_envvar = 'LD_PRELOAD'
 
 
 class ClangLinker(LDLinker):
@@ -289,7 +293,9 @@ class ClangLinker(LDLinker):
     default_executable = ClangCompiler.default_executable
     toolset = ClangCompiler.toolset
     compatible_toolsets = ClangCompiler.compatible_toolsets
-    version_regex = ClangCompiler.version_regex
+    version_flags = ['-Xlinker', '-v']
+    version_regex = LDLinker.version_regex + ClangCompiler.version_regex
+    # version_regex = ClangCompiler.version_regex
     search_path_flags = ['-Xlinker', '-v']
     search_regex = [r'\t([^\t\n]+)\n']
     search_regex_begin = 'Library search paths:'
@@ -297,7 +303,6 @@ class ClangLinker(LDLinker):
                                **{'linker-version': '-mlinker-version=%s',
                                   'library_rpath': '-rpath',
                                   'library_libs_nonstd': ''})
-    preload_envvar = 'DYLD_INSERT_LIBRARIES'
     # libtype_flags = {'shared': '-dynamiclib'}
 
     @staticmethod
