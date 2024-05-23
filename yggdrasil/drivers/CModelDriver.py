@@ -91,7 +91,7 @@ class GCCCompiler(CCompilerBase):
     default_disassembler = 'objdump'
     toolset = 'gnu'
     aliases = ['gnu-cc', 'gnu-gcc']
-    standard_library = 'c'
+    # standard_library = 'c'
     compatible_toolsets = ['llvm']
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],
