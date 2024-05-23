@@ -7,34 +7,34 @@ import shutil
 from yggdrasil import platform, constants, tools
 from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers import CompiledModelDriver
-from yggdrasil.components import import_component
 
 
 def test_get_compatible_tool():
     r"""Test get_compatible_tool when default provided."""
+    tool_registry = CompiledModelDriver.get_tool_registry()
     with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
-        CompiledModelDriver._tool_registry.tool('compiler', 'invalid',
-                                                language='c')
-    assert (CompiledModelDriver._tool_registry.tool(
+        tool_registry.tool('compiler', 'invalid', language='c')
+    assert (tool_registry.tool(
         'compiler', 'invalid', language='c', default=None) is None)
 
 
 def test_find_compilation_tool():
     r"""Test errors raised by find_compilation_tool."""
     with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
-        CompiledModelDriver._tool_registry.tool('archiver', 'cmake')
+        CompiledModelDriver.get_tool_registry().tool('archiver', 'cmake')
 
 
 def test_get_alternate_class():
     r"""Test get_alternate_class."""
-    import_component('model', subtype='c')
-    gcc = CompiledModelDriver._tool_registry.tool('compiler', 'gcc')
+    gcc = CompiledModelDriver.get_tool_registry(
+        'c').tool('compiler', 'gcc')
     gcc.get_alternate_class(toolname='clang')
     
 
 def test_get_compilation_tool():
     r"""Test get_compilation_tool for different name variations."""
     from yggdrasil.drivers.CModelDriver import CModelDriver
+    tool_registry = CompiledModelDriver.get_tool_registry()
     if CModelDriver.is_language_installed():
         tooltype = 'compiler'
         out = CModelDriver.get_tool('compiler').__class__
@@ -45,16 +45,16 @@ def test_get_compilation_tool():
         if platform._is_win:
             vals += [toolname.upper(), toolfile.upper()]
         for v in vals:
-            assert CompiledModelDriver._tool_registry.tool(tooltype, v) == out
+            assert tool_registry.tool(tooltype, v) == out
         with pytest.raises(CompiledModelDriver.InvalidCompilationTool):
-            CompiledModelDriver._tool_registry.tool('compiler', 'invalid')
+            tool_registry.tool('compiler', 'invalid')
     else:
         with pytest.raises(NotImplementedError):
             CModelDriver.get_tool('compiler')
         assert (CModelDriver.get_tool(
             'compiler', default='invalid') == 'invalid')
-    assert (CompiledModelDriver._tool_registry.tool('compiler', 'invalid',
-                                                    default='invalid')
+    assert (tool_registry.tool('compiler', 'invalid',
+                               default='invalid')
             == 'invalid')
 
 

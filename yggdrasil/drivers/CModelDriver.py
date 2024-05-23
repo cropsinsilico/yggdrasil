@@ -90,9 +90,9 @@ class GCCCompiler(CCompilerBase):
     default_linker = 'gcc'
     default_disassembler = 'objdump'
     toolset = 'gnu'
+    aliases = ['gnu-cc', 'gnu-gcc']
     standard_library = 'c'
     compatible_toolsets = ['llvm']
-    aliases = ['gnu-cc', 'gnu-gcc']
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],
                  'dep_shared_flags': ['-fsanitize=address'],
@@ -181,7 +181,7 @@ class ClangCompiler(CCompilerBase):
         checking environment variables for default settings.
         """
         if GCCCompiler.is_clang() and 'gcc' not in cls.aliases:
-            cls.aliases.append('gcc')
+            cls.aliases = cls.aliases + ['gcc']
         CCompilerBase.before_registration(cls)
         
     @classmethod
@@ -201,6 +201,7 @@ class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
     toolname = 'cl'
     platforms = ['Windows']
+    aliases = []
     # TODO: Currently everything compiled as C++ on windows to allow use
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
@@ -351,6 +352,7 @@ class MSVCLinker(LinkerBase):
     platforms = MSVCCompiler.platforms
     languages = MSVCCompiler.languages
     toolset = MSVCCompiler.toolset
+    aliases = []
     output_key = '/OUT:%s'
     output_first = True
     output_first_library = False

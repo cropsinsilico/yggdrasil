@@ -120,6 +120,8 @@ class CompilationToolRegistry(object):
         self._bases = {}
 
     def _init_languages(self, languages, driver=None):
+        if not isinstance(languages, list):
+            languages = [languages]
         for x in languages:
             if driver and x == driver.language:
                 continue
@@ -127,6 +129,8 @@ class CompilationToolRegistry(object):
                 import_component('model', x)
 
     def _check_toolname(self, tooltype, toolname):
+        if toolname in self.tooltype[tooltype]:
+            return toolname
         return self.aliases[tooltype].get(toolname, toolname)
 
     def _toolnames(self, tooltype, toolname):
@@ -163,8 +167,9 @@ class CompilationToolRegistry(object):
             return out
         if not isinstance(default, tools.InvalidDefault):
             return default
-        raise InvalidCompilationTool(f"Could not locate a {tooltype} "
-                                     f"that matches {kwargs}")
+        raise InvalidCompilationTool(
+            f"Could not locate a {tooltype} that matches {kwargs}.\n"
+            f"Available tools:\n{pprint.pformat(self.tooltype)}")
 
     def _sorting_kws(self, tooltype, toolname=None, language=None,
                      toolset=None,
@@ -637,6 +642,23 @@ class CompilationToolRegistry(object):
 
 
 _tool_registry = CompilationToolRegistry()
+
+
+def get_tool_registry(languages=None):
+    r"""Get the global tool registry.
+
+    Args:
+        languages (list, optional): Languages that should be initialized
+            before returning the registry.
+
+    Returns:
+        CompilationToolRegistry: Global tool registry.
+    
+    """
+    global _tool_registry
+    if languages:
+        _tool_registry._init_languages(languages)
+    return _tool_registry
 
 
 def is_windows_import(fname, **kwargs):
@@ -3108,6 +3130,7 @@ class CompilationDependency(object):
             return []
         out = ['working_dir']
         if isinstance(tool, str):
+            global _tool_registry
             tool = _tool_registry._bases[tool]
         out += list(tool.flag_options.keys())
         out += tool.build_params

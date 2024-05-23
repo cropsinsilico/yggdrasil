@@ -3,7 +3,7 @@ import glob
 import copy
 from yggdrasil import components, constants
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, _tool_registry)
+    CompiledModelDriver, get_tool_registry)
 
 
 class BuildModelDriver(CompiledModelDriver):
@@ -144,7 +144,7 @@ class BuildModelDriver(CompiledModelDriver):
         default settings.
         """
         CompiledModelDriver.before_registration(cls)
-        cls.target_tooltypes = _tool_registry.tooltypes(
+        cls.target_tooltypes = get_tool_registry().tooltypes(
             cls.target_basetool)
         if 'disassembler' in cls.target_tooltypes:
             cls.target_tooltypes.remove('disassembler')

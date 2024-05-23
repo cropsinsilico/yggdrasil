@@ -356,8 +356,6 @@ jobs:
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
         == 1
       name: (WINDOWS,PIP) Set up MSMPI
@@ -758,8 +756,6 @@ jobs:
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
         == 1
       name: (WINDOWS,PIP) Set up MSMPI
@@ -1136,8 +1132,6 @@ jobs:
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
         == 1
       name: (WINDOWS,PIP) Set up MSMPI
@@ -1495,8 +1489,6 @@ jobs:
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
         == 1
       name: (WINDOWS,PIP) Set up MSMPI
@@ -1853,8 +1845,6 @@ jobs:
         == 1
       name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - if: runner.os == 'Windows' && matrix.install-method == 'pip' && env.INSTALLMPI
         == 1
       name: (WINDOWS,PIP) Set up MSMPI

@@ -7,7 +7,7 @@ from yggdrasil import platform, tools, constants, rapidjson
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompilerBase, CompiledModelDriver, _tool_registry)
+    CompilerBase, CompiledModelDriver, get_tool_registry)
 
 
 logger = logging.getLogger(__name__)
@@ -451,11 +451,12 @@ class FortranModelDriver(CompiledModelDriver):
         checking environment variables for default settings.
         """
         CompiledModelDriver.before_registration(cls)
-        cxx_compiler = _tool_registry.tool('compiler', language='c++',
-                                           default=None)
+        tool_registry = get_tool_registry()
+        cxx_compiler = tool_registry.tool('compiler', language='c++',
+                                          default=None)
         if platform._is_win and cxx_compiler:  # pragma: debug
             msg_error = None
-            cxx_compiler = _tool_registry.tool('compiler', cxx_compiler)
+            cxx_compiler = tool_registry.tool('compiler', cxx_compiler)
             if cxx_compiler.toolname != 'cl++':
                 msg_error = "The MSVC compiler is not selected for C/C++"
             elif not cxx_compiler.is_installed():
