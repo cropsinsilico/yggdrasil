@@ -238,7 +238,7 @@ class LDLinker(LinkerBase):
 class GCCLinker(LDLinker):
     r"""Interface class for gcc linker (calls to ld)."""
     toolname = GCCCompiler.toolname
-    aliases = GCCCompiler.aliases
+    aliases = GCCCompiler.aliases + ['gnu-ld']
     languages = GCCCompiler.languages
     platforms = GCCCompiler.platforms
     default_executable = GCCCompiler.default_executable

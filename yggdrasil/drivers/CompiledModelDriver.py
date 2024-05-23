@@ -4482,6 +4482,10 @@ class CompilationToolBase(object):
             if not with_flags:
                 envi_full = envi_full.split(maxsplit=1)[0]
             return envi_full
+        logger.info(f"{cls.tooltype.title()} {cls.toolname} does not "
+                    f"match environment:"
+                    f"\n\ttool_base = {tool_base}"
+                    f"\n\tenvi_base = {envi_base}")
         return out
 
     @classmethod

@@ -134,7 +134,7 @@ class MakeModelDriver(BuildModelDriver):
             lines = fd.read()
         ext_present = []
         for lang, info in constants.COMPILER_ENV_VARS.items():
-            if info['exec'] in lines:
+            if info['exec'] and info['exec'] in lines:
                 ext_present.append(lang)
         if ('c' in ext_present) and ('c++' in ext_present):  # pragma: debug
             ext_present.remove('c')

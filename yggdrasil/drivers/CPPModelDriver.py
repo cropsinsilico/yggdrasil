@@ -56,7 +56,7 @@ class CPPCompilerBase(CCompilerBase):
 class GPPCompiler(CPPCompilerBase, GCCCompiler):
     r"""Interface class for G++ compiler/linker."""
     toolname = 'g++'
-    aliases = ['gnu-c++']
+    aliases = ['gnu-c++', 'gnu-g++']
     default_linker = 'g++'
     standard_library = 'stdc++'
     libraries = {}
@@ -163,7 +163,7 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
 class GPPLinker(GCCLinker):
     r"""Interface class for clang++ linker (calls to ld)."""
     toolname = GPPCompiler.toolname
-    aliases = GPPCompiler.aliases
+    aliases = GPPCompiler.aliases + ['gnu-ld']
     languages = GPPCompiler.languages
     default_executable = GPPCompiler.default_executable
     toolset = GPPCompiler.toolset
