@@ -406,7 +406,7 @@ jobs:
       max-parallel: 20
       matrix:
         os-base: [ubuntu, macos, windows]
-        python-version: [3.8]
+        python-version: [3.9]  # TODO: propertly update the base version
         install-method: [conda]
         test-flags1: [long-mpi]
         test-flags2: [examples-backwards]

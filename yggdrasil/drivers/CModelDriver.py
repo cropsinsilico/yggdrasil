@@ -400,6 +400,8 @@ class ARArchiver(ArchiverBase):
     output_key = ''
     output_first_library = True
     toolset = 'gnu'
+    version_regex = [
+        r'(?P<version>GNU ar version \d+\.\d+\.\d+(?:\-[\.0-9a-zA-Z]+)?)']
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIBRARY_PATH']
 

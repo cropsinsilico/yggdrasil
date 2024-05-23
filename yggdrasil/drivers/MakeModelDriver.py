@@ -19,7 +19,7 @@ class MakeBuilder(BuilderBase):
         [('buildfile', {'key': '-f', 'position': 0})])
     output_key = None
     build_params = ['target']
-    version_regex = r'(?P<version>GNU Make \d+\.\d+(?:\.\d+)?)'
+    version_regex = [r'(?P<version>GNU Make \d+\.\d+(?:\.\d+)?)']
         
     @classmethod
     def get_flags(cls, target=None, **kwargs):

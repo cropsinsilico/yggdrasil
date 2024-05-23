@@ -679,7 +679,7 @@ jobs:
         - macos
         - windows
         python-version:
-        - 3.8
+        - 3.9
         test-flags1:
         - long-mpi
         test-flags2:

@@ -5003,9 +5003,10 @@ class CompilationToolBase(object):
                 f"Could not locate version in string: {x} with "
                 f"regex {cls.version_regex}")
         if x and require_match:
-            raise Exception(f"{cls}: {cls.tooltype.title()} "
-                            f"{cls.toolname} does not have a "
-                            f"version regex")
+            # raise Exception(f"{cls}: {cls.tooltype.title()} "
+            #                 f"{cls.toolname} does not have a "
+            #                 f"version regex")
+            return ''
         return x
 
     @staticmethod
