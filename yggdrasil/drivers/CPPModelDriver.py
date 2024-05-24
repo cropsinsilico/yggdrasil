@@ -188,6 +188,7 @@ class ClangPPLinker(ClangLinker):
     default_executable = ClangPPCompiler.default_executable
     toolset = ClangPPCompiler.toolset
     version_regex = LDLinker.version_regex + ClangPPCompiler.version_regex
+    standard_library = ClangPPCompiler.standard_library
 
 
 class MSVCPPLinker(MSVCLinker):

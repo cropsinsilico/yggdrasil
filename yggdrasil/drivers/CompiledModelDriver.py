@@ -3736,7 +3736,7 @@ class CompilationDependency(object):
             if fname_base.startswith('lib'):
                 fname_try.append(fname_base[3:])
             else:
-                fname_try.append('lib' + fname_try)
+                fname_try.append('lib' + fname_base)
         search_list = self.tool(libtype).get_search_path(
             libtype=libtype, cfg=self.cfg, **kwargs)
         for fname_base in fname_try:
