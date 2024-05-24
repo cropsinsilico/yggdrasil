@@ -1737,11 +1737,12 @@ def install_pkg(method, param=None, without_build=False,
             f"cd {_pkg_dir}",
             f"{param.python_cmd} -m pip install{flags} {src}",
             f"cd {os.getcwd()}"]
-    cmds += config_pkg(param=param, return_commands=True,
-                       allow_missing=False)
     if return_commands:
+        # cmds += config_pkg(param=param, return_commands=True,
+        #                    allow_missing=False)
         return cmds
     call_script(cmds, param=param)
+    config_pkg(param=param, allow_missing=False)
 
 
 def verify_pkg(install_opts=None):
