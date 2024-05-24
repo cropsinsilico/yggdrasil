@@ -47,6 +47,15 @@
         }
       }
     },
+    {
+      "vs2019_win-64": {
+        "method": "conda_recipe",
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
     "deprecation",
     "flask",
     {

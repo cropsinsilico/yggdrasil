@@ -6834,7 +6834,10 @@ class CompiledModelDriver(ModelDriver):
         # Search for external libraries
         kws = {'with_asan': True}  # To force location of ASAN lib
         for k in cls.tooltypes:
-            kws[k] = cls.get_tool(k)
+            try:
+                kws[k] = cls.get_tool(k)
+            except InvalidCompilationTool:
+                pass
         libs = cls.libraries.specialized(**kws)
         for v in libs.libraries.values():
             v.from_cache(cfg)

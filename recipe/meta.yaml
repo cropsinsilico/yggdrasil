@@ -52,6 +52,7 @@ requirements:
     - python-build
     - scikit-build-core
     - setuptools_scm
+    - vs2019_win-64
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
   host:
