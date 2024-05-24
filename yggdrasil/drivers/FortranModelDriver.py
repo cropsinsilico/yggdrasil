@@ -457,7 +457,7 @@ class FortranModelDriver(CompiledModelDriver):
                                           default=None)
         if platform._is_win and cxx_compiler:  # pragma: debug
             msg_error = None
-            cxx_compiler = tool_registry.tool('compiler', cxx_compiler)
+            # cxx_compiler = tool_registry.tool('compiler', cxx_compiler)
             if cxx_compiler.toolname != 'cl++':
                 msg_error = "The MSVC compiler is not selected for C/C++"
             elif not cxx_compiler.is_installed():
