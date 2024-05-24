@@ -31,7 +31,7 @@ general:
       flags:
         build: True
         build_only: True
-  - cmake >= 3.16:
+  - cmake>=3.16:
       method: conda_recipe
       flags:
         build: True

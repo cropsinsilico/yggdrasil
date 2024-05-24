@@ -45,7 +45,7 @@ build:
 
 requirements:
   build:
-    - cmake  >= 3.16
+    - cmake >=3.16
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
     - hatch-fancy-pypi-readme
     - numpy >=1.13.0
