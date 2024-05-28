@@ -27,9 +27,18 @@ class CMakeConfigure(ConfigurerBase):
         ('target_fortran_compiler_path',
          '-DCMAKE_Fortran_COMPILER:FILEPATH=%s'),
         ('target_linker_path', '-DCMAKE_LINKER=%s'),
-        ('ignore_default_c_flags', '-DCMAKE_C_FLAGS='),
-        ('ignore_default_c++_flags', '-DCMAKE_CXX_FLAGS='),
-        ('ignore_default_fortran_flags', '-DCMAKE_Fortran_FLAGS='),
+        ('ignore_default_c_flags',
+         ['-DCMAKE_C_FLAGS=',
+          '-DCMAKE_C_FLAGS_DEBUG=',
+          '-DCMAKE_C_FLAGS_RELEASE=']),
+        ('ignore_default_c++_flags',
+         ['-DCMAKE_CXX_FLAGS=',
+          '-DCMAKE_CXX_FLAGS_DEBUG=',
+          '-DCMAKE_CXX_FLAGS_RELEASE=']),
+        ('ignore_default_fortran_flags',
+         ['-DCMAKE_Fortran_FLAGS=',
+          '-DCMAKE_Fortran_FLAGS_DEBUG=',
+          '-DCMAKE_Fortran_FLAGS_RELEASE=']),
         ('osx_sysroot', '-DCMAKE_OSX_SYSROOT=%s'),
         ('osx_deployment_target', '-DCMAKE_OSX_DEPLOYMENT_TARGET=%s'),
         ('sourcedir', '-S'),
@@ -815,6 +824,9 @@ class CMakeModelDriver(BuildModelDriver):
         """
         logger.debug(f"CREATE_IMPORTS {dep} {imp}")
         buildfile = dep['buildfile']
+        if not os.path.isabs(buildfile):
+            buildfile = dep._relative_to_directory(buildfile)
+        logger.info(f"CREATE_IMPORTS {dep}: {buildfile}")
         target = dep.get('target', '${PROJECT_NAME}')
         if products is None:
             products = tools.IntegrationPathSet(overwrite=overwrite)

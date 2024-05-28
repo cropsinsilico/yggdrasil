@@ -1742,7 +1742,7 @@ def install_pkg(method, param=None, without_build=False,
         #                    allow_missing=False)
         return cmds
     call_script(cmds, param=param)
-    config_pkg(param=param, allow_missing=False)
+    config_pkg(param=param, allow_missing=False, use_shell=True)
 
 
 def verify_pkg(install_opts=None):

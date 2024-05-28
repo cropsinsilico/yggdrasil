@@ -222,7 +222,12 @@ class FortranModelDriver(CompiledModelDriver):
             'source': 'c_wrappers.c',
             'language': 'c',
             'libtype': 'object',
-            'internal_dependencies': [('c', 'ygg')]}}
+            'internal_dependencies': [('c', 'ygg')],
+            'platform_specifics': {
+                'Linux': {
+                    'compiler_flags': ['-fPIC'],
+                }
+            }}}
     type_map = {
         'comm': 'yggcomm',
         'dtype': 'yggdtype',

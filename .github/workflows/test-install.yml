@@ -461,8 +461,6 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - continue-on-error: true
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -861,8 +859,6 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - continue-on-error: true
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -1237,8 +1233,6 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - continue-on-error: true
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -1594,8 +1588,6 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - continue-on-error: true
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -1950,8 +1942,6 @@ jobs:
         runner.os == 'Windows' && env.INSTALLC == 1
       name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
     - continue-on-error: true
       id: conda_build
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'

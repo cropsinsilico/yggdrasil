@@ -21,7 +21,7 @@ def test_ModelDriver_implementation():
     with pytest.raises(NotImplementedError):
         ModelDriver.is_library_installed(None)
     with pytest.raises(InvalidCompilationTool):
-        CompiledModelDriver.get_tool('compiler')
+        print(CompiledModelDriver.get_tool('compiler'))
     with pytest.raises(NotImplementedError):
         CompiledModelDriver.language_executable()
     with pytest.raises(NotImplementedError):

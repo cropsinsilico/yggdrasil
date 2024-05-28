@@ -29,7 +29,7 @@ _tool_types = [
 _all_toolsets = [
     'gnu', 'msvc', 'llvm',
 ]
-_default_libtype = 'static'  # TODO: retry static'
+_default_libtype = 'static'
 _conda_prefix = tools.get_conda_prefix()
 _venv_prefix = tools.get_venv_prefix()
 _system_suffix = ""
@@ -2193,7 +2193,7 @@ class CompilationDependency(object):
                     tooltype0, language=language,
                     driver=self.parent_driver,
                     compatible_with=toolname,
-                    only_installed=True)
+                    only_installed=True, default=None)
             self._updated_tools[tooltype][toolname] = out
             if out and out.toolname not in self._updated_tools[tooltype]:
                 self._updated_tools[tooltype][out.toolname] = out
@@ -2940,6 +2940,9 @@ class CompilationDependency(object):
     def _generated_windows_import(self, previous=None, **kwargs):
         out = None
         dll = self.get('shared', **kwargs)
+        # TODO: temp
+        logger.info(f"GENERATED_WINDOWS_IMPORT [{self.name}]: {dll} "
+                    f"(previous = {previous}")
         if dll:
             directory = self.parent_driver.get_language_dir()
             out = create_windows_import(
@@ -3471,8 +3474,7 @@ class CompilationDependency(object):
             if not os.path.isfile(dep_lib):
                 raise RuntimeError(f"Library for {self.name} dependency "
                                    f"does not exist: '{dep_lib}'.")
-        if ((self['libtype'] in self.library_files
-             and dep_libtype != 'static')):
+        if self['libtype'] in self.library_files:
             libkey = 'libraries'
             if use_library_path_internal and self.origin == 'internal':
                 if to_update.get('skip_library_libs', False):
@@ -3595,6 +3597,7 @@ class CompilationDependency(object):
         if ((self.parent_driver.is_build_tool
              and self.parameters.get('target_dep', False))):
             target_dep = self.parameters['target_dep']
+            out.update(target_dep.get(key, **kws))
             for k in target_dep.active_tools():
                 out.update(
                     target_dep.get(f'{k}_env', for_build=for_build, **kws))
@@ -3730,6 +3733,7 @@ class CompilationDependency(object):
                 fname_ext = expected_ext[0]
         if os.path.isfile(fname):
             return fname
+        fname_base = os.path.basename(fname_base)
         # use_regex = (not platform._is_win)
         fname_try = [fname_base]
         if platform._is_win and libtype in self.library_files:
@@ -4414,7 +4418,7 @@ class CompilationToolBase(object):
             list: Items representing the flag.
 
         """
-        if (not isinstance(key, dict)) and (key in cls.flag_options):
+        if (not isinstance(key, (dict, list))) and (key in cls.flag_options):
             key = cls.flag_options[key]
         if isinstance(key, dict):
             key = key['key']
@@ -4422,6 +4426,10 @@ class CompilationToolBase(object):
             out = []
             for v in value:
                 out += cls.create_flag(key, v)
+        elif isinstance(key, list):
+            out = []
+            for k in key:
+                out += cls.create_flag(k, value)
         elif value is None:
             out = []
         elif len(key) == 0:
