@@ -880,8 +880,7 @@ class CMakeModelDriver(BuildModelDriver):
             f'{dep.name}{suffix}Targets.cmake')
         dependencies = dep.dependency_order()
         dep_kws = {'dry_run': True}
-        dependencies.getall('dep_kwargs', to_update=dep_kws,
-                            dep_libtype=dep['libtype'])
+        dependencies.getall('dep_kwargs', to_update=dep_kws)
         if dep.result in dep_kws.get('libraries', []):
             dep_kws['libraries'].remove(dep.result)
         lines = [

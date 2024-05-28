@@ -3474,7 +3474,8 @@ class CompilationDependency(object):
             if not os.path.isfile(dep_lib):
                 raise RuntimeError(f"Library for {self.name} dependency "
                                    f"does not exist: '{dep_lib}'.")
-        if self['libtype'] in self.library_files:
+        if ((self['libtype'] in self.library_files
+             and dep_libtype != 'static')):
             libkey = 'libraries'
             if use_library_path_internal and self.origin == 'internal':
                 if to_update.get('skip_library_libs', False):
