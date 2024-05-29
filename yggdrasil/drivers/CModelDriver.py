@@ -402,7 +402,8 @@ class ARArchiver(ArchiverBase):
     toolset = 'gnu'
     version_regex = [
         r'(?P<version>GNU ar \(.+\) \d+\.\d+(?:\.\d+)?'
-        r'(?:\-[\.0-9a-zA-Z]+)?)']
+        r'(?:\-[\.0-9a-zA-Z]+)?)',
+        r'(?P<version>ar \-d \[\-TLsv\].+)']
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIBRARY_PATH']
 

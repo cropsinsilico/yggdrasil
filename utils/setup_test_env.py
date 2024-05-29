@@ -1185,8 +1185,8 @@ def build_conda_recipe(recipe='recipe', param=None,
     # else:
     conda_build = f"{CONDA_CMD} build"
     build_pkgs = ["conda-build", "conda-verify"]
-    if param.use_mamba:
-        build_flags += ' --solver=libmamba'
+    # if param.use_mamba:
+    #     build_flags += ' --solver=libmamba'
     # Must always build in base to avoid errors (and don't change the
     # version of Python used in the environment)
     # https://github.com/conda/conda/issues/9124
