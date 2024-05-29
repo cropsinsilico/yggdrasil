@@ -327,8 +327,8 @@ class ClangLinker(LDLinker):
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
-        ver = cls.tool_version().split()[-1]
-        if int(ver.split('.')[0]) >= 10:
+        ver = cls.tool_version().split()[-1].split('.')[0]
+        if ver.isnumeric() and int(ver) >= 10:
             ld_version = LDLinker.tool_version()
             if float(ld_version.split('.')[0]) < 520:  # pragma: version
                 # No longer covered as the default conda

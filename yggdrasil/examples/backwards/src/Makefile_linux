@@ -13,10 +13,10 @@ $(ODIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 backwards_modelA: $(ODIR)/backwards_modelA.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 backwards_modelB: $(ODIR)/backwards_modelB.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 .PHONY: clean
 clean:

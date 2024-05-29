@@ -216,6 +216,9 @@ class FortranModelDriver(CompiledModelDriver):
                             if tools.get_conda_prefix() else False
                         }
                     }
+                },
+                'Linux': {
+                    'compiler_flags': ['-fPIC'],
                 }
             }},
         'c_wrappers': {

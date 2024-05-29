@@ -8,7 +8,7 @@ import logging
 from yggdrasil import platform, constants
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, InvalidCompilationTool)
+    CompiledModelDriver, InvalidCompilationTool, get_tool_registry)
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
@@ -20,8 +20,9 @@ def test_ModelDriver_implementation():
         ModelDriver.executable_command(None)
     with pytest.raises(NotImplementedError):
         ModelDriver.is_library_installed(None)
+    get_tool_registry()._init_languages(['c++'])
     with pytest.raises(InvalidCompilationTool):
-        print(CompiledModelDriver.get_tool('compiler'))
+        CompiledModelDriver.get_tool('compiler')
     with pytest.raises(NotImplementedError):
         CompiledModelDriver.language_executable()
     with pytest.raises(NotImplementedError):

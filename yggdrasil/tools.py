@@ -695,8 +695,9 @@ def find_all(name, path, verification_func=None, use_regex=False,
         if use_regex:
             result = [
                 x for x in result if re.fullmatch(regex_pattern, x)]
-    result = [os.path.normcase(os.path.normpath(bytes2str(m)))
-              for m in result]
+    result = sorted(
+        [os.path.normcase(os.path.normpath(bytes2str(m)))
+         for m in result])
     if verification_func is not None:
         result = [x for x in result if verification_func(x)]
     return result

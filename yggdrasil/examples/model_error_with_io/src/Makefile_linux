@@ -13,10 +13,10 @@ $(ODIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 model_error_with_io_modelA: $(ODIR)/model_error_with_io_modelA.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 model_error_with_io_modelB: $(ODIR)/model_error_with_io_modelB.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 .PHONY: clean
 clean:

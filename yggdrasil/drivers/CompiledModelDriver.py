@@ -157,6 +157,10 @@ class CompilationToolRegistry(object):
             driver = None
         elif driver:
             language = driver.language
+            if not language:
+                raise InvalidCompilationTool(f"Driver {driver} does not "
+                                             f"does not have a language "
+                                             f"set")
         if language and (not skip_driver) and (not driver):
             driver = import_component('model', language)
         return (language, driver)
@@ -1873,9 +1877,11 @@ class CompilationDependency(object):
                 tooltypes = _tool_types
             elif only_active:
                 tooltypes = self.active_tools()
-            else:
+            elif self.basetool:
                 tooltypes = [self.basetool.tooltype]
                 tooltypes += self.basetool.associated_tooltypes
+            else:
+                tooltypes = []
             for k in tooltypes:
                 out += self.tool_parameters(k, generalize=generalize)
             if generalize or only_active:

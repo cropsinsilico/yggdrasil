@@ -825,8 +825,10 @@ class CMakeModelDriver(BuildModelDriver):
         logger.debug(f"CREATE_IMPORTS {dep} {imp}")
         buildfile = dep['buildfile']
         if not os.path.isabs(buildfile):
-            buildfile = dep._relative_to_directory(buildfile)
-        logger.info(f"CREATE_IMPORTS {dep}: {buildfile}")
+            buildfile = dep._relative_to_directory(
+                buildfile, directory=dep.get('working_dir', None))
+        logger.info(f"CREATE_IMPORTS {dep}: {buildfile}\n"
+                    f"source_dir: {dep.get('source_dir', None)}")
         target = dep.get('target', '${PROJECT_NAME}')
         if products is None:
             products = tools.IntegrationPathSet(overwrite=overwrite)

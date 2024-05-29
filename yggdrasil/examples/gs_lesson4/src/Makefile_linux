@@ -13,10 +13,10 @@ $(ODIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 gs_lesson4_modelA: $(ODIR)/gs_lesson4_modelA.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 gs_lesson4_modelB: $(ODIR)/gs_lesson4_modelB.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 .PHONY: clean
 clean:
