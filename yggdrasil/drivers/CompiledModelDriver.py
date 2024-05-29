@@ -3336,8 +3336,8 @@ class CompilationDependency(object):
                          f"output:     {self.result}\n"
                          f"tooltypes:  {tooltypes}\n"
                          f"toolnames:  {toolnames}")
-            kwargs['products'].teardown()
             kwargs['products'].teardown(tag='build_time')
+            kwargs['products'].teardown()
             raise
         next_tool = None
         if not (no_additional_stages
@@ -6008,7 +6008,7 @@ class ConfigurerBase(BuilderBase):
 
     tooltype = 'configurer'
     default_libtype = 'builddir'
-    input_filetypes = ['sourcedir']
+    input_filetypes = ['buildfile']
     output_filetypes = ['configfile']
     associated_tooltypes = ['builder']
     libtype_next_stage = {'build': 'builder'}

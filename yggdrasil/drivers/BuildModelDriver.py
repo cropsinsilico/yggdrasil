@@ -228,6 +228,9 @@ class BuildModelDriver(CompiledModelDriver):
                     if self.is_valid_buildfile(y):
                         self.buildfile = y
                         break
+        if not os.path.isabs(self.buildfile):
+            self.buildfile = os.path.normpath(
+                os.path.join(self.sourcedir, self.buildfile))
         # Build directory
         if self.builddir is None:
             self.builddir = self.builddir_base

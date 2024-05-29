@@ -41,6 +41,7 @@ class CMakeConfigure(ConfigurerBase):
           '-DCMAKE_Fortran_FLAGS_RELEASE=']),
         ('osx_sysroot', '-DCMAKE_OSX_SYSROOT=%s'),
         ('osx_deployment_target', '-DCMAKE_OSX_DEPLOYMENT_TARGET=%s'),
+        ('osx_arch', '-DCMAKE_OSX_ARCHITECTURES=%s'),
         ('sourcedir', '-S'),
         ('builddir', '-B'),
         ('configuration', '-DCMAKE_BUILD_TYPE=%s'),
@@ -267,14 +268,15 @@ class CMakeConfigure(ConfigurerBase):
         if (args == cls.version_flags) or ('--help' in args):
             new_args = args
         if args and not kwargs.get('skip_flags', False):
-            sourcedir = kwargs.get('sourcedir', args[0])
-            if sourcedir != args[0]:  # pragma: debug
+            args_dir = os.path.dirname(args[0])
+            sourcedir = kwargs.get('sourcedir', args_dir)
+            if sourcedir != args_dir:  # pragma: debug
                 raise RuntimeError(
-                    f"The argument list contents (='{args[0]}') "
+                    f"The argument list contents (='{args_dir}') "
                     f"and 'sourcedir' (='{sourcedir}') keyword "
                     f"specify the same thing, but those provided do "
                     f"not match.")
-            kwargs['sourcedir'] = args[0]
+            kwargs['sourcedir'] = args_dir
         return super(CMakeConfigure, cls).get_executable_command(
             new_args, **kwargs)
     
@@ -299,210 +301,7 @@ class CMakeConfigure(ConfigurerBase):
                 path = path.replace('\\', re.escape('\\'))
         return path
 
-    # TODO: Remove this once exports working
-    # @classmethod
-    # def create_include(cls, fname, target, products=None, driver=None,
-    #                    compiler=None, compiler_flags=None,
-    #                    linker=None, linker_flags=None,
-    #                    library_flags=None, internal_library_flags=None,
-    #                    configuration='Release', verbose=False, **kwargs):
-    #     r"""Create CMakeList include file with necessary includes,
-    #     definitions, and linker flags.
 
-    #     Args:
-    #         fname (str): File where the include file should be saved.
-    #         target (str): Target that links should be added to.
-    #         driver (CompiledModelDriver): Driver for the language being
-    #             compiled.
-    #         products (tools.IntegratedPathSet, optional): Path set to
-    #             added include file to.
-    #         compiler (CompilerBase): Compiler that should be used to
-    #             generate the list of compilation flags.
-    #         compile_flags (list, optional): Additional compile flags that
-    #             should be set. Defaults to [].
-    #         linker (LinkerBase): Linker that should be used to generate
-    #             the list of compilation flags.
-    #         linker_flags (list, optional): Additional linker flags that
-    #             should be set. Defaults to [].
-    #         library_flags (list, optional): List of library flags to add.
-    #             Defaults to [].
-    #         internal_library_flags (list, optional): List of library flags
-    #             associated with yggdrasil libraries. Defaults to [].
-    #         configuration (str, optional): Build type/configuration that
-    #             should be built. Defaults to 'Release'. Only used on
-    #             Windows to determine the standard library.
-    #         verbose (bool, optional): If True, the contents of the created
-    #             file are displayed. Defaults to False.
-    #         **kwargs: Additional keyword arguments are ignored.
-
-    #     Returns:
-    #         list: Lines that should be added before the executable is
-    #             defined in the CMakeLists.txt (e.g. LINK_DIRECTORIES
-    #             commands).
-
-    #     Raises:
-    #         ValueError: If a linker or compiler flag cannot be interpreted.
-
-    #     """
-    #     if target is None:
-    #         target = '${PROJECT_NAME}'
-    #     if compiler_flags is None:
-    #         compiler_flags = []
-    #     if linker_flags is None:
-    #         linker_flags = []
-    #     if library_flags is None:
-    #         library_flags = []
-    #     if internal_library_flags is None:
-    #         internal_library_flags = []
-    #     assert compiler is not None
-    #     assert linker is not None
-    #     lines = []
-    #     pretarget_lines = []
-    #     preamble_lines = []
-    #     # Suppress warnings on windows about the security of strcpy etc.
-    #     # and target x64 if the current platform is 64bit
-    #     is_gnu = True
-    #     if platform._is_win:  # pragma: windows
-    #         is_gnu = compiler.is_gnu
-    #         new_flags = compiler.default_flags
-    #         def_flags = compiler.get_env_flags()
-    #         if (((compiler.toolname in ['cl', 'msvc', 'cl++'])
-    #              and (not (('/MD' in def_flags) or ('-MD' in def_flags))))):
-    #             if configuration.lower() == 'debug':  # pragma: debug
-    #                 new_flags.append("/MTd")
-    #             else:
-    #                 new_flags.append("/MT")
-    #         else:
-    #             preamble_lines += ['SET(CMAKE_FIND_LIBRARY_PREFIXES "")',
-    #                                'SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")']
-    #         for x in new_flags:
-    #             if x not in compiler_flags:
-    #                 compiler_flags.append(x)
-    #     # Find Python using cmake
-    #     # https://martinopilia.com/posts/2018/09/15/building-python-extension.html
-    #     # preamble_lines.append('find_package(PythonInterp REQUIRED)')
-    #     # preamble_lines.append('find_package(PythonLibs REQUIRED)')
-    #     # preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
-    #     # lines.append('TARGET_LINK_LIBRARIES({target} ${{PYTHON_LIBRARIES}})')
-    #     # Compilation flags
-    #     for x in compiler_flags:
-    #         if x.startswith('-D'):
-    #             preamble_lines.append(f'ADD_DEFINITIONS({x})')
-    #         elif x.startswith('-I'):
-    #             xdir = cls.fix_path(x.split('-I', 1)[-1], is_gnu=is_gnu)
-    #             new_dir = f'INCLUDE_DIRECTORIES({xdir})'
-    #             if new_dir not in preamble_lines:
-    #                 preamble_lines.append(new_dir)
-    #         elif x.startswith('-std=c++') or x.startswith('/std=c++'):
-    #             new_def = f"SET(CMAKE_CXX_STANDARD {x.split('c++')[-1]})"
-    #             if new_def not in preamble_lines:
-    #                 preamble_lines.append(new_def)
-    #         elif x.startswith('-') or x.startswith('/'):
-    #             new_def = f'ADD_DEFINITIONS({x})'
-    #             if new_def not in preamble_lines:
-    #                 preamble_lines.append(new_def)
-    #         else:
-    #             raise ValueError(f"Could not parse compiler flag '{x}'.")
-    #     # Linker flags
-    #     for x in linker_flags:
-    #         if x.startswith('-l'):
-    #             lines.append(f'TARGET_LINK_LIBRARIES({target} {x})')
-    #         elif x.startswith('-L'):
-    #             libdir = cls.fix_path(x.split('-L')[-1], is_gnu=is_gnu)
-    #             pretarget_lines.append(f'LINK_DIRECTORIES({libdir})')
-    #         elif x.startswith('/LIBPATH:'):  # pragma: windows
-    #             libdir = x.split('/LIBPATH:')[-1]
-    #             if '"' in libdir:
-    #                 libdir = libdir.split('"')[1]
-    #             libdir = cls.fix_path(libdir, is_gnu=is_gnu)
-    #             pretarget_lines.append(f'LINK_DIRECTORIES({libdir})')
-    #         elif os.path.isfile(x):
-    #             library_flags.append(x)
-    #         elif x.startswith('-mlinker-version='):  # pragma: version
-    #             # Currently this only called when clang is >=10
-    #             # and ld is <520 or mlinker is set in the env
-    #             # flags via CFLAGS, CXXFLAGS, etc.
-    #             preamble_lines.insert(
-    #                 0, f'target_link_options({target} PRIVATE {x})')
-    #         elif x.startswith(('-fsanitize=', '-shared-libasan')):
-    #             preamble_lines.insert(
-    #                 0, f'target_link_options({target} PRIVATE {x})')
-    #         elif x.startswith('-') or x.startswith('/'):
-    #             raise ValueError(f"Could not parse linker flag '{x}'.")
-    #         else:
-    #             lines.append(f'TARGET_LINK_LIBRARIES({target} {x})')
-    #     # Libraries
-    #     for x in library_flags:
-    #         xorig = x
-    #         xd, xf = os.path.split(x)
-    #         xl, xe = os.path.splitext(xf)
-    #         xl = linker.libpath2libname(xf)
-    #         x = cls.fix_path(x, is_gnu=is_gnu)
-    #         xd = cls.fix_path(xd, is_gnu=is_gnu)
-    #         xn = os.path.splitext(xl)[0]
-    #         new_dir = f'LINK_DIRECTORIES({xd})'
-    #         if new_dir not in preamble_lines:
-    #             pretarget_lines.append(new_dir)
-    #         if cls.add_libraries or (xorig in internal_library_flags):
-    #             # Version adding library
-    #             lines.append(f'if (NOT TARGET {xl})')
-    #             if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
-    #                 # Not covered atm due to internal libraries being
-    #                 # compiled as static libraries, but this may change
-    #                 lines.append(f'    ADD_LIBRARY({xl} SHARED IMPORTED)')
-    #             else:
-    #                 lines.append(f'    ADD_LIBRARY({xl} STATIC IMPORTED)')
-    #             lines += ['    SET_TARGET_PROPERTIES(',
-    #                       f'        {xl} PROPERTIES']
-    #             # Untested on appveyor, but required when using dynamic
-    #             # library directly (if create_windows_import not used).
-    #             # if xe.lower() == '.dll':
-    #             #     lines.append(f"        IMPORTED_IMPLIB "
-    #             #                  f"{x.replace('.dll', '.lib')}")
-    #             lines += [f'        IMPORTED_LOCATION {x})',
-    #                       'endif()',
-    #                       f'TARGET_LINK_LIBRARIES({target} {xl})']
-    #         elif os.path.isfile(xorig):
-    #             lines.append(f'TARGET_LINK_LIBRARIES({target} {xorig})')
-    #         else:
-    #             # elif not (driver and driver.is_standard_library(xn)):
-    #             # Version finding library
-    #             lines.append(
-    #                 f'FIND_LIBRARY({xn.upper()}_LIBRARY NAMES {xf} {xn}'
-    #                 f' HINTS {xd})')
-    #             lines.append(
-    #                 f'MESSAGE(STATUS "{xn.upper()}_LIBRARY = '
-    #                 f'${{{xn.upper()}_LIBRARY}}")')
-    #             lines.append(f'TARGET_LINK_LIBRARIES({target} '
-    #                          f'${{{xn.upper()}_LIBRARY}})')
-    #     preamble_lines.insert(
-    #         0, f'MESSAGE(STATUS "INCLUDE {fname} INCLUDED")')
-    #     lines = preamble_lines + lines
-    #     lines_str = '\n\t'.join(lines)
-    #     log_msg = (
-    #         f"CMake compiler flags:\n\t{' '.join(compiler_flags)}\n"
-    #         f"CMake linker flags:\n\t{' '.join(linker_flags)}\n"
-    #         f"CMake library flags:\n\t{' '.join(library_flags)}\n"
-    #         f"CMake include file: {fname}\n\t{lines_str}")
-    #     if verbose:
-    #         logger.info(log_msg)
-    #     else:
-    #         logger.debug(log_msg)
-    #     pretarget_lines = list(set(pretarget_lines))
-    #     if fname is None:
-    #         return pretarget_lines + lines
-    #     else:
-    #         force_write = (products is None)
-    #         if products is None:
-    #             products = tools.IntegrationFileSet(overwrite=True)
-    #         products.append_generated(fname, lines,
-    #                                   verbose=verbose,
-    #                                   tag='compile_time')
-    #         if force_write:
-    #             products.setup('compile_time')
-    #         return pretarget_lines
-
-    
 class CMakeBuilder(BuilderBase):
     r"""CMake build tool."""
     toolname = 'cmake'

@@ -228,8 +228,6 @@ def test_find_all():
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     mout = tools.find_all(mpat, mdir)
-    print(mout)
-    print(mans)
     assert isinstance(mout, list)
     assert mout == mans
 

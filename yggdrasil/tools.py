@@ -2500,7 +2500,8 @@ class GeneratedFile(CacheDirMixin, IntegrationPath):
         r"""Remove products associated with the managed path, preserving
         the original first if one is being replaced and the cache
         doesn't exist."""
-        self.cache_original()
+        if os.path.isfile(self.name):
+            self.cache_original()
         super(GeneratedFile, self).remove_products()
 
     def cache_original(self):

@@ -1176,15 +1176,17 @@ def build_conda_recipe(recipe='recipe', param=None,
         build_flags = ''
     else:
         build_flags = '-q'
+    # if param.use_mamba:
+    #     conda_build = f"{CONDA_CMD} mambabuild"
+    #     build_pkgs = ["boa"]
+    #     # if _is_win and _on_gha:
+    #     #     build_pkgs.append("\"conda-build<3.23.0\"")
+    #     build_flags += ' -c conda-forge'
+    # else:
+    conda_build = f"{CONDA_CMD} build"
+    build_pkgs = ["conda-build", "conda-verify"]
     if param.use_mamba:
-        conda_build = f"{CONDA_CMD} mambabuild"
-        build_pkgs = ["boa"]
-        # if _is_win and _on_gha:
-        #     build_pkgs.append("\"conda-build<3.23.0\"")
-        build_flags += ' -c conda-forge'
-    else:
-        conda_build = f"{CONDA_CMD} build"
-        build_pkgs = ["conda-build", "conda-verify"]
+        build_flags += ' --solver=libmamba'
     # Must always build in base to avoid errors (and don't change the
     # version of Python used in the environment)
     # https://github.com/conda/conda/issues/9124
@@ -1737,12 +1739,15 @@ def install_pkg(method, param=None, without_build=False,
             f"cd {_pkg_dir}",
             f"{param.python_cmd} -m pip install{flags} {src}",
             f"cd {os.getcwd()}"]
+    if param.method != 'conda':
+        cmds += config_pkg(param=param, return_commands=True,
+                           allow_missing=False)
     if return_commands:
-        # cmds += config_pkg(param=param, return_commands=True,
-        #                    allow_missing=False)
         return cmds
     call_script(cmds, param=param)
-    config_pkg(param=param, allow_missing=False, use_shell=True)
+    env_vars = {k: os.environ.get(k, None) for k in ['CC', 'CXX', 'CPP']}
+    print(f"AFTER INSTALL: {env_vars}")
+    # config_pkg(param=param, allow_missing=False, use_shell=True)
 
 
 def verify_pkg(install_opts=None):

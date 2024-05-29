@@ -43,29 +43,47 @@ def test_CMakeModelDriver_no_C_library(scripts):  # pragma: windows
 def test_CMakeModelDriver_error_cmake(scripts):
     r"""Test CMakeModelDriver error for invalid cmake args."""
     makedir, target = os.path.split(scripts['cmake'])
+    builddir = os.path.join(makedir, 'build')
+    assert not os.path.isfile(builddir)
     with pytest.raises(RuntimeError):
         CMakeModelDriver('test', target,
                          sourcedir=makedir, configurer_flags='-P',
                          target_language='c',
                          overwrite=True, remove_products=True)
+    assert not os.path.isfile(builddir)
 
 
 @pytest.mark.language('cmake')
 def test_CMakeModelDriver_error_notarget(scripts):
     r"""Test CMakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['cmake'])
+    builddir = os.path.join(makedir, 'build')
+    assert not os.path.isfile(builddir)
     with pytest.raises(RuntimeError):
         CMakeModelDriver('test', 'invalid',
                          sourcedir=makedir, target_language='c',
                          overwrite=True, remove_products=True)
+    assert not os.path.isfile(builddir)
 
 
 @pytest.mark.language('cmake')
 def test_CMakeModelDriver_error_nofile():
     r"""Test CMakeModelDriver error for missing CMakeLists.txt."""
+    sourcedir = os.path.dirname(__file__)
+    working_dir = sourcedir
+    builddir = os.path.join(sourcedir, 'invalid_build')
+    buildfile = os.path.join(sourcedir, 'CMakeLists.txt')
+    assert not os.path.isdir(builddir)
+    assert not os.path.isfile(buildfile)
     with pytest.raises(RuntimeError):
         CMakeModelDriver('test', 'invalid', target_language='c',
+                         buildfile=buildfile,
+                         sourcedir=sourcedir,
+                         builddir=os.path.basename(builddir),
+                         working_dir=working_dir,
                          overwrite=True, remove_products=True)
+    assert not os.path.isdir(builddir)
+    assert not os.path.isfile(buildfile)
                          
 
 class TestCMakeModelDriver(base_class):
