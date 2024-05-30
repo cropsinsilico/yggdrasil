@@ -276,6 +276,20 @@ def display_source_diff(fname1, fname2, number_lines=False,
     if return_lines:
         return lines
     print(lines)
+
+
+def dict_diff(a, b):
+    r"""Get the parameters that differ between two dictionaries.
+
+    Args:
+        a (dict): First dictionary for comparison.
+        b (dict): Second dictionary for comparison.
+
+    Returns:
+        dict: Key/value pairs from a that differ from those in b.
+
+    """
+    return {k: v for k, v in a.items() if v != b.get(k, None)}
     
 
 def get_fds(by_column=None, ignore_closed=False, ignore_kqueue=False,

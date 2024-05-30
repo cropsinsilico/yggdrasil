@@ -18,6 +18,7 @@ class MPIPartnerModel(ModelDriver):
     base_languages = []
     language_ext = []
     comms_implicit = True
+    check_mpi_requests = []
 
     def __init__(self, *args, **kwargs):
         kwargs.pop('function', None)
@@ -131,6 +132,8 @@ class MPIPartnerModel(ModelDriver):
             self.set_break_flag()
         else:
             self.sleep()
+        for k in self.check_mpi_requests:
+            self.check_mpi_request(k)
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""

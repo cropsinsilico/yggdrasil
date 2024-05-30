@@ -1260,7 +1260,8 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
             else:
                 assert msg_recv == recv_inst.eof_msg
             return (not flag)
-        wait_on_function(recv_element, timeout=timeout)
+        wait_on_function(recv_element, timeout=timeout,
+                         name='recv_message_list')
         if expected_result is not None:
             try:
                 assert nested_approx(expected_result) == msg_list
@@ -1308,7 +1309,8 @@ def check_file_exists(wait_on_function):
     """
     def check_file_exists_w(fname, timeout=2):
         wait_on_function(lambda: os.path.isfile(fname), timeout=timeout,
-                         on_timeout=f"File '{fname}' does not exist")
+                         on_timeout=f"File '{fname}' does not exist",
+                         name='check_file_exists')
     return check_file_exists_w
 
 
@@ -1336,7 +1338,8 @@ def check_file_size(wait_on_function):
             raise AssertionError(f"File size ({os.stat(fname).st_size}), "
                                  f"dosn't match expected size ({fsize}).")
         wait_on_function(lambda: os.stat(fname).st_size == fsize,
-                         timeout=timeout, on_timeout=on_timeout)
+                         timeout=timeout, on_timeout=on_timeout,
+                         name='check_file_size')
     return check_file_size_w
 
 
@@ -1638,7 +1641,8 @@ def verify_count_threads(wait_on_function):
                                  f"{nthread}. Running threads:\n\t{threads}")
         # Subtract one as it will be the thread checking function
         wait_on_function(lambda: threading.active_count() <= (nthread + 1),
-                         on_timeout=on_timeout)
+                         on_timeout=on_timeout,
+                         name='verify_count_threads')
 
 
 @pytest.fixture
@@ -1657,7 +1661,8 @@ def verify_count_comms(wait_on_function, count_comms, communicator_types):
                                  f"in registry, but the test started with "
                                  f"{ncomm}. Available comms:\n\t{comms}")
         wait_on_function(lambda: count_comms() <= ncomm,
-                         on_timeout=on_timeout)
+                         on_timeout=on_timeout,
+                         name='verify_count_comms')
 
 
 @pytest.fixture(scope="session")
@@ -1702,7 +1707,8 @@ def verify_count_fds(wait_on_function, first_test, count_fds,
             raise AssertionError(f"{count_fds()} file descriptors are open, "
                                  f"but the test started with {_fd_count}.")
         wait_on_function(lambda: count_fds() <= _fd_count,
-                         on_timeout=on_timeout)
+                         on_timeout=on_timeout,
+                         name='verify_count_fds')
 
 
 @pytest.fixture

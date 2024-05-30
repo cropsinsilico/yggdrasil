@@ -96,17 +96,131 @@ class InvalidCompilationTool(CompilationToolError):
 
 
 class LockedFile(object):
-    r"""Class for locking files during compilation."""
+    r"""Class for locking files during compilation to prevent race
+    conditions between models running on separate threads/processes that
+    utilize the same files.
 
-    def __init__(self, fname, context, when_to_lock="init"):
+    Args:
+        fname (str): Full path to the file that should be locked.
+        context (multitasking.TaskContext): Context that should be used
+            to create a lock for models launched by the local runner
+            process.
+        lock_conditions (tuple, optional): Conditions where the lock on
+            the file should be acquired by the partner comm when running
+            with MPI.
+
+    """
+
+    def __init__(self, fname, context, lock_conditions=("build", "cleanup")):
         self.fname = fname
-        self.lock = context.RLock()
-        self.when_to_lock = when_to_lock
+        self._lock = context.RLock()
+        self.lock_conditions = lock_conditions
+
+    @contextlib.contextmanager
+    def locked(self, driver, dry_run=False):
+        r"""Acquire the lock on the file so that operations can be
+        performed without race conditions between models on different
+        threads/processes.
+
+        Args:
+            driver (CompiledModelDriver): Driver for the model that is
+                locking the file.
+            dry_run (bool, optional): If True, this is a dry run and the
+                file should not actually be locked.
+
+        """
+        try:
+            if not dry_run:
+                self.lock(driver)
+            yield
+        finally:
+            if not dry_run:
+                self.unlock(driver)
+
+    def add_partner_request(self, driver):
+        r"""Add an async receive to handle requests from a model running
+        on another process to lock the file.
+
+        Args:
+            driver (MPIPartnerModel): Partner model driver shadowing the
+                model running on another process.
+
+        """
+        from yggdrasil.multitasking import MPIRequestWrapper
+        driver._mpi_requests[self.fname] = MPIRequestWrapper(
+            driver.recv_mpi(tag=driver._mpi_tags['LOCK_BUILDFILE'],
+                            dont_block=True))
+        if (("build" in self.lock_conditions
+             and self.fname not in driver.check_mpi_requests)):
+            driver._mpi_requests[self.fname].callback = (
+                lambda x: self.partner_locked(driver, x))
+            driver.check_mpi_requests.append(self.fname)
+
+    def partner_locked(self, driver, result=None):
+        r"""Respond to a lock request from a model running on another
+        processes by locking the file and waiting until it is unlocked
+        by that process.
+
+        Args:
+            driver (MPIPartnerModel): Partner model driver shadowing the
+                model that is locking the file.
+            result (object, optional): Received request to lock the file.
+
+        """
+        if result is None:
+            result = driver.wait_on_mpi_request(self.fname)
+        self._lock.acquire()
+        driver.send_mpi('LOCK_BUILDFILE',
+                        tag=driver._mpi_tags['LOCK_BUILDFILE'])
+        driver.recv_mpi(tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
+        self.add_partner_request(driver)
+        driver.send_mpi('UNLOCK_BUILDFILE',
+                        tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
+        self._lock.release()
+
+    def lock(self, driver):
+        r"""Lock the file.
+
+        Args:
+            driver (CompiledModelDriver): Driver for the model that is
+                locking the file.
+
+        Returns:
+            object: Result of the lock response call if running with MPI,
+               None otherwise.
+
+        """
+        self._lock.acquire()
+        if driver._mpi_rank == 0:
+            return
+        driver.send_mpi('LOCK_BUILDFILE',
+                        tag=driver._mpi_tags['LOCK_BUILDFILE'])
+        return driver.recv_mpi(tag=driver._mpi_tags['LOCK_BUILDFILE'])
+
+    def unlock(self, driver):
+        r"""Unlock the file.
+
+        Args:
+            driver (CompiledModelDriver): Driver for the model that is
+                unlocking the file.
+
+        Returns:
+            object: Result of the unlock response call if running with
+               MPI, None otherwise.
+
+        """
+        self._lock.release()
+        if driver._mpi_rank == 0:
+            return
+        driver.send_mpi('UNLOCK_BUILDFILE',
+                        tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
+        return driver.recv_mpi(tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
 
     @property
     def message(self):
         r"""str: Message form."""
-        return {'fname': self.fname, 'when_to_lock': self.when_to_lock}
+        return {'fname': self.fname,
+                'lock_conditions': self.lock_conditions}
 
 
 class CompilationToolRegistry(object):
@@ -5190,19 +5304,20 @@ class CompilationToolBase(object):
         # Run command
         
         def format_out(name, x, indent=2, wrap=100, tab='  ',
-                       hanging_indent=False):
+                       hanging_indent=False, dont_wrap=False):
             if not isinstance(x, str):
-                x = str(x)
+                x = pprint.pformat(x)
             lines = x.splitlines()
-            for i in range(len(lines) - 1, -1, -1):
-                j = i
-                while len(lines[j]) > wrap:
-                    rem = lines[j][wrap:]
-                    if hanging_indent:
-                        rem = tab + rem
-                    lines[j] = lines[j][:wrap]
-                    j += 1
-                    lines.insert(j, rem)
+            if not dont_wrap:
+                for i in range(len(lines) - 1, -1, -1):
+                    j = i
+                    while len(lines[j]) > wrap:
+                        rem = lines[j][wrap:]
+                        if hanging_indent:
+                            rem = tab + rem
+                        lines[j] = lines[j][:wrap]
+                        j += 1
+                        lines.insert(j, rem)
             if len(lines) == 1:
                 x = lines[0]
             else:
@@ -5232,8 +5347,11 @@ class CompilationToolBase(object):
             output, err = proc.communicate()
             output = tools.safe_decode(output)
             err = tools.safe_decode(err)
+            env_diff = tools.dict_diff(unused_kwargs.get('env', {}),
+                                       os.environ)
             message = (message_before
                        + format_out('Return Code', proc.returncode)
+                       + format_out('Env Changes', env_diff)
                        + format_out('Output', output))
             if err:
                 message += format_out('Error', err)
@@ -6293,6 +6411,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         global _buildfile_locks
+        global _buildfile_locks_lock
         if fname is None:
             fname = cls.locked_buildfile
         assert fname is not None
@@ -6306,19 +6425,11 @@ class CompiledModelDriver(ModelDriver):
     @contextlib.contextmanager
     def buildfile_locked(self, dry_run=False):
         r"""Context manager for locked build file."""
-        dry_run = (dry_run or self.allow_parallel_build)
-        try:
-            if not dry_run:
-                self.buildfile_lock.lock.acquire()
-                if self._mpi_rank > 0:
-                    self.recv_mpi(tag=self._mpi_tags['LOCK_BUILDFILE'])
+        if self.buildfile_lock:
+            with self.buildfile_lock.locked(self, dry_run=dry_run):
+                yield
+        else:
             yield
-        finally:
-            if not dry_run:
-                if self._mpi_rank > 0:
-                    self.send_mpi('UNLOCK_BUILDFILE',
-                                  tag=self._mpi_tags['UNLOCK_BUILDFILE'])
-                self.buildfile_lock.lock.release()
 
     @classmethod
     def mpi_partner_init(cls, self):
@@ -6327,25 +6438,18 @@ class CompiledModelDriver(ModelDriver):
             message = self.recv_mpi(tag=self._mpi_tags['BUILDFILE'])
             message['context'] = self.context
             self.buildfile_lock = cls.get_buildfile_lock(**message)
-            if self.buildfile_lock.when_to_lock == 'init':
-                cls.partner_buildfile_lock(self)
+            self.buildfile_lock.add_partner_request(self)
+            if 'init' in self.buildfile_lock.lock_conditions:
+                self.buildfile_lock.partner_locked(self)
 
     @classmethod
     def mpi_partner_cleanup(cls, self):
         r"""Actions cleaning up an MPIPartnerModel."""
         super(CompiledModelDriver, cls).mpi_partner_cleanup(self)
         if (((not cls.allow_parallel_build)
-             and (self.buildfile_lock.when_to_lock == 'cleanup'))):
-            cls.partner_buildfile_lock(self)
+             and 'cleanup' in self.buildfile_lock.lock_conditions)):
+            self.buildfile_lock.partner_locked(self)
         
-    @classmethod
-    def partner_buildfile_lock(cls, self):
-        r"""Actions completing buildfile lock on MPIPartnerModels."""
-        with self.buildfile_lock.lock:
-            self.send_mpi('LOCK_BUILDFILE',
-                          tag=self._mpi_tags['LOCK_BUILDFILE'])
-            self.recv_mpi(tag=self._mpi_tags['UNLOCK_BUILDFILE'])
-
     def init_model_dep(self, **kwargs):
         r"""Set the language of the target being compiled (usually the same
         as the language associated with this driver.
@@ -6981,9 +7085,9 @@ class CompiledModelDriver(ModelDriver):
         dep = dep.specialized(**kwargs)
         kwargs = DependencySpecialization.remainder(
             kwargs, remove_parameters=dep.all_parameters())
+        for k in ['overwrite', 'working_dir']:
+            kwargs.setdefault(k, getattr(self, k))
         with self.buildfile_locked(dry_run=dont_lock_buildfile):
-            for k in ['overwrite', 'working_dir']:
-                kwargs.setdefault(k, getattr(self, k))
             return dep.build(**kwargs)
 
     @classmethod

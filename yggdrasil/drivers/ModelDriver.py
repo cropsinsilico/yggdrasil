@@ -1615,10 +1615,15 @@ class ModelDriver(Driver):
                    msg, not dont_block)
         kws = {'dest': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
         if dont_block:  # pragma: debug
-            # return self._mpi_comm.isend(msg, **kws)
+            out = None
+            # out = self._mpi_comm.isend(msg, **kws)
             raise NotImplementedError("Non-blocking MPI send not tested.")
         else:
-            return self._mpi_comm.send(msg, **kws)
+            out = self._mpi_comm.send(msg, **kws)
+        self.debug("send %d (%d) [%s]: %s (blocking=%s) = %s", tag,
+                   self._mpi_tag + tag, self._inv_mpi_tags[tag],
+                   msg, not dont_block, out)
+        return out
 
     def recv_mpi(self, tag=0, dont_block=False):
         r"""Receive an MPI message."""
@@ -1627,9 +1632,13 @@ class ModelDriver(Driver):
                    not dont_block)
         kws = {'source': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
         if dont_block:
-            return self._mpi_comm.irecv(**kws)
+            out = self._mpi_comm.irecv(**kws)
         else:
-            return self._mpi_comm.recv(**kws)
+            out = self._mpi_comm.recv(**kws)
+        self.debug('recv %d (%d) [%s] (blocking=%s) = %s', tag,
+                   self._mpi_tag + tag, self._inv_mpi_tags[tag],
+                   not dont_block, out)
+        return out
 
     def stop_mpi_partner(self, msg=None, dest=0, tag=None):
         r"""Send a message to stop the MPI partner model on the main process."""

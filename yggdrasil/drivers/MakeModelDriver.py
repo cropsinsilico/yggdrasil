@@ -112,13 +112,6 @@ class MakeModelDriver(BuildModelDriver):
     default_target = []
 
     @classmethod
-    def get_buildfile_lock(cls, **kwargs):
-        r"""Get a lock for a buildfile to prevent simultaneous access,
-        creating one as necessary."""
-        kwargs.setdefault('when_to_lock', 'cleanup')
-        return super(MakeModelDriver, cls).get_buildfile_lock(**kwargs)
-        
-    @classmethod
     def get_language_for_buildfile(cls, buildfile, target=None):
         r"""Determine the target language based on the contents of a build
         file.

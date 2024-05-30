@@ -1067,16 +1067,19 @@ class WaitableFunction(object):
             returns a boolean.
         polling_interval (float, optional): Time (in seconds) that should be
             waited in between function calls. Defaults to 0.1 seconds.
+        name (str, optional): Name to use in log messages if verbose
+            is True.
 
     """
 
-    __slots__ = ["function", "polling_interval"]
+    __slots__ = ["function", "polling_interval", "logname"]
 
-    def __init__(self, function, polling_interval=0.01):
+    def __init__(self, function, polling_interval=0.01, name=None):
         self.function = function
         self.polling_interval = polling_interval
+        self.logname = name if name else str(function)
 
-    def wait(self, timeout=None, on_timeout=False):
+    def wait(self, timeout=None, on_timeout=False, verbose=False):
         r"""Wait for the function to return True.
 
         Args:
@@ -1090,6 +1093,8 @@ class WaitableFunction(object):
                 value of True will cause the function value to be returned.
                 A string will be used as the error message for a raised
                 timeout error. Defaults to False.
+            verbose (bool, optional): If True, log messages will be emitted
+                each time the function is called.
 
         Returns:
             object: The result of the function call.
@@ -1098,6 +1103,8 @@ class WaitableFunction(object):
         def task_target():
             if self.function():
                 raise BreakLoopException
+            if verbose:
+                logger.info(f"{self.logname}: Called during wait")
         loop = TaskLoop(target=task_target,
                         polling_interval=self.polling_interval)
         loop.start()
@@ -1117,7 +1124,7 @@ class WaitableFunction(object):
 
 
 def wait_on_function(function, timeout=None, on_timeout=False,
-                     polling_interval=0.1):
+                     polling_interval=0.1, name=None, verbose=False):
     r"""Wait for the function to return True.
 
     Args:
@@ -1135,25 +1142,33 @@ def wait_on_function(function, timeout=None, on_timeout=False,
             timeout error. Defaults to False.
         polling_interval (float, optional): Time (in seconds) that should be
             waited in between function calls. Defaults to 0.1 seconds.
+        name (str, optional): Name to use in log messages if verbose
+            is True.
+        verbose (bool, optional): If True, log messages will be emitted
+            each time the function is called.
 
     Returns:
         object: The result of the function call.
 
     """
-    x = WaitableFunction(function, polling_interval=polling_interval)
-    return x.wait(timeout=timeout, on_timeout=on_timeout)
+    x = WaitableFunction(function, polling_interval=polling_interval,
+                         name=name)
+    return x.wait(timeout=timeout, on_timeout=on_timeout,
+                  verbose=verbose)
 
 
 class MPIRequestWrapper(WaitableFunction):
     r"""Wrapper for an MPI request."""
 
-    __slots__ = ["request", "completed", "canceled", "_result"]
+    __slots__ = ["request", "completed", "canceled", "callback", "_result"]
 
-    def __init__(self, request, completed=False, **kwargs):
+    def __init__(self, request, completed=False, callback=None, **kwargs):
         self.request = request
         self.completed = completed
         self.canceled = False
+        self.callback = callback
         self._result = None
+        kwargs.setdefault('name', request)
         super(MPIRequestWrapper, self).__init__(
             lambda: self.test()[0] or self.canceled, **kwargs)
 
@@ -1174,6 +1189,8 @@ class MPIRequestWrapper(WaitableFunction):
         r"""Test to see if the request has completed."""
         if not self.completed:
             self.completed, self._result = self.request.test()
+            if self.completed and self.callback:
+                self.callback(self._result)
         return (self.completed, self._result)
 
     def wait(self, timeout=None, on_timeout=False):
@@ -1238,7 +1255,7 @@ class MPIErrorExchange(object):
         self.incoming = [
             MPIRequestWrapper(
                 self.comm.irecv(source=i, tag=self.incoming_tag),
-                polling_interval=0)
+                polling_interval=0, name=f'ERROR_ON_RANK{i}')
             for i in self.partner_ranks]
         self._first_use = False
         
@@ -1257,7 +1274,8 @@ class MPIErrorExchange(object):
                     self.comm.irecv(
                         source=self.partner_ranks[i],
                         tag=self.incoming_tag),
-                    polling_interval=0)
+                    polling_interval=0,
+                    name=f'CLOSING{self.partner_ranks[i]}')
             results.append((completed, result))
         return results
 
