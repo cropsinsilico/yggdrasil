@@ -2081,7 +2081,7 @@ if __name__ == "__main__":
             (('--without-deps', ),
              {'action': 'store_true',
               'help': ("Perform installation steps without installing "
-                       "dependencies first (assuming the depdnencies "
+                       "dependencies first (assuming the dependencies "
                        "were already installed).")}),
         ])
     # Install recipe
@@ -2116,6 +2116,12 @@ if __name__ == "__main__":
                        "first (assuming the package was already "
                        "built).")}),
         ])
+    # Configure package
+    parser_pkg = subparsers.add_parser(
+        'configure', help="Configure the package.")
+    SetupParam.add_parser_args(
+        parser_pkg, skip=['method'],
+        include=['allow_missing'])
     # Installation verification
     parser_ver = subparsers.add_parser(
         'verify', help="Verify that the package was installed correctly.")
@@ -2211,6 +2217,10 @@ if __name__ == "__main__":
                              param=param, dont_test=args.dont_test,
                              varient_config_files=args.varient_config_files,
                              without_build=args.without_build)
+    elif args.operation == 'configure':
+        param = SetupParam.from_args(args, install_opts)
+        config_pkg(param=param, python=args.python,
+                   allow_missing=args.allow_missing)
     elif args.operation == 'verify':
         param = SetupParam.from_args(args, install_opts)
         verify_pkg(install_opts=param.install_opts)

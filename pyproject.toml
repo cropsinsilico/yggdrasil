@@ -87,6 +87,9 @@ sdist.include = [
   "yggdrasil/demos/fspm2020/meshes/*.obj",
   "yggdrasil/demos/CiS2021-hackathon/meshes/*.obj",
   "yggdrasil/examples/*/src/CMakeLists.txt",
+  "yggdrasil/examples/backwards/src/CMakeLists.txt",
+  "yggdrasil/examples/gs_lesson4/src/CMakeLists.txt",
+  "yggdrasil/examples/model_error_with_io/src/CMakeLists.txt",
 ]
 wheel.exclude = [
   "CMakeLists.txt",

@@ -2724,7 +2724,7 @@ class CompilationDependency(object):
                               DependencySpecialization.tooltypes)]:
             tooltype = filetype.rsplit('_', 1)[0]
             out = None
-            tool = self.get(tooltype, **kwargs)
+            tool = self.get(tooltype, None, **kwargs)
             if tool:
                 out = tool.get_executable(full_path=True)
         elif filetype in [f'{k}_env' for k in

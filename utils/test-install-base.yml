@@ -295,7 +295,7 @@ jobs:
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build --use-mamba
     - name: (CONDA) Configure
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: yggconfig
+      run: python utils/setup_test_env.py configure --use-mamba
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
       run: |
