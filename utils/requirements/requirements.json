@@ -33,6 +33,7 @@
       "{{ compiler('c') }}": {
         "method": "conda_recipe",
         "host": true,
+        "os": "unix",
         "flags": {
           "build": true,
           "build_only": true
@@ -43,6 +44,7 @@
       "{{ compiler('cxx') }}": {
         "method": "conda_recipe",
         "host": true,
+        "os": "unix",
         "flags": {
           "build": true,
           "build_only": true

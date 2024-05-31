@@ -53,8 +53,8 @@ requirements:
     - python-build
     - scikit-build-core
     - setuptools_scm
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('c') }}                    # [not win]
+    - {{ compiler('cxx') }}                  # [not win]
   host:
     - hatch-fancy-pypi-readme
     - libxcrypt  # [py<38]
@@ -64,8 +64,8 @@ requirements:
     - scikit-build-core
     - setuptools_scm
     - sysv_ipc  # [not win]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('c') }}  # [not win]
+    - {{ compiler('cxx') }}  # [not win]
   run:
     - GitPython
     - chevron

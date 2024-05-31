@@ -18,12 +18,14 @@ general:
   - "{{ compiler('c') }}":
       method: conda_recipe
       host: True
+      os: unix
       flags:
         build: True
         build_only: True
   - "{{ compiler('cxx') }}":
       method: conda_recipe
       host: True
+      os: unix
       flags:
         build: True
         build_only: True
