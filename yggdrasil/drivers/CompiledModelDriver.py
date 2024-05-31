@@ -577,7 +577,8 @@ class CompilationToolRegistry(object):
                       toolset=None, only_installed=False,
                       driver=None, skip_driver=False,
                       compatible_with=None,
-                      default=tools.InvalidDefault(), **kwargs):
+                      default=tools.InvalidDefault(),
+                      dont_check_executable=False, **kwargs):
         r"""Locate a tool that matches the specified parameters,
         prioritizing classes according to configuration parameters and
         create an instance.
@@ -628,7 +629,9 @@ class CompilationToolRegistry(object):
         out = None
         if driver:
             out = getattr(driver, f'{tooltype}_tool', None)
-            if not self._matches(out, **sorting_kws):
+            if not self._matches(
+                    out, dont_check_executable=dont_check_executable,
+                    **sorting_kws):
                 out = None
                 if not toolname:
                     toolname = self.toolname(
@@ -659,8 +662,10 @@ class CompilationToolRegistry(object):
                       or shutil.which(toolname)))):
                 kwargs['executable'] = toolname
             out = out(**kwargs)
-        return self._check_return(tooltype, out, default=default,
-                                  **sorting_kws)
+        return self._check_return(
+            tooltype, out, default=default,
+            dont_check_executable=dont_check_executable,
+            **sorting_kws)
 
     def tool(self, tooltype, toolname=None, language=None,
              toolset=None, only_installed=False,
@@ -3789,13 +3794,14 @@ class CompilationDependency(object):
             filetype = 'include'
         kwargs['verbose'] = True  # TODO: Temporary
         out = False
+        search_param = self._search_param(libtype=filetype)
         if ((filetype in ['shared', 'windows_import']
              and self.origin in ['standard', 'language'])):
-            out = self._search_linked(filetype, **kwargs)
+            out = self._search_linked(search_param=search_param,
+                                      libtype=filetype, **kwargs)
         if not out:
-            out = self._search_brute(
-                self.parameters.get(filetype, self.name),
-                libtype=filetype, **kwargs)
+            out = self._search_brute(search_param=search_param,
+                                     libtype=filetype, **kwargs)
         if (((not out) and self.origin in ['standard', 'language']
              and filetype in self.library_files)):
             out = self._build_output_base(filetype=filetype, **kwargs)
@@ -3803,26 +3809,80 @@ class CompilationDependency(object):
             out = os.path.normpath(out)
         return out
 
-    def _search_linked(self, filetype, **kwargs):
+    def _search_param(self, fname=None, libtype=None):
+        if libtype is None:
+            libtype = self.get('libtype')
+        if fname is None:
+            if self.name == 'python':
+                fname = tools.get_python_c_library(allow_failure=True,
+                                                   libtype=libtype)
+            elif self.name == 'numpy':
+                fname = tools.get_numpy_c_library(allow_failure=True,
+                                                  libtype=libtype)
+            else:
+                fname = self.parameters.get(libtype, self.name)
+        fname_base, fname_ext = DependencyRegistry.splitext(fname)
+        if not fname_ext:
+            fname_base = self.prefix(libtype) + fname
+            fname_ext = self.extension(libtype)
+            fname = fname_base + fname_ext
+        else:
+            expected_ext = self.extension(libtype, return_all=True)
+            if (((fname_ext not in expected_ext)
+                 and not fname_ext.startswith(tuple(expected_ext)))):
+                fname = fname_base + expected_ext[0]
+                fname_ext = expected_ext[0]
+        if os.path.isfile(fname):
+            return [(fname_base, fname_ext, fname, None)]
+        fname_base = os.path.basename(fname_base)
+        fname_try = [fname_base]
+        if platform._is_win and libtype in self.library_files:
+            if fname_base.startswith('lib'):
+                fname_try.append(fname_base[3:])
+            else:
+                fname_try.append('lib' + fname_base)
+        return [(fname_base, fname_ext,
+                 fname_base + '*' + fname_ext,
+                 (r'(?:(?:^)|(?:\s)).*[^a-zA-Z](?:lib)?'
+                  + tools.escape_regex(
+                      fname_base[3:] if fname_base.startswith('lib')
+                      else fname_base)
+                  + r'(?:[^a-zA-Z].*)?'
+                  + tools.escape_regex(fname_ext)))
+                for fname_base in fname_try]
+
+    def _search_linked(self, search_param=None, libtype=None, **kwargs):
+        if libtype is None:
+            libtype = self.get('libtype')
+        if search_param is None:
+            search_param = self._search_param(libtype=libtype)
         assert self.origin in ['standard', 'language']
-        assert filetype in ['shared', 'windows_import']
+        assert libtype in ['shared', 'windows_import']
         out = False
-        if filetype == 'windows_import':
+        if libtype == 'windows_import':
             dll = self.get('shared', False)
             if dll:
-                out = self._search_brute(dll, libtype=filetype, **kwargs)
+                out = self._search_brute(fname=dll, libtype=libtype,
+                                         **kwargs)
             return out
         flags = self.get('dep_shared_flags', [])
         if not flags:
             if self.origin == 'standard':
                 flags.append(f'-l{self.name}')
         try:
-            for lib in self.basetool.find_component(
-                    self.name, cfg=self.cfg, flags=flags,
-                    component_types='shared_libraries', **kwargs):
-                # TODO: temp
-                print(f"FIND_COMPONENT {self.name}: {lib}")
-                out = self._search_brute(lib, libtype='shared', **kwargs)
+            for fname_base, fname_ext, fname, regex in search_param:
+                if os.path.isfile(fname):
+                    return fname
+                for lib in self.basetool.find_component(
+                        self.name, cfg=self.cfg, flags=flags,
+                        component_types='shared_libraries',
+                        regex=regex, **kwargs):
+                    # TODO: temp
+                    print(f"FIND_COMPONENT {self.name}: {lib}")
+                    out = self._search_brute(fname=lib, libtype='shared',
+                                             **kwargs)
+                    if out:
+                        break
                 if out:
                     break
         except RuntimeError as e:
@@ -3830,8 +3890,9 @@ class CompilationDependency(object):
                          f"\'{self.name}\': {e}")
         return out
 
-    def _search_brute(self, fname, libtype=None, verbose=False,
-                      dont_check_windows_import=False, **kwargs):
+    def _search_brute(self, search_param=None, fname=None, libtype=None,
+                      verbose=False, dont_check_windows_import=False,
+                      **kwargs):
         r"""Locate a library file.
 
         Args:
@@ -3854,43 +3915,15 @@ class CompilationDependency(object):
         """
         if libtype is None:
             libtype = self.get('libtype')
-        out = False
-        if self.name == 'python':
-            fname = tools.get_python_c_library(allow_failure=True,
-                                               libtype=libtype)
-        elif self.name == 'numpy':
-            fname = tools.get_numpy_c_library(allow_failure=True,
+        if search_param is None:
+            search_param = self._search_param(fname=fname,
                                               libtype=libtype)
-        fname_base, fname_ext = DependencyRegistry.splitext(fname)
-        if not fname_ext:
-            fname_base = self.prefix(libtype) + fname
-            fname_ext = self.extension(libtype)
-            fname = fname_base + fname_ext
-        else:
-            expected_ext = self.extension(libtype, return_all=True)
-            if (((fname_ext not in expected_ext)
-                 and not fname_ext.startswith(tuple(expected_ext)))):
-                fname = fname_base + expected_ext[0]
-                fname_ext = expected_ext[0]
-        if os.path.isfile(fname):
-            return fname
-        fname_base = os.path.basename(fname_base)
-        # use_regex = (not platform._is_win)
-        fname_try = [fname_base]
-        if platform._is_win and libtype in self.library_files:
-            if fname_base.startswith('lib'):
-                fname_try.append(fname_base[3:])
-            else:
-                fname_try.append('lib' + fname_base)
+        out = False
         search_list = self.tool(libtype).get_search_path(
             libtype=libtype, cfg=self.cfg, **kwargs)
-        for fname_base in fname_try:
-            fname = fname_base + '*' + fname_ext
-            use_regex = (
-                r'[^a-zA-Z]'
-                + tools.escape_regex(fname_base)
-                + r'([^a-zA-Z].*)?'
-                + tools.escape_regex(fname_ext))
+        for fname_base, fname_ext, fname, use_regex in search_param:
+            if os.path.isfile(fname):
+                return fname
             out = tools.locate_file(fname, directory_list=search_list,
                                     environment_variable=None,
                                     use_regex=use_regex,
@@ -5614,7 +5647,7 @@ class CompilerBase(CompilationToolBase):
 
     @classmethod
     def find_component(cls, component, component_types=None,
-                       flags=[], cfg=None, **kwargs):
+                       flags=[], cfg=None, regex=None, **kwargs):
         r"""Locate components in a compiled test library that match.
 
         Args:
@@ -5622,6 +5655,9 @@ class CompilerBase(CompilationToolBase):
             component_types ((str, list, optional): Type of component(s)
                 that should be searched for.
             flags (list, optional): Flags to add to the test compilation.
+            regex (str, optional): Regular expression that should be used
+                to locate the component in the output from the
+                disassembler.
             **kwargs: Additional keyword arguments are passed to
                 CompilationToolBase.call.
 
@@ -5645,15 +5681,18 @@ class CompilerBase(CompilationToolBase):
                      force_simultaneous_next_stage=True, **kwargs)
             for lib in cls.disassembler().find_component(
                     ftest, component, component_types=component_types,
-                    verbose=kwargs.get('verbose', False)):
+                    verbose=kwargs.get('verbose', False),
+                    regex=regex):
                 if ((not (os.path.isabs(lib)
                           and os.path.isfile(lib))
                      and cls.toolset in ['llvm', 'gnu'])):
                     lib = os.path.basename(lib)
-                    lib = subprocess.check_output(
+                    lib_file = subprocess.check_output(
                         [cls.get_executable(),
                          f'-print-file-name={lib}']
                     ).decode('utf-8').strip()
+                    if lib_file:
+                        lib = lib_file
                 if lib:
                     yield lib
         finally:
@@ -5967,7 +6006,7 @@ class DisassemblerBase(CompilationToolBase):
 
     @classmethod
     def find_component(cls, fname, component, component_types=None,
-                       **kwargs):
+                       regex=None, **kwargs):
         r"""Locate components in a binary file that match.
 
         Args:
@@ -5976,6 +6015,9 @@ class DisassemblerBase(CompilationToolBase):
             component (str): Name of component to search for.
             component_types ((str, list, optional): Type of component(s)
                 that should be searched for.
+            regex (str, optional): Regular expression that should be used
+                to locate the component in the output from the
+                disassembler.
             **kwargs: Additional keyword arguments are passed to
                 CompilationToolBase.call.
 
@@ -5983,11 +6025,17 @@ class DisassemblerBase(CompilationToolBase):
             list: Matching components.
 
         """
-        component_re = tools.escape_regex(component)
-        regex = re.compile(
-            r"(?:(?:^)|(?:\s))(?:\S*[^a-zA-Z])?(?:lib)?"
-            + component_re
-            + r"(?:[^a-zA-Z]\S*)?(?:(?:$)|(?:\s))")
+        if regex is None:
+            component_re = tools.escape_regex(component)
+            path_sep_re = tools.escape_regex(os.path.sep)
+            regex = re.compile(
+                r"(?:(?:(?:^)|(?:\s))|(?:"
+                + path_sep_re
+                + r"))(?:\S*[^a-zA-Z])?(?:lib)?"
+                + component_re
+                + r"(?:[^a-zA-Z]\S*)?(?:(?:$)|(?:\s))")
+        elif isinstance(regex, str):
+            regex = re.compile(regex)
         result = cls.call([fname], components=component_types, **kwargs)
         return [x.strip() for x in regex.findall(result[0])]
 
@@ -6012,14 +6060,15 @@ class DisassemblerBase(CompilationToolBase):
                 if cls.component_options[x]:
                     flags += cls.component_options[x].get('flags', [])
                     filters += cls.component_options[x].get('filters', [])
-        out = super(DisassemblerBase, cls).call(flags + args, **kwargs)[0]
+        out = super(DisassemblerBase, cls).call(flags + args, **kwargs)
         if filters:
+            out = out[0]
             lines = out.splitlines()
             lines_filtered = []
             for x in lines:
                 if any(xf in x for xf in filters):
                     lines_filtered.append(x)
-            out = '\n'.join(lines_filtered)
+            out = ['\n'.join(lines_filtered)]
         return out
 
 

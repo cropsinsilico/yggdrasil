@@ -3318,6 +3318,11 @@ definitions:
           should include the tool executable and any flags that should be passed to
           it.
         type: string
+      with_omp:
+        default: false
+        description: If True, the model will be compiled and linked with OpenMP if
+          OpenMP is installed and can be located.
+        type: boolean
       with_strace:
         default: false
         description: If True, the command is run with strace (on Linux) or dtrace
@@ -3424,6 +3429,11 @@ definitions:
         default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
+        type: boolean
+      with_omp:
+        default: false
+        description: If True, the model will be compiled and linked with OpenMP if
+          OpenMP is installed and can be located.
         type: boolean
     required:
     - args
@@ -3572,6 +3582,11 @@ definitions:
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
         type: boolean
+      with_omp:
+        default: false
+        description: If True, the model will be compiled and linked with OpenMP if
+          OpenMP is installed and can be located.
+        type: boolean
     required:
     - args
     - language
@@ -3656,6 +3671,11 @@ definitions:
         default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
+        type: boolean
+      with_omp:
+        default: false
+        description: If True, the model will be compiled and linked with OpenMP if
+          OpenMP is installed and can be located.
         type: boolean
     required:
     - args
@@ -3831,6 +3851,11 @@ definitions:
         default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
+        type: boolean
+      with_omp:
+        default: false
+        description: If True, the model will be compiled and linked with OpenMP if
+          OpenMP is installed and can be located.
         type: boolean
     required:
     - args
@@ -4071,6 +4096,11 @@ definitions:
         default: false
         description: If True, the model will be compiled and linked with the address
           sanitizer enabled (if there is one available for the selected compiler).
+        type: boolean
+      with_omp:
+        default: false
+        description: If True, the model will be compiled and linked with OpenMP if
+          OpenMP is installed and can be located.
         type: boolean
     required:
     - args
