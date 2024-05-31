@@ -17,11 +17,13 @@ general:
         cross_build: True
   - "{{ compiler('c') }}":
       method: conda_recipe
+      host: True
       flags:
         build: True
         build_only: True
   - "{{ compiler('cxx') }}":
       method: conda_recipe
+      host: True
       flags:
         build: True
         build_only: True

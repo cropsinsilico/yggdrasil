@@ -64,6 +64,8 @@ requirements:
     - scikit-build-core
     - setuptools_scm
     - sysv_ipc  # [not win]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   run:
     - GitPython
     - chevron

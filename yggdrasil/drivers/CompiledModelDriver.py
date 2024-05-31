@@ -3748,6 +3748,8 @@ class CompilationDependency(object):
                     self.get(f'{k}_flags', dry_run=True,
                              no_additional_stages=True,
                              skip_no_additional_stages_flag=True))
+                for k in tool.additional_flags_env:
+                    out[k] = ''
         return out
     
     def _runtime_env(self, to_update=None, **kwargs):
@@ -4073,6 +4075,7 @@ class CompilationToolBase(object):
     default_flags = []
     default_flags_env = None
     default_libtype = None
+    additional_flags_env = []
     output_key = '-o'
     output_first = False
     flag_options = OrderedDict()
@@ -4389,14 +4392,17 @@ class CompilationToolBase(object):
         if not cls.env_matches_tool():
             config_vars = {}
             cls.env_matches_tool(use_sysconfig=True, env=config_vars)
+            env_vars = []
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
                 if not isinstance(env, list):
                     env = [env]
-                for ienv in env:
-                    existing.pop(ienv, [])
-                    if ienv in config_vars:
-                        existing[ienv] = config_vars[ienv]
+                env_vars += env
+            env_vars += cls.additional_flags_env
+            for ienv in env_vars:
+                existing.pop(ienv, [])
+                if ienv in config_vars:
+                    existing[ienv] = config_vars[ienv]
         return existing
 
     @classmethod
@@ -4672,13 +4678,16 @@ class CompilationToolBase(object):
                                        use_sysconfig=True)
         if exe and env_dict:
             out += exe.split()[1:]
+            env_vars = []
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
                 if not isinstance(env, list):
                     env = [env]
-                for ienv in env:
-                    new_val = env_dict.get(ienv, '').split()
-                    out += [v for v in new_val if v not in out]
+                env_vars += env
+            env_vars += cls.additional_flags_env
+            for ienv in env_vars:
+                new_val = env_dict.get(ienv, '').split()
+                out += [v for v in new_val if v not in out]
         return out
 
     @classmethod

@@ -29,6 +29,7 @@ class CCompilerBase(CompilerBase):
     default_executable_env = 'CC'
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
+    additional_flags_env = ['CPPFLAGS']
     # GCC & CLANG have similar call patterns
     # create_next_stage_tool = {
     #     'attributes': {
