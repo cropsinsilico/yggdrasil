@@ -5575,7 +5575,7 @@ class CompilerBase(CompilationToolBase):
         CompilationToolBase.before_registration(cls)
         if platform._is_win:  # pragma: windows
             if not cls.is_gnu:
-                cls.libtype_ext['object'] = '.obj'
+                cls.libtype_ext = dict(cls.libtype_ext, object='.obj')
             cls.search_path_env.append(os.path.join('library', 'include'))
 
     @classmethod
@@ -5725,7 +5725,10 @@ class LinkerBase(CompilationToolBase):
         else:
             cls.libtype_ext['shared'] = '.so'
         if cls.is_gnu:
-            # cls.libtype_prefix['windows_import'] = 'lib'
+            cls.libtype_ext = dict(cls.libtype_ext,
+                                   windows_import='.dll.a')
+            # cls.libtype_prefix = dict(cls.libtype_prefix,
+            #                           windows_import='lib')
             cls.libtype_ext['windows_import'] = '.dll.a'
         if cls.libtype_ext['shared'] not in cls.all_library_ext:
             cls.all_library_ext = (
