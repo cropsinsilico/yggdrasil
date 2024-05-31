@@ -2937,6 +2937,13 @@ class CompilationDependency(object):
                 if os.path.isfile(include):
                     include = os.path.dirname(include)
                 out += [include]
+        elif self.origin in ['external', 'language']:
+            if self.is_rebuildable:
+                compiler = self.tool('compiler')
+                if isinstance(compiler.search_path_env, list):
+                    out += [os.path.join(iprefix, ienv)
+                            for iprefix in compiler.get_env_prefixes()
+                            for ienv in compiler.search_path_env]
         elif self.origin in ['user', 'internal']:
             root = self.get('directory', False)
             if not root:
