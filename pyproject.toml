@@ -92,7 +92,7 @@ sdist.include = [
   "yggdrasil/examples/model_error_with_io/src/CMakeLists.txt",
 ]
 wheel.exclude = [
-  "CMakeLists.txt",
+  # "CMakeLists.txt",
   "__pycache__",
   "yggdrasil/python-rapidjson",
   "yggdrasil/core/cmake",

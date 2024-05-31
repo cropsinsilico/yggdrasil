@@ -1997,7 +1997,7 @@ class CompilationDependency(object):
         """
         if self._all_parameters is None:
             out = (self.scalar_parameters + self.list_parameters
-                   + self.dict_parameters)
+                   + self.dict_parameters + self.passed_parameters)
             if generalize:
                 tooltypes = _tool_types
             elif only_active:
@@ -2318,6 +2318,9 @@ class CompilationDependency(object):
                     self['libtype'], None)
             if tooltype0 is None:
                 out = None
+            elif (tooltype0 != 'compiler'
+                  and self.origin in ['language', 'standard']):
+                out = self.tool('compiler').get_tool(tooltype0)
             else:
                 language = self.parameters.get(f"{tooltype0}_language",
                                                self.language)
@@ -2890,7 +2893,7 @@ class CompilationDependency(object):
                     filetype.split('target_', 1)[-1], None)
         else:
             out = self.parameters.get(filetype, None)
-        if out is None and hasattr(self, f'_generated_{filetype}'):
+        if out in [None, False] and hasattr(self, f'_generated_{filetype}'):
             out = getattr(self, f'_generated_{filetype}')(**kwargs)
             if out is not None:
                 self.generated.append(key)
