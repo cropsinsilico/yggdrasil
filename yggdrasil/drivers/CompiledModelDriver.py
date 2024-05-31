@@ -6012,7 +6012,7 @@ class DisassemblerBase(CompilationToolBase):
                 if cls.component_options[x]:
                     flags += cls.component_options[x].get('flags', [])
                     filters += cls.component_options[x].get('filters', [])
-        out = super(DisassemblerBase, cls).call(flags + args, **kwargs)
+        out = super(DisassemblerBase, cls).call(flags + args, **kwargs)[0]
         if filters:
             lines = out.splitlines()
             lines_filtered = []
@@ -6067,6 +6067,8 @@ class DumpBinDisassembler(DisassemblerBase):
             'flags': ['/all'],
             'filters': ['DLL name']},
     }
+    version_regex = [
+        r'Microsoft \(R\) COFF\/PE Dumper Version \d+\.\d+\.\d+\.\d+']
 
 
 class BuilderBase(CompilationToolBase):
@@ -6900,7 +6902,8 @@ class CompiledModelDriver(ModelDriver):
                 raise ValueError(f"Unexpected configuration option: '{k}'")
             vtool = None
             try:
-                vtool = _tool_registry.tool_instance(k, v)
+                vtool = _tool_registry.tool_instance(
+                    k, v, dont_check_executable=True)
             except InvalidCompilationTool:  # pragma: debug
                 reg = _tool_registry.tooltype[k]
                 for kreg, vreg in reg.items():

@@ -500,12 +500,13 @@ class CModelDriver(CompiledModelDriver):
                                           'python', 'numpy'],
                 'include_dirs': ['communication', 'serialize'],
                 'compiler_flags': [],
-                'platform_specifics': {
-                    'Linux': {
-                        'compiler_flags': ['-fPIC'],
-                        'external_dependencies': ['m'],
-                    },
-                }},
+                # 'platform_specifics': {
+                #     'Linux': {
+                #         'compiler_flags': ['-fPIC'],
+                #         'external_dependencies': ['m'],
+                #     },
+                # }},
+                },
         'regex_win32': {'name': 'regex',
                         'source': 'regex_win32.cpp',
                         'platforms': ['Windows'],
