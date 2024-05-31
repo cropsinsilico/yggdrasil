@@ -101,7 +101,7 @@ class CMakeConfigure(ConfigurerBase):
             out = os.environ.get('CMAKE_GENERATOR', default)
         if not out:
             lines = cls.call(['--help'], skip_flags=True,
-                             allow_error=True, **kwargs)
+                             allow_error=True, **kwargs)[0]
             if 'Generators' not in lines:  # pragma: debug
                 raise RuntimeError(f"Generator call failed:\n{lines}")
             gen_list = (lines.split('Generators')[-1]).splitlines()

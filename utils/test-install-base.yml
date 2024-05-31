@@ -208,7 +208,7 @@ jobs:
       run: ygginstall R --update-r-requirements
     - name: (MACOS,PIP) Set C compiler to llvm clang
       if: matrix.install-method == 'pip' && runner.os == 'macOS'
-      run: yggconfig --c-compiler=/usr/local/opt/llvm/bin/clang --c++-compiler=/usr/local/opt/llvm/bin/clang++
+      run: yggconfig --c-compiler=/opt/homebrew/opt/llvm/bin/clang --c++-compiler=/opt/homebrew/opt/llvm/bin/clang++
     # ========================================================
 
     # ========================================================

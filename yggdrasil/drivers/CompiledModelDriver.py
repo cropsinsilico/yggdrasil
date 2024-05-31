@@ -1171,6 +1171,7 @@ class DependencySpecialization(object):
         ('builder', None),
         ('configurer', None),
         ('with_asan', False),
+        ('with_omp', False),
         ('disable_python_c_api', False),
         ('logging_level', False),
         ('commtype', None),
@@ -1179,11 +1180,11 @@ class DependencySpecialization(object):
     ])
     tooltypes = ['basetool'] + _tool_types
     target_param = [
-        'with_asan', 'disable_python_c_api', 'logging_level',
+        'with_asan', 'with_omp', 'disable_python_c_api', 'logging_level',
         'commtype',
     ]
     command_line_param = [
-        'with_asan', 'disable_python_c_api', 'logging_level',
+        'with_asan', 'with_omp', 'disable_python_c_api', 'logging_level',
         'commtype', 'dry_run',
     ]
     command_line_options = [
@@ -1193,6 +1194,9 @@ class DependencySpecialization(object):
         (('--with-asan', ),
          {'action': 'store_true',
           'help': "Compile with address sanitizer if available."}),
+        (('--with-omp', ),
+         {'action': 'store_true',
+          'help': "Compile with OpenMP if available."}),
         (('--commtype', ),
          {'type': str,
           'help': ("Type of communicator that compilation should "
@@ -1856,6 +1860,8 @@ class CompilationDependency(object):
             'origin': origin,
             'language': language,
         }
+        if '-fopenmp' in kwargs.get('compiler_flags', []):
+            kwargs.setdefault('with_omp', True)
         self._parent_driver = driver
         self._driver = None
         self._all_parameters = None
@@ -2241,6 +2247,8 @@ class CompilationDependency(object):
             out += '_nopython'
         if self.specialization['with_asan']:
             out += '_asan'
+        if self.specialization['with_omp']:
+            out += '_omp'
         commtype = self.specialization['commtype']
         if commtype is None:
             commtype = tools.get_default_comm()
@@ -2931,19 +2939,18 @@ class CompilationDependency(object):
     def _include_dirs(self, **kwargs):
         out = []
         root = False
+        if self.is_rebuildable:
+            compiler = self.tool('compiler')
+            if isinstance(compiler.search_path_env, list):
+                out += [os.path.join(iprefix, ienv)
+                        for iprefix in compiler.get_env_prefixes()
+                        for ienv in compiler.search_path_env]
         if self.origin == 'external':
             include = self.get('include', False)
             if include:
                 if os.path.isfile(include):
                     include = os.path.dirname(include)
                 out += [include]
-        elif self.origin in ['external', 'language']:
-            if self.is_rebuildable:
-                compiler = self.tool('compiler')
-                if isinstance(compiler.search_path_env, list):
-                    out += [os.path.join(iprefix, ienv)
-                            for iprefix in compiler.get_env_prefixes()
-                            for ienv in compiler.search_path_env]
         elif self.origin in ['user', 'internal']:
             root = self.get('directory', False)
             if not root:
@@ -3172,6 +3179,10 @@ class CompilationDependency(object):
              and self.name != 'asan')):
             self.driver.libraries.add_compiler_libraries(self.basetool)
             alldeps.append((self.basetool.languages[0], 'asan'))
+        if ((self.specialization['with_omp']
+             and self['libtype'] in self.compiled_files
+             and self.name != 'omp')):
+            alldeps.append(('c', 'omp'))
         if ((self['libtype'] in self.compiled_files
              and self.basetool.standard_library
              and self.is_rebuildable
@@ -6184,6 +6195,9 @@ class CompiledModelDriver(ModelDriver):
         with_asan (bool, optional): If True, the model will be compiled
             and linked with the address sanitizer enabled (if there is
             one available for the selected compiler).
+        with_omp (bool, optional): If True, the model will be compiled
+            and linked with OpenMP if OpenMP is installed and can be
+            located.
         compile_working_dir (str, optional): Directory where compilation
             should be invoked from if it is not the same as the provided
             working_dir.
@@ -6227,7 +6241,8 @@ class CompiledModelDriver(ModelDriver):
         'source_files': {'type': 'array', 'items': {'type': 'string'},
                          'default': []},
         'disable_python_c_api': {'type': 'boolean', 'default': False},
-        'with_asan': {'type': 'boolean', 'default': False}}
+        'with_asan': {'type': 'boolean', 'default': False},
+        'with_omp': {'type': 'boolean', 'default': False}}
     executable_type = 'compiler'
     is_build_tool = False
     allow_parallel_build = False
@@ -6967,7 +6982,8 @@ class CompiledModelDriver(ModelDriver):
         """
         out = ModelDriver.configure_libraries.__func__(cls, cfg)
         # Search for external libraries
-        kws = {'with_asan': True}  # To force location of ASAN lib
+        kws = {'with_asan': True,  # To force location of ASAN lib
+               'with_omp': True}
         for k in cls.tooltypes:
             try:
                 kws[k] = cls.get_tool(k)
