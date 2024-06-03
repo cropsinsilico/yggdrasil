@@ -3812,6 +3812,20 @@ class CompilationDependency(object):
             out = os.path.normpath(out)
         return out
 
+    @classmethod
+    def _search_regex(cls, fname_base, fname_ext):
+        return (r'(?:(?:^)|(?:\s))(?:\@rpath'
+                + tools.escape_regex(os.path.sep)
+                + r')?(?P<path>(?P<base>(?:\S*[^a-zA-Z\s])?(?:lib)?'
+                + tools.escape_regex(
+                    fname_base[3:] if fname_base.startswith('lib')
+                    else fname_base)
+                + r'(?:[^a-zA-Z\.\s])*)(?P<ext>'
+                + r'(?:[^a-zA-Z\s]\S*)?'
+                + tools.escape_regex(fname_ext)
+                + r'(?:[^a-zA-Z\s]\S*)?))'
+                + r'(?:(?:$)|(?:\s))')
+
     def _search_param(self, fname=None, libtype=None):
         if libtype is None:
             libtype = self.get('libtype')
@@ -3846,12 +3860,7 @@ class CompilationDependency(object):
                 fname_try.append('lib' + fname_base)
         return [(fname_base, fname_ext,
                  fname_base + '*' + fname_ext,
-                 (r'(?:(?:^)|(?:\s)).*[^a-zA-Z](?:lib)?'
-                  + tools.escape_regex(
-                      fname_base[3:] if fname_base.startswith('lib')
-                      else fname_base)
-                  + r'(?:[^a-zA-Z].*)?'
-                  + tools.escape_regex(fname_ext)))
+                 self._search_regex(fname_base, fname_ext))
                 for fname_base in fname_try]
 
     def _search_linked(self, search_param=None, libtype=None, **kwargs):
@@ -6029,18 +6038,15 @@ class DisassemblerBase(CompilationToolBase):
 
         """
         if regex is None:
-            component_re = tools.escape_regex(component)
-            path_sep_re = tools.escape_regex(os.path.sep)
             regex = re.compile(
-                r"(?:(?:(?:^)|(?:\s))|(?:"
-                + path_sep_re
-                + r"))(?:\S*[^a-zA-Z])?(?:lib)?"
-                + component_re
-                + r"(?:[^a-zA-Z]\S*)?(?:(?:$)|(?:\s))")
+                CompilationDependency._search_regex(component, ''))
         elif isinstance(regex, str):
             regex = re.compile(regex)
         result = cls.call([fname], components=component_types, **kwargs)
-        return [x.strip() for x in regex.findall(result[0])]
+        out = [x[0].strip() for x in regex.findall(result[0])]
+        # TODO: temp
+        print("FIND_COMPONENT", regex, out)
+        return out
 
     @classmethod
     def call(cls, args, components=None, **kwargs):
