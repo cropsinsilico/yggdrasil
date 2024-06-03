@@ -594,7 +594,7 @@ class ConnectionDriver(Driver):
         self.debug('Returning')
 
     @run_remotely
-    def remove_model(self, direction, name):
+    def remove_model(self, direction0, name):
         r"""Remove a model from the list of models.
 
         Args:
@@ -608,15 +608,18 @@ class ConnectionDriver(Driver):
         """
         self.debug('')
         with self.lock:
-            if name in self.models[direction]:
-                self.models[direction].remove(name)
-            self.debug(("%s model '%s' signed off."
-                        "\n\tInput  models: %d"
-                        "\n\tOutput models: %d")
-                       % (direction.title(), name,
-                          len(self.models["input"]),
-                          len(self.models["output"])))
-            return (len(self.models[direction]) == 0)
+            out = False
+            for direction in ['input', 'output']:
+                if name in self.models[direction]:
+                    self.models[direction].remove(name)
+                self.debug(("%s model '%s' signed off."
+                            "\n\tInput  models: %d"
+                            "\n\tOutput models: %d")
+                           % (direction.title(), name,
+                              len(self.models["input"]),
+                              len(self.models["output"])))
+                out = (out or (len(self.models[direction]) == 0))
+            return out
 
     @run_remotely
     def on_model_exit_remote(self, direction, name,

@@ -269,6 +269,7 @@ class BuildModelDriver(CompiledModelDriver):
         creating one as necessary."""
         if kwargs.get('instance', None):
             kwargs.setdefault('fname', kwargs['instance'].buildfile)
+        kwargs.setdefault('lock_conditions', ('build', 'cleanup'))
         return super(BuildModelDriver, cls).get_buildfile_lock(**kwargs)
     
     @classmethod

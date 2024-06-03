@@ -111,7 +111,7 @@ class LockedFile(object):
 
     """
 
-    def __init__(self, fname, context, lock_conditions=("build", "cleanup")):
+    def __init__(self, fname, context, lock_conditions=("init", )):
         self.fname = fname
         self._lock = context.RLock()
         self.lock_conditions = lock_conditions
