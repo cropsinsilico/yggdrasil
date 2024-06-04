@@ -11,10 +11,10 @@ import socket
 from collections import OrderedDict
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
-from yggdrasil import platform, yamlfile
+from yggdrasil import platform, yamlfile, rapidjson
 from yggdrasil.drivers import create_driver
 from yggdrasil.components import import_component
-from yggdrasil.multitasking import MPI
+from yggdrasil.multitasking import init_mpi
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
@@ -319,6 +319,8 @@ class YggRunner(YggClass):
             be disabled. Defaults to False.
         with_asan (bool, optional): Compile and run all models with the
             address sanitizer. Defaults to False.
+        with_omp (bool, optional): Compile all models with OpenMP if
+            OpenMP is installed and can be located. Defaults to False.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -349,14 +351,17 @@ class YggRunner(YggClass):
                  partial_commtype=None, production_run=False,
                  mpi_tag_start=None, yaml_param=None, validate=False,
                  with_debugger=None, disable_python_c_api=False,
-                 with_asan=False, overwrite=False, remove_products=False):
+                 with_asan=False, with_omp=False, overwrite=False,
+                 remove_products=False):
         kwargs_models = {'with_debugger': with_debugger,
                          'disable_python_c_api': disable_python_c_api,
                          'with_asan': with_asan,
+                         'with_omp': with_omp,
                          'overwrite': overwrite,
                          'remove_products': remove_products}
         self.mpi_comm = None
         name = 'runner'
+        MPI = init_mpi()
         if MPI is not None:
             comm = MPI.COMM_WORLD
             if comm.Get_size() > 1:
@@ -609,6 +614,8 @@ class YggRunner(YggClass):
             models[io[:-1]] = [x['name'] for x in self.get_models(
                 [x.get('partner_model', None) for x in yml[io]
                  if x.get('partner_model', None)])]
+        if 'models' not in yml:
+            yml['models'] = models
         for io, io_opp in io_map.items():
             for x in yml[io]:
                 model = x.get('partner_model', None)
@@ -620,12 +627,12 @@ class YggRunner(YggClass):
                     rank_map[m['mpi_rank']].append(m)
                 if not any(rank > 0 for rank in rank_map.keys()):
                     continue
-                if 'models' not in yml:
-                    yml['models'] = models
                 comms = []
                 for rank in rank_map.keys():
                     x_copy = dict(copy.deepcopy(x),
                                   partner_copies=len(rank_map[rank]))
+                    x_copy.pop('transform', None)
+                    x_copy.pop('filter', None)
                     if rank == 0:
                         icomm = x_copy
                     else:
@@ -641,8 +648,7 @@ class YggRunner(YggClass):
                                           'daemon': True}],
                                 io: [x_copy],
                                 'driver': yml['driver'],
-                                'name': (
-                                    '%s_mpi%s_%s' % (yml['name'], rank, io)),
+                                'name': f"{x['name']}_mpi{rank}_{io}",
                                 'models': {
                                     io_opp[:-1]: models[io_opp[:-1]],
                                     io[:-1]: [m['name'] for m in
@@ -651,7 +657,7 @@ class YggRunner(YggClass):
                             icomm['mpi_stride'] += MPIComm._max_response
                         self._mpi_comms.append(icomm)
                         for m in rank_map[rank]:
-                            drv_key = 'mpi_%s_drivers' % io_opp[:-1]
+                            drv_key = f'mpi_{io_opp[:-1]}_drivers'
                             m.setdefault(drv_key, [])
                             m[drv_key].append(icomm['mpi_driver']['name'])
                     comms.append(icomm)
@@ -730,7 +736,7 @@ class YggRunner(YggClass):
                 for k2 in ['input_drivers', 'output_drivers', 'mpi_rank']:
                     x_cp.pop(k2, None)
                 for k2 in ['input_drivers', 'output_drivers']:
-                    x_cp[k2] = x_cp.get('mpi_%s' % k2, [])
+                    x_cp[k2] = x_cp.get(f'mpi_{k2}', [])
                 # Skew models away from root process so that
                 # connection threading might not share process
                 models[v['mpi_rank']].append((k, x_cp))
@@ -738,18 +744,22 @@ class YggRunner(YggClass):
             for x in models:
                 while len(x) < max_len:
                     x.append(None)
+            models = [rapidjson.dumps(x) for x in models]
+            connections = [rapidjson.dumps(x) for x in connections]
         else:
             models = None
             connections = None
+        self.modeldrivers = rapidjson.loads(
+            self.mpi_comm.scatter(models, root=0))
+        self.connectiondrivers = rapidjson.loads(
+            self.mpi_comm.scatter(connections, root=0))
         self.modeldrivers = dict(
-            [x for x in self.mpi_comm.scatter(models, root=0)
-             if (x is not None)])
+            [x for x in self.modeldrivers if (x is not None)])
         self.connectiondrivers = dict(
-            [x for x in self.mpi_comm.scatter(connections, root=0)
-             if (x is not None)])
+            [x for x in self.connectiondrivers if (x is not None)])
         self.modelcopies = self.mpi_comm.bcast(self.modelcopies, root=0)
-        self.info("Models on MPI process %d: %s", self.rank,
-                  list(self.modeldrivers.keys()))
+        self.info(f"Models on MPI process {self.rank}: "
+                  f"{list(self.modeldrivers.keys())}")
         # Add dummy drivers on root process to monitor remote ones
         # and re-group copies into duplicate model w/ duplicate models
         # before non-duplicate to allow them to start before starting
@@ -963,6 +973,7 @@ class YggRunner(YggClass):
             self.printStatus()
             self.terminate()
         if self.mpi_comm:
+            MPI = init_mpi()
             allcode = self.mpi_comm.allreduce(self.error_flag, op=MPI.SUM)
             if not self.error_flag:
                 self.error_flag = allcode

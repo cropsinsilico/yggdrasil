@@ -6,8 +6,6 @@ import glob
 import logging
 import subprocess
 import shutil
-import contextlib
-import threading
 import sysconfig
 import warnings
 import pprint
@@ -37,8 +35,6 @@ if _conda_prefix is not None:
     _system_suffix += '_' + os.path.basename(_conda_prefix)
 if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
-_buildfile_locks_lock = threading.RLock()
-_buildfile_locks = {}
 _library_types = ['include', 'static', 'shared', 'windows_import']
 
 
@@ -93,134 +89,6 @@ class CompilationToolError(Exception):
 class InvalidCompilationTool(CompilationToolError):
     r"""Class for invalid compilation tools"""
     pass
-
-
-class LockedFile(object):
-    r"""Class for locking files during compilation to prevent race
-    conditions between models running on separate threads/processes that
-    utilize the same files.
-
-    Args:
-        fname (str): Full path to the file that should be locked.
-        context (multitasking.TaskContext): Context that should be used
-            to create a lock for models launched by the local runner
-            process.
-        lock_conditions (tuple, optional): Conditions where the lock on
-            the file should be acquired by the partner comm when running
-            with MPI.
-
-    """
-
-    def __init__(self, fname, context, lock_conditions=("init", )):
-        self.fname = fname
-        self._lock = context.RLock()
-        self.lock_conditions = lock_conditions
-
-    @contextlib.contextmanager
-    def locked(self, driver, dry_run=False):
-        r"""Acquire the lock on the file so that operations can be
-        performed without race conditions between models on different
-        threads/processes.
-
-        Args:
-            driver (CompiledModelDriver): Driver for the model that is
-                locking the file.
-            dry_run (bool, optional): If True, this is a dry run and the
-                file should not actually be locked.
-
-        """
-        try:
-            if not dry_run:
-                self.lock(driver)
-            yield
-        finally:
-            if not dry_run:
-                self.unlock(driver)
-
-    def add_partner_request(self, driver):
-        r"""Add an async receive to handle requests from a model running
-        on another process to lock the file.
-
-        Args:
-            driver (MPIPartnerModel): Partner model driver shadowing the
-                model running on another process.
-
-        """
-        from yggdrasil.multitasking import MPIRequestWrapper
-        driver._mpi_requests[self.fname] = MPIRequestWrapper(
-            driver.recv_mpi(tag=driver._mpi_tags['LOCK_BUILDFILE'],
-                            dont_block=True))
-        if (("build" in self.lock_conditions
-             and self.fname not in driver.check_mpi_requests)):
-            driver._mpi_requests[self.fname].callback = (
-                lambda x: self.partner_locked(driver, x))
-            driver.check_mpi_requests.append(self.fname)
-
-    def partner_locked(self, driver, result=None):
-        r"""Respond to a lock request from a model running on another
-        processes by locking the file and waiting until it is unlocked
-        by that process.
-
-        Args:
-            driver (MPIPartnerModel): Partner model driver shadowing the
-                model that is locking the file.
-            result (object, optional): Received request to lock the file.
-
-        """
-        if result is None:
-            result = driver.wait_on_mpi_request(self.fname)
-        self._lock.acquire()
-        driver.send_mpi('LOCK_BUILDFILE',
-                        tag=driver._mpi_tags['LOCK_BUILDFILE'])
-        driver.recv_mpi(tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
-        self.add_partner_request(driver)
-        driver.send_mpi('UNLOCK_BUILDFILE',
-                        tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
-        self._lock.release()
-
-    def lock(self, driver):
-        r"""Lock the file.
-
-        Args:
-            driver (CompiledModelDriver): Driver for the model that is
-                locking the file.
-
-        Returns:
-            object: Result of the lock response call if running with MPI,
-               None otherwise.
-
-        """
-        self._lock.acquire()
-        if driver._mpi_rank == 0:
-            return
-        driver.send_mpi('LOCK_BUILDFILE',
-                        tag=driver._mpi_tags['LOCK_BUILDFILE'])
-        return driver.recv_mpi(tag=driver._mpi_tags['LOCK_BUILDFILE'])
-
-    def unlock(self, driver):
-        r"""Unlock the file.
-
-        Args:
-            driver (CompiledModelDriver): Driver for the model that is
-                unlocking the file.
-
-        Returns:
-            object: Result of the unlock response call if running with
-               MPI, None otherwise.
-
-        """
-        self._lock.release()
-        if driver._mpi_rank == 0:
-            return
-        driver.send_mpi('UNLOCK_BUILDFILE',
-                        tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
-        return driver.recv_mpi(tag=driver._mpi_tags['UNLOCK_BUILDFILE'])
-
-    @property
-    def message(self):
-        r"""str: Message form."""
-        return {'fname': self.fname,
-                'lock_conditions': self.lock_conditions}
 
 
 class CompilationToolRegistry(object):
@@ -4223,10 +4091,10 @@ class CompilationToolBase(object):
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
         # Set attributes based on environment variables or sysconfig
         if cls.default_executable is None:
-            cls.default_executable = cls.env_matches_tool(verbose=True)
+            cls.default_executable = cls.env_matches_tool()
         if cls.default_executable is None:
             cls.default_executable = cls.env_matches_tool(
-                use_sysconfig=True, verbose=True)
+                use_sysconfig=True)
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
@@ -6309,7 +6177,6 @@ class CompiledModelDriver(ModelDriver):
     executable_type = 'compiler'
     is_build_tool = False
     allow_parallel_build = False
-    locked_buildfile = None
     libraries = None
     standard_libraries = {}
     external_libraries = {}
@@ -6320,13 +6187,9 @@ class CompiledModelDriver(ModelDriver):
     optional_tooltypes = ['disassembler']
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
-        self.buildfile_lock = None
         self.model_dep = None
+        self.skip_compile = skip_compile
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
-        # Compile
-        if not skip_compile:
-            self.build_model(products=self.products)
-            self.debug(f"Built {self.model_file}")
 
     @staticmethod
     def before_registration(cls):
@@ -6480,69 +6343,14 @@ class CompiledModelDriver(ModelDriver):
             self.model_file = out[0]
         self.debug(f"source_files: {self.source_files}")
         self.debug(f"model_file: {self.model_file}")
-        # Add the buildfile_lock and pass the file
-        if not self.allow_parallel_build:
-            self.buildfile_lock = self.get_buildfile_lock(instance=self)
-            if self._mpi_rank > 0:
-                self.send_mpi(self.buildfile_lock.message,
-                              tag=self._mpi_tags['BUILDFILE'])
 
-    @classmethod
-    def get_buildfile_lock(cls, fname=None, context=None, instance=None,
-                           **kwargs):
-        r"""Get a lock for a buildfile to prevent simultaneous access,
-        creating one as necessary.
-
-        Args:
-            name (str): Build file.
-            context (threading.Context): Threading context.
-            instance (ModelDriver): Driver instance that should be used.
-            **kwargs: Additional keyword arguments are passed to the FileLock
-                initialization.
-
-        Returns:
-            FileLock: Lock for the buildfile.
-
-        """
-        global _buildfile_locks
-        global _buildfile_locks_lock
-        if fname is None:
-            fname = cls.locked_buildfile
-        assert fname is not None
-        if (context is None) and (instance is not None):
-            context = instance.context
-        with _buildfile_locks_lock:
-            if fname not in _buildfile_locks:
-                _buildfile_locks[fname] = LockedFile(fname, context, **kwargs)
-        return _buildfile_locks[fname]
-
-    @contextlib.contextmanager
-    def buildfile_locked(self, dry_run=False):
-        r"""Context manager for locked build file."""
-        if self.buildfile_lock:
-            with self.buildfile_lock.locked(self, dry_run=dry_run):
-                yield
-        else:
-            yield
-
-    @classmethod
-    def mpi_partner_init(cls, self):
-        r"""Actions initializing an MPIPartnerModel."""
-        if not cls.allow_parallel_build:
-            message = self.recv_mpi(tag=self._mpi_tags['BUILDFILE'])
-            message['context'] = self.context
-            self.buildfile_lock = cls.get_buildfile_lock(**message)
-            self.buildfile_lock.add_partner_request(self)
-            if 'init' in self.buildfile_lock.lock_conditions:
-                self.buildfile_lock.partner_locked(self)
-
-    @classmethod
-    def mpi_partner_cleanup(cls, self):
-        r"""Actions cleaning up an MPIPartnerModel."""
-        super(CompiledModelDriver, cls).mpi_partner_cleanup(self)
-        if (((not cls.allow_parallel_build)
-             and 'cleanup' in self.buildfile_lock.lock_conditions)):
-            self.buildfile_lock.partner_locked(self)
+    def init_model(self):
+        r"""Initialize the model executable."""
+        super(CompiledModelDriver, self).init_model()
+        # Compile
+        if not self.skip_compile:
+            self.build_model(products=self.products)
+            self.debug(f"Built {self.model_file}")
         
     def init_model_dep(self, **kwargs):
         r"""Set the language of the target being compiled (usually the same
@@ -7169,8 +6977,6 @@ class CompiledModelDriver(ModelDriver):
             str: Compiled model file path.
 
         """
-        dont_lock_buildfile = (kwargs.pop('dont_lock_buildfile', False)
-                               or kwargs.get('dry_run', False))
         if source_files:
             kwargs['source'] = source_files
         if dep is None:
@@ -7183,8 +6989,7 @@ class CompiledModelDriver(ModelDriver):
             kwargs, remove_parameters=dep.all_parameters())
         for k in ['overwrite', 'working_dir']:
             kwargs.setdefault(k, getattr(self, k))
-        with self.buildfile_locked(dry_run=dont_lock_buildfile):
-            return dep.build(**kwargs)
+        return dep.build(**kwargs)
 
     @classmethod
     def call_tool(cls, obj, tooltype='compiler', **kwargs):

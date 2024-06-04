@@ -3,11 +3,11 @@ import os
 import glob
 import tempfile
 import shutil
-import importlib
 from yggdrasil.components import import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
-    get_example_yaml, get_example_languages, ext_map, source)
+    get_example_yaml, get_example_languages, get_example_module,
+    ext_map, source)
 from tests import TestBase as base_class
 
 
@@ -71,12 +71,7 @@ class TestExample(base_class):
     @pytest.fixture(scope="class")
     def example_module(self, example_name):
         r"""Python module associated with the test."""
-        try:
-            return importlib.import_module(
-                f'yggdrasil.examples.{example_name}')
-        except ImportError:
-            # pytest.skip(f"Could not import {example_name} example module")
-            return None
+        return get_example_module(example_name)
 
     @pytest.fixture(scope="class")
     def testing_options(self, example_module):

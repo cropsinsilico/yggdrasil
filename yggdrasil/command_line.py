@@ -284,8 +284,11 @@ class yggrun(SubCommand):
     @classmethod
     def func(cls, args):
         if args.with_mpi > 1:
-            new_args = ['mpiexec', '-n', str(args.with_mpi)]
-            i = 0
+            new_args = ['mpiexec', '-n', str(args.with_mpi),
+                        sys.executable, '-c',
+                        f'\'from yggdrasil import command_line; '
+                        f'command_line.{cls.__name__}()\'']
+            i = 1
             while i < len(sys.argv):
                 x = sys.argv[i]
                 if x.startswith(('--with-mpi', '--mpi-nproc')):
@@ -294,7 +297,7 @@ class yggrun(SubCommand):
                 else:
                     new_args.append(x)
                 i += 1
-            return subprocess.check_call(new_args)
+            return subprocess.check_call(' '.join(new_args), shell=True)
         from yggdrasil import runner, config
         prog = sys.argv[0].split(os.path.sep)[-1]
         with config.parser_config(args):
@@ -321,6 +324,99 @@ class yggrun(SubCommand):
                     assert args.client_id
                     kwargs['partial_commtype']['client_id'] = args.client_id
             runner.run(args.yamlfile, **kwargs)
+        return 0
+
+
+class yggexample(yggrun):
+    r"""Run an example."""
+
+    name = "example"
+    help = "Run an example integration."
+    arguments = [
+        (('--example-name', ),
+         {'type': str,
+          'help': ("Name of the example to run. If not provided, the "
+                   "example in the current directory will be assumed.")}),
+        (('--with-mpi', '--mpi-nproc'),
+         {'type': int, 'default': 1,
+          'help': 'Number of MPI processes to run on.'}),
+        (('--mpi-tag-start', ),
+         {'type': int, 'default': 0,
+          'help': 'Tag that MPI communications should start at.'}),
+        (('--validate', ),
+         {'action': 'store_true',
+          'help': ('Validate the run via model validation commands on '
+                   'completion.')}),
+        (('--with-debugger', ),
+         {'type': str,
+          'help': ('Run all models with a specific debuggin tool. If '
+                   'quoted, this can also include flags for the tool.')}),
+        (('--overwrite', ),
+         {'action': 'store_true',
+          'help': ('Overwrite existing integration products like '
+                   'compilation products and wrappers')}),
+        (('--remove-products', ),
+         {'action': 'store_true',
+          'help': ('Remove integration products like compilation '
+                   'products and wrappers on completion of the '
+                   'integration')}),
+        (('--language', ),
+         {'type': str,
+          'help': 'Language version of example that should be run'}),
+        (('--python', '-p', ),
+         {'action': 'store_true',
+          'help': 'Run the Python version of the example'}),
+        (('--matlab', '-m', ),
+         {'action': 'store_true',
+          'help': 'Run the Matlab version of the example'}),
+        (('--cc', '-c', ),
+         {'action': 'store_true',
+          'help': 'Run the C version of the example'}),
+        (('--cxx', '--cpp', ),
+         {'action': 'store_true',
+          'help': 'Run the C++ version of the example'}),
+        (('-R', '-r', ),
+         {'action': 'store_true',
+          'help': 'Run the R version of the example'}),
+        (('--fortran', '-f', ),
+         {'action': 'store_true',
+          'help': 'Run the Fortran version of the example'}),
+        (('--julia', '-j', ),
+         {'action': 'store_true',
+          'help': 'Run the Julia version of the example'}),
+    ] + [
+        x for x in DependencySpecialization.command_line_options
+        if x[0][0] != '--dry-run'
+    ]
+
+    @classmethod
+    def func(cls, args):
+        if args.with_mpi > 1:
+            return super(yggexample, cls).func(args)
+        from yggdrasil import tools
+        from yggdrasil.examples import (
+            get_example_yaml, get_example_testing_options,
+            validate_example)
+        args.as_service = False
+        args.partial_commtype = 'rest'
+        args.client_id = None
+        if not args.example_name:
+            args.example_name = os.path.basename(os.getcwd())
+        testing_options = get_example_testing_options(args.example_name)
+        name_map = {'cc': 'c', 'cxx': 'c++', 'R': 'r'}
+        for k in ['python', 'matlab', 'cc', 'cxx', 'R',
+                  'fortran', 'julia']:
+            if getattr(args, k):
+                args.language = name_map.get(k, k)
+        args.yamlfile = get_example_yaml(args.example_name, args.language)
+        env = testing_options.get('env', {})
+        out = 0
+        with tools.updated_environment(env):
+            out = super(yggexample, cls).func(args)
+            from yggdrasil import multitasking
+            if args.validate and multitasking._mpi_rank <= 0:
+                validate_example(args.example_name)
+        return out
 
 
 class integration_service_manager(SubCommand):
@@ -1775,7 +1871,7 @@ class main(SubCommand):
     help = (
         "Command line interface for the yggdrasil package.")
     arguments = []
-    subcommands = [yggrun, ygginfo, validate_yaml,
+    subcommands = [yggrun, ygginfo, validate_yaml, yggexample,
                    yggcc, yggcompile, yggclean,
                    ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,

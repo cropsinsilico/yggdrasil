@@ -1,5 +1,5 @@
 import os
-from yggdrasil import multitasking, platform
+from yggdrasil import multitasking, platform, tools
 from yggdrasil.components import import_component
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
@@ -111,9 +111,11 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
         kwargs = self.model_wrapper_kwargs
         self.debug('Working directory: %s', self.working_dir)
         self.debug('Model file: %s', self.model_file)
-        self.debug('Environment Variables:\n%s',
-                   self.pprint(kwargs['env'], block_indent=1))
-        p = multitasking.YggTask(task_method='process', with_pipe=True,
+        env_diff = tools.dict_diff(kwargs['env'], os.environ)
+        self.debug(f"Environment Variables:\n"
+                   f"{self.pprint(env_diff, block_indent=1)}")
+        p = multitasking.YggTask(task_method='process',
+                                 with_pipe=True, env=kwargs['env'],
                                  target=self.model_wrapper_no_forward,
                                  args=args, kwargs=kwargs)
         p.start()

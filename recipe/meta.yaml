@@ -21,6 +21,7 @@ build:
     - yggdrasil = yggdrasil.command_line:main
     - ygginfo = yggdrasil.command_line:ygginfo
     - yggrun = yggdrasil.command_line:yggrun
+    - yggexample = yggdrasil.command_line:yggexample
     - cisrun = yggdrasil.command_line:yggrun
     - yggcompile = yggdrasil.command_line:yggcompile
     - yggcc = yggdrasil.command_line:yggcc

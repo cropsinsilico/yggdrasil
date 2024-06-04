@@ -40,6 +40,7 @@ if ((logging.getLogger("yggdrasil").getEffectiveLevel()
      <= logging.DEBUG)):  # pragma: debug
     _stack_in_log = False
     _stack_in_timeout = True
+_environ_cache = []
 
 
 def apply_recurse(x, func, **kwargs):
@@ -376,6 +377,58 @@ def check_environ_bool(name, valid_values=['true', '1', True, 1]):
 
     """
     return (os.environ.get(name, '').lower() in valid_values)
+
+
+def update_environ(env, exclusive=False):
+    r"""Update the current environment variables.
+
+    Args:
+        env (dict): Environment variables to update.
+        exclusive (bool, optional): If True, only those variables in
+            env will be present after the update. If False, the
+            variables in env will be updated via the 'update' method and
+            any existing variables not specified in env will remain.
+
+    """
+    if env is None:
+        return
+    os.environ.update(env)
+    if exclusive:
+        for k in list(os.environ.keys()):
+            if k not in env:
+                del os.environ[k]
+
+
+def cache_environ():
+    r"""Cache the current environment variables."""
+    global _environ_cache
+    _environ_cache.append(copy.deepcopy(os.environ))
+
+
+def restored_cached_environ():
+    r"""Restore the last set of cached environment variables."""
+    global _environ_cache
+    oldenv = _environ_cache.pop()
+    update_environ(oldenv, exclusive=True)
+
+
+@contextlib.contextmanager
+def updated_environment(env, exclusive=False):
+    r"""Context to perform actions with an updated set of environment
+    variables.
+
+    Args:
+        env (dict): Environment variables to add within the context.
+        exclusive (bool, optional): If True, only those variables in
+            env will be present within the context. If False, the
+            variables in env will be updated via the 'update' method and
+            any existing variables not specified in env will remain.
+
+    """
+    cache_environ()
+    update_environ(env, exclusive=exclusive)
+    yield
+    restored_cached_environ
 
 
 def get_numpy_c_library(allow_failure=False, libtype=None):
@@ -2171,11 +2224,14 @@ class IntegrationPathSet(CacheDirMixin):
         generalized_suffix (str, optional): Suffix to replace with * in
             associated paths in order to search for related paths that
             should also be managed.
+        lock (callable, optional): Context manager that should be used
+            during setup and teardown operations.
 
     """
 
     def __init__(self, products=None, overwrite=False, cache_dir=None,
-                 removable_source_exts=None, generalized_suffix=None):
+                 removable_source_exts=None, generalized_suffix=None,
+                 lock=None):
         super(IntegrationPathSet, self).__init__(cache_dir=cache_dir)
         self.overwrite = overwrite
         self.removable_source_exts = removable_source_exts
@@ -2184,6 +2240,7 @@ class IntegrationPathSet(CacheDirMixin):
             self.removable_source_exts = tuple([])
         self.paths = []
         self.last_idx = -1
+        self.lock = lock
         if products:
             for x in products:
                 self.append(x)
@@ -2254,6 +2311,40 @@ class IntegrationPathSet(CacheDirMixin):
         kwargs['cls'] = CompilationProduct
         return self.append(*args, **kwargs)
 
+    @property
+    def products(self):
+        r"""Products to remove during setup when overwrite is set or
+        during teardown."""
+        out = []
+        if self.cache_dir:
+            out += self.cache_dir.products
+        for x in self.paths:
+            out += x.products
+        return out
+
+    @property
+    def root(self):
+        r"""str: Root directory containing all products in the set."""
+        out = None
+        for k in self.products:
+            if not (k and os.path.isabs(k)):
+                continue
+            if out is None:
+                out = k
+                continue
+            while not k.startswith(out):
+                out = os.path.dirname(out)
+        return out
+
+    @contextlib.contextmanager
+    def locked(self):
+        r"""Acquire the lock for the set."""
+        if self.lock:
+            with self.lock():
+                yield
+        else:
+            yield
+
     def setup(self, tag=None):
         r"""Perform actions on the paths before an integration run.
 
@@ -2262,10 +2353,11 @@ class IntegrationPathSet(CacheDirMixin):
                 provided tag.
 
         """
-        self.setup_cache_dir()
-        for x in self.paths:
-            if x.tag == tag:
-                x.setup()
+        with self.locked():
+            self.setup_cache_dir()
+            for x in self.paths:
+                if x.tag == tag:
+                    x.setup()
 
     def teardown(self, tag=None):
         r"""Perform actions to cleanup the paths after an integration run.
@@ -2275,10 +2367,11 @@ class IntegrationPathSet(CacheDirMixin):
                 provided tag.
 
         """
-        for x in self.paths:
-            if x.tag == tag:
-                x.teardown()
-        self.teardown_cache_dir()
+        with self.locked():
+            for x in self.paths:
+                if x.tag == tag:
+                    x.teardown()
+            self.teardown_cache_dir()
 
     def restore_modified(self, tag=None):
         r"""Restore modified original files.

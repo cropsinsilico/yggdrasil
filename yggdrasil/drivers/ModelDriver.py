@@ -9,6 +9,8 @@ import shutil
 import uuid
 import tempfile
 import asyncio
+import threading
+import contextlib
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import (
@@ -17,6 +19,337 @@ from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from queue import Empty
 logger = logging.getLogger(__name__)
+
+
+class LockedFileSet(OrderedDict):
+    r"""Container for file locks on this process.
+
+    Args:
+        context (multitasking.TaskContext): Context that should be used
+            to create a lock for models launched by the local runner
+            process. If None, the set will be assumed to be the global set
+            used for pan-thread locking on the current process.
+
+    """
+
+    def __init__(self, context, *args, **kwargs):
+        self._lock = threading.RLock()
+        self._context = context
+        self._is_global = (context is None)
+        super(LockedFileSet, self).__init__(*args, **kwargs)
+
+    @property
+    def message(self):
+        r"""dict: Message containing info on all locked files that
+        can be used to create counterparts on other processes."""
+        with self._lock:
+            return {k: v.message for k, v in self.items()}
+
+    def is_locked(self, fname):
+        r"""Check if any of the file locks contain the provided path.
+
+        Args:
+            fname (str): Path to check against file locks.
+
+        Returns:
+            bool: True if fname is inside a locked path, False otherwise.
+
+        """
+        with self._lock:
+            for k, v in self.items():
+                if fname.startswith(k) and v.is_locked():
+                    return True
+        return False
+
+    def is_unlocked(self, fname):
+        r"""Check if any of the file locks contain the provided path.
+
+        Args:
+            fname (str): Path to check against file locks.
+
+        Returns:
+            bool: False if fname is inside a locked path, True otherwise.
+
+        """
+        return (not self.is_locked(fname))
+
+    @contextlib.contextmanager
+    def locked(self, fname, *args, **kwargs):
+        r"""Context that acquries the lock for the specified path.
+
+        Args:
+            fname (str): Path that should be locked.
+            *args: Additional arguments are passed to the locked method
+                 for the lock corresponding to fname.
+            **kwargs: Additional keyword arguments are passed to the
+                 locked method for the lock corresponding to fname.
+            
+        
+        """
+        with self[fname].locked(*args, **kwargs):
+            yield
+
+    @contextlib.contextmanager
+    def locked_condition(self, condition, *args, **kwargs):
+        r"""Context that acquires the locks for all files in the set
+        that were registered with the specified condition.
+
+        Args:
+            condition (str): Condition for files that should be locked.
+            *args: Additional arguments are passed to the lock & unlock
+                 methods for each of the identified files.
+            **kwargs: Additional keyword arguments are passed to the lock
+                 & unlock methods for each of the identified files.
+
+        """
+        locked = []
+        try:
+            for v in self.values():
+                if condition not in v.conditions:
+                    continue
+                v.lock(*args, **kwargs)
+                locked.append(v)
+            yield
+        finally:
+            for v in locked:
+                v.unlock(*args, **kwargs)
+        
+    def condition_count(self, condition):
+        r"""Count the number of file locks for the specified condition.
+
+        Args:
+            condition (str): Condition to count locks for.
+
+        Returns:
+            int: Number of file locks registered with the specified
+                condition.
+
+        """
+        out = 0
+        for v in self.values():
+            if condition in v.conditions:
+                out += 1
+        return out
+
+    def expected_requests(self, driver, condition,
+                          requests=['LOCKFILE', 'UNLOCKFILE']):
+        r"""Determine what the expected request count should be following
+        successful completion.
+
+        Args:
+            driver (ModelDriver): Driver instance that requests belong to.
+            condition (str): Condition under which the requests will be
+                performed.
+            requests (list, optional): Request types that should be
+                included.
+
+        Returns:
+            dict: Mapping between request type and expected request count.
+        
+        """
+        ncond = self.condition_count(condition)
+        return {k: driver._mpi_requests_count.get(k, 0) + ncond
+                for k in requests}
+
+    def find(self, fname, **kwargs):
+        r"""Locate a file lock within the set. If one does not exist, one
+        will be created.
+
+        Args:
+            fname (str): Path that lock should be located for.
+            **kwargs: Additional keyword arguments will be passed to
+                insert if a new lock is created.
+
+        Returns:
+            LockedFile: File lock for fname.
+        
+        """
+        kwargs.setdefault('context', self._context)
+        with self._lock:
+            if fname not in self:
+                if self._is_global:
+                    self.insert(fname, **kwargs)
+                else:
+                    global _file_locks
+                    self[fname] = _file_locks.find(fname, **kwargs)
+            return self[fname]
+
+    def insert(self, fname, **kwargs):
+        r"""Add a new file lock to the set.
+        
+        Args:
+            fname (str): Path that lock should be created for.
+            **kwargs: Additional keyword arguments will be passed to
+                the LockedFile constructor.
+
+        Returns:
+            LockedFile: File lock for fname.
+        
+        """
+        kwargs.setdefault('context', self._context)
+        with self._lock:
+            assert fname not in self
+            self[fname] = LockedFile(fname, **kwargs)
+            return self[fname]
+
+
+_file_locks = LockedFileSet(None)
+
+
+class LockedFile(object):
+    r"""Class for locking files during compilation to prevent race
+    conditions between models running on separate threads/processes that
+    utilize the same files.
+
+    Args:
+        fname (str): Full path to the file that should be locked.
+        context (multitasking.TaskContext): Context that should be used
+            to create a lock for models launched by the local runner
+            process.
+        conditions (tuple, optional): Conditions where the lock on
+            the file should be acquired by the partner comm when running
+            with MPI.
+
+    """
+
+    def __init__(self, fname, context, conditions=("init", )):
+        self.fname = fname
+        self._lock = context.RLock()
+        self.conditions = conditions
+
+    def is_locked(self):
+        r"""Check if the file is locked.
+
+        Returns:
+            bool: True if the file is locked, False otherwise.
+
+        """
+        return self._lock.locked()
+
+    @contextlib.contextmanager
+    def locked(self, driver, dry_run=False):
+        r"""Acquire the lock on the file so that operations can be
+        performed without race conditions between models on different
+        threads/processes.
+
+        Args:
+            driver (CompiledModelDriver): Driver for the model that is
+                locking the file.
+            dry_run (bool, optional): If True, this is a dry run and the
+                file should not actually be locked.
+
+        """
+        try:
+            if not dry_run:
+                self.lock(driver)
+            yield
+        finally:
+            if not dry_run:
+                self.unlock(driver)
+
+    def partner_lock(self, driver, result=None):
+        r"""Lock the file from an MPIPartnerModel in response to a request
+        from the corresponding model running on another MPI process.
+
+        Args:
+            driver (MPIPartnerModel): Driver instance that owns the
+                request.
+            result (object, optional): Response to a LOCKFILE request.
+                If not provided, wait will be called on the current
+                request.
+
+        """
+        if result is None:
+            result = driver.wait_on_mpi_request('LOCKFILE')
+        assert result == self.fname
+        self._lock.acquire()
+        driver.send_mpi(self.fname,
+                        tag=driver._mpi_tags['LOCKFILE'])
+
+    def partner_unlock(self, driver, result=None):
+        r"""Unlock the file from an MPIPartnerModel in response to a
+        request from the corresponding model running on another MPI
+        process.
+
+        Args:
+            driver (MPIPartnerModel): Driver instance that owns the
+                request.
+            result (object, optional): Response to an UNLOCKFILE request.
+                If not provided, wait will be called on the current
+                request.
+
+        """
+        if result is None:
+            result = driver.wait_on_mpi_request('UNLOCKFILE')
+        assert result == self.fname
+        driver.send_mpi(self.fname,
+                        tag=driver._mpi_tags['UNLOCKFILE'])
+        self._lock.release()
+
+    def partner_request(self, driver, request, result=None):
+        r"""Perform actions based on a received request related to this
+        file lock.
+
+        Args:
+            driver (MPIPartnerModel): Driver instance that owns the
+                request.
+            request (str): Request type.
+            result (object, optional): Response to the request.
+                If not provided, wait will be called on the current
+                request of the specified type.
+        
+        """
+        assert request in ['LOCKFILE', 'UNLOCKFILE']
+        if request == 'LOCKFILE':
+            self.partner_lock(driver, result=result)
+        elif request == 'UNLOCKFILE':
+            self.partner_unlock(driver, result=result)
+        else:  # pragma: debug
+            raise RuntimeError(f"Unsupported request: {request}")
+
+    def lock(self, driver):
+        r"""Lock the file.
+
+        Args:
+            driver (CompiledModelDriver): Driver for the model that is
+                locking the file.
+
+        Returns:
+            object: Result of the lock response call if running with MPI,
+               None otherwise.
+
+        """
+        self._lock.acquire()
+        if driver._mpi_rank == 0:
+            return
+        driver.send_mpi(self.fname,
+                        tag=driver._mpi_tags['LOCKFILE'])
+        return driver.recv_mpi(tag=driver._mpi_tags['LOCKFILE'])
+
+    def unlock(self, driver):
+        r"""Unlock the file.
+
+        Args:
+            driver (CompiledModelDriver): Driver for the model that is
+                unlocking the file.
+
+        Returns:
+            object: Result of the unlock response call if running with
+               MPI, None otherwise.
+
+        """
+        self._lock.release()
+        if driver._mpi_rank == 0:
+            return
+        driver.send_mpi(self.fname,
+                        tag=driver._mpi_tags['UNLOCKFILE'])
+        return driver.recv_mpi(tag=driver._mpi_tags['UNLOCKFILE'])
+
+    @property
+    def message(self):
+        r"""str: Message form."""
+        return {'fname': self.fname,
+                'conditions': self.conditions}
 
 
 class ModelDriver(Driver):
@@ -462,13 +795,14 @@ class ModelDriver(Driver):
                  'START': 2,
                  'STOP_RANK0': 3,  # Stopped by partner
                  'STOP_RANKX': 4,  # Stopped by root
-                 'BUILDFILE': 5,
-                 'LOCK_BUILDFILE': 6,
-                 'UNLOCK_BUILDFILE': 7}
+                 'FILELOCKS': 5,
+                 'LOCKFILE': 6,
+                 'UNLOCKFILE': 7}
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  preparsed_function=None, outputs_in_inputs=None,
                  mpi_rank=0, mpi_tag_start=None, **kwargs):
+        multitasking.init_mpi()
         self._inv_mpi_tags = {v: k for k, v in self._mpi_tags.items()}
         self.model_outputs_in_inputs = outputs_in_inputs
         self.preparsed_function = preparsed_function
@@ -516,7 +850,7 @@ class ModelDriver(Driver):
             if k in os.environ:
                 self.env[k] = os.environ[k]
         if not self.is_installed():
-            raise RuntimeError("%s is not installed" % self.language)
+            raise RuntimeError(f"{self.language} is not installed")
         self.raw_model_file = None
         self.model_function_file = None
         self.model_function_info = None
@@ -526,12 +860,15 @@ class ModelDriver(Driver):
         self.model_args = []
         self.model_dir = None
         self.model_src = None
+        self.file_locks = LockedFileSet(self.context)
         self.args = args
         self.modified_files = []
         self._mpi_comm = False
         self._mpi_rank = 0
         self._mpi_size = 1
         self._mpi_requests = {}
+        self._mpi_requests_count = {}
+        self._mpi_requests_checked = []
         self._mpi_tag = (len(self._mpi_tags) * self.model_index)
         if mpi_tag_start is not None:
             self._mpi_tag += mpi_tag_start
@@ -547,8 +884,17 @@ class ModelDriver(Driver):
         self.debug(str(args))
         self.parse_arguments(args)
         assert self.model_file is not None
-        # Add wrappers to products and initialize products
+        # Add wrappers
         self.write_wrappers()
+        # Initialize the model, creating files with inter-process locks
+        #   if necessary
+        self.locked_file = None
+        with self.mpi_init():
+            self.init_model()
+
+    def init_model(self):
+        r"""Initialize the model executable."""
+        # Add wrappers to products and initialize products
         self.products.setup()
         # Install dependencies
         if self.dependencies:
@@ -606,15 +952,166 @@ class ModelDriver(Driver):
         initialized and registered."""
         pass
 
+    def create_file_lock(self, fname=None, **kwargs):
+        r"""Create a new file lock.
+
+        Args:
+            fname (str, optional): Path to create a lock for. If not
+                provided, self.locked_file will be used.
+            **kwargs: Additional keyword arguments are passed to
+                self.file_locks.find.
+
+        Returns:
+            FileLock: Created file lock.
+
+        """
+        if fname is None:
+            fname = self.locked_file
+        self.debug(f"CREATE_FILE_LOCK: {fname}")
+        kwargs.setdefault('context', self.context)
+        return self.file_locks.find(fname, **kwargs)
+
+    @contextlib.contextmanager
+    def file_locked(self, fname=None, dry_run=False):
+        r"""Context manager for performing actions with a file locked.
+
+        Args:
+            fname (str, optional): Path to lock for. If not provided,
+                self.locked_file will be used.
+            dry_run (bool, optional): If True, this is a dry run and the
+                file should not actually be locked.
+
+        """
+        if fname is None:
+            fname = self.locked_file
+        if fname in self.file_locks:
+            with self.file_locks[fname].locked(self, dry_run=dry_run):
+                yield
+        else:
+            yield
+
+    @classmethod
+    def mpi_partner_add_request(cls, self, request, callback=None):
+        r"""Add a request to an MPIPartnerModel instance if a request of
+        the specified type does not exist or has already completed.
+
+        Args:
+            self (MPIPartnerModel): Driver instance to add request to.
+            request (str): Request type to add.
+            callback (function, optional): Callback function that should
+                be called when the request successfully completes. If not
+                provided, cls.mpi_partner_request_callback will be used.
+
+        Returns:
+            MPIRequestWrapper: Created (or existing) request.
+
+        """
+        from yggdrasil.multitasking import MPIRequestWrapper
+        if ((request not in self._mpi_requests
+             or self.check_mpi_request(request))):
+            if callback is None:
+                from functools import partial
+                callback = partial(cls.mpi_partner_request_callback,
+                                   self, request)
+                if request not in self._mpi_requests_checked:
+                    self._mpi_requests_checked.append(request)
+            self._mpi_requests_count.setdefault(request, 0)
+            self._mpi_requests[request] = MPIRequestWrapper(
+                self.recv_mpi(tag=self._mpi_tags[request],
+                              dont_block=True), callback=callback)
+        return self._mpi_requests[request]
+
+    @classmethod
+    def mpi_partner_request_callback(cls, self, request, result=None):
+        r"""Default callback for a request from a MPIPartnerModel instance.
+
+        Args:
+            self (MPIPartnerModel): Driver instance that owns the request.
+            request (str): Request type.
+            result (object, optional): Request response. If not provided,
+                the current request will be checked.
+        
+        """
+        if result is None:
+            result = self.check_mpi_request(request)
+            if not result:
+                return
+        if request in ['LOCKFILE', 'UNLOCKFILE']:
+            lock = self.file_locks[result]
+            lock.partner_request(self, request)
+        self._mpi_requests_count[request] += 1
+        cls.mpi_partner_add_request(self, request)
+
+    @classmethod
+    def mpi_partner_process_requests(cls, self, expected):
+        r"""Continue processing MPIPartnerModel requests until the
+        expected condition is met.
+
+        Args:
+            self (MPIPartnerModel): Driver instance that owns the
+                requests.
+            expected (dict): Mapping between request type and expected
+                request count.
+        
+        """
+        actual = {k: 0 for k in expected.keys()}
+        while actual != expected:
+            for k in expected.keys():
+                self.check_mpi_request(k)
+            actual = {k: self._mpi_requests_count.get(k, 0)
+                      for k in expected.keys()}
+
+    @contextlib.contextmanager
+    def mpi_init(self):
+        r"""Context that initializes the MPI state of the model and locks
+        files for the 'init' condition."""
+        if self.locked_file is None:
+            self.locked_file = self.products.root
+        if self.locked_file:
+            self.create_file_lock(self.locked_file,
+                                  conditions=('init', 'cleanup'))
+        if self._mpi_rank > 0:
+            self.send_mpi(self.file_locks.message,
+                          tag=self._mpi_tags['FILELOCKS'])
+        with self.file_locks.locked_condition('init', self):
+            yield
+
+    @contextlib.contextmanager
+    def mpi_cleanup(self):
+        r"""Context that finalizes the MPI state of the model and locks
+        files for the 'cleanup' condition."""
+        with self.file_locks.locked_condition('cleanup', self):
+            yield
+            
     @classmethod
     def mpi_partner_init(cls, self):
-        r"""Actions initializing an MPIPartnerModel."""
-        pass
+        r"""Actions initializing an MPIPartnerModel including any file
+        locks and the 'init' file lock condition.
+
+        Args:
+            self (MPIPartnerModel): Instance to initialize.
+
+        """
+        message = self.recv_mpi(tag=self._mpi_tags['FILELOCKS'])
+        if message:
+            cls.mpi_partner_add_request(self, 'LOCKFILE')
+            cls.mpi_partner_add_request(self, 'UNLOCKFILE')
+        for x in message.values():
+            self.create_file_lock(**x)
+        expected = self.file_locks.expected_requests(self, 'init')
+        cls.mpi_partner_process_requests(self, expected)
 
     @classmethod
     def mpi_partner_cleanup(cls, self):
-        r"""Actions cleaning up an MPIPartnerModel."""
-        pass
+        r"""Actions finaling an MPIPartnerModel including any file
+        locks and the 'cleanup' file lock condition.
+
+        Args:
+            self (MPIPartnerModel): Instance to finalize.
+
+        """
+        expected = self.file_locks.expected_requests(self, 'cleanup')
+        cls.mpi_partner_process_requests(self, expected)
 
     @classmethod
     def get_inverse_type_map(cls):
@@ -1039,7 +1536,9 @@ class ModelDriver(Driver):
             kwargs.setdefault('debug_flags', self.with_debugger.split())
         self.debug(f'Working directory: {self.working_dir}')
         self.debug('Command: %s', ' '.join(command))
-        self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
+        self.debug('Environment Variables:\n%s',
+                   self.pprint(tools.dict_diff(env, os.environ),
+                               block_indent=1))
         # Update keywords
         # NOTE: Setting forward_signals to False allows faster debugging
         # but should not be used in deployment for cases where models are
@@ -1544,8 +2043,6 @@ class ModelDriver(Driver):
             **kwargs: Keyword arguments are pased to run_model.
 
         """
-        # if multitasking._on_mpi:
-        #     self.init_mpi_env()
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
         if not no_queue_thread:
@@ -1554,7 +2051,7 @@ class ModelDriver(Driver):
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()
         if multitasking._on_mpi:
-            self.init_mpi()
+            self.start_mpi()
 
     def queue_close(self):
         r"""Close the queue for messages from the model process."""
@@ -1598,7 +2095,7 @@ class ModelDriver(Driver):
     #     r"""Receive env information to the partner model."""
     #     self.env = self.recv_mpi(tag=self._mpi_tags['ENV'])
         
-    def init_mpi(self):
+    def start_mpi(self):
         r"""Initialize MPI communicator."""
         if self._mpi_rank == 0:
             self._mpi_comm = None
@@ -1706,6 +2203,8 @@ class ModelDriver(Driver):
         if self.check_mpi_request('stopped'):
             self.debug("Stop requested by MPI partner.")
             self.set_break_flag()
+        for k in self._mpi_requests_checked:
+            self.check_mpi_request(k)
         try:
             line = self.queue.get_nowait()
         except Empty:
@@ -1758,7 +2257,8 @@ class ModelDriver(Driver):
                                               errors=self.errors)
         for drv in self.yml.get('output_drivers', []):
             if 'instance' in drv:
-                if self.language == 'mpi':
+                if ((self.language == 'mpi'
+                     and drv['instance'].models["input"] == [self.name])):
                     drv['instance'].wait(self.timeout)
                 drv['instance'].on_model_exit('input', self.name,
                                               errors=self.errors)
@@ -1866,10 +2366,14 @@ class ModelDriver(Driver):
 
     def cleanup(self):
         r"""Remove compile executable."""
+        with self.mpi_cleanup():
+            self.cleanup_model()
+        super(ModelDriver, self).cleanup()
+
+    def cleanup_model(self):
         if self.remove_products:
             self.products.teardown()
         self.products.restore_modified()
-        super(ModelDriver, self).cleanup()
 
     def on_error_code(self, code):
         r"""Perform actions in response to an error code returned by

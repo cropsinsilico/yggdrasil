@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from yggdrasil.multitasking import _on_mpi, MPI, RLock, MPIRequestWrapper
+from yggdrasil.multitasking import init_mpi, RLock, MPIRequestWrapper
 from yggdrasil.communication import (
     CommBase, NoMessages)
 logger = logging.getLogger(__name__)
@@ -35,6 +35,7 @@ class MPIRequest(object):
 
     def make_request(self, payload=None):
         r"""Complete a request."""
+        MPI = init_mpi()
         kwargs = dict(tag=self.tag)
         if self.direction == 'send':
             method = 'Isend'
@@ -60,6 +61,7 @@ class MPIRequest(object):
     @property
     def complete(self):
         r"""bool: True if the request has been completed, False otherwise."""
+        MPI = init_mpi()
         if self.direction == 'recv':
             if self.size_req.test()[0] and (self.req is None):
                 self._data = np.zeros(self.size[0], dtype='c')
@@ -147,7 +149,8 @@ class MPIComm(CommBase.CommBase):
     _maxMsgSize = 2**20
 
     def __init__(self, *args, ranks=[], tag_start=0, tag_stride=1, **kwargs):
-        assert _on_mpi
+        MPI = init_mpi()
+        assert MPI
         if kwargs.get('partner_mpi_ranks', []):
             assert kwargs.get('address', 'generate') in ['generate',
                                                          'address']
@@ -241,15 +244,16 @@ class MPIComm(CommBase.CommBase):
             request (MPIRequest, MPIMultiRequest): Request advancing the tag.
 
         """
-        if isinstance(request, MPIMultiRequest):
-            for v in request.req.values():
-                self.advance_tag(v)
-            return
-        if request.tag in self.unused_tags.get(request.address, []):
-            self.unused_tags[request.address].remove(request.tag)
-            return
-        self.tags[request.address] = max(self.tags[request.address],
-                                         request.tag + self.tag_stride)
+        # if isinstance(request, MPIMultiRequest):
+        #     for v in request.req.values():
+        #         self.advance_tag(v)
+        #     return
+        # if request.tag in self.unused_tags.get(request.address, []):
+        #     self.unused_tags[request.address].remove(request.tag)
+        #     return
+        # self.tags[request.address] = max(self.tags[request.address],
+        #                                  request.tag + self.tag_stride)
+        pass
 
     def cache_tag(self, request):
         r"""Store a tag for an uncompleted request.
@@ -258,12 +262,13 @@ class MPIComm(CommBase.CommBase):
             request (MPIRequest, MPIMultiRequest): Request to cache.
 
         """
-        if isinstance(request, MPIMultiRequest):
-            for v in request.req.values():
-                self.cache_tag(v)
-            return
-        self.unused_tags.setdefault(request.address, [])
-        self.unused_tags[request.address].append(request.tag)
+        # if isinstance(request, MPIMultiRequest):
+        #     for v in request.req.values():
+        #         self.cache_tag(v)
+        #     return
+        # self.unused_tags.setdefault(request.address, [])
+        # self.unused_tags[request.address].append(request.tag)
+        pass
 
     def bind(self):
         r"""Bind to random queue if address is generate."""
@@ -301,7 +306,7 @@ class MPIComm(CommBase.CommBase):
         #     raise Exception("Starting tag for next response comm "
         #                     "exceeds the maximum and may conflict with "
         #                     "other messages this comm will send.")
-        tag = self.get_tag()
+        tag = self.get_tag() + len(self.response_tags) + 1
         tag_stride = 0
         assert tag not in self.response_tags
         self.response_tags.append(tag)

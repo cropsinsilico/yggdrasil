@@ -1,6 +1,7 @@
 """Tools for accessing examples from python."""
 import os
 import glob
+import importlib
 from yggdrasil import tools, languages, serialize, constants
 
 
@@ -255,6 +256,22 @@ def discover_examples(parent_dir=None):
 base_langs, avail_langs, yamls, source = discover_examples()
 
 
+def get_example_module(name):
+    r"""Get the module containing the example.
+
+    Args:
+        name (str): Name of the example.
+
+    Returns:
+        module: Example module, None if one does not exist.
+    
+    """
+    try:
+        return importlib.import_module(f'yggdrasil.examples.{name}')
+    except ImportError:
+        return None
+
+
 def get_example_yaml(name, language):
     r"""Get yaml file(s) associated with an example in a certain language.
 
@@ -269,11 +286,15 @@ def get_example_yaml(name, language):
     if name not in yamls:
         raise KeyError("Could not locate yaml for example: '%s'" % name)
     if language in yamls[name]:
-        return yamls[name][language]
+        out = yamls[name][language]
     elif language.lower() in yamls[name]:
-        return yamls[name][language.lower()]
-    raise KeyError("Could not locate yaml for example '%s' in language '%s'"
-                   % (name, language))
+        out = yamls[name][language.lower()]
+    else:
+        raise KeyError(f"Could not locate yaml for example '{name}' "
+                       f"in language '{language}'")
+    if isinstance(out, str):
+        out = [out]
+    return out
 
 
 def get_example_source(name, language):
@@ -326,6 +347,23 @@ def get_example_languages(name, language=None):
     return out
 
 
+def get_example_testing_options(name):
+    r"""Get the testing options for an example.
+
+    Args:
+        name (str): Name of the example.
+
+    Returns:
+        dict: Testing options.
+
+    """
+    example_module = get_example_module(name)
+    testing_options = {}
+    if hasattr(example_module, 'get_testing_options'):
+        testing_options = example_module.get_testing_options()
+    return testing_options
+
+
 def display_example(name, language, number_lines=False):
     r"""Display the yaml and source code for an example with syntax
     highlighting.
@@ -341,6 +379,21 @@ def display_example(name, language, number_lines=False):
     ex_src = get_example_source(name, language)
     tools.display_source(ex_yml, number_lines=number_lines)
     tools.display_source(ex_src, number_lines=number_lines)
-    
+
+
+def validate_example(name):
+    r"""Validate an example's results.
+
+    Args:
+        name (str): Name of the example.
+
+    """
+    yamldir = os.path.join(_example_dir, name)
+    testing_options = get_example_testing_options(name)
+    if testing_options.get('validation_function', False):
+        testing_options['validation_function'](rootdir=yamldir)
+    if testing_options.get('skip_check_results', False):
+        return
+
 
 __all__ = ['yamls', 'source']

@@ -97,10 +97,16 @@ class OSRModelDriver(ExecutableModelDriver):
             self.model_file = os.path.join(
                 self.repository, 'OpenSimRoot', 'InputFiles',
                 os.path.basename(self.model_file))
+
+    def init_model(self):
+        r"""Initialize the model executable."""
+        super(OSRModelDriver, self).init_model()
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
         compile_kwargs = DependencySpecialization.select_attr(
             self, no_tools=True)
+        # if multitasking._on_mpi:
+        #     compile_kwargs.setdefault('maxjobs', 1)
         self.compile_dependencies(**compile_kwargs)
         assert os.path.isfile(self.executable_path)
 
@@ -133,7 +139,7 @@ class OSRModelDriver(ExecutableModelDriver):
 
     @classmethod
     def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None,
-                             **kwargs):
+                             maxjobs=4, **kwargs):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
 
         Args:
@@ -155,7 +161,9 @@ class OSRModelDriver(ExecutableModelDriver):
             #                                    return_prop='name',
             #                                    default=None)
             cwd = os.path.join(cls.repository, 'OpenSimRoot')
-            flags = ['-j4']
+            flags = []
+            if maxjobs > 1:
+                flags += [f'-j{maxjobs}']
             env = copy.deepcopy(os.environ)
             if platform._is_win:  # pragma: windows
                 toolname = 'cl'

@@ -594,7 +594,7 @@ class ConnectionDriver(Driver):
         self.debug('Returning')
 
     @run_remotely
-    def remove_model(self, direction0, name):
+    def remove_model(self, direction, name):
         r"""Remove a model from the list of models.
 
         Args:
@@ -609,16 +609,16 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             out = False
-            for direction in ['input', 'output']:
-                if name in self.models[direction]:
-                    self.models[direction].remove(name)
-                self.debug(("%s model '%s' signed off."
-                            "\n\tInput  models: %d"
-                            "\n\tOutput models: %d")
-                           % (direction.title(), name,
-                              len(self.models["input"]),
-                              len(self.models["output"])))
-                out = (out or (len(self.models[direction]) == 0))
+            if name in self.models[direction]:
+                self.models[direction].remove(name)
+                self.debug(
+                    "{direction.title()} model '{name}' signed off."
+                    "\n\tInput  models: {len(self.models['input'])}"
+                    "\n\tOutput models: {len(self.models['output'])}")
+            out = (out or (len(self.models[direction]) == 0))
+            opp_direction = 'output' if direction == 'input' else 'input'
+            if out and name in self.models[opp_direction]:
+                self.remove_model(opp_direction, name)
             return out
 
     @run_remotely
@@ -643,7 +643,7 @@ class ConnectionDriver(Driver):
             return False
         if not self.is_alive():
             return False
-        self.debug("All %s models have signed off.", direction)
+        self.debug(f"All {direction} models have signed off.")
         if (((self.onexit not in [None, 'on_model_exit', 'pass'])
              and (not errors))):
             self.debug("Calling onexit = '%s'" % self.onexit)
@@ -673,9 +673,8 @@ class ConnectionDriver(Driver):
 
     def on_model_exit(self, direction, name, errors=False):
         r"""Drain input and then close it."""
-        self.debug('%s model %s exiting', direction.title(), name)
-        if self.on_model_exit_remote(direction, name,
-                                     errors=errors):
+        self.debug(f'{direction.title()} model {name} exiting')
+        if self.on_model_exit_remote(direction, name, errors=errors):
             self.wait()
             self.debug('Finished')
 
@@ -712,6 +711,7 @@ class ConnectionDriver(Driver):
         """
         msg = beg_msg
         msg += '%-50s' % (self.__module__.split('.')[-1] + '(' + self.name + '): ')
+        msg += f'{self.icomm.address} => {self.ocomm.address}'
         msg += '\n\t'
         msg += '%-30s' % ('last action: ' + self.state)
         msg += '%-25s' % ('is_open(%s, %s), ' % (self.icomm.is_open,

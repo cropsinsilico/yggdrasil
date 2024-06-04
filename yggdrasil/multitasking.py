@@ -8,21 +8,11 @@ import threading
 import queue
 import multiprocessing
 import asyncio
-from yggdrasil.tools import YggClass, sleep
+from yggdrasil import tools
 MPI = None
 _on_mpi = False
 _mpi_rank = -1
-if os.environ.get('YGG_SUBPROCESS', False):
-    if 'YGG_MPI_RANK' in os.environ:
-        _on_mpi = True
-        _mpi_rank = int(os.environ['YGG_MPI_RANK'])
-else:
-    try:
-        from mpi4py import MPI
-        _on_mpi = (MPI.COMM_WORLD.Get_size() > 1)
-        _mpi_rank = MPI.COMM_WORLD.Get_rank()
-    except ImportError:
-        pass
+_mpi_initialized = False
 
 
 mp_ctx = multiprocessing.get_context()
@@ -38,7 +28,35 @@ def test_target_error():  # pragma: debug
 
 
 def test_target_sleep():  # pragma: debug
-    sleep(10.0)
+    tools.sleep(10.0)
+
+
+def init_mpi():
+    r"""Initialize MPI on the process and return the MPI singleton
+    from mpi4py on success.
+
+    Returns:
+        MPI: mpi4py.MPI
+
+    """
+    global _on_mpi
+    global _mpi_rank
+    global MPI
+    global _mpi_initialized
+    if not _mpi_initialized:
+        if os.environ.get('YGG_SUBPROCESS', False):
+            if 'YGG_MPI_RANK' in os.environ:
+                _on_mpi = True
+                _mpi_rank = int(os.environ['YGG_MPI_RANK'])
+        else:
+            try:
+                from mpi4py import MPI
+                _on_mpi = (MPI.COMM_WORLD.Get_size() > 1)
+                _mpi_rank = MPI.COMM_WORLD.Get_rank()
+            except ImportError:
+                pass
+    _mpi_initialized = True
+    return MPI
 
 
 def check_processes():  # pragma: debug
@@ -697,13 +715,14 @@ class Task(ContextObject):
                   # Process only
                   'terminate']
 
-    def __init__(self, target=None, args=(), kwargs={}, **kws):
+    def __init__(self, target=None, args=(), kwargs={}, env=None, **kws):
         self._target = target
         self._args = args
         self._kwargs = kwargs
         if self._target is not None:
             kws['target'] = self.target
-        super(Task, self).__init__(**kws)
+        with tools.updated_environment(env):
+            super(Task, self).__init__(**kws)
 
     @classmethod
     def get_base_class(cls, context):
@@ -1231,6 +1250,7 @@ class MPIErrorExchange(object):
     closing_messages = ['ERROR', 'COMPLETE']
 
     def __init__(self, global_tag=0):
+        init_mpi()
         self.comm = MPI.COMM_WORLD
         self.rank = self.comm.Get_rank()
         self.size = self.comm.Get_size()
@@ -1385,17 +1405,17 @@ class MPIErrorExchange(object):
 #         self[key] = self._dict_refs[key]
 
 
-class YggTask(YggClass):
+class YggTask(tools.YggClass):
     r"""Class for managing Ygg thread/process."""
 
-    _disconnect_attr = (YggClass._disconnect_attr
+    _disconnect_attr = (tools.YggClass._disconnect_attr
                         + ['context', 'lock', 'process_instance',
                            'error_flag', 'start_flag', 'terminate_flag',
                            'pipe'])
     
     def __init__(self, name=None, target=None, args=(), kwargs=None,
                  daemon=False, group=None, task_method='thread',
-                 context=None, with_pipe=False, **ygg_kwargs):
+                 context=None, with_pipe=False, env=None, **ygg_kwargs):
         if kwargs is None:
             kwargs = {}
         if (target is not None) and ('target' in self._schema_properties):
@@ -1415,7 +1435,7 @@ class YggTask(YggClass):
             self.in_process = True
         process_kwargs = dict(
             name=name, group=group, daemon=daemon,
-            target=self.run)
+            target=self.run, env=env)
         self.process_instance = self.context.Task(**process_kwargs)
         self._ygg_target = target
         self._ygg_args = args
@@ -1861,7 +1881,7 @@ class MemoryTracker(YggTaskLoop):
         for x in children:
             child_mem += x.memory_info().rss / 1024 ** 2
         self.record.append(total_mem + child_mem)
-        sleep(self.track_interval)
+        tools.sleep(self.track_interval)
 
     @property
     def max_memory(self):

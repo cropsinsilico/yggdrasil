@@ -1,8 +1,9 @@
 from collections import OrderedDict
 import shutil
+import contextlib
 from yggdrasil.components import import_component
 from yggdrasil.drivers.ModelDriver import ModelDriver
-from yggdrasil.multitasking import MPI, MPIRequestWrapper
+from yggdrasil.multitasking import init_mpi, MPIRequestWrapper
 
 
 class MPIPartnerModel(ModelDriver):
@@ -18,21 +19,19 @@ class MPIPartnerModel(ModelDriver):
     base_languages = []
     language_ext = []
     comms_implicit = True
-    check_mpi_requests = []
 
     def __init__(self, *args, **kwargs):
         kwargs.pop('function', None)
         super(MPIPartnerModel, self).__init__(*args, **kwargs)
-        self.partner_driver = import_component('model',
-                                               self.yml['partner_driver'],
-                                               without_schema=True)
-        self.partner_driver.mpi_partner_init(self)
 
-    def cleanup(self, *args, **kwargs):
-        r"""Remove compile executable."""
-        self.partner_driver.mpi_partner_cleanup(self)
-        super(MPIPartnerModel, self).cleanup(*args, **kwargs)
-
+    def parse_arguments(self, *args, **kwargs):
+        r"""Sort model arguments to determine which one is the executable
+        and which ones are arguments."""
+        if self.yml['partner_driver'] in ['timesync', 'TimeSyncModelDriver']:
+            self.model_file = 'dummy'
+            return
+        super(MPIPartnerModel, self).parse_arguments(*args, **kwargs)
+        
     @classmethod
     def is_language_installed(self):
         r"""Determine if this model driver is installed on the current
@@ -43,7 +42,7 @@ class MPIPartnerModel(ModelDriver):
                 machine.
 
         """
-        return (MPI is not None)
+        return (init_mpi() is not None)
 
     @classmethod
     def configuration_steps(cls):
@@ -113,7 +112,24 @@ class MPIPartnerModel(ModelDriver):
     #     env.update(self.get_io_env())
     #     self.send_mpi(env, tag=self._mpi_tags['ENV'])
         
-    def init_mpi(self):
+    @contextlib.contextmanager
+    def mpi_init(self):
+        r"""Context that initializes the MPI state of the model and locks
+        files for the 'init' condition."""
+        self.partner_driver = import_component('model',
+                                               self.yml['partner_driver'],
+                                               without_schema=True)
+        self.partner_driver.mpi_partner_init(self)
+        yield
+        
+    @contextlib.contextmanager
+    def mpi_cleanup(self):
+        r"""Context that finalizes the MPI state of the model and locks
+        files for the 'cleanup' condition."""
+        self.partner_driver.mpi_partner_cleanup(self)
+        yield
+        
+    def start_mpi(self):
         r"""Initialize MPI communicator."""
         self.send_mpi('START', tag=self._mpi_tags['START'])
         self._mpi_requests['stopped'] = MPIRequestWrapper(
@@ -132,8 +148,6 @@ class MPIPartnerModel(ModelDriver):
             self.set_break_flag()
         else:
             self.sleep()
-        for k in self.check_mpi_requests:
-            self.check_mpi_request(k)
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""

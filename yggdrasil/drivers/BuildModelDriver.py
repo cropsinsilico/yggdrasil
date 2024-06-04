@@ -264,15 +264,6 @@ class BuildModelDriver(CompiledModelDriver):
         return os.path.isfile(fname)
 
     @classmethod
-    def get_buildfile_lock(cls, **kwargs):
-        r"""Get a lock for a buildfile to prevent simultaneous access,
-        creating one as necessary."""
-        if kwargs.get('instance', None):
-            kwargs.setdefault('fname', kwargs['instance'].buildfile)
-        kwargs.setdefault('lock_conditions', ('build', 'cleanup'))
-        return super(BuildModelDriver, cls).get_buildfile_lock(**kwargs)
-    
-    @classmethod
     def get_source_dir(cls, fname=None, source_dir=None):
         if source_dir is None:
             if isinstance(fname, str):
@@ -526,12 +517,12 @@ class BuildModelDriver(CompiledModelDriver):
         """
         pass
 
-    def cleanup(self):
+    def cleanup_model(self):
         r"""Remove compiled executable."""
         if ((self.remove_products and self.model_file is not None
              and os.path.isfile(self.model_file))):
             self.build_model(target='clean')
-        super(BuildModelDriver, self).cleanup()
+        super(BuildModelDriver, self).cleanup_model()
 
     @classmethod
     def fix_path(cls, path, for_env=False, is_gnu=False):

@@ -19,7 +19,7 @@ from yggdrasil.tools import (
     get_supported_lang, get_supported_comm, get_supported_type,
     resolve_language_aliases)
 from yggdrasil.components import import_component
-from yggdrasil.multitasking import _on_mpi
+from yggdrasil.multitasking import init_mpi
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -437,7 +437,7 @@ def do_yggdrasil_mods(opts, dont_exit=False):
         mpi_test_args = " ".join(mpi_test_args)
         opts.append('separate_tests', mpi_test_args)
     # MPI process should be started
-    if ('mpi' in options.suite) and (mpi_nproc <= 1) and (not _on_mpi):
+    if ('mpi' in options.suite) and (mpi_nproc <= 1) and (not init_mpi()):
         mpi_nproc = 2
     if mpi_nproc > 1:
         run_process = True
@@ -452,7 +452,7 @@ def do_yggdrasil_mods(opts, dont_exit=False):
         # TODO: Remove these once MPI debugged
         prefix_pytest += ['-svx']
     # Continuous integration
-    if options.ci and (not _on_mpi):
+    if options.ci and (not init_mpi()):
         setup_ci(opts)
         opts.args.remove('--ci')  # Much faster
         # Must launch in separate process so that pytest recognizes
