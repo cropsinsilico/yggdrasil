@@ -2667,7 +2667,8 @@ class CompilationDependency(object):
         if filetype in self.always_generated:
             overwrite = True
         key = self.key(filetype)
-        if key in self.generated and not os.path.isfile(self.files[key]):
+        if ((key in self.generated and key in self.files
+             and not os.path.isfile(self.files[key]))):
             kwargs['previous'] = self.files.pop(key)
         if key in self.files and not overwrite:
             return self.files[key]
@@ -2949,7 +2950,7 @@ class CompilationDependency(object):
 
     def _generated_windows_import(self, previous=None, **kwargs):
         out = None
-        dll = self.get('shared', **kwargs)
+        dll = self.get('shared', default=None, **kwargs)
         # TODO: temp
         logger.info(f"GENERATED_WINDOWS_IMPORT [{self.name}]: {dll} "
                     f"(previous = {previous}")
@@ -3546,8 +3547,9 @@ class CompilationDependency(object):
         if env_var and paths_to_add:
             path_list = []
             prev_path = to_update.get(env_var, '')
-            prev_path_list = prev_path.split(os.pathsep)
+            prev_path_list = []
             if prev_path:
+                prev_path_list += prev_path.split(os.pathsep)
                 path_list.append(prev_path)
             for x in paths_to_add:
                 if x not in prev_path_list:
@@ -4851,7 +4853,8 @@ class CompilationToolBase(object):
         if (cls.search_path_envvar is not None) and (not env_only):
             assert isinstance(cls.search_path_envvar, list)
             for ienv in cls.search_path_envvar:
-                paths += os.environ.get(ienv, '').split(os.pathsep)
+                if os.environ.get(ienv, ''):
+                    paths += os.environ[ienv].split(os.pathsep)
         # Get flags based on path
         if (cls.search_path_flags is not None) and (not env_only):
             output = cls.call(cls.search_path_flags, for_version=True)[0]
