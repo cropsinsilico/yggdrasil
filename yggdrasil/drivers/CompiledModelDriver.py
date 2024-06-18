@@ -3552,7 +3552,7 @@ class CompilationDependency(object):
                 prev_path_list += prev_path.split(os.pathsep)
                 path_list.append(prev_path)
             for x in paths_to_add:
-                if x not in prev_path_list:
+                if x and x not in prev_path_list:
                     if add_to_front:
                         path_list.insert(0, x)
                     else:

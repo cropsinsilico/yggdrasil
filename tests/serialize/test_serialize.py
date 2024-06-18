@@ -5,8 +5,8 @@ from yggdrasil import serialize, platform, constants
 
 unsupported_nptype = ['bool_']
 map_nptype2cformat = [
-    (['float_', 'float16', 'float32', 'float64'], '%g'),
-    (['complex_', 'complex64', 'complex128'], '%g%+gj'),
+    (['float16', 'float32', 'float64'], '%g'),
+    (['complex64', 'complex128'], '%g%+gj'),
     # (['int8', 'short', 'intc', 'int_', 'longlong'], '%d'),
     # (['uint8', 'ushort', 'uintc', 'uint64', 'ulonglong'], '%u'),
     ('int8', '%hhd'), ('short', '%hd'), ('intc', '%d'),
@@ -18,6 +18,9 @@ if platform._is_win:  # pragma: windows
 else:
     map_nptype2cformat.append(('int64', '%ld'))
     map_nptype2cformat.append(('uint64', '%lu'))
+if not platform._numpy2:
+    map_nptype2cformat.append(('float_', '%g'))
+    map_nptype2cformat.append(('complex_', '%g%+gj'))
 # Conditional on if default int 32bit or 64bit
 # This is for when default int is 32bit
 if np.dtype('int_') != np.dtype('intc'):

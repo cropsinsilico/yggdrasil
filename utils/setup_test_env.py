@@ -1412,13 +1412,18 @@ def preinstall_deps(method, param=None, return_commands=False,
         if param.conda_env:
             conda_prefix = os.path.join(conda_root, 'envs',
                                         param.conda_env)
-        # Do both to ensure that the path is set for the installation
-        # and in following steps
-        cmds += [
-            f"export LD_LIBRARY_PATH={conda_prefix}/lib:$LD_LIBRARY_PATH",
-            "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
-            f"echo {conda_prefix}/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
-        ]
+        conda_libdir = os.path.join(conda_prefix, 'lib')
+        existing_paths = os.environ.get('LD_LIBRARY_PATH', '').split(os.pathsep)
+        if conda_libdir not in existing_paths:
+            if existing_paths:
+                conda_libdir += os.pathsep + "$LD_LIBRARY_PATH"
+            # Do both to ensure that the path is set for the installation
+            # and in following steps
+            cmds += [
+                f"export LD_LIBRARY_PATH={conda_libdir}",
+                "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
+                f"echo {conda_libdir} >> $GITHUB_ENV"
+            ]
     if return_commands:
         return cmds
     if cmds:

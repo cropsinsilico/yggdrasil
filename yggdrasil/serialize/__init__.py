@@ -72,9 +72,11 @@ def nptype2cformat(nptype, asbytes=False):
     if len(t) > 0:
         out = [nptype2cformat(t[n], asbytes=asbytes) for n in t.names]
         return out
-    if t in [np.dtype(x) for x in ["float_", "float16", "float32", "float64"]]:
+    if t in ([np.dtype(x) for x in ["float16", "float32", "float64"]]
+             or ((not platform._numpy2) and (t == np.dtype("float_")))):
         cfmt = "%g"  # Ensures readability
-    elif t in [np.dtype(x) for x in ["complex_", "complex64", "complex128"]]:
+    elif t in ([np.dtype(x) for x in ["complex64", "complex128"]]
+               or ((not platform._numpy2) and (t == np.dtype("complex_")))):
         cfmt = "%g%+gj"
     elif t == np.dtype("int8"):
         cfmt = "%hhd"
