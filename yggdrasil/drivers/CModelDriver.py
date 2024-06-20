@@ -96,7 +96,7 @@ class GCCCompiler(CCompilerBase):
     next_stage_flag_flag = '-Xlinker'
     version_regex = [
         r'(?P<version>(?:.*gnu\-)?g?cc \(.+\) \d+\.\d+\.\d+)']
-    standard_library = 'c'
+    # standard_library = 'c'
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],
                  'dep_shared_flags': ['-fsanitize=address'],

@@ -93,6 +93,10 @@ general:
       host_only: True
       flags:
         conda_selectors: [py<38]
+  - urllib3<2.2.2:
+      method: conda_recipe
+      flags:
+        conda_selectors: [py<38]
   - six
   - toml
   - unyt

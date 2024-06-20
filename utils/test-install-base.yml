@@ -11,6 +11,9 @@ name: Test of package installation & execution
     - cron: "0 10 1 * *"  # 3AM PST once a month
 
 env:
+  PYTHONVERSION_MIN: 3.7
+  PYTHONVERSION_MAX: 3.12
+  PYTHONVERSION_STD: 3.9
   NUMPY: numpy
   INSTALLR: 0  # TODO: temp
   INSTALLC: 1
@@ -54,7 +57,7 @@ jobs:
       max-parallel: 20
       matrix:
         os-base: [ubuntu, macos, windows]
-        python-version: [3.8]
+        python-version: [std]
         install-method: [pip]
         test-flags1: [basic, examples, types-no-c, types-c]
         test-flags2: [empty]
@@ -65,7 +68,7 @@ jobs:
         install-pytorch: [true]
         include:
           - os-base: windows
-            python-version: 3.8
+            python-version: std
             install-method: pip
             test-flags1: long
             test-flags2: empty
@@ -77,6 +80,21 @@ jobs:
       fail-fast: false
 
     steps: &steps
+    - name: Set Python version
+      run: echo "PYTHONVERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set Python version to minimum
+      if: matrix.python-version == 'min'
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MIN" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set Python version to maximum
+      if: matrix.python-version == 'max'
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MAX" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set Python version to standard
+      if: matrix.python-version == 'std'
+      run: echo "PYTHONVERSION=$PYTHONVERSION_STD" >> $GITHUB_ENV
+      shell: bash -l {0}
     - name: Set test-flags1
       env:
         TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
@@ -172,12 +190,12 @@ jobs:
           ${{ runner.os }}-pip-
     - name: (PIP) Set up Python
       uses: actions/setup-python@v5
-      if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os != 'macOS')
+      if: matrix.install-method == 'pip' && (env.PYTHONVERSION != 3.7 || runner.os != 'macOS')
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHONVERSION }}
     - name: (PIP) Set up Python 3.7
       uses: actions/setup-python@v5
-      if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os == 'macOS'
+      if: matrix.install-method == 'pip' && env.PYTHONVERSION == 3.7 && runner.os == 'macOS'
       with:
         python-version: 3.7.16
     - name: (PIP) Set up Julia
@@ -191,7 +209,7 @@ jobs:
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: |
-        python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
+        python utils/setup_test_env.py env virtualenv ${{ env.PYTHONVERSION }} --env-name=test
         echo "source activate ygg" > ~/.bashrc
         source test/bin/activate
         echo "$VIRTUAL_ENV"
@@ -240,7 +258,7 @@ jobs:
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
       with:
         auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHONVERSION }}
         channels: conda-forge
         # use-only-tar-bz2: true
         channel-priority: strict
@@ -272,13 +290,13 @@ jobs:
       run: |
         conda deactivate
         conda activate base
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ env.PYTHONVERSION }} --use-mamba
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
       run: |
         conda deactivate
         conda activate base
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }} --use-mamba
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ env.PYTHONVERSION }} --use-mamba
     # - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
     #   if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
     #   run: ./utils/setup_old_mac_sdk.sh
@@ -413,7 +431,7 @@ jobs:
       max-parallel: 20
       matrix:
         os-base: [ubuntu, macos, windows]
-        python-version: [3.9]  # TODO: propertly update the base version
+        python-version: [std]
         install-method: [conda]
         test-flags1: [long-mpi]
         test-flags2: [examples-backwards]
@@ -492,7 +510,7 @@ jobs:
     strategy:
       matrix:
         os-base: [ubuntu]
-        python-version: [3.8]
+        python-version: [std]
         install-method: [pip]
         test-flags1: [long-interp]
         test-flags2: [empty]
@@ -521,7 +539,7 @@ jobs:
     strategy:
       matrix:
         os-base: [ubuntu]
-        python-version: [3.8]
+        python-version: [std]
         install-method: [conda]
         test-flags1: [long-interp]
         test-flags2: [services]
@@ -555,7 +573,7 @@ jobs:
     strategy:
       matrix:
         os-base: [ubuntu, macos, windows]
-        python-version: [3.8]
+        python-version: [std]
         install-method: [pip]
         test-flags1: [long]
         test-flags2: [empty]
@@ -583,7 +601,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: std
     - name: Install dependencies
       run: python utils/setup_test_env.py install pip
     - name: Verify installation
@@ -681,7 +699,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: std
       - name: Install build utilities
         run: |
           python -m pip install build
@@ -752,7 +770,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: std
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
@@ -779,7 +797,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: std
     - name: Install dependencies
       run: |
         python -m pip install PyGithub

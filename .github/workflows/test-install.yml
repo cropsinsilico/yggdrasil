@@ -21,6 +21,9 @@ env:
   INSTALLTRIMESH: 1
   INSTALLZMQ: 1
   NUMPY: numpy
+  PYTHONVERSION_MAX: 3.12
+  PYTHONVERSION_MIN: 3.7
+  PYTHONVERSION_STD: 3.9
   TMPDIR: /tmp/
   USEVIRTUALENV: 0
   YGG_GHA_JOB_ID_SUFFIX: null
@@ -51,7 +54,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: std
     - name: Install build utilities
       run: 'python -m pip install build
 
@@ -168,7 +171,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: std
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
@@ -196,7 +199,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: std
     - name: Install dependencies
       run: python utils/setup_test_env.py install pip
     - name: Verify installation
@@ -266,7 +269,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: std
     - name: Install dependencies
       run: 'python -m pip install PyGithub
 
@@ -293,6 +296,21 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
+    - name: Set Python version
+      run: echo "PYTHONVERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'min'
+      name: Set Python version to minimum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MIN" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'max'
+      name: Set Python version to maximum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MAX" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'std'
+      name: Set Python version to standard
+      run: echo "PYTHONVERSION=$PYTHONVERSION_STD" >> $GITHUB_ENV
+      shell: bash -l {0}
     - env:
         TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
@@ -393,13 +411,13 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+    - if: matrix.install-method == 'pip' && (env.PYTHONVERSION != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        python-version: ${{ env.PYTHONVERSION }}
+    - if: matrix.install-method == 'pip' && env.PYTHONVERSION == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
       uses: actions/setup-python@v5
@@ -413,8 +431,8 @@ jobs:
       uses: matlab-actions/setup-matlab@v1
     - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       name: (PIP) Set up Virtual Env
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
+      run: 'python utils/setup_test_env.py env virtualenv ${{ env.PYTHONVERSION }}
+        --env-name=test
 
         echo "source activate ygg" > ~/.bashrc
 
@@ -459,7 +477,7 @@ jobs:
         channel-priority: strict
         channels: conda-forge
         miniforge-variant: Mambaforge
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
     - continue-on-error: true
       id: conda_build
@@ -470,7 +488,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
@@ -481,7 +499,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: runner.os == 'Linux' && matrix.install-sbml == true
@@ -680,7 +698,7 @@ jobs:
         - macos
         - windows
         python-version:
-        - 3.9
+        - std
         test-flags1:
         - long-mpi
         test-flags2:
@@ -694,6 +712,21 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
+    - name: Set Python version
+      run: echo "PYTHONVERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'min'
+      name: Set Python version to minimum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MIN" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'max'
+      name: Set Python version to maximum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MAX" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'std'
+      name: Set Python version to standard
+      run: echo "PYTHONVERSION=$PYTHONVERSION_STD" >> $GITHUB_ENV
+      shell: bash -l {0}
     - env:
         TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
@@ -794,13 +827,13 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+    - if: matrix.install-method == 'pip' && (env.PYTHONVERSION != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        python-version: ${{ env.PYTHONVERSION }}
+    - if: matrix.install-method == 'pip' && env.PYTHONVERSION == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
       uses: actions/setup-python@v5
@@ -814,8 +847,8 @@ jobs:
       uses: matlab-actions/setup-matlab@v1
     - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       name: (PIP) Set up Virtual Env
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
+      run: 'python utils/setup_test_env.py env virtualenv ${{ env.PYTHONVERSION }}
+        --env-name=test
 
         echo "source activate ygg" > ~/.bashrc
 
@@ -860,7 +893,7 @@ jobs:
         channel-priority: strict
         channels: conda-forge
         miniforge-variant: Mambaforge
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
     - continue-on-error: true
       id: conda_build
@@ -871,7 +904,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
@@ -882,7 +915,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: runner.os == 'Linux' && matrix.install-sbml == true
@@ -1021,7 +1054,7 @@ jobs:
           install-r: false
           install-sbml: false
           os-base: windows
-          python-version: 3.8
+          python-version: std
           test-flags1: long
           test-flags2: empty
         install-c:
@@ -1041,7 +1074,7 @@ jobs:
         - macos
         - windows
         python-version:
-        - 3.8
+        - std
         test-flags1:
         - basic
         - examples
@@ -1071,6 +1104,21 @@ jobs:
         ports:
         - 5672:5672
     steps:
+    - name: Set Python version
+      run: echo "PYTHONVERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'min'
+      name: Set Python version to minimum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MIN" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'max'
+      name: Set Python version to maximum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MAX" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'std'
+      name: Set Python version to standard
+      run: echo "PYTHONVERSION=$PYTHONVERSION_STD" >> $GITHUB_ENV
+      shell: bash -l {0}
     - env:
         TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
@@ -1171,13 +1219,13 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+    - if: matrix.install-method == 'pip' && (env.PYTHONVERSION != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        python-version: ${{ env.PYTHONVERSION }}
+    - if: matrix.install-method == 'pip' && env.PYTHONVERSION == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
       uses: actions/setup-python@v5
@@ -1191,8 +1239,8 @@ jobs:
       uses: matlab-actions/setup-matlab@v1
     - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       name: (PIP) Set up Virtual Env
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
+      run: 'python utils/setup_test_env.py env virtualenv ${{ env.PYTHONVERSION }}
+        --env-name=test
 
         echo "source activate ygg" > ~/.bashrc
 
@@ -1237,7 +1285,7 @@ jobs:
         channel-priority: strict
         channels: conda-forge
         miniforge-variant: Mambaforge
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
     - continue-on-error: true
       id: conda_build
@@ -1248,7 +1296,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
@@ -1259,7 +1307,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: runner.os == 'Linux' && matrix.install-sbml == true
@@ -1405,7 +1453,7 @@ jobs:
         os-base:
         - ubuntu
         python-version:
-        - 3.8
+        - std
         test-flags1:
         - long-interp
         test-flags2:
@@ -1429,6 +1477,21 @@ jobs:
         ports:
         - 5672:5672
     steps:
+    - name: Set Python version
+      run: echo "PYTHONVERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'min'
+      name: Set Python version to minimum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MIN" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'max'
+      name: Set Python version to maximum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MAX" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'std'
+      name: Set Python version to standard
+      run: echo "PYTHONVERSION=$PYTHONVERSION_STD" >> $GITHUB_ENV
+      shell: bash -l {0}
     - env:
         TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
@@ -1529,13 +1592,13 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+    - if: matrix.install-method == 'pip' && (env.PYTHONVERSION != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        python-version: ${{ env.PYTHONVERSION }}
+    - if: matrix.install-method == 'pip' && env.PYTHONVERSION == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
       uses: actions/setup-python@v5
@@ -1549,8 +1612,8 @@ jobs:
       uses: matlab-actions/setup-matlab@v1
     - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       name: (PIP) Set up Virtual Env
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
+      run: 'python utils/setup_test_env.py env virtualenv ${{ env.PYTHONVERSION }}
+        --env-name=test
 
         echo "source activate ygg" > ~/.bashrc
 
@@ -1595,7 +1658,7 @@ jobs:
         channel-priority: strict
         channels: conda-forge
         miniforge-variant: Mambaforge
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
     - continue-on-error: true
       id: conda_build
@@ -1606,7 +1669,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
@@ -1617,7 +1680,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: runner.os == 'Linux' && matrix.install-sbml == true
@@ -1763,7 +1826,7 @@ jobs:
         os-base:
         - ubuntu
         python-version:
-        - 3.8
+        - std
         test-flags1:
         - long-interp
         test-flags2:
@@ -1786,6 +1849,21 @@ jobs:
     runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base]
       }}
     steps:
+    - name: Set Python version
+      run: echo "PYTHONVERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'min'
+      name: Set Python version to minimum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MIN" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'max'
+      name: Set Python version to maximum
+      run: echo "PYTHONVERSION=$PYTHONVERSION_MAX" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - if: matrix.python-version == 'std'
+      name: Set Python version to standard
+      run: echo "PYTHONVERSION=$PYTHONVERSION_STD" >> $GITHUB_ENV
+      shell: bash -l {0}
     - env:
         TEST_FLAGS1: ${{fromJSON(needs.params.outputs.test-flags)[matrix.test-flags1]}}
       name: Set test-flags1
@@ -1886,13 +1964,13 @@ jobs:
         restore-keys: '${{ runner.os }}-pip-
 
           '
-    - if: matrix.install-method == 'pip' && (matrix.python-version != 3.7 || runner.os
+    - if: matrix.install-method == 'pip' && (env.PYTHONVERSION != 3.7 || runner.os
         != 'macOS')
       name: (PIP) Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip' && matrix.python-version == 3.7 && runner.os
+        python-version: ${{ env.PYTHONVERSION }}
+    - if: matrix.install-method == 'pip' && env.PYTHONVERSION == 3.7 && runner.os
         == 'macOS'
       name: (PIP) Set up Python 3.7
       uses: actions/setup-python@v5
@@ -1906,8 +1984,8 @@ jobs:
       uses: matlab-actions/setup-matlab@v1
     - if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       name: (PIP) Set up Virtual Env
-      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
-        }} --env-name=test
+      run: 'python utils/setup_test_env.py env virtualenv ${{ env.PYTHONVERSION }}
+        --env-name=test
 
         echo "source activate ygg" > ~/.bashrc
 
@@ -1952,7 +2030,7 @@ jobs:
         channel-priority: strict
         channels: conda-forge
         miniforge-variant: Mambaforge
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
     - continue-on-error: true
       id: conda_build
@@ -1963,7 +2041,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method ==
@@ -1974,7 +2052,7 @@ jobs:
         conda activate base
 
         python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }} --use-mamba
+        ${{ env.PYTHONVERSION }} --use-mamba
 
         '
     - if: runner.os == 'Linux' && matrix.install-sbml == true
@@ -2122,7 +2200,7 @@ jobs:
         - macos
         - windows
         python-version:
-        - 3.8
+        - std
         test-flags1:
         - long
         test-flags2:

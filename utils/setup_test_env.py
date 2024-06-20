@@ -1413,8 +1413,8 @@ def preinstall_deps(method, param=None, return_commands=False,
             conda_prefix = os.path.join(conda_root, 'envs',
                                         param.conda_env)
         conda_libdir = os.path.join(conda_prefix, 'lib')
-        existing_paths = os.environ.get('LD_LIBRARY_PATH', '').split(os.pathsep)
-        if conda_libdir not in existing_paths:
+        existing_paths = os.environ.get('LD_LIBRARY_PATH', '')
+        if conda_libdir not in existing_paths.split(os.pathsep):
             if existing_paths:
                 conda_libdir += os.pathsep + "$LD_LIBRARY_PATH"
             # Do both to ensure that the path is set for the installation
