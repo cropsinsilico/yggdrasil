@@ -381,10 +381,10 @@ def update_language_config(languages=None, skip_warnings=False,
     ygg_cfg.reload()
     if not skip_warnings:
         for sect, opt, desc in miss:  # pragma: windows
-            warnings.warn(("Could not set option %s in section %s. "
-                           + "Please set this in %s to: %s")
-                          % (opt, sect, ygg_cfg_usr.file_to_update, desc),
-                          RuntimeWarning)
+            warnings.warn(
+                f"Could not set option {opt} in section {sect}. Please "
+                f"set this in {ygg_cfg_usr.file_to_update} to: {desc}",
+                RuntimeWarning)
     if verbose:
         with open(usr_config_file, 'r') as fd:
             print(fd.read())

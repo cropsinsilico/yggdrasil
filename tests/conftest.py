@@ -837,6 +837,12 @@ def project_dir():
 
 
 @pytest.fixture(scope="session")
+def external_dir():
+    r"""Directory outside of the local yggdrasil installation."""
+    return os.path.dirname(os.getcwd())
+    
+
+@pytest.fixture(scope="session")
 def logger():
     r"""Package logger."""
     import logging
@@ -1064,7 +1070,7 @@ def check_service_manager_settings():
 
 @pytest.fixture(scope="session")
 def running_service(pytestconfig, check_service_manager_settings,
-                    project_dir):
+                    project_dir, external_dir, logger):
     r"""Context manager to run and clean-up an integration service."""
     manager = pytestconfig.pluginmanager
     plugin_class = manager.get_plugin('pytest_cov').CovPlugin
@@ -1095,7 +1101,7 @@ def running_service(pytestconfig, check_service_manager_settings,
             args.append("--track-memory")
         if debug:
             args.append("--debug")
-        process_kws = {}
+        process_kws = {'cwd': external_dir}
         if with_coverage:
             script_path = os.path.expanduser(os.path.join('~', 'run_server.py'))
             process_kws['cwd'] = project_dir
@@ -1131,6 +1137,7 @@ def running_service(pytestconfig, check_service_manager_settings,
             assert cli.service_type == 'flask'
         assert not cli.is_running
         p = subprocess.Popen(args, **process_kws)
+        logger.info(f"Started service manager via {args} ({process_kws})")
         try:
             cli.wait_for_server()
             yield cli

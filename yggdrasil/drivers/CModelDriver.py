@@ -108,6 +108,19 @@ class GCCCompiler(CCompilerBase):
     }
 
     @classmethod
+    def is_alias(cls):
+        r"""Determine if the tool is actually an alias for another tool.
+
+        Returns:
+            bool, str: False if this tool is not an alias, otherwise
+                return the name of the aliased tool.
+
+        """
+        if cls.is_clang():
+            return 'clang'
+        return super(GCCCompiler, cls).is_alias()
+
+    @classmethod
     def is_clang(cls):
         r"""Determine if this tool is actually an alias for clang.
 

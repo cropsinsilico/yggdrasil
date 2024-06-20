@@ -121,6 +121,9 @@ class CompilationToolRegistry(object):
         if platform._is_win:
             out += [x.lower() for x in out.copy()]
         out = list(set([self._check_toolname(tooltype, x) for x in out]))
+        out_aliased = [self.tooltype[tooltype][x].is_alias() for x in out
+                       if x in self.tooltype[tooltype]]
+        out = [k for k in out_aliased if k] + out
         return out
 
     def _check_tooltype(self, tooltype, driver=None):
@@ -604,6 +607,9 @@ class CompilationToolRegistry(object):
             for x in self._toolnames(tooltype, toolname):
                 if x in self.tooltype[tooltype]:
                     out = self.tooltype[tooltype][x]
+                    aliased = out.is_alias()
+                    if aliased:
+                        out = self.tooltype[tooltype][aliased]
                     break
             return self._check_return(tooltype, out, default=default,
                                       **sorting_kws)
@@ -925,6 +931,26 @@ class DependencyRegistry(object):
         return {k: v for k, v in self.libraries.items()
                 if v.origin == origin}
 
+    def remove(self, key, cfg=None):
+        r"""Remove a dependency from the registry.
+
+        Args:
+            key (str): Name of dependency to remove.
+            cfg (CisConfigParser, optional): Set of configuration options
+                that the dependency's options should also be removed from.
+
+        Returns:
+            bool: True if the dependency was present (and removed), False
+                otherwise.
+
+        """
+        if key in self:
+            if cfg is not None:
+                self[key].clear_cache(cfg)
+            del self.libraries[key]
+            return True
+        return False
+
     @classmethod
     def splitext(cls, fname):
         r"""Split a file extension, taking special care for the .dll.a
@@ -973,8 +999,39 @@ class DependencyRegistry(object):
                 self._basetool = False
         return self._basetool
 
+    def remove_compiler_libraries(self, basetool=None, cfg=None):
+        r"""Reset the libraries associated with the compiler.
+
+        Args:
+            basetool (CompilationToolBase, optional): Compilation base
+                tool that owns the libraries that should be reset. If not
+                provided, self.basetool will be used.
+            cfg (CisConfigParser, optional): Set of configuration options
+                that libraries should be removed from.
+
+        Returns:
+            bool: True if any librares are removed, False otherwise.
+
+        """
+        if basetool is None:
+            basetool = self.basetool
+        libs_removed = False
+        if basetool:
+            stdlib = basetool.standard_library
+            if stdlib and self.remove(stdlib, cfg=cfg):
+                libs_removed = True
+            for k, v in basetool.libraries.items():
+                if self.remove(v.get("name", k), cfg=cfg):
+                    libs_removed = True
+        return libs_removed
+
     def add_compiler_libraries(self, basetool=None):
         r"""Add the standard library for the compiler.
+
+        Args:
+            basetool (CompilationToolBase, optional): Compilation base
+                tool that owns the libraries that should be added. If not
+                provided, self.basetool will be used.
 
         Returns:
             bool: True if any libraries are added, False otherwise.
@@ -2647,6 +2704,28 @@ class CompilationDependency(object):
                       for kk, v in cached.items()}
             self.files.update(cached)
 
+    def clear_cache(self, cfg):
+        r"""Update the configuration file to remove paths associated with
+        this dependency.
+
+        Args:
+            cfg (CisConfigParser): Configuration class containing cached
+                file paths.
+
+        """
+        if self.is_internal:
+            return
+        options = [f'{self.name}_generated']
+        for k, v in self.files.items():
+            if not (v and isinstance(k, str)
+                    and k.startswith(tuple(self.cached_files))):
+                continue
+            assert '_' not in self.name  # So that key can be loaded
+            options.append(f"{self.name}_{k}")
+        for k in options:
+            if cfg.has_option(self.language, k):
+                cfg.remove_option(self.language, k)
+
     def update_cache(self, cfg):
         r"""Update the configuration file with library file paths.
 
@@ -2724,7 +2803,7 @@ class CompilationDependency(object):
             tool = self.tool(tooltype, **kwargs)
             out = None
             if tool:
-                out = tool.get_executable(full_path=True)
+                out = tool.get_executable(full_path=True, cfg=self.cfg)
         elif filetype in [f'{lang}_{k}' for lang, k in
                           itertools.product(
                               constants.LANGUAGES['compiled'],
@@ -2745,7 +2824,7 @@ class CompilationDependency(object):
             out = None
             tool = self.get(tooltype, None, **kwargs)
             if tool:
-                out = tool.get_executable(full_path=True)
+                out = tool.get_executable(full_path=True, cfg=self.cfg)
         elif filetype in [f'{k}_env' for k in
                           DependencySpecialization.tooltypes]:
             out = self._build_env(filetype, **kwargs)
@@ -3647,7 +3726,8 @@ class CompilationDependency(object):
             if self.parameters.get('flags_in_env', False):
                 kenv = self.parameters.get(
                     f'env_{k}', tool.default_executable_env)
-                out[kenv] = tool.get_executable(full_path=True)
+                out[kenv] = tool.get_executable(full_path=True,
+                                                cfg=self.cfg)
                 if self.parameters.get('build_driver', False):
                     out[kenv] = self.parameters['build_driver'].fix_path(
                         out[kenv], for_env=True)
@@ -4151,6 +4231,17 @@ class CompilationToolBase(object):
             del stage_cls
 
     @classmethod
+    def is_alias(cls):
+        r"""Determine if the tool is actually an alias for another tool.
+
+        Returns:
+            bool, str: False if this tool is not an alias, otherwise
+                return the name of the aliased tool.
+
+        """
+        return False
+
+    @classmethod
     def get_tool(cls, tooltype, allow_uninstalled=False,
                  force_simultaneous_next_stage=False, **kwargs):
         r"""Get the associate class for the required tool type.
@@ -4518,15 +4609,20 @@ class CompilationToolBase(object):
         return out
 
     @classmethod
-    def is_installed(cls):
+    def is_installed(cls, cfg=None):
         r"""Determine if this tool is installed by looking for the executable.
 
+        Args:
+            cfg (CisConfigParser, optional): Configuration options that
+                should be checked for a tool executable path. If not
+                provided, yggdrasil.config.ygg_cfg will be used.
+        
         Returns:
             bool: True if the tool is installed, False otherwise.
 
         """
         try:
-            cls.get_executable()
+            cls.get_executable(cfg=cfg)
             return True
         except InvalidCompilationTool:
             return False
@@ -4788,12 +4884,15 @@ class CompilationToolBase(object):
         return out
 
     @classmethod
-    def get_executable(cls, full_path=False):
+    def get_executable(cls, full_path=False, cfg=None):
         r"""Determine the executable that should be used to call this tool.
 
         Args:
             full_path (bool, optional): If True the full path to the executable
                 file will be returned. Defaults to False.
+            cfg (CisConfigParser, optional): Configuration options that
+                should be checked for a tool executable path. If not
+                provided, yggdrasil.config.ygg_cfg will be used.
 
         Returns:
             str: Name of (or path to) the tool executable.
@@ -4801,12 +4900,13 @@ class CompilationToolBase(object):
         """
         out = getattr(cls, 'executable', None)
         if out is None:
-            from yggdrasil.config import ygg_cfg
             out = cls.default_executable
             if cls.languages:
-                out = ygg_cfg.get(cls.languages[0],
-                                  f'{cls.toolname}_executable',
-                                  out)
+                if cfg is None:
+                    from yggdrasil.config import ygg_cfg as cfg
+                out = cfg.get(cls.languages[0],
+                              f'{cls.toolname}_executable',
+                              out)
         if out is None or not (os.path.isfile(out) or shutil.which(out)):
             raise InvalidCompilationTool(f"Executable invalid for "
                                          f"{cls.tooltype} "
@@ -4846,8 +4946,7 @@ class CompilationToolBase(object):
 
         """
         if cfg is None:
-            from yggdrasil.config import ygg_cfg
-            cfg = ygg_cfg
+            from yggdrasil.config import ygg_cfg as cfg
         if (cls.search_path_flags is None) and (cls.search_path_envvar is None):
             raise NotImplementedError("get_search_path method not implemented for "
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))
@@ -4857,7 +4956,7 @@ class CompilationToolBase(object):
             suffix = 'lib'
         paths = []
         # Add path based on executable
-        exec_file = cls.get_executable(full_path=True)
+        exec_file = cls.get_executable(full_path=True, cfg=cfg)
         if exec_file is not None:
             prefix, exec_dir = os.path.split(os.path.dirname(exec_file))
             if exec_dir == 'bin':
@@ -5584,7 +5683,7 @@ class CompilerBase(CompilationToolBase):
                      and cls.toolset in ['llvm', 'gnu'])):
                     lib = os.path.basename(lib)
                     lib_file = subprocess.check_output(
-                        [cls.get_executable(),
+                        [cls.get_executable(cfg=cfg),
                          f'-print-file-name={lib}']
                     ).decode('utf-8').strip()
                     if lib_file:
@@ -6270,12 +6369,17 @@ class CompiledModelDriver(ModelDriver):
                                      f'an alternative .')
                     setattr(cls, f'default_{k}', None)
         if not kwargs.get('second_pass', False):
-            cls.libraries = DependencyRegistry(
-                cls.language,
-                internal=cls.internal_libraries,
-                external=cls.external_libraries,
-                standard=cls.standard_libraries,
-                cfg=cls.cfg, driver=cls, in_driver_registration=True)
+            CompiledModelDriver._reset_libraries(
+                cls, in_driver_registration=True)
+
+    @staticmethod
+    def _reset_libraries(cls, **kwargs):
+        cls.libraries = DependencyRegistry(
+            cls.language,
+            internal=cls.internal_libraries,
+            external=cls.external_libraries,
+            standard=cls.standard_libraries,
+            cfg=cls.cfg, driver=cls, **kwargs)
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -6796,8 +6900,15 @@ class CompiledModelDriver(ModelDriver):
                 raise InvalidCompilationTool(
                     f"Could not locate a {k} tool '{v}'.")
             cfg.set(cls.language, k, vtool.toolname)
+            setattr(cls, f'default_{k}', vtool.toolname)
             if os.path.isfile(v):
                 cfg.set(cls.language, f'{vtool.toolname}_executable', v)
+        # Clear dependencies that should be set based on tool
+        if kwargs:
+            cls.cleanup_dependencies()
+            cls.libraries.remove_compiler_libraries(cfg=cfg)
+            cls.cfg = cfg
+            CompiledModelDriver._reset_libraries(cls)
         # Call __func__ to avoid direct invoking of class which dosn't
         # exist in after_registration where this is called
         return ModelDriver.configure.__func__(cls, cfg)

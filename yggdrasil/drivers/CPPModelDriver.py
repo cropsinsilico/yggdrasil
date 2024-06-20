@@ -65,6 +65,19 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     libraries = {}
 
     @classmethod
+    def is_alias(cls):
+        r"""Determine if the tool is actually an alias for another tool.
+
+        Returns:
+            bool, str: False if this tool is not an alias, otherwise
+                return the name of the aliased tool.
+
+        """
+        if cls.is_clang():
+            return 'clang++'
+        return super(GPPCompiler, cls).is_alias()
+
+    @classmethod
     def get_flags(cls, skip_standard_flag=False, **kwargs):
         r"""Get a list of compiler flags.
 
