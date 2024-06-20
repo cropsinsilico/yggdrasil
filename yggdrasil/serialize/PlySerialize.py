@@ -191,6 +191,7 @@ class GeometryBase:
         """
         from matplotlib import cm
         from matplotlib import colors as mpl_colors
+        from matplotlib import colormaps as mpl_colormaps
         # Scale by area
         if scale_by_area:
             areas = np.array(self.areas)
@@ -221,7 +222,8 @@ class GeometryBase:
             assert isinstance(vmax, np.ma.core.MaskedConstant)
             vertex_colors = np.zeros((len(vertex_scalar), 3), 'int')
         else:
-            cmap = cm.get_cmap(color_map)
+            cmap = mpl_colormaps[color_map]
+            # cmap = cm.get_cmap(color_map)
             if scaling == 'log':
                 norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)
             elif scaling == 'linear':

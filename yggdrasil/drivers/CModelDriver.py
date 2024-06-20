@@ -533,7 +533,7 @@ class CModelDriver(CompiledModelDriver):
                       'platform_specifics': {
                           'Linux': {
                               'compiler_flags': ['-fPIC'],
-                              'external_dependencies': ['m'],
+                              # 'external_dependencies': ['m'],
                           },
                           'Windows': {
                               'include_dirs': [_top_lang_dir],

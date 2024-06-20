@@ -612,9 +612,9 @@ class ConnectionDriver(Driver):
             if name in self.models[direction]:
                 self.models[direction].remove(name)
                 self.debug(
-                    "{direction.title()} model '{name}' signed off."
-                    "\n\tInput  models: {len(self.models['input'])}"
-                    "\n\tOutput models: {len(self.models['output'])}")
+                    f"{direction.title()} model '{name}' signed off."
+                    f"\n\tInput  models: {self.models['input']}"
+                    f"\n\tOutput models: {self.models['output']}")
             out = (out or (len(self.models[direction]) == 0))
             opp_direction = 'output' if direction == 'input' else 'input'
             if out and name in self.models[opp_direction]:

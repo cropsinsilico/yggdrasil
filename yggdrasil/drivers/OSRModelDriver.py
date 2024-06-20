@@ -157,19 +157,21 @@ class OSRModelDriver(ExecutableModelDriver):
             if not os.path.isdir(cls.repository):  # pragma: debug
                 # This will only need to be called if the tempdir was cleaned up
                 cls.clone_repository(cls.repository)
-            # toolname = CPPModelDriver.get_tool('compiler',
-            #                                    return_prop='name',
-            #                                    default=None)
+            if toolname is None:
+                toolname = CPPModelDriver.get_tool('compiler',
+                                                   return_prop='name',
+                                                   default=None)
+            logger.info(f"OSR C++ compiler: {toolname}")
             cwd = os.path.join(cls.repository, 'OpenSimRoot')
             flags = []
             if maxjobs > 1:
                 flags += [f'-j{maxjobs}']
             env = copy.deepcopy(os.environ)
             if platform._is_win:  # pragma: windows
-                toolname = 'cl'
+                # toolname = 'cl++'
                 env['YGG_OSR_TOOL'] = toolname
-                if toolname == 'cl':
-                    cl_path = shutil.which(toolname + '.exe')
+                if toolname == 'cl++':
+                    cl_path = shutil.which('cl.exe')
                     if cl_path:
                         msvc_bin = os.path.dirname(cl_path)
                         env['YGG_OSR_CXX'] = cl_path

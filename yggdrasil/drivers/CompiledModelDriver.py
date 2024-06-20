@@ -1325,7 +1325,7 @@ class DependencySpecialization(object):
         return out
 
     def __str__(self):
-        return str(self._tuple)
+        return str({k: self[k] for k in self.defaults.keys()})
 
     def __repr__(self):
         return f"DependencySpecialization({str(self)})"
@@ -2356,6 +2356,26 @@ class CompilationDependency(object):
         return (f"CompilationDependency({self.name}, "
                 f"driver={self.parent_driver.language})")
 
+    def logInfo(self, level=logging.INFO, tooltype='basetool'):
+        r"""Display info abou the dependency as an info level log message."""
+        specinfo = pprint.pformat({k: self.specialization[k] for k in
+                                   self.specialization.defaults.keys()})
+        specinfo = specinfo.replace('\n', '\n' + 16 * ' ')
+        toolinfo = pprint.pformat({k: self.toolname(k) for k in
+                                   self.active_tools()})
+        toolinfo = toolinfo.replace('\n', '\n' + 16 * ' ')
+        tool = self.tool(tooltype)
+        src = self.get(f'{tool.tooltype}_input')
+        logger.log(level,
+                   f"\n"
+                   f"    dependency: {self.name}\n"
+                   f"    driver:     {self.parent_driver.language}\n"
+                   f"    spec:       {specinfo}\n"
+                   f"    libtype:    {self['libtype']}\n"
+                   f"    input:      {src}\n"
+                   f"    output:     {self.result}\n"
+                   f"    tooltypes:  {toolinfo}")
+
     def set(self, filetype, value, key=None):
         r"""Set a library file path.
 
@@ -3337,14 +3357,7 @@ class CompilationDependency(object):
             # Recursion can occur if the dependencies are not actually
             # being compiled or there is a mismatch in the path to
             # a compiled dependency and the path used by dependents
-            tooltypes = self.active_tools()
-            toolnames = [self.toolname(k) for k in tooltypes]
-            logger.error(f"dependency: {self.name}\n"
-                         f"libtype:    {self['libtype']}\n"
-                         f"input:      {src}\n"
-                         f"output:     {self.result}\n"
-                         f"tooltypes:  {tooltypes}\n"
-                         f"toolnames:  {toolnames}")
+            self.logInfo(level=logging.ERROR)
             kwargs['products'].teardown(tag='build_time')
             kwargs['products'].teardown()
             raise
@@ -6939,6 +6952,7 @@ class CompiledModelDriver(ModelDriver):
         dep = cls.libraries[dep].specialized(**kwargs)
         kwargs.update(preserved_kwargs)
         dep.build(**kwargs)
+        dep.logInfo()
 
     @classmethod
     def cleanup_dependencies(cls, dep=None, products=None,

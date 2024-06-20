@@ -144,14 +144,14 @@ extras:
     - gfortran:
         - name: "{{ compiler('fortran') }}"
           method: conda_recipe
-          os: unix
+          # os: unix
         - name: fortran-compiler
-          os: unix
+          # os: unix
           method: conda
-        - name: m2w64-gcc-fortran
-          os: win
-          method: conda
-          add: [m2w64-toolchain_win-64]
+        # - name: m2w64-gcc-fortran
+        #   os: win
+        #   method: conda
+        #   add: [m2w64-toolchain_win-64]
         - name: gfortran
           method: apt
         - name: gfortran
