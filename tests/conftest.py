@@ -420,7 +420,7 @@ def do_yggdrasil_mods(opts, dont_exit=False):
     options = opts.options
     options.yggdrasil_tests_rootdir = _test_directory
     # Disable output capture
-    if options.nocapture:
+    if options.nocapture or options.second_attempt:
         opts.remove('nocapture')
         opts += ['--capture=no', '-o', 'log_cli=true']
     # MPI script

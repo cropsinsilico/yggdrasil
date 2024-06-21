@@ -161,7 +161,7 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
 class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
     r"""Inteface class for MSVC compiler when compiling C++."""
     toolname = 'cl++'
-    default_linker = MSVCCompiler.default_linker
+    default_linker = 'LINK++'
     default_archiver = MSVCCompiler.default_archiver
     default_executable = MSVCCompiler.default_executable
     default_disassembler = MSVCCompiler.default_disassembler

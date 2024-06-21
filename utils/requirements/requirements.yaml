@@ -148,9 +148,9 @@ extras:
         - name: fortran-compiler
           os: unix
           method: conda
-        # - name: m2w64-gcc-fortran
         # - name: gfortran
-        - name: "{{ compiler('m2w64_fortran') }}"
+        # - name: "{{ compiler('m2w64_fortran') }}"
+        - name: m2w64-gcc-fortran
           os: win
           method: conda
           # add: [m2w64-toolchain_win-64]

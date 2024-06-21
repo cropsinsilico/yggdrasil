@@ -2414,7 +2414,7 @@ class CompilationDependency(object):
         return (f"CompilationDependency({self.name}, "
                 f"driver={self.parent_driver.language})")
 
-    def logInfo(self, level=logging.INFO, tooltype='basetool'):
+    def logInfo(self, msg='', level=logging.INFO, tooltype='basetool'):
         r"""Display info abou the dependency as an info level log message."""
         specinfo = pprint.pformat({k: self.specialization[k] for k in
                                    self.specialization.defaults.keys()})
@@ -2423,9 +2423,11 @@ class CompilationDependency(object):
                                    self.active_tools()})
         toolinfo = toolinfo.replace('\n', '\n' + 16 * ' ')
         tool = self.tool(tooltype)
-        src = self.get(f'{tool.tooltype}_input')
+        src = None
+        if self.is_rebuildable:
+            src = self.get(f'{tool.tooltype}_input')
         logger.log(level,
-                   f"\n"
+                   f"{msg}\n"
                    f"    dependency: {self.name}\n"
                    f"    driver:     {self.parent_driver.language}\n"
                    f"    spec:       {specinfo}\n"
@@ -2967,9 +2969,18 @@ class CompilationDependency(object):
             if logging_level is not None:
                 out.append(f'YGG_DEBUG={logging_level}')
         if ((self.specialization['disable_python_c_api']
-             and not self.basetool.is_build_tool)):
+             and not self.basetool.is_build_tool
+             and self.is_rebuildable)):
             out.append('YGGDRASIL_DISABLE_PYTHON_C_API')
         return out
+
+    def _check_disabled(self, kwargs, msg):  # pragma: debug
+        if (((not self.specialization['disable_python_c_api'])
+             and ('YGGDRASIL_DISABLE_PYTHON_C_API' in
+                  kwargs.get('definitions', [])))):
+            self.logInfo()
+            raise Exception(
+                f"{self.name} added YGGDRASIL_DISABLE_PYTHON_C_API: {msg}")
 
     def _basename(self, out):
         if isinstance(out, list):
