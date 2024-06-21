@@ -259,7 +259,7 @@ jobs:
       with:
         auto-update-conda: true
         python-version: ${{ env.PYTHONVERSION }}
-        channels: [msys, conda-forge]
+        channels: msys,conda-forge
         # use-only-tar-bz2: true
         channel-priority: strict
         miniforge-variant: Mambaforge

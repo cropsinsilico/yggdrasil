@@ -475,9 +475,7 @@ jobs:
       with:
         auto-update-conda: true
         channel-priority: strict
-        channels:
-        - msys
-        - conda-forge
+        channels: msys,conda-forge
         miniforge-variant: Mambaforge
         python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
@@ -893,9 +891,7 @@ jobs:
       with:
         auto-update-conda: true
         channel-priority: strict
-        channels:
-        - msys
-        - conda-forge
+        channels: msys,conda-forge
         miniforge-variant: Mambaforge
         python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
@@ -1287,9 +1283,7 @@ jobs:
       with:
         auto-update-conda: true
         channel-priority: strict
-        channels:
-        - msys
-        - conda-forge
+        channels: msys,conda-forge
         miniforge-variant: Mambaforge
         python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
@@ -1662,9 +1656,7 @@ jobs:
       with:
         auto-update-conda: true
         channel-priority: strict
-        channels:
-        - msys
-        - conda-forge
+        channels: msys,conda-forge
         miniforge-variant: Mambaforge
         python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
@@ -2036,9 +2028,7 @@ jobs:
       with:
         auto-update-conda: true
         channel-priority: strict
-        channels:
-        - msys
-        - conda-forge
+        channels: msys,conda-forge
         miniforge-variant: Mambaforge
         python-version: ${{ env.PYTHONVERSION }}
         use-mamba: true
