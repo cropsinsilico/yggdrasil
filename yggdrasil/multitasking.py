@@ -8,6 +8,7 @@ import threading
 import queue
 import multiprocessing
 import asyncio
+import contextlib
 from yggdrasil import tools
 MPI = None
 _on_mpi = False
@@ -240,7 +241,7 @@ class AliasObject(object):
 
     """
 
-    __slots__ = ['_base', '__weakref__']
+    __slots__ = ['_base', '_multitasking', '__weakref__']
     _base_class_name = None
     _base_class = None
     _base_attr = []
@@ -250,8 +251,23 @@ class AliasObject(object):
 
     def __init__(self, *args, dont_initialize_base=False, **kwargs):
         self._base = None
+        self._multitasking = self._identify_multitasking()
         if (not dont_initialize_base) and (self._base_class is not None):
             self._base = self._base_class(*args, **kwargs)
+
+    @classmethod
+    def _identify_multitasking(cls):
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    @contextlib.contextmanager
+    def _multitasking_on_path(self):
+        modified_path = False
+        if sys.path[0] != self._multitasking:
+            sys.path.insert(0, self._multitasking)
+            modified_path = True
+        yield
+        if modified_path:
+            del sys.path[0]
 
     @classmethod
     def from_base(cls, base, *args, **kwargs):
@@ -284,6 +300,12 @@ class AliasObject(object):
     def __setstate__(self, state):
         for slot, value in state.items():
             setattr(self, slot, value)
+        if self._multitasking != self._identify_multitasking():  # pragma: debug
+            raise AssertionError(
+                f"The child process loaded yggdrasil from a different "
+                f"location than the parent process.\n"
+                f"    Parent: {self._multitasking}\n"
+                f"    Child:  {self._identify_multitasking()}\n")
 
     def check_for_base(self, attr):
         r"""Raise an error if the aliased object has been disconnected."""
@@ -300,7 +322,7 @@ class AliasObject(object):
     def disconnect(self):
         r"""Disconnect from the aliased object by replacing it with
         a dummy object."""
-        if self._base is not None:
+        if hasattr(self, '_base') and self._base is not None:
             dummy = self.dummy_copy
             del self._base
             self._base = dummy
@@ -1512,7 +1534,8 @@ class YggTask(tools.YggClass):
         if not self.was_terminated:
             self.set_started_flag()
             self.before_start()
-        self.process_instance.start(*args, **kwargs)
+        with self.process_instance._multitasking_on_path():
+            self.process_instance.start(*args, **kwargs)
         # self._calling_thread = self.get_current_task()
 
     def before_start(self):

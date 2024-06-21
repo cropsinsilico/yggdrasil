@@ -122,8 +122,7 @@ outputs:
         - python
       run:
         - {{ pin_subpackage('yggdrasil.c', exact=True) }}
-        - m2w64-gcc-fortran  # [win]
-        - m2w64-toolchain_win-64  # [win]
+        - gfortran  # [win]
         - {{ compiler('fortran') }}  # [not win]
   - name: yggdrasil.r
     build:

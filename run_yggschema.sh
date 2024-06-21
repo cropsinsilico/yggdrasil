@@ -1,5 +1,6 @@
 set -e
 
+FULL_INSTALL=""
 DONT_BUILD=""
 WITH_ASAN=""
 BUILD_ARGS=""
@@ -7,6 +8,10 @@ OUTSIDE_DIR=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
+	--full-install )
+	    FULL_INSTALL="TRUE"
+	    shift # past argument with no value
+	    ;;
 	--dont-build )
 	    DONT_BUILD="TRUE"
 	    shift # past argument with no value
@@ -27,10 +32,22 @@ if [ -n "$WITH_ASAN" ]; then
 fi
 
 if [ ! -n "$DONT_BUILD" ]; then
+    if [ -f yggclean ]; then
+	yggclean
+	pip uninstall yggdrasil-framework
+    fi
+    BUILD_ARGS="${BUILD_ARGS} -v"
+    if [ ! -n "$FULL_INSTALL" ]; then
+	BUILD_ARGS="${BUILD_ARGS} -e"
+    fi
+    if [ -d "${CONDA_PREFIX}/lib/python3.9/site-packages/yggdrasil" ]; then
+       rm -rf "${CONDA_PREFIX}/lib/python3.9/site-packages/yggdrasil"
+       rm -rf "${CONDA_PREFIX}/lib/python3.9/site-packages/yggdrasil_framework*"
+    fi
     pip install \
 	--config-settings=cmake.define.RAPIDJSON_INCLUDE_DIRS=../rapidjson/include/ \
 	--config-settings=cmake.define.PYRJ_DIR=../python-rapidjson/ \
-	$BUILD_ARGS -v -e .
+	$BUILD_ARGS .
 fi
 
 export PYTHONFAULTHANDLER=1
@@ -60,7 +77,12 @@ if [ -n "$OUTSIDE_DIR" ]; then
     cd ..
     PREFIX_PATH="yggdrasil/"
 fi
-pytest -svx --ygg-debug ${PREFIX_PATH}tests/test_runner.py::test_run_compilation_opt
+# pytest -svx --ygg-debug ${PREFIX_PATH}tests/test_runner.py::test_run_compilation_opt
+# pytest -svx --import-mode importlib tests/drivers/test_ConnectionDriver.py::TestConnectionDriverProcess
+# pytest -svx tests/drivers/test_ConnectionDriver.py::TestConnectionDriverProcess
+# pytest -svx tests/drivers/test_CompiledModelDriver.py
+pytest -svx tests/drivers/test_CompiledModelDriver.py::test_get_alternate_class
+pytest -svx tests/drivers/test_CompiledModelDriver.py::test_create_windows_import_gcc
 # pytest -svx --suite=mpi --mpi-script=run_mpi.sh
 # pytest -svx --ygg-debug --suite=demos ${PREFIX_PATH}tests/demos/test_fspm2020.py::TestFSPM2020Demo::test_run[plant_v1_cpp]
 # pytest -svx tests/communication/transforms/test_TransformBase.py

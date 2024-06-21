@@ -232,7 +232,6 @@ class CompilationToolRegistry(object):
             return False
         for k, v in kwargs.items():
             if k not in self.sorting_keys:
-                print("UNSUPORTED KEY", k, v)
                 continue
             if isinstance(v, list):
                 if not (set(v) & set(self._key2attr(cls, k))):
@@ -255,13 +254,16 @@ class CompilationToolRegistry(object):
                           and (toolname.lower() in
                                [x.lower() for x in outnames]))
                  and (toolname_version != cls_version))):
-                _log("executable", toolname, outnames)
-                raise CompilationToolError(
-                    f"Provided executable ({toolname}) "
-                    f"conflicts with the class-defined executable "
-                    f"({cls.get_executable()})\n"
-                    f"Provided version:\n{toolname_version}\n"
-                    f"Class version:\n{cls_version}")
+                _log("executable", toolname_version, cls_version)
+                # raise CompilationToolError(
+                #     f"Provided executable ({toolname}) "
+                #     f"conflicts with the class-defined executable "
+                #     f"so it is likely that there is more than one "
+                #     f"version of {cls.toolname} installed "
+                #     f"({cls.get_executable()})\n"
+                #     f"Provided version:\n{toolname_version}\n"
+                #     f"Class version:\n{cls_version}")
+                return False
         return True
 
     def _lookup(self, tooltype, return_all=False, **kwargs):
@@ -605,11 +607,10 @@ class CompilationToolRegistry(object):
         # Direct search for a specific tool
         if toolname:
             for x in self._toolnames(tooltype, toolname):
-                if x in self.tooltype[tooltype]:
+                if ((x in self.tooltype[tooltype]
+                     and self._matches(self.tooltype[tooltype][x],
+                                       **sorting_kws))):
                     out = self.tooltype[tooltype][x]
-                    aliased = out.is_alias()
-                    if aliased:
-                        out = self.tooltype[tooltype][aliased]
                     break
             return self._check_return(tooltype, out, default=default,
                                       **sorting_kws)
@@ -3501,7 +3502,8 @@ class CompilationDependency(object):
             if x.parent_driver == self.parent_driver and x.is_rebuildable:
                 x.build(exported_builds=exported_builds, **kwargs)
         
-    def products(self, products=None, include_dependencies=False):
+    def products(self, products=None, include_dependencies=False,
+                 skip_build_products=False):
         r"""Get the set of products produced by this dependency.
 
         Args:
@@ -3509,6 +3511,8 @@ class CompilationDependency(object):
                 that additional products should be appended to.
             include_dependencies (bool, optional): If True, include
                 dependencies associated with the same driver as this one.
+            skip_build_products (bool, optional): If True, don't
+                include products produced by the build.
 
         Returns:
             tools.IntegrationPathSet: Updated product list.
@@ -3518,7 +3522,7 @@ class CompilationDependency(object):
             suffix = str(uuid.uuid4())[:13]
             products = tools.IntegrationPathSet(
                 generalized_suffix=suffix)
-        if self.is_rebuildable:
+        if self.is_rebuildable and not skip_build_products:
             self.build(dry_run=True, products=products)
         for k in self.generated:
             products.append_compilation_product(self.files[k])
@@ -7041,7 +7045,8 @@ class CompiledModelDriver(ModelDriver):
         return self.libraries_class(self, **kwargs)
 
     @classmethod
-    def compile_dependencies(cls, dep=None, **kwargs):
+    def compile_dependencies(cls, dep=None, add_all_products=False,
+                             **kwargs):
         r"""Compile any required internal libraries, including the interface."""
         if dep is None:
             dep = cls.interface_library
@@ -7063,6 +7068,10 @@ class CompiledModelDriver(ModelDriver):
         dep = cls.libraries[dep].specialized(**kwargs)
         kwargs.update(preserved_kwargs)
         dep.build(**kwargs)
+        if add_all_products and kwargs.get('products', False):
+            dep.products(kwargs['products'],
+                         include_dependencies=True,
+                         skip_build_products=True)
         dep.logInfo()
 
     @classmethod
@@ -7076,7 +7085,8 @@ class CompiledModelDriver(ModelDriver):
         assert products.generalized_suffix
         kwargs.update(
             generalized_suffix=products.generalized_suffix,
-            products=products, dry_run=True)
+            products=products, dry_run=True,
+            add_all_products=True)
         if isinstance(libtype, str):
             libtype = [libtype]
         elif libtype is None:

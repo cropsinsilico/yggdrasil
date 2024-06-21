@@ -244,12 +244,9 @@
               "method": "conda"
             },
             {
-              "name": "m2w64-gcc-fortran",
+              "name": "gfortran",
               "os": "win",
-              "method": "conda",
-              "add": [
-                "m2w64-toolchain_win-64"
-              ]
+              "method": "conda"
             },
             {
               "name": "gfortran",
