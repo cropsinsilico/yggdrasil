@@ -244,7 +244,7 @@
               "method": "conda"
             },
             {
-              "name": "gfortran",
+              "name": "{{ compiler('m2w64_fortran') }}",
               "os": "win",
               "method": "conda"
             },

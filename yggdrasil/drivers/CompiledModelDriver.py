@@ -3766,7 +3766,8 @@ class CompilationDependency(object):
         out = False
         search_param = self._search_param(libtype=filetype)
         if ((filetype in ['shared', 'windows_import']
-             and self.origin in ['standard', 'language'])):
+             and (self.origin in ['standard', 'language']
+                  or self.get('dep_shared_flags', False)))):
             out = self._search_linked(search_param=search_param,
                                       libtype=filetype, **kwargs)
         if not out:
@@ -3835,7 +3836,8 @@ class CompilationDependency(object):
             libtype = self.get('libtype')
         if search_param is None:
             search_param = self._search_param(libtype=libtype)
-        assert self.origin in ['standard', 'language']
+        flags = self.get('dep_shared_flags', [])
+        assert (self.origin in ['standard', 'language']) or flags
         assert libtype in ['shared', 'windows_import']
         out = False
         if libtype == 'windows_import':
@@ -3844,7 +3846,6 @@ class CompilationDependency(object):
                 out = self._search_brute(fname=dll, libtype=libtype,
                                          **kwargs)
             return out
-        flags = self.get('dep_shared_flags', [])
         if not flags:
             if self.origin == 'standard':
                 flags.append(f'-l{self.name}')

@@ -32,6 +32,18 @@ def test_target_sleep():  # pragma: debug
     tools.sleep(10.0)
 
 
+def on_mpi():
+    r"""Check if the current process is a yggdrasil MPI subprocess.
+
+    Returns:
+        bool: True if running on an MPI process, False otherwise.
+
+    """
+    init_mpi()
+    global _on_mpi
+    return _on_mpi
+
+
 def init_mpi():
     r"""Initialize MPI on the process and return the MPI singleton
     from mpi4py on success.
