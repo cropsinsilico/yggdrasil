@@ -422,7 +422,8 @@ def do_yggdrasil_mods(opts, dont_exit=False):
     # Disable output capture
     if options.nocapture or options.second_attempt:
         opts.remove('nocapture')
-        opts += ['--capture=no', '-o', 'log_cli=true']
+        opts += ['--capture=no', '--log-level=INFO']
+        # opts += ['--capture=no', '-o', 'log_cli=true']
     # MPI script
     mpi_nproc = options.mpi_nproc
     if options.mpi_nproc > 1:

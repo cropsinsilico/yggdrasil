@@ -5,6 +5,7 @@ DONT_BUILD=""
 WITH_ASAN=""
 BUILD_ARGS=""
 OUTSIDE_DIR=""
+DONT_COMPILE=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -22,6 +23,10 @@ while [[ $# -gt 0 ]]; do
 	    ;;
 	--outside-dir )
 	    OUTSIDE_DIR="TRUE"
+	    shift # past argument with no value
+	    ;;
+	--dont-compile )
+	    DONT_COMPILE="TRUE"
 	    shift # past argument with no value
 	    ;;
     esac
@@ -57,11 +62,13 @@ if [ -n "$WITH_ASAN" ]; then
 fi
 
 if [ ! -n "$DONT_BUILD" ]; then
-    # yggschema
-    if [ -n "$WITH_ASAN" ]; then
-	yggcompile c cpp fortran --with-asan
-    else
-	yggcompile c cpp fortran
+    if [ ! -n "$DONT_COMPILE" ]; then
+	# yggschema
+	if [ -n "$WITH_ASAN" ]; then
+	    yggcompile c cpp fortran --with-asan
+	else
+	    yggcompile c cpp fortran
+	fi
     fi
 fi
 
@@ -77,12 +84,13 @@ if [ -n "$OUTSIDE_DIR" ]; then
     cd ..
     PREFIX_PATH="yggdrasil/"
 fi
+pytest -svx -n0 -p no:rerunfailures tests/languages/test_YggInterface.py
 # pytest -svx --ygg-debug ${PREFIX_PATH}tests/test_runner.py::test_run_compilation_opt
 # pytest -svx --import-mode importlib tests/drivers/test_ConnectionDriver.py::TestConnectionDriverProcess
 # pytest -svx tests/drivers/test_ConnectionDriver.py::TestConnectionDriverProcess
 # pytest -svx tests/drivers/test_CompiledModelDriver.py
-pytest -svx tests/drivers/test_CompiledModelDriver.py::test_get_alternate_class
-pytest -svx tests/drivers/test_CompiledModelDriver.py::test_create_windows_import_gcc
+# pytest -svx tests/drivers/test_CompiledModelDriver.py::test_get_alternate_class
+# pytest -svx tests/drivers/test_CompiledModelDriver.py::test_create_windows_import_gcc
 # pytest -svx --suite=mpi --mpi-script=run_mpi.sh
 # pytest -svx --ygg-debug --suite=demos ${PREFIX_PATH}tests/demos/test_fspm2020.py::TestFSPM2020Demo::test_run[plant_v1_cpp]
 # pytest -svx tests/communication/transforms/test_TransformBase.py
