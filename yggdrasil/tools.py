@@ -1036,7 +1036,7 @@ def get_supported_comm(dont_include_value=False):
     for k in excl_list:
         if k in out:
             out.remove(k)
-    return list(set(out))
+    return out  # list(set(out))
 
 
 def is_lang_installed(lang):

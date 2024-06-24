@@ -14,6 +14,7 @@ import logging
 import warnings
 import configparser
 import copy
+import pprint
 import argparse
 from contextlib import contextmanager
 from collections import OrderedDict
@@ -257,6 +258,38 @@ class YggConfigParser(configparser.ConfigParser, object):
             return self.backwards_str2val(out)
         return default
 
+    def diff(self, solf):
+        r"""Get the difference between this and another YggConfigParser.
+
+        Args:
+            solf (YggConfigParser): Parser to compare against this one.
+
+        Returns:
+            dict: Sets of added, missing and changed parameters between
+                this config parser and solf.
+
+        """
+        out = {k: [] for k in ['added', 'missing', 'changed']}
+        for s in self.sections():
+            if not solf.has_section(s):
+                out['missing'] += [(s, opt) for opt in self.options(s)]
+                continue
+            for opt in self.options(s):
+                if not solf.has_option(s, opt):
+                    out['missing'].append((s, opt))
+                elif self.get(s, opt) != solf.get(s, opt):
+                    out['changed'].append((s, opt,
+                                           self.get(s, opt),
+                                           solf.get(s, opt)))
+        for s in solf.sections():
+            if not self.has_section(s):
+                out['added'] += [(s, opt) for opt in solf.options(s)]
+                continue
+            for opt in solf.options(s):
+                if not self.has_option(s, opt):
+                    out['added'].append((s, opt))
+        return out
+
 
 def get_language_order(drivers):
     r"""Get the correct language order, including any base languages.
@@ -306,7 +339,7 @@ def get_language_order(drivers):
 def update_language_config(languages=None, skip_warnings=False,
                            disable_languages=None, enable_languages=None,
                            allow_multiple_omp=None, lang_kwargs=None,
-                           overwrite=False, verbose=False):
+                           overwrite=False, verbose=False, diff=False):
     r"""Update configuration options for a language driver.
 
     Args:
@@ -327,14 +360,17 @@ def update_language_config(languages=None, skip_warnings=False,
             Defaults to False.
         verbose (bool, optional): If True, information about the config file
             will be displayed. Defaults to False.
+        diff (bool, optional): If True, display the difference between
+            the updated configuration and the existing one, without
+            actually updating the file. Defaults to False.
         lang_kwargs (dict, optional): Dictionary containing language
             specific keyword arguments. Defaults to {}.
 
     """
     from yggdrasil.components import import_component
-    if verbose:
-        logger.info("Updating user configuration file for yggdrasil at:\n\t%s"
-                    % usr_config_file)
+    if verbose and not diff:
+        logger.info(f"Updating user configuration file for yggdrasil "
+                    f"at:\n\t{usr_config_file}")
     miss = []
     if (languages is None) or overwrite:
         all_languages = tools.get_supported_lang()
@@ -350,44 +386,65 @@ def update_language_config(languages=None, skip_warnings=False,
         enable_languages = []
     if lang_kwargs is None:
         lang_kwargs = {}
-    if overwrite:
-        shutil.copy(def_config_file, usr_config_file)
-        ygg_cfg_usr.reload()
-    if allow_multiple_omp is not None:
-        if not ygg_cfg_usr.has_section('general'):
-            ygg_cfg_usr.add_section('general')
-        ygg_cfg_usr.set('general', 'allow_multiple_omp', allow_multiple_omp)
-    drivers = OrderedDict([(lang, import_component('model', lang))
-                           for lang in languages])
-    drv = list(get_language_order(drivers).values())
-    for idrv in drv:
-        if (((idrv.language in disable_languages)
-             and (idrv.language in enable_languages))):
-            logger.info(("%s language both enabled and disabled. "
-                         "No action will be taken.") % idrv.language)
-        elif idrv.language in disable_languages:
-            if not ygg_cfg_usr.has_section(idrv.language):
-                ygg_cfg_usr.add_section(idrv.language)
-            ygg_cfg_usr.set(idrv.language, 'disable', 'True')
-        elif idrv.language in enable_languages:
-            if not ygg_cfg_usr.has_section(idrv.language):
-                ygg_cfg_usr.add_section(idrv.language)
-            ygg_cfg_usr.set(idrv.language, 'disable', 'False')
-        if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
-            continue  # pragma: no cover
-        miss += idrv.configure(ygg_cfg_usr,
-                               **lang_kwargs.get(idrv.language, {}))
-    ygg_cfg_usr.update_file()
-    ygg_cfg.reload()
-    if not skip_warnings:
-        for sect, opt, desc in miss:  # pragma: windows
-            warnings.warn(
-                f"Could not set option {opt} in section {sect}. Please "
-                f"set this in {ygg_cfg_usr.file_to_update} to: {desc}",
-                RuntimeWarning)
-    if verbose:
-        with open(usr_config_file, 'r') as fd:
-            print(fd.read())
+    existing = None
+    cached = '_cached'.join(os.path.splitext(usr_config_file))
+    if diff:
+        shutil.copy2(usr_config_file, cached)
+        existing = YggConfigParser.from_files(
+            [def_config_file, cached, loc_config_file])
+    try:
+        if overwrite:
+            shutil.copy(def_config_file, usr_config_file)
+            ygg_cfg_usr.reload()
+        if allow_multiple_omp is not None:
+            if not ygg_cfg_usr.has_section('general'):
+                ygg_cfg_usr.add_section('general')
+            ygg_cfg_usr.set('general', 'allow_multiple_omp',
+                            allow_multiple_omp)
+        drivers = OrderedDict([(lang, import_component('model', lang))
+                               for lang in languages])
+        drv = list(get_language_order(drivers).values())
+        for idrv in drv:
+            if (((idrv.language in disable_languages)
+                 and (idrv.language in enable_languages))):
+                logger.info(("%s language both enabled and disabled. "
+                             "No action will be taken.") % idrv.language)
+            elif idrv.language in disable_languages:
+                if not ygg_cfg_usr.has_section(idrv.language):
+                    ygg_cfg_usr.add_section(idrv.language)
+                ygg_cfg_usr.set(idrv.language, 'disable', 'True')
+            elif idrv.language in enable_languages:
+                if not ygg_cfg_usr.has_section(idrv.language):
+                    ygg_cfg_usr.add_section(idrv.language)
+                ygg_cfg_usr.set(idrv.language, 'disable', 'False')
+            if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
+                continue  # pragma: no cover
+            miss += idrv.configure(ygg_cfg_usr,
+                                   **lang_kwargs.get(idrv.language, {}))
+        ygg_cfg_usr.update_file()
+        ygg_cfg.reload()
+        if not skip_warnings:
+            for sect, opt, desc in miss:  # pragma: windows
+                warnings.warn(
+                    f"Could not set option {opt} in section {sect}. Please "
+                    f"set this in {ygg_cfg_usr.file_to_update} to: {desc}",
+                    RuntimeWarning)
+        if verbose:
+            with open(usr_config_file, 'r') as fd:
+                print(fd.read())
+        if diff:
+            diffdict = existing.diff(ygg_cfg)
+            msg = (f"Cached:  {cached}\n"
+                   f"Updated: {usr_config_file}\n")
+            for k in ['missing', 'added', 'changed']:
+                msg += f"{k.title():7}: {pprint.pformat(diffdict[k])}\n"
+            print(msg)
+    finally:
+        if diff:
+            shutil.move(cached, usr_config_file)
+            ygg_cfg_usr.reload()
+            ygg_cfg.reload()
+            assert not any(existing.diff(ygg_cfg).values())
     
 
 def get_ygg_loglevel(cfg=None, default='DEBUG'):

@@ -648,10 +648,10 @@ class CMakeModelDriver(BuildModelDriver):
         if platform._is_win and out['target_dep'].tool('compiler').is_gnu:
             gcc = out['target_dep'].tool('compiler').get_executable(
                 full_path=True)
-            env = out['build_env']
+            env = out.get('builder_env', for_build=True)
             path = cls.prune_sh_gcc(env, gcc)
             env['PATH'] = path
-            out.set('build_env', env)
+            out.set('builder_env', env)
             if not shutil.which('sh', path=path):  # pragma: appveyor
                 # This will not be run on Github actions where
                 # the shell is always set

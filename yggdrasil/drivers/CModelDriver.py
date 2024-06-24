@@ -169,7 +169,7 @@ class ClangCompiler(CCompilerBase):
     compatible_toolsets = ['gnu']
     next_stage_flag_flag = '-Xlinker'
     version_regex = [
-        r'(?P<version>(?:Apple )?clang version \d+\.\d+\.\d+)']
+        r'(?P<version>(?:Apple )?(?:(?:clang)|(?:LLVM)) version \d+\.\d+\.\d+)']
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
                                + [('sysroot', '--sysroot'),
                                   ('isysroot', {'key': '-isysroot',
@@ -371,6 +371,7 @@ class MSVCLinker(LinkerBase):
     platforms = MSVCCompiler.platforms
     languages = MSVCCompiler.languages
     toolset = MSVCCompiler.toolset
+    compatible_toolsets = ['llvm', 'gnu']
     aliases = []
     output_key = '/OUT:%s'
     output_first = True
@@ -440,7 +441,7 @@ class MSVCArchiver(ArchiverBase):
     libtype_flags = {}
     output_key = '/OUT:%s'
     toolset = 'msvc'
-    compatible_toolsets = ['llvm']
+    compatible_toolsets = ['llvm', 'gnu']
     search_path_envvar = ['LIB']
     
 

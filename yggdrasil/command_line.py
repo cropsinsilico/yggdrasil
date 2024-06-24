@@ -1412,7 +1412,12 @@ class update_config(SubCommand):
           {'action': 'store_true', 'default': None,
            'help': ('Don\'t set the KMP_DUPLICATE_LIB_OK environment variable '
                     'when running models (see help for \'--allow-multiple-omp\' '
-                    'for more information).')})]
+                    'for more information).')}),
+         (('--diff', ),
+          {'action': 'store_true',
+           'help': ('Display the diff between the updated configuration '
+                    'and the existing configuration without actually '
+                    'updating the configuration file.')})]
         + [(('--%s-compiler' % k, ),
             {'help': ('Name or path to compiler that should be used to compile '
                       'models written in %s.' % k)})
@@ -1523,7 +1528,7 @@ class update_config(SubCommand):
                     lang_kwargs[k][x] = getattr(args, '%s_%s' % (k, x))
         config.update_language_config(
             args.languages, overwrite=args.overwrite,
-            verbose=(not args.quiet),
+            verbose=(not args.quiet), diff=args.diff,
             disable_languages=args.disable_languages,
             enable_languages=args.enable_languages,
             allow_multiple_omp=args.allow_multiple_omp,

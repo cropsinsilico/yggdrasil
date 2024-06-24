@@ -4191,6 +4191,7 @@ class CompilationToolBase(object):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
+        from yggdrasil.config import ygg_cfg
         if cls.toolname is None:  # pragma: debug
             raise CompilationToolError("Registering unnamed compilation tool.")
         cls.is_gnu = (cls.toolset == 'gnu')
@@ -4201,6 +4202,9 @@ class CompilationToolBase(object):
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
         # Set attributes based on environment variables or sysconfig
+        if cls.default_executable is None and cls.languages:
+            cls.default_executable = ygg_cfg.get(
+                cls.languages[0], f'{cls.toolname}_executable', None)
         if cls.default_executable is None:
             cls.default_executable = cls.env_matches_tool()
         if cls.default_executable is None:
@@ -4670,6 +4674,10 @@ class CompilationToolBase(object):
             env.update(sysconfig.get_config_vars())
         else:
             env.update(os.environ)
+        # TODO: temp
+        if (('-arch arm64' in env.get('CFLAGS', '')
+             and '-arch x86_64' in env.get('CFLAGS', ''))):
+            verbose = True
         envi_full = ''
         if isinstance(cls.default_executable_env, str):
             envi_full = env.get(cls.default_executable_env, '').split(
@@ -6918,6 +6926,8 @@ class CompiledModelDriver(ModelDriver):
             cfg.set(cls.language, k, vtool.toolname)
             setattr(cls, f'default_{k}', vtool.toolname)
             if os.path.isfile(v):
+                setattr(_tool_registry.tool(k, vtool.toolname),
+                        'default_executable', v)
                 cfg.set(cls.language, f'{vtool.toolname}_executable', v)
         # Clear dependencies that should be set based on tool
         if kwargs:
@@ -7004,6 +7014,7 @@ class CompiledModelDriver(ModelDriver):
                 kws[k] = cls.get_tool(k)
             except InvalidCompilationTool:
                 pass
+        print(f"CONFIGURATION SPECIALIZATION:\n{pprint.pformat(kws)}")
         libs = cls.libraries.specialized(**kws)
         for v in libs.libraries.values():
             v.from_cache(cfg)
@@ -7084,7 +7095,7 @@ class CompiledModelDriver(ModelDriver):
             dep.products(kwargs['products'],
                          include_dependencies=True,
                          skip_build_products=True)
-        dep.logInfo()
+        dep.logInfo(f'compiled: {dep}')
 
     @classmethod
     def cleanup_dependencies(cls, dep=None, products=None,
