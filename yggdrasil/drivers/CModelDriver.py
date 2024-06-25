@@ -287,9 +287,9 @@ class GCCLinker(LDLinker):
     default_executable = GCCCompiler.default_executable
     toolset = GCCCompiler.toolset
     compatible_toolsets = GCCCompiler.compatible_toolsets
-    version_flags = ['-Xlinker', '-v']
+    version_flags = ['-Xlinker', '--verbose']
     version_regex = LDLinker.version_regex + GCCCompiler.version_regex
-    search_path_flags = ['-Xlinker', '-v']
+    search_path_flags = ['-Xlinker', '--verbose']
     search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
     flag_options = OrderedDict(LDLinker.flag_options,
                                **{'library_rpath': '-Wl,-rpath'})

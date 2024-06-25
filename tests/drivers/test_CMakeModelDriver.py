@@ -86,6 +86,8 @@ def test_CMakeModelDriver_error_nofile():
     assert not os.path.isfile(buildfile)
                          
 
+@pytest.mark.language('c')
+@pytest.mark.language('c++')
 class TestCMakeModelDriver(base_class):
     r"""Test runner for CMakeModelDriver."""
 

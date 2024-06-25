@@ -6254,7 +6254,8 @@ class DumpBinDisassembler(DisassemblerBase):
             'filters': ['DLL name']},
     }
     version_regex = [
-        r'Microsoft \(R\) COFF\/PE Dumper Version \d+\.\d+\.\d+\.\d+']
+        r'(?P<version>Microsoft \(R\) COFF\/PE Dumper Version '
+        r'\d+\.\d+\.\d+\.\d+)']
 
 
 class BuilderBase(CompilationToolBase):
