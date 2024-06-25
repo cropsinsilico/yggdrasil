@@ -160,6 +160,7 @@ class MPIComm(CommBase.CommBase):
         self.unused_tags = {}
         self.tags = {}
         self.ranks = ranks
+        self.curr_rank_index = 0
         self.tag_start = tag_start
         self.tag_stride = tag_stride
         self.requires_disconnect = False
@@ -215,7 +216,8 @@ class MPIComm(CommBase.CommBase):
         if len(self.ranks) == 1:
             return self.ranks[0]
         elif self.direction == 'send':
-            return min(self.ranks, key=self.get_tag)
+            # return min(self.ranks, key=self.get_tag)
+            return self.ranks[self.curr_rank_index % len(self.ranks)]
         else:
             return self.ranks
 
@@ -410,6 +412,7 @@ class MPIComm(CommBase.CommBase):
             req = cls(*args, **kwargs)
             self.requests.append(req)
             self.advance_tag(req)
+            self.curr_rank_index += 1
 
     def send_message(self, msg, **kwargs):
         r"""Send a message encapsulated in a CommMessage object.
@@ -426,7 +429,11 @@ class MPIComm(CommBase.CommBase):
             for _ in range(len(self.ranks) - 1):
                 msg.add_message(msg=msg.msg, length=msg.length, flag=msg.flag,
                                 args='DONT_RECURSE', header=msg.header)
-        return super(MPIComm, self).send_message(msg, **kwargs)
+        send_serializer = self._send_serializer
+        out = super(MPIComm, self).send_message(msg, **kwargs)
+        if send_serializer and self._n_sent < len(self.ranks):
+            self._send_serializer = True
+        return out
 
     def recv_message(self, *args, **kwargs):
         r"""Receive a message.

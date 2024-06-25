@@ -246,6 +246,8 @@ class CMakeConfigure(ConfigurerBase):
                  and (not generator.endswith(('Win64', 'ARM')))
                  and platform._is_64bit)):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
+        # elif platform._is_mac and ('osx_arch' not in kwargs):
+        #     kwargs['osx_arch'] = platform._machine
         return out
 
     @classmethod

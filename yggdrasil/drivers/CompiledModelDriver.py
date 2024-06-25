@@ -1167,7 +1167,7 @@ class DependencySpecialization(object):
             added_tools = [basetool.tooltype] + basetool.associated_tooltypes
             for k in added_tools:
                 if self[k] is None:
-                    self.settool(k, dep.tool(k).toolname)
+                    self.settool(k, dep.tool(k), dep=dep)
             if self['libtype']:
                 dep.libtype = self['libtype']
             for k in self.tooltypes:
@@ -1225,7 +1225,7 @@ class DependencySpecialization(object):
         """
         assert key in self.tooltypes
         tool = None
-        if ((isinstance(value, CompilationToolBase)
+        if ((isinstance(value, (CompilationToolBase, MissingCompilationTool))
              or (isinstance(value, type)
                  and issubclass(value, CompilationToolBase)))):
             tool = value
@@ -1237,8 +1237,10 @@ class DependencySpecialization(object):
                     assert tool == dep._updated_tools[key][value]
                 else:
                     dep._updated_tools[key][value] = tool
-            value = dep.locate_tool(key, value).toolname
-        if key not in self.values or dep.is_rebuildable:
+            tool = dep.locate_tool(key, value)
+            if tool:
+                value = tool.toolname
+        if key not in self.values or (dep and dep.is_rebuildable):
             self.values[key] = value
 
     def __eq__(self, other):
@@ -1770,6 +1772,7 @@ class CompilationDependency(object):
         'dependencies', 'internal_dependencies', 'external_dependencies',
         'dep_compiler_flags', 'dep_executable_flags',
         'dep_shared_flags', 'dep_static_flags', 'toolsets', 'platforms',
+        'alt_fname_base',
     ]
     aliased_parameters = {
         'out': 'output',
@@ -2242,11 +2245,14 @@ class CompilationDependency(object):
             elif tooltype == 'nexttool':
                 tooltype0 = self.basetool.libtype_next_stage.get(
                     self['libtype'], None)
+            default = MissingCompilationTool(toolname, tooltype0)
             if tooltype0 is None:
-                out = None
+                out = default
             elif (tooltype0 != 'compiler'
                   and self.origin in ['language', 'standard']):
-                out = self.tool('compiler').get_tool(tooltype0)
+                basetool = self.tool('compiler')
+                out = (basetool.get_tool(tooltype0, default=default)
+                       if basetool else default)
             else:
                 language = self.parameters.get(f"{tooltype0}_language",
                                                self.language)
@@ -2255,7 +2261,7 @@ class CompilationDependency(object):
                     tooltype0, language=language,
                     driver=self.parent_driver,
                     compatible_with=toolname,
-                    only_installed=True, default=None)
+                    only_installed=True, default=default)
             self._updated_tools[tooltype][toolname] = out
             if out and out.toolname not in self._updated_tools[tooltype]:
                 self._updated_tools[tooltype][out.toolname] = out
@@ -2776,98 +2782,101 @@ class CompilationDependency(object):
             return self.files[key]
         aliases = {'header_only': 'include'}
         filetype = aliases.get(filetype, filetype)
-        if hasattr(self, f'_{filetype}'):
-            out = getattr(self, f'_{filetype}')(**kwargs)
-        elif filetype == 'input':
-            if self['libtype'] in self.built_files:
-                out = self.get(self.basetool.input_filetypes[0],
-                               default=None, **kwargs)
-            else:
+        try:
+            if hasattr(self, f'_{filetype}'):
+                out = getattr(self, f'_{filetype}')(**kwargs)
+            elif filetype == 'input':
+                if self['libtype'] in self.built_files:
+                    out = self.get(self.basetool.input_filetypes[0],
+                                   default=None, **kwargs)
+                else:
+                    out = self.get(self['libtype'], default=None, **kwargs)
+            elif filetype == 'output':
                 out = self.get(self['libtype'], default=None, **kwargs)
-        elif filetype == 'output':
-            out = self.get(self['libtype'], default=None, **kwargs)
-        elif filetype == 'library':
-            libtype = kwargs.pop('libtype', None)
-            if libtype is None:
-                libtype = self.get('libtype', **kwargs)
-            out = self.get(libtype, **kwargs)
-        elif filetype == 'library_base':
-            libtype = kwargs.pop('libtype', None)
-            if libtype is None:
-                libtype = self.get('libtype', **kwargs)
-            out = self._build_output_base(libtype, **kwargs)
-        elif filetype in self.result_files:
-            out = self._result(filetype=filetype, **kwargs)
-        elif filetype in DependencySpecialization.tooltypes:
-            out = self.tool(filetype, **kwargs)
-        elif filetype in [f'{k}_path' for k in
-                          DependencySpecialization.tooltypes]:
-            tooltype = filetype.rsplit('_path', 1)[0]
-            tool = self.tool(tooltype, **kwargs)
+            elif filetype == 'library':
+                libtype = kwargs.pop('libtype', None)
+                if libtype is None:
+                    libtype = self.get('libtype', **kwargs)
+                out = self.get(libtype, **kwargs)
+            elif filetype == 'library_base':
+                libtype = kwargs.pop('libtype', None)
+                if libtype is None:
+                    libtype = self.get('libtype', **kwargs)
+                out = self._build_output_base(libtype, **kwargs)
+            elif filetype in self.result_files:
+                out = self._result(filetype=filetype, **kwargs)
+            elif filetype in DependencySpecialization.tooltypes:
+                out = self.tool(filetype, **kwargs)
+            elif filetype in [f'{k}_path' for k in
+                              DependencySpecialization.tooltypes]:
+                tooltype = filetype.rsplit('_path', 1)[0]
+                tool = self.tool(tooltype, **kwargs)
+                out = None
+                if tool:
+                    out = tool.get_executable(full_path=True, cfg=self.cfg)
+            elif filetype in [f'{lang}_{k}' for lang, k in
+                              itertools.product(
+                                  constants.LANGUAGES['compiled'],
+                                  DependencySpecialization.tooltypes)]:
+                language, tooltype = filetype.split('_', 1)
+                out = self.get(tooltype, **kwargs)
+                if (not out) or (language not in out.languages):
+                    global _tool_registry
+                    out = _tool_registry.tool_instance(
+                        tooltype, language=language,
+                        compatible_with=self.basetool,
+                        only_installed=True, default=None, **kwargs)
+            elif filetype in [f'{lang}_{k}_path' for lang, k in
+                              itertools.product(
+                                  constants.LANGUAGES['compiled'],
+                                  DependencySpecialization.tooltypes)]:
+                tooltype = filetype.rsplit('_', 1)[0]
+                out = None
+                tool = self.get(tooltype, None, **kwargs)
+                if tool:
+                    out = tool.get_executable(full_path=True, cfg=self.cfg)
+            elif filetype in [f'{k}_env' for k in
+                              DependencySpecialization.tooltypes]:
+                out = self._build_env(filetype, **kwargs)
+            elif filetype in [f'{k}_input' for k in
+                              DependencySpecialization.tooltypes]:
+                out = self._tool_input(filetype.rsplit('_input', 1)[0],
+                                       **kwargs)
+            elif filetype in [f'{k}_output' for k in
+                              DependencySpecialization.tooltypes]:
+                out = self._tool_output(filetype.rsplit('_output', 1)[0],
+                                        **kwargs)
+            elif filetype in [f'{k}_flags' for k in
+                              DependencySpecialization.tooltypes]:
+                out = self.tool_flags(filetype.rsplit('_flags', 1)[0],
+                                      **kwargs)
+            elif filetype in [f'{k}_kwargs' for k in
+                              DependencySpecialization.tooltypes]:
+                out = self.tool_kwargs(filetype.rsplit('_flags', 1)[0],
+                                       **kwargs)
+            elif filetype == 'dep_kwargs':
+                out = dict(kwargs.pop('to_update', {}))
+                for k in self.active_tools():
+                    self.get(f'dep_{k}_kwargs', to_update=out, **kwargs)
+            elif filetype in ['dep_builder_kwargs', 'dep_configurer_kwargs']:
+                out = {}
+            elif filetype in [f'dep_{k}_kwargs' for k in
+                              ['linker', 'archiver', 'libtool']]:
+                out = self._dep_libtool_kwargs(filetype, **kwargs)
+            elif filetype.startswith('target_') and filetype != 'target_dep':
+                target_dep = self.parameters.get('target_dep', False)
+                out = None
+                if target_dep:
+                    out = target_dep.get(
+                        filetype.split('target_', 1)[-1], None)
+            else:
+                out = self.parameters.get(filetype, None)
+            if out in [None, False] and hasattr(self, f'_generated_{filetype}'):
+                out = getattr(self, f'_generated_{filetype}')(**kwargs)
+                if out is not None:
+                    self.generated.append(key)
+        except InvalidCompilationTool:
             out = None
-            if tool:
-                out = tool.get_executable(full_path=True, cfg=self.cfg)
-        elif filetype in [f'{lang}_{k}' for lang, k in
-                          itertools.product(
-                              constants.LANGUAGES['compiled'],
-                              DependencySpecialization.tooltypes)]:
-            language, tooltype = filetype.split('_', 1)
-            out = self.get(tooltype, **kwargs)
-            if (not out) or (language not in out.languages):
-                global _tool_registry
-                out = _tool_registry.tool_instance(
-                    tooltype, language=language,
-                    compatible_with=self.basetool,
-                    only_installed=True, default=None, **kwargs)
-        elif filetype in [f'{lang}_{k}_path' for lang, k in
-                          itertools.product(
-                              constants.LANGUAGES['compiled'],
-                              DependencySpecialization.tooltypes)]:
-            tooltype = filetype.rsplit('_', 1)[0]
-            out = None
-            tool = self.get(tooltype, None, **kwargs)
-            if tool:
-                out = tool.get_executable(full_path=True, cfg=self.cfg)
-        elif filetype in [f'{k}_env' for k in
-                          DependencySpecialization.tooltypes]:
-            out = self._build_env(filetype, **kwargs)
-        elif filetype in [f'{k}_input' for k in
-                          DependencySpecialization.tooltypes]:
-            out = self._tool_input(filetype.rsplit('_input', 1)[0],
-                                   **kwargs)
-        elif filetype in [f'{k}_output' for k in
-                          DependencySpecialization.tooltypes]:
-            out = self._tool_output(filetype.rsplit('_output', 1)[0],
-                                    **kwargs)
-        elif filetype in [f'{k}_flags' for k in
-                          DependencySpecialization.tooltypes]:
-            out = self.tool_flags(filetype.rsplit('_flags', 1)[0],
-                                  **kwargs)
-        elif filetype in [f'{k}_kwargs' for k in
-                          DependencySpecialization.tooltypes]:
-            out = self.tool_kwargs(filetype.rsplit('_flags', 1)[0],
-                                   **kwargs)
-        elif filetype == 'dep_kwargs':
-            out = dict(kwargs.pop('to_update', {}))
-            for k in self.active_tools():
-                self.get(f'dep_{k}_kwargs', to_update=out, **kwargs)
-        elif filetype in ['dep_builder_kwargs', 'dep_configurer_kwargs']:
-            out = {}
-        elif filetype in [f'dep_{k}_kwargs' for k in
-                          ['linker', 'archiver', 'libtool']]:
-            out = self._dep_libtool_kwargs(filetype, **kwargs)
-        elif filetype.startswith('target_') and filetype != 'target_dep':
-            target_dep = self.parameters.get('target_dep', False)
-            out = None
-            if target_dep:
-                out = target_dep.get(
-                    filetype.split('target_', 1)[-1], None)
-        else:
-            out = self.parameters.get(filetype, None)
-        if out in [None, False] and hasattr(self, f'_generated_{filetype}'):
-            out = getattr(self, f'_generated_{filetype}')(**kwargs)
-            if out is not None:
-                self.generated.append(key)
         # logger.debug(f"GENERATE: {self.name}, {key}, {out}")
         self.files[key] = out
 
@@ -3279,7 +3288,9 @@ class CompilationDependency(object):
 
         """
         if isinstance(tooltype, str) and not generalize:
-            tooltype = self.tool(tooltype)
+            tool = self.tool(tooltype)
+            if tool:
+                tooltype = tool
         return self.tool_parameters_class(tooltype)
 
     def tool_kwargs(self, tooltype='basetool', toolname=None,
@@ -3831,12 +3842,13 @@ class CompilationDependency(object):
         if os.path.isfile(fname):
             return [(fname_base, fname_ext, fname, None)]
         fname_base = os.path.basename(fname_base)
-        fname_try = [fname_base]
+        fname_try = [fname_base] + self.parameters.get('alt_fname_base', [])
         if platform._is_win and libtype in self.library_files:
-            if fname_base.startswith('lib'):
-                fname_try.append(fname_base[3:])
-            else:
-                fname_try.append('lib' + fname_base)
+            for fname_base in copy.deepcopy(fname_try):
+                if fname_base.startswith('lib'):
+                    fname_try.append(fname_base[3:])
+                else:
+                    fname_try.append('lib' + fname_base)
         return [(fname_base, fname_ext,
                  fname_base + '*' + fname_ext,
                  self._search_regex(fname_base, fname_ext))
@@ -3869,7 +3881,7 @@ class CompilationDependency(object):
                         component_types='shared_libraries',
                         regex=regex, **kwargs):
                     # TODO: temp
-                    print(f"FIND_COMPONENT {self.name}: {lib}")
+                    logger.info(f"FIND_COMPONENT {self.name}: {lib}")
                     out = self._search_brute(fname=lib, libtype='shared',
                                              **kwargs)
                     if out:
@@ -3946,6 +3958,24 @@ class CompilationDependency(object):
                             f"{fname} (search_list = "
                             f"\n\t" + '\n\t'.join(search_list) + ')')
         return out
+
+
+class MissingCompilationTool(object):
+    r"""Class for recording an unlocatable compilation tool."""
+
+    def __init__(self, toolname, tooltype):
+        if toolname is None:
+            toolname = 'missing'
+        self.toolname = toolname
+        self.tooltype = tooltype
+        super(MissingCompilationTool, self).__init__()
+
+    def __bool__(self):
+        return False
+
+    def __getattr__(self, name):
+        raise InvalidCompilationTool(
+            f"Missing {self.tooltype} {self.toolname}")
 
 
 # TODO: Cannot currently make compilation tools components because
@@ -4447,8 +4477,6 @@ class CompilationToolBase(object):
             CompilationDependency._update_env_val(k, v, existing,
                                                   to_update=existing)
         if not cls.env_matches_tool():
-            config_vars = {}
-            cls.env_matches_tool(use_sysconfig=True, env=config_vars)
             env_vars = []
             env = getattr(cls, 'default_flags_env', None)
             if env is not None:
@@ -4458,8 +4486,11 @@ class CompilationToolBase(object):
             env_vars += cls.additional_flags_env
             for ienv in env_vars:
                 existing.pop(ienv, [])
-                if ienv in config_vars:
-                    existing[ienv] = config_vars[ienv]
+            config_vars = {}
+            if cls.env_matches_tool(use_sysconfig=True, env=config_vars):
+                for ienv in env_vars:
+                    if ienv in config_vars:
+                        existing[ienv] = config_vars[ienv]
         return existing
 
     @classmethod
@@ -6052,7 +6083,7 @@ class DisassemblerBase(CompilationToolBase):
         result = cls.call([fname], components=component_types, **kwargs)
         out = [x[0].strip() for x in regex.findall(result[0])]
         # TODO: temp
-        print("FIND_COMPONENT", regex, out)
+        logger.info(f"FIND_COMPONENT {regex}\n{out}")
         return out
 
     @classmethod
@@ -6383,7 +6414,7 @@ class CompiledModelDriver(ModelDriver):
             default_tool_name = getattr(cls, f'default_{k}', None)
             if default_tool_name:
                 default_tool = _tool_registry.tool(k, default_tool_name,
-                                                   None)
+                                                   default=None)
                 if (((default_tool is None)
                      or (not default_tool.is_installed()))):  # pragma: debug
                     if not tools.is_subprocess():
@@ -7014,7 +7045,7 @@ class CompiledModelDriver(ModelDriver):
                 kws[k] = cls.get_tool(k)
             except InvalidCompilationTool:
                 pass
-        print(f"CONFIGURATION SPECIALIZATION:\n{pprint.pformat(kws)}")
+        logger.info(f"CONFIGURATION SPECIALIZATION:\n{pprint.pformat(kws)}")
         libs = cls.libraries.specialized(**kws)
         for v in libs.libraries.values():
             v.from_cache(cfg)

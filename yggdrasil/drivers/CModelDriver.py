@@ -504,7 +504,8 @@ class CModelDriver(CompiledModelDriver):
                 'language': 'c',
                 'specialization': 'with_omp',
                 'dep_executable_flags': ['-fopenmp'],
-                'dep_shared_flags': ['-fopenmp']}}
+                'dep_shared_flags': ['-fopenmp'],
+                'alt_fname_base': ['gomp']}}
     internal_libraries = {
         'ygg': {'source': 'YggInterface.c',
                 'language': 'c',
