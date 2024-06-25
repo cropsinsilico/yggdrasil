@@ -311,7 +311,7 @@ class CPPModelDriver(CModelDriver):
             elif platform._is_mac:
                 cls.default_compiler = 'clang++'
             elif platform._is_win:  # pragma: windows
-                cls.default_compiler = 'cl'
+                cls.default_compiler = 'cl++'
         cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
         for k in cls._document_types + cls._cpp_class_types:
             cls.function_param.pop(f'init_{k}', None)

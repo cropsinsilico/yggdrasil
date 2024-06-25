@@ -1010,9 +1010,24 @@ class ygginfo(SubCommand):
                 # System config vars
                 vardict.append(('Sysconfig Vars:', ''))
                 curr_prefix += prefix
-                for k, v in sysconfig.get_config_vars().items():
-                    vardict.append((curr_prefix + k, v))
+                config_vars = sysconfig.get_config_vars()
+                for k in env_vars:
+                    vardict.append(
+                        (curr_prefix + k, config_vars.get(k, None)))
+                # for k, v in sysconfig.get_config_vars().items():
+                #     vardict.append((curr_prefix + k, v))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+                # Tool info
+                from yggdrasil.drivers.CompiledModelDriver import (
+                    get_tool_registry)
+                tool_registry = get_tool_registry(
+                    languages=LANGUAGES['compiled'])
+                tool_info = tool_registry.logInfo(return_str=True)
+                vardict.append(
+                    (curr_prefix + 'Compilation Tools:',
+                     # "\n" + curr_prefix + prefix
+                     ("\n" + curr_prefix + prefix).join(
+                         tool_info.splitlines(False))))
         finally:
             # Print things
             max_len = max(len(x[0]) for x in vardict)

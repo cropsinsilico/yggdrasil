@@ -651,9 +651,10 @@ class CMakeModelDriver(BuildModelDriver):
             gcc = out['target_dep'].tool('compiler').get_executable(
                 full_path=True)
             env = out.get('builder_env', for_build=True)
-            path = cls.prune_sh_gcc(env, gcc)
-            env['PATH'] = path
-            out.set('builder_env', env)
+            if env.get('PATH', ''):
+                path = cls.prune_sh_gcc(env.get('PATH', ''), gcc)
+                env['PATH'] = path
+                out.set('builder_env', env)
             if not shutil.which('sh', path=path):  # pragma: appveyor
                 # This will not be run on Github actions where
                 # the shell is always set

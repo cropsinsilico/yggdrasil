@@ -302,7 +302,8 @@ class OSRModelDriver(ExecutableModelDriver):
             bool: True if the language interpreter/compiler is installed.
 
         """
-        return (cls.repository is not None)
+        return (cls.repository is not None
+                and tools.is_git_repository(cls.repository))
 
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):
@@ -315,6 +316,8 @@ class OSRModelDriver(ExecutableModelDriver):
             str: Version of compiler/interpreter for this language.
 
         """
+        if not tools.is_git_repository(cls.repository):
+            return 'uninstalled'
         repo = git.Repo(cls.repository)
         return str(repo.commit())
         
@@ -332,7 +335,7 @@ class OSRModelDriver(ExecutableModelDriver):
         """
         if dest is None:
             dest = os.path.join(tempfile.gettempdir(), 'OpenSimRoot')
-        if not os.path.isdir(dest):  # pragma: config
+        if not tools.is_git_repository(dest):  # pragma: config
             repo = git.Repo.clone_from(cls.repository_url, dest,
                                        branch=cls.repository_branch)
             repo.close()

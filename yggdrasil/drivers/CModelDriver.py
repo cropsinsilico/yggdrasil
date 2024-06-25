@@ -259,9 +259,9 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     version_regex = [
-        r'PROJECT:(?:(?:ld64)|(?:dyld))-(?P<version>\d+(?:\.\d+)?)',
-        (r'GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
-         r'(?P<version>\d+(?:\.\d+){0,2})')
+        r'(?P<version>PROJECT:(?:(?:ld64)|(?:dyld))-\d+(?:\.\d+)?)',
+        (r'(?P<version>GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
+         r'\d+(?:\.\d+){0,2})')
     ]
     search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
     compatible_toolsets = ['gnu', 'llvm']
@@ -287,12 +287,40 @@ class GCCLinker(LDLinker):
     default_executable = GCCCompiler.default_executable
     toolset = GCCCompiler.toolset
     compatible_toolsets = GCCCompiler.compatible_toolsets
-    version_flags = ['-Xlinker', '--verbose']
+    version_flags = ['-Xlinker', '-v']
     version_regex = LDLinker.version_regex + GCCCompiler.version_regex
-    search_path_flags = ['-Xlinker', '--verbose']
+    search_path_flags = ['-Xlinker', '-v']
     search_regex = [r'SEARCH_DIR\("=([^"]+)"\);']
     flag_options = OrderedDict(LDLinker.flag_options,
                                **{'library_rpath': '-Wl,-rpath'})
+    
+    @classmethod
+    def is_clang(cls):
+        r"""Determine if this tool is actually an alias for clang.
+
+        Returns:
+            bool: True if gcc actually points to clang.
+        
+        """
+        try:
+            return (platform._is_mac
+                    and 'clang' in cls.tool_version(skip_regex=True))
+        except InvalidCompilationTool:
+            return False
+
+    @classmethod
+    def is_installed(cls):
+        r"""Determine if this tool is installed by looking for the executable.
+
+        Returns:
+            bool: True if the tool is installed, False otherwise.
+
+        """
+        out = super(GCCLinker, cls).is_installed()
+        # Disable gcc when it is an alias for clang
+        if out and cls.is_clang():  # pragma: debug
+            out = False
+        return out
 
 
 class ClangLinker(LDLinker):
@@ -386,6 +414,9 @@ class MSVCLinker(LinkerBase):
     search_path_envvar = ['LIB']
     search_path_flags = None
     version_flags = []
+    version_regex = [
+        r'(?P<version>Microsoft (R) Incremental Linker Version '
+        r'\d+\.\d+(?:\.\d+)*)']
 
     @staticmethod
     def before_registration(cls):
@@ -418,7 +449,7 @@ class ARArchiver(ArchiverBase):
     version_regex = [
         r'(?P<version>GNU ar \(.+\) \d+\.\d+(?:\.\d+)?'
         r'(?:\-[\.0-9a-zA-Z]+)?)',
-        r'(?P<version>ar \-d \[\-TLsv\].+)']
+        r'(?P<version>)ar \-d \[\-TLsv\].+']
     compatible_toolsets = ['llvm']
     search_path_envvar = ['LIBRARY_PATH']
 
@@ -443,6 +474,9 @@ class MSVCArchiver(ArchiverBase):
     toolset = 'msvc'
     compatible_toolsets = ['llvm', 'gnu']
     search_path_envvar = ['LIB']
+    version_regex = [
+        r'(?P<version>Microsoft (R) Library Manager Version '
+        r'\d+\.\d+(?:\.\d+)*)']
     
 
 _incl_interface = _top_lang_dir

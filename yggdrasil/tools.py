@@ -178,6 +178,26 @@ def timer_context(msg_format, **kwargs):
         logger.info(msg_format.format(elapsed=elapsed, **kwargs))
 
 
+def is_git_repository(path):
+    r"""Check if a directory contains a git repository.
+
+    Args:
+        path (str): Directory to check.
+
+    Returns:
+        bool: True if path exists and is a git repository, False otherwise
+
+    """
+    import git
+    if not os.path.isdir(path):
+        return False
+    try:
+        git.Repo(path)
+    except git.exc.InvalidGitRepositoryError:
+        return False
+    return True
+
+
 def display_source(fname, number_lines=False, return_lines=False):
     r"""Display source code with syntax highlighting (if available).
 

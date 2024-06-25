@@ -92,6 +92,7 @@ class InvalidCompilationTool(CompilationToolError):
 
 
 class CompilationToolRegistry(object):
+    r"""Registry for compilation tools"""
 
     sorting_keys = ['tooltype', 'language', 'toolset']
 
@@ -109,6 +110,73 @@ class CompilationToolRegistry(object):
                 continue
             if x not in self.language:
                 import_component('model', x)
+
+    def logInfo(self, msg='', level=logging.INFO, tooltype=None,
+                return_str=False, widths=None):
+        r"""Display log info about the registered tools.
+
+        Args:
+            msg (str, optional): Message to prefix the log message with.
+            level (int, optional): Level at which message should be
+                logged. Defaults to logging.INFO.
+            tooltype (str, optional): Tool type to display information for.
+                If not provided, all tool types will be included.
+            return_str (bool, optional): If True, return the log message
+                instead of logging it.
+            widths (dict, optional): Mapping between column name and max
+                element width.
+
+        """
+        out = f"{msg}\n"
+        columns = ['toolname', 'languages', 'toolset',
+                   # 'alias for',
+                   'installed', 'executable']
+        if widths is None:
+            default_max = {'languages': 15,
+                           'installed': 25}
+            widths = {k: len(k) for k in columns}
+            for k, v in default_max.items():
+                widths[k] = max(widths[k], v)
+        if tooltype is None:
+            out = f"{msg}"
+            for tooltype in _tool_types:
+                out += self.logInfo(tooltype=tooltype, return_str=True,
+                                    widths=widths)
+        else:
+            out += f"{tooltype.title()}:\n"
+            rows = [[k.title() for k in columns]]
+            for k in sorted(self.tooltype[tooltype].keys()):
+                if k == 'dummy':
+                    continue
+                cls = self.tooltype[tooltype][k]
+                row = []
+                for col in columns:
+                    val = False
+                    if col == 'installed':
+                        if cls.is_installed():
+                            val = cls.tool_version(require_match=True)
+                            val = val.splitlines()[0] if val else True
+                    elif col == 'alias for':
+                        val = cls.is_alias()
+                    elif col == 'executable':
+                        if cls.is_installed():
+                            val = cls.get_executable(full_path=True)
+                    else:
+                        val = getattr(cls, col)
+                    if col in ['languages']:
+                        val = ', '.join(val)
+                    val = str(val)
+                    if col != 'executable':  # 'installed':
+                        widths[col] = max(widths[col], len(val))
+                    row.append(val)
+                rows.append(row)
+            rows = ['  '.join([v + (widths[k] - len(v)) * ' '
+                               for k, v in zip(columns, row)])
+                    for row in rows]
+            out += '    ' + '\n    '.join(rows)
+        if return_str:
+            return out
+        logger.log(level, out)
 
     def _check_toolname(self, tooltype, toolname):
         if toolname in self.tooltype[tooltype]:
@@ -2420,8 +2488,20 @@ class CompilationDependency(object):
         return (f"CompilationDependency({self.name}, "
                 f"driver={self.parent_driver.language})")
 
-    def logInfo(self, msg='', level=logging.INFO, tooltype='basetool'):
-        r"""Display info abou the dependency as an info level log message."""
+    def logInfo(self, msg='', level=logging.INFO, tooltype='basetool',
+                return_str=False):
+        r"""Display info abou the dependency as an info level log message.
+        Args:
+            msg (str, optional): Message to prefix the log message with.
+            level (int, optional): Level at which message should be
+                logged. Defaults to logging.INFO.
+            tooltype (str, optional): Tool type to display information for.
+                If not provided, the base tool type will be used.
+            return_str (bool, optional): If True, return the log message
+                instead of logging it.
+
+
+        """
         specinfo = pprint.pformat({k: self.specialization[k] for k in
                                    self.specialization.defaults.keys()})
         specinfo = specinfo.replace('\n', '\n' + 16 * ' ')
@@ -2432,15 +2512,17 @@ class CompilationDependency(object):
         src = None
         if self.is_rebuildable:
             src = self.get(f'{tool.tooltype}_input')
-        logger.log(level,
-                   f"{msg}\n"
-                   f"    dependency: {self.name}\n"
-                   f"    driver:     {self.parent_driver.language}\n"
-                   f"    spec:       {specinfo}\n"
-                   f"    libtype:    {self['libtype']}\n"
-                   f"    input:      {src}\n"
-                   f"    output:     {self.result}\n"
-                   f"    tooltypes:  {toolinfo}")
+        out = (f"{msg}\n"
+               f"    dependency: {self.name}\n"
+               f"    driver:     {self.parent_driver.language}\n"
+               f"    spec:       {specinfo}\n"
+               f"    libtype:    {self['libtype']}\n"
+               f"    input:      {src}\n"
+               f"    output:     {self.result}\n"
+               f"    tooltypes:  {toolinfo}")
+        if return_str:
+            return out
+        logger.log(level, out)
 
     def set(self, filetype, value, key=None):
         r"""Set a library file path.
@@ -5308,12 +5390,14 @@ class CompilationToolBase(object):
         return CompilationToolBase.extract_tool_version(cls, out, **kwargs)
 
     @classmethod
-    def tool_version(cls, skip_regex=False, **kwargs):
+    def tool_version(cls, skip_regex=False, require_match=False, **kwargs):
         r"""Get the version of the compilation tool.
 
         Args:
             skip_regex (bool, optional): If True, don't call
                 extract_tool_version and return the raw version result.
+            require_match (bool, optional): If True, a match to
+                version_regex is required.
             **kwargs: Additional keyword arguments are passed to call.
 
         Returns:
@@ -5324,7 +5408,8 @@ class CompilationToolBase(object):
         out = cls.call(cls.version_flags, for_version=True, **kwargs)[0]
         if skip_regex:
             return out
-        return CompilationToolBase.extract_tool_version(cls, out)
+        return CompilationToolBase.extract_tool_version(
+            cls, out, require_match=require_match)
 
     @classmethod
     def run_executable_command(cls, args, skip_flags=False,
@@ -6150,6 +6235,11 @@ class ObjDumpDisassembler(DisassemblerBase):
             # 'filters': ['NEEDED'],
         },
     }
+    version_regex = [
+        r'(?P<version>(?:Apple )?(?:(?:clang)|(?:LLVM)) '
+        r'version \d+\.\d+(?:\.\d+)?)',
+        r'(?P<version>GNU objdump \((?:GNU )?Binutils'
+        r'(?: for (?P<os>.+))?\) \d+\.\d+(?:\.\d+)?)']
 
 
 class DumpBinDisassembler(DisassemblerBase):
