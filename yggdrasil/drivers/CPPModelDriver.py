@@ -60,7 +60,7 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
     aliases = ['gnu-c++', 'gnu-g++']
     default_linker = 'g++'
     version_regex = [
-        r'(?P<version>(?:.*gnu\-)?(?:g|c)\+\+ \(.+\) \d+\.\d+\.\d+)']
+        r'(?P<version>(?:.*gnu\-)?(?:g|c)\+\+(?:\.exe)? \(.+\) \d+\.\d+\.\d+)']
     standard_library = 'stdc++'
     libraries = {}
 

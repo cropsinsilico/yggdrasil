@@ -80,8 +80,10 @@ class NMakeBuilder(MakeBuilder):
     default_flags = ['/NOLOGO']
     flag_options = OrderedDict([('buildfile', '/f')])
     default_executable = None
-    version_regex = None
-    
+    version_regex = [
+        r'(?P<version>Microsoft \(R\) Program Maintenance Utility '
+        r'Version \d+\.\d+(?:\.\d+)*)']
+
 
 class MakeModelDriver(BuildModelDriver):
     r"""Class for running make file compiled drivers. Before running the
