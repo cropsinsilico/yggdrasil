@@ -1,4 +1,3 @@
-import re
 import copy
 import numpy as np
 import pandas
@@ -47,16 +46,11 @@ def extract_formats(fmt_str):
         list: List of identified format codes.
 
     """
-    fmt_regex = (
-        "%(?:\\d+\\$)?[+-]?(?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
-        + "[lhjztL]*(?:64)?[bcdeEufFgGosxXi]"
-        + "(?:%(?:\\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
-        + "[lhjztL]*[eEfFgG]j)?")
     as_bytes = False
     if isinstance(fmt_str, bytes):
         as_bytes = True
         fmt_str = fmt_str.decode("utf-8")
-    out = re.findall(fmt_regex, fmt_str)
+    out = [x[0] for x in scanf.findall_cformats(fmt_str)]
     if as_bytes:
         out = [f.encode("utf-8") for f in out]
     return out
@@ -173,82 +167,12 @@ def cformat2nptype(cfmt, names=None):
         ValueError: If the c format cannot be translated to a numpy datatype.
 
     """
-    # TODO: this may fail on 32bit systems where C long types are 32 bit
+    if names:
+        names = tools.bytes2str(names, recurse=True)
     if not (isinstance(cfmt, list) or isinstance(cfmt, (str, bytes))):
         raise TypeError(f"Input must be a string, bytes string, or list,"
                         f" not {type(cfmt)}")
-    if isinstance(cfmt, (str, bytes)):
-        cfmt = tools.bytes2str(cfmt)
-        fmt_list = extract_formats(cfmt)
-        if len(fmt_list) == 0:
-            raise ValueError(f"Could not locate any format codes in the"
-                             f" provided format string ({cfmt}).")
-    else:
-        fmt_list = cfmt
-    nfmt = len(fmt_list)
-    if nfmt == 1:
-        cfmt_str = fmt_list[0]
-    else:
-        dtype_list = [cformat2nptype(f) for f in fmt_list]
-        if names is None:
-            names = ['f%d' % i for i in range(nfmt)]
-        elif len(names) != nfmt:
-            raise ValueError("Number of names does not match the number of fields.")
-        else:
-            names = tools.bytes2str(names, recurse=True)
-        out = np.dtype(dict(names=names, formats=dtype_list))
-        # out = np.dtype([(n, d) for n, d in zip(names, dtype_list)])
-        return out
-    out = None
-    if cfmt_str[-1] in ['j']:
-        out = 'complex128'
-    elif cfmt_str[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
-        # if 'hh' in cfmt_str:
-        #     out = 'float8'
-        # elif cfmt_str[-2] == 'h':
-        #     out = 'float16'
-        # elif 'll' in cfmt_str:
-        #     out = 'longfloat'
-        # elif cfmt_str[-2] == 'l':
-        #     out = 'double'
-        # else:
-        #     out = 'single'
-        out = 'float64'
-    elif cfmt_str[-1] in ['d', 'i']:
-        if 'hh' in cfmt_str:  # short short, single char
-            out = 'int8'
-        elif cfmt_str[-2] == 'h':  # short
-            out = 'short'
-        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
-            out = 'longlong'  # long long
-        elif cfmt_str[-2] == 'l':
-            out = 'int_'  # long (broken in python)
-            if platform._is_win and np.dtype(out).itemsize == 8:
-                out = 'int32'
-        else:
-            out = 'intc'  # int, platform dependent
-    elif cfmt_str[-1] in ['u', 'o', 'x', 'X']:
-        if 'hh' in cfmt_str:  # short short, single char
-            out = 'uint8'
-        elif cfmt_str[-2] == 'h':  # short
-            out = 'ushort'
-        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
-            out = 'ulonglong'  # long long
-        elif cfmt_str[-2] == 'l':
-            out = 'uint64'  # long (broken in python)
-        else:
-            out = 'uintc'  # int, platform dependent
-    elif cfmt_str[-1] in ['c', 's']:
-        lstr = cfmt_str[1:-1]
-        if lstr:
-            lint = int(lstr)
-        else:
-            lint = 0
-        lsiz = lint * np.dtype('S1').itemsize
-        out = 'S%d' % lsiz
-    else:
-        raise ValueError("Could not find match for format str %s" % cfmt)
-    return np.dtype(out)
+    return scanf.cformat2nptype(cfmt, names=names)
 
 
 def cformat2pyscanf(cfmt):
@@ -273,12 +197,10 @@ def cformat2pyscanf(cfmt):
                         type(cfmt))
     if isinstance(cfmt, list):
         return [cformat2pyscanf(f) for f in cfmt]
-    if isinstance(cfmt, str):
-        as_bytes = False
-        cfmt_out = cfmt
-    else:
-        as_bytes = True
-        cfmt_out = cfmt.decode("utf-8")
+    as_bytes = isinstance(cfmt, bytes)
+    cfmt_out = cfmt
+    if as_bytes:
+        cfmt_out = cfmt.decode('utf-8')
     fmt_list = extract_formats(cfmt_out)
     if len(fmt_list) == 0:
         raise ValueError("Could not locate any format codes in the "
@@ -323,23 +245,12 @@ def format_message(args, fmt_str):
     """
     if not isinstance(args, (tuple, list)):
         args = (args, )
-    nfmt = len(extract_formats(fmt_str))
-    args_ = []
-    if len(args) < nfmt:
-        raise RuntimeError("Number of arguments (%d) does not match " % len(args)
-                           + "number of format fields (%d)." % nfmt)
-    for a0 in args:
-        a = units.get_data(a0)
-        if np.iscomplexobj(a):
-            args_ += [a.real, a.imag]
-        elif isinstance(a, bytes) and isinstance(fmt_str, str):
-            args_.append(a.decode("utf-8"))
-        elif isinstance(a, str) and isinstance(fmt_str, bytes):
-            args_.append(a.encode("utf-8"))
-        else:
-            args_.append(a)
-    out = fmt_str % tuple(args_)
-    return out
+    # nfmt = len(extract_formats(fmt_str))
+    # if len(args) < nfmt:
+    #     raise RuntimeError(f"Number of arguments ({len(args)}) does not "
+    #                        f"match number of format fields ({nfmt}).")
+    args_ = [units.get_data(a) for a in args]
+    return scanf.sprintf(fmt_str, *args_)
 
 
 def process_message(msg, fmt_str):
@@ -361,21 +272,11 @@ def process_message(msg, fmt_str):
     """
     if not isinstance(msg, (str, bytes)):
         raise TypeError("Message must be a string or bytes string type.")
-    nfmt = len(extract_formats(fmt_str))
     py_fmt_str = cformat2pyscanf(fmt_str)
-    args = scanf.scanf(py_fmt_str, msg)
+    args = scanf.scanf(py_fmt_str, msg, numpy_types=True)
     if args is None:
-        nargs = 0
-    else:
-        nargs = len(args)
-        if len(args) > 1:
-            dtype = cformat2nptype(fmt_str)
-            dtype_list = [dtype[i] for i in range(nargs)]
-            args = tuple([np.array([a], idtype)[0] for
-                          a, idtype in zip(args, dtype_list)])
-    if nargs != nfmt:
-        raise ValueError("%d arguments were extracted, " % nargs
-                         + "but format string expected %d." % nfmt)
+        raise ValueError(f"No arguments were extracted from \"{msg}\" "
+                         f"using {fmt_str} -> {py_fmt_str}")
     return args
 
 

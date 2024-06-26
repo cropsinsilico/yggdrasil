@@ -38,7 +38,9 @@ map_cformat2pyscanf = [(['%5s', '%s'], '%s'),
                        ('%s', '%s'),
                        # (['%hhd', '%hd', '%d', '%ld', '%lld', '%l64d'], '%d'),
                        # (['%hhu', '%hu', '%u', '%lu', '%llu', '%l64u'], '%u'),
-                       ('%g%+gj', '%g%+gj')]
+                       ('%g%+gj', '%g%+gj'),
+                       # ('%l64d', '%ld'),
+                       ]
 
 unsupported_cfmt = ['a', 'A', 'p', 'n', '']
 map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
@@ -61,6 +63,18 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
 map_cformat2nptype.append(
     (['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
      'complex128'))
+
+
+def _expand_keys(x):
+    out = []
+    for k, v in x:
+        out += (
+            [(k, v)] if isinstance(k, str) else [(ik, v) for ik in k])
+    return out
+
+
+map_cformat2nptype_expanded = _expand_keys(map_cformat2nptype)
+map_cformat2pyscanf_expanded = _expand_keys(map_cformat2pyscanf)
 
 
 def test_extract_formats():
@@ -106,18 +120,19 @@ def test_nptype2cformat_structured():
                 == [ib.encode("utf-8") for ib in b])
 
 
-def test_cformat2nptype():
+@pytest.mark.parametrize('a,b', map_cformat2nptype_expanded)
+def test_cformat2nptype(a, b):
     r"""Test conversion from C format string to numpy dtype."""
-    for a, b in map_cformat2nptype:
-        if isinstance(a, str):
-            a = [a]
-        for _ia in a:
-            if _ia.startswith(constants.FMT_CHAR_STR):
-                ia = _ia.encode("utf-8")
-            else:
-                ia = constants.FMT_CHAR + _ia.encode("utf-8")
-            assert serialize.cformat2nptype(ia) == np.dtype(b)  # .str)
-            # assert serialize.cformat2nptype(ia) == np.dtype(b).str
+    if a.startswith(constants.FMT_CHAR_STR):
+        ia = a.encode("utf-8")
+    else:
+        ia = constants.FMT_CHAR + a.encode("utf-8")
+    assert serialize.cformat2nptype(ia) == np.dtype(b)  # .str)
+    # assert serialize.cformat2nptype(ia) == np.dtype(b).str
+
+
+def test_cformat2nptype_errors():
+    r"""Test errors in conversion from C format string to numpy dtype."""
     with pytest.raises(TypeError):
         serialize.cformat2nptype(0)
     with pytest.raises(ValueError):
@@ -151,51 +166,57 @@ def test_cformat2nptype_structured():
         assert b1 == dtype1
 
 
-def test_cformat2pyscanf():
+@pytest.mark.parametrize('a,b', map_cformat2pyscanf_expanded)
+def test_cformat2pyscanf(a, b):
     r"""Test conversion of C format string to version for python scanf."""
-    all_a = []
-    all_b = []
-    for a, b in map_cformat2pyscanf:
-        if isinstance(a, str):
-            a = [a]
-        for _ia in a:
-            ia = _ia.encode("utf-8")
-            ib = b.encode("utf-8")
-            all_a.append(ia)
-            all_b.append(ib)
-            assert serialize.cformat2pyscanf(ia) == ib
+    ia = a.encode("utf-8")
+    ib = b.encode("utf-8")
+    assert serialize.cformat2pyscanf(ia) == ib
+
+
+def test_cformat2pyscanf_errors():
     with pytest.raises(TypeError):
         serialize.cformat2pyscanf(0)
     with pytest.raises(ValueError):
         serialize.cformat2pyscanf(b's')
     with pytest.raises(ValueError):
         serialize.cformat2pyscanf(b'%')
+    all_a = [x[0].encode('utf-8') for x in map_cformat2pyscanf_expanded]
+    all_b = [x[1].encode('utf-8') for x in map_cformat2pyscanf_expanded]
     fmt_a = b'\t'.join(all_a)
     fmt_b = b'\t'.join(all_b)
     assert serialize.cformat2pyscanf(all_a) == all_b
     assert serialize.cformat2pyscanf(fmt_a) == fmt_b
 
 
-def test_format_message():
+@pytest.mark.parametrize('f,a,exp_msg', [
+    (b'%5s\t%ld\t%lf\t%g%+gj\n', None, None),
+    ("%ld", 0, None),
+    ("%l64d", 1, None),
+    ('%s', b'hello', 'hello'),
+    (b'%s', 'hello', b'hello'),
+])
+def test_format_message(f, a, exp_msg):
     r"""Test formatting message from a list or arguments and back."""
-    fmt = b'%5s\t%ld\t%lf\t%g%+gj\n'
-    dtype = serialize.cformat2nptype(fmt)
-    x_arr = np.ones(1, dtype)
-    x_tup = [x_arr[n][0] for n in x_arr.dtype.names]
-    flist = [fmt, "%ld"]
-    alist = [tuple(x_tup), 0]
-    for a, f in zip(alist, flist):
-        msg = serialize.format_message(a, f)
-        b = serialize.process_message(msg, f)
-        if not isinstance(a, tuple):
-            assert b == (a, )
+    if a is None:
+        dtype = serialize.cformat2nptype(f)
+        if dtype.names:
+            a = tuple([np.ones((1, ), dtype[n])[0] for n in dtype.names])
         else:
-            assert b == a
-    # Formats with mixed types
-    assert serialize.format_message(b'hello', '%s') == 'hello'
-    assert serialize.format_message('hello', b'%s') == b'hello'
-    # Errors
-    with pytest.raises(RuntimeError):
+            a = dtype(1)
+    msg = serialize.format_message(a, f)
+    if exp_msg is None:
+        exp_msg = a
+    b = serialize.process_message(msg, f)
+    if not isinstance(exp_msg, tuple):
+        assert b == (exp_msg, )
+    else:
+        assert b == exp_msg
+
+
+def test_format_message_errors():
+    r"""Test errors in format_message and process_message."""
+    with pytest.raises(TypeError):
         serialize.format_message((0, ), "%d %d")
     with pytest.raises(TypeError):
         serialize.process_message(0, "%d")

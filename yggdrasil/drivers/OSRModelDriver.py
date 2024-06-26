@@ -170,6 +170,9 @@ class OSRModelDriver(ExecutableModelDriver):
             if platform._is_win:  # pragma: windows
                 env['YGG_OSR_TOOL'] = toolname
                 if toolname == 'cl++':
+                    # cl is explicitly checked for in the generated
+                    # makefile
+                    env['YGG_OSR_TOOL'] = 'cl'
                     cl_path = tool.get_executable(full_path=True)
                     link_path = tool.get_tool('linker').get_executable(
                         full_path=True)
@@ -185,10 +188,10 @@ class OSRModelDriver(ExecutableModelDriver):
                             v = env.get(k, None)
                             if v is not None:
                                 if v in ['CL', '_CL_']:  # pragma: appveyor
-                                    env[k] = v.replace('/', '-')
+                                    v = v.replace('/', '-')
                                 env[k] = MakeModelDriver.fix_path(
                                     v, for_env=True, is_gnu=True)
-                                logger.info(f"OSR env {k} = {v}")
+                                logger.info(f"OSR env {k} = {env[k]}")
                     else:  # pragma: debug
                         env.pop('YGG_OSR_TOOL')
                         warnings.warn(

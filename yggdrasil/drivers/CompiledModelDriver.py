@@ -18,8 +18,8 @@ from yggdrasil.components import import_component, ComponentMeta
 
 
 logger = logging.getLogger(__name__)
-if platform._is_win:
-    logger.setLevel(level=logging.DEBUG)
+# if platform._is_win:
+#     logger.setLevel(level=logging.DEBUG)
 _tool_types = [
     'compiler', 'linker', 'archiver', 'disassembler',
     'builder', 'configurer',
@@ -4798,10 +4798,6 @@ class CompilationToolBase(object):
             env.update(sysconfig.get_config_vars())
         else:
             env.update(os.environ)
-        # TODO: temp
-        if (('-arch arm64' in env.get('CFLAGS', '')
-             and '-arch x86_64' in env.get('CFLAGS', ''))):
-            verbose = True
         envi_full = ''
         if isinstance(cls.default_executable_env, str):
             envi_full = env.get(cls.default_executable_env, '').split(

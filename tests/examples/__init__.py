@@ -52,12 +52,11 @@ class TestExample(base_class):
         r"""Prepare a make file for the test."""
         if language == 'make':
             makefile = os.path.join(yamldir, 'src', 'Makefile')
+            make_ext = '_linux'
             if platform._is_win:  # pragma: windows
                 makedrv = import_component('model', 'make')
-                assert makedrv.get_tool('compiler').toolname == 'nmake'
-                make_ext = '_windows'
-            else:
-                make_ext = '_linux'
+                if makedrv.get_tool('compiler').toolname == 'nmake':
+                    make_ext = '_windows'
             if not os.path.isfile(makefile):
                 shutil.copy(makefile + make_ext, makefile)
             try:

@@ -933,10 +933,12 @@ def scripts(testdir):
     else:
         scripts['executable'] = ['sleep', 0.1]
     # Makefile
-    if platform._is_win:  # pragma: windows
-        makefile0 = os.path.join(script_dir, "Makefile_windows")
-    else:
-        makefile0 = os.path.join(script_dir, "Makefile_linux")
+    from yggdrasil.drivers.MakeModelDriver import MakeModelDriver
+    makefile0 = os.path.join(script_dir, "Makefile_linux")
+    if MakeModelDriver.is_language_installed():
+        make_tool = MakeModelDriver.get_tool(MakeModelDriver.basetool)
+        if make_tool.toolname == 'nmake':
+            makefile0 = os.path.join(script_dir, "Makefile_windows")
     dest = os.path.join(script_dir, "Makefile")
     shutil.copy(makefile0, dest)
     yield scripts

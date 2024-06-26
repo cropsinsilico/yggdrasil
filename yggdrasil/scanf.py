@@ -63,10 +63,27 @@ from yggdrasil import tools
 
 __version__ = '1.3.3'
 
-__all__ = ["scanf", 'scanf_translate', 'scanf_compile']
+__all__ = ["scanf", "sprintf", 'scanf_translate', 'scanf_compile']
 
 
 DEBUG = False
+# %[flags][width][.precision][length]specifier
+# fmt_regex = (
+#         "%(?:\\d+\\$)?[+-]?(?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
+#         + "[lhjztL]*(?:64)?[bcdeEufFgGosxXi]"
+#         + "(?:%(?:\\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
+#         + "[lhjztL]*[eEfFgG]j)?")
+_float_format = (
+    "(\\d*)((?:\\.\\d+)?)([hlL]{,2})([eEfFgG])")
+_complex_format = (
+    "%([ -0]{,3})" + _float_format
+    + "%(\\+?[ -0]{,3}\\+?)" + _float_format + "j")
+_any_format = (
+    "%([\\* \\-\\+#0]{,6})(\\d*)((?:\\.\\d+)?)([hlLjzt]{,2}(?:64)?)"
+    "([bcdieEfFgGosuxX])")
+_complex_format_token = re.compile(_complex_format)
+_any_format_token = re.compile(_any_format)
+_any_format_n_groups = 5
 
 
 def no_cast(s):
@@ -121,7 +138,8 @@ def cast_oct(s):
     return int(s, 8)
 
 
-def cformat2regex(flags, width, precision, length, specifier):
+def _cformat2regex(flags, width, precision, length, specifier,
+                   *complex_args):
     r"""Get regex substring that will match the given cformat components.
 
     Args:
@@ -152,9 +170,9 @@ def cformat2regex(flags, width, precision, length, specifier):
     if precision and specifier in 'diuoxX':
         pad_zero = max(pad_zero, int(precision[1:]))
     # Casts
-    if pad_zero and specifier in 'diueEfgG':
+    if pad_zero and specifier in 'diueEfFgG':
         pat_sub += '0{,%d}' % pad_zero
-    if specifier == 'f':
+    if specifier in 'fF':
         pat_sub += pat_dec
     elif specifier in 'eE':
         pat_sub += '%s%s[+-]\\d+' % (pat_dec, specifier)
@@ -184,56 +202,193 @@ def cformat2regex(flags, width, precision, length, specifier):
         pat_sub += '[0-7]*'
     if ('-' in flags) and ('0' not in flags) and width:
         pat_sub += "\\s{,%s}" % width
+    if complex_args:
+        pat_sub += _cformat2regex(*complex_args) + 'j'
     return pat_sub
 
 
-def parse_cformat(format, i):
-    pattern = None
-    cast = None
-    # %[flags][width][.precision][length]specifier
-    # float_format = "%([ -\\+0]{,4})(\\d*)((?:\\.\\d+)?)(L?)([eEfgG])"
-    # First check for match to complex
-    complex_format = ("%([ -0]{,3})(\\d*)((?:\\.\\d+)?)([hlL]{,2})([eEfgG])"
-                      + "%(\\+?[ -0]{,3}\\+?)(\\d*)((?:\\.\\d+)?)([hlL]{,2})([eEfgG])j")
-    token = re.compile(complex_format)
+def _cformat2nptype(flags, width, precision, length, specifier,
+                    *complex_args, as_bytes=False):
+    r"""Get numpy datatype that will match the given cformat components.
+
+    Args:
+        flags (str): Format flags.
+        width (str): Minimum field width.
+        precision (str): Field precision.
+        length (str): Field value size (e.g. short, long).
+        specifier (str): Field specifier.
+        *complex_args: Additional arguments indicate that the cformat is
+            for a complex field.
+
+    Returns:
+        str: Regex expression that will match the provided components.
+
+    """
+    # TODO: this may fail on 32bit systems where C long types are 32 bit
+    import numpy as np
+    from yggdrasil import platform
+    out = None
+    if complex_args:
+        out = 'complex128'
+    elif specifier in 'fFeEgG':
+        # if not length:
+        #     out = 'single'
+        # elif length == 'hh':
+        #     out = 'float8'
+        # elif length = 'h':
+        #     out = 'float16'
+        # elif length == 'll':
+        #     out = 'longfloat'
+        # elif length == 'l':
+        #     out = 'double'
+        out = 'float64'
+    elif specifier in 'di':
+        if not length:
+            out = 'intc'  # int, platform dependent
+        elif length == 'hh':  # short short, single char
+            out = 'int8'
+        elif length == 'h':  # short
+            out = 'short'
+        elif length in ['ll', 'l64']:  # long long
+            out = 'longlong'
+        elif length == 'l':
+            out = 'int_'  # long (broken in python)
+            if platform._is_win and np.dtype(out).itemsize == 8:
+                out = 'int32'
+    elif specifier in 'uoxX':
+        if not length:
+            out = 'uintc'  # int, platform dependent
+        elif length == 'hh':  # short short, single char
+            out = 'uint8'
+        elif length == 'h':  # short
+            out = 'ushort'
+        elif length in ['ll', 'l64']:
+            out = 'ulonglong'  # long long
+        elif length == 'l':
+            out = 'uint64'  # long (broken in python)
+    elif specifier in 'cs':
+        lint = int(width) if width else 0
+        lsiz = lint * np.dtype('S1').itemsize
+        # if as_bytes:
+        out = f'S{lsiz}'
+        # else:
+        #     out = f'U{lsiz}'
+    if out is None:
+        raise ValueError(f"Could not find match for length "
+                         f"\"{length}\" for format specification "
+                         f"\"{specifier}\"")
+    return np.dtype(out)
+
+
+def match_cformat(format, i):
+    r"""Check for a C format code within a string.
+
+    Args:
+        format (str): Format string to search.
+
+    Returns:
+        re.Match: Regex match.
+
+    """
+    token = _complex_format_token
     found = token.match(format, i)
     if found:
-        cast = complex
-        groups = found.groups()
-        pat_sub1 = cformat2regex(*groups[:5])
-        pat_sub2 = cformat2regex(*groups[5:])
-        pattern = "(%s%sj)" % (pat_sub1, pat_sub2)
-        return found, pattern, cast
-    # Then check for generic
-    any_format = "%([\\* \\-\\+#0]{,6})(\\d*)((?:\\.\\d+)?)([hlL]{,2})([cdieEfgGosuxX])"
-    token = re.compile(any_format)
-    found = token.match(format, i)
+        return found
+    token = _any_format_token
+    return token.match(format, i)
+
+
+def findall_cformats(format):
+    r"""Extract all format codes from a format string.
+
+    Args:
+        format (str): Format string to extract codes from.
+
+    Returns:
+        list: List of identified format codes.
+
+    """
+    i = 0
+    length = len(format)
+    while i < length:
+        found = match_cformat(format, i)
+        if found:
+            yield found
+            i = found.end()
+        else:
+            i += 1
+
+
+def _match2regex(found):
+    pattern = None
     if found:
         groups = found.groupdict() or found.groups()
-        # Get cast
-        specifier = groups[-1]
-        if specifier in 'eEfgG':
-            cast = float
-        elif specifier in 'diu':
-            cast = int
-        elif specifier == 'c':
-            cast = no_cast
-        elif specifier == 's':
-            cast = cast_str
-        elif specifier in ['x', 'X']:
-            cast = cast_hex
-        elif specifier in ['o']:
-            cast = cast_oct
-        else:  # pragma: debug
-            raise Exception('No cast for specifier %s.' % specifier)
-        # Get pattern
-        pat_sub = cformat2regex(*groups)
+        pat_sub = _cformat2regex(*groups)
         if '*' in groups[0]:
             pattern = "(?:%s)" % pat_sub
-            cast = None
         else:
             pattern = "(%s)" % pat_sub
-        return found, pattern, cast
+    return pattern
+
+
+def _match2cast(found, numpy_types=False, as_bytes=False):
+    cast = None
+    if found:
+        groups = found.groups()
+        if '*' in groups[0]:
+            cast = None
+        else:
+            specifier = groups[-1]
+            if specifier not in 'cs':
+                as_bytes = False
+            if len(groups) > _any_format_n_groups:
+                cast = complex
+            elif specifier in 'eEfFgG':
+                cast = float
+            elif specifier in 'diu':
+                cast = int
+            elif specifier == 'c':
+                cast = no_cast
+            elif specifier == 's':
+                cast = cast_str
+            elif specifier in ['x', 'X']:
+                cast = cast_hex
+            elif specifier in ['o']:
+                cast = cast_oct
+            else:  # pragma: debug
+                raise Exception(f'No cast for specifier {specifier}.')
+            if numpy_types and specifier not in 'cs':
+                import numpy as np
+                dtype = _match2nptype(found, as_bytes=as_bytes)
+                return lambda x: np.array([cast(x)], dtype)[0]
+            elif as_bytes:
+                return lambda x: cast(x).encode('utf-8')
+    return cast
+
+
+def _match2pyformat(found):
+    replacement = None
+    if found:
+        groups = found.groupdict() or found.groups()
+        replacement = "%" + groups[0] + groups[1] + groups[2] + groups[4]
+        if len(groups) > _any_format_n_groups:
+            replacement += (
+                "%" + groups[5] + groups[6] + groups[7] + groups[9] + 'j')
+    return replacement
+
+
+def _match2nptype(found, as_bytes=False):
+    dtype = None
+    if found:
+        groups = found.groupdict() or found.groups()
+        dtype = _cformat2nptype(*groups, as_bytes=as_bytes)
+    return dtype
+
+
+def parse_cformat(format, i, numpy_types=False, as_bytes=False):
+    found = match_cformat(format, i)
+    pattern = _match2regex(found)
+    cast = _match2cast(found, numpy_types=numpy_types, as_bytes=as_bytes)
     return found, pattern, cast
 
 
@@ -299,7 +454,8 @@ SCANF_CACHE_SIZE = 1000
 scanf_cache = {}
 
 
-def scanf_compile(format, collapseWhitespace=True):
+def scanf_compile(format, collapseWhitespace=True, numpy_types=False,
+                  as_bytes=False):
     """
     Translate the format into a regular expression
 
@@ -320,7 +476,9 @@ def scanf_compile(format, collapseWhitespace=True):
     length = len(format)
     while i < length:
         found = None
-        found, pattern, cast = parse_cformat(format, i)
+        found, pattern, cast = parse_cformat(format, i,
+                                             numpy_types=numpy_types,
+                                             as_bytes=as_bytes)
         if found:
             if cast:
                 cast_list.append(cast)
@@ -357,7 +515,102 @@ def scanf_compile(format, collapseWhitespace=True):
     return format_re, cast_list
 
 
-def scanf(format, s=None, collapseWhitespace=True):
+def cformat2pyformat(format):
+    r"""Convert a C format string into one that can be used as a Python
+    format string.
+
+    Args:
+        format (str): Format to convert.
+
+    Returns:
+        str: Python format string.
+    
+    """
+    revised = ''
+    iprev = 0
+    for match in findall_cformats(format):
+        revised += format[iprev:match.start()] + _match2pyformat(match)
+        iprev = match.end()
+    revised += format[iprev:]
+    return revised
+
+
+def cformat2nptype(format, names=None):
+    r"""Convert a c format string to a numpy data type.
+
+    Args:
+        format (str, bytes): c format that should be translated.
+        names (list, optional): Names that should be assigned to fields in the
+            format string if there is more than one. If not provided, names
+            are generated based on the order of the format codes.
+
+    Returns:
+        np.dtype: Corresponding numpy data type.
+
+    """
+    import numpy as np
+    if isinstance(format, list):
+        dtypes = [cformat2nptype(x) for x in format]
+    else:
+        as_bytes = isinstance(format, bytes)
+        if as_bytes:
+            format = format.decode('utf-8')
+        dtypes = [_match2nptype(match, as_bytes=as_bytes)
+                  for match in findall_cformats(format)]
+    if len(dtypes) == 0:
+        raise ValueError(f"Could not locate any format codes in the"
+                         f" provided format string ({format}).")
+    elif len(dtypes) == 1:
+        return dtypes[0]
+    else:
+        if names is None:
+            names = ['f%d' % i for i in range(len(dtypes))]
+        elif len(names) != len(dtypes):
+            raise ValueError(f"Number of names ({len(names)}) does not "
+                             f"match the number of fields "
+                             f"({len(dtypes)}).")
+        return np.dtype(dict(names=names, formats=dtypes))
+
+
+def sprintf(format, *args):
+    r"""Format a string with support for c format strings that are not
+    available with python format strings.
+
+    Args:
+        format (str): C style format string.
+        *args: Additional arguments are treated as fields to format.
+
+    Returns:
+        str: Formatted string.
+
+    """
+    import numpy as np
+    as_bytes = isinstance(format, bytes)
+    if as_bytes:
+        format = format.decode('utf-8')
+    expanded_args = []
+    for a in args:
+        if np.iscomplexobj(a):
+            expanded_args += [a.real, a.imag]
+        elif isinstance(a, bytes):
+            expanded_args.append(a.decode("utf-8"))
+        else:
+            expanded_args.append(a)
+        # elif isinstance(a, bytes) and isinstance(format, str):
+        #     expanded_args.append(a.decode("utf-8"))
+        # elif isinstance(a, str) and isinstance(format, bytes):
+        #     expanded_args.append(a.encode("utf-8"))
+    try:
+        out = format % tuple(expanded_args)
+    except (ValueError, TypeError):
+        revised = cformat2pyformat(format)
+        out = revised % tuple(expanded_args)
+    if as_bytes:
+        out = out.encode('utf-8')
+    return out
+
+
+def scanf(format, s=None, collapseWhitespace=True, numpy_types=False):
     """
     scanf supports the following formats:
       %c        One character
@@ -396,7 +649,9 @@ def scanf(format, s=None, collapseWhitespace=True):
 
     # print(s, format)
 
-    format_re, casts = scanf_compile(format, collapseWhitespace)
+    format_re, casts = scanf_compile(format, collapseWhitespace,
+                                     numpy_types=numpy_types,
+                                     as_bytes=as_bytes)
 
     found = format_re.search(s)
     if found:
