@@ -95,7 +95,7 @@ class GCCCompiler(CCompilerBase):
     compatible_toolsets = ['llvm']
     next_stage_flag_flag = '-Xlinker'
     version_regex = [
-        r'(?P<version>(?:.*gnu\-)?g?cc \(.+\) \d+\.\d+\.\d+)']
+        r'(?P<version>(?:.*gnu\-)?g?cc(?:\.exe)? \(.+\) \d+\.\d+\.\d+)']
     # standard_library = 'c'
     libraries = {
         'asan': {'dep_executable_flags': ['-fsanitize=address'],

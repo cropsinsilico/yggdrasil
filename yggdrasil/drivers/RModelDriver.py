@@ -10,6 +10,10 @@ from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 from yggdrasil.drivers.CModelDriver import CModelDriver
 from yggdrasil.languages.R import install
+if platform._numpy2:
+    np_string = np.bytes_
+else:
+    np_string = np.string_
 
 
 logger = logging.getLogger(__name__)
@@ -272,7 +276,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(pyobj, dict):
             return {cls.python2language(k): cls.python2language(v)
                     for k, v in pyobj.items()}
-        elif isinstance(pyobj, np.string_):
+        elif isinstance(pyobj, np_string):
             return pyobj.decode("utf-8")
         elif isinstance(pyobj, pd.DataFrame):
             # R dosn't have int64 and will cast 64bit ints as floats if passed
@@ -601,12 +605,12 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             deps=['units', 'zeallot',
                   {'package': 'units', 'arguments': '-v'}],
             python2language=[
-                (np.string_('hello'), 'hello'),
-                ((np.string_('hello'), ), ('hello', )),
-                ([np.string_('hello')], ['hello']),
-                ({np.string_('hello'): np.string_('hello')},
+                (np_string('hello'), 'hello'),
+                ((np_string('hello'), ), ('hello', )),
+                ([np_string('hello')], ['hello']),
+                ({np_string('hello'): np_string('hello')},
                  {'hello': 'hello'}),
-                (OrderedDict([(np.string_('hello'), np.string_('hello'))]),
+                (OrderedDict([(np_string('hello'), np_string('hello'))]),
                  OrderedDict([('hello', 'hello')])),
                 (pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int64')}),
                  pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int32')}))],
