@@ -462,6 +462,8 @@ class LibtoolArchiver(ArchiverBase):
     libtype_flags = {'static': '-static'}
     toolset = 'llvm'
     search_path_envvar = ['LIBRARY_PATH']
+    version_regex = [
+        r'(?P<version>)error\: .*libtool\: .+']
     
 
 class MSVCArchiver(ArchiverBase):

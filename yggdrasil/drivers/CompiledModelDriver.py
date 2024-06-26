@@ -150,16 +150,22 @@ class CompilationToolRegistry(object):
                     continue
                 cls = self.tooltype[tooltype][k]
                 row = []
+                is_installed = None
                 for col in columns:
                     val = False
                     if col == 'installed':
                         if cls.is_installed():
-                            val = cls.tool_version(require_match=True)
-                            val = val.splitlines()[0] if val else True
+                            val = cls.tool_version(require_match=True,
+                                                   default=False)
+                            assert val is not False
+                            if val is not False:
+                                val = val.splitlines()[0] if val else True
+                        is_installed = bool(val)
                     elif col == 'alias for':
                         val = cls.is_alias()
                     elif col == 'executable':
-                        if cls.is_installed():
+                        assert is_installed is not None
+                        if is_installed:
                             val = cls.get_executable(full_path=True)
                     else:
                         val = getattr(cls, col)
@@ -169,7 +175,7 @@ class CompilationToolRegistry(object):
                         else:
                             val = ', '.join(val)
                     val = str(val)
-                    if col != 'executable':  # 'installed':
+                    if col != columns[-1]:
                         widths[col] = max(widths[col], len(val))
                     row.append(val)
                 rows.append(row)
@@ -4759,7 +4765,9 @@ class CompilationToolBase(object):
         """
         try:
             cls.get_executable(cfg=cfg)
-            return True
+            ver = cls.tool_version(require_match=True,
+                                   default=False, cfg=cfg)
+            return isinstance(ver, str)
         except InvalidCompilationTool:
             return False
 
@@ -5235,7 +5243,7 @@ class CompilationToolBase(object):
     @classmethod
     def get_executable_command(cls, args, skip_flags=False,
                                unused_kwargs=None, use_ccache=False,
-                               executable=None, **kwargs):
+                               executable=None, cfg=None, **kwargs):
         r"""Determine the command required to run the tool using the
         specified arguments and options.
 
@@ -5255,6 +5263,9 @@ class CompilationToolBase(object):
             executable (str, optional): Executable that should be used.
                 If not provided, the output of cls.get_executable(full_path=True)
                 will be used.
+            cfg (CisConfigParser, optional): Configuration options that
+                should be checked for a tool executable path. If not
+                provided, yggdrasil.config.ygg_cfg will be used.
             **kwargs: Additional keyword arguments are ignored and stored in
                 unused_kwargs if provided.
 
@@ -5276,7 +5287,7 @@ class CompilationToolBase(object):
                                   library_flags=library_flags, **kwargs)
         # Form command
         if executable is None:
-            executable = cls.get_executable(full_path=True)
+            executable = cls.get_executable(full_path=True, cfg=cfg)
         cmd = flags + args + library_flags
         cmd = [executable] + cmd
         if use_ccache and shutil.which('ccache'):
@@ -5324,13 +5335,15 @@ class CompilationToolBase(object):
         return products.last
 
     @staticmethod
-    def extract_tool_version(cls, x, require_match=False):
+    def extract_tool_version(cls, x, require_match=False, default=''):
         r"""Extract the tool's version from the provided string.
 
         Args:
             x (str): Raw version string.
             require_match (bool, optional): If True, a match to
                 version_regex is required.
+            default (str, optional): String that should be returned if
+                there is no match and require_match is True.
 
         Returns:
             str: Extracted version string.
@@ -5347,7 +5360,7 @@ class CompilationToolBase(object):
                 if match is not None:
                     return match.group('version')
             if require_match:
-                return ''
+                return default
             warnings.warn(
                 f"Could not locate version in string: {x} with "
                 f"regex {cls.version_regex}")
@@ -5355,7 +5368,7 @@ class CompilationToolBase(object):
             # raise Exception(f"{cls}: {cls.tooltype.title()} "
             #                 f"{cls.toolname} does not have a "
             #                 f"version regex")
-            return ''
+            return default
         return x
 
     @staticmethod
@@ -5393,7 +5406,8 @@ class CompilationToolBase(object):
         return CompilationToolBase.extract_tool_version(cls, out, **kwargs)
 
     @classmethod
-    def tool_version(cls, skip_regex=False, require_match=False, **kwargs):
+    def tool_version(cls, skip_regex=False, require_match=False,
+                     default='', **kwargs):
         r"""Get the version of the compilation tool.
 
         Args:
@@ -5401,6 +5415,8 @@ class CompilationToolBase(object):
                 extract_tool_version and return the raw version result.
             require_match (bool, optional): If True, a match to
                 version_regex is required.
+            default (str, optional): String that should be returned if
+                there is no match and require_match is True.
             **kwargs: Additional keyword arguments are passed to call.
 
         Returns:
@@ -5412,7 +5428,7 @@ class CompilationToolBase(object):
         if skip_regex:
             return out
         return CompilationToolBase.extract_tool_version(
-            cls, out, require_match=require_match)
+            cls, out, require_match=require_match, default=default)
 
     @classmethod
     def run_executable_command(cls, args, skip_flags=False,
