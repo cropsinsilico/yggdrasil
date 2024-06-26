@@ -1,7 +1,6 @@
 import os
 import git
 import copy
-import shutil
 import subprocess
 import tempfile
 import logging
@@ -11,6 +10,7 @@ import warnings
 import xml.etree.ElementTree as ET
 from yggdrasil import tools, platform
 from yggdrasil.components import import_component
+from yggdrasil.drivers.MakeModelDriver import MakeBuilder, MakeModelDriver
 from yggdrasil.drivers.ExecutableModelDriver import ExecutableModelDriver
 from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
 from yggdrasil.drivers.CompiledModelDriver import DependencySpecialization
@@ -54,7 +54,7 @@ class OSRModelDriver(ExecutableModelDriver):
     executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
-    base_languages = ['c++']
+    base_languages = ['c++', 'make']
     interface_dependencies = ['make']
     repository = None
     executable_path = None
@@ -113,10 +113,11 @@ class OSRModelDriver(ExecutableModelDriver):
     @classmethod
     def make_name(cls):
         r"""str: Name of make executable to use"""
-        make_base = 'make'
-        if platform._is_win:  # pragma: windows
-            make_base = 'mingw32-make'
-        return shutil.which(make_base)
+        # make_base = 'make'
+        # if platform._is_win:  # pragma: windows
+        #     make_base = 'mingw32-make'
+        # return shutil.which(make_base)
+        return MakeBuilder.get_executable(full_path=True)
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):
@@ -133,7 +134,7 @@ class OSRModelDriver(ExecutableModelDriver):
         # Need to treat gnu make as dependency since OSR Makefile is not
         # compatible with nmake
         if lib == 'make':
-            return bool(cls.make_name())
+            return MakeBuilder.is_installed()
         return super(OSRModelDriver, cls).is_library_installed(
             lib, **kwargs)  # pragma: debug
 
@@ -157,10 +158,9 @@ class OSRModelDriver(ExecutableModelDriver):
             if not os.path.isdir(cls.repository):  # pragma: debug
                 # This will only need to be called if the tempdir was cleaned up
                 cls.clone_repository(cls.repository)
+            tool = CPPModelDriver.get_tool('compiler', toolname=toolname)
             if toolname is None:
-                toolname = CPPModelDriver.get_tool('compiler',
-                                                   return_prop='name',
-                                                   default=None)
+                toolname = tool.toolname
             logger.info(f"OSR C++ compiler: {toolname}")
             cwd = os.path.join(cls.repository, 'OpenSimRoot')
             flags = []
@@ -168,18 +168,22 @@ class OSRModelDriver(ExecutableModelDriver):
                 flags += [f'-j{maxjobs}']
             env = copy.deepcopy(os.environ)
             if platform._is_win:  # pragma: windows
-                # toolname = 'cl++'
                 env['YGG_OSR_TOOL'] = toolname
                 if toolname == 'cl++':
-                    cl_path = shutil.which('cl.exe')
+                    cl_path = tool.get_executable(full_path=True)
                     if cl_path:
                         msvc_bin = os.path.dirname(cl_path)
                         env['YGG_OSR_CXX'] = cl_path
-                        env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
-                        for k in ['CL', '_CL_']:
+                        env['YGG_OSR_LINK'] = os.path.join(
+                            msvc_bin, 'link.exe')
+                        for k in ['YGG_OSR_CXX', 'YGG_OSR_LINK',
+                                  'CL', '_CL_']:
                             v = os.environ.get(k, None)
-                            if v is not None:  # pragma: appveyor
-                                env[k] = v.replace('/', '-').replace('\\', '/')
+                            if v is not None:
+                                if v in ['CL', '_CL_']:  # pragma: appveyor
+                                    env[k] = v.replace('/', '-')
+                                env[k] = MakeModelDriver.fix_path(
+                                    v, for_env=True, is_gnu=True)
                     else:  # pragma: debug
                         env.pop('YGG_OSR_TOOL')
                         warnings.warn(
@@ -198,8 +202,9 @@ class OSRModelDriver(ExecutableModelDriver):
             if target != 'cleanygg':
                 for x in cls.base_languages:
                     base_cls = import_component('model', x)
-                    base_cls.compile_dependencies(toolname=toolname,
-                                                  **kwargs)
+                    if not base_cls.is_build_tool:
+                        base_cls.compile_dependencies(toolname=toolname,
+                                                      **kwargs)
             elif not os.path.isfile(cls.executable_path):
                 return
             cmd = [cls.make_name(), target] + flags
@@ -362,7 +367,7 @@ class OSRModelDriver(ExecutableModelDriver):
         #     out.append((cls.language, opt, desc))
         #     return out
         if (((not cfg.has_option(cls.language, opt))
-             or (not os.path.isdir(cfg.get(cls.language, opt))))):
+             or (not tools.is_git_repository(cfg.get(cls.language, opt))))):
             fname = 'OpenSimRoot'
             fpath = tools.locate_file(fname)
             if not fpath:

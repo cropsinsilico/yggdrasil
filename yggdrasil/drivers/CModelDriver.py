@@ -415,7 +415,7 @@ class MSVCLinker(LinkerBase):
     search_path_flags = None
     version_flags = []
     version_regex = [
-        r'(?P<version>Microsoft (R) Incremental Linker Version '
+        r'(?P<version>Microsoft \(R\) Incremental Linker Version '
         r'\d+\.\d+(?:\.\d+)*)']
 
     @staticmethod
@@ -475,7 +475,7 @@ class MSVCArchiver(ArchiverBase):
     compatible_toolsets = ['llvm', 'gnu']
     search_path_envvar = ['LIB']
     version_regex = [
-        r'(?P<version>Microsoft (R) Library Manager Version '
+        r'(?P<version>Microsoft \(R\) Library Manager Version '
         r'\d+\.\d+(?:\.\d+)*)']
     
 

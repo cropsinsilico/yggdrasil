@@ -1,3 +1,4 @@
+import re
 from collections import OrderedDict
 from yggdrasil import platform, constants
 from yggdrasil.drivers.CompiledModelDriver import BuilderBase
@@ -13,13 +14,14 @@ class MakeBuilder(BuilderBase):
     """
     toolname = 'make'
     languages = ['make']
-    platforms = ['MacOS', 'Linux']
+    platforms = ['MacOS', 'Linux', 'Windows']
     default_flags = ['--always-make']  # Always overwrite
     flag_options = OrderedDict(
         [('buildfile', {'key': '-f', 'position': 0})])
     output_key = None
     build_params = ['target']
     version_regex = [r'(?P<version>GNU Make \d+\.\d+(?:\.\d+)?)']
+    aliases = ['mingw32-make'] if platform._is_win else []
         
     @classmethod
     def get_flags(cls, target=None, **kwargs):
@@ -140,13 +142,14 @@ class MakeModelDriver(BuildModelDriver):
             buildfile)  # pragma: debug
         
     @classmethod
-    def fix_path(cls, path, for_env=False, **kwargs):
+    def fix_path(cls, path, for_env=False, is_gnu=False, **kwargs):
         r"""Update a path.
 
         Args:
             path (str): Path that should be formatted.
             for_env (bool, optional): If True, the path is formatted for
                 use in an environment variable. Defaults to False.
+            is_gnu (bool, optional): If True, the tool is a GNU tool.
             **kwargs: Additional keyword arguments are passed to the
                 parent class's method.
 
@@ -157,5 +160,7 @@ class MakeModelDriver(BuildModelDriver):
         out = super(MakeModelDriver, cls).fix_path(path, for_env=for_env,
                                                    **kwargs)
         if platform._is_win and for_env:
+            if is_gnu:
+                out = out.replace('\\', re.escape('/'))
             out = f'"{out}"'
         return out

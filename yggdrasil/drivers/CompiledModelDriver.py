@@ -132,7 +132,7 @@ class CompilationToolRegistry(object):
                    # 'alias for',
                    'installed', 'executable']
         if widths is None:
-            default_max = {'languages': 15,
+            default_max = {'languages': 0,
                            'installed': 25}
             widths = {k: len(k) for k in columns}
             for k, v in default_max.items():
@@ -164,7 +164,10 @@ class CompilationToolRegistry(object):
                     else:
                         val = getattr(cls, col)
                     if col in ['languages']:
-                        val = ', '.join(val)
+                        if val == constants.LANGUAGES['compiled']:
+                            val = 'all'
+                        else:
+                            val = ', '.join(val)
                     val = str(val)
                     if col != 'executable':  # 'installed':
                         widths[col] = max(widths[col], len(val))
@@ -226,7 +229,7 @@ class CompilationToolRegistry(object):
             return default
         raise InvalidCompilationTool(
             f"Could not locate a {tooltype} that matches {kwargs}.\n"
-            f"Available tools:\n{pprint.pformat(self.tooltype)}")
+            f"Available tools:{self.logInfo(return_str=True)}")
 
     def _sorting_kws(self, tooltype, toolname=None, language=None,
                      toolset=None,
