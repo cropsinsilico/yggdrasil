@@ -111,7 +111,7 @@ class ServiceBase(YggClass):
 
         """
         kwargs.setdefault("on_timeout", "Server never started")
-        kwargs.setdefault("timeout", 15)
+        kwargs.setdefault("timeout", 150)
         wait_on_function(lambda: self.is_running, **kwargs)
 
     def setup_server(self, *args, **kwargs):

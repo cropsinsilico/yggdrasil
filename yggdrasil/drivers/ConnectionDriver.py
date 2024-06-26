@@ -235,7 +235,7 @@ class ConnectionDriver(Driver):
                       'enum': ['all', 'line', 'table_array', 'ascii',
                                'binary', 'json', 'map', 'mat', 'netcdf',
                                'obj', 'pandas', 'pickle', 'ply', 'table',
-                               'wofost', 'yaml']},
+                               'wofost', 'yaml', 'read', 'readline']},
         'write_meth': {'type': 'string', 'deprecated': True,
                        'enum': ['all', 'line', 'table_array', 'ascii',
                                 'binary', 'json', 'map', 'mat', 'netcdf',

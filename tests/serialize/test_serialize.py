@@ -253,14 +253,14 @@ def test_combine_eles():
     arrs_void = [res1[i] for i in range(nele)]
     arrs_mixd = [a.tolist() for a in res1]
     arrs_mixd[-1] = arrs_void[-1]
-    if platform._is_win:  # pragma: windows
-        dtype0_w = np.dtype({'names': names0, 'formats': ['S5', 'i4', 'f8', 'c16']})
-        dtype1_w = np.dtype({'names': names1, 'formats': ['S5', 'i4', 'f8', 'c16']})
-        res0_list = res0.astype(dtype0_w)
-        res1_list = res1.astype(dtype1_w)
-    else:
-        res0_list = res0
-        res1_list = res1
+    dtype0_w = np.dtype(
+        {'names': names0,
+         'formats': ['S5', platform._default_numpy_int, 'f8', 'c16']})
+    dtype1_w = np.dtype(
+        {'names': names1,
+         'formats': ['S5', platform._default_numpy_int, 'f8', 'c16']})
+    res0_list = res0.astype(dtype0_w)
+    res1_list = res1.astype(dtype1_w)
     np.testing.assert_array_equal(serialize.combine_eles([res1[n][0] for n in names1]),
                                   res0[0])
     np.testing.assert_array_equal(serialize.combine_eles(arrs), res0)
@@ -272,12 +272,8 @@ def test_combine_eles():
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list, dtype=dtype1),
                                   res1)
     # Version of test where width of string field needs to be found
-    if platform._is_win:  # pragma: windows
-        dtype = np.dtype([("f0", "S"), ("f1", "i4"),
-                          ("f2", "f8"), ("f3", "c16")])
-    else:
-        dtype = np.dtype([("f0", "S"), ("f1", "i8"),
-                          ("f2", "f8"), ("f3", "c16")])
+    dtype = np.dtype([("f0", "S"), ("f1", platform._default_numpy_int),
+                      ("f2", "f8"), ("f3", "c16")])
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list,
                                                          dtype=dtype),
                                   res0_list)
@@ -300,11 +296,9 @@ def test_consolidate_array():
     # names1 = ["name", "number", "value", "complex"]
     dtypes = ['S5', 'i8', 'f8', 'c16']
     dtype0 = np.dtype([(n, f) for n, f in zip(names0, dtypes)])
-    if platform._is_win:  # pragma: windows
-        dtype0_list = np.dtype({'names': names0,
-                                'formats': ['S5', 'i4', 'f8', 'c16']})
-    else:
-        dtype0_list = dtype0
+    dtype0_list = np.dtype(
+        {'names': names0,
+         'formats': ['S5', platform._default_numpy_int, 'f8', 'c16']})
     # dtype1 = np.dtype([(n, f) for n, f in zip(names1, dtypes)])
     dtype2 = np.dtype([('f0', 'i8'), ('f1', 'f8')])
     dtype3 = np.dtype([('f0', 'i4'), ('f1', 'f4')])

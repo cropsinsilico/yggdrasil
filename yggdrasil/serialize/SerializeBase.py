@@ -956,6 +956,7 @@ class SerializeBase(tools.YggClass):
 
         """
         from yggdrasil.communication.FileComm import FileComm
+        kwargs.setdefault("skip_component_schema_normalization", True)
         kwargs.setdefault("serializer", self)
         comm = FileComm(fd, direction="recv", **kwargs)
         try:
@@ -974,6 +975,7 @@ class SerializeBase(tools.YggClass):
 
         """
         from yggdrasil.communication.FileComm import FileComm
+        kwargs.setdefault("skip_component_schema_normalization", True)
         kwargs.setdefault("serializer", self)
         comm = FileComm(fd, direction="send", **kwargs)
         try:

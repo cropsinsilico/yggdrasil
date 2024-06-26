@@ -596,7 +596,7 @@ class ComponentBase(ComponentBaseUnregistered, metaclass=ComponentMeta):
                 kwargs.setdefault(self._schema_subtype_key, subtype)
                 if additional_component_properties:
                     kwargs.update(additional_component_properties)
-                # Remove properties that shouldn't ve validated in class
+                # Remove properties that shouldn't be validated in class
                 extra_kwargs = {}
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:

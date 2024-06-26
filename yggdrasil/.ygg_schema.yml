@@ -294,6 +294,8 @@ definitions:
         enum:
         - IPCInputDriver
         - IPCOutputDriver
+        - InputDriver
+        - OutputDriver
         type: string
       name:
         description: Name used for component in log messages.
@@ -388,6 +390,8 @@ definitions:
         enum:
         - RMQInputDriver
         - RMQOutputDriver
+        - InputDriver
+        - OutputDriver
         type: string
       name:
         description: Name used for component in log messages.
@@ -418,6 +422,8 @@ definitions:
         enum:
         - RMQAsyncInputDriver
         - RMQAsyncOutputDriver
+        - InputDriver
+        - OutputDriver
         type: string
       name:
         description: Name used for component in log messages.
@@ -476,6 +482,8 @@ definitions:
         enum:
         - ZMQInputDriver
         - ZMQOutputDriver
+        - InputDriver
+        - OutputDriver
         type: string
       name:
         description: Name used for component in log messages.
@@ -627,6 +635,8 @@ definitions:
         - table
         - wofost
         - yaml
+        - read
+        - readline
         type: string
       transform:
         aliases:

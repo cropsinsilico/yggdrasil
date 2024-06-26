@@ -22,8 +22,13 @@ def test_discover_header_no_header(tmpdir):
     fd = fd0.open('rb')
     inst = AsciiTableSerialize.AsciiTableSerialize(delimiter=b' ')
     inst.deserialize_file_header(fd)
-    if platform._is_win:  # pragma: windows
+    if platform._is_win and ((not platform._numpy2)
+                             or (not platform._is_64bit)):  # pragma: windows
+        # Currently untested on 32bit windows, but numpy 2.0 changes
+        # default integer to 64bit on 64bit systems
         assert inst.format_str == b'%d %6s\n'
+    elif platform._is_win:
+        assert inst.format_str == b'%l64d %6s\n'
     else:
         assert inst.format_str == b'%ld %6s\n'
     assert inst.field_names == ('f0', 'f1')

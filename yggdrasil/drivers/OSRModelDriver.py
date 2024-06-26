@@ -182,7 +182,7 @@ class OSRModelDriver(ExecutableModelDriver):
                             msvc_bin, 'link.exe')
                         for k in ['YGG_OSR_CXX', 'YGG_OSR_LINK',
                                   'CL', '_CL_']:
-                            v = os.environ.get(k, None)
+                            v = env.get(k, None)
                             if v is not None:
                                 if v in ['CL', '_CL_']:  # pragma: appveyor
                                     env[k] = v.replace('/', '-')

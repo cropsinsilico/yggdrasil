@@ -201,7 +201,8 @@ class IPCComm(CommBase.CommBase):
     _schema_subtype_description = ('Interprocess communication (IPC) queue.')
     _maxMsgSize = 2048  # Based on IPC limit on MacOS
     address_description = ("An IPC message queue key.")
-    _deprecated_drivers = ['IPCInputDriver', 'IPCOutputDriver']
+    _deprecated_drivers = ['IPCInputDriver', 'IPCOutputDriver',
+                           'InputDriver', 'OutputDriver']
 
     def _init_before_open(self, **kwargs):
         r"""Initialize empty queue and server class."""

@@ -20,6 +20,23 @@ class SerializationError(TypeError):
     pass
 
 
+# Table of numpy/C/format string mappings for integers
+# Size     C-Unix  C-Windows  Numpy1  Numpy2  Windows
+#    1     int8_t     int8_t
+#    2      short      short
+#    4        int  int, long
+#    8       long  long long
+#   16  long long          -
+
+# Numpy integer types
+# Name        Description
+# intc        Native integer type
+# intp        Default integer type (long on numpy < 2.0, int64 on
+#             numpy > 2.0 unless 32bit)
+# int_        Default integer type 32bit on 32bit, 64bit on 64bit
+# long        Alias of int_
+# long long   Size if C long long
+
 def extract_formats(fmt_str):
     r"""Locate format codes within a format string.
 
@@ -85,14 +102,17 @@ def nptype2cformat(nptype, asbytes=False):
     elif t == np.dtype("intc"):
         cfmt = "%d"
     elif t == np.dtype("int_"):
-        cfmt = "%ld"
+        if platform._is_win and t.itemsize == 8:  # pragma: windows
+            cfmt = "%l64d"
+        else:
+            cfmt = "%ld"
     # elif t == np.dtype("int64"):
     #     if platform._is_win:
     #         cfmt = "%l64d"
     #     else:  # pragma: no cover
     #         cfmt = "%ld"
     elif t == np.dtype("longlong"):
-        # On windows C long is 32bit and long long is 64bit
+        # On 64bit windows C long is 32bit and long long is 64bit
         if platform._is_win:  # pragma: windows
             cfmt = "%l64d"
         else:  # pragma: no cover
@@ -203,6 +223,8 @@ def cformat2nptype(cfmt, names=None):
             out = 'longlong'  # long long
         elif cfmt_str[-2] == 'l':
             out = 'int_'  # long (broken in python)
+            if platform._is_win and np.dtype(out).itemsize == 8:
+                out = 'int32'
         else:
             out = 'intc'  # int, platform dependent
     elif cfmt_str[-1] in ['u', 'o', 'x', 'X']:

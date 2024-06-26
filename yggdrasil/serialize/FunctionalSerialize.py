@@ -37,11 +37,15 @@ class FunctionalSerialize(SerializeBase):
     func_deserialize = None
     
     def __init__(self, **kwargs):
-        if isinstance(kwargs.get('func_serialize', None), SerializeBase):
-            kwargs['func_serialize'] = kwargs['func_serialize'].func_serialize
-        if isinstance(kwargs.get('func_deserialize', None), SerializeBase):
-            kwargs['func_deserialize'] = kwargs['func_deserialize'].func_deserialize
+        extracted = {}
+        for k in ['func_serialize', 'func_deserialize']:
+            if not isinstance(kwargs.get(k, ''), str):
+                extracted[k] = kwargs.pop(k)
+                if isinstance(extracted[k], SerializeBase):
+                    extracted[k] = getattr(extracted[k], k)
         super(FunctionalSerialize, self).__init__(**kwargs)
+        for k, v in extracted.items():
+            setattr(self, k, v)
 
     @property
     def serializer_info(self):

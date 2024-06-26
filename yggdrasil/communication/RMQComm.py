@@ -180,7 +180,8 @@ class RMQComm(CommBase.CommBase):
                            "the queue.")
     _disconnect_attr = (CommBase.CommBase._disconnect_attr
                         + ['_opening', '_closing'])
-    _deprecated_drivers = ['RMQInputDriver', 'RMQOutputDriver']
+    _deprecated_drivers = ['RMQInputDriver', 'RMQOutputDriver',
+                           'InputDriver', 'OutputDriver']
     
     def _init_before_open(self, **kwargs):
         r"""Set null connection and channel."""
