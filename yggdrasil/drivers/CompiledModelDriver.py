@@ -2775,6 +2775,14 @@ class CompilationDependency(object):
         out.specialization = DependencySpecialization(self)
         out.specialization.update(out, **kwargs)
         if out.origin == 'language':
+            if out.name != out.basetool.standard_library:
+                out.logInfo(f"Dependency {out.name} is language related, "
+                            f"but not the {out.basetool.tooltype}'s "
+                            f"standard library "
+                            f"\"{out.basetool.standard_library}\" "
+                            f"({out.basetool.tooltype} = "
+                            f"{out.basetool.toolname})",
+                            level=logging.ERROR)
             assert out.name == out.basetool.standard_library
         if target_dep:
             out.parameters['target_dep'] = target_dep.specialized(
@@ -3754,20 +3762,9 @@ class CompilationDependency(object):
             paths_to_add += self.tool('linker').get_search_path(
                 env_only=True)
         if env_var and paths_to_add:
-            path_list = []
-            prev_path = to_update.get(env_var, '')
-            prev_path_list = []
-            if prev_path:
-                prev_path_list += prev_path.split(os.pathsep)
-                path_list.append(prev_path)
-            for x in paths_to_add:
-                if x and x not in prev_path_list:
-                    if add_to_front:
-                        path_list.insert(0, x)
-                    else:
-                        path_list.append(x)
-            if path_list:
-                out[env_var] = os.pathsep.join(path_list)
+            tools.update_path_env(env_var, paths_to_add, env=out,
+                                  add_to_front=add_to_front,
+                                  src_env=to_update)
         return out
 
     @classmethod

@@ -330,10 +330,6 @@ class SerializeBase(tools.YggClass):
                 arr = np.array(rows, dtype=dtype)
                 if no_names:
                     arr = [arr[n] for n in arr.dtype.names]
-                import pprint
-                print("BEFORE POSSIBLE SEGFAULT")
-                pprint.pprint(arr)
-                pprint.pprint(out['datatype'])
                 lst = rapidjson.normalize(arr, out['datatype'])
                 out['objects'] = [lst, lst]
         else:

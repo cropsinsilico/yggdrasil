@@ -198,6 +198,41 @@ def is_git_repository(path):
     return True
 
 
+def update_path_env(env_var, paths_to_add, env=None, add_to_front=False,
+                    src_env=None):
+    r"""Add a set of paths to an environment variable.
+
+    Args:
+        env_var (str): Environment variable to update
+        paths_to_add (list): Paths to add if not present.
+        env (dict, optional): Dictionary of environment variables to
+            update if not provided, os.environ will be used.
+        add_to_front (bool, optional): If True, added paths should be
+            added before any existing paths.
+        src_env (dict, optional): Environment variable set that existing
+            paths should be pulled from if different from env.
+
+    """
+    if env is None:
+        env = os.environ
+    if src_env is None:
+        src_env = env
+    path_list = []
+    prev_path = src_env.get(env_var, '')
+    prev_path_list = []
+    if prev_path:
+        prev_path_list += prev_path.split(os.pathsep)
+        path_list.append(prev_path)
+    for x in paths_to_add:
+        if x and x not in prev_path_list:
+            if add_to_front:
+                path_list.insert(0, x)
+            else:
+                path_list.append(x)
+    if path_list:
+        env[env_var] = os.pathsep.join(path_list)
+
+
 def display_source(fname, number_lines=False, return_lines=False):
     r"""Display source code with syntax highlighting (if available).
 

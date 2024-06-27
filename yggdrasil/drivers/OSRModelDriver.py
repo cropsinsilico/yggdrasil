@@ -179,10 +179,13 @@ class OSRModelDriver(ExecutableModelDriver):
                     logger.info(f"OSR compiler: {cl_path}\n"
                                 f"OSR linker:   {link_path}")
                     if cl_path:
-                        msvc_bin = os.path.dirname(cl_path)
-                        env['YGG_OSR_CXX'] = cl_path
-                        env['YGG_OSR_LINK'] = os.path.join(
-                            msvc_bin, 'link.exe')
+                        paths_to_add = os.pathsep.join(list(set([
+                            os.path.dirname(cl_path),
+                            os.path.dirname(link_path)])))
+                        env['YGG_OSR_CXX'] = os.path.basename(cl_path)
+                        env['YGG_OSR_LINK'] = os.path.basename(link_path)
+                        tools.update_path_env("PATH", paths_to_add,
+                                              env=env, add_to_front=True)
                         for k in ['YGG_OSR_CXX', 'YGG_OSR_LINK',
                                   'CL', '_CL_']:
                             v = env.get(k, None)

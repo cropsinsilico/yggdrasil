@@ -65,9 +65,10 @@ def test_create_windows_import_gcc():
                                 default=None)
     if gcc:
         kws = {'toolname': 'gcc'}
+        filetype = 'library'
         if platform._is_win:
-            kws['libtype'] = 'shared'
-        dll = CModelDriver.libraries.getfile('python', 'library', **kws)
+            filetype = 'shared'
+        dll = CModelDriver.libraries.getfile('python', filetype, **kws)
         if platform._is_win:
             assert dll.endswith('.dll')
         CompiledModelDriver.create_windows_import(dll, for_gnu=True,
