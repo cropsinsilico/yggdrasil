@@ -243,8 +243,8 @@ jobs:
         --parametrize-language=sbml\", \"long-remote-service\":\"--long-running --remote-service\",
         \"examples-rpc-lesson3\":\"--suites examples top --parametrize-example-name=rpc_lesson3\",
         \"tools\":\"tests/test_tools.py\", \"long-interp\":\"--long-running --languages
-        python R matlab\", \"services\":\"tests/test_services.py --nocapture\"}" >>
-        $GITHUB_OUTPUT
+        python R matlab --nocapture\", \"services\":\"tests/test_services.py --nocapture\"}"
+        >> $GITHUB_OUTPUT
   schema:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Update the schema used by the model submission form

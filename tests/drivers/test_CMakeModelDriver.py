@@ -33,13 +33,22 @@ def test_CMakeBuilder(scripts):
 
 
 @pytest.mark.absent_language('cmake')
-def test_CMakeModelDriver_no_C_library(scripts):  # pragma: windows
-    r"""Test CMakeModelDriver error when C library not installed."""
+def test_CMakeModelDriver_no_cmake(scripts):  # pragma: windows
+    r"""Test CMakeModelDriver error when cmake not installed."""
     with pytest.raises(RuntimeError):
         CMakeModelDriver('test', scripts['cmake'])
 
 
 @pytest.mark.language('cmake')
+@pytest.mark.absent_language('c++')
+def test_CMakeModelDriver_no_C_library(scripts):  # pragma: windows
+    r"""Test CMakeModelDriver error when C++ library not installed."""
+    with pytest.raises(RuntimeError):
+        CMakeModelDriver('test', scripts['cmake'])
+
+
+@pytest.mark.language('cmake')
+@pytest.mark.language('c++')
 def test_CMakeModelDriver_error_cmake(scripts):
     r"""Test CMakeModelDriver error for invalid cmake args."""
     makedir, target = os.path.split(scripts['cmake'])
@@ -54,6 +63,7 @@ def test_CMakeModelDriver_error_cmake(scripts):
 
 
 @pytest.mark.language('cmake')
+@pytest.mark.language('c++')
 def test_CMakeModelDriver_error_notarget(scripts):
     r"""Test CMakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['cmake'])
@@ -67,6 +77,7 @@ def test_CMakeModelDriver_error_notarget(scripts):
 
 
 @pytest.mark.language('cmake')
+@pytest.mark.language('c++')
 def test_CMakeModelDriver_error_nofile():
     r"""Test CMakeModelDriver error for missing CMakeLists.txt."""
     sourcedir = os.path.dirname(__file__)
