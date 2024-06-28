@@ -689,12 +689,14 @@ class ygginfo(SubCommand):
                         kws['libtype'] = 'executable'
                 dep = drv.create_dep(**kws)
                 flags = dep.tool_flags(
-                    args.tool, no_additional_stages=True,
+                    args.tool,
+                    no_additional_stages=True,
                     skip_no_additional_stages_flag=True,
                     dry_run=args.dry_run)
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
-                    out = out.replace('/', '-')
+                    if dep.tool(args.tool).toolset != 'msvc':
+                        out = out.replace('/', '-')
                     out = out.replace('\\', '/')
             elif args.fullpath:
                 out = drv.get_tool(args.tool).get_executable(full_path=True)

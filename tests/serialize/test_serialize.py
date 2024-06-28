@@ -24,7 +24,10 @@ if not platform._numpy2:
 # Conditional on if default int 32bit or 64bit
 # This is for when default int is 32bit
 if np.dtype('int_') != np.dtype('intc'):
-    map_nptype2cformat.append(('int_', '%ld'))
+    if platform._is_win:  # pragma: windows
+        map_nptype2cformat.append(('int_', '%l64d'))
+    else:
+        map_nptype2cformat.append(('int_', '%ld'))
 else:
     map_nptype2cformat.append(('int_', '%d'))  # pragma: windows
 if np.dtype('int_') != np.dtype('longlong'):
@@ -49,7 +52,6 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
                       (['hhd', 'hhi'], 'int8'),
                       (['hd', 'hi'], 'short'),
                       (['d', 'i'], 'intc'),
-                      (['ld', 'li'], 'int_'),
                       (['lld', 'lli', 'l64d'], 'longlong'),
                       (['hhu', 'hho', 'hhx', 'hhX'], 'uint8'),
                       (['hu', 'ho', 'hx', 'hX'], 'ushort'),
@@ -58,8 +60,10 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
                       (['llu', 'llo', 'llx', 'llX', 'l64u'], 'ulonglong'),
                       (['c', 's'], 'S'),
                       ('s', 'S')]
-# if np.dtype('int_') != np.dtype('intc'):
-#     map_cformat2nptype.append((['ld', 'li'], 'int_'))
+if platform._is_win and platform._numpy2:  # pragma: windows:
+    map_cformat2nptype.append((['ld', 'li'], 'intc'))
+else:
+    map_cformat2nptype.append((['ld', 'li'], 'int_'))
 map_cformat2nptype.append(
     (['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
      'complex128'))
@@ -73,6 +77,7 @@ def _expand_keys(x):
     return out
 
 
+map_nptype2cformat_expanded = _expand_keys(map_nptype2cformat)
 map_cformat2nptype_expanded = _expand_keys(map_cformat2nptype)
 map_cformat2pyscanf_expanded = _expand_keys(map_cformat2pyscanf)
 
@@ -87,18 +92,23 @@ def test_extract_formats():
                 == [i.encode("utf-8") for i in f])
 
 
-def test_nptype2cformat():
+@pytest.mark.parametrize('a,b', map_nptype2cformat_expanded)
+def test_nptype2cformat(a, b):
     r"""Test conversion from numpy dtype to C format string."""
-    for a, b in map_nptype2cformat:
-        if isinstance(a, str):
-            a = [a]
-        for ia in a:
-            assert serialize.nptype2cformat(ia) == b
+    assert serialize.nptype2cformat(a) == b
+
+
+def test_nptype2cformat_errors():
+    r"""Test errors raised by nptype2cformat."""
     with pytest.raises(TypeError):
         serialize.nptype2cformat(0)
-    for a in unsupported_nptype:
-        with pytest.raises(ValueError):
-            serialize.nptype2cformat(a)
+
+
+@pytest.mark.parametrize('a', unsupported_nptype)
+def test_nptype2cformat_unsupported(a):
+    r"""Test unsupport numpy types with nptype2cformat."""
+    with pytest.raises(ValueError):
+        serialize.nptype2cformat(a)
 
 
 def test_nptype2cformat_structured():

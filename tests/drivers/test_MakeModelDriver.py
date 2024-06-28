@@ -6,6 +6,14 @@ from yggdrasil.drivers.MakeModelDriver import MakeModelDriver
 
 
 @pytest.mark.absent_language('make')
+def test_MakeModelDriver_no_make(scripts):  # pragma: windows
+    r"""Test MakeModelDriver error when make not installed."""
+    with pytest.raises(RuntimeError):
+        MakeModelDriver('test', scripts['make'])
+
+
+@pytest.mark.language('make')
+@pytest.mark.absent_language('c')
 def test_MakeModelDriver_no_C_library(scripts):  # pragma: windows
     r"""Test MakeModelDriver error when C library not installed."""
     with pytest.raises(RuntimeError):
@@ -28,6 +36,7 @@ def test_MakeModelDriver_error_nofile(scripts):
         MakeModelDriver('test', 'invalid')
 
 
+@pytest.mark.language('c')
 class TestMakeModelDriver(base_class):
     r"""Test runner for MakeModelDriver."""
 
