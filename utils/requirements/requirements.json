@@ -63,9 +63,17 @@
     "deprecation",
     "flask",
     {
-      "git": {
-        "method": "conda"
-      }
+      "git": [
+        {
+          "method": "conda",
+          "os": "unix"
+        },
+        {
+          "name": "m2w64-crt-git",
+          "method": "conda",
+          "os": "win"
+        }
+      ]
     },
     {
       "hatch-fancy-pypi-readme": {
@@ -202,10 +210,17 @@
           }
         },
         {
-          "make": {
-            "method": "conda",
-            "os": "unix"
-          }
+          "make": [
+            {
+              "method": "conda",
+              "os": "unix"
+            },
+            {
+              "name": "m2w64-make",
+              "method": "conda",
+              "os": "win"
+            }
+          ]
         },
         {
           "{{ compiler('c') }}": {
@@ -246,7 +261,10 @@
             {
               "name": "m2w64-gcc-fortran",
               "os": "win",
-              "method": "conda"
+              "method": "conda",
+              "add": [
+                "m2w64-toolchain_win-64"
+              ]
             },
             {
               "name": "gfortran",

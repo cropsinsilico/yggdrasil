@@ -72,7 +72,8 @@ requirements:
     - chevron
     - deprecation
     - flask
-    - git
+    - git  # [not win]
+    - m2w64-crt-git  # [win]
     - matplotlib-base
     - numpy >=1.13.0
     - pandas
@@ -109,6 +110,7 @@ outputs:
         - {{ pin_subpackage('yggdrasil.zmq', exact=True) }}  # [win]
         - cmake  # [not win]
         - compiler-rt  # [osx]
+        - m2w64-make  # [win]
         - make  # [not win]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
@@ -123,6 +125,7 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil.c', exact=True) }}
         - m2w64-gcc-fortran  # [win]
+        - m2w64-toolchain_win-64  # [win]
         - {{ compiler('fortran') }}  # [not win]
   - name: yggdrasil.r
     build:

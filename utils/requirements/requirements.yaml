@@ -1,3 +1,17 @@
+# About use of m2w64 conda packages:
+#   The msmpi recipe currently requires m2w64_fortran explicitly, which
+#   has not been rebuilt since 2021, but the updated msys packages (m2-*)
+#   require m2-conda-epoch 20230914 making msmpi incompatible. The m2w64
+#   versions of git & make are used on windows to prevent conflicts
+#   between the m2w64 and other msys2 libraries installed by the
+#   non-m2w64 versions of these packages. This conflict can appear as
+#   segfaults during compilation if the non-m2w64 msys2 libraries precede
+#   the m2w64 on the PATH.
+#
+#   Once (if) msmpi is updated to use the new msys2 gfortran
+#   distribution, then the m2w64- versions should be replaced with m2-
+#   versions or the non-prefixed versions if the PATH conflicts are
+#   resolved.
 general:
   - python-build:
       flags:
@@ -37,7 +51,11 @@ general:
   - deprecation
   - flask
   - git:
-      method: conda
+      - method: conda
+        os: unix
+      - name: m2w64-crt-git
+        method: conda
+        os: win
   - hatch-fancy-pypi-readme:
       host: True
       flags:
@@ -116,8 +134,11 @@ extras:
         method: conda
         os: unix
     - make:
-        method: conda
-        os: unix
+        - method: conda
+          os: unix
+        - name: m2w64-make
+          method: conda
+          os: win
     - "{{ compiler('c') }}":
         method: conda_recipe
     - "{{ compiler('cxx') }}":
@@ -153,7 +174,7 @@ extras:
         - name: m2w64-gcc-fortran
           os: win
           method: conda
-          # add: [m2w64-toolchain_win-64]
+          add: [m2w64-toolchain_win-64]
         - name: gfortran
           method: apt
         - name: gfortran
