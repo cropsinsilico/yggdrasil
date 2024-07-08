@@ -472,6 +472,7 @@ class RMQService(ServiceBase):
 
     def _init_rmq(self, *args, **kwargs):
         from yggdrasil.communication.RMQComm import pika, get_rmq_parameters
+        self.info("_init_rmq begin")
         self.pika = pika
         if not self.address:
             kwargs['port'] = self.port
@@ -483,6 +484,7 @@ class RMQService(ServiceBase):
         parameters = pika.URLParameters(self.address)
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
+        self.info("_init_rmq end")
 
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests.
@@ -495,6 +497,7 @@ class RMQService(ServiceBase):
 
         """
         self._init_rmq(*args, **kwargs)
+        self.info("setup_server begin")
         if self.exchange:  # pragma: debug
             # self.channel.exchange_declare(exchange=self.exchange,
             #                               auto_delete=True)
@@ -507,6 +510,7 @@ class RMQService(ServiceBase):
             on_message_callback=self._on_request)
         cb = functools.partial(self.shutdown, in_callback=True)
         self.channel.add_on_cancel_callback(cb)
+        self.info("setup_server end")
     
     def setup_client(self, *args, **kwargs):
         r"""Set up the machinery for sending requests.
@@ -519,23 +523,29 @@ class RMQService(ServiceBase):
 
         """
         self._init_rmq(*args, **kwargs)
+        self.info("setup_client begin")
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue
         self.consumer_tag = self.channel.basic_consume(
             queue=self.callback_queue,
             on_message_callback=self._on_response,
             auto_ack=True)
+        self.info("setup_client end")
 
     def run_server(self):
         r"""Listen for requests."""
+        self.info("run_server begin")
         try:
             self.channel.start_consuming()
         except self.pika.exceptions.ChannelWrongStateError:  # pragma: debug
             pass
+        self.info("run_server end")
 
     def shutdown(self, in_callback=False):
         r"""Shutdown the process from the server."""
+        self.info("shutdown begin")
         if not self.channel:  # pragma: debug
+            self.info("shutdown end - no channel")
             return
         if self.for_request:
             queue = self.callback_queue
@@ -545,14 +555,17 @@ class RMQService(ServiceBase):
         if not in_callback:
             self.channel.basic_cancel(consumer_tag=self.consumer_tag)
             if not self.for_request:
+                self.info("shutdown end - not for_request")
                 return
         self.channel.queue_delete(queue=queue)
         self.channel.close()
         self.channel = None
         self.connection.close()
         self.connection = None
+        self.info("shutdown end")
 
     def _on_request(self, ch, method, props, body):
+        self.info("_on_request begin")
         response = self.process_request(body)
         ch.basic_publish(exchange=self.exchange,
                          routing_key=props.reply_to,
@@ -560,17 +573,20 @@ class RMQService(ServiceBase):
                              correlation_id=props.correlation_id),
                          body=response)
         ch.basic_ack(delivery_tag=method.delivery_tag)
+        self.info("_on_request end")
 
     def _on_response(self, ch, method, props, body):
+        self.info("_on_response begin")
         if self.corr_id == props.correlation_id:
             self.response.set(body)
+        self.info("_on_response end")
 
     @property
     def is_running(self):
         r"""bool: True if the server is running."""
         return (super(RMQService, self).is_running and bool(self.channel))
 
-    def call(self, request, timeout=10.0, **kwargs):
+    def call(self, request, timeout=60.0, **kwargs):
         r"""Send a request.
 
         Args:
@@ -583,6 +599,7 @@ class RMQService(ServiceBase):
             str: Serialized response.
 
         """
+        self.info("call begin")
         self.response = ValueEvent()
         self.corr_id = str(uuid.uuid4())
         try:
@@ -607,7 +624,9 @@ class RMQService(ServiceBase):
             wait_on_function(
                 process_events, timeout=timeout, polling_interval=0.5,
                 on_timeout=client_error)
-        return self.response.get()
+        out = self.response.get()
+        self.info("call end")
+        return out
 
 
 def create_service_manager_class(service_type=None):

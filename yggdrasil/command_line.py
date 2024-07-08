@@ -1310,6 +1310,11 @@ class cc_flags(cc_toolname):
         (('--toolname', ),
          {'default': None,
           'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--gnu-style-flags', ),
+         {'action': 'store_true',
+          'help': ('Convert flags to use dashes (-) instead of '
+                   'forward slashes (/) (used only with MSVC '
+                   'compilation tools.')}),
     ] + DependencySpecialization.command_line_options
 
     @classmethod
@@ -1332,6 +1337,11 @@ class ld_flags(cc_toolname):
         (('--toolname', ),
          {'default': None,
           'help': 'Name of the tool that associated flags be returned for.'}),
+        (('--gnu-style-flags', ),
+         {'action': 'store_true',
+          'help': ('Convert flags to use dashes (-) instead of '
+                   'forward slashes (/) (used only with MSVC '
+                   'compilation tools.')}),
     ] + DependencySpecialization.command_line_options
 
     @classmethod

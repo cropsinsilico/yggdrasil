@@ -1161,9 +1161,13 @@ class WaitableFunction(object):
         loop = TaskLoop(target=task_target,
                         polling_interval=self.polling_interval)
         loop.start()
+        if timeout is None:
+            timeout = 60.0 * 5.0  # 5 minutes
         loop.join(timeout)
         if loop.is_alive():
             loop.kill()
+            logger.info(f"{self.logname}: Task taking longer than "
+                        f"{timeout} s")
             if on_timeout is True:
                 return self.function()
             elif (on_timeout is False):
