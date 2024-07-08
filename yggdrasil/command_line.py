@@ -701,8 +701,8 @@ class ygginfo(SubCommand):
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
                     if ((args.gnu_style_flags
-                         or (dep.tool(args.tool).toolname
-                             not in ['LINK', 'LINK++']))):
+                         and (dep.tool(args.tool).toolname
+                              not in ['LINK', 'LINK++']))):
                         out = out.replace('/', '-')
                     out = out.replace('\\', '/')
             elif args.fullpath:
