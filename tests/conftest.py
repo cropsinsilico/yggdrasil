@@ -1143,16 +1143,22 @@ def running_service(pytestconfig, check_service_manager_settings,
         logger.info(f"Started service manager via {args} ({process_kws})")
         try:
             cli.wait_for_server()
+            logger.info("Service manager started")
             yield cli
+            logger.info("Stopping service manager")
             cli.stop_server()
             assert not cli.is_running
+            logger.info("Stopped service manager")
             p.wait(10)
         finally:
             if p.returncode is None:  # pragma: debug
+                logger.error("Terminating service manager that is still "
+                             "running after stop_server")
                 p.terminate()
             if with_coverage:
                 if os.path.isfile(script_path):
                     os.remove(script_path)
+        logger.info("Exiting service manager fixture")
     return running_service_w
 
 

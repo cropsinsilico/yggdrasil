@@ -808,7 +808,8 @@ class FileComm(CommBase.CommBase):
     def serialize(self, obj, **kwargs):
         r"""Serialize a message using the associated serializer."""
         with self._closing_thread.lock:
-            if (not self.concats_as_str) and self.is_open and (self.file_tell() != 0):
+            if (((not self.is_eof(obj)) and (not self.concats_as_str)
+                 and self.is_open and (self.file_tell() != 0))):
                 new_obj = obj
                 with open(self.current_address, 'rb') as fd:
                     old_obj = self.deserialize(fd.read())[0]

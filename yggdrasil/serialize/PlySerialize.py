@@ -371,7 +371,12 @@ class PlySerialize(SerializeBase):
         if len(objects) == 0:
             return []
         total = type(objects[0])(objects[0])
-        out = total.merge(objects[1:], no_copy=True)
+        try:
+            out = total.merge(objects[1:], no_copy=True)
+        except TypeError:  # pragma: debug
+            print(f"type(total) = {type(total)}\n"
+                  f"type(objects) = {[type(x) for x in objects]}")
+            raise
         return [out]
         
     @classmethod

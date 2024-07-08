@@ -651,6 +651,11 @@ class ygginfo(SubCommand):
                 (('--fullpath', ),
                  {'action': 'store_true',
                   'help': 'Get the full path to the tool exectuable.'}),
+                (('--gnu-style-flags', ),
+                 {'action': 'store_true',
+                  'help': ('Convert flags to use dashes (-) instead of '
+                           'forward slashes (/) (used only with MSVC '
+                           'compilation tools.')}),
             ] + DependencySpecialization.command_line_options,
             parsers=[
                 ArgumentParser(
@@ -695,7 +700,9 @@ class ygginfo(SubCommand):
                     dry_run=args.dry_run)
                 out = ' '.join(flags)
                 if platform._is_win:  # pragma: windows:
-                    if dep.tool(args.tool).toolset != 'msvc':
+                    if ((args.gnu_style_flags
+                         or (dep.tool(args.tool).toolname
+                             not in ['LINK', 'LINK++']))):
                         out = out.replace('/', '-')
                     out = out.replace('\\', '/')
             elif args.fullpath:

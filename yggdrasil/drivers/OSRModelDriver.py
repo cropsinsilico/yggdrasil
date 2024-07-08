@@ -167,6 +167,7 @@ class OSRModelDriver(ExecutableModelDriver):
             if maxjobs > 1:
                 flags += [f'-j{maxjobs}']
             env = copy.deepcopy(os.environ)
+            flag_options = ''
             if platform._is_win:  # pragma: windows
                 env['YGG_OSR_TOOL'] = toolname
                 if toolname == 'cl++':
@@ -179,13 +180,14 @@ class OSRModelDriver(ExecutableModelDriver):
                     logger.info(f"OSR compiler: {cl_path}\n"
                                 f"OSR linker:   {link_path}")
                     if cl_path:
-                        paths_to_add = os.pathsep.join(list(set([
+                        paths_to_add = list(set([
                             os.path.dirname(cl_path),
-                            os.path.dirname(link_path)])))
+                            os.path.dirname(link_path)]))
                         env['YGG_OSR_CXX'] = os.path.basename(cl_path)
                         env['YGG_OSR_LINK'] = os.path.basename(link_path)
                         tools.update_path_env("PATH", paths_to_add,
                                               env=env, add_to_front=True)
+                        flag_options += '--gnu-style-flags '
                         for k in ['YGG_OSR_CXX', 'YGG_OSR_LINK',
                                   'CL', '_CL_']:
                             v = env.get(k, None)
@@ -207,7 +209,7 @@ class OSRModelDriver(ExecutableModelDriver):
                 cwd = os.path.join(cwd, 'StaticBuild')
             if target == 'cleanygg':
                 kwargs['dry_run'] = True
-            flag_options = DependencySpecialization.as_command_flags(kwargs)
+            flag_options += DependencySpecialization.as_command_flags(kwargs)
             if flag_options:
                 env['YGG_OSR_FLAG_OPTIONS'] = flag_options.strip()
             if target != 'cleanygg':
