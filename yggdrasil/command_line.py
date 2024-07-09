@@ -699,10 +699,13 @@ class ygginfo(SubCommand):
                     skip_no_additional_stages_flag=True,
                     dry_run=args.dry_run)
                 out = ' '.join(flags)
-                if platform._is_win:  # pragma: windows:
-                    if ((args.gnu_style_flags
-                         and (dep.tool(args.tool).toolname
-                              not in ['LINK', 'LINK++']))):
+                if ((platform._is_win
+                     and (dep.tool(args.tool).toolname
+                          not in ['LINK', 'LINK++']))):  # pragma: windows
+                    # if ((args.gnu_style_flags
+                    #      and (dep.tool(args.tool).toolname
+                    #           not in ['LINK', 'LINK++']))):
+                    if args.gnu_style_flags:
                         out = out.replace('/', '-')
                     out = out.replace('\\', '/')
             elif args.fullpath:
