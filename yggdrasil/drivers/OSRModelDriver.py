@@ -184,7 +184,8 @@ class OSRModelDriver(ExecutableModelDriver):
                             os.path.dirname(cl_path),
                             os.path.dirname(link_path)]))
                         env['YGG_OSR_CXX'] = os.path.basename(cl_path)
-                        env['YGG_OSR_LINK'] = os.path.basename(link_path)
+                        # env['YGG_OSR_LINK'] = os.path.basename(link_path)
+                        env['YGG_OSR_LINK'] = link_path
                         tools.update_path_env("PATH", paths_to_add,
                                               env=env, add_to_front=True)
                         flag_options += '--gnu-style-flags '
