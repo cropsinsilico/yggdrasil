@@ -5328,7 +5328,8 @@ class CompilationToolBase(object):
         return products.last
 
     @staticmethod
-    def extract_tool_version(cls, x, require_match=False, default=''):
+    def extract_tool_version(cls, x, require_match=False, default='',
+                             cmd=None, **kwargs):
         r"""Extract the tool's version from the provided string.
 
         Args:
@@ -5337,6 +5338,12 @@ class CompilationToolBase(object):
                 version_regex is required.
             default (str, optional): String that should be returned if
                 there is no match and require_match is True.
+            cmd (list, optional): Command used to generate the version
+                string. If not provided, the default is assumed. This is
+                only used for log messages.
+            **kwargs: Additional keyword arguments will be passed to
+                get_executable_command if cmd is not provided and a log
+                message needs to be emitted.
 
         Returns:
             str: Extracted version string.
@@ -5354,9 +5361,13 @@ class CompilationToolBase(object):
                     return match.group('version')
             if require_match:
                 return default
+            if cmd is None:
+                cmd = cls.get_executable_command(cls.version_flags,
+                                                 skip_flags=True,
+                                                 **kwargs)
             warnings.warn(
                 f"Could not locate version in string: {x} with "
-                f"regex {cls.version_regex}")
+                f"regex {cls.version_regex} (cmd = {cmd})")
         if x and require_match:
             # raise Exception(f"{cls}: {cls.tooltype.title()} "
             #                 f"{cls.toolname} does not have a "
@@ -5388,15 +5399,16 @@ class CompilationToolBase(object):
             executable = (
                 cls.default_executable
                 if cls.default_executable else cls.toolname)
+        cmd = [executable] + cls.version_flags
         try:
             out = subprocess.check_output(
-                [executable] + cls.version_flags,
-                stderr=subprocess.STDOUT).decode('utf-8').strip()
+                cmd, stderr=subprocess.STDOUT).decode('utf-8').strip()
         except (subprocess.CalledProcessError, OSError):
             out = ''
         if skip_regex:
             return out
-        return CompilationToolBase.extract_tool_version(cls, out, **kwargs)
+        return CompilationToolBase.extract_tool_version(cls, out, **kwargs,
+                                                        cmd=cmd)
 
     @classmethod
     def tool_version(cls, skip_regex=False, require_match=False,
@@ -5421,7 +5433,9 @@ class CompilationToolBase(object):
         if skip_regex:
             return out
         return CompilationToolBase.extract_tool_version(
-            cls, out, require_match=require_match, default=default)
+            cls, out, require_match=require_match, default=default,
+            executable=kwargs.get('executable', None),
+            cfg=kwargs.get('cfg', None))
 
     @classmethod
     def run_executable_command(cls, args, skip_flags=False,

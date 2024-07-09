@@ -164,7 +164,9 @@ class MakeModelDriver(BuildModelDriver):
         if platform._is_win and for_env:
             if is_gnu:
                 out = out.replace('\\', re.escape('/'))
-                assert ' ' not in out
             if ' ' in out:
                 out = f'"{out}"'
+                if is_gnu:
+                    out.replace(' ', r'\\ ')
+                    # assert ' ' not in out
         return out
