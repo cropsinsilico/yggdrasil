@@ -167,6 +167,6 @@ class MakeModelDriver(BuildModelDriver):
             if ' ' in out:
                 out = f'"{out}"'
                 if is_gnu:
-                    out.replace(' ', r'\\ ')
+                    out = out.replace(' ', r'\\ ')
                     # assert ' ' not in out
         return out
