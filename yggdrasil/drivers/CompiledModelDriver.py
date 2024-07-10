@@ -3448,6 +3448,8 @@ class CompilationDependency(object):
                 kwargs.setdefault(k, [])
                 kwargs[k] = kwargs[k] + v
             elif v is not None:
+                if k in tool.flag_options.keys() and isinstance(v, str):
+                    v = tool.fix_path(v, context='flag')
                 kwargs[k] = v
         suffix = self.suffix
         if suffix:
@@ -3838,19 +3840,22 @@ class CompilationDependency(object):
             tool = self.tool(k)
             tool.set_env(existing=out)
             if self.parameters.get('flags_in_env', False):
+                fixer = tool
+                if self.parameters.get('build_driver', False):
+                    fixer = self.parameters['build_driver'].get_tool(
+                        'basetool')
                 kenv = self.parameters.get(
                     f'env_{k}', tool.default_executable_env)
-                out[kenv] = tool.get_executable(full_path=True,
-                                                cfg=self.cfg)
-                if self.parameters.get('build_driver', False):
-                    out[kenv] = self.parameters['build_driver'].fix_path(
-                        out[kenv], for_env=True)
+                out[kenv] = fixer.fix_path(
+                    tool.get_executable(full_path=True, cfg=self.cfg),
+                    context='env', tool=tool)
                 kenv = self.parameters.get(
                     f'env_{k}_flags', tool.default_flags_env)
-                out[kenv] = ' '.join(
-                    self.get(f'{k}_flags', dry_run=True,
-                             no_additional_stages=True,
-                             skip_no_additional_stages_flag=True))
+                out[kenv] = fixer.fix_flags(
+                    ' '.join(self.get(f'{k}_flags', dry_run=True,
+                                      no_additional_stages=True,
+                                      skip_no_additional_stages_flag=True)),
+                    context='env', tool=tool)
                 for k in tool.additional_flags_env:
                     out[k] = ''
         return out
@@ -4494,6 +4499,88 @@ class CompilationToolBase(object):
             logger.info(f"Setting is_mingw to {cls._is_mingw}: "
                         f"ver = {ver}")
         return cls._is_mingw
+
+    @classmethod
+    def fix_flags(cls, flags, context='flag', tool=None, for_gnu=None):
+        r"""Update a string containing flags so that it can be used in
+        the given context.
+
+        Args:
+            flags (str): String containing flags.
+            context (str, optional): Context that the flags should be
+                formated for.
+            tool (CompilationToolBase, optional): Tool that was used to
+                generate the flags. Defaults to None and this tool is
+                assumed.
+            for_gnu (bool, optional): If True, the path is formatted
+                so that it can be used by a GNU tool.
+
+        """
+        if tool is None:
+            tool = cls
+        if for_gnu is None:
+            for_gnu = cls.is_gnu
+        out = flags
+        if tool.toolset == 'msvc' and for_gnu:
+            out = out.replace('/', '-')
+        if context == 'cmd':
+            out = cls.fix_path(out, context=context, tool=tool,
+                               for_gnu=for_gnu, actions=['forwardslash'])
+        return out
+
+    @classmethod
+    def fix_path(cls, path, context='flag', tool=None,
+                 for_gnu=None, actions=None):
+        r"""Update a path so it can be used in the given context. This
+        function handles the presence of backslashes or spaces in the
+        path.
+
+        Args:
+            path (str): Path that should be formatted.
+            context (str, optional): Context that path should be
+                format for.
+            tool (CompilationToolBase, optional): Tool that was used to
+                generate the flags. Defaults to None and this tool is
+                assumed.
+            for_gnu (bool, optional): If True, the path is formatted
+                so that it can be used by a GNU tool.
+            actions (list, optional): Set of actions that should be
+                taken to modify the path. If not provided, context and
+                for_gnu will be used to determine which should be
+                performed:
+                  forwardslash - Change backslashes in path to forward
+                  escapespace  - Spaces will be escaped with backslash
+                  doublequote  - Double quotes will be added
+                  singlequote  - Single quotes will be added
+
+        Returns:
+            str: Updated path.
+
+        """
+        if tool is None:
+            tool = cls
+        if for_gnu is None:
+            for_gnu = cls.is_gnu
+        out = path
+        if actions is None:
+            actions = []
+            if ' ' in out:
+                actions += ['doublequote']
+            if for_gnu:
+                actions += ['forwardslash']
+                if ' ' in out:
+                    actions += ['escapespace']
+        if 'forwardslash' in actions:
+            out = out.replace('\\', re.escape('/'))
+        if 'doublequote' in actions:
+            out = f'"{out}"'
+        elif 'singlequote' in actions:
+            out = f"'{out}'"
+        if 'escapespace' in actions:
+            out = out.replace(' ', r'\\ ')
+        # TODO: Add extra backslashes in contexts where string will be
+        #   expanded before it is used
+        return out
     
     @classmethod
     def get_language_ext(cls, languages=None):

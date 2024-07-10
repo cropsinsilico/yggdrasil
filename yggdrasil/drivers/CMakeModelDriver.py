@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import logging
 import sysconfig
@@ -283,25 +282,26 @@ class CMakeConfigure(ConfigurerBase):
             new_args, **kwargs)
     
     @classmethod
-    def fix_path(cls, path, is_gnu=False):
-        r"""Update a path.
+    def fix_path(cls, path, **kwargs):
+        r"""Update a path so it can be used in the given context. This
+        function handles the presence of backslashes or spaces in the
+        path.
 
         Args:
             path (str): Path that should be formatted.
-            is_gnu (bool, optional): If True, the tool is a GNU tool.
+            **kwargs: Additional keyword arguments are passed to the
+                 parent class.
 
         Returns:
             str: Updated path.
 
         """
-        if platform._is_win:  # pragma: windows
-            # if ' ' in path:
-            #     path = "%s" % path
-            if is_gnu:
-                path = path.replace('\\', re.escape('/'))
-            else:
-                path = path.replace('\\', re.escape('\\'))
-        return path
+        kwargs.setdefault('for_gnu', True)  # cmake uses forward slashes
+        if kwargs.get('context', None) == 'cmakelist':
+            # Force lists to be quoted
+            kwargs.setdefault(
+                'actions', ['doublequote', 'forwardslash', 'escapespace'])
+        return super(CMakeConfigure, cls).fix_path(path, **kwargs)
 
 
 class CMakeBuilder(BuilderBase):
@@ -481,28 +481,6 @@ class CMakeModelDriver(BuildModelDriver):
             buildfile)  # pragma: debug
 
     @classmethod
-    def fix_path(cls, path, for_env=False, **kwargs):
-        r"""Update a path.
-
-        Args:
-            path (str): Path that should be formatted.
-            for_env (bool, optional): If True, the path is formatted for
-                use in an environment variable. Defaults to False.
-            **kwargs: Additional keyword arguments are passed to the
-                parent class's method.
-
-        Returns:
-            str: Updated path.
-
-        """
-        out = super(CMakeModelDriver, cls).fix_path(path,
-                                                    for_env=for_env,
-                                                    **kwargs)
-        if platform._is_win and for_env:
-            out = ''
-        return out
-
-    @classmethod
     def create_imports(cls, dep, imp, products=None, overwrite=False,
                        verbose=False, **kwargs):
         r"""Modify the build file to import the provided library.
@@ -521,6 +499,9 @@ class CMakeModelDriver(BuildModelDriver):
             **kwargs: Additional keyword arguments are ignored.
 
         """
+        # TODO: temp
+        if platform._is_win:
+            verbose = True
         logger.debug(f"CREATE_IMPORTS {dep} {imp}")
         buildfile = dep['buildfile']
         if not os.path.isabs(buildfile):
@@ -574,6 +555,9 @@ class CMakeModelDriver(BuildModelDriver):
                 dep.tool_kwargs.
 
         """
+        # TODO: temp
+        if platform._is_win:
+            verbose = True
         logger.debug(f"CREATE_EXPORTS {dep}")
         suffix = dep.suffix + dep.suffix_tools(dep['libtype'])
         target = f"{dep.name}::{dep.name}{suffix}"
@@ -588,7 +572,8 @@ class CMakeModelDriver(BuildModelDriver):
             f"add_library({target} {dep['libtype'].upper()} IMPORTED)"
         ]
         properties = OrderedDict([
-            ('IMPORTED_LOCATION', dep.result),
+            ('IMPORTED_LOCATION',
+             CMakeConfigure.fix_path(dep.result, context='cmakevar')),
         ])
         kw2prop = OrderedDict([
             ('include_dirs', 'INTERFACE_INCLUDE_DIRECTORIES'),
@@ -597,10 +582,11 @@ class CMakeModelDriver(BuildModelDriver):
         ])
         for k, v in kw2prop.items():
             if dep_kws.get(k, None):
-                properties[v] = ';'.join(dep_kws[k])
+                properties[v] = CMakeConfigure.fix_path(
+                    ';'.join(dep_kws[k]), context='cmakelist')
         if properties:
             lines += [f"set_target_properties({target} PROPERTIES"]
-            lines += [f"  {k} \"{v}\"" for k, v in properties.items()]
+            lines += [f"  {k} {v}" for k, v in properties.items()]
             lines += [")"]
         if products is None:
             products = tools.IntegrationPathSet(overwrite=overwrite)
@@ -609,7 +595,7 @@ class CMakeModelDriver(BuildModelDriver):
         else:
             products.append_generated(fname, lines, verbose=verbose)
         products.last.setup()
-        return (target, fname)
+        return (target, CMakeConfigure.fix_path(fname, context='cmakevar'))
 
     @classmethod
     def create_dep(cls, without_wrapper=False, **kwargs):

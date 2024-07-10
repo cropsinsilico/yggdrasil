@@ -693,22 +693,19 @@ class ygginfo(SubCommand):
                     else:
                         kws['libtype'] = 'executable'
                 dep = drv.create_dep(**kws)
+                tool = dep.tool(args.tool)
                 flags = dep.tool_flags(
                     args.tool,
                     no_additional_stages=True,
                     skip_no_additional_stages_flag=True,
                     dry_run=args.dry_run)
                 out = ' '.join(flags)
-                # if ((platform._is_win
-                #      and (dep.tool(args.tool).toolname
-                #           not in ['LINK', 'LINK++']))):  # pragma: windows
-                #     # if ((args.gnu_style_flags
-                #     #      and (dep.tool(args.tool).toolname
-                #     #           not in ['LINK', 'LINK++']))):
-                if platform._is_win:  # pragma: windows
-                    if args.gnu_style_flags:
-                        out = out.replace('/', '-')
-                    out = out.replace('\\', '/')
+                out = tool.fix_flags(out, context='cmd', tool=tool,
+                                     for_gnu=args.gnu_style_flags)
+                # if platform._is_win:  # pragma: windows
+                #     if args.gnu_style_flags:
+                #         out = out.replace('/', '-')
+                #     out = out.replace('\\', '/')
             elif args.fullpath:
                 out = drv.get_tool(args.tool).get_executable(full_path=True)
             else:

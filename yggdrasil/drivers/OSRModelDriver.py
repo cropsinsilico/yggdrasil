@@ -10,7 +10,7 @@ import warnings
 import xml.etree.ElementTree as ET
 from yggdrasil import tools, platform
 from yggdrasil.components import import_component
-from yggdrasil.drivers.MakeModelDriver import MakeBuilder, MakeModelDriver
+from yggdrasil.drivers.MakeModelDriver import MakeBuilder
 from yggdrasil.drivers.ExecutableModelDriver import ExecutableModelDriver
 from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
 from yggdrasil.drivers.CompiledModelDriver import DependencySpecialization
@@ -196,8 +196,8 @@ class OSRModelDriver(ExecutableModelDriver):
                             if v is not None:
                                 if v in ['CL', '_CL_']:  # pragma: appveyor
                                     v = v.replace('/', '-')
-                                env[k] = MakeModelDriver.fix_path(
-                                    v, for_env=True, is_gnu=True)
+                                env[k] = MakeBuilder.fix_path(
+                                    v, context='env', for_gnu=True)
                                 logger.info(f"OSR env {k} = {env[k]}")
                     else:  # pragma: debug
                         env.pop('YGG_OSR_TOOL')

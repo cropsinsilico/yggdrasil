@@ -526,19 +526,3 @@ class BuildModelDriver(CompiledModelDriver):
              and os.path.isfile(self.model_file))):
             self.build_model(target='clean')
         super(BuildModelDriver, self).cleanup_model()
-
-    @classmethod
-    def fix_path(cls, path, for_env=False, is_gnu=False):
-        r"""Update a path.
-
-        Args:
-            path (str): Path that should be formatted.
-            for_env (bool, optional): If True, the path is formatted for
-                use in an environment variable. Defaults to False.
-            is_gnu (bool, optional): If True, the tool is a GNU tool.
-
-        Returns:
-            str: Updated path.
-
-        """
-        return path
