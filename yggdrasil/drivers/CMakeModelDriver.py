@@ -269,7 +269,8 @@ class CMakeConfigure(ConfigurerBase):
         if (args == cls.version_flags) or ('--help' in args):
             new_args = args
         if args and not kwargs.get('skip_flags', False):
-            args_dir = os.path.dirname(args[0])
+            args_dir = cls.fix_path(os.path.dirname(args[0]),
+                                    context='flag')
             sourcedir = kwargs.get('sourcedir', args_dir)
             if sourcedir != args_dir:  # pragma: debug
                 raise RuntimeError(
