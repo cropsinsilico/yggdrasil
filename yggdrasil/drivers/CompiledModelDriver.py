@@ -6728,6 +6728,7 @@ class CompiledModelDriver(ModelDriver):
         super(CompiledModelDriver, self).init_model()
         # Compile
         if not self.skip_compile:
+            self.debug(f"Building {self.model_file}")
             self.build_model(products=self.products)
             self.debug(f"Built {self.model_file}")
         

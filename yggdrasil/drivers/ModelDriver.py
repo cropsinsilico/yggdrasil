@@ -883,14 +883,17 @@ class ModelDriver(Driver):
         # Parse arguments
         self.debug(str(args))
         self.parse_arguments(args)
+        self.debug("Finished self.parse_arguments")
         assert self.model_file is not None
         # Add wrappers
         self.write_wrappers()
         # Initialize the model, creating files with inter-process locks
         #   if necessary
         self.locked_file = None
+        self.debug("Before mpi_init")
         with self.mpi_init():
             self.init_model()
+        self.debug("Finished init")
 
     def init_model(self):
         r"""Initialize the model executable."""
@@ -1073,8 +1076,11 @@ class ModelDriver(Driver):
         if self._mpi_rank > 0:
             self.send_mpi(self.file_locks.message,
                           tag=self._mpi_tags['FILELOCKS'])
+        self.debug("Before init lock")
         with self.file_locks.locked_condition('init', self):
+            self.debug("Acquired init lock")
             yield
+            self.debug("Releasing init lock")
 
     @contextlib.contextmanager
     def mpi_cleanup(self):
