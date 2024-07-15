@@ -1068,7 +1068,7 @@ class ModelDriver(Driver):
     def mpi_init(self):
         r"""Context that initializes the MPI state of the model and locks
         files for the 'init' condition."""
-        self.debug("Begin mpi_init")
+        self.debug(f"Begin mpi_init: {self.locked_file}")
         if self.locked_file is None:
             self.locked_file = self.products.root
         self.debug(f"Before create_file_lock: {self.locked_file}")
