@@ -546,7 +546,9 @@ jobs:
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --ci --cov-append --nocapture --ygg-debug tests/drivers/test_CMakeModelDriver.py
+      run: pytest --import-mode=importlib --config-file=pyproject.toml --cov-config=.coveragerc
+        --cov-append --capture=no --log-level=INFO --verbose --ygg-debug --ignore=yggdrasil/rapidjson/
+        tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -963,7 +965,9 @@ jobs:
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --ci --cov-append --nocapture --ygg-debug tests/drivers/test_CMakeModelDriver.py
+      run: pytest --import-mode=importlib --config-file=pyproject.toml --cov-config=.coveragerc
+        --cov-append --capture=no --log-level=INFO --verbose --ygg-debug --ignore=yggdrasil/rapidjson/
+        tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -1356,7 +1360,9 @@ jobs:
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --ci --cov-append --nocapture --ygg-debug tests/drivers/test_CMakeModelDriver.py
+      run: pytest --import-mode=importlib --config-file=pyproject.toml --cov-config=.coveragerc
+        --cov-append --capture=no --log-level=INFO --verbose --ygg-debug --ignore=yggdrasil/rapidjson/
+        tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -1730,7 +1736,9 @@ jobs:
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --ci --cov-append --nocapture --ygg-debug tests/drivers/test_CMakeModelDriver.py
+      run: pytest --import-mode=importlib --config-file=pyproject.toml --cov-config=.coveragerc
+        --cov-append --capture=no --log-level=INFO --verbose --ygg-debug --ignore=yggdrasil/rapidjson/
+        tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
@@ -2103,7 +2111,9 @@ jobs:
     - if: runner.os == 'Windows' && matrix.install-method != 'conda' && matrix.install-method
         != 'mamba'
       name: Run cmake test in command prompt (PIP)
-      run: pytest --ci --cov-append --nocapture --ygg-debug tests/drivers/test_CMakeModelDriver.py
+      run: pytest --import-mode=importlib --config-file=pyproject.toml --cov-config=.coveragerc
+        --cov-append --capture=no --log-level=INFO --verbose --ygg-debug --ignore=yggdrasil/rapidjson/
+        tests/drivers/test_CMakeModelDriver.py
       shell: cmd /C CALL {0}
       timeout-minutes: 180
     - continue-on-error: true
