@@ -1070,9 +1070,11 @@ class ModelDriver(Driver):
         files for the 'init' condition."""
         if self.locked_file is None:
             self.locked_file = self.products.root
+        self.debug(f"Before create_file_lock: {self.locked_file}")
         if self.locked_file:
             self.create_file_lock(self.locked_file,
                                   conditions=('init', 'cleanup'))
+        self.debug(f"Before send_mpi filelocks ({self._mpi_rank})")
         if self._mpi_rank > 0:
             self.send_mpi(self.file_locks.message,
                           tag=self._mpi_tags['FILELOCKS'])
