@@ -2381,7 +2381,6 @@ class IntegrationPathSet(CacheDirMixin):
     def root(self):
         r"""str: Root directory containing all products in the set."""
         out = None
-        logger.info(f"Looking for root:\n{pprint.pformat(self.products)}")
         for k in self.products:
             if platform._is_win and '/' in k:
                 k = k.replace('/', os.path.sep)

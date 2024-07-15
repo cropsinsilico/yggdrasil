@@ -302,6 +302,9 @@ class CMakeConfigure(ConfigurerBase):
             # Force lists to be quoted
             kwargs.setdefault(
                 'actions', ['doublequote', 'forwardslash', 'escapespace'])
+        elif kwargs.get('context', None) == 'flag':
+            kwargs.setdefault(
+                'actions', ['doublequote', 'forwardslash'])
         return super(CMakeConfigure, cls).fix_path(path, **kwargs)
 
 
