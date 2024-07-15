@@ -2383,12 +2383,14 @@ class IntegrationPathSet(CacheDirMixin):
         out = None
         logger.info(f"Looking for root:\n{pprint.pformat(self.products)}")
         for k in self.products:
+            if platform._is_win and '/' in k:
+                k = k.replace('/', os.path.sep)
             if not (k and os.path.isabs(k)):
                 continue
             if out is None:
                 out = k
                 continue
-            while not k.startswith(out):
+            while out and not k.startswith(out):
                 out = os.path.dirname(out)
         return out
 
