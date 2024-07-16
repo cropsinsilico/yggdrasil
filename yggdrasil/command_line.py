@@ -699,9 +699,9 @@ class ygginfo(SubCommand):
                     no_additional_stages=True,
                     skip_no_additional_stages_flag=True,
                     dry_run=args.dry_run)
-                out = ' '.join(flags)
-                out = tool.fix_flags(out, context='cmd', tool=tool,
-                                     for_gnu=args.gnu_style_flags)
+                out = ' '.join(
+                    tool.fix_flags(flags, context='cmd', tool=tool,
+                                   for_gnu=args.gnu_style_flags))
                 # if platform._is_win:  # pragma: windows
                 #     if args.gnu_style_flags:
                 #         out = out.replace('/', '-')

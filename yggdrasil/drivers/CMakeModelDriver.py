@@ -283,6 +283,24 @@ class CMakeConfigure(ConfigurerBase):
             new_args, **kwargs)
     
     @classmethod
+    def fix_flags(cls, flags, **kwargs):
+        r"""Update a string containing flags so that it can be used in
+        the given context.
+
+        Args:
+            flags (str): String containing flags.
+            **kwargs: Additional keyword arguments are passed to the
+                 parent class.
+
+        """
+        if ((isinstance(flags, str) and ' ' in flags
+             and kwargs.get('context', None) == 'flag')):
+            if '"' in flags:
+                flags = flags.replace('"', '\\"')
+            flags = f'"{flags}"'
+        return super(CMakeConfigure, cls).fix_flags(flags, **kwargs)
+        
+    @classmethod
     def fix_path(cls, path, **kwargs):
         r"""Update a path so it can be used in the given context. This
         function handles the presence of backslashes or spaces in the

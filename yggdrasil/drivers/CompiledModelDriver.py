@@ -3498,7 +3498,7 @@ class CompilationDependency(object):
                 **self.specialization.remainder(kwargs))
         kwargs = self.tool_kwargs(tooltype, **kwargs)
         tool = self.tool(tooltype)
-        out = tool.get_flags(**kwargs)
+        out = tool.fix_flags(tool.get_flags(**kwargs), context='flag')
         next_tool = self.next_tool(tool, self['libtype'])
         if ((next_tool
              and not (no_additional_stages
@@ -3851,11 +3851,12 @@ class CompilationDependency(object):
                     context='env', tool=tool)
                 kenv = self.parameters.get(
                     f'env_{k}_flags', tool.default_flags_env)
-                out[kenv] = fixer.fix_flags(
-                    ' '.join(self.get(f'{k}_flags', dry_run=True,
-                                      no_additional_stages=True,
-                                      skip_no_additional_stages_flag=True)),
-                    context='env', tool=tool)
+                out[kenv] = ' '.join(
+                    fixer.fix_flags(
+                        self.get(f'{k}_flags', dry_run=True,
+                                 no_additional_stages=True,
+                                 skip_no_additional_stages_flag=True),
+                        context='env', tool=tool))
                 for k in tool.additional_flags_env:
                     out[k] = ''
         return out
@@ -4520,6 +4521,10 @@ class CompilationToolBase(object):
             tool = cls
         if for_gnu is None:
             for_gnu = cls.is_gnu
+        if isinstance(flags, list):
+            return [cls.fix_flags(x, context=context, tool=tool,
+                                  for_gnu=for_gnu)
+                    for x in flags]
         out = flags
         if tool.toolset == 'msvc' and for_gnu:
             out = out.replace('/', '-')
