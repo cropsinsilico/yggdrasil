@@ -303,8 +303,10 @@ class CMakeConfigure(ConfigurerBase):
             kwargs.setdefault(
                 'actions', ['doublequote', 'forwardslash', 'escapespace'])
         elif kwargs.get('context', None) == 'flag':
-            kwargs.setdefault(
-                'actions', ['doublequote', 'forwardslash'])
+            default_actions = ['forwardslash']
+            if ' ' in path:
+                default_actions.append('doublequote')
+            kwargs.setdefault('actions', default_actions)
         return super(CMakeConfigure, cls).fix_path(path, **kwargs)
 
 
