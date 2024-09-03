@@ -1899,7 +1899,7 @@ jobs:
     - build_sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: sdist
         path: dist
@@ -1916,7 +1916,7 @@ jobs:
     - build_wheels
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: artifact
         path: dist
