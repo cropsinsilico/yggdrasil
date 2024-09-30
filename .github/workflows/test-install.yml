@@ -199,7 +199,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: std
+        python-version: ${{ env.PYTHONVERSION_STD }}
     - name: Install dependencies
       run: python utils/setup_test_env.py install pip
     - name: Verify installation

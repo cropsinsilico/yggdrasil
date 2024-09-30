@@ -293,7 +293,7 @@ class CMakeConfigure(ConfigurerBase):
                  parent class.
 
         """
-        if ((isinstance(flags, str) and ' ' in flags
+        if ((isinstance(flags, str)  # and ' ' in flags
              and kwargs.get('context', None) == 'flag')):
             if '"' in flags:
                 flags = flags.replace('"', '\\"')
