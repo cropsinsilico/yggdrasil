@@ -298,6 +298,7 @@ class CMakeConfigure(ConfigurerBase):
             if '"' in flags:
                 flags = flags.replace('"', '\\"')
             flags = f'"{flags}"'
+        print(f"CMakeConfigure FIX_FLAGS: {type(flags)}, {flags}")
         return super(CMakeConfigure, cls).fix_flags(flags, **kwargs)
         
     @classmethod
