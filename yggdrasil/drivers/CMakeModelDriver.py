@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import logging
 import sysconfig
@@ -456,9 +457,9 @@ class CMakeModelDriver(BuildModelDriver):
 
         """
         if self.target is None:
-            self.builddir_base = 'build'
+            self.builddir_base = 'yggbuild'
         else:
-            self.builddir_base = f'build_{self.target}'
+            self.builddir_base = f'yggbuild_{self.target}'
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
 
     @classmethod
@@ -506,8 +507,27 @@ class CMakeModelDriver(BuildModelDriver):
             buildfile)  # pragma: debug
 
     @classmethod
-    def create_imports(cls, dep, imp, products=None, overwrite=False,
-                       verbose=False, **kwargs):
+    def create_imports(cls, dep, imp, **kwargs):
+        r"""Modify the build file to import the provided library.
+
+        Args:
+            dep (CompilationDependency): Dependency to add imports to in
+                its build file.
+            imp (object): Information about the library that should be
+                imported as output by create_exports.
+            **kwargs: Additional keyword arguments are passed to the
+                appropriate create_imports_* method.
+
+        """
+        target = dep.get('target', None)
+        if target is None:
+            return cls.create_imports_replace(dep, imp, **kwargs)
+        return cls.create_imports_replace(dep, imp, **kwargs)
+        # return cls.create_imports_preserve(dep, imp, **kwargs)
+        
+    @classmethod
+    def create_imports_replace(cls, dep, imp, products=None,
+                               overwrite=False, verbose=False, **kwargs):
         r"""Modify the build file to import the provided library.
 
         Args:
@@ -527,27 +547,39 @@ class CMakeModelDriver(BuildModelDriver):
         # TODO: temp
         if platform._is_win:
             verbose = True
-        logger.debug(f"CREATE_IMPORTS {dep} {imp}")
+        logger.debug(f"CREATE_IMPORTS_REPLACE {dep} {imp}")
         buildfile = dep['buildfile']
         if not os.path.isabs(buildfile):
             buildfile = dep._relative_to_directory(
                 buildfile, directory=dep.get('working_dir', None))
-        logger.info(f"CREATE_IMPORTS {dep}: {buildfile}\n"
-                    f"source_dir: {dep.get('source_dir', None)}")
+        logger.debug(f"CREATE_IMPORTS {dep}: {buildfile}\n"
+                     f"source_dir: {dep.get('source_dir', None)}")
         target = dep.get('target', '${PROJECT_NAME}')
         if products is None:
             products = tools.IntegrationPathSet(overwrite=overwrite)
         products.append_generated(buildfile, [], replaces=True,
                                   tag='build_time', verbose=verbose)
+        regex_link_scope = (
+            r'target_link_libraries\(\s*' + target
+            + r'(?P<scope>\s+(?:PRIVATE)|(?:PUBLIC))?'
+            + r'(?:\s+[^\) \t]+)+\s*\)'
+        )
+        regex_link_scope_match = None
         build_product = products.last
         orig_buildfile = build_product.name
         if os.path.isfile(build_product.replaces):
             orig_buildfile = build_product.replaces
+        link_scope = ''
         if os.path.isfile(orig_buildfile):
             with open(orig_buildfile, 'r') as fd:
-                contents = fd.read().splitlines()
-            if contents[0].startswith(_invalid_buildfile_comment):
+                contents = fd.read()
+                regex_link_scope_match = re.search(
+                    regex_link_scope, contents)
+            if contents.startswith(_invalid_buildfile_comment):
                 return
+            if ((regex_link_scope_match
+                 and regex_link_scope_match.group('scope'))):
+                link_scope = 'PRIVATE '
             prefix_lines = [
                 # Prevent error when cross compiling by building static
                 #   lib as test
@@ -555,9 +587,84 @@ class CMakeModelDriver(BuildModelDriver):
             ]
             suffix_lines = [
                 f'include({imp[1]})',
-                f'target_link_libraries({target} PRIVATE {imp[0]})',
+                f'target_link_libraries({target} {link_scope}{imp[0]})',
             ]
-            build_product.lines = prefix_lines + contents + suffix_lines
+            build_product.lines = (
+                prefix_lines + contents.splitlines() + suffix_lines)
+
+    @classmethod
+    def create_imports_preserve(cls, dep, imp, products=None,
+                                overwrite=False, verbose=False, **kwargs):
+        r"""Modify the build file to import the provided library.
+
+        Args:
+            dep (CompilationDependency): Dependency to add imports to in
+                its build file.
+            imp (object): Information about the library that should be
+                imported as output by create_exports.
+            products (tools.IntegrationPathSet, optional): Existing set
+                that additional products should be appended to.
+            overwrite (bool, optional): If True, any existing exports
+                file with the same name will be overwritten.
+            verbose (bool, optional): If True, info level log messages
+                will be created when the file is generated/destroyed.
+            **kwargs: Additional keyword arguments are ignored.
+
+        """
+        # TODO: temp
+        verbose = True
+        # if platform._is_win:
+        #     verbose = True
+        logger.debug(f"CREATE_IMPORTS_PRESERVE {dep} {imp}")
+        target = dep['target']
+        buildfile = dep.get('buildfile_wrapped', None)
+        if buildfile is None:
+            buildfile = dep['buildfile']
+            sourcedir = dep.get('source_dir', os.path.dirname(buildfile))
+            if not sourcedir:
+                sourcedir = dep.get('working_dir', os.getcwd())
+            dep.set('source_dir_wrapped', sourcedir)
+            dep.set('buildfile_wrapped', buildfile)
+            dep.set('source_dir', os.path.join(sourcedir, 'yggsource'))
+            dep.set('buildfile', os.path.join(
+                dep['source_dir'], cls.buildfile_base))
+        sourcedir = dep['source_dir']
+        wrapper = dep['buildfile']
+        if not os.path.isabs(buildfile):
+            buildfile = dep._relative_to_directory(
+                buildfile, directory=dep.get('working_dir', None))
+        # buildfile_wrap = os.path.join(dep.builddir)
+        logger.info(f"CREATE_IMPORTS {dep}: {buildfile}\n"
+                    f"wrapper: {wrapper}\n"
+                    f"source_dir: {dep.get('source_dir', None)}")
+        result = CMakeConfigure.fix_path(dep.result, context='cmakevar')
+        if products is None:
+            products = tools.IntegrationPathSet(overwrite=overwrite)
+        products.append_generated(wrapper, [],
+                                  tag='build_time', verbose=verbose,
+                                  create_parent_dir=True)
+        build_product = products.last
+        build_product.lines = [
+            'cmake_minimum_required(VERSION 3.25)',
+            # Prevent error when cross compiling by building static
+            #   lib as test
+            'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")',
+            f'set(TARGET_NAME {target})'
+            f'include({imp[1]})',
+            f'link_libraries({imp[0]})',
+            f'add_subdirectory({os.path.dirname(dep.buildfile)} wrapped)',
+            f'set(TARGET_FILENAME {result})',
+            'add_custom_command(',
+            '      OUTPUT ${TARGET_FILENAME}',
+            '      COMMAND ${CMAKE_COMMAND} -E copy',
+            '      $<TARGET_FILE:${TARGET_NAME}> ${TARGET_FILENAME}',
+            '      DEPENDS ${TARGET_NAME}',
+            '    )',
+            'add_custom_target(',
+            '      copy_files ALL',
+            '      DEPENDS ${TARGET_FILENAME}',
+            '    )',
+        ]
 
     @classmethod
     def create_exports(cls, dep, products=None, overwrite=False,

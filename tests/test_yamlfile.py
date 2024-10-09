@@ -703,7 +703,8 @@ class TestYamlModelSubmission(YamlTestBase):
         r"""Remove the git repository."""
         yield
         import git
-        git.rmtree("cropsinsilico")
+        if os.path.isdir("cropsinsilico"):
+            git.rmtree("cropsinsilico")
 
 
 class TestYamlServerNoClient(YamlTestBaseError):

@@ -1,3 +1,4 @@
+import numpy as np
 from yggdrasil import serialize, tools, constants, datatypes
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
@@ -96,6 +97,14 @@ class AsciiTableSerialize(DefaultSerialize):
             if new_typedef:
                 kwargs['datatype'] = new_typedef
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
+        if ((kwargs.get('from_message', False) is not False
+             and self.initialized
+             and not self.field_names
+             and isinstance(kwargs['from_message'], np.ndarray)
+             and kwargs['from_message'].dtype.names
+             and self.datatype['type'] == 'array'
+             and isinstance(self.datatype['items'], dict))):
+            self.field_names = list(kwargs['from_message'].dtype.names)
         self.update_format_str()
         self.update_field_names()
         self.update_field_units()
@@ -110,8 +119,12 @@ class AsciiTableSerialize(DefaultSerialize):
             if isinstance(self.datatype['items'], dict):  # pragma: debug
                 idtype = datatypes.definition2dtype(self.datatype['items'])
                 ifmt = serialize.nptype2cformat(idtype, asbytes=True)
-                # fmts = [ifmt for x in msg]
-                raise Exception("Variable number of items not yet supported.")
+                if self.field_names:
+                    fmts = [ifmt for x in self.field_names]
+                else:
+                    raise Exception(f"Variable number of items not yet "
+                                    f"supported (ifmt={ifmt}, "
+                                    f"idtype={idtype}).")
             elif isinstance(self.datatype['items'], list):
                 for x in self.datatype['items']:
                     idtype = datatypes.definition2dtype(x)

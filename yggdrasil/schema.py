@@ -1520,7 +1520,7 @@ class SchemaRegistry(object):
                 'model': ['client_of', 'is_server', 'preserve_cache',
                           'products', 'source_products', 'working_dir',
                           'overwrite', 'skip_interpreter', 'copies',
-                          'timesync', 'with_strace', 'with_valgrind',
+                          'with_strace', 'with_valgrind',
                           'valgrind_flags', 'with_debugger', 'copies',
                           'logging_level', 'additional_variables',
                           'aggregation', 'interpolation', 'synonyms',

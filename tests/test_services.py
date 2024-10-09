@@ -251,15 +251,17 @@ def test_validate_model_repo():
     import tempfile
     dest = os.path.join(tempfile.gettempdir(), "model_repo")
     url = "https://github.com/cropsinsilico/yggdrasil_models"
+    dest_exists = os.path.isdir(dest)
     for x in [url, url + "_test"]:
         try:
-            repo = git.Repo.clone_from(x, dest)
+            repo = None
+            if not dest_exists:
+                repo = git.Repo.clone_from(x, dest)
             model_dir = os.path.join(dest, "models")
-            if os.path.isdir(model_dir):
-                # This condition can be removed once there are models
-                # in the non-dev repository
-                validate_model_submission(model_dir)
-            repo.close()
+            validate_model_submission(model_dir)
+            if not dest_exists:
+                repo.close()
         finally:
-            if os.path.isdir(dest):
-                git.rmtree(dest)
+            if not dest_exists:
+                if os.path.isdir(dest):
+                    git.rmtree(dest)

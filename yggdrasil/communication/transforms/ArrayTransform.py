@@ -5,7 +5,8 @@ from yggdrasil import constants
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.datatypes import type2numpy
 from yggdrasil.serialize import (
-    consolidate_array, pandas2numpy, numpy2pandas, dict2list)
+    consolidate_array, pandas2numpy, numpy2pandas, dict2list,
+    object2names)
 
 
 class ArrayTransform(TransformBase):
@@ -63,9 +64,11 @@ class ArrayTransform(TransformBase):
             s = x.get('shape', None)
             t = 'ndarray'
         elif x['type'] == '1darray':
-            s = x.get('length', None)
-            if s is not None:
-                s = (s,)
+            s = x.get('shape', None)
+            if s is None:
+                s = x.get('length', None)
+                if s is not None:
+                    s = (s,)
             t = '1darray'
         elif ((x['type'] == 'scalar')
               or (x['type'] in constants.VALID_TYPES)):
@@ -217,10 +220,13 @@ class ArrayTransform(TransformBase):
                                    order=self.field_names)
         elif datatype['type'] == 'object':
             order = self.field_names
-            if order is None:
-                order = list(datatype['properties'].keys())
-            self.check_array_items([datatype['properties'][k]
-                                    for k in order])
+            if 'properties' in datatype:
+                if order is None:
+                    order = list(datatype['properties'].keys())
+                self.check_array_items([datatype['properties'][k]
+                                        for k in order])
+            if 'additionalProperties' in datatype:
+                self.check_array_items(datatype['additionalProperties'])
         else:
             raise AssertionError("Invalid datatypes: %s" % datatype)
 
@@ -241,8 +247,18 @@ class ArrayTransform(TransformBase):
             list: Transformed array column type definitions.
 
         """
+        no_length = False
         if isinstance(items, dict):
-            items = [items]
+            if order is None:
+                if 'title' in items:
+                    items = [items]
+                elif items['type'] in ['1darray', 'ndarray']:
+                    return copy.deepcopy(items)
+                else:
+                    no_length = True
+                    items = [items]
+            else:
+                items = [copy.deepcopy(items) for _ in range(len(order))]
         assert isinstance(items, (list, tuple))
         if items[0]['type'] == 'array':
             base_types = items[0]['items']
@@ -258,6 +274,8 @@ class ArrayTransform(TransformBase):
             return items
         base_summary = [cls.get_summary(x, subtype=True)
                         for x in base_types]
+        length = len(items)
+        # Transpose so that the inside arrays contain structured types
         if not all([(base_summary == [cls.get_summary(t, subtype=True)
                                       for t in x['items']])
                     for x in items[1:]]):
@@ -265,9 +283,26 @@ class ArrayTransform(TransformBase):
                                 for j in range(len(items))]}
                      for i in range(len(items[0]['items']))]
             base_types = items[0]['items']
-        out = [dict(x, type='1darray',
-                    subtype=x.get('subtype', x['type']))
+            length = len(items)
+        shape = cls.get_summary(base_types[0])['shape']
+        new_shape = [length] + list(shape)
+        while new_shape and new_shape[-1] == 1:
+            new_shape.pop()
+        out_kws = {}
+        if len(new_shape) > 1:
+            out_kws['type'] = 'ndarray'
+        else:
+            out_kws['type'] = '1darray'
+        out = [dict(x, subtype=x.get('subtype', x['type']), **out_kws)
                for x in base_types]
+        if new_shape and not no_length:
+            for x in out:
+                x.pop('length', None)
+                x.pop('shape', None)
+                if len(new_shape) == 1:
+                    x['length'] = new_shape[0]
+                else:
+                    x['shape'] = tuple(new_shape)
         for i, x in enumerate(out):
             if x['subtype'] in constants.FLEXIBLE_TYPES:
                 x['precision'] = max(
@@ -276,33 +311,51 @@ class ArrayTransform(TransformBase):
                     x.pop('precision')
         return out
         
-    def transform_datatype(self, datatype):
+    def transform_datatype(self, datatype, order=None):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 
         Args:
             datatype (dict): Datatype to transform.
+            order (list, optional): Order of field names that should be
+                used in the transformed datatype. If not provided, the
+                field_names property is used.
 
         Returns:
             dict: Transformed datatype.
 
         """
+        if order is None:
+            order = self.field_names
+        elif self.field_names is not None:
+            assert len(order) == len(self.field_names)
         out = copy.deepcopy(datatype)
         if datatype['type'] == 'array':
             out['items'] = self.transform_array_items(
-                out['items'], order=self.field_names)
+                out['items'], order=order)
         elif datatype['type'] == 'object':
-            order = self.field_names
-            if order is None:
-                order = list(out['properties'].keys())
             out['type'] = 'array'
-            out['items'] = self.transform_array_items(
-                [dict(out['properties'][k], title=k)
-                 for k in order])
+            if 'properties' in out:
+                if order is None:
+                    order = list(out['properties'].keys())
+                if 'additionalProperties' in out:
+                    for k in order:
+                        if k not in out['properties']:
+                            out['properties'][k] = dict(
+                                out['additionalProperties'])
+                out['items'] = self.transform_array_items(
+                    [dict(out['properties'][k], title=k)
+                     for k in order])
+            elif 'additionalProperties' in out:
+                assert order is not None
+                out['items'] = self.transform_array_items(
+                    [dict(out['additionalProperties'], title=k)
+                     for k in order])
             out.pop('properties', None)
-        if self.field_names is not None:
-            assert len(self.field_names) == len(out['items'])
-            for x, n in zip(out['items'], self.field_names):
+            out.pop('additionalProperties', None)
+        if order is not None:
+            assert len(order) == len(out['items'])
+            for x, n in zip(out['items'], order):
                 x['title'] = n
         return out
     
@@ -320,7 +373,13 @@ class ArrayTransform(TransformBase):
 
         """
         out = x
-        np_dtype = type2numpy(self.transformed_datatype)
+        out_type = self.transformed_datatype
+        if isinstance(out_type['items'], dict):
+            assert not self.field_names
+            names = object2names(x)
+            if names:
+                out_type = self.transform_datatype(out_type, order=names)
+        np_dtype = type2numpy(out_type, array=x)
         if isinstance(x, pandas.DataFrame):
             out = pandas2numpy(x)
             if np_dtype:
@@ -337,8 +396,8 @@ class ArrayTransform(TransformBase):
                 out = consolidate_array(x, dtype=np_dtype)
         else:
             # warning?
-            raise TypeError(("Cannot consolidate object of type %s "
-                             "into a structured numpy array.") % type(x))
+            raise TypeError(f"Cannot consolidate object of type "
+                            f"{type(x)} into a structured numpy array.")
         if not no_copy:
             out = copy.deepcopy(out)
         return out
@@ -353,7 +412,17 @@ class ArrayTransform(TransformBase):
                 keywords.
         
         """
+
+        def _remove_len(src, **kws):
+            out = copy.deepcopy(src)
+            for x in out['items']:
+                x.pop('length', None)
+                x.pop('shape', None)
+                x.update(**kws)
+            return out
+            
         length = 5
+        shape = (length, 3)
         dtype = np.dtype([('f%d' % i, f) for i, f in enumerate(
             ['S5', 'i8', 'f8', 'c16'])])
         dtype_alt = np.dtype([('alt%d' % i, f) for i, f in enumerate(
@@ -368,6 +437,19 @@ class ArrayTransform(TransformBase):
                   'precision': 8, 'length': length},
                  {'type': '1darray', 'subtype': 'complex',
                   'precision': 16, 'length': length}]}
+        t_nolen = _remove_len(t)
+        tnd = {'type': 'array',
+               'items': [
+                   {'type': 'ndarray', 'subtype': 'bytes',
+                    'precision': 5, 'shape': shape},
+                   {'type': 'ndarray', 'subtype': 'int',
+                    'precision': 8, 'shape': shape},
+                   {'type': 'ndarray', 'subtype': 'float',
+                    'precision': 8, 'shape': shape},
+                   {'type': 'ndarray', 'subtype': 'complex',
+                    'precision': 16, 'shape': shape}]}
+        tnd_len = _remove_len(tnd, length=shape[-1])
+        # tnd_nolen = _remove_len(tnd)
         t_prec = {
             'type': 'array',
             'items': [
@@ -379,31 +461,39 @@ class ArrayTransform(TransformBase):
                  'precision': 8, 'length': length},
                 {'type': '1darray', 'subtype': 'complex',
                  'precision': 16, 'length': length}]}
+        t_prec_nolen = _remove_len(t_prec)
         t_arr = {'type': 'array',
                  'items': [{'type': 'array',
                             'items': [dict(i, type='scalar') for
-                                      i in t['items']]}
+                                      i in t_nolen['items']]}
                            for _ in range(length)]}
+        tnd_arr = {'type': 'array',
+                   'items': [{'type': 'array',
+                              'items': [dict(i, type='1darray') for
+                                        i in tnd_len['items']]}
+                             for _ in range(length)]}
+        assert len(t_arr['items']) == length
         t_arr_err = copy.deepcopy(t_arr)
         t_arr_err['items'][0]['items'][0]['type'] = 'null'
         t_obj = {'type': 'array',
-                 'items': [{'type': 'object',
-                            'properties': {
-                                dtype_alt.names[i]: dict(t['items'][i],
-                                                         type='scalar')
-                                for i in range(len(t['items']))}}
-                           for _ in range(length)]}
+                 'items': [
+                     {'type': 'object',
+                      'properties': {
+                          dtype_alt.names[i]: dict(t_nolen['items'][i],
+                                                   type='scalar')
+                          for i in range(len(t_nolen['items']))}}
+                     for _ in range(length)]}
         t_arr_T = {
             'type': 'array',
             'items': [{'type': 'array',
-                       'items': [dict(t['items'][i], type='scalar')
+                       'items': [dict(t_nolen['items'][i], type='scalar')
                                  for _ in range(length)]}
-                      for i in range(len(t['items']))]}
+                      for i in range(len(t_nolen['items']))]}
         t_arr_prec = {
             'type': 'array',
             'items': [{'type': 'array',
                        'items': [dict(i, type='scalar') for
-                                 i in t_prec['items']]}
+                                 i in t_prec_nolen['items']]}
                       for _ in range(length)]}
         t_alt = {'type': 'array',
                  'items': [dict(x, title=dtype_alt.names[i])
@@ -411,8 +501,10 @@ class ArrayTransform(TransformBase):
         x = np.zeros(length, dtype=dtype)
         x[dtype.names[0]][0] = b'hello'
         y = [x[n] for n in dtype.names]
+        xnd = np.zeros(shape, dtype=dtype)
+        ynd = [xnd[n] for n in dtype.names]
         x2 = np.zeros((length, length), dtype=dtype)
-        # y2 = [x2[n] for n in dtype2.names]
+        y2 = [x2[n] for n in dtype.names]
         return [{'kwargs': {'original_datatype': t},
                  'in/out': [(y, x),
                             ([], np.zeros(0, dtype=dtype))],
@@ -427,8 +519,10 @@ class ArrayTransform(TransformBase):
                                           for i, v in enumerate(t['items'])]},
                                AssertionError),
                               (t_arr_err, AssertionError)]},
-                {'in/out': [(x, x)]},
-                {'in/out': [(x2, x2)]},
+                {'in/out': [(x, x), (y, x)]},
+                {'in/out': [(x2, x2), (y2, x2)]},
+                {'in/out': [(xnd, xnd), (ynd, xnd)],
+                 'in/out_t': [(tnd_arr, tnd)]},
                 {'kwargs': {'field_names': dtype_alt.names},
                  'in/out': [(x, x.astype(dtype_alt, copy=True))],
                  'in/out_t': [(t, t_alt)]},
@@ -439,7 +533,7 @@ class ArrayTransform(TransformBase):
                  'in/out': [(x.tolist(), x)],
                  'in/out_t': [(t_arr, t),
                               ({'type': 'array',
-                                'items': t_arr['items'][0]}, t)]},
+                                'items': t_arr['items'][0]}, t_nolen)]},
                 {'in/out': [({n: x[n] for n in dtype.names}, x)],
                  'in/out_t': [({'type': 'object',
                                 'properties': {n: i for n, i in

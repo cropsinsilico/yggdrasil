@@ -1154,14 +1154,14 @@ class IntegrationServiceRegistry(object):
             directory = os.path.expanduser(
                 os.path.join('~', '.yggdrasil_services'))
         yaml_dir = clone_github_repo(model_repository,
-                                     local_directory=directory)
+                                     directory_for_clones=directory)
         yaml_files = (glob.glob(os.path.join(yaml_dir, '*.yaml'))
                       + glob.glob(os.path.join(yaml_dir, '*.yml')))
         for x in yaml_files:
             # Calling prep_yaml allows the model repositories to be cloned
-            # in advance to circumvent th hold place on git cloning on the
-            # service manager (these models are assumed to be vetted so
-            # they do not pose a security risk).
+            # in advance to circumvent the hold place on git cloning on
+            # the service manager (these models are assumed to be vetted
+            # so they do not pose a security risk).
             prep_yaml(x, directory_for_clones=directory)
             self.add(os.path.splitext(os.path.basename(x))[0], x)
         return directory
@@ -1212,6 +1212,7 @@ def validate_model_submission(fname):
 
     """
     from yggdrasil import yamlfile, runner
+    from yggdrasil.tools import is_lang_installed
     if isinstance(fname, list):
         for x in fname:
             validate_model_submission(x)
@@ -1232,6 +1233,8 @@ def validate_model_submission(fname):
              or glob.glob(os.path.join(repo_dir, x.lower())))):
             break
     else:
-        raise RuntimeError("Model repository does not contain a LICENSE file.")
+        raise RuntimeError(f"Model repository ({repo_dir}) does not "
+                           f"contain a LICENSE file.")
     # 4. Run & validate
-    runner.run(fname, validate=True)
+    if is_lang_installed(yml['models'][0]['driver']):
+        runner.run(fname, validate=True)

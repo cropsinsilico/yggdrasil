@@ -1091,7 +1091,7 @@ def dict2list(d, order=None):
     if not isinstance(d, dict):
         raise TypeError("d must be a dictionary, not %s." % type(d))
     if order is None:
-        order = sorted(list(d.keys()))
+        order = object2names(d)
     out = [d[k] for k in order]
     return out
 
@@ -1329,6 +1329,39 @@ def list2pandas(arrays, names=None):
     if names is None:
         out.columns = pandas.RangeIndex(len(arrays))
     return out
+
+
+def object2names(x):
+    r"""Get the field order based on the provided object. Names for
+    pandas DataFrame and numpy NDArray objects are based on the names of
+    fields, if present, and the number of columns if not. If a dict object
+    is provided, the sorted keys will be used. If a list of objects is
+    provided that do not have implicit names (e.g. array with named
+    fields), they are set based on order (e.g. 'f0', 'f1').
+
+    Args:
+        arrays (list): List of arrays.
+        no_default (bool, optional): If True, fields will not be set from
+            order if they cannot be determined from the passed arrays. None
+            will be returned instead.
+
+    Returns:
+        list: Field names.
+
+    """
+    if isinstance(x, pandas.DataFrame):
+        return [str(xx) for xx in x.columns]
+    elif isinstance(x, np.ndarray):
+        if x.dtype.names:
+            return list(x.dtype.names)
+        # TODO: From columns?
+        return ['f0']
+    elif isinstance(x, dict):
+        return sorted(list(x.keys()))
+    elif isinstance(x, (list, tuple)):
+        return list2names(x)
+    raise NotImplementedError(f'Cannot determine names for {type(x)} '
+                              f'instance: {x}')
 
 
 # def pandas2list(frame):

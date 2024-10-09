@@ -118,6 +118,7 @@ class MakeModelDriver(BuildModelDriver):
     builddir_base = '.'
     default_builder = 'nmake' if platform._is_win else 'make'
     default_target = []
+    default_in_source_build = True
 
     @classmethod
     def get_language_for_buildfile(cls, buildfile, target=None):

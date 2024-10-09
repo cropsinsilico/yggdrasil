@@ -81,6 +81,11 @@ def get_OSX_SYSROOT():
 _osx_sysroot = get_OSX_SYSROOT()
 
 
+class CompilationError(Exception):
+    r"""Class for errors related to compilation"""
+    pass
+
+
 class CompilationToolError(Exception):
     r"""Class for errors related to compilation tools"""
     pass

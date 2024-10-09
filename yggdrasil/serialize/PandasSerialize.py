@@ -16,6 +16,10 @@ class PandasSerialize(AsciiTableSerialize):
             serialized from/to tables. Defaults to False.
         str_as_bytes (bool, optional): If True, strings in columns are
             read as bytes. Defaults to False.
+        index_row (int, optional): Row index in the serialized table that
+            contains the column index/names.
+        index_col (int, optional): Column index in the serialized table
+            that contains the row index/names.
 
     """
 
@@ -24,7 +28,9 @@ class PandasSerialize(AsciiTableSerialize):
     _schema_properties = {'no_header': {'type': 'boolean',
                                         'default': False},
                           'str_as_bytes': {'type': 'boolean',
-                                           'default': False}}
+                                           'default': False},
+                          'index_row': {'type': 'integer'},
+                          'index_col': {'type': 'integer'}}
     _schema_excluded_from_inherit = ['as_array']
     default_read_meth = 'read'
     as_array = True
@@ -221,8 +227,12 @@ class PandasSerialize(AsciiTableSerialize):
                    dtype=dtype,
                    encoding='utf8',
                    skipinitialspace=True)
-        if self.no_header:
+        if isinstance(self.index_row, int):
+            kws['header'] = [self.index_row]
+        elif self.no_header:
             kws['header'] = None
+        if isinstance(self.index_col, int):
+            kws['index_col'] = [self.index_col]
         out = pandas.read_csv(fd, **kws)
         out = out.dropna(axis='columns', how='all')
         fd.close()

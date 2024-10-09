@@ -1462,7 +1462,8 @@ class CommBase(tools.YggClass):
                 msg.sinfo[k] = msg.stype.pop(k)
         msg.sinfo['datatype'] = msg.stype
         if not self.serializer.initialized:
-            self.serializer.update_serializer(from_message=True, **msg.sinfo)
+            self.serializer.update_serializer(from_message=msg.args,
+                                              **msg.sinfo)
 
     def apply_transform_to_type(self, typedef):
         r"""Evaluate the transform to alter the type definition.

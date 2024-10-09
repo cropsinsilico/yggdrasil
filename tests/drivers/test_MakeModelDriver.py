@@ -2,6 +2,7 @@ import pytest
 from tests.drivers.test_BuildModelDriver import (
     TestBuildModelDriver as base_class)
 import os
+from yggdrasil.drivers.BuildModelDriver import BuildError
 from yggdrasil.drivers.MakeModelDriver import MakeModelDriver
 
 
@@ -25,14 +26,15 @@ def test_MakeModelDriver_error_notarget(scripts):
     r"""Test MakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['make'])
     with pytest.raises(RuntimeError):
-        MakeModelDriver('test', 'invalid', makedir=makedir)
+        MakeModelDriver('test', 'invalid', makedir=makedir,
+                        working_dir=makedir)
 
 
 @pytest.mark.language('make')
 def test_MakeModelDriver_error_nofile(scripts):
     r"""Test MakeModelDriver error for missing Makefile."""
     makedir, target = os.path.split(scripts['make'])
-    with pytest.raises(RuntimeError):
+    with pytest.raises(BuildError):
         MakeModelDriver('test', 'invalid')
 
 

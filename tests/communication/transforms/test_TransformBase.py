@@ -69,16 +69,24 @@ class TestTransformBase(base_class):
 
     def test_transform_type(self, python_class, testing_options):
         r"""Test transform_type."""
-        for x in testing_options:
+        for itest, x in enumerate(testing_options):
             inst = python_class(**x.get('kwargs', {}))
-            for typ_in, typ_exp in x.get('in/out_t', []):
+            for ityp, (typ_in, typ_exp) in enumerate(x.get('in/out_t', [])):
+                orig = copy.deepcopy(typ_in)
                 if isinstance(typ_exp, type(BaseException)):
                     with pytest.raises(typ_exp):
                         inst.validate_datatype(typ_in)
                 else:
                     inst.validate_datatype(typ_in)
                     typ_out = inst.transform_datatype(typ_in)
+                    if typ_out != typ_exp:
+                        import pprint
+                        print(f"Test {itest}, type {ityp}")
+                        print(f"INPUT:\n{pprint.pformat(typ_in)}")
+                        print(f"ACTUAL:\n{pprint.pformat(typ_out)}")
+                        print(f"EXPECTED:\n{pprint.pformat(typ_exp)}")
                     assert typ_out == typ_exp
+                assert typ_in == orig
 
     def test_transform_empty(self, instance):
         r"""Test transform of empty bytes message."""

@@ -106,7 +106,8 @@ class SetupParam(object):
                      "environment")}),
         (('--build-method', ), ['auto'], {
             'choices': ['conda', 'mamba', 'sdist',
-                        'wheel', 'bdist_wheel', 'direct', None],
+                        'wheel', 'bdist_wheel', 'direct',
+                        'production', None],
             'default': None,
             'help': ("Method that should be used to build "
                      "yggdrasil")}),
@@ -259,7 +260,7 @@ class SetupParam(object):
         else:
             self.conda_exe = CONDA_CMD
             # self.conda_build = f"{CONDA_CMD} build"
-            # self.build_pkgs = ["conda-build", "conda-verify"]
+            # self.build_pkgs = ["conda-build"]
         if self.fallback_to_conda is None:
             self.fallback_to_conda = ((self.method_base == 'conda')
                                       or (_is_win and _on_appveyor)
@@ -1184,7 +1185,7 @@ def build_conda_recipe(recipe='recipe', param=None,
     #     build_flags += ' -c conda-forge'
     # else:
     conda_build = f"{CONDA_CMD} build"
-    build_pkgs = ["conda-build", "conda-verify"]
+    build_pkgs = ["conda-build"]
     # if param.use_mamba:
     #     build_flags += ' --solver=libmamba'
     # Must always build in base to avoid errors (and don't change the
@@ -1251,7 +1252,10 @@ def build_pkg(method, param=None, return_commands=False, **kwargs):
     upgrade_pkgs = ['wheel', 'setuptools', 'scikit-build-core', 'build']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
-    if param.build_method == 'direct':
+    if param.build_method == 'production':
+        # Do nothing, package will be installed from pypi/conda-forge
+        pass
+    elif param.build_method == 'direct':
         # Do nothing, package will be installed from source
         pass
     elif param.build_method in ('mamba', 'conda'):
@@ -1527,19 +1531,25 @@ def install_conda_build(package, param=None, return_commands=False,
     allow_fail_str = ''
     if allow_fail:
         allow_fail_str = " # [ALLOW FAIL]"
-    cmds = [
-        f"{conda_exe_config} config --prepend channels {index_channel}",
-        # Related issues if this stops working again
-        # https://github.com/conda/conda/issues/466#issuecomment-378050252
-        f"{conda_exe} install {install_flags} -c"
-        f" {index_channel} {package}{allow_fail_str}"
-        # Required for non-strict channel priority
-        # https://github.com/conda-forge/conda-forge.github.io/pull/670
-        # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
-        # packages.html?highlight=openblas#installing-numpy-with-blas-variants
-        # f"{conda_exe} install {install_flags} --update-deps -c
-        #   {index_channel} yggdrasil \"blas=*=openblas\""
-    ]
+    if param.build_method == 'production':
+        cmds = [
+            f"{conda_exe} install {install_flags} "
+            f"{package}{allow_fail_str}"
+        ]
+    else:
+        cmds = [
+            f"{conda_exe_config} config --prepend channels {index_channel}",
+            # Related issues if this stops working again
+            # https://github.com/conda/conda/issues/466#issuecomment-378050252
+            f"{conda_exe} install {install_flags} -c"
+            f" {index_channel} {package}{allow_fail_str}"
+            # Required for non-strict channel priority
+            # https://github.com/conda-forge/conda-forge.github.io/pull/670
+            # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
+            # packages.html?highlight=openblas#installing-numpy-with-blas-variants
+            # f"{conda_exe} install {install_flags} --update-deps -c
+            #   {index_channel} yggdrasil \"blas=*=openblas\""
+        ]
     if return_commands:
         return cmds
     call_script(cmds, verbose=param.verbose, dry_run=param.dry_run)
@@ -1684,32 +1694,39 @@ def install_pkg(method, param=None, without_build=False,
     if param.for_development or param.build_method == 'direct':
         # Call install in separate process from the package directory
         pass
-    elif param.build_method in ('conda', 'mamba'):
+    elif (param.build_method in ('conda', 'mamba')
+          or (param.build_method == 'production'
+              and param.method == 'conda')):
         ygg_pkgs = ['yggdrasil']
         ygg_pkgs += [f'yggdrasil.{x}' for x in extras]
         cmds += install_conda_build(ygg_pkgs, param=param,
                                     return_commands=True,
                                     allow_fail=('mpi' in extras))
         cmds += summary_cmds
-    elif param.build_method in ('sdist', 'wheel', 'bdist_wheel'):
-        build_ext = None
-        build_dir = 'dist'
-        if param.build_method in ('sdist'):
-            build_ext = '.tar.gz'
-        elif param.build_method in ('bdist_wheel', 'wheel'):
-            build_ext = '.whl'
+    elif (param.build_method in ('sdist', 'wheel', 'bdist_wheel')
+          or (param.build_method == 'production'
+              and param.method == 'pip')):
+        if param.build_method == 'production':
+            build_dist = 'yggdrasil-framework'
         else:
-            raise NotImplementedError(param.build_method)
-        build_dist = os.path.join(build_dir, f"*{build_ext}")
-        if _is_win:  # pragma: windows
-            cmds += [
-                f"for %%a in (\"{build_dist}\")"
-                f" do set YGGSDIST=%%a",
-                "echo %YGGSDIST%"
-            ]
-            build_dist = "%YGGSDIST%"
-        # if extras:
-        #     build_dist += f"[{','.join(extras)}]"
+            build_ext = None
+            build_dir = 'dist'
+            if param.build_method in ('sdist'):
+                build_ext = '.tar.gz'
+            elif param.build_method in ('bdist_wheel', 'wheel'):
+                build_ext = '.whl'
+            else:
+                raise NotImplementedError(param.build_method)
+            build_dist = os.path.join(build_dir, f"*{build_ext}")
+            if _is_win:  # pragma: windows
+                cmds += [
+                    f"for %%a in (\"{build_dist}\")"
+                    f" do set YGGSDIST=%%a",
+                    "echo %YGGSDIST%"
+                ]
+                build_dist = "%YGGSDIST%"
+            # if extras:
+            #     build_dist += f"[{','.join(extras)}]"
         cmds += [
             f"{param.python_cmd} -m pip install"
             f" {param.pip_flags} {build_dist}",

@@ -3,6 +3,7 @@ from tests.drivers.test_BuildModelDriver import (
     TestBuildModelDriver as base_class)
 import os
 from yggdrasil import platform
+from yggdrasil.drivers.BuildModelDriver import BuildError
 from yggdrasil.drivers.CMakeModelDriver import (
     CMakeModelDriver, CMakeConfigure, CMakeBuilder)
 from yggdrasil.drivers.CModelDriver import GCCCompiler
@@ -55,7 +56,7 @@ def test_CMakeModelDriver_error_cmake(scripts):
     builddir = os.path.join(makedir, 'build')
     assert not os.path.isfile(builddir)
     with pytest.raises(RuntimeError):
-        CMakeModelDriver('test', target,
+        CMakeModelDriver('test', target, working_dir=makedir,
                          sourcedir=makedir, configurer_flags='-P',
                          target_language='c',
                          overwrite=True, remove_products=True)
@@ -70,7 +71,7 @@ def test_CMakeModelDriver_error_notarget(scripts):
     builddir = os.path.join(makedir, 'build')
     assert not os.path.isfile(builddir)
     with pytest.raises(RuntimeError):
-        CMakeModelDriver('test', 'invalid',
+        CMakeModelDriver('test', 'invalid', working_dir=makedir,
                          sourcedir=makedir, target_language='c',
                          overwrite=True, remove_products=True)
     assert not os.path.isfile(builddir)
@@ -86,7 +87,7 @@ def test_CMakeModelDriver_error_nofile():
     buildfile = os.path.join(sourcedir, 'CMakeLists.txt')
     assert not os.path.isdir(builddir)
     assert not os.path.isfile(buildfile)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(BuildError):
         CMakeModelDriver('test', 'invalid', target_language='c',
                          buildfile=buildfile,
                          sourcedir=sourcedir,

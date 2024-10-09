@@ -449,6 +449,13 @@ class ModelDriver(Driver):
         repository_commit (str, optional): Commit that should be checked out
             in the model repository specified by repository_url. If not
             provided, the most recent commit on the default branch will be used.
+        repository_dir (str, optional): Directory where the respository
+            should be cloned to (including the repository name). If the
+            directory already exists, it will be assumed to be a git
+            repository and the provided commit will be checked out if
+            provided. If not provided, the respository will be cloned into
+            the model working_dir. If not an absolute path, it will be
+            taken as relative to the model working_dir.
         description (str, optional): Description of the model. This parameter
             is only used in the model repository or when providing the model
             as a service.
@@ -580,6 +587,13 @@ class ModelDriver(Driver):
             directory.
         repository_commit (str): Commit that should be checked out in the
             model repository specified by repository_url.
+        repository_dir (str): Directory where the respository
+            should be cloned to (including the repository name). If the
+            directory already exists, it will be assumed to be a git
+            repository and the provided commit will be checked out if
+            provided. If not provided, the respository will be cloned into
+            the model working_dir. If not an absolute path, it will be
+            taken as relative to the model working_dir.
         description (str): Description of the model. This parameter is only
             used in the model repository or when providing the model as a
             service.
@@ -708,6 +722,7 @@ class ModelDriver(Driver):
         'copies': {'type': 'integer', 'default': 1, 'minimum': 1},
         'repository_url': {'type': 'string'},
         'repository_commit': {'type': 'string'},
+        'repository_dir': {'type': 'string'},
         'description': {'type': 'string'},
         'contact_email': {'type': 'string'},
         'validation_command': {'type': 'string'},
@@ -2032,6 +2047,8 @@ class ModelDriver(Driver):
             env[k.replace(':', '__COLON__')] = env.pop(k)
         if ygg_cfg.get('general', 'allow_multiple_omp', False):
             env['KMP_DUPLICATE_LIB_OK'] = 'True'
+        import pprint
+        pprint.pprint(env)
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -2910,7 +2927,8 @@ class ModelDriver(Driver):
                 elif any(xx.get('datatype', None) for xx in non_length):
                     if (len(non_length) == 1):
                         x['datatype'] = non_length[0]['datatype']
-                        x['datatype']['allowWrapped'] = True
+                        if not is_default_typedef(x['datatype']):
+                            x['datatype']['allowWrapped'] = True
                     else:
                         x['datatype'] = {
                             'type': 'array',
@@ -3422,6 +3440,15 @@ class ModelDriver(Driver):
             transform_type = try_vals[-1]
             if isinstance(transform_type, dict):
                 transform_type = transform_type.get('transformtype', None)
+            while transform_type in ['statement', 'function']:
+                try_vals.pop()
+                if not try_vals:
+                    transform_type = None
+                    break
+                transform_type = try_vals[-1]
+                if isinstance(transform_type, dict):
+                    transform_type = transform_type.get(
+                        'transformtype', None)
             try_key = f"{transform_type}_{key}"
             if ((isinstance(transform_type, str)
                  and 'python_interface' in cls.function_param

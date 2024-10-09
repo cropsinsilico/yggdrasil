@@ -50,7 +50,8 @@ for cls in (BaseConstructor, Constructor, SafeConstructor):
                         no_duplicates_constructor)
 
 
-def clone_github_repo(fname, commit=None, local_directory=None):
+def clone_github_repo(fname, commit=None, repository_dir=None,
+                      directory_for_clones=None, working_dir=None):
     r"""Clone a GitHub repository, returning the path to the local copy of the
     file pointed to by the URL if there is one.
 
@@ -59,9 +60,22 @@ def clone_github_repo(fname, commit=None, local_directory=None):
             repository that should be cloned.
         commit (str, optional): Commit that should be checked out. Defaults
             to None and the HEAD of the default branch is used.
-        local_directory (str, optional): Local directory that the file should
-            be cloned into. Defaults to None and the current working directory
-            will be used.
+        repository_dir (str, optional): Directory where the respository
+            should be cloned to (including the repository name). If the
+            directory already exists, it will be assumed to be a git
+            repository and the provided commit will be checked out if
+            provided. If not an absolute path, repository_dir will be
+            taken as relative to working_dir. If not provided, the
+            respository will be cloned into working_dir. If
+            directory_for_clones is provided, this value will be ignored.
+        directory_for_clones (str, optional): Local directory that the
+            repository should be cloned into, discarding any value
+            for repository_dir. If not provided and the
+            YGGDRASIL_SERVICE_REPO_DIR environment variable is set
+            (such as by a service manager), that value will be used.
+        working_dir (str, optional): Working directory that relative
+            paths should be taken from. Defaults to the current working
+            directory.
 
     Returns:
         str: Path to the local copy of the repository or file in the
@@ -69,10 +83,12 @@ def clone_github_repo(fname, commit=None, local_directory=None):
 
     """
     from yggdrasil.services import _service_host_env, _service_repo_dir
-    if local_directory is None:
-        local_directory = os.environ.get(_service_repo_dir, os.getcwd())
+    if directory_for_clones is None:
+        directory_for_clones = os.environ.get(_service_repo_dir, None)
+    if working_dir is None:
+        working_dir = os.getcwd()
     # make sure we start with a full url
-    if 'http' not in fname:
+    if not fname.startswith('http'):
         url = 'http://github.com/' + fname
     else:
         url = fname
@@ -86,9 +102,20 @@ def clone_github_repo(fname, commit=None, local_directory=None):
     reponame = splitpath[2]
     # the full path is the file name and location
     # turn the file path into an os based format
-    fname = os.path.join(local_directory, *splitpath)
+    if directory_for_clones is not None:
+        repository_dir = os.path.join(directory_for_clones, owner,
+                                      reponame)
+    if repository_dir is None:
+        repository_dir = os.path.join(owner, reponame)
+    if not os.path.isabs(repository_dir):
+        repository_dir = os.path.join(working_dir, repository_dir)
+    fname = os.path.join(repository_dir, *splitpath[3:])
     # check to see if the file already exists, and clone if it does not
-    if not os.path.exists(fname):
+    if os.path.exists(fname):
+        repo = git.Repo(repository_dir)
+        for remote in repo.remotes:
+            remote.fetch()
+    else:
         if os.environ.get(_service_host_env, False):
             raise RuntimeError("Cloning of unvetted git repo is "
                                "not permitted on a integration "
@@ -97,17 +124,16 @@ def clone_github_repo(fname, commit=None, local_directory=None):
         cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
             reponame
         # clone the repo into the appropriate directory
-        repo = git.Repo.clone_from(cloneurl, os.path.join(local_directory,
-                                                          owner, reponame))
-        if commit is not None:
-            repo.git.checkout(commit)
-        repo.close()
-        # now that it is cloned, just pass the yaml file (and path) onwards
+        repo = git.Repo.clone_from(cloneurl, repository_dir)
+    if commit is not None:
+        repo.git.checkout(commit)
+    repo.close()
+    # now that it is cloned, just pass the yaml file (and path) onwards
     return os.path.realpath(fname)
 
 
 def load_yaml(fname, yaml_param=None, directory_for_clones=None,
-              model_submission=False, verbose=False):
+              model_submission=False, verbose=False, included=False):
     r"""Parse a yaml file defining a run.
 
     Args:
@@ -122,14 +148,18 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
-        directory_for_clones (str, optional): Directory that git repositories
-            should be cloned into. Defaults to None and the current working
-            directory will be used.
+        directory_for_clones (str, optional): Local directory that git
+            repositories should be cloned into overriding and values
+            specified in the yaml via repository_dir. If not provided and
+            repository_dir is not set, the working_dir for the yaml will
+            be used.
         model_submission (bool, optional): If True, the YAML will be evaluated
             as a submission to the yggdrasil model repository and model_only
             will be set to True. Defaults to False.
         verbose (bool, optional): If True, steps of the YAML parsing
             process will be printed. Defaults to False.
+        included (bool, optional): If True, the yaml is being included
+            by another. Defaults to False.
 
     Returns:
         dict: Contents of yaml file.
@@ -139,23 +169,26 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
     yamlparsed = None
     if isinstance(fname, dict):
         yamlparsed = copy.deepcopy(fname)
-        yamlparsed.setdefault('working_dir', os.getcwd())
+        # yamlparsed.setdefault('working_dir', os.getcwd())
+        yamldir = fname.get('working_dir', os.getcwd())
     elif isinstance(fname, str):
         # pull foreign file
         if fname.startswith('git:'):
-            fname = clone_github_repo(fname[4:],
-                                      local_directory=directory_for_clones)
+            fname = clone_github_repo(
+                fname[4:], directory_for_clones=directory_for_clones)
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
         fd = open(fname, 'r')
         opened = True
+        yamldir = os.path.dirname(fname)
     else:
         fd = fname
         if (hasattr(fd, 'name') and (not fd.name.startswith('<'))):
             fname = fd.name
         else:
             fname = os.path.join(os.getcwd(), 'stream')
+        yamldir = os.path.dirname(fname)
     # Mustache replace vars
     if not isinstance(yamlparsed, dict):
         if yaml_param is None:
@@ -163,14 +196,20 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
         yamlparsed = fd.read()
         yamlparsed = chevron.render(
             sio.StringIO(yamlparsed).getvalue(),
-            dict(os.environ, **yaml_param))
+            dict(os.environ, YAMLDIR=yamldir, **yaml_param))
         if fname.endswith('.json'):
             yamlparsed = json.loads(yamlparsed)
         else:
             yamlparsed = yaml.safe_load(yamlparsed)
         if not isinstance(yamlparsed, dict):  # pragma: debug
             raise YAMLSpecificationError("Loaded yaml is not a dictionary.")
-        yamlparsed.setdefault('working_dir', os.path.dirname(fname))
+    if not os.path.isabs(yamldir):
+        yamldir = os.path.join(os.getcwd(), yamldir)
+    if (('working_dir' in yamlparsed
+         and not os.path.isabs(yamlparsed['working_dir']))):
+        yamlparsed['working_dir'] = os.path.join(
+            yamldir, yamlparsed['working_dir'])
+    yamlparsed.setdefault('working_dir', yamldir)
     if opened:
         fd.close()
     # Standardize models/model as list so that working directory can be set
@@ -179,12 +218,17 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
     if not isinstance(yamlparsed['models'], list):
         yamlparsed['models'] = [yamlparsed['models']]
     for x in yamlparsed['models']:
-        if isinstance(x, dict) and 'repository_url' in x and 'working_dir' not in x:
-            repo_dir = clone_github_repo(
+        if 'working_dir' in x and not os.path.isabs(x['working_dir']):
+            x['working_dir'] = os.path.join(yamldir, x['working_dir'])
+        if isinstance(x, dict) and 'repository_url' in x:
+            x['repository_dir'] = clone_github_repo(
                 x['repository_url'],
                 commit=x.get('repository_commit', None),
-                local_directory=directory_for_clones)
-            x.setdefault('working_dir', repo_dir)
+                repository_dir=x.get('repository_dir', None),
+                directory_for_clones=directory_for_clones,
+                working_dir=x.get('working_dir', yamldir)
+            )
+            x.setdefault('working_dir', x['repository_dir'])
     s = get_schema()
     # TODO: Add support for turning off defaults?
     if model_submission:
@@ -214,9 +258,11 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
-        directory_for_clones (str, optional): Directory that git repositories
-            should be cloned into. Defaults to None and the current working
-            directory will be used.
+        directory_for_clones (str, optional): Local directory that
+            repositories should be cloned into, discarding any values
+            for repository_dir. If not provided and the
+            YGGDRASIL_SERVICE_REPO_DIR environment variable is set
+            (such as by a service manager), that value will be used.
         model_submission (bool, optional): If True, the YAML will be evaluated
             as a submission to the yggdrasil model repository and model_only
             will be set to True. Defaults to False.
@@ -241,7 +287,7 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
     files = []
     while first or files:
         for f in files:
-            yamls.append(load_yaml(f, yaml_param,
+            yamls.append(load_yaml(f, yaml_param, included=(not first),
                                    directory_for_clones=directory_for_clones))
         first = False
         files = []
@@ -303,9 +349,11 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
-        directory_for_clones (str, optional): Directory that git repositories
-            should be cloned into. Defaults to None and the current working
-            directory will be used.
+        directory_for_clones (str, optional): Local directory that
+            repositories should be cloned into, discarding any values
+            for repository_dir. If not provided and the
+            YGGDRASIL_SERVICE_REPO_DIR environment variable is set
+            (such as by a service manager), that value will be used.
         verbose (bool, optional): If True, steps of the YAML parsing
             process will be printed. Defaults to False.
 
@@ -575,10 +623,10 @@ def parse_component(yml, ctype, existing=None):
         existing = parse_connection(yml, existing)
     # Ensure component dosn't already exist
     if yml['name'] in existing[ctype]:
-        pprint.pprint(existing)
-        pprint.pprint(yml)
-        raise YAMLSpecificationError("%s is already a registered '%s' component." % (
-            yml['name'], ctype))
+        raise YAMLSpecificationError(
+            f"{yml['name']} is already a registered '{ctype}' "
+            f"component:\nexisting:\n{pprint.pformat(existing)}\n"
+            f"yaml:\n{pprint.pformat(yml)}")
     existing[ctype][yml['name']] = yml
     return existing
 
@@ -733,7 +781,8 @@ def parse_connection(yml, existing):
             if (((not os.path.isfile(fname))
                  and (not x.get('wait_for_creation', False)))):  # pragma: debug
                 raise YAMLSpecificationError(
-                    f"Input file does not exist: \"{x['name']}\"")
+                    f"Input file does not exist: \"{x['name']}\" "
+                    f"(full path = {fname})")
             x['address'] = fname
         elif 'default_value' in x:
             x['address'] = x['default_value']

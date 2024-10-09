@@ -1153,6 +1153,12 @@ definitions:
         description: Path to file containing index if different from the standard
           naming convention for BAM and CRAM files.
         type: string
+      index_col:
+        description: Column index in the serialized table that contains the row index/names.
+        type: integer
+      index_row:
+        description: Row index in the serialized table that contains the column index/names.
+        type: integer
       is_series:
         default: false
         description: If True, input/output will be done to a series of files. If reading,
@@ -2056,6 +2062,12 @@ definitions:
         enum:
         - pandas
         type: string
+      index_col:
+        description: Column index in the serialized table that contains the row index/names.
+        type: integer
+      index_row:
+        description: Row index in the serialized table that contains the column index/names.
+        type: integer
       name:
         description: Name used for component in log messages.
         pattern: ^([A-Za-z0-9-_]+:)?\.?[A-Za-z0-9-_\\\/]+\.[A-Za-z0-9-_]+(::[A-Za-z0-9-_]+)?$
@@ -3102,6 +3114,13 @@ definitions:
         description: Commit that should be checked out in the model repository specified
           by repository_url. If not provided, the most recent commit on the default
           branch will be used.
+        type: string
+      repository_dir:
+        description: Directory where the respository should be cloned to (including
+          the repository name). If the directory already exists, it will be assumed
+          to be a git repository and the provided commit will be checked out if provided.
+          If not provided, the respository will be cloned into the model working_dir.
+          If not an absolute path, it will be taken as relative to the model working_dir.
         type: string
       repository_url:
         description: URL for the git repository containing the model source code.
@@ -4728,6 +4747,12 @@ definitions:
         type:
         - string
         - int
+      index_col:
+        description: Column index in the serialized table that contains the row index/names.
+        type: integer
+      index_row:
+        description: Row index in the serialized table that contains the column index/names.
+        type: integer
       newline:
         default: '
 
@@ -4972,6 +4997,12 @@ definitions:
           a list of arguments and parse messages to get a list of arguments in C printf/scanf
           style. Defaults to None and messages are assumed to already be bytes.
         type: string
+      index_col:
+        description: Column index in the serialized table that contains the row index/names.
+        type: integer
+      index_row:
+        description: Row index in the serialized table that contains the column index/names.
+        type: integer
       no_header:
         default: false
         description: If True, headers will not be read or serialized from/to tables.

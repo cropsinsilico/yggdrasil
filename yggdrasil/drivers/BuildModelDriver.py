@@ -3,7 +3,12 @@ import glob
 import copy
 from yggdrasil import components, constants
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, get_tool_registry)
+    CompiledModelDriver, CompilationError, get_tool_registry)
+
+
+class BuildError(CompilationError):
+    r"""Class for errors related to builds"""
+    pass
 
 
 class BuildModelDriver(CompiledModelDriver):
@@ -15,18 +20,19 @@ class BuildModelDriver(CompiledModelDriver):
             and any arguments for the executable or source files that
             the model will be built from.
         buildfile (str, optional): Path to the file containing build
-            instructions. Can be absolute or relative to working_dir,
+            instructions. Can be absolute or relative to
             compile_working_dir (if provided), builddir (if provided),
             or the source directory containing the model source files
             that will be built.
         builddir (str, optional): Path to the directory that will contain
-            build products. Can be absolute or relative to the directory
-            containing buildfile. Defaults to builddir_base. If builddir
-            is not provided to the build tool as a command line flag,
-            compile_working_dir will be set to builddir.
-        sourcedir (str, optional0: Path to the directory that contains
+            build products. Can be absolute or relative to working_dir.
+            Defaults to builddir_base. If builddir is not provided to
+            the build tool as a command line flag, compile_working_dir
+            will be set to builddir (e.g. so make is called from
+            builddir).
+        sourcedir (str, optional): Path to the directory that contains
             source files. Can be absolute or relative to working_dir.
-            If not provided, it will be determined from args.
+            If not provided, it will be determined from args & buildfile.
         target (str, optional): Target that should be built to create the
             model executable. Defaults to None.
         target_language (str, optional): Language that the target is
@@ -126,6 +132,7 @@ class BuildModelDriver(CompiledModelDriver):
     allow_parallel_build = False
     basetool = 'builder'
     default_model_libtype = 'build'
+    default_in_source_build = False
     target_basetool = 'compiler'
     target_flags_in_env = True
     comms_implicit = True
@@ -173,7 +180,7 @@ class BuildModelDriver(CompiledModelDriver):
                                 f'flags should be stored in when '
                                 f'building the model')
             }
-        
+
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an
         argument is a source file, compilation flag, or runtime
@@ -195,57 +202,53 @@ class BuildModelDriver(CompiledModelDriver):
         for k, v in default_attr:
             if not hasattr(self, k):
                 setattr(self, k, v)
-        # Directory that compilation should be called from
-        # Needs to be called before used for buildfile search
-        if ((isinstance(self.compile_working_dir, str)
-             and not os.path.isabs(self.compile_working_dir))):
-            self.compile_working_dir = os.path.realpath(
-                os.path.join(self.working_dir, self.compile_working_dir))
-        # Source directory
-        if self.sourcedir is None:
-            self.sourcedir = os.path.dirname(args[0])
-        if not os.path.isabs(self.sourcedir):
-            self.sourcedir = os.path.normpath(
-                os.path.realpath(os.path.join(self.working_dir,
-                                              self.sourcedir)))
+        # Directories from args
         model_is_source = self.is_source_file(args[0])
-        if not model_is_source:
-            if os.path.dirname(args[0]):
+        if model_is_source:
+            if self.sourcedir is None:
+                self.sourcedir = os.path.dirname(args[0])
+        else:
+            if self.builddir is None and os.path.dirname(args[0]):
                 self.builddir = os.path.dirname(args[0])
-            elif self.target is None:
-                self.target = args[0]
-        # Target
+            if self.target is None:
+                self.target = os.path.basename(args[0])
+        # Defaults
         if self.target is None:
             self.target = self.default_target
-        # Build file
         if self.buildfile is None:
             self.buildfile = self.buildfile_base
-        if not os.path.isabs(self.buildfile):
-            for x in set([self.working_dir, self.sourcedir,
-                          self.builddir, self.compile_working_dir]):
-                if x is not None:
-                    y = os.path.normpath(os.path.join(x, self.buildfile))
-                    if self.is_valid_buildfile(y):
-                        self.buildfile = y
-                        break
-        if not os.path.isabs(self.buildfile):
-            self.buildfile = os.path.normpath(
-                os.path.join(self.sourcedir, self.buildfile))
-        # Build directory
         if self.builddir is None:
-            self.builddir = self.builddir_base
-        if not os.path.isabs(self.builddir):
-            self.builddir = os.path.realpath(
-                os.path.join(os.path.dirname(self.buildfile),
-                             self.builddir))
+            if self.default_in_source_build and self.sourcedir:
+                self.builddir = self.sourcedir
+            else:
+                self.builddir = self.builddir_base
+        # Set relative paths from the working directory
+        for k in ['sourcedir', 'builddir', 'compile_working_dir']:
+            v = getattr(self, k)
+            if isinstance(v, str) and not os.path.isabs(v):
+                setattr(self, k, os.path.realpath(
+                    os.path.join(self.working_dir, v)))
+        if not os.path.isabs(self.buildfile):
+            for k in ['sourcedir', 'builddir', 'compile_working_dir',
+                      'working_dir']:
+                v = getattr(self, k)
+                if not isinstance(v, str):
+                    continue
+                v = os.path.join(v, self.buildfile)
+                if os.path.isfile(v):
+                    self.buildfile = v
+                    break
+        if not self.is_valid_buildfile(self.buildfile):
+            raise BuildError(f"Provided buildfile ({self.buildfile}) "
+                             f"is invalid")
+        # Source directory
+        if self.sourcedir is None:
+            self.sourcedir = os.path.dirname(self.buildfile)
         # Compilation directory
-        if 'buildir' not in self.get_tool_instance('basetool').flag_options:
+        if 'builddir' not in self.get_tool_instance('basetool').flag_options:
             self.compile_working_dir = self.builddir
         elif self.compile_working_dir is None:
             self.compile_working_dir = os.path.dirname(self.buildfile)
-        if not os.path.isabs(self.compile_working_dir):
-            self.compile_working_dir = os.path.realpath(
-                os.path.join(self.working_dir, self.compile_working_dir))
         if not model_is_source:
             kwargs.setdefault('default_model_dir', self.builddir)
         super(BuildModelDriver, self).parse_arguments(args, **kwargs)
@@ -272,7 +275,7 @@ class BuildModelDriver(CompiledModelDriver):
                 else:
                     source_dir = os.path.dirname(fname)
             else:  # pragma: debug
-                raise RuntimeError("No source file/dir provided")
+                raise BuildError("No source file/dir provided")
         return source_dir
 
     @classmethod
@@ -382,8 +385,8 @@ class BuildModelDriver(CompiledModelDriver):
                     components.import_component(
                         'model', self.target_language))
         if not self.target_language_driver.is_installed():
-            raise RuntimeError(f"Target language \"{self.language}\" is "
-                               f"not installed")
+            raise BuildError(f"Target language \"{self.language}\" is "
+                             f"not installed")
         if self.target_compiler is None:
             self.target_compiler = self.target_language_driver.get_tool(
                 'compiler', return_prop='name')

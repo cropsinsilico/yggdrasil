@@ -455,8 +455,13 @@ class SerializeBase(tools.YggClass):
             out = [str(units.Units(x)) for x in self.field_units]
         elif 'items' in self.datatype:
             if isinstance(self.datatype['items'], dict):  # pragma: debug
-                raise Exception("Variable number of items not yet "
-                                "supported.")
+                if self.field_names:
+                    if len(self.datatype['items'].get('units', '')) > 0:
+                        out = [self.datatype['items']['units']
+                               for _ in self.field_names]
+                else:
+                    raise Exception("Variable number of items not yet "
+                                    "supported.")
             elif isinstance(self.datatype['items'], list):
                 out = []
                 any_units = False
@@ -507,7 +512,7 @@ class SerializeBase(tools.YggClass):
                 serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
             except TypeError as e:
                 raise serialize.SerializationError(e)
-        self.update_serializer(from_message=True, **serializer)
+        self.update_serializer(from_message=msg, **serializer)
 
     def initialize_from_metadata(self, metadata):
         r"""Initialize a serializer based on received metadata. This method
@@ -557,18 +562,19 @@ class SerializeBase(tools.YggClass):
             if datatype is None:
                 datatype = {}
             # Update datatype from oldstyle keywords in extra_kwargs
-            if from_message or (datatype and datatype != self.default_datatype):
+            if ((from_message is not False
+                 or (datatype and datatype != self.default_datatype))):
                 datatype = self.update_typedef_from_oldstyle(datatype)
             if 'type' in datatype:
                 # TODO: Fix push/pull of schema properties
                 if ((self.partial_datatype
-                     and (from_message
+                     and (from_message is not False
                           or datatype != self.default_datatype))):
                     datatype.update(self.partial_datatype)
                     self.partial_datatype = None
                 self.datatype = rapidjson.normalize(datatype,
                                                     {'type': 'schema'})
-                if from_message:
+                if from_message is not False:
                     self._initialized = True
                 if ((self.datatype['type'] == 'array'
                      and isinstance(self.datatype.get('items', None), list)

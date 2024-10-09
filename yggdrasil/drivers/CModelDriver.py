@@ -259,7 +259,7 @@ class LDLinker(LinkerBase):
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
     version_regex = [
-        r'(?P<version>PROJECT:(?:(?:ld64)|(?:dyld))-\d+(?:\.\d+)?)',
+        r'(?P<version>PROJECT:(?:(?:ld(?:64)?)|(?:dyld))-\d+(?:\.\d+)?)',
         (r'(?P<version>GNU ld \((?:GNU )?Binutils(?: for (?P<os>.+))?\) '
          r'\d+(?:\.\d+){0,2})')
     ]

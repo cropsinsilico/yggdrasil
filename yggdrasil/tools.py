@@ -1309,11 +1309,13 @@ def safe_eval(statement, **kwargs):
         'builtins': [
             'abs', 'any', 'bool', 'bytes', 'float', 'int', 'len',
             'list', 'map', 'max', 'min', 'repr', 'set', 'str',
-            'sum', 'tuple', 'type'],
+            'sum', 'tuple', 'type', 'isinstance'],
         'numpy': [
             'array', 'int8', 'int16', 'int32', 'int64',
             'uint8', 'uint16', 'uint32', 'uint64',
             'float16', 'float32', 'float64'],
+        'pandas': [
+            'DataFrame'],
         'yggdrasil.units': [
             'get_data', 'add_units', 'Quantity', 'QuantityArray']}
     for mod_name, func_list in _safe_lists.items():
@@ -2238,11 +2240,13 @@ class CacheDirMixin:
         self.init_cache_dir()
         super().__init__(*args, **kwargs)
 
-    def init_cache_dir(self, *args):
+    def init_cache_dir(self, *args, **kwargs):
         r"""Initialize the cache directory."""
         if self.cache_dir is None and args:
-            self.cache_dir = os.path.join(
-                os.path.dirname(args[0]), '_ygg_cache')
+            base_dir = os.path.dirname(args[0])
+            if kwargs.get('create_parent_dir', False):
+                base_dir = os.path.dirname(base_dir)
+            self.cache_dir = os.path.join(base_dir, '_ygg_cache')
         if isinstance(self.cache_dir, str):
             self.cache_dir = GeneratedDirectory(self.cache_dir)
         return bool(self.cache_dir)
@@ -2356,8 +2360,8 @@ class IntegrationPathSet(CacheDirMixin):
 
     def append_generated(self, *args, **kwargs):
         r"""Append a GeneratedFile to this path set."""
-        kwargs['cls'] = GeneratedFile
-        self.init_cache_dir(*args)
+        kwargs.setdefault('cls', GeneratedFile)
+        self.init_cache_dir(*args, **kwargs)
         kwargs.setdefault('cache_dir', self.cache_dir)
         return self.append(*args, **kwargs)
 
@@ -2471,13 +2475,16 @@ class IntegrationPath(object):
             not be checked for source files prior to be removed.
         tag (str, optional): Tag that should be added to the path for
             performing tags on subsets of files.
+        create_parent_dir (bool, optional): If True, create the path's
+            parent directory if it does not exist.
         **kwargs: Additional keyword arguments are ignored.
 
     """
 
     def __init__(self, name, overwrite=False, additional_products=None,
                  removable_source_exts=None, generalized_suffix=None,
-                 skip_source_check=False, tag=None, **kwargs):
+                 skip_source_check=False, tag=None,
+                 create_parent_dir=False, **kwargs):
         self.name = name
         self.overwrite = overwrite
         self.additional_products = additional_products
@@ -2485,11 +2492,15 @@ class IntegrationPath(object):
         self.generalized_suffix = generalized_suffix
         self.skip_source_check = skip_source_check
         self.tag = tag
+        self.create_parent_dir = create_parent_dir
         if self.additional_products is None:
             self.additional_products = []
         if self.removable_source_exts is None:
             self.removable_source_exts = tuple([])
         self.removed = False
+        if self.create_parent_dir:
+            self.create_parent_dir = GeneratedDirectory(
+                os.path.dirname(self.name))
 
     def __str__(self):
         return self.name
@@ -2523,10 +2534,14 @@ class IntegrationPath(object):
         r"""Perform actions on the path before an integration."""
         if self.overwrite:
             self.remove_products()
+        if self.create_parent_dir:
+            self.create_parent_dir.setup()
 
     def teardown(self):
         r"""Perform actions to cleanup the path after an integration."""
         self.remove_products()
+        if self.create_parent_dir:
+            self.create_parent_dir.teardown()
 
     @property
     def split_sources(self):
