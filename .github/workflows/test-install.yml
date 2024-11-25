@@ -512,7 +512,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -863,7 +863,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -1206,7 +1206,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -1532,7 +1532,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
@@ -1857,7 +1857,7 @@ jobs:
     - continue-on-error: true
       if: ${{ always() }}
       name: Download the last successful workflow environment log
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
