@@ -262,7 +262,7 @@ jobs:
         channels: msys,conda-forge
         # use-only-tar-bz2: true
         channel-priority: strict
-        miniforge-variant: Mambaforge
+        miniforge-version: latest
         use-mamba: true
     # The compiler must be initialized after the base environment for
     # conda so that it dosn't interfere with the base environment
