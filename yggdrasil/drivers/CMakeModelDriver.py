@@ -547,7 +547,7 @@ class CMakeModelDriver(BuildModelDriver):
         # TODO: temp
         if platform._is_win:
             verbose = True
-        logger.debug(f"CREATE_IMPORTS_REPLACE {dep} {imp}")
+        logger.info(f"CREATE_IMPORTS_REPLACE {dep} {imp}")
         buildfile = dep['buildfile']
         if not os.path.isabs(buildfile):
             buildfile = dep._relative_to_directory(

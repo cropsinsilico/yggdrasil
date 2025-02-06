@@ -2730,9 +2730,9 @@ definitions:
         type: array
       builddir:
         description: Path to the directory that will contain build products. Can be
-          absolute or relative to the directory containing buildfile. Defaults to
-          builddir_base. If builddir is not provided to the build tool as a command
-          line flag, compile_working_dir will be set to builddir.
+          absolute or relative to working_dir. Defaults to builddir_base. If builddir
+          is not provided to the build tool as a command line flag, compile_working_dir
+          will be set to builddir (e.g. so make is called from builddir).
         type: string
       builder:
         description: Name of builder that should be used to build the model
@@ -2745,9 +2745,8 @@ definitions:
         type: array
       buildfile:
         description: Path to the file containing build instructions. Can be absolute
-          or relative to working_dir, compile_working_dir (if provided), builddir
-          (if provided), or the source directory containing the model source files
-          that will be built.
+          or relative to compile_working_dir (if provided), builddir (if provided),
+          or the source directory containing the model source files that will be built.
         type: string
       client_of:
         allowSingular: true
@@ -3168,6 +3167,9 @@ definitions:
           type: string
         type: array
       sourcedir:
+        description: Path to the directory that contains source files. Can be absolute
+          or relative to working_dir. If not provided, it will be determined from
+          args & buildfile.
         type: string
       standard:
         default: f2003
@@ -3239,6 +3241,8 @@ definitions:
           the keys:'
         type: object
       target:
+        description: Target that should be built to create the model executable. Defaults
+          to None.
         type: string
       target_archiver:
         description: Name of archiver that should be used to build the model
@@ -3261,6 +3265,8 @@ definitions:
           type: string
         type: array
       target_language:
+        description: Language that the target is written in. Defaults to None and
+          will be set based on the source files provided.
         type: string
       target_linker:
         description: Name of linker that should be used to build the model
@@ -3486,9 +3492,9 @@ definitions:
         type: array
       builddir:
         description: Path to the directory that will contain build products. Can be
-          absolute or relative to the directory containing buildfile. Defaults to
-          builddir_base. If builddir is not provided to the build tool as a command
-          line flag, compile_working_dir will be set to builddir.
+          absolute or relative to working_dir. Defaults to builddir_base. If builddir
+          is not provided to the build tool as a command line flag, compile_working_dir
+          will be set to builddir (e.g. so make is called from builddir).
         type: string
       builder:
         description: Name of builder that should be used to build the model
@@ -3501,9 +3507,8 @@ definitions:
         type: array
       buildfile:
         description: Path to the file containing build instructions. Can be absolute
-          or relative to working_dir, compile_working_dir (if provided), builddir
-          (if provided), or the source directory containing the model source files
-          that will be built.
+          or relative to compile_working_dir (if provided), builddir (if provided),
+          or the source directory containing the model source files that will be built.
         type: string
       compile_working_dir:
         description: Directory where compilation should be invoked from if it is not
@@ -3572,8 +3577,13 @@ definitions:
           type: string
         type: array
       sourcedir:
+        description: Path to the directory that contains source files. Can be absolute
+          or relative to working_dir. If not provided, it will be determined from
+          args & buildfile.
         type: string
       target:
+        description: Target that should be built to create the model executable. Defaults
+          to None.
         type: string
       target_archiver:
         description: Name of archiver that should be used to build the model
@@ -3596,6 +3606,8 @@ definitions:
           type: string
         type: array
       target_language:
+        description: Language that the target is written in. Defaults to None and
+          will be set based on the source files provided.
         type: string
       target_linker:
         description: Name of linker that should be used to build the model
@@ -4014,9 +4026,9 @@ definitions:
         type: array
       builddir:
         description: Path to the directory that will contain build products. Can be
-          absolute or relative to the directory containing buildfile. Defaults to
-          builddir_base. If builddir is not provided to the build tool as a command
-          line flag, compile_working_dir will be set to builddir.
+          absolute or relative to working_dir. Defaults to builddir_base. If builddir
+          is not provided to the build tool as a command line flag, compile_working_dir
+          will be set to builddir (e.g. so make is called from builddir).
         type: string
       builder:
         description: Name of builder that should be used to build the model
@@ -4029,9 +4041,8 @@ definitions:
         type: array
       buildfile:
         description: Path to the file containing build instructions. Can be absolute
-          or relative to working_dir, compile_working_dir (if provided), builddir
-          (if provided), or the source directory containing the model source files
-          that will be built.
+          or relative to compile_working_dir (if provided), builddir (if provided),
+          or the source directory containing the model source files that will be built.
         type: string
       compile_working_dir:
         description: Directory where compilation should be invoked from if it is not
@@ -4087,8 +4098,13 @@ definitions:
           type: string
         type: array
       sourcedir:
+        description: Path to the directory that contains source files. Can be absolute
+          or relative to working_dir. If not provided, it will be determined from
+          args & buildfile.
         type: string
       target:
+        description: Target that should be built to create the model executable. Defaults
+          to None.
         type: string
       target_archiver:
         description: Name of archiver that should be used to build the model
@@ -4111,6 +4127,8 @@ definitions:
           type: string
         type: array
       target_language:
+        description: Language that the target is written in. Defaults to None and
+          will be set based on the source files provided.
         type: string
       target_linker:
         description: Name of linker that should be used to build the model
