@@ -40,6 +40,9 @@ class YggFunction(YggClass):
         service_address (str, optional): Address for service manager that is
             capable of running the specified integration. Defaults to None
             and is ignored.
+        signal_handler (function, optional): Function that should handle
+            received SIGINT and SIGTERM signals. Defaults to
+            runner.signal_handler.
         **kwargs: Additional keyword arguments are passed to the YggRunner
             constructor.
 
@@ -50,7 +53,8 @@ class YggFunction(YggClass):
 
     """
     
-    def __init__(self, model_yaml, service_address=None, **kwargs):
+    def __init__(self, model_yaml, service_address=None,
+                 signal_handler=None, **kwargs):
         import uuid
         super(YggFunction, self).__init__()
         # Create and start runner in another process
@@ -69,7 +73,7 @@ class YggFunction(YggClass):
             with open(self.model_yaml, 'w') as fd:
                 fd.write(contents)
         self.runner = None
-        self.run()
+        self.run(signal_handler=signal_handler)
 
     # def widget_function(self, *args, **kwargs):
     #     # import matplotlib.pyplot as plt
@@ -117,18 +121,19 @@ class YggFunction(YggClass):
                             a_kws = list(a_dtype.get('properties', {}).keys())
                         kwargs[a] = {k: kwargs[k] for k in a_kws}
                     else:  # pragma: debug
-                        raise RuntimeError("Required argument %s not provided." % a)
+                        # TODO: Get default data from file if available
+                        raise RuntimeError(f"Required argument {a} not provided.")
             # Send
             for k, v in self.inputs.items():
                 flag = v['comm'].send([kwargs[a] for a in v['vars']])
                 if not flag:  # pragma: debug
-                    raise RuntimeError("Failed to send %s" % k)
+                    raise RuntimeError(f"Failed to send {k}")
             # Receive
             out = {}
             for k, v in self.outputs.items():
                 flag, data = v['comm'].recv(timeout=60.0)
                 if not flag:  # pragma: debug
-                    raise RuntimeError("Failed to receive variable %s" % v)
+                    raise RuntimeError(f"Failed to receive variable {v}")
                 ivars = v['vars']
                 if ((isinstance(data, (list, tuple))
                      and (len(ivars) > 1 or len(data) == len(ivars)))):
@@ -140,11 +145,12 @@ class YggFunction(YggClass):
                     out[ivars[0]] = data
             self.runner.pause()
             return out
-        except BaseException:
+        except BaseException as e:
+            print(f"STOPPING DUE TO ERROR: {e}")
             self.stop(error=True)
             raise
 
-    def run(self):
+    def run(self, **kwargs):
         r"""Run the model"""
         if self.runner is not None:
             self.info("Model already running")
@@ -153,7 +159,8 @@ class YggFunction(YggClass):
             YggInput, YggOutput, YggRpcClient)
         self.runner = YggRunner(self.model_yaml, **self.runner_kwargs)
         # Start the drivers
-        self.runner.run()
+        # TODO: Allow call directly?
+        self.runner.run(**kwargs)
         self.model_driver = self.runner.modeldrivers[self.dummy_name]
         for k in self.runner.modeldrivers.keys():
             if k != self.dummy_name:
@@ -268,14 +275,18 @@ class YggFunction(YggClass):
 
     def model_info(self):
         r"""Display information about the wrapped model(s)."""
-        print("Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
-              % (', '.join([x['name'] for x in
-                            self.runner.modeldrivers.values()
-                            if x['name'] != self.dummy_name]),
-                 '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
-                            for k, v in self.inputs.items()]),
-                 '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
-                            for k, v in self.outputs.items()])))
+        self.printStatus()
+
+    def printStatus(self, level='info', return_str=False):
+        getattr(self.logger, level)(
+            "Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
+            % (', '.join([x['name'] for x in
+                          self.runner.modeldrivers.values()
+                          if x['name'] != self.dummy_name]),
+               '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+                          for k, v in self.inputs.items()]),
+               '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+                          for k, v in self.outputs.items()])))
 
 
 class YggRunner(YggClass):

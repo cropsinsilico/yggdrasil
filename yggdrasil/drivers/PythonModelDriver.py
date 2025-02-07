@@ -14,6 +14,7 @@ class PythonModelDriver(InterpretedModelDriver):
     default_interpreter = sys.executable
     interface_library = 'yggdrasil.interface.YggInterface'
     # supported_comms = ['ipc', 'zmq', 'rmq']
+    default_package_manager = 'pip'
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux'],
                 'libraries': ['sysv_ipc']},
@@ -226,29 +227,6 @@ class PythonModelDriver(InterpretedModelDriver):
                      name=var['name'])]
         return out
 
-    @classmethod
-    def install_dependency(cls, package=None, package_manager=None, **kwargs):
-        r"""Install a dependency.
-
-        Args:
-            package (str): Name of the package that should be installed. If
-                the package manager supports it, this can include version
-                requirements.
-            package_manager (str, optional): Package manager that should be
-                used to install the package.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class.
-
-        """
-        if package_manager in [None, 'pip']:
-            if isinstance(package, str):
-                package = package.split()
-            kwargs.setdefault(
-                'command',
-                [cls.get_interpreter(), '-m', 'pip', 'install'] + package)
-        return super(PythonModelDriver, cls).install_dependency(
-            package, package_manager=package_manager, **kwargs)
-        
     def run_validation(self):
         r"""Run the validation script for the model."""
         if ((self.validation_command

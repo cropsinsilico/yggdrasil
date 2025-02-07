@@ -840,6 +840,738 @@ definitions:
       required:
       - driver
       - args
+  dependency:
+    allOf:
+    - $ref: '#/definitions/dependency-subtype-base'
+    - anyOf:
+      - $ref: '#/definitions/dependency-subtype-apt'
+      - $ref: '#/definitions/dependency-subtype-cmake'
+      - $ref: '#/definitions/dependency-subtype-cran'
+      - $ref: '#/definitions/dependency-subtype-choco'
+      - $ref: '#/definitions/dependency-subtype-command'
+      - $ref: '#/definitions/dependency-subtype-conda'
+      - $ref: '#/definitions/dependency-subtype-options'
+      - $ref: '#/definitions/dependency-subtype-set'
+      - $ref: '#/definitions/dependency-subtype-git'
+      - $ref: '#/definitions/dependency-subtype-brew'
+      - $ref: '#/definitions/dependency-subtype-make'
+      - $ref: '#/definitions/dependency-subtype-pip'
+      - $ref: '#/definitions/dependency-subtype-source'
+      - $ref: '#/definitions/dependency-subtype-vcpkg'
+    description: Schema for dependency components.
+    title: complete-dependency-package_manager
+  dependency-subtype-apt:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['apt'] subtype.
+    properties:
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: apt
+        description: Dependency installed from apt
+        enum:
+        - apt
+        type: string
+    title: yggdrasil.dependencies.AptDependency
+    type: object
+  dependency-subtype-base:
+    additionalProperties: false
+    allowSingular: package
+    description: Base schema for all subtypes of dependency components.
+    properties:
+      additional_steps:
+        description: Additional commands that should be executed in order to install
+          the package.
+        items:
+          type: string
+        type: array
+      additional_steps_uninstall:
+        description: Additional commands that should be executed in order to uninstall
+          the package.
+        items:
+          type: string
+        type: array
+      args_build:
+        description: Arguments that should be passed to the build tool during the
+          build step if buildfile is provided.
+        items:
+          type: string
+        type: array
+      args_config:
+        description: Arguments that should be passed to the build tool during the
+          configuration step (only used when buildfile is a CMakeLists.txt file).
+        items:
+          type: string
+        type: array
+      args_install:
+        description: Arguments that should be passed to the build tool during the
+          install step if buildfile is provided.
+        items:
+          type: string
+        type: array
+      arguments:
+        description: Additional arguments that should be passed to the package manager
+          during installation.
+        items:
+          type: string
+        type: array
+      arguments_uninstall:
+        description: Additional arguments that should be passed to the package manager
+          during uninstall.
+        items:
+          type: string
+        type: array
+      branch:
+        description: Branch that should be checked out. Ignored if commit or tag provided.
+        type: string
+      buildfile:
+        description: Path to buildfile (Makefile or CMakeLists.txt) that should be
+          used to build the dependency. If a relative path is provided, it will be
+          assumed to be relative to directory. If provided, a build will be attempted
+          to install the dependency.
+        type: string
+      channel:
+        description: Conda channel that the package should be installed from.
+        type: string
+      command:
+        description: Command arguments.
+        items:
+          type: string
+        type: array
+      command_kwargs:
+        additionalProperties: true
+        description: Keyword arguments that should be passed to the subprocess call
+          for the installation.
+        properties:
+          shell:
+            default: false
+            type: boolean
+        type: object
+      command_uninstall:
+        description: Command arguments used to uninstall the dependency.
+        items:
+          type: string
+        type: array
+      commit:
+        description: Commit that should be checked out.
+        type: string
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      default_package_manager:
+        allowSingular: true
+        description: 'Package manager(s) that should be used for members that do not
+          have a package_manager property and cannot be determined from the provided
+          properties. If a list is provided, the first package_manager that is installed
+          will be used. If not provided, the default order will be based on the operating
+          system: macos  : [''conda'', ''brew'', ''apt'', ''choco'', ''vcpkg''] linux  :
+          [''conda'', ''apt'', ''brew'', ''choco'', ''vcpkg''] windows: [''conda'',
+          ''choco'', ''vcpkg'', ''apt'', ''brew'']'
+        items:
+          $ref: '#/definitions/dependency-subtype-base/properties/package_manager'
+        type: array
+      directory:
+        description: Path to the directory that contains the source code to install.
+        type: string
+      fstring_tag:
+        default: v{version}
+        description: Format string that should be used to turn versions into tags.
+          Defaults to 'v{version}'
+        type: string
+      install_method:
+        description: 'Method that should be used to install the package from the specified
+          directory. If not provided, the directory will be inspected to try to determine
+          how to install the package. Valid options include: ''make'' : make installation
+          controlled via buildfile, args_build & args_install. make /path/to/buildfile
+          args_build[0] ... make install args_install[0] ... ''cmake'': cmake installation
+          controlled via buildfile, args_config, args_build & args_install. cmake
+          -S /path/to/buildfile -B build args_config[0] ... cmake --build build args_build[0]
+          ... cmake --install build args_install[0] ... ''pip'':   pip installation
+          from source controlled via args_install. pip install package args_install[0]
+          ...'
+        enum:
+        - cmake
+        - command
+        - cran
+        - make
+        - pip
+      install_prefix:
+        description: Prefix for directory under which built packages should be installed.
+          If not provided and conda_env set or run inside a conda environment, the
+          conda environment prefix will be used.
+        type: string
+      is_private:
+        default: false
+        description: If True, the repository is private and the user may be asked
+          for credentials when cloning the repository.
+        type: string
+      members:
+        description: Dependencies in the set. All of the members will be installed
+          with the set is installed.
+        items:
+          $ref: '#/definitions/dependency'
+        type: array
+      operating_systems:
+        description: Operating systems that the dependency is valid for.
+        items:
+          enum:
+          - windows
+          - macos
+          - linux
+          - unix
+          type: string
+        type: array
+      options:
+        description: Different options for installing the dependency. The first valid
+          option will be installed.
+        items:
+          $ref: '#/definitions/dependency'
+        type: array
+      overwrite:
+        default: false
+        description: If True, any existing instance of the repository in directory
+          will be overwritten. overwrite will automatically set to True if directory
+          is not provided and the repository is cloned into a temporary directory.
+        type: boolean
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        description: Set of related dependencies
+        enum:
+        - apt
+        - brew
+        - choco
+        - cmake
+        - command
+        - conda
+        - cran
+        - git
+        - make
+        - options
+        - pip
+        - set
+        - source
+        - vcpkg
+        type: string
+      preserve:
+        default: false
+        description: If True, uninstall will only uninstall the dependency installation
+          and the git repository will not be removed. preserve will automatically
+          set to False if directory is not provided and the repository is cloned into
+          a temporary directory.
+        type: boolean
+      products:
+        description: Files that are required for the dependency to be considered installed.
+        items:
+          type: string
+        type: array
+      repos:
+        default: http://cloud.r-project.org
+        description: Mirror that should be used to install the dependency from.
+        type: string
+      repository:
+        description: URL address to the repository.
+        type: string
+      shared_properties:
+        description: Properties that will be added to all members/options.
+        type: object
+      sourcedir:
+        description: Directory containing package source code that the package should
+          be installed from.
+        type: string
+      tag:
+        description: Tag that should be checked out. Ignored if commit provided. If
+          version is provided, but tag is not, the tag will be set using fstring_tag.
+          If version is a min, max, or range, the maximum valid tag will be used.
+        type: string
+      version:
+        description: Version of the package that should be installed. This string
+          can begin with '==', '<', '<=', '>', or '>=' to indicate the type of contraint
+          on the version installed. If none of these are present, it will be assumed
+          to be a strict version requirement (i.e. ==version).
+        type: string
+    required:
+    - package
+    title: dependency_base
+    type: object
+  dependency-subtype-brew:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['brew'] subtype.
+    properties:
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: brew
+        description: Dependency installed from homebrew
+        enum:
+        - brew
+        type: string
+    title: yggdrasil.dependencies.HomebrewDependency
+    type: object
+  dependency-subtype-choco:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['choco'] subtype.
+    properties:
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: choco
+        description: Dependency installed via chocolate
+        enum:
+        - choco
+        type: string
+    title: yggdrasil.dependencies.ChocoDependency
+    type: object
+  dependency-subtype-cmake:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['cmake'] subtype.
+    properties:
+      args_build:
+        description: Arguments that should be passed to the build tool during the
+          build step if buildfile is provided.
+        items:
+          type: string
+        type: array
+      args_config:
+        description: Arguments that should be passed to the build tool during the
+          configuration step (only used when buildfile is a CMakeLists.txt file).
+        items:
+          type: string
+        type: array
+      args_install:
+        description: Arguments that should be passed to the build tool during the
+          install step if buildfile is provided.
+        items:
+          type: string
+        type: array
+      buildfile:
+        description: Path to buildfile (Makefile or CMakeLists.txt) that should be
+          used to build the dependency. If a relative path is provided, it will be
+          assumed to be relative to directory. If provided, a build will be attempted
+          to install the dependency.
+        type: string
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      directory:
+        description: Path to the directory that contains the source code to install.
+        type: string
+      install_prefix:
+        description: Prefix for directory under which built packages should be installed.
+          If not provided and conda_env set or run inside a conda environment, the
+          conda environment prefix will be used.
+        type: string
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: cmake
+        description: Dependency installed from source code via cmake
+        enum:
+        - cmake
+        type: string
+    required:
+    - directory
+    title: yggdrasil.dependencies.CMakeDependency
+    type: object
+  dependency-subtype-command:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['command'] subtype.
+    properties:
+      command:
+        description: Command arguments.
+        items:
+          type: string
+        type: array
+      command_uninstall:
+        description: Command arguments used to uninstall the dependency.
+        items:
+          type: string
+        type: array
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: command
+        description: Dependency installed via user supplied command
+        enum:
+        - command
+        type: string
+      sourcedir:
+        description: Directory containing package source code that the package should
+          be installed from.
+        type: string
+    required:
+    - command
+    title: yggdrasil.dependencies.CommandDependency
+    type: object
+  dependency-subtype-conda:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['conda'] subtype.
+    properties:
+      channel:
+        description: Conda channel that the package should be installed from.
+        type: string
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: conda
+        description: Dependency installed from conda
+        enum:
+        - conda
+        type: string
+    title: yggdrasil.dependencies.CondaDependency
+    type: object
+  dependency-subtype-cran:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['cran'] subtype.
+    properties:
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: cran
+        description: Dependency installed from CRAN
+        enum:
+        - cran
+        type: string
+      repos:
+        default: http://cloud.r-project.org
+        description: Mirror that should be used to install the dependency from.
+        type: string
+      sourcedir:
+        description: Directory containing package source code that the package should
+          be installed from.
+        type: string
+    title: yggdrasil.dependencies.CRANDependency
+    type: object
+  dependency-subtype-git:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['git'] subtype.
+    properties:
+      branch:
+        description: Branch that should be checked out. Ignored if commit or tag provided.
+        type: string
+      commit:
+        description: Commit that should be checked out.
+        type: string
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      directory:
+        description: Path to the directory that contains the source code to install.
+        type: string
+      fstring_tag:
+        default: v{version}
+        description: Format string that should be used to turn versions into tags.
+          Defaults to 'v{version}'
+        type: string
+      install_method:
+        description: 'Method that should be used to install the package from the specified
+          directory. If not provided, the directory will be inspected to try to determine
+          how to install the package. Valid options include: ''make'' : make installation
+          controlled via buildfile, args_build & args_install. make /path/to/buildfile
+          args_build[0] ... make install args_install[0] ... ''cmake'': cmake installation
+          controlled via buildfile, args_config, args_build & args_install. cmake
+          -S /path/to/buildfile -B build args_config[0] ... cmake --build build args_build[0]
+          ... cmake --install build args_install[0] ... ''pip'':   pip installation
+          from source controlled via args_install. pip install package args_install[0]
+          ...'
+        enum:
+        - cmake
+        - command
+        - cran
+        - make
+        - pip
+      install_prefix:
+        description: Prefix for directory under which built packages should be installed.
+          If not provided and conda_env set or run inside a conda environment, the
+          conda environment prefix will be used.
+        type: string
+      is_private:
+        default: false
+        description: If True, the repository is private and the user may be asked
+          for credentials when cloning the repository.
+        type: string
+      overwrite:
+        default: false
+        description: If True, any existing instance of the repository in directory
+          will be overwritten. overwrite will automatically set to True if directory
+          is not provided and the repository is cloned into a temporary directory.
+        type: boolean
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: git
+        description: Dependency installed from a git respository
+        enum:
+        - git
+        type: string
+      preserve:
+        default: false
+        description: If True, uninstall will only uninstall the dependency installation
+          and the git repository will not be removed. preserve will automatically
+          set to False if directory is not provided and the repository is cloned into
+          a temporary directory.
+        type: boolean
+      repository:
+        description: URL address to the repository.
+        type: string
+      tag:
+        description: Tag that should be checked out. Ignored if commit provided. If
+          version is provided, but tag is not, the tag will be set using fstring_tag.
+          If version is a min, max, or range, the maximum valid tag will be used.
+        type: string
+    required:
+    - directory
+    - repository
+    title: yggdrasil.dependencies.GitDependency
+    type: object
+  dependency-subtype-make:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['make'] subtype.
+    properties:
+      args_build:
+        description: Arguments that should be passed to the build tool during the
+          build step if buildfile is provided.
+        items:
+          type: string
+        type: array
+      args_install:
+        description: Arguments that should be passed to the build tool during the
+          install step if buildfile is provided.
+        items:
+          type: string
+        type: array
+      buildfile:
+        description: Path to buildfile (Makefile or CMakeLists.txt) that should be
+          used to build the dependency. If a relative path is provided, it will be
+          assumed to be relative to directory. If provided, a build will be attempted
+          to install the dependency.
+        type: string
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      directory:
+        description: Path to the directory that contains the source code to install.
+        type: string
+      install_prefix:
+        description: Prefix for directory under which built packages should be installed.
+          If not provided and conda_env set or run inside a conda environment, the
+          conda environment prefix will be used.
+        type: string
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: make
+        description: Dependency installed from source code via make
+        enum:
+        - make
+        type: string
+    required:
+    - directory
+    title: yggdrasil.dependencies.MakeDependency
+    type: object
+  dependency-subtype-options:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['options'] subtype.
+    properties:
+      default_package_manager:
+        allowSingular: true
+        description: 'Package manager(s) that should be used for members that do not
+          have a package_manager property and cannot be determined from the provided
+          properties. If a list is provided, the first package_manager that is installed
+          will be used. If not provided, the default order will be based on the operating
+          system: macos  : [''conda'', ''brew'', ''apt'', ''choco'', ''vcpkg''] linux  :
+          [''conda'', ''apt'', ''brew'', ''choco'', ''vcpkg''] windows: [''conda'',
+          ''choco'', ''vcpkg'', ''apt'', ''brew'']'
+        items:
+          $ref: '#/definitions/dependency-subtype-base/properties/package_manager'
+        type: array
+      options:
+        description: Different options for installing the dependency. The first valid
+          option will be installed.
+        items:
+          $ref: '#/definitions/dependency'
+        type: array
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: options
+        description: Set of different options for installing a dependency
+        enum:
+        - options
+        type: string
+      shared_properties:
+        description: Properties that will be added to all members/options.
+        type: object
+    required:
+    - options
+    title: yggdrasil.dependencies.DependencyOptions
+    type: object
+  dependency-subtype-pip:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['pip'] subtype.
+    properties:
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: pip
+        description: Dependency installed from PyPI via pip
+        enum:
+        - pip
+        type: string
+      sourcedir:
+        description: Directory containing package source code that the package should
+          be installed from.
+        type: string
+    title: yggdrasil.dependencies.PipDependency
+    type: object
+  dependency-subtype-set:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['set'] subtype.
+    properties:
+      default_package_manager:
+        allowSingular: true
+        description: 'Package manager(s) that should be used for members that do not
+          have a package_manager property and cannot be determined from the provided
+          properties. If a list is provided, the first package_manager that is installed
+          will be used. If not provided, the default order will be based on the operating
+          system: macos  : [''conda'', ''brew'', ''apt'', ''choco'', ''vcpkg''] linux  :
+          [''conda'', ''apt'', ''brew'', ''choco'', ''vcpkg''] windows: [''conda'',
+          ''choco'', ''vcpkg'', ''apt'', ''brew'']'
+        items:
+          $ref: '#/definitions/dependency-subtype-base/properties/package_manager'
+        type: array
+      members:
+        description: Dependencies in the set. All of the members will be installed
+          with the set is installed.
+        items:
+          $ref: '#/definitions/dependency'
+        type: array
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: set
+        description: Set of related dependencies
+        enum:
+        - set
+        type: string
+      shared_properties:
+        description: Properties that will be added to all members/options.
+        type: object
+    required:
+    - members
+    title: yggdrasil.dependencies.DependencySet
+    type: object
+  dependency-subtype-source:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['source'] subtype.
+    properties:
+      conda_env:
+        description: Conda environment where the dependency should be installed.
+        type: string
+      directory:
+        description: Path to the directory that contains the source code to install.
+        type: string
+      install_method:
+        description: 'Method that should be used to install the package from the specified
+          directory. If not provided, the directory will be inspected to try to determine
+          how to install the package. Valid options include: ''make'' : make installation
+          controlled via buildfile, args_build & args_install. make /path/to/buildfile
+          args_build[0] ... make install args_install[0] ... ''cmake'': cmake installation
+          controlled via buildfile, args_config, args_build & args_install. cmake
+          -S /path/to/buildfile -B build args_config[0] ... cmake --build build args_build[0]
+          ... cmake --install build args_install[0] ... ''pip'':   pip installation
+          from source controlled via args_install. pip install package args_install[0]
+          ...'
+        enum:
+        - cmake
+        - command
+        - cran
+        - make
+        - pip
+      install_prefix:
+        description: Prefix for directory under which built packages should be installed.
+          If not provided and conda_env set or run inside a conda environment, the
+          conda environment prefix will be used.
+        type: string
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: source
+        description: Dependency installed from source code
+        enum:
+        - source
+        type: string
+    required:
+    - directory
+    title: yggdrasil.dependencies.SourceDependency
+    type: object
+  dependency-subtype-vcpkg:
+    additionalProperties: true
+    allowSingular: package
+    description: Schema for dependency component ['vcpkg'] subtype.
+    properties:
+      package:
+        description: Name of the package that should be installed. If the package
+          manager supports it, this can include version requirements.
+        type: string
+      package_manager:
+        default: vcpkg
+        description: Dependency installed via vcpkg
+        enum:
+        - vcpkg
+        type: string
+    title: yggdrasil.dependencies.VcpkgDependency
+    type: object
   file:
     allOf:
     - $ref: '#/definitions/file-subtype-base'
@@ -2669,19 +3401,7 @@ definitions:
       additional_dependencies:
         additionalProperties:
           items:
-            oneOf:
-            - type: string
-            - additionalProperties: false
-              properties:
-                arguments:
-                  type: string
-                package:
-                  type: string
-                package_manager:
-                  type: string
-              required:
-              - package
-              type: object
+            $ref: '#/definitions/dependency'
           type: array
         description: A mapping between languages and lists of packages in those languages
           that are required by the model.
@@ -2811,23 +3531,9 @@ definitions:
         description: A list of packages required by the model that are written in
           the same language as the model. If the package requires dependencies outside
           the language of the model. use the additional_dependencies parameter to
-          provide them. If you need a version of the package from a specific package
-          manager, a mapping with 'package' and 'package_manager' fields can be provided
-          instead of just the name of the package.
+          provide them.
         items:
-          oneOf:
-          - type: string
-          - additionalProperties: false
-            properties:
-              arguments:
-                type: string
-              package:
-                type: string
-              package_manager:
-                type: string
-            required:
-            - package
-            type: object
+          $ref: '#/definitions/dependency'
         type: array
       description:
         description: Description of the model. This parameter is only used in the

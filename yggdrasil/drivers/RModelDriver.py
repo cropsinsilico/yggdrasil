@@ -46,6 +46,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     # stdout so use Rscript instead. For the batch version, use the following:
     #     default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
     default_interpreter_flags = ['--default-packages=methods,utils']
+    default_package_manager = 'cran'
     send_converters = {'table': serialize.consolidate_array}
     type_map = {
         'int': 'integer, bit64::integer64',
@@ -552,39 +553,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return super(RModelDriver, cls).write_expand_single_element(
             output_var, add_cond)
         
-    @classmethod
-    def install_dependency(cls, package, package_manager=None, **kwargs):
-        r"""Install a dependency.
-
-        Args:
-            package (str): Name of the package that should be installed. If
-                the package manager supports it, this can include version
-                requirements.
-            package_manager (str, optional): Package manager that should be
-                used to install the package.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class.
-
-        """
-        # if cls.compiled_with_asan():
-        #     kwargs.setdefault('command_kwargs', {})
-        #     kwargs['command_kwargs'].setdefault(
-        #         'env', copy.deepcopy(os.environ))
-        #     cls.set_asan_env(kwargs['command_kwargs']['env'])
-        if package_manager in [None, 'cran', 'CRAN']:
-            if isinstance(package, list):
-                package = (
-                    'c(' + ', '.join([f"\"{x}\"" for x in package]) + ')')
-            else:
-                package = f'\"{package}\"'
-            kwargs.setdefault(
-                'command',
-                [cls.get_interpreter(), '-e',
-                 (f'\'install.packages({package}, dep=TRUE, '
-                  f'repos=\"http://cloud.r-project.org\")\'')])
-        return super(RModelDriver, cls).install_dependency(
-            package, package_manager=package_manager, **kwargs)
-
     @classmethod
     def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.

@@ -50,8 +50,10 @@ for cls in (BaseConstructor, Constructor, SafeConstructor):
                         no_duplicates_constructor)
 
 
-def clone_github_repo(fname, commit=None, repository_dir=None,
-                      directory_for_clones=None, working_dir=None):
+def clone_github_repo(fname, commit=None, branch=None, tag=None,
+                      repository_dir=None, directory_for_clones=None,
+                      working_dir=None, return_repo=False,
+                      is_private=False):
     r"""Clone a GitHub repository, returning the path to the local copy of the
     file pointed to by the URL if there is one.
 
@@ -60,6 +62,13 @@ def clone_github_repo(fname, commit=None, repository_dir=None,
             repository that should be cloned.
         commit (str, optional): Commit that should be checked out. Defaults
             to None and the HEAD of the default branch is used.
+        tag (str, optional): Tag that should be checked out. Defaults to
+            None and the HEAD of the default branch is used. This will be
+            ignored if commit is provided. If True, the most recent tag
+            will be checked out.
+        branch (str, optional): Branch that should be checked out.
+            Defaults to None and the HEAD of the default branch is used.
+            This will be ignored if commit or tag is provided.
         repository_dir (str, optional): Directory where the respository
             should be cloned to (including the repository name). If the
             directory already exists, it will be assumed to be a git
@@ -76,6 +85,11 @@ def clone_github_repo(fname, commit=None, repository_dir=None,
         working_dir (str, optional): Working directory that relative
             paths should be taken from. Defaults to the current working
             directory.
+        return_repo (bool, optional): If True, the repo object will be
+            returned.
+        is_private (bool, optional): If True, the repository is private
+            and the user may be asked for credentials when cloning the
+            repository.
 
     Returns:
         str: Path to the local copy of the repository or file in the
@@ -124,9 +138,31 @@ def clone_github_repo(fname, commit=None, repository_dir=None,
         cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
             reponame
         # clone the repo into the appropriate directory
-        repo = git.Repo.clone_from(cloneurl, repository_dir)
-    if commit is not None:
-        repo.git.checkout(commit)
+        kws = {}
+        if not is_private:
+            kws.update(
+                multi_options=['--config core.askPass=echo'],
+                allow_unsafe_options=True,
+            )
+            # kws['env'] = {
+            #     'GIT_TERMINAL_PROMPT': '0',
+            #     'GIT_ASKPASS': 'false',
+            #     'GCM_INTERACTIVE': 'never',
+            # }
+        repo = git.Repo.clone_from(cloneurl, repository_dir, **kws)
+    checkout = commit
+    if checkout is None and tag is not None:
+        if tag is True:
+            checkout = sorted(
+                repo.tags, key=lambda t: t.commit.committed_datetime)[-1]
+        else:
+            checkout = tag
+    elif checkout is None and branch is not None:
+        checkout = branch
+    if checkout is not None:
+        repo.git.checkout(checkout)
+    if return_repo:
+        return repo
     repo.close()
     # now that it is cloned, just pass the yaml file (and path) onwards
     return os.path.realpath(fname)

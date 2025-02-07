@@ -20,7 +20,7 @@
 {% for client, integrations in running.items() %}
 <h3>Client {{ client }}</h3>
 {% for integration, body in integrations.items() %}
-<h4>Integration {{ integration }}</h4>
+<h4>Integration/Function {{ integration }}</h4>
   <p>
     {% for line in body %}
     {{ line }}<br>

@@ -437,11 +437,13 @@ class FlaskService(ServiceBase):
         """
         return self.jsonify(response)
 
-    def call(self, request, **kwargs):
+    def call(self, request, address=None, **kwargs):
         r"""Send a request.
 
         Args:
             request (object): JSON serializable request.
+            address (str, optional): Address to POST to if different than
+                the default manager address.
             **kwargs: Keyword arguments are ignored.
 
         Returns:
@@ -449,8 +451,10 @@ class FlaskService(ServiceBase):
 
         """
         import requests
+        if address is None:
+            address = self.address + self.name
         try:
-            r = requests.post(self.address + self.name, json=request)
+            r = requests.post(address, json=request)
             r.raise_for_status()
         except BaseException as e:
             raise ClientError(e)
@@ -668,6 +672,7 @@ def create_service_manager_class(service_type=None):
         def __init__(self, name=None, commtype=None, is_app=False, **kwargs):
             if name is None:
                 name = 'ygg_integrations'
+            self.functions = {}
             self.integrations = {}
             self.stopped_integrations = {}
             self.registry = IntegrationServiceRegistry()
@@ -690,7 +695,8 @@ def create_service_manager_class(service_type=None):
                 _client_id = str(uuid.uuid4())
             return _client_id
 
-        def send_request(self, name=None, yamls=None, action='start', **kwargs):
+        def send_request(self, name=None, yamls=None, action='start',
+                         model=None, **kwargs):
             r"""Send a request.
 
             Args:
@@ -701,19 +707,30 @@ def create_service_manager_class(service_type=None):
                     a network of models to run as a service. Defaults to None.
                 action (str, optional): Action that is being requested.
                     Defaults to 'start'.
+                model (str, optional): Name of the model that the request
+                    should be sent to.
                 **kwargs: Additional keyword arguments are included in the
                     request.
 
             """
-            if isinstance(yamls, str):
-                yamls = [yamls]
-            if name is None:
-                name = yamls
-            request = dict(kwargs, name=name, yamls=yamls, action=action)
-            request.setdefault('client_id', self.client_id)
+            request_kws = {}
+            if model is None:
+                if isinstance(yamls, str):
+                    yamls = [yamls]
+                if name is None:
+                    name = yamls
+                request = dict(kwargs, name=name, yamls=yamls,
+                               action=action)
+                request.setdefault('client_id', self.client_id)
+            else:
+                action = None
+                assert isinstance(name, dict)
+                request = name
+                request_kws['address'] = self.address + model
             wait_for_complete = ((action in ['start', 'stop', 'shutdown'])
                                  and (service_type != RMQService))
-            out = super(IntegrationServiceManager, self).send_request(request)
+            out = super(IntegrationServiceManager, self).send_request(
+                request, **request_kws)
             if wait_for_complete and (out['status'] != 'complete'):
                 def is_complete():
                     out.update(
@@ -741,11 +758,22 @@ def create_service_manager_class(service_type=None):
                         'running': {
                             k: {k2: v2.printStatus(return_str=True).splitlines()
                                 for k2, v2 in v.items()}
-                            for k, v in self.integrations.items()}}
+                            for k, v in self.integrations.items()},
+                    }
+                    for k, v in self.functions.items():
+                        kwargs['running'][f'{k}[FUNCTION]'] = {
+                            k2: k2.printStatus(return_str=True).splitlines()
+                            for k2, v2 in v.items()}
                     out = render_template(
                         'service_manager_index.html', **kwargs)
                     return out
-                
+
+                @self.app.route('/<model>', methods=['POST'])
+                def call(model):
+                    r"""Call a model as a function."""
+                    return self.process_request(self.request.json,
+                                                model_function=model)
+
                 from yggdrasil.communication import RESTComm
                 RESTComm.add_comm_server_to_app(self.app)
             
@@ -887,7 +915,32 @@ def create_service_manager_class(service_type=None):
                 # is running (perhaps in a future callback?)
                 return True
 
-        def respond(self, request, **kwargs):
+        def call_model_function(self, model, request):
+            r"""Call a model function, adding it to the loaded functions
+            if it is not already present.
+
+            Args:
+                model (str): Name of the model to call.
+                request (dict): Input to model call.
+
+            Returns:
+                dict: Output from model call.
+
+            """
+            if model not in self.functions:
+                reg = self.registry.registry.get(model, None)
+                if reg is None:
+                    raise KeyError(
+                        f'No model with the name "{model}" in '
+                        f'the registry. Valid models include: '
+                        f'{list(self.registry.registry.keys())}')
+                self.functions[model] = runner.YggFunction(
+                    reg['yamls'], signal_handler=False)
+            # TODO: Pass object untouched for single argument
+            response = self.functions[model](**request)
+            return response
+
+        def respond(self, request, model_function=None, **kwargs):
             r"""Create a response to the request.
 
             Args:
@@ -903,6 +956,9 @@ def create_service_manager_class(service_type=None):
             yamls = None
             client_id = None
             try:
+                if model_function is not None:
+                    return self.call_model_function(model_function,
+                                                    request)
                 name = request.pop('name')
                 action = request.pop('action')
                 yamls = request.pop('yamls')
@@ -1051,7 +1107,9 @@ class IntegrationServiceRegistry(object):
 
     """
 
-    def __init__(self, filename=os.path.join('~', '.yggdrasil_services.yml')):
+    def __init__(self, filename=None):
+        if filename is None:
+            filename = os.path.join('~', '.yggdrasil_services.yml')
         self.filename = os.path.expanduser(filename)
 
     @property

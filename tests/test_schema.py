@@ -151,7 +151,7 @@ def test_create_schema():
         open(f_consts, 'w').write(old_consts)
 
 
-def test_save_load_schema():
+def test_save_load_schema(display_diff):
     r"""Test saving & loading schema."""
     fname = 'test_schema.yml'
     if os.path.isfile(fname):  # pragma: debug
@@ -163,7 +163,12 @@ def test_save_load_schema():
     assert os.path.isfile(fname)
     old_contents = open(schema._schema_fname, 'r').read()
     new_contents = open(fname, 'r').read()
-    assert new_contents == old_contents
+    try:
+        assert new_contents == old_contents
+    except AssertionError:
+        display_diff(old_contents, new_contents,
+                     ncontext=10, number_lines=True)
+        raise
     s1 = schema.get_schema(fname)
     assert s1.schema == s0.schema
     # assert s1 == s0
@@ -198,7 +203,7 @@ def test_normalize(normalize_objects, display_diff):
             pprint.pprint(a)
             print('\nB:')
             pprint.pprint(y)
-            display_diff(a, y)
+            display_diff(a, y, ncontext=10)
             raise
 
 
@@ -247,7 +252,7 @@ def test_update_constants(project_dir, display_diff):
             new = fd.read()
         assert old == new
     except AssertionError:
-        display_diff(old, new)
+        display_diff(old, new, ncontext=10, number_lines=True)
         raise
     finally:
         with open(filename, 'w') as fd:

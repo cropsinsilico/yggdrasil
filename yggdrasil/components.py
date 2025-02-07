@@ -192,16 +192,20 @@ def import_component(comptype, subtype=None, **kwargs):
         class_name = subtype
     if subtype in registry.get("subtype_modules", {}):
         module_name = registry["subtype_modules"][subtype]
+    elif not registry["subtype_modules"]:
+        module_name = None
     else:
         module_name = class_name
     # Check registered components to prevent importing multiple times
     if class_name not in registry.get("classes", {}):
         registry.setdefault("classes", {})
+        if module_name:
+            module = f"{registry['module']}.{module_name}"
+        else:
+            module = registry['module']
         try:
             registry["classes"][class_name] = getattr(
-                importlib.import_module(f"{registry['module']}."
-                                        f"{module_name}"),
-                class_name)
+                importlib.import_module(module), class_name)
         except ImportError:
             if comptype == 'comm':
                 try:
@@ -215,6 +219,45 @@ def import_component(comptype, subtype=None, **kwargs):
     if hasattr(out_cls, '_get_alias'):
         out_cls = out_cls._get_alias()
     return out_cls
+
+
+def identify_component_subtype(comptype, properties, subtype=None):
+    r"""Identify the component subtype by checking the properties
+    against the schema for the component type.
+
+    Args:
+        comptype (str): Component type.
+        properties (dict): Component properties.
+        subtype (str, optional): Component subtype. If subtype is not one
+            of the registered subtypes for the specified comptype,
+            subtype is treated as the name of the class. Defaults to None
+            if not provided and the default subtype defined in the schema
+            for the specified component will be used. If the subtype is
+            specified by the component subtype key in properties, that
+            subtype will be used instead.
+
+    Returns:
+        str: Component subtype.
+
+    Raises:
+        ComponentError: If comptype is not a registered component type or
+            the component subtype cannot be determined from the provided
+            properties.
+
+    """
+    from yggdrasil.schema import get_schema, SchemaError
+    s = get_schema().get(comptype, None)
+    if s is None:  # pragma: debug
+        raise ComponentError("Unrecognized component type: %s" % comptype)
+    if s.subtype_key in properties:
+        subtype = properties[s.subtype_key]
+    if subtype is None:
+        try:
+            subtype = s.identify_subtype(properties)
+        except SchemaError:
+            raise ComponentError(f"Could not determine {comptype} "
+                                 f"component subtype from {properties}")
+    return subtype
 
 
 def create_component(comptype, subtype=None, **kwargs):
@@ -242,14 +285,8 @@ def create_component(comptype, subtype=None, **kwargs):
         ComponentError: If comptype is not a registered component type.
 
     """
-    from yggdrasil.schema import get_schema
-    s = get_schema().get(comptype, None)
-    if s is None:  # pragma: debug
-        raise ComponentError("Unrecognized component type: %s" % comptype)
-    if s.subtype_key in kwargs:
-        subtype = kwargs[s.subtype_key]
-    if subtype is None:
-        subtype = s.identify_subtype(kwargs)
+    subtype = identify_component_subtype(comptype, kwargs,
+                                         subtype=subtype)
     cls = import_component(comptype, subtype=subtype, **kwargs)
     return cls(**kwargs)
 
@@ -271,6 +308,18 @@ def get_component_base_class(comptype, subtype=None, **kwargs):
     registry = get_registry(comptype=comptype)
     base_class_name = registry['base']
     return import_component(comptype, subtype=base_class_name, **kwargs)
+
+
+def get_component_classes(comptype):
+    r"""Get a list of the classes that belong to a component type.
+
+    Returns:
+        list: Component classes.
+
+    """
+    registry = get_registry(comptype=comptype)
+    subtypes = list(registry['subtypes'].keys())
+    return [import_component(comptype, subtype=x) for x in subtypes]
 
 
 def isinstance_component(x, comptype, subtype=None, **kwargs):
@@ -412,10 +461,16 @@ class ComponentMeta(type):
             default_subtype = cls._schema_properties.get(
                 cls._schema_subtype_key, {}).get('default',
                                                  cls._schema_subtype_default)
+            if cls._schema_subtypes_in_single_file:
+                module = cls.__module__
+                subtype_module = None
+            else:
+                module = '.'.join(cls.__module__.split('.')[:-1])
+                subtype_module = cls.__module__.split('.')[-1]
             if yaml_typ not in _registry:
                 _registry[yaml_typ] = OrderedDict([
                     ("classes", OrderedDict()),
-                    ("module", '.'.join(cls.__module__.split('.')[:-1])),
+                    ("module", module),
                     ("default", default_subtype),
                     ("base", cls._schema_base_class),
                     ("key", cls._schema_subtype_key),
@@ -426,8 +481,9 @@ class ComponentMeta(type):
             if cls.__name__ not in _registry[yaml_typ]["classes"]:
                 _registry[yaml_typ]["classes"][cls.__name__] = cls
                 _registry[yaml_typ]["subtypes"][subtype] = cls.__name__
-                _registry[yaml_typ]["subtype_modules"][subtype] = (
-                    cls.__module__.split('.')[-1])
+                if subtype_module:
+                    _registry[yaml_typ]["subtype_modules"][subtype] = (
+                        subtype_module)
             if not registration_in_progress():
                 cls.after_registration(cls)
                 cls.finalize_registration(cls)
@@ -512,6 +568,7 @@ class ComponentBase(ComponentBaseUnregistered, metaclass=ComponentMeta):
     _schema_additional_kwargs_base = {}
     _schema_additional_kwargs_no_inherit = {}
     _schema_no_default_subtype = False
+    _schema_subtypes_in_single_file = False
     _dont_register = False
 
     def __new__(cls, *args, **kwargs):
@@ -658,6 +715,14 @@ class ComponentBase(ComponentBaseUnregistered, metaclass=ComponentMeta):
         These actions will not be performed if the environment variable
         YGGDRASIL_REGISTRATION_IN_PROGRESS is set."""
         pass
+
+    def update_component_properties(self, **kwargs):
+        r"""Update the component properties."""
+        for k in self._schema_properties.keys():
+            if k in self._schema_excluded_from_class:
+                continue
+            if k in kwargs and k in self._defaults_set:
+                setattr(self, k, kwargs[k])
 
 
 def create_component_class(globals_dict, base, name, attr):

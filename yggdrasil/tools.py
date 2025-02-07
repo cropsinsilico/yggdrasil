@@ -297,25 +297,69 @@ def display_source(fname, number_lines=False, return_lines=False):
     print(lines)
 
 
-def display_source_diff(fname1, fname2, number_lines=False,
-                        return_lines=False):
+def ndiff(a, b, ncontext=-1, number_lines=False, **kwargs):
+    r"""Get the diff between two lists of strings.
+
+    Args:
+        a (list): List of strings.
+        b (list): List of strings.
+        ncontext (int, optional): Number of lines before and after
+             differences that should be kept for context. If -1, all lines
+             will be included.
+        number_lines (bool, optional): If True, line numbers will be added
+            to the diff. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to difflib.ndiff.
+
+    Returns:
+        list: List of line differences.
+
+    """
+    diff = list(difflib.ndiff(a, b, **kwargs))
+    selected = []
+    if ncontext == -1:
+        selected = slice(0, len(diff))
+    else:
+        i = 0
+        last_end = 0
+        start = -1
+        end = -1
+        for i, x in enumerate(diff):
+            if x.startswith(('-', '+', '?')):
+                if start == -1:
+                    start = max(last_end, i - ncontext)
+                end = min(len(diff), i + ncontext + 1)
+            else:
+                selected.append(slice(start, end))
+                last_end = end
+                start = -1
+                end = -1
+        if start != -1:
+            selected.append(slice(start, end))
+    if number_lines:
+        diff = add_line_numbers(diff, for_diff=True)
+    out = []
+    for i, x in enumerate(selected):
+        if i > 0 and x.start != selected[i - 1].stop:
+            out += [' ...']
+        out += diff[x]
+    return out
+
+
+def display_source_diff(fname1, fname2, return_lines=False, **kwargs):
     r"""Display a diff between two source code files with syntax highlighting
     (if available).
 
     Args:
         fname1 (str): Name of first source file.
         fname2 (src): Name of second source file.
-        number_lines (bool, optional): If True, line numbers will be added
-            to the displayed examples. Defaults to False.
         return_lines (bool, optional): If True, the lines are returned rather
             than displayed. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to ndiff.
 
     """
     src1 = display_source(fname1, return_lines=True)
     src2 = display_source(fname2, return_lines=True)
-    diff = difflib.ndiff(src1.splitlines(), src2.splitlines())
-    if number_lines:
-        diff = add_line_numbers(diff, for_diff=True)
+    diff = ndiff(src1.splitlines(), src2.splitlines(), **kwargs)
     if isinstance(fname1, str):
         prefix_type1 = 'file'
     else:
@@ -645,8 +689,12 @@ def get_venv_prefix():
     return os.environ.get('VIRTUAL_ENV', None)
 
 
-def get_conda_prefix():
+def get_conda_prefix(env=None):
     r"""Determine the conda path prefix for the current environment.
+
+    Args:
+        env (str, optional): Environment to get the prefix for. If not
+            provided, the current environment's prefix will be returned.
 
     Returns:
         str: Full path to the directory prefix used for the current conda
@@ -654,6 +702,11 @@ def get_conda_prefix():
             returned.
 
     """
+    if env:
+        conda_root = get_conda_root()
+        if conda_root is None:
+            return None
+        return os.path.join(conda_root, 'envs', env)
     conda_prefix = os.environ.get('CONDA_PREFIX', None)
     # This part should be enabled if the conda base enviroment dosn't have
     # CONDA_PREFIX set. Older version of conda behaved this way so it is
@@ -674,6 +727,67 @@ def get_conda_env():
 
     """
     return os.environ.get('CONDA_DEFAULT_ENV', None)
+
+
+def get_conda_root():
+    r"""Get the root directory containing all conda environments if one
+    exists.
+
+    Returns:
+        str: Root directory containing conda environments. If conda is
+            not installed, None is returned.
+
+    """
+    conda_prefix = get_conda_prefix()
+    if conda_prefix is None:
+        return None
+    conda_env = get_conda_env()
+    if conda_prefix.endswith(conda_env):
+        return os.path.dirname(os.path.dirname(conda_prefix))
+    return conda_prefix
+
+
+def call_conda_command(command, env=None, args=None, return_output=False,
+                       default_to_mamba=False, return_command=False,
+                       **kwargs):
+    r"""Call a conda command.
+
+    Args:
+        command (str): Conda command.
+        env (str, optional): Environment to call the command for.
+        args (list, optional): Additional arguments to pass to the
+            command.
+        return_output (bool, optional): If True, the output from the
+            command will be returned.
+        default_to_mamba (bool, optional): If True, mamba will be used in
+            place of conda if it is installed.
+        return_command (bool, optional): If True, the command will be
+            returned.
+        **kwargs: Additional keyword arguments are passed to
+            subprocess.check_call or subprocess.check_output.
+
+    """
+    if default_to_mamba and shutil.which('mamba'):
+        executable = 'mamba'
+    else:
+        executable = 'conda'
+    cmd = [executable, command]
+    if env:
+        cmd += ['-n', env]
+    if args:
+        cmd += args
+    if platform._is_win:  # pragma: windows
+        # Conda/mamba commands must be run on the shell on
+        # windows as it is implemented as a batch script
+        cmd.insert(0, 'call')
+        kwargs['shell'] = True
+    if kwargs.get('shell', False):
+        cmd = ' '.join(cmd)
+    if return_command:
+        return cmd
+    if return_output:
+        return subprocess.check_output(cmd, **kwargs)
+    return subprocess.check_call(cmd, **kwargs)
 
 
 def get_subprocess_language():
@@ -2722,6 +2836,111 @@ class GeneratedFile(CacheDirMixin, IntegrationPath):
         r"""Perform actions to cleanup the file after an integration run."""
         super(GeneratedFile, self).teardown()
         self.restore_modified()
+
+
+class GeneratedShellScript(GeneratedFile):
+    r"""Generated script that will be made executable.
+
+    Args:
+        exit_on_error (bool, optional): If True, the script will be
+            generated so that it exits when there is an error.
+
+    """
+
+    def __init__(self, name, lines, exit_on_error=False, **kwargs):
+        if name.endswith('.sh'):
+            if '#!/bin/bash' not in lines:
+                lines.insert(0, '#!/bin/bash')
+        if exit_on_error:
+            if name.endswith('.sh'):
+                if 'set -e' not in lines:
+                    lines.insert(1, 'set -e')
+            elif name.endswith('.bat'):  # pragma: windows
+                error_check = 'if %errorlevel% neq 0 exit /b %errorlevel%'
+                for i in range(len(lines), 0, -1):
+                    lines.insert(i, error_check)
+        super(GeneratedShellScript, self).__init__(name, lines, **kwargs)
+
+    def setup(self):
+        r"""Perform actions on the file before an integration run
+        including generating the file."""
+        super(GeneratedShellScript, self).setup()
+        if (not platform._is_win) and os.path.isfile(self.name):
+            # mode = (stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+            # os.chmod(self.name, mode)
+            os.chmod(self.name, 0o755)
+
+    def run(self, cmd=None, return_output=False, **kws):
+        r"""Run the generated script, first generating it if necessary.
+
+        Args:
+            cmd (list, optional): Prefix arguments that should be used to
+                run the script with the script file name appended.
+            return_output (bool, optional): If True, the output from the
+                generated script will be captured and returned.
+            **kws: Additional keyword arguments are passed to
+                subprocess.check_call (or subprocess.check_output if
+                return_output is True).
+
+        """
+        generated = self.generated
+        if not generated:
+            self.setup()
+        try:
+            if cmd:
+                cmd = cmd + [self.name]
+            elif platform._is_win:  # pragma: windows
+                cmd = [os.environ['COMSPEC'], '/c', 'call', self.name]
+            else:
+                cmd = []
+                if os.path.isabs(self.name):
+                    cmd.append(self.name)
+                else:
+                    cmd.append(f'./{self.name}')
+            log_msg = f'RUNNING: {self.name}:\n\t' + '\n\t'.join(self.lines)
+            if self.verbose:
+                logger.info(log_msg)
+            else:
+                logger.debug(log_msg)
+            if kws.get('shell', False):
+                cmd = ' '.join(cmd)
+            if return_output:
+                return subprocess.check_output(cmd, **kws)
+            else:
+                subprocess.check_call(cmd, **kws)
+        finally:
+            if not generated:
+                self.teardown()
+
+
+def TemporaryGeneratedFile(lines, prefix='', suffix='', ext='.txt',
+                           cls=GeneratedFile, **kwargs):
+    r"""Class for generating a temporary generated file. The file name
+    will be generated in the temporary directory.
+
+    Args:
+        lines (list): List of lines that should be placed in the file.
+        prefix (str, optional): Prefix that will be added to the generated
+            file name before the unique identifier.
+        suffix (str, optional): Suffix that will be added to the generated
+            file name after the unique identifier.
+        ext (str, optional): File extension to use.
+        **kwargs: Additional keyword arguments are passed to the
+            GeneratedFile constructor.
+
+    """
+    import tempfile
+    uuid = str(uuid_gen.uuid4())
+    kwargs.setdefault('overwrite', True)
+    assert not kwargs.get('replace', False)
+    if ext is None and cls == GeneratedShellScript:
+        if platform._is_win:  # pragma: windows
+            ext = '.bat'
+        else:
+            ext = '.sh'
+    name = os.path.join(tempfile.gettempdir(),
+                        f'{prefix}{uuid}{suffix}{ext}')
+    return cls(name, lines, **kwargs)
 
 
 class CompilationProduct(IntegrationPath):

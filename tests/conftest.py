@@ -17,7 +17,7 @@ from yggdrasil.serialize.ObjSerialize import ObjDict
 from yggdrasil.serialize.PlySerialize import PlyDict
 from yggdrasil.tools import (
     get_supported_lang, get_supported_comm, get_supported_type,
-    resolve_language_aliases)
+    resolve_language_aliases, ndiff)
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import on_mpi as check_on_mpi
 logger = logging.getLogger(__name__)
@@ -51,12 +51,12 @@ _params = {
     "language": sorted([x for x in constants.LANGUAGES['all']
                         if x not in ['mpi', 'dummy']]),
     "commtype": sorted(get_supported_comm()),
-    "filetype": sorted(list(
-        constants.COMPONENT_REGISTRY["file"]["subtypes"].keys())),
+    "filetype": None,
     "use_async": ['False', 'True'],
     "transform": None,
     "filter": None,
     "serializer": None,
+    "package_manager": None,
     "typename": get_supported_type(),
 }
 _mpi_paths = [
@@ -528,6 +528,15 @@ def pytest_addoption(parser):
     add_options_to_parser(parser)
 
 
+def get_component_subtypes(k):
+    if k not in constants.COMPONENT_REGISTRY:
+        for kalt, v in constants.COMPONENT_REGISTRY.items():
+            if v['key'] == k:
+                k = kalt
+                break
+    return sorted(list(constants.COMPONENT_REGISTRY[k]["subtypes"].keys()))
+
+
 def add_options_to_parser(parser):
     languages = sorted(get_supported_lang())
     for x in _markers:
@@ -537,7 +546,7 @@ def add_options_to_parser(parser):
                          help=f"run {x[2]} tests")
     for k, v in _params.items():
         if v is None:
-            v = sorted(list(constants.COMPONENT_REGISTRY[k]["subtypes"].keys()))
+            v = get_component_subtypes(k)
         choices = v if v else None
         parser.addoption(f"--parametrize-{k.replace('_', '-')}",
                          help=f"Set '{k}' test parameter", nargs='*',
@@ -759,12 +768,19 @@ def pytest_collection_modifyitems(config, items):
 
 def pytest_generate_tests(metafunc):
     for k, v in _params.items():
-        if k not in metafunc.fixturenames:
-            continue
-        fixture = getattr(metafunc.cls, k, None)
-        if ((fixture
-             and ('request' not in
-                  fixture.__wrapped__.__code__.co_varnames))):
+        k_key = None
+        if k in constants.COMPONENT_REGISTRY:
+            k_key = constants.COMPONENT_REGISTRY[k]['key']
+        k_param = f'{k}_param_raw'
+        for k_target in [k_param, k_key, k]:
+            if k_target not in metafunc.fixturenames:
+                continue
+            fixture = getattr(metafunc.cls, k_target, None)
+            if ((fixture
+                 and ('request' in
+                      fixture.__wrapped__.__code__.co_varnames))):
+                break
+        else:
             continue
         flag = f"--parametrize-{k.replace('_', '-')}"
         scope = None
@@ -788,11 +804,31 @@ def pytest_generate_tests(metafunc):
             else:
                 scope = None
             if v is None:
-                params = sorted(list(
-                    constants.COMPONENT_REGISTRY[k]["subtypes"].keys()))
+                params = get_component_subtypes(k)
             else:
                 params = v
-        metafunc.parametrize(k, params, indirect=True, scope=scope)
+        if k_target == k_param:
+            counts = {
+                k: len(metafunc.cls._component_instance_param.get(k, []))
+                for k in params
+            }
+            params = [
+                pytest.param((k, v), id=f'{k}-{i}')
+                for k in params for i, v in
+                enumerate(metafunc.cls._component_instance_param.get(k, []))
+            ]
+            for k, v in metafunc.cls._component_instance_param.items():
+                if not isinstance(k, tuple):
+                    continue
+                for kk in k:
+                    if kk in counts:
+                        for vv in v:
+                            i = counts[kk]
+                            counts[kk] += 1
+                            params.append(
+                                pytest.param((kk, vv), id=f'{kk}-{i}')
+                            )
+        metafunc.parametrize(k_target, params, indirect=True, scope=scope)
 
 
 def write_pytest_script(fname, argv):
@@ -841,6 +877,14 @@ def project_dir():
 def external_dir():
     r"""Directory outside of the local yggdrasil installation."""
     return os.path.dirname(os.getcwd())
+
+
+@pytest.fixture(scope="session")
+def requires_conda():
+    r"""Skips the test if conda is not installed."""
+    from yggdrasil.tools import get_conda_prefix
+    if not get_conda_prefix():
+        pytest.skip("conda not installed")
     
 
 @pytest.fixture(scope="session")
@@ -1072,16 +1116,20 @@ def check_service_manager_settings():
 
 
 @pytest.fixture(scope="session")
-def running_service(pytestconfig, check_service_manager_settings,
-                    project_dir, external_dir, logger):
-    r"""Context manager to run and clean-up an integration service."""
+def with_coverage(pytestconfig):
+    r"""bool: True if the tests are run with coverage turned on."""
     manager = pytestconfig.pluginmanager
     plugin_class = manager.get_plugin('pytest_cov').CovPlugin
-    with_coverage = False
     for x in manager.get_plugins():
         if isinstance(x, plugin_class):
-            with_coverage = True
-            break
+            return True
+    return False
+
+
+@pytest.fixture(scope="session")
+def running_service(with_coverage, check_service_manager_settings,
+                    project_dir, external_dir, logger):
+    r"""Context manager to run and clean-up an integration service."""
 
     @contextlib.contextmanager
     def running_service_w(service_type, partial_commtype=None,
@@ -1889,12 +1937,12 @@ def finalize_mpi(request, on_mpi, mpi_comm, mpi_rank, mpi_size):
 @pytest.fixture
 def display_diff():
 
-    def wrapped(a, b):
-        import difflib
+    def wrapped(a, b, **kwargs):
         a_str = pprint.pformat(a)
         b_str = pprint.pformat(b)
-        diff = difflib.ndiff(a_str.splitlines(),
-                             b_str.splitlines())
+        diff = ndiff(a_str.splitlines(),
+                     b_str.splitlines(),
+                     **kwargs)
         print('\n'.join(diff))
 
     return wrapped

@@ -14,7 +14,8 @@ import contextlib
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import (
-    platform, tools, languages, multitasking, constants, rapidjson)
+    platform, tools, languages, multitasking, constants, rapidjson,
+    dependencies)
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from queue import Empty
@@ -468,10 +469,7 @@ class ModelDriver(Driver):
         dependencies (list, optional): A list of packages required by the
             model that are written in the same language as the model. If the
             package requires dependencies outside the language of the model.
-            use the additional_dependencies parameter to provide them. If you
-            need a version of the package from a specific package manager,
-            a mapping with 'package' and 'package_manager' fields can be
-            provided instead of just the name of the package.
+            use the additional_dependencies parameter to provide them.
         additional_dependencies (dict, optional): A mapping between languages
             and lists of packages in those languages that are required by the
             model.
@@ -536,6 +534,9 @@ class ModelDriver(Driver):
         comms_implicit (bool): True if the comms installed for this driver
             are not explicitly defined (depend on input parameters). Defaults
             to False.
+        default_package_manager (str): Package manager that should be
+            used to install dependencies associated with this language
+            that do not have a package_manager specified.
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
@@ -606,11 +607,7 @@ class ModelDriver(Driver):
         dependencies (list): A list of packages required by the model that are
             written in the same language as the model. If the package requires
             dependencies outside the language of the model, use the
-            additional_dependencies parameter to provide them. If you need a
-            version of the package from a specific package manager, a mapping
-            
-            with 'package' and 'package_manager' fields can be provided
-            instead of just the name of the package.
+            additional_dependencies parameter to provide them.
         additional_dependencies (dict): A mapping between languages and lists
             of packages in those languages that are required by the model.
 
@@ -727,29 +724,19 @@ class ModelDriver(Driver):
         'contact_email': {'type': 'string'},
         'validation_command': {'type': 'string'},
         'dependencies': {
+            # 'anyOf': [
+            #     {'type': 'object'},
             'type': 'array',
-            'items': {'oneOf': [
-                {'type': 'string'},
-                {'type': 'object',
-                 'required': ['package'],
-                 'properties': {
-                     'package': {'type': 'string'},
-                     'package_manager': {'type': 'string'},
-                     'arguments': {'type': 'string'}},
-                 'additionalProperties': False}]}},
+            'items': {'$ref': '#/definitions/dependency'},
+        },
         'additional_dependencies': {
             'type': 'object',
             'additionalProperties': {
                 'type': 'array',
-                'items': {'oneOf': [
-                    {'type': 'string'},
-                    {'type': 'object',
-                     'required': ['package'],
-                     'properties': {
-                         'package': {'type': 'string'},
-                         'package_manager': {'type': 'string'},
-                         'arguments': {'type': 'string'}},
-                     'additionalProperties': False}]}}}}
+                'items': {'$ref': '#/definitions/dependency'},
+            }
+        }
+    }
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _schema_additional_kwargs_base = {
@@ -797,6 +784,7 @@ class ModelDriver(Driver):
                         'array_output': 'YggArrayOutput',
                         'pandas_input': 'YggPandasInput',
                         'pandas_output': 'YggPandasOutput'}
+    default_package_manager = None
     _library_cache = {}
     _config_keys = []
     _config_attr_map = []
@@ -1304,113 +1292,58 @@ class ModelDriver(Driver):
         return []
 
     @classmethod
-    def install_model_dependencies(cls, dependencies, always_yes=False):
+    def install_model_dependencies(cls, deps, package_manager=None,
+                                   **kwargs):
         r"""Install any dependencies required by the model.
 
         Args:
-            dependencies (list): Dependencies that should be installed.
-            always_yes (bool, optional): If True, the package manager will
-                not ask users for input during installation. Defaults to
-                False.
+            deps (list, ManagedDependencyBase): Dependencies that should
+                be installed.
+            package_manager (str, optional): Package manager that should
+                be used to install the dependencies that do not already
+                have a package_manager specified.
+            **kwargs: Additional keyword arguments will be passed to
+                install_dependency.
+
+        Returns:
+            DependencySet: Instance containing dependencies.
 
         """
-        packages = {}
-        for x in dependencies:
-            if isinstance(x, str):
-                x = {'package': x}
-            if x.get('arguments', None):
-                cls.install_dependency(always_yes=always_yes, **x)
-            else:
-                packages.setdefault(x.get('package_manager', None), [])
-                packages[x.get('package_manager', None)].append(
-                    x['package'])
-        for k, v in packages.items():
-            cls.install_dependency(v, package_manager=k,
-                                   always_yes=always_yes)
+        if package_manager is not None:
+            kwargs['default_package_manager'] = package_manager
+        return cls.install_dependency(deps, **kwargs)
 
     @classmethod
-    def install_dependency(cls, package=None, package_manager=None,
-                           arguments=None, command=None, always_yes=False,
-                           command_kwargs=None):
+    def install_dependency(cls, package=None, always_yes=False, **kwargs):
         r"""Install a dependency.
 
         Args:
             package (str): Name of the package that should be installed. If
                 the package manager supports it, this can include version
                 requirements.
-            package_manager (str, optional): Package manager that should be
-                used to install the package.
-            arguments (str, optional): Additional arguments that should be
-                passed to the package manager.
-            command (list, optional): Command that should be used to
-                install the package.
             always_yes (bool, optional): If True, the package manager will
                 not ask users for input during installation. Defaults to
                 False.
+            command (list, optional): Command that should be used to
+                install the package.
             command_kwargs (dict, optional): Keyword arguments that should
                 be passed to the subprocess call for the installation.
+            **kwargs: Additional keyword arguments are passed to the
+                dependency component class initializer.
+
+        Returns:
+            ManagedDependencyBase: Dependency instance.
 
         """
-        assert package
-        if isinstance(package, str):
-            package = package.split()
-        if package_manager is None:
-            if tools.get_conda_prefix():
-                package_manager = 'conda'
-                if shutil.which('mamba'):
-                    package_manager = 'mamba'
-            elif platform._is_mac:
-                package_manager = 'brew'
-            elif platform._is_linux:
-                package_manager = 'apt'
-            elif platform._is_win:
-                package_manager = 'choco'
-        yes_cmd = []
-        if command_kwargs is None:
-            command_kwargs = {}
-        if command:
-            cmd = copy.copy(command)
-        elif package_manager in ('conda', 'mamba'):
-            cmd = [package_manager, 'install'] + package
-            if platform._is_win:  # pragma: windows
-                # Conda/mamba commands must be run on the shell on
-                # windows as it is implemented as a batch script
-                cmd.insert(0, 'call')
-                command_kwargs['shell'] = True
-            yes_cmd = ['-y']
-        elif package_manager == 'brew':
-            cmd = ['brew', 'install'] + package
-        elif package_manager == 'apt':
-            cmd = ['apt-get', 'install'] + package
-            if bool(os.environ.get('GITHUB_ACTIONS', False)):
-                # Only enable sudo for testing, otherwise allow the user to
-                # decide if they want to run yggdrasil with sudo, or just
-                # install the dependencies themselves
-                cmd.insert(0, 'sudo')
-            yes_cmd = ['-y']
-        elif package_manager == 'choco':
-            cmd = ['choco', 'install'] + package
-        elif package_manager == 'vcpkg':
-            cmd = ['vcpkg.exe', 'install', '--triplet', 'x64-windows']
-            cmd += package
-        else:
-            package_managers = {'pip': 'python',
-                                'cran': 'r'}
-            if package_manager in package_managers:
-                drv = import_component(
-                    'model', package_managers[package_manager])
-                return drv.install_dependency(
-                    package=package, package_manager=package_manager,
-                    arguments=arguments, always_yes=always_yes)
-            raise NotImplementedError(f"Unsupported package manager: "
-                                      f"{package_manager}")
-        if arguments:
-            cmd += arguments.split()
-        if always_yes:
-            cmd += yes_cmd
-        if command_kwargs.get('shell', False):
-            cmd = ' '.join(cmd)
-        subprocess.check_call(cmd, **command_kwargs)
+        if bool(os.environ.get('GITHUB_ACTIONS', False)):
+            always_yes = True
+        kwargs.setdefault('default_package_manager',
+                          cls.default_package_manager)
+        if not isinstance(package, dependencies.ManagedDependencyBase):
+            package = dependencies.ManagedDependencyBase.create_component(
+                package=package, **kwargs)
+        package.install(always_yes=always_yes)
+        return package
         
     def model_command(self):
         r"""Return the command that should be used to run the model.
@@ -2047,8 +1980,6 @@ class ModelDriver(Driver):
             env[k.replace(':', '__COLON__')] = env.pop(k)
         if ygg_cfg.get('general', 'allow_multiple_omp', False):
             env['KMP_DUPLICATE_LIB_OK'] = 'True'
-        import pprint
-        pprint.pprint(env)
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):

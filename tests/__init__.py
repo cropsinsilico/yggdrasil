@@ -237,9 +237,57 @@ class TestClassBase(TestBase):
         del out
 
 
-class TestComponentBase(TestClassBase):
+class TestComponentMeta(type):
+    r"""Meta class for component tests."""
+
+    def __new__(meta, name, bases, class_dict):
+        from yggdrasil import constants
+        component_type = class_dict.get('_component_type', None)
+        if component_type is not None:
+            use_param = bool(
+                class_dict.get('_component_instance_param', None))
+            k = constants.COMPONENT_REGISTRY[component_type]['key']
+            k_param = f'{k}_param_raw'
+            new_methods = {}
+            if use_param:
+                new_methods[k_param] = (
+                    f'def {k_param}(self, request):\n'
+                    f'    return request.param'
+                )
+                new_methods['component_subtype_param_raw'] = (
+                    f'def component_subtype_param_raw(self, {k_param}):\n'
+                    f'    return {k_param}'
+                )
+                new_methods[k] = (
+                    f'def {k}(self, {k_param}):\n'
+                    f'    return {k_param}[0]'
+                )
+            else:
+                new_methods[k] = (
+                    f'def {k}(self, request):\n'
+                    f'    return request.param'
+                )
+            new_methods['component_subtype'] = (
+                f'def component_subtype(self, {k}):\n'
+                f'    return {k}'
+            )
+            new_methods[component_type] = (
+                f'def {component_type}(self, {k}):\n'
+                f'    return {k}'
+            )
+            if not any(k in class_dict for k in new_methods.keys()):
+                for k, v in new_methods.items():
+                    exec(v)
+                    class_dict[k] = pytest.fixture(
+                        scope="class", autouse=True, name=k)(eval(k))
+        cls = type.__new__(meta, name, bases, class_dict)
+        return cls
+
+
+class TestComponentBase(TestClassBase, metaclass=TestComponentMeta):
 
     _component_type = None
+    _component_instance_param = {}
 
     @pytest.fixture(scope="class", autouse=True)
     def reset_test(self, component_subtype):
@@ -251,10 +299,22 @@ class TestComponentBase(TestClassBase):
         return self._component_type
 
     @pytest.fixture(scope="class", autouse=True, params=[])
-    def component_subtype(self, request):
+    def component_subtype(self, request, component_subtype_param_raw):
         r"""Subtype of component being tested."""
         return request.param
 
+    @pytest.fixture(scope="class", params=[])
+    def component_subtype_param_raw(self, request):
+        r"""Parameters of component being tested."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def component_subtype_param(self, component_subtype_param_raw):
+        r"""Parameters of component being tested."""
+        if component_subtype_param_raw is None:
+            pytest.skip('Component subtype not parametrized by param')
+        return component_subtype_param_raw[1]
+    
     @pytest.fixture(scope="class")
     def module_name(self, python_class):
         r"""Name of the module containing the class being tested."""

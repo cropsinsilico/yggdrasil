@@ -18,6 +18,11 @@ _constants_separator = (
     "# ======================================================\n")
 
 
+class SchemaError(BaseException):
+    r"""Error related to the schema."""
+    pass
+
+
 class SchemaDict(OrderedDict):
     r"""OrderedDict subclass for ordering schemas on read in Python 2."""
 
@@ -271,7 +276,8 @@ def update_constants(schema=None):
             'base': v.base_subtype_class_name,
             'key': v.subtype_key,
             'subtypes': v.subtype2class,
-            'subtype_modules': v.subtype2module}
+            'subtype_modules': v.subtype2module,
+        }
     # File information
     files = {
         k: import_component('file', v)
@@ -456,8 +462,8 @@ class ComponentSchema(object):
                 return subtype
             except rapidjson.ValidationError:
                 pass
-        raise ValueError("Could not determine subtype "
-                         "for document: %s" % doc)  # pragma: debug
+        raise SchemaError(f"Could not determine subtype "
+                          f"for document: {doc}")  # pragma: debug
 
     def get_base_schema(self):
         r"""Get a base schema containing properties that are the same
@@ -953,6 +959,16 @@ class ComponentSchema(object):
                        if k in subt_base}
         for v in subt_schema:
             v_module_name, v_class_name = v['title'].split('.')[-2:]
+            if ((out.module is not None
+                 and out.module.endswith(v_module_name)
+                 and out.module == '.'.join(v['title'].split('.')[:-1]))):
+                v_module_name = None
+            elif len(out.schema_modules) == 1:
+                existing_k = next(iter(out.schema_modules.keys()))
+                if v_module_name == out.schema_modules[existing_k]:
+                    v_module_name = None
+                    out.module = '.'.join(v['title'].split('.')[:-1])
+                    out.schema_modules.pop(existing_k)
             v_new = copy.deepcopy(v)
             v_new['required'] = sorted(list(
                 set(v.get('required', [])) | set(subt_base.get('required', []))))
@@ -971,8 +987,11 @@ class ComponentSchema(object):
                               kwargs_no_inherit=kwargs_no_inherit)
             subtypes = v['properties'][out.subtype_key]['enum']
             out.schema_subtypes[v_class_name] = subtypes
-            out.schema_modules[v_class_name] = v_module_name
-            v_module = '.'.join(v['title'].split('.')[:-2])
+            if v_module_name is None:
+                v_module = '.'.join(v['title'].split('.')[:-1])
+            else:
+                out.schema_modules[v_class_name] = v_module_name
+                v_module = '.'.join(v['title'].split('.')[:-2])
             if out.module is None:
                 out.module = v_module
             else:
@@ -1053,7 +1072,8 @@ class ComponentSchema(object):
         out = {}
         for k, v in self.schema_subtypes.items():
             for iv in v:
-                out[iv] = self.schema_modules[k]
+                if k in self.schema_modules:
+                    out[iv] = self.schema_modules[k]
         return out
 
     @property
@@ -1068,9 +1088,11 @@ class ComponentSchema(object):
         r"""ComponentClass: Base class for the subtype."""
         if not getattr(self, '_base_subtype_class', None):
             default_class = list(self.schema_subtypes.keys())[0]
-            cls = getattr(
-                importlib.import_module(f"{self.module}.{default_class}"),
-                default_class)
+            if default_class in self.schema_modules:
+                module = f"{self.module}.{default_class}"
+            else:
+                module = self.module
+            cls = getattr(importlib.import_module(module), default_class)
             base_class = cls
             for i, x in enumerate(cls.__mro__):
                 if x._schema_type != cls._schema_type:
@@ -1207,7 +1229,12 @@ class ComponentSchema(object):
         assert comp_cls._schema_subtype_key == self.subtype_key
         name = comp_cls.__name__
         fullname = f'{comp_cls.__module__}.{comp_cls.__name__}'
-        subtype_module = '.'.join(comp_cls.__module__.split('.')[:-1])
+        if comp_cls._schema_subtypes_in_single_file:
+            base_module = comp_cls.__module__
+            subtype_module = None
+        else:
+            base_module = '.'.join(comp_cls.__module__.split('.')[:-1])
+            subtype_module = comp_cls.__module__.split('.')[-1]
         # Append subtype
         subtype_list = copy.deepcopy(
             getattr(comp_cls, f'_{self.subtype_key}', None))
@@ -1219,8 +1246,9 @@ class ComponentSchema(object):
         if name.endswith(('Driver', 'Model')):
             driver_list.append(name)
         self.schema_subtypes[name] = subtype_list
-        self.schema_modules[name] = comp_cls.__module__.split('.')[-1]
-        assert subtype_module == self.module
+        if subtype_module:
+            self.schema_modules[name] = subtype_module
+        assert base_module == self.module
         # Create new schema for subtype
         new_schema = {'title': fullname,
                       'description': ('Schema for %s component %s subtype.'
@@ -1305,7 +1333,14 @@ class SchemaRegistry(object):
         self._cache = {}
         self._storage[k] = v
         if verify:
-            rapidjson.Normalizer.check_schema(self.get_schema())
+            if k == 'package_manager':
+                import pprint
+                pprint.pprint(self.get_schema())
+            try:
+                rapidjson.Normalizer.check_schema(self.get_schema())
+            except BaseException:
+                print("HERE", k)
+                raise
 
     def get(self, k, *args, **kwargs):
         r"""Return a component schema from the registry."""

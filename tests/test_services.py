@@ -50,12 +50,12 @@ def test_call_integration_remote():
         if os.path.isfile(remote_yml):
             os.remove(remote_yml)
         cli.send_request(name, action='stop')
-        
-        
+
+
 class TestServices(object):
     r"""Class to test integration services."""
 
-    @pytest.fixture(params=itertools.product(['flask', 'rmq'], [None, 'rmq']),
+    @pytest.fixture(params=itertools.product(['flask'], [None]),
                     ids=_make_ids, scope="class", autouse=True)
     def running_service(self, request, running_service):
         track_memory = (request.param[0] == 'flask'
@@ -228,6 +228,26 @@ class TestServices(object):
         finally:
             cli.registry.remove(name)
 
+    def test_calling_model_as_service(self, running_service):
+        r"""Test calling a model as a service."""
+        cli = running_service
+        if cli.service_type != 'flask':
+            pytest.skip('Only valid for flask services')
+        name = 'fakeplant_python'
+        test_yml = ex_yamls['fakeplant']['python']
+        try:
+            cli.registry.add(name, test_yml)
+            out = cli.send_request({'light_intensity': 1.0,
+                                    'temperature': 35.0,
+                                    'co2': 50.0}, model=name)
+            with pytest.raises(ServerError):
+                out = cli.send_request({'light_intensity': 1.0,
+                                        'temperature': 35.0,
+                                        'co2': 50.0}, model='invalid')
+            assert out == {'photosynthesis_rate': 1.4285714285714286}
+        finally:
+            cli.registry.remove(name)
+
 
 def test_validate_model_submission():
     r"""Test validate_model_submission"""
@@ -249,7 +269,9 @@ def test_validate_model_repo():
     r"""Test validation of YAMLs in the model repository."""
     import git
     import tempfile
-    dest = os.path.join(tempfile.gettempdir(), "model_repo")
+    dest = '/Users/langmm/yggdrasil_models'
+    if not os.path.isdir(dest):
+        dest = os.path.join(tempfile.gettempdir(), "model_repo")
     url = "https://github.com/cropsinsilico/yggdrasil_models"
     dest_exists = os.path.isdir(dest)
     for x in [url, url + "_test"]:

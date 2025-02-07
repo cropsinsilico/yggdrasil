@@ -1916,8 +1916,8 @@ class main(SubCommand):
                    ygginstall, update_config, regen_schema,
                    yggmodelform, yggdevup,
                    timing_plots, generate_gha_workflow,
-                   integration_service_manager, coveragerc,
-                   file_converter]
+                   integration_service_manager,
+                   coveragerc, file_converter]
 
     @classmethod
     def get_parser(cls, **kwargs):

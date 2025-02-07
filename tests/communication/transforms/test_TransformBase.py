@@ -12,16 +12,6 @@ class TestTransformBase(base_class):
 
     _component_type = 'transform'
     
-    @pytest.fixture(scope="class", autouse=True)
-    def component_subtype(self, transform):
-        r"""Subtype of component being tested."""
-        return transform
-
-    @pytest.fixture(scope="class", autouse=True)
-    def transform(self, request):
-        r"""str: Transformation being tested."""
-        return request.param
-
     @pytest.fixture
     def testing_options(self, python_class, options):
         r"""Testing options."""
