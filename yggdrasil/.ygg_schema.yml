@@ -882,18 +882,6 @@ definitions:
     allowSingular: package
     description: Base schema for all subtypes of dependency components.
     properties:
-      additional_steps:
-        description: Additional commands that should be executed in order to install
-          the package.
-        items:
-          type: string
-        type: array
-      additional_steps_uninstall:
-        description: Additional commands that should be executed in order to uninstall
-          the package.
-        items:
-          type: string
-        type: array
       args_build:
         description: Arguments that should be passed to the build tool during the
           build step if buildfile is provided.
@@ -1058,6 +1046,30 @@ definitions:
         - source
         - vcpkg
         type: string
+      post_install_steps:
+        description: Additional commands that should be executed in order to install
+          the package.
+        items:
+          type: string
+        type: array
+      post_uninstall_steps:
+        description: Additional commands that should be executed in order to uninstall
+          the package.
+        items:
+          type: string
+        type: array
+      pre_install_steps:
+        description: Additional commands that should be executed before install in
+          order to install the package.
+        items:
+          type: string
+        type: array
+      pre_uninstall_steps:
+        description: Additional commands that should be executed before uninstall
+          in order to uninstall the package.
+        items:
+          type: string
+        type: array
       preserve:
         default: false
         description: If True, uninstall will only uninstall the dependency installation
@@ -1067,6 +1079,12 @@ definitions:
         type: boolean
       products:
         description: Files that are required for the dependency to be considered installed.
+        items:
+          type: string
+        type: array
+      r_install_steps:
+        description: Set of R commands that should be used to install the package
+          if different from the standard 'install.packages()' method.
         items:
           type: string
         type: array
@@ -1261,6 +1279,12 @@ definitions:
         enum:
         - cran
         type: string
+      r_install_steps:
+        description: Set of R commands that should be used to install the package
+          if different from the standard 'install.packages()' method.
+        items:
+          type: string
+        type: array
       repos:
         default: http://cloud.r-project.org
         description: Mirror that should be used to install the dependency from.
@@ -3827,6 +3851,10 @@ definitions:
           If not provided, the respository will be cloned into the model working_dir.
           If not an absolute path, it will be taken as relative to the model working_dir.
         type: string
+      repository_patches:
+        items:
+          type: string
+        type: array
       repository_url:
         description: URL for the git repository containing the model source code.
           If provided, relative paths in the model YAML definition will be considered

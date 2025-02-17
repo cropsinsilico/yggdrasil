@@ -269,16 +269,19 @@ def test_validate_model_repo():
     r"""Test validation of YAMLs in the model repository."""
     import git
     import tempfile
-    dest = '/Users/langmm/yggdrasil_models'
-    if not os.path.isdir(dest):
-        dest = os.path.join(tempfile.gettempdir(), "model_repo")
-    url = "https://github.com/cropsinsilico/yggdrasil_models"
-    dest_exists = os.path.isdir(dest)
-    for x in [url, url + "_test"]:
+    dest0 = '/Users/langmm/yggdrasil_models'
+    url0 = "https://github.com/cropsinsilico/yggdrasil_models"
+    for suffix in ["", "_test"]:
+        dest = dest0 + suffix
+        dest_exists = os.path.isdir(dest)
+        if not dest_exists:
+            dest = os.path.join(tempfile.gettempdir(),
+                                "model_repo" + suffix)
+            dest_exists = os.path.isdir(dest)
         try:
             repo = None
             if not dest_exists:
-                repo = git.Repo.clone_from(x, dest)
+                repo = git.Repo.clone_from(url0 + suffix, dest)
             model_dir = os.path.join(dest, "models")
             validate_model_submission(model_dir)
             if not dest_exists:

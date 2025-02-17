@@ -22,7 +22,8 @@ RUN source /opt/conda/etc/profile.d/conda.sh && \
 RUN source /opt/conda/etc/profile.d/conda.sh && \
     conda activate env && \
     ls /yggdrasil/yggdrasil/rapidjson/include/rapidjson/ && \
-    python setup.py develop --rj-include-dir=/yggdrasil/yggdrasil/rapidjson/include
+    python utils/setup_test_env.py install mamba --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --without-deps
+    # python setup.py develop --rj-include-dir=/yggdrasil/yggdrasil/rapidjson/include
     # python -m pip install --editable .
 # RUN source /opt/conda/etc/profile.d/conda.sh && \
 #     conda activate env && \

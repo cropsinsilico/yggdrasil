@@ -1,4 +1,5 @@
 import numpy as np
+import pprint
 from yggdrasil import constants, units
 
 
@@ -73,7 +74,8 @@ def definition2dtype(props, array=None):
     """
     typename = props.get('subtype', props.get('type', None))
     if typename is None:  # pragma: debug
-        raise KeyError('Could not find type in dictionary')
+        raise KeyError(f'Could not find type in dictionary: '
+                       f'{pprint.pformat(props)}')
     if typename in constants.FLEXIBLE_TYPES:
         nbytes = constants.FIXED_ENCODING_SIZES.get(props.get('encoding', 'ASCII'), 4)
         if (((typename == 'string' and 'subtype' not in props)

@@ -52,8 +52,9 @@ for cls in (BaseConstructor, Constructor, SafeConstructor):
 
 def clone_github_repo(fname, commit=None, branch=None, tag=None,
                       repository_dir=None, directory_for_clones=None,
-                      working_dir=None, return_repo=False,
-                      is_private=False):
+                      use_submodules=False, working_dir=None,
+                      return_repo=False, is_private=False,
+                      patches=None):
     r"""Clone a GitHub repository, returning the path to the local copy of the
     file pointed to by the URL if there is one.
 
@@ -82,6 +83,8 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
             for repository_dir. If not provided and the
             YGGDRASIL_SERVICE_REPO_DIR environment variable is set
             (such as by a service manager), that value will be used.
+        use_submodules (bool, optional): If True, new clones inside of
+            existing repositories will be added as submodules.
         working_dir (str, optional): Working directory that relative
             paths should be taken from. Defaults to the current working
             directory.
@@ -90,6 +93,8 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
         is_private (bool, optional): If True, the repository is private
             and the user may be asked for credentials when cloning the
             repository.
+        patches (list, optional): Patches that should be applied to the
+            repository after it is cloned/checked out.
 
     Returns:
         str: Path to the local copy of the repository or file in the
@@ -149,7 +154,18 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
             #     'GIT_ASKPASS': 'false',
             #     'GCM_INTERACTIVE': 'never',
             # }
-        repo = git.Repo.clone_from(cloneurl, repository_dir, **kws)
+        parent_repo = None
+        if use_submodules:
+            parent_repo = find_parent_repo(repository_dir)
+        if parent_repo:
+            if 'multi_options' in kws:
+                kws['clone_multi_options'] = kws.pop('multi_options')
+            git.Submodule.add(parent_repo, reponame, repository_dir,
+                              url=cloneurl, branch=branch, **kws)
+            repo = git.Repo(repository_dir)
+            parent_repo.close()
+        else:
+            repo = git.Repo.clone_from(cloneurl, repository_dir, **kws)
     checkout = commit
     if checkout is None and tag is not None:
         if tag is True:
@@ -161,6 +177,15 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
         checkout = branch
     if checkout is not None:
         repo.git.checkout(checkout)
+    if patches and not repo.is_dirty():
+        for patch in patches:
+            if not os.path.isfile(patch):
+                for x in [working_dir, repository_dir]:
+                    y = os.path.join(x, patch)
+                    if os.path.isfile(y):
+                        patch = y
+                        break
+            repo.git.execute(['git', 'apply', patch])
     if return_repo:
         return repo
     repo.close()
@@ -168,8 +193,37 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
     return os.path.realpath(fname)
 
 
+def find_parent_repo(repository_dir):
+    r"""Find the parent repository containing a directory.
+
+    Args:
+        repository_dir (str): Directory to find parent repository for.
+
+    Returns:
+        git.Repo: Parent repository instance or None if one cannot be
+            located.
+
+    """
+    candidates = []
+    x = repository_dir
+    while x not in ['', '/', '\\']:
+        if os.path.isdir(x):
+            try:
+                candidates.append(git.Repo(x))
+            except git.InvalidGitRepositoryError:
+                pass
+        x = os.path.dirname(x)
+    if candidates:
+        out = candidates[-1]
+        for x in candidates[:-1]:
+            x.close()
+        return out
+    return None
+
+
 def load_yaml(fname, yaml_param=None, directory_for_clones=None,
-              model_submission=False, verbose=False, included=False):
+              use_submodules=False, model_submission=False, verbose=False,
+              included=False):
     r"""Parse a yaml file defining a run.
 
     Args:
@@ -189,6 +243,8 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
             specified in the yaml via repository_dir. If not provided and
             repository_dir is not set, the working_dir for the yaml will
             be used.
+        use_submodules (bool, optional): If True, new clones inside of
+            existing repositories will be added as submodules.
         model_submission (bool, optional): If True, the YAML will be evaluated
             as a submission to the yggdrasil model repository and model_only
             will be set to True. Defaults to False.
@@ -211,7 +267,8 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
         # pull foreign file
         if fname.startswith('git:'):
             fname = clone_github_repo(
-                fname[4:], directory_for_clones=directory_for_clones)
+                fname[4:], directory_for_clones=directory_for_clones,
+                use_submodules=use_submodules)
         fname = os.path.realpath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
@@ -262,7 +319,9 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
                 commit=x.get('repository_commit', None),
                 repository_dir=x.get('repository_dir', None),
                 directory_for_clones=directory_for_clones,
-                working_dir=x.get('working_dir', yamldir)
+                use_submodules=use_submodules,
+                working_dir=x.get('working_dir', yamldir),
+                patches=x.get('repository_patches', None),
             )
             x.setdefault('working_dir', x['repository_dir'])
     s = get_schema()
@@ -283,7 +342,7 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
 
 
 def prep_yaml(files, yaml_param=None, directory_for_clones=None,
-              model_submission=False, verbose=False):
+              use_submodules=False, model_submission=False, verbose=False):
     r"""Prepare yaml to be parsed by rapidjson including covering backwards
     compatible options.
 
@@ -299,6 +358,8 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
             for repository_dir. If not provided and the
             YGGDRASIL_SERVICE_REPO_DIR environment variable is set
             (such as by a service manager), that value will be used.
+        use_submodules (bool, optional): If True, new clones inside of
+            existing repositories will be added as submodules.
         model_submission (bool, optional): If True, the YAML will be evaluated
             as a submission to the yggdrasil model repository and model_only
             will be set to True. Defaults to False.
@@ -315,6 +376,7 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
         files = [files]
     yamls = [load_yaml(f, yaml_param=yaml_param,
                        directory_for_clones=directory_for_clones,
+                       use_submodules=use_submodules,
                        model_submission=model_submission,
                        verbose=verbose)
              for f in files]
@@ -324,7 +386,8 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
     while first or files:
         for f in files:
             yamls.append(load_yaml(f, yaml_param, included=(not first),
-                                   directory_for_clones=directory_for_clones))
+                                   directory_for_clones=directory_for_clones,
+                                   use_submodules=use_submodules))
         first = False
         files = []
         for y in yamls:
@@ -364,7 +427,8 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
 
 def parse_yaml(files, complete_partial=False, partial_commtype=None,
                model_only=False, model_submission=False, yaml_param=None,
-               directory_for_clones=None, verbose=False):
+               directory_for_clones=None, use_submodules=False,
+               verbose=False):
     r"""Parse list of yaml files.
 
     Args:
@@ -390,6 +454,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
             for repository_dir. If not provided and the
             YGGDRASIL_SERVICE_REPO_DIR environment variable is set
             (such as by a service manager), that value will be used.
+        use_submodules (bool, optional): If True, new clones inside of
+            existing repositories will be added as submodules.
         verbose (bool, optional): If True, steps of the YAML parsing
             process will be printed. Defaults to False.
 
@@ -409,6 +475,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     run_backwards_compat = True
     yml_norm = prep_yaml(files, yaml_param=yaml_param,
                          directory_for_clones=directory_for_clones,
+                         use_submodules=use_submodules,
                          model_submission=model_submission,
                          verbose=verbose)
     __display_progress(verbose, yml_norm, "prepped")

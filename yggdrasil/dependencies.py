@@ -1,6 +1,3 @@
-# TODO: Install conda package into env
-# TODO: Allow repo w/ pip, cran, conda install
-# TODO: Isolate conda_env property to package_managers it affects
 import subprocess
 import re
 import os
@@ -47,6 +44,16 @@ class DependencyError(BaseException):
 
 class DependencyValidationError(DependencyError):
     r"""Class for validation error"""
+    pass
+
+
+class DependencyInstalledError(DependencyError):
+    r"""Class for error raised when checking a package is installed"""
+    pass
+
+
+class DependencyUninstalledError(DependencyError):
+    r"""Class for error raised when checking a package is uninstalled"""
     pass
 
 
@@ -210,6 +217,225 @@ def parse_version_string(version, pos=0, endswith=False):
     return out
 
 
+def is_installed_any(package, included=None, excluded=None,
+                     language=None, **kwargs):
+    r"""Check if a package is installed via any of the known package
+    managers.
+
+    Args:
+        package (str): The name of the package that should be checked.
+        included (list, optional): Set of package managers that should be
+            checked. If not provided, all of the installed package
+            managers will be checked.
+        excluded (list, optional): Set of package managers that should
+            not be checked.
+        language (str, optional): Language that the package is written in.
+        **kwargs: Additional keyword arguments are passed to the
+            constructor for each package manager dependency.
+
+    Returns:
+       str, bool: The name of the package manager that the package is
+           installed by if it is installed or False if it is not.
+
+    """
+    if included is None:
+        included = get_component_classes('dependency')
+    else:
+        included = [import_component('dependency', x) for x in included]
+    for x in included:
+        if x._schema_required != ['package']:
+            continue
+        if excluded and x._package_manager in excluded:
+            continue
+        if ((language and x.language_specific
+             and language != x.language_specific)):
+            continue
+        x_inst = x(package=package, **kwargs)
+        x_is_installed = x_inst.is_installed
+        if x_is_installed:
+            x_is_installed['package_manager'] = x_inst._package_manager
+            return x_is_installed
+    return False
+
+
+class ErrorRegistry(object):
+    r"""Registry for catching and accumulating errors.
+
+    Args:
+        error_types (type, tuple): One or more error types that should be
+            registered.
+        final_error (type, optional): Type of error that should be raised
+            raised when the context exits if errors were registered. If
+            False, no error will be raised. Defaults to False if registry
+            is provided and the first error in error_types otherwise.
+        error_prefix (str, optional): Prefix that should be added to
+            the final error raised with all accumulated errors.
+        error_count (int, optional): Minimum number of errors that
+            need to be registered for the final error to be raised when
+            the context exits.
+        registry (list, optional): Existing list that errors should be
+            appended to when they are registered.
+        print_accumulated (bool, optional): If True, print the registered
+            errors when the instance is finalized.
+
+    """
+
+    def __init__(self, error_types, final_error=None,
+                 error_prefix='Accumulated errors: ', error_count=1,
+                 registry=None, print_accumulated=False):
+        if isinstance(error_types, type):
+            error_types = (error_types, )
+        elif isinstance(error_types, list):
+            error_types = tuple(error_types)
+        if isinstance(final_error, str):
+            error_prefix = final_error
+            final_error = None
+        if final_error is None:
+            if registry is None and not print_accumulated:
+                final_error = error_types[0]
+            else:
+                final_error = False
+        if registry is None:
+            registry = []
+        self.error_types = error_types
+        self.registry = registry
+        self.final_error = final_error
+        self.error_prefix = error_prefix
+        self.error_count = error_count
+        self.print_accumulated = print_accumulated
+        self.active = False
+
+    def __enter__(self):
+        self.active = True
+        return self
+
+    def __exit__(self, ext, exv, trb):
+        # if ext:
+        #     print("ERROR REGISTRY")
+        #     print(ext, type(ext), ext in self.error_types)
+        #     print(exv, type(exv), isinstance(exv, self.error_types))
+        #     import pdb; pdb.set_trace()
+        self.active = False
+        out = None
+        if ext and ext in self.error_types:
+            self.registry.append(exv)
+            out = True
+            ext = None
+        return out
+
+    def finalize(self):
+        r"""Finalize the registry, raising the final error if
+        appropriate.
+
+        Returns:
+            list, BaseException: Registered errors if final_error not set
+                or the number of registered errors does not exceed
+                error_count. Otherwise, the final error is returned.
+
+        """
+        message = (
+            self.error_prefix + '\n\t'
+            + '\n\t'.join([str(x) for x in self.registry])
+        )
+        if self.print_accumulated:
+            print(message)
+        if not (self.final_error
+                and len(self.registry) >= self.error_count):
+            return self.registry
+        return self.final_error(message)
+
+
+class ErrorRegistrySet(object):
+    r"""Set of registries for catching and accumulating errors."""
+
+    def __init__(self):
+        self.registries = []
+
+    def accumulate_error(self, error, message=None, dont_raise=False):
+        r"""Add an error to the most recent matching registry or raise
+        it.
+
+        Args:
+            error (BaseException): Error instance or error class. If a
+                class is provided, message must be as well.
+            message (str, optional): Error message used to create error
+                instance from class passed via error.
+            dont_raise (bool, optional): If True, don't raise the error
+                if it does not match any of the current registries.
+
+        Returns:
+            bool: True if the error was registered, False otherwise.
+
+        """
+        if isinstance(error, type):
+            error = error(message)
+        for x in self.registries[::-1]:
+            if isinstance(error, x.error_types):
+                x.registry.append(error)
+                return True
+        if not dont_raise:
+            raise error
+        return False
+
+    @contextlib.contextmanager
+    def accumulate(self, *args, **kwargs):
+        r"""Context manager to accumulate errors to any of the registries
+        in this set.
+
+        Args:
+            *args: Arguments are used to create a new registry. If
+                provided, the created registry will be removed and
+                finalized when the context exits.
+            **kwargs: Additional keyword arguments are passed to append
+                only if args are provided.
+
+        Returns:
+            list: Registered errors if args provided to create a new
+                registry.
+        
+        """
+        out = None
+        if args:
+            self.append(*args, **kwargs)
+        with contextlib.ExitStack() as stack:
+            for x in self.registries:
+                if not x.active:
+                    stack.enter_context(x)
+            try:
+                yield
+            except BaseException as e:
+                if not self.accumulate_error(e, dont_raise=True):
+                    raise
+        if args:
+            out = self.pop()
+        return out
+
+    def append(self, *args, **kwargs):
+        r"""Begin registering errors.
+
+        Args:
+            *args: All arguments are passed to the ErrorRegistry
+                 constructor.
+            **kwargs: All keyword arguments are passed to the
+                 ErrorRegistry constructor.
+
+        """
+        self.registries.append(ErrorRegistry(*args, **kwargs))
+
+    def pop(self):
+        r"""Remove and return the last registry added.
+
+        Returns:
+            list: List of error registered.
+
+        """
+        out = self.registries.pop().finalize()
+        if isinstance(out, BaseException):
+            self.accumulate_error(out)
+            out = None
+        return out
+
+
 class ManagedDependencyBase(ComponentBase):
     r"""Base class for managed dependencies.
 
@@ -294,6 +520,9 @@ class ManagedDependencyBase(ComponentBase):
             elements. If any of the elements is a set, the directory will
             be labeled a source directory if it contains all of the paths
             in the set.
+        language_specific (str): Name of the language that the package
+            manager is specific to. False if the package manager is
+            language agnostic.
 
     """
 
@@ -381,6 +610,7 @@ class ManagedDependencyBase(ComponentBase):
     double_check_install = False
     installable_from_source = False
     manager_conda_package = None
+    language_specific = False
     _install_manager_called = {}
 
     @staticmethod
@@ -412,7 +642,7 @@ class ManagedDependencyBase(ComponentBase):
         if self.conda_env and not self.conda_prefix:
             raise DependencyError('conda_env set, but conda could '
                                   'not be located')
-        self._error_registries = []
+        self._error_registries = ErrorRegistrySet()
         self._version_parts = None
         self._install_called = False
         if self.package:
@@ -540,10 +770,10 @@ class ManagedDependencyBase(ComponentBase):
         else:
             name = cls._package_manager
         if cls.affected_by_conda_env and conda_env:
-            # Check for executable in the desired conda environment first,
-            # but allow for another executable on PATH (e.g. system
-            # installation to be returned as long as it is not in another
-            # conda environment
+            # Check for executable in the desired conda environment
+            # first, but allow for another executable on PATH (e.g.
+            # system installation to be returned as long as it is not in
+            # another conda environment
             # TODO: This is different on windows
             out = os.path.join(tools.get_conda_prefix(conda_env),
                                'bin', name)
@@ -656,76 +886,38 @@ class ManagedDependencyBase(ComponentBase):
         return out
 
     @contextlib.contextmanager
-    def error_accumulator(self, registry=None, error_types=None,
-                          final_error_prefix='Accumulated errors: '):
-        r"""Context for accumulating errors.
-
-        Args:
-            registry (list, optional): Existing list where errors should
-                be stored instead of being raised or an error class
-                that should be raised at the end if errors are
-                accumulated.
-            error_types (tuple, optional): Set of errors that should be
-                accumulated. Defaults to (BaseException, ).
-            final_error_prefix (str, optional): Prefix that should be
-                added to error raised with all accumulated errors if
-                registry is an error class.
-
-        """
-        if registry is None:
-            try:
-                yield
-            except BaseException as e:
-                for k, v in self._error_registries[::-1]:
-                    if isinstance(e, k):
-                        v.append(e)
-                        break
-                else:
-                    raise
-        else:
-            final_error = False
-            if isinstance(registry, type):
-                final_error = registry
-                registry = []
-            assert isinstance(registry, list)
-            if error_types is None:
-                error_types = (BaseException, )
-            elif isinstance(error_types, type):
-                error_types = (error_types, )
-            self._error_registries.append((error_types, registry))
-            length = len(self._error_registries)
-            try:
-                yield
-                if final_error and registry:
-                    raise final_error(
-                        final_error_prefix + '\n\t'
-                        + '\n\t'.join([str(x) for x in registry]))
-            finally:
-                assert length == len(self._error_registries)
-                self._error_registries.pop()
-
-    def throw_accumulated(self, error):
-        r"""Raise an exception that can be accumulated instead of being
+    def error_accumulator(self, *args, **kwargs):
+        r"""If an exception is raised within this context that matches
+        any of the error registries, it will be registered instead of
         raised.
 
         Args:
-            error (BaseException): Type of error that should be raised.
+            *args: All arguments are passed to the accumulate method of
+                the _error_registries attribute.
+            **kwargs: All keyword arguments are passed to the accumulate
+                method of the _error_registries attribute.
 
         """
-        with self.error_accumulator():
-            raise error
-
-    def accumulate_validation_error(self, message):
-        r"""Raise a DependencyValidationError that can be accumulated.
+        with self._error_registries.accumulate(*args, **kwargs):
+            yield
+        
+    def accumulate_error(self, *args, **kwargs):
+        r"""Raise an exception that can be accumulated instead of being
+        raised if an appriate error registry has been set up.
 
         Args:
-            message (str): Error message.
+            *args: All arguments are passed to the accumulate_error
+                method of the _error_registries attribute.
+            **kwargs: All keyword arguments are passed to the
+                accumulate_error method of the _error_registries
+                attribute.
+
+        Returns:
+            bool: True if the error was registered, False otherwise.
 
         """
-        self.throw_accumulated(
-            DependencyValidationError(f'{self}: {message}')
-        )
-
+        return self._error_registries.accumulate_error(*args, **kwargs)
+        
     def check_validity(self, **kwargs):
         r"""Check if the dependency can be installed.
 
@@ -741,22 +933,83 @@ class ManagedDependencyBase(ComponentBase):
             if not (platform._platform.lower() in self.operating_systems
                     or (platform._platform.lower() in ['macos', 'linux']
                         and 'unix' in self.operating_systems)):
-                self.accumulate_validation_error(
+                self.accumulate_error(
+                    DependencyValidationError,
                     f'Platform "{platform._platform.lower()}" is '
                     f'not one of the enumerated options specified '
                     f'by operating_systems '
                     f'({self.operating_systems})'
                 )
         if self.conda_env and not os.path.isdir(self.conda_prefix):
-            self.accumulate_validation_error(
+            self.accumulate_error(
+                DependencyValidationError,
                 f'Conda env "{self.conda_env}" does not exist at prefix '
                 f'"{self.conda_prefix}"'
             )
         if not self.manager_installed(conda_env=self.conda_env):
-            self.accumulate_validation_error(
+            self.accumulate_error(
+                DependencyValidationError,
                 f'Manager executable "'
                 f'{self.manager_executable(conda_env=self.conda_env)}" '
                 f'is not installed or is not on the current path'
+            )
+
+    def check_installed(self, **kwargs):
+        r"""Check if the dependency is installed.
+
+        Args:
+            **kwargs: Additional keyword arguments are ignored.
+
+        Raises:
+            DependencyInstalledError: If the dependency is not installed.
+
+        """
+        with self.error_accumulator(
+                DependencyValidationError,
+                DependencyInstalledError,
+                f'Dependency {self.package} is not valid:'):
+            self.check_validity()
+        try:
+            info = self.search()
+        except DependencyError as e:
+            self.accumulate_error(
+                DependencyInstalledError,
+                f'Search for {self.package} failed: {e}'
+            )
+            info = None
+        for x in self.additional_packages:
+            x.check_installed(**kwargs)
+        for x in self.products:
+            if not os.path.exists(x):
+                self.accumulate_error(
+                    DependencyInstalledError,
+                    f'Product \'{x}\' does not exist'
+                )
+        return info
+
+    def check_uninstalled(self, **kwargs):
+        r"""Check if the dependency is uninstalled.
+
+        Args:
+            **kwargs: Additional keyword arguments are ignored.
+
+        Raises:
+            DependencyUninstalledError: If the dependency is not
+                uninstalled.
+
+        """
+        for x in self.products:
+            if os.path.exists(x):
+                self.accumulate_error(
+                    DependencyUninstalledError,
+                    f'Product \'{x}\' exists'
+                )
+        for x in self.additional_packages:
+            x.check_uninstalled()
+        if self.is_installed:
+            self.accumulate_error(
+                DependencyUninstalledError,
+                f'Package \'{self.package}\' installed'
             )
 
     @property
@@ -766,6 +1019,23 @@ class ManagedDependencyBase(ComponentBase):
             self.check_validity()
             return True
         except DependencyValidationError:
+            return False
+
+    @property
+    def is_installed(self):
+        r"""bool: True if the dependency has already been installed."""
+        try:
+            return self.check_installed()
+        except DependencyInstalledError:
+            return False
+
+    @property
+    def is_uninstalled(self):
+        r"""bool: True if the dependency has been uninstalled."""
+        try:
+            self.check_uninstalled()
+            return True
+        except DependencyUninstalledError:
             return False
 
     @classmethod
@@ -933,32 +1203,13 @@ class ManagedDependencyBase(ComponentBase):
                               f"{pprint.pformat(package_list)}")
 
     @property
-    def is_installed(self):
-        r"""bool: True if the dependency has already been installed."""
-        if not self.is_valid:
-            return False
-        try:
-            info = self.search()
-        except DependencyError:
-            return False
-        for x in self.additional_packages:
-            if not x.is_installed:
-                return False
-        for x in self.products:
-            if not os.path.exists(x):
-                return False
-        return info
-
-    @property
-    def is_uninstalled(self):
-        r"""bool: True if the dependency has been uninstalled."""
-        for x in self.products:
-            if os.path.exists(x):
-                return False
-        for x in self.additional_packages:
-            if not x.is_uninstalled:
-                return False
-        return (not self.is_installed)
+    def is_installed_by_other(self):
+        r"""str, bool: The name of the package manager that the package
+        is installed by if it is installed or False if it is not.
+        """
+        return is_installed_any(
+            self.package, excluded=[self._package_manager],
+            language=self.language_specific, conda_env=self.conda_env)
 
     @property
     def source_directory(self):
@@ -1145,13 +1396,30 @@ class ManagedDependencyBase(ComponentBase):
         """
         self.install_manager(always_yes=always_yes)
         with self.error_accumulator(
-                DependencyError,
                 DependencyValidationError,
+                DependencyError,
                 f'Dependency {self.package} cannot be '
                 f'installed via {self._package_manager}:'):
             self.check_validity()
-        if (not force) and self.is_installed:
+        installed = self.is_installed
+        if (not force) and installed:
             return
+        if not installed:
+            alt_installed = self.is_installed_by_other
+            if alt_installed:
+                msg = (
+                    f'Package {self.package} already installed via '
+                    f'{alt_installed["package_manager"]}. Installing with '
+                    f'{self._package_manager} may result in conflicts. '
+                    f'Installation with {self._package_manager} '
+                )
+                if force:
+                    msg += 'forced by user'
+                else:
+                    msg += 'can be forced by passing `force=True`'
+                warnings.warn(msg)
+                if not force:
+                    return
         if not (always_yes or self.args_yes):  # pragma: user input
             if not self.ask_user(f'Install {self.package} via '
                                  f'{self._package_manager}?'):
@@ -1202,8 +1470,8 @@ class ManagedDependencyBase(ComponentBase):
 
         """
         with self.error_accumulator(
-                DependencyError,
                 DependencyValidationError,
+                DependencyError,
                 f'Dependency {self.package} cannot be '
                 f'uninstalled via {self._package_manager}:'):
             self.check_validity()
@@ -1288,12 +1556,12 @@ class ManagedDependencyBase(ComponentBase):
             if return_output:
                 if ((invalidate_cache
                      or cache_key not in _cached_results)):
-                    print(f"RUNNING: {cmdstr}")
+                    # print(f"RUNNING: {cmdstr}")
                     _cached_results[cache_key] = (
                         subprocess.check_output(cmd, **kwargs))
                 return _cached_results[cache_key]
             else:
-                print(f"RUNNING: {cmdstr}")
+                # print(f"RUNNING: {cmdstr}")
                 subprocess.check_call(cmd, **kwargs)
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
             if package:
@@ -1425,7 +1693,7 @@ class DependencyCollectionBase(ManagedDependencyBase):
     }
 
     def __init__(self, shared_properties=None, **kwargs):
-        collection = kwargs.pop(self._collection_property, None)
+        collection = kwargs.pop(self._collection_property, [])
         if shared_properties is None:
             shared_properties = {}
         for k, v in kwargs.items():
@@ -1533,6 +1801,18 @@ class DependencySet(DependencyCollectionBase):
     _schema_required = ['members']
     _collection_property = 'members'
 
+    @property
+    def is_installed_by_other(self):
+        r"""str, bool: The name of the package manager that the package
+        is installed by if it is installed or False if it is not.
+        """
+        out = [x.is_installed_by_other for x in self.members]
+        if any(out):
+            return {'package_manager': tuple([x['package_manager']
+                                              for x in out if x]),
+                    'members': out}
+        return False
+
     def check_validity(self, **kwargs):
         r"""Check if the dependency can be installed.
 
@@ -1549,25 +1829,41 @@ class DependencySet(DependencyCollectionBase):
         for x in self.members:
             x.check_validity(**kwargs)
         
-    @property
-    def is_installed(self):
-        r"""bool: True if the dependency has already been installed."""
+    def check_installed(self, **kwargs):
+        r"""Check if the dependency is installed.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the
+                parent method and the method of the members.
+
+        Raises:
+            DependencyInstalledError: If the dependency is not installed.
+
+        """
+        # super(DependencySet, self).check_installed(**kwargs)
         out = []
         for x in self.members:
-            iout = x.is_installed
-            if not iout:
-                return False
-            out.append(iout)
+            out.append(x.check_installed(**kwargs))
         return out
-        
-    @property
-    def is_uninstalled(self):
-        r"""bool: True if the dependency has been uninstalled."""
+
+    def check_uninstalled(self, **kwargs):
+        r"""Check if the dependency is uninstalled.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the
+                parent method and the method of the members.
+
+        Raises:
+            DependencyUninstalledError: If the dependency is not
+                uninstalled.
+
+        """
+        # super(DependencySet, self).check_uninstalled(**kwargs)
+        out = []
         for x in self.members:
-            if x.is_installed:
-                return False
-        return True
-        
+            out.append(x.check_uninstalled(**kwargs))
+        return out
+
     def is_appendable(self, solf):
         r"""Determine if this dependency can be installed at the same
         time as another dependency.
@@ -1616,7 +1912,6 @@ class DependencySet(DependencyCollectionBase):
         """
         with self.error_accumulator(
                 DependencyError,
-                DependencyError,
                 'One or more errors during installation of members:'):
             for x in self.members:
                 if members is not None and x.package not in members:
@@ -1634,7 +1929,6 @@ class DependencySet(DependencyCollectionBase):
 
         """
         with self.error_accumulator(
-                DependencyError,
                 DependencyError,
                 'One or more errors during uninstallation of members:'):
             for x in self.members:
@@ -1668,6 +1962,16 @@ class DependencyOptions(DependencyCollectionBase):
         self.selected_option = None
         super(DependencyOptions, self).__init__(*args, **kwargs)
 
+    @property
+    def is_installed_by_other(self):
+        r"""str, bool: The name of the package manager that the package
+        is installed by if it is installed or False if it is not.
+        """
+        return is_installed_any(
+            self.package, language=self.language_specific,
+            excluded=[x._package_manager for x in self.options],
+            conda_env=self.conda_env)
+
     def check_validity(self, **kwargs):
         r"""Check if the dependency can be installed.
 
@@ -1684,37 +1988,57 @@ class DependencyOptions(DependencyCollectionBase):
         if self.selected_option:
             self.selected_option.check_validity(**kwargs)
             return
-        err_opt = []
-        with self.error_accumulator(err_opt, DependencyValidationError):
+        with self.error_accumulator(DependencyValidationError,
+                                    'None of the options are valid:',
+                                    error_count=len(self.options)):
             for x in self.options:
                 x.check_validity(**kwargs)
-        if len(err_opt) == len(self.options):
-            self.accumulate_validation_error(
-                'None of the options are valid:\n\t'
-                + '\n\t'.join([str(x) for x in err_opt])
-            )
         
-    @property
-    def is_installed(self):
-        r"""bool: True if the dependency has already been installed."""
+    def check_installed(self, **kwargs):
+        r"""Check if the dependency is installed.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the
+                parent method and the method of the options.
+
+        Raises:
+            DependencyInstalledError: If the dependency is not installed.
+
+        """
+        # super(DependencyOptions, self).check_installed(**kwargs)
         if self.selected_option:
-            return self.selected_option.is_installed
-        for x in self.options:
-            iout = x.is_installed
-            if iout:
-                return iout
-        return False
-        
-    @property
-    def is_uninstalled(self):
-        r"""bool: True if the dependency has been uninstalled."""
+            return self.selected_option.check_installed(**kwargs)
+        out = None
+        with self.error_accumulator(DependencyInstalledError,
+                                    'None of the options are installed:',
+                                    error_count=len(self.options)):
+            for x in self.options:
+                iout = x.check_installed(**kwargs)
+                if iout and out is None:
+                    out = iout
+        return out
+
+    def check_uninstalled(self, **kwargs):
+        r"""Check if the dependency is uninstalled.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the
+                parent method and the method of the options.
+
+        Raises:
+            DependencyUninstalledError: If the dependency is not
+                uninstalled.
+
+        """
+        # super(DependencyOptions, self).check_uninstalled(**kwargs)
         if self.selected_option:
-            return self.selected_option.is_uninstalled
-        for x in self.options:
-            if not x.is_uninstalled:
-                return False
-        return True
-        
+            return self.selected_option.check_uninstalled(**kwargs)
+        with self.error_accumulator(DependencyUninstalledError,
+                                    'One or more options are not '
+                                    'uninstalled:'):
+            for x in self.options:
+                x.check_uninstalled(**kwargs)
+
     def append(self, solf, require_all=False, init=False):
         r"""Add a dependency to the set of additional packages that will
         be installed at the same time as this one.
@@ -1738,7 +2062,7 @@ class DependencyOptions(DependencyCollectionBase):
             self.options.append(solf)
             return
         errors = []
-        with self.error_accumulator(errors, DependencyError):
+        with self.error_accumulator(DependencyError, registry=errors):
             for i, x in enumerate(self.options):
                 x.append(solf)
                 if (not require_all) and (len(errors) < (i + 1)):
@@ -1765,11 +2089,9 @@ class DependencyOptions(DependencyCollectionBase):
         if self.selected_option:
             self.selected_option.install(**kwargs)
             return
-        with self.error_accumulator(
-                DependencyError,
-                DependencyError,
-                f'Failed to install {self.package} '
-                f'via any of the options:'):
+        with self.error_accumulator(DependencyError,
+                                    f'Failed to install {self.package} '
+                                    f'via any of the options:'):
             for x in self.options:
                 x.install(**kwargs)
                 if x.is_installed:
@@ -1794,11 +2116,9 @@ class DependencyOptions(DependencyCollectionBase):
         for x in self.options:
             if x.is_valid:
                 return x.uninstall(**kwargs)
-        with self.error_accumulator(
-                DependencyError,
-                DependencyError,
-                f'Failed to uninstall {self.package} '
-                f'via any of the options:'):
+        with self.error_accumulator(DependencyError,
+                                    f'Failed to uninstall {self.package} '
+                                    f'via any of the options:'):
             for x in self.options:
                 x.uninstall(**kwargs)
 
@@ -1822,7 +2142,7 @@ class CondaDependency(ManagedDependencyBase):
     args_prefix_uninstall = ['uninstall']
     args_prefix_list = ['list']
     args_prefix_search = ['list']
-    quoted_names = True
+    quoted_names = False
     ignore_properties_appendable = ['package', 'version']
     affected_by_conda_env = True
 
@@ -1854,7 +2174,8 @@ class CondaDependency(ManagedDependencyBase):
 
         """
         if not tools.get_conda_prefix():
-            self.accumulate_validation_error(
+            self.accumulate_error(
+                DependencyValidationError,
                 'Conda environment could not be located'
             )
         super(CondaDependency, self).check_validity(**kwargs)
@@ -1957,30 +2278,7 @@ class PipDependency(ManagedDependencyBase):
     installable_from_source = ['setup.py', 'setup.cfg', 'pyproject.toml']
     manager_conda_package = 'python'
     manager_executable_name = 'python'
-
-    # @classmethod
-    # def command_prefix(cls, uninstall=False, conda_env=None):
-    #     r"""Prefix arguments for installation commands.
-
-    #     Args:
-    #         uninstall (bool, optional): If True, get the prefix for
-    #             uninstallation.
-    #         conda_env (str, optional): Conda environment that executable
-    #             should come from.
-
-    #     Returns:
-    #         list: Prefix arguments.
-        
-    #     """
-    #     from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
-    #     if cls.affected_by_conda_env and conda_env:
-    #         interpreter = os.path.join(
-    #             tools.get_conda_prefix(conda_env),
-    #             os.path.basename(PythonModelDriver.default_interpreter))
-    #     else:
-    #         interpreter = PythonModelDriver.get_interpreter()
-    #     return [interpreter, '-m'] + super(
-    #         PipDependency, cls).command_prefix(uninstall=uninstall)
+    language_specific = 'python'
 
     @classmethod
     def parse_list(cls, contents):
@@ -2034,6 +2332,9 @@ class CRANDependency(ManagedDependencyBase):
     Args:
         repos (str, optional): Mirror that should be used to install the
             dependency from.
+        r_install_steps (list, optional): Set of R commands that should
+            be used to install the package if different from the
+            standard 'install.packages()' method.
 
     """
 
@@ -2043,7 +2344,11 @@ class CRANDependency(ManagedDependencyBase):
         'repos': {
             'type': 'string',
             'default': 'http://cloud.r-project.org'
-        }
+        },
+        'r_install_steps': {
+            'type': 'array',
+            'items': {'type': 'string'},
+        },
     }
     constraint_fstring = '{op} {ver}'
     constraint_sep = ', '
@@ -2052,6 +2357,7 @@ class CRANDependency(ManagedDependencyBase):
     installable_from_source = [{'R', 'NAMESPACE', 'DESCRIPTION'}]
     args_prefix = ['-s', '-q']
     manager_conda_package = 'r-base'
+    language_specific = 'R'
 
     @classmethod
     def manager_executable(cls, for_script=False, **kwargs):
@@ -2271,7 +2577,11 @@ class CRANDependency(ManagedDependencyBase):
         """
         kwargs = {'context': 'install', 'conda_env': self.conda_env}
         cmd = []
-        if self.source_directory:
+        if self.r_install_steps:
+            print(f"USING r_install_steps = {self.r_install_steps}")
+            kwargs['is_R'] = True
+            cmd += self.r_install_steps
+        elif self.source_directory:
             cmd += [
                 self.manager_executable(),
                 'CMD', 'INSTALL', self.source_directory
@@ -2615,7 +2925,8 @@ class SourceDependencyBase(ManagedDependencyBase):
                       or isinstance(parent, GitDependency)))):
             # The GitDependency class will create the directory during
             # install via clone if it does not exist
-            self.accumulate_validation_error(
+            self.accumulate_error(
+                DependencyValidationError,
                 f'Directory "{self.directory}" does not exist'
             )
 
@@ -2827,7 +3138,9 @@ class SourceDependency(SourceDependencyBase):
         try:
             self.install_method_instance.check_validity(**kwargs)
         except DependencySourceError as e:
-            self.accumulate_validation_error(str(e))
+            self.accumulate_error(
+                DependencyValidationError, str(e)
+            )
 
     def _install(self, **kwargs):
         return self.install_method_instance._install(**kwargs)
@@ -2907,8 +3220,9 @@ class BuilderDependencyBase(SourceDependencyBase):
         self.builddir = os.path.join(self.directory, 'yggbuild')
         self.install_manifest = os.path.join(
             self.builddir, 'install_manifest.txt')
-        self.products.append(self.install_manifest)
-        self.products.append(self.builddir)
+        if not self.products:
+            self.products.append(self.install_manifest)
+            self.products.append(self.builddir)
         if self.install_prefix and not any(x.startswith('--prefix')
                                            for x in self.args_install):
             self.args_install += ['--prefix', self.install_prefix]
@@ -3170,7 +3484,8 @@ class GitDependency(SourceDependency):
         """
         if (((not self.overwrite) and os.path.isdir(self.directory)
              and (not self.is_git_repo(self.directory)))):
-            self.accumulate_validation_error(
+            self.accumulate_error(
+                DependencyValidationError,
                 f'Directory "{self.directory}" already exists, but it is '
                 f'not a valid git respository and overwrite is not set'
             )
@@ -3415,13 +3730,26 @@ class CommandDependency(ManagedDependencyBase):
             return [{'name': package}]
         return []
         
-    @property
-    def is_installed(self):
-        r"""bool: True if the dependency has already been installed."""
+    def check_installed(self, **kwargs):
+        r"""Check if the dependency is installed.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the
+                parent method and the method of the members.
+
+        Raises:
+            DependencyInstalledError: If the dependency is not installed.
+
+        """
+        out = super(CommandDependency, self).check_installed(**kwargs)
         if not (self.products or self._install_called):
-            return False
-        return super(CommandDependency, self).is_installed
-        
+            self.accumulate_error(
+                DependencyInstalledError,
+                'No products identified and install not called during '
+                'this session'
+            )
+        return out
+
     def is_appendable(self, solf):
         r"""Determine if this dependency can be installed at the same
         time as another dependency.

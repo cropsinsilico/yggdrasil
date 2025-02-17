@@ -1,4 +1,3 @@
-# TODO: Test conda_env
 import pytest
 import os
 import copy
@@ -177,7 +176,6 @@ class TestManagedDependencyBase(base_class):
         'conda': [
             ({'package': 'python'}, True, True, None),
             ({'package': 'pyyaml'}, True, True, True),
-            # ({'package': 'nbconvert'}, False, True, True),
         ],
         'pip': [
             ({'package': 'pyyaml'}, True, True, True),
@@ -185,7 +183,6 @@ class TestManagedDependencyBase(base_class):
              False, True, True),
         ],
         'cran': [
-            # ({'package': 'BioCro'}, False, True, True),
             ({'package': 'tinytest'}, False, True, True),
         ],
         'apt': [
@@ -201,6 +198,7 @@ class TestManagedDependencyBase(base_class):
         'vcpkg': [],
         'source': [],
         'git': [
+            # TODO: Find a simpler package to build
             ({'package': 'sundials',
               'repository': 'https://github.com/LLNL/sundials.git',
               'buildfile': 'CMakeLists.txt',
@@ -323,12 +321,13 @@ class TestManagedDependencyBase(base_class):
                                          default_to_mamba=True)
                 assert os.path.isdir(conda_prefix)
         # Test install
+        preinstall_status_any1 = instance.is_installed_by_other
         preinstall_status_act1 = instance.is_installed
         preuninstall_status_act1 = instance.is_uninstalled
         if install_expectation:
             with install_expectation as e:
                 instance.install(always_yes=always_yes)
-                if e is True:
+                if e is True and not preinstall_status_any1:
                     assert instance.is_installed
                     assert not instance.is_uninstalled
                 else:
@@ -336,12 +335,13 @@ class TestManagedDependencyBase(base_class):
                     assert instance.is_installed == preinstall_status_act1
                     assert instance.is_uninstalled == preuninstall_status_act1
         # Don't uninstall a package that was installed before tests
-        if preinstall_status and (not conda_env):
+        if (preinstall_status or preinstall_status_any1) and (not conda_env):
             return
         debugging_tests = True  # TODO: Disable this
         if preinstall_status_act1:
             if ((os.environ.get('GITHUB_ACTIONS', False)
-                 or not debugging_tests)):
+                 or not debugging_tests
+                 or preinstall_status_any1)):
                 return
             always_yes = False
         # Test uninstall
@@ -358,6 +358,7 @@ class TestManagedDependencyBase(base_class):
                 if e is True:
                     assert not instance.is_installed
                     assert instance.is_uninstalled
+                    assert not instance.is_installed_by_other
                 else:
                     # Check that nothing changed
                     assert instance.is_installed == preinstall_status_act2

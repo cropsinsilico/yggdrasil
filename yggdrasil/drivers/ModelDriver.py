@@ -595,6 +595,9 @@ class ModelDriver(Driver):
             provided. If not provided, the respository will be cloned into
             the model working_dir. If not an absolute path, it will be
             taken as relative to the model working_dir.
+        repository_patches (list): Files containing patches that should
+            be applied to the repository cloned from repository_url
+            before building the model.
         description (str): Description of the model. This parameter is only
             used in the model repository or when providing the model as a
             service.
@@ -720,6 +723,10 @@ class ModelDriver(Driver):
         'repository_url': {'type': 'string'},
         'repository_commit': {'type': 'string'},
         'repository_dir': {'type': 'string'},
+        'repository_patches': {
+            'type': 'array',
+            'items': {'type': 'string'},
+        },
         'description': {'type': 'string'},
         'contact_email': {'type': 'string'},
         'validation_command': {'type': 'string'},
