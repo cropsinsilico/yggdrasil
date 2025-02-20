@@ -507,8 +507,9 @@ class TestModelDriver(base_class):
 
     def test_install_model_dependencies(self, python_class, testing_options):
         r"""Test install_model_dependencies."""
+        from yggdrasil.components import ComponentError
         deps = testing_options.get('deps', [])
         python_class.install_model_dependencies(deps, always_yes=True)
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(ComponentError):
             python_class.install_dependency(
                 'invalid', package_manager='invalid')

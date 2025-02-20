@@ -724,7 +724,7 @@ class ManagedDependencyBase(ComponentBase):
         if isinstance(package, str):
             package = package.split()
         if isinstance(package, list):
-            if len(package) > 1:
+            if len(package) != 1:
                 if default_package_manager:
                     kwargs.setdefault('default_package_manager',
                                       default_package_manager)
@@ -738,12 +738,17 @@ class ManagedDependencyBase(ComponentBase):
         if package is not None:
             kwargs['package'] = package
         if ((default_package_manager
-             and not kwargs.get('package_manager', None))):
+             and not kwargs.get('package_manager', None)
+             and any(k not in ManagedDependencyBase._schema_properties.keys()
+                     for k in kwargs.keys()))):
             try:
                 kwargs['package_manager'] = identify_component_subtype(
                     'dependency', kwargs)
             except ComponentError:
-                kwargs['package_manager'] = default_package_manager
+                pass
+        if ((default_package_manager
+             and not kwargs.get('package_manager', None))):
+            kwargs['package_manager'] = default_package_manager
         if ((default_package_manager
              and kwargs['package_manager'] in ['set', 'options'])):
             kwargs['default_package_manager'] = default_package_manager
@@ -1700,8 +1705,7 @@ class DependencyCollectionBase(ManagedDependencyBase):
         for k, v in kwargs.items():
             if k != 'default_package_manager':
                 shared_properties.setdefault(k, v)
-        if collection:
-            kwargs[self._collection_property] = []
+        kwargs[self._collection_property] = []
         super(DependencyCollectionBase, self).__init__(
             shared_properties=shared_properties, **kwargs)
         if self.default_package_manager is not None:

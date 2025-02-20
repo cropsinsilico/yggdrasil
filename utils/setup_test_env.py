@@ -1185,7 +1185,7 @@ def build_conda_recipe(recipe='recipe', param=None,
     #     build_flags += ' -c conda-forge'
     # else:
     conda_build = f"{CONDA_CMD} build"
-    build_pkgs = ["conda-build"]
+    build_pkgs = ["conda-build", "py-lief=0.14"]
     # if param.use_mamba:
     #     build_flags += ' --solver=libmamba'
     # Must always build in base to avoid errors (and don't change the

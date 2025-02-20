@@ -22,7 +22,7 @@ def image_exists(tag):
 
 def build(dockerfile=None, tag=None, flags=[],
           repo='cropsinsilico/yggdrasil', context=_utils_dir, cwd=None,
-          base=None, args=None):
+          base=None, parsed_args=None):
     r"""Build a docker image.
 
     Args:
@@ -36,7 +36,7 @@ def build(dockerfile=None, tag=None, flags=[],
             context for the image. Defaults to the directory containing this
             script.
         base (dict, optional): Parameters for the base image.
-        args (ParsedArgs, optional): Parsed arguments.
+        parsed_args (ParsedArgs, optional): Parsed arguments.
 
     """
     # TODO: Update so multiple targets are built
@@ -45,10 +45,10 @@ def build(dockerfile=None, tag=None, flags=[],
     if base:
         base_tag = f"{base['repo']}:{base['tag']}"
         if not image_exists(base_tag):
-            build(args=args, **base)
-    assert args and args.python
-    flags = flags + ['--build-arg', f'python={args.python}']
-    if args.verbose:
+            build(parsed_args=parsed_args, **base)
+    assert parsed_args and parsed_args.python
+    flags = flags + ['--build-arg', f'python={parsed_args.python}']
+    if parsed_args.verbose:
         flags += ['--progress', 'plain']
     if repo:
         assert tag
@@ -60,7 +60,7 @@ def build(dockerfile=None, tag=None, flags=[],
             '--platform', 'linux/amd64'] + flags
     args.append(context)
     subprocess.call(args)
-    if not args.disable_latest:
+    if not parsed_args.disable_latest:
         assert repo
         args = ['docker', 'tag', docker_tag, f"{repo}:latest"]
         subprocess.call(args, cwd=cwd)
@@ -334,7 +334,7 @@ if __name__ == "__main__":
     # else:
     dockerfile = params.pop('dockerfile')
     tag = params.pop('tag')
-    build(dockerfile, tag, args=args, **params)
+    build(dockerfile, tag, parsed_args=args, **params)
     if args.push:
         assert not params['repo'].endswith('-local')
         push_image(tag, repo=params['repo'])

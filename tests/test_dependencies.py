@@ -8,6 +8,11 @@ from yggdrasil import dependencies, tools
 from yggdrasil.components import create_component
 
 
+_conda_env_param = [None]
+if os.environ.get('CONDA_PREFIX', None):
+    _conda_env_param.append('valid1939502')
+
+
 @pytest.mark.parametrize("version,expected", [
     ('1.2', {
         'strict': '1.2', 'stricteq': False,
@@ -295,7 +300,7 @@ class TestManagedDependencyBase(base_class):
         with pytest.raises(dependencies.DependencyError):
             instance.uninstall()
 
-    @pytest.mark.parametrize("conda_env", [None, 'valid1939502'])
+    @pytest.mark.parametrize("conda_env", _conda_env_param)
     def test_install(self, python_class, instance_kwargs, always_yes,
                      preinstall_status, install_expectation,
                      uninstall_expectation, conda_env):

@@ -374,7 +374,7 @@ class ArrayTransform(TransformBase):
         """
         out = x
         out_type = self.transformed_datatype
-        if isinstance(out_type['items'], dict):
+        if isinstance(out_type.get('items', None), dict):
             assert not self.field_names
             names = object2names(x)
             if names:

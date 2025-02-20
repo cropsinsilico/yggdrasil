@@ -206,7 +206,7 @@ def import_component(comptype, subtype=None, **kwargs):
         try:
             registry["classes"][class_name] = getattr(
                 importlib.import_module(module), class_name)
-        except ImportError:
+        except (ImportError, AttributeError):
             if comptype == 'comm':
                 try:
                     return import_component('file', subtype, **kwargs)
