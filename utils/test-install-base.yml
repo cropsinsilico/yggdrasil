@@ -262,8 +262,8 @@ jobs:
         channels: msys,conda-forge
         # use-only-tar-bz2: true
         channel-priority: strict
+        miniforge-variant: Miniforge3
         miniforge-version: latest
-        use-mamba: true
     # The compiler must be initialized after the base environment for
     # conda so that it dosn't interfere with the base environment
     # initialization
@@ -290,13 +290,13 @@ jobs:
       run: |
         conda deactivate
         conda activate base
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ env.PYTHONVERSION }} --use-mamba
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ env.PYTHONVERSION }}
     - name: (CONDA) Build package in base environment (re-attempt)
       if: ${{ steps.conda_build.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
       run: |
         conda deactivate
         conda activate base
-        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ env.PYTHONVERSION }} --use-mamba
+        python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ env.PYTHONVERSION }}
     # - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
     #   if: runner.os == 'macOS' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')
     #   run: ./utils/setup_old_mac_sdk.sh
@@ -307,13 +307,13 @@ jobs:
       id: conda_install
       continue-on-error: true
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build --use-mamba
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
       if: ${{ steps.conda_install.outcome == 'failure' && (matrix.install-method == 'conda' || matrix.install-method == 'mamba')}}
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build --use-mamba
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Configure
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
-      run: python utils/setup_test_env.py configure --use-mamba
+      run: python utils/setup_test_env.py configure
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: (matrix.install-method == 'conda' || matrix.install-method == 'mamba') && runner.os == 'macOS'
       run: |
