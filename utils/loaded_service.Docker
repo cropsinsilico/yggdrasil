@@ -1,0 +1,13 @@
+ARG base
+ARG commit
+FROM $base
+
+# Clone production yggdrasil_models repo
+RUN git clone --recurse-submodules https://github.com/cropsinsilico/yggdrasil_models.git && \
+    cd yggdrasil_models && \
+    git checkout $commit
+
+ENV YGGDRASIL_SERVICE_REPO_DIR=yggdrasil_models/models
+
+# Validate models so that they are each loaded, cloned, and built
+RUN conda run -n env python -m yggdrasil validate yggdrasil_models/models --model-submission

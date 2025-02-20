@@ -1281,6 +1281,7 @@ def validate_model_submission(fname):
         for x in files:
             validate_model_submission(x)
         return
+    print("validate_model_submission", fname, os.path.isdir(fname))
     # 1-2. YAML syntax and schema
     yml = yamlfile.parse_yaml(fname, model_submission=True)
     # 3a. LICENSE

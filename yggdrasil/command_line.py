@@ -1073,7 +1073,14 @@ class validate_yaml(SubCommand):
     def func(cls, args):
         if args.model_submission:
             from yggdrasil.services import validate_model_submission
-            validate_model_submission(args.yamlfile)
+            yamlfiles = []
+            print(f"VALIDATE FILES: {args.yamlfile}")
+            for x in args.yamlfile:
+                if not os.path.isabs(x):
+                    x = os.path.abspath(x)
+                yamlfiles.append(x)
+            print(yamlfiles)
+            validate_model_submission(yamlfiles)
         else:
             from yggdrasil import yamlfile
             yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,

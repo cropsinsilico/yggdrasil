@@ -1,15 +1,15 @@
 FROM --platform=linux/amd64 condaforge/miniforge3
 ARG python
-ARG commit
+ARG sourcedir
 RUN apt-get --allow-releaseinfo-change update -y
 RUN conda config --add channels conda-forge && \
     conda config --set channel_priority strict
 
-# Clone selected commit
-RUN git clone --recurse-submodules https://github.com/cropsinsilico/yggdrasil.git && \
-    cd yggdrasil && \
-    git checkout $commit && \
-    git submodule update --recursive
+# Copy local repository
+COPY $sourcedir /yggdrasil/
+COPY *.py /yggdrasil/utils/
+COPY requirements/ /yggdrasil/utils/requirements/
+RUN ls /yggdrasil/*
 WORKDIR /yggdrasil
 
 # Create environment
@@ -20,8 +20,7 @@ RUN conda run -n env python utils/setup_test_env.py deps conda --for-development
 RUN conda install -n env -y c-compiler cxx-compiler
 
 # Install yggdrasil
-RUN ls /yggdrasil/yggdrasil/rapidjson/include/rapidjson/ && \
-    conda run -n env python utils/setup_test_env.py install conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --without-deps --build-method=direct
+RUN conda run -n env python utils/setup_test_env.py install conda --for-development --always-yes --no-sudo --python-only  --without-deps --build-method=direct
 
 # Configure yggdrasil
 RUN conda run -n yggconfig && \

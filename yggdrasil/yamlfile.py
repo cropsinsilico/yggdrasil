@@ -6,6 +6,8 @@ import yaml
 import json
 import git
 import io as sio
+import tempfile
+import shutil
 from yggdrasil import constants, rapidjson
 from yggdrasil.schema import get_schema
 from urllib.parse import urlparse
@@ -54,7 +56,7 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
                       repository_dir=None, directory_for_clones=None,
                       use_submodules=False, working_dir=None,
                       return_repo=False, is_private=False,
-                      patches=None):
+                      patches=None, clean_dirty_repos=False):
     r"""Clone a GitHub repository, returning the path to the local copy of the
     file pointed to by the URL if there is one.
 
@@ -95,6 +97,9 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
             repository.
         patches (list, optional): Patches that should be applied to the
             repository after it is cloned/checked out.
+        clean_dirty_repos (bool, optional): If True, any local changes to
+            the cloned repository will be cleaned up before checking out
+            the specified tag/branch/commit.
 
     Returns:
         str: Path to the local copy of the repository or file in the
@@ -130,15 +135,26 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
         repository_dir = os.path.join(working_dir, repository_dir)
     fname = os.path.join(repository_dir, *splitpath[3:])
     # check to see if the file already exists, and clone if it does not
+    repo = None
     if os.path.exists(fname):
-        repo = git.Repo(repository_dir)
-        for remote in repo.remotes:
-            remote.fetch()
-    else:
+        try:
+            repo = git.Repo(repository_dir)
+            for remote in repo.remotes:
+                remote.fetch()
+        except git.InvalidGitRepositoryError:
+            if repository_dir.startswith(tempfile.gettempdir()):
+                shutil.rmtree(repository_dir)
+            else:
+                raise
+    if repo is None:
         if os.environ.get(_service_host_env, False):
             raise RuntimeError("Cloning of unvetted git repo is "
                                "not permitted on a integration "
-                               "service manager.")
+                               "service manager. All of the required "
+                               "repositories should be included as part "
+                               "of the service repository as submodules "
+                               "or clone by the Docker image used to "
+                               "deploy the service manager.")
         # create the url for cloning the repo
         cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
             reponame
@@ -175,6 +191,8 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
             checkout = tag
     elif checkout is None and branch is not None:
         checkout = branch
+    if clean_dirty_repos and repo.is_dirty():
+        repo.git.reset('--hard')
     if checkout is not None:
         repo.git.checkout(checkout)
     if patches and not repo.is_dirty():
@@ -190,7 +208,7 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
         return repo
     repo.close()
     # now that it is cloned, just pass the yaml file (and path) onwards
-    return os.path.realpath(fname)
+    return os.path.abspath(fname)
 
 
 def find_parent_repo(repository_dir):
@@ -221,9 +239,8 @@ def find_parent_repo(repository_dir):
     return None
 
 
-def load_yaml(fname, yaml_param=None, directory_for_clones=None,
-              use_submodules=False, model_submission=False, verbose=False,
-              included=False):
+def load_yaml(fname, yaml_param=None, model_submission=False,
+              verbose=False, included=False, **kwargs):
     r"""Parse a yaml file defining a run.
 
     Args:
@@ -238,13 +255,6 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
         yaml_param (dict, optional): Parameters that should be used in
             mustache formatting of YAML files. Defaults to None and is
             ignored.
-        directory_for_clones (str, optional): Local directory that git
-            repositories should be cloned into overriding and values
-            specified in the yaml via repository_dir. If not provided and
-            repository_dir is not set, the working_dir for the yaml will
-            be used.
-        use_submodules (bool, optional): If True, new clones inside of
-            existing repositories will be added as submodules.
         model_submission (bool, optional): If True, the YAML will be evaluated
             as a submission to the yggdrasil model repository and model_only
             will be set to True. Defaults to False.
@@ -252,6 +262,9 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
             process will be printed. Defaults to False.
         included (bool, optional): If True, the yaml is being included
             by another. Defaults to False.
+        **kwargs: Additional keyword arguments will be passed to
+            clone_github_repo if fname is a git repository or when loading
+            models with repository_url properties.
 
     Returns:
         dict: Contents of yaml file.
@@ -266,10 +279,8 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
     elif isinstance(fname, str):
         # pull foreign file
         if fname.startswith('git:'):
-            fname = clone_github_repo(
-                fname[4:], directory_for_clones=directory_for_clones,
-                use_submodules=use_submodules)
-        fname = os.path.realpath(fname)
+            fname = clone_github_repo(fname[4:], **kwargs)
+        fname = os.path.abspath(fname)
         if not os.path.isfile(fname):
             raise IOError("Unable locate yaml file %s" % fname)
         fd = open(fname, 'r')
@@ -318,10 +329,9 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
                 x['repository_url'],
                 commit=x.get('repository_commit', None),
                 repository_dir=x.get('repository_dir', None),
-                directory_for_clones=directory_for_clones,
-                use_submodules=use_submodules,
                 working_dir=x.get('working_dir', yamldir),
                 patches=x.get('repository_patches', None),
+                **kwargs
             )
             x.setdefault('working_dir', x['repository_dir'])
     s = get_schema()
@@ -341,30 +351,19 @@ def load_yaml(fname, yaml_param=None, directory_for_clones=None,
     return yml_norm
 
 
-def prep_yaml(files, yaml_param=None, directory_for_clones=None,
-              use_submodules=False, model_submission=False, verbose=False):
-    r"""Prepare yaml to be parsed by rapidjson including covering backwards
-    compatible options.
+def prep_yaml(files, model_submission=False, **kwargs):
+    r"""Prepare yaml to be parsed by rapidjson including covering
+    backwards compatible options.
 
     Args:
-        files (str, list): Either the path to a single yaml file or a list of
-            yaml files. Entries can also be opened file descriptors for files
-            containing YAML documents or pre-loaded YAML documents.
-        yaml_param (dict, optional): Parameters that should be used in
-            mustache formatting of YAML files. Defaults to None and is
-            ignored.
-        directory_for_clones (str, optional): Local directory that
-            repositories should be cloned into, discarding any values
-            for repository_dir. If not provided and the
-            YGGDRASIL_SERVICE_REPO_DIR environment variable is set
-            (such as by a service manager), that value will be used.
-        use_submodules (bool, optional): If True, new clones inside of
-            existing repositories will be added as submodules.
-        model_submission (bool, optional): If True, the YAML will be evaluated
-            as a submission to the yggdrasil model repository and model_only
-            will be set to True. Defaults to False.
-        verbose (bool, optional): If True, steps of the YAML parsing
-            process will be printed. Defaults to False.
+        files (str, list): Either the path to a single yaml file or a
+            list of yaml files. Entries can also be opened file
+            descriptors for files containing YAML documents or pre-loaded
+            YAML documents.
+        model_submission (bool, optional): If True, the YAML will be
+            evaluated as a submission to the yggdrasil model repository
+            and model_only will be set to True. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to load_yaml.
 
     Returns:
         dict: YAML ready to be parsed using schema.
@@ -374,20 +373,14 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
     # Load each file
     if not isinstance(files, list):
         files = [files]
-    yamls = [load_yaml(f, yaml_param=yaml_param,
-                       directory_for_clones=directory_for_clones,
-                       use_submodules=use_submodules,
-                       model_submission=model_submission,
-                       verbose=verbose)
+    yamls = [load_yaml(f, model_submission=model_submission, **kwargs)
              for f in files]
     # Load files pointed to
     first = True
     files = []
     while first or files:
         for f in files:
-            yamls.append(load_yaml(f, yaml_param, included=(not first),
-                                   directory_for_clones=directory_for_clones,
-                                   use_submodules=use_submodules))
+            yamls.append(load_yaml(f, included=(not first), **kwargs))
         first = False
         files = []
         for y in yamls:
@@ -426,9 +419,8 @@ def prep_yaml(files, yaml_param=None, directory_for_clones=None,
 
 
 def parse_yaml(files, complete_partial=False, partial_commtype=None,
-               model_only=False, model_submission=False, yaml_param=None,
-               directory_for_clones=None, use_submodules=False,
-               verbose=False):
+               model_only=False, model_submission=False,
+               verbose=False, **kwargs):
     r"""Parse list of yaml files.
 
     Args:
@@ -446,18 +438,9 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         model_submission (bool, optional): If True, the YAML will be evaluated
             as a submission to the yggdrasil model repository and model_only
             will be set to True. Defaults to False.
-        yaml_param (dict, optional): Parameters that should be used in
-            mustache formatting of YAML files. Defaults to None and is
-            ignored.
-        directory_for_clones (str, optional): Local directory that
-            repositories should be cloned into, discarding any values
-            for repository_dir. If not provided and the
-            YGGDRASIL_SERVICE_REPO_DIR environment variable is set
-            (such as by a service manager), that value will be used.
-        use_submodules (bool, optional): If True, new clones inside of
-            existing repositories will be added as submodules.
         verbose (bool, optional): If True, steps of the YAML parsing
             process will be printed. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to prep_yaml.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or
@@ -473,11 +456,8 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     # Parse files using schema
     # TODO: only run backward_compat if deprecation warnings raised
     run_backwards_compat = True
-    yml_norm = prep_yaml(files, yaml_param=yaml_param,
-                         directory_for_clones=directory_for_clones,
-                         use_submodules=use_submodules,
-                         model_submission=model_submission,
-                         verbose=verbose)
+    yml_norm = prep_yaml(files, model_submission=model_submission,
+                         verbose=verbose, **kwargs)
     __display_progress(verbose, yml_norm, "prepped")
     if model_submission:
         models = []

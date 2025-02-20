@@ -1054,7 +1054,8 @@ class ManagedDependencyBase(ComponentBase):
         if field_names is None:
             field_names = cls.list_field_names
         if field_names is None:
-            raise NotImplementedError(f'{cls}.parse_list')
+            raise NotImplementedError(f'{cls}.parse_list. Cannot parse'
+                                      f'\n===={contents}\n====')
         out = []
         for x in contents.splitlines():
             out.append(
