@@ -875,6 +875,8 @@ definitions:
         enum:
         - apt
         type: string
+    required:
+    - package
     title: yggdrasil.dependencies.AptDependency
     type: object
   dependency-subtype-base:
@@ -995,7 +997,7 @@ definitions:
         default: false
         description: If True, the repository is private and the user may be asked
           for credentials when cloning the repository.
-        type: string
+        type: boolean
       members:
         description: Dependencies in the set. All of the members will be installed
           with the set is installed.
@@ -1113,8 +1115,6 @@ definitions:
           on the version installed. If none of these are present, it will be assumed
           to be a strict version requirement (i.e. ==version).
         type: string
-    required:
-    - package
     title: dependency_base
     type: object
   dependency-subtype-brew:
@@ -1132,6 +1132,8 @@ definitions:
         enum:
         - brew
         type: string
+    required:
+    - package
     title: yggdrasil.dependencies.HomebrewDependency
     type: object
   dependency-subtype-choco:
@@ -1149,6 +1151,8 @@ definitions:
         enum:
         - choco
         type: string
+    required:
+    - package
     title: yggdrasil.dependencies.ChocoDependency
     type: object
   dependency-subtype-cmake:
@@ -1203,6 +1207,7 @@ definitions:
         type: string
     required:
     - directory
+    - package
     title: yggdrasil.dependencies.CMakeDependency
     type: object
   dependency-subtype-command:
@@ -1236,6 +1241,7 @@ definitions:
         type: string
     required:
     - command
+    - package
     title: yggdrasil.dependencies.CommandDependency
     type: object
   dependency-subtype-conda:
@@ -1259,6 +1265,8 @@ definitions:
         enum:
         - conda
         type: string
+    required:
+    - package
     title: yggdrasil.dependencies.CondaDependency
     type: object
   dependency-subtype-cran:
@@ -1293,6 +1301,8 @@ definitions:
         description: Directory containing package source code that the package should
           be installed from.
         type: string
+    required:
+    - package
     title: yggdrasil.dependencies.CRANDependency
     type: object
   dependency-subtype-git:
@@ -1343,7 +1353,7 @@ definitions:
         default: false
         description: If True, the repository is private and the user may be asked
           for credentials when cloning the repository.
-        type: string
+        type: boolean
       overwrite:
         default: false
         description: If True, any existing instance of the repository in directory
@@ -1377,6 +1387,7 @@ definitions:
         type: string
     required:
     - directory
+    - package
     - repository
     title: yggdrasil.dependencies.GitDependency
     type: object
@@ -1426,6 +1437,7 @@ definitions:
         type: string
     required:
     - directory
+    - package
     title: yggdrasil.dependencies.MakeDependency
     type: object
   dependency-subtype-options:
@@ -1466,6 +1478,7 @@ definitions:
         type: object
     required:
     - options
+    - package
     title: yggdrasil.dependencies.DependencyOptions
     type: object
   dependency-subtype-pip:
@@ -1490,6 +1503,8 @@ definitions:
         description: Directory containing package source code that the package should
           be installed from.
         type: string
+    required:
+    - package
     title: yggdrasil.dependencies.PipDependency
     type: object
   dependency-subtype-set:
@@ -1515,10 +1530,6 @@ definitions:
         items:
           $ref: '#/definitions/dependency'
         type: array
-      package:
-        description: Name of the package that should be installed. If the package
-          manager supports it, this can include version requirements.
-        type: string
       package_manager:
         default: set
         description: Set of related dependencies
@@ -1577,6 +1588,7 @@ definitions:
         type: string
     required:
     - directory
+    - package
     title: yggdrasil.dependencies.SourceDependency
     type: object
   dependency-subtype-vcpkg:
@@ -1594,6 +1606,8 @@ definitions:
         enum:
         - vcpkg
         type: string
+    required:
+    - package
     title: yggdrasil.dependencies.VcpkgDependency
     type: object
   file:

@@ -1,4 +1,5 @@
-FROM --platform=linux/amd64 condaforge/miniforge3
+ARG platform
+FROM --platform=linux/$platform condaforge/miniforge3
 ARG python
 ARG commit
 RUN apt-get --allow-releaseinfo-change update -y
@@ -20,15 +21,15 @@ RUN conda run -n env python utils/setup_test_env.py deps conda --for-development
 RUN conda install -n env -y c-compiler cxx-compiler
 
 # Install yggdrasil
-RUN ls /yggdrasil/yggdrasil/rapidjson/include/rapidjson/ && \
-    conda run -n env python utils/setup_test_env.py install conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --without-deps --build-method=direct
+RUN conda run -n env python -m pip install -e .
+# RUN conda run -n env python utils/setup_test_env.py install conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --without-deps --build-method=direct
 
 # Configure yggdrasil
-RUN conda run -n yggconfig && \
-    conda run -n ygginfo --verbose
+RUN conda run -n env yggconfig && \
+    conda run -n env ygginfo --verbose
 
 # Compile interfaces
-RUN conda run -n yggcompile c cpp
+RUN conda run -n env yggcompile c cpp
 
 WORKDIR /home
 # RUN echo "conda activate env" > ~/.bashrc

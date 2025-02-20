@@ -26,7 +26,7 @@ class CMakeConfigure(ConfigurerBase):
         ('target_c++_compiler_path', '-DCMAKE_CXX_COMPILER:FILEPATH=%s'),
         ('target_fortran_compiler_path',
          '-DCMAKE_Fortran_COMPILER:FILEPATH=%s'),
-        ('target_linker_path', '-DCMAKE_LINKER=%s'),
+        ('target_linker_path', '-DCMAKE_LINKER:FILEPATH=%s'),
         ('ignore_default_c_flags',
          ['-DCMAKE_C_FLAGS=',
           '-DCMAKE_C_FLAGS_DEBUG=',

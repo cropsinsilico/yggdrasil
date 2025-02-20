@@ -1347,8 +1347,10 @@ class ModelDriver(Driver):
         kwargs.setdefault('default_package_manager',
                           cls.default_package_manager)
         if not isinstance(package, dependencies.ManagedDependencyBase):
+            if package is not None:
+                kwargs['package'] = package
             package = dependencies.ManagedDependencyBase.create_component(
-                package=package, **kwargs)
+                **kwargs)
         package.install(always_yes=always_yes)
         return package
         

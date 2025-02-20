@@ -353,13 +353,9 @@ class OSRModelDriver(ExecutableModelDriver):
             str: Full path to location where the repository was cloned.
 
         """
-        if dest is None:
-            dest = os.path.join(tempfile.gettempdir(), 'OpenSimRoot')
-        if not tools.is_git_repository(dest):  # pragma: config
-            repo = git.Repo.clone_from(cls.repository_url, dest,
-                                       branch=cls.repository_branch)
-            repo.close()
-        return dest
+        from yggdrasil.yamlfile import clone_github_repo
+        return clone_github_repo(cls.repository_url, repository_dir=dest,
+                                 branch=cls.repository_branch)
         
     @classmethod
     def configure_executable_type(cls, cfg):

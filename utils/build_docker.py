@@ -1,4 +1,6 @@
 import os
+import platform
+import sys
 import argparse
 import subprocess
 import json
@@ -20,12 +22,13 @@ def image_exists(tag):
     return False
 
 
-def build(dockerfile=None, tag=None, flags=[],
+def build(parsed_args, dockerfile=None, tag=None, flags=None,
           repo='cropsinsilico/yggdrasil', context=_utils_dir, cwd=None,
-          base=None, parsed_args=None):
+          base_params=None):
     r"""Build a docker image.
 
     Args:
+        parsed_args (argparse.Namespace): Parsed arguments.
         dockerfile (str): Full path to the docker file that should be used.
         tag (str): Tag that should be added to the image.
         flags (list, optional): Additional flags that should be passed to
@@ -35,19 +38,23 @@ def build(dockerfile=None, tag=None, flags=[],
         context (str, optional): Directory that should be provided as the
             context for the image. Defaults to the directory containing this
             script.
-        base (dict, optional): Parameters for the base image.
-        parsed_args (ParsedArgs, optional): Parsed arguments.
+        base_params (dict, optional): Parameters for the base image.
 
     """
     # TODO: Update so multiple targets are built
     # https://docs.docker.com/build/building/multi-platform/
     # TODO: Update sysv_ipc & czmq to have linux/aarch64 builds
-    if base:
-        base_tag = f"{base['repo']}:{base['tag']}"
-        if not image_exists(base_tag):
-            build(parsed_args=parsed_args, **base)
-    assert parsed_args and parsed_args.python
-    flags = flags + ['--build-arg', f'python={parsed_args.python}']
+    if flags is None:
+        flags = []
+    if not parsed_args.platform:
+        if sys.platform == 'darwin' and platform.machine().lower() == 'arm64':
+            parsed_args.platform = 'arm64'
+        else:
+            parsed_args.platform = 'amd64'
+    if sys.platform == 'darwin' and platform.machine().lower() == 'arm64':
+        assert parsed_args.platform == 'arm64'
+    if parsed_args.platform != 'amd64':
+        tag += f'-{parsed_args.platform}'
     if parsed_args.verbose:
         flags += ['--progress', 'plain']
     if repo:
@@ -56,20 +63,44 @@ def build(dockerfile=None, tag=None, flags=[],
     else:
         assert tag
         docker_tag = tag
+    if base_params:
+        base_tag = f"{base_params['repo']}:{base_params['tag']}"
+        if parsed_args.platform != 'amd64':
+            base_tag += f'-{parsed_args.platform}'
+        flags += ['--build-arg', f'base={base_tag}']
+        if not image_exists(base_tag):
+            build(parsed_args, **base_params)
+    flags += ['--build-arg', f'python={parsed_args.python}',
+              '--build-arg', f'platform={parsed_args.platform}']
     args = ['docker', 'build', '-t', docker_tag, '-f', dockerfile,
             '--platform', 'linux/amd64'] + flags
     args.append(context)
-    subprocess.call(args)
+    if parsed_args.dry_run:
+        print(f"BUILD: \"{' '.join(args)}\"")
+    else:
+        subprocess.call(args)
     if not parsed_args.disable_latest:
         assert repo
-        args = ['docker', 'tag', docker_tag, f"{repo}:latest"]
-        subprocess.call(args, cwd=cwd)
+        latest_tag = 'latest'
+        if parsed_args.platform != 'amd64':
+            latest_tag += f'-{parsed_args.platform}'
+        args = ['docker', 'tag', docker_tag, f"{repo}:{latest_tag}"]
+        if parsed_args.dry_run:
+            print(f"TAG LATEST: \"{' '.join(args)}\"")
+        else:
+            subprocess.call(args, cwd=cwd)
+    if parsed_args.push:
+        assert not repo.endswith('-local')
+        push_image(parsed_args, tag, repo=repo)
+        if not parsed_args.disable_latest:
+            push_image(parsed_args, 'latest', repo=repo)
 
 
-def push_image(tag, repo='cropsinsilico/yggdrasil'):
+def push_image(parsed_args, tag, repo='cropsinsilico/yggdrasil'):
     r"""Push a docker image to DockerHub.
 
     Args:
+        parsed_args (argparse.Namespace): Parsed arguments.
         tag (str): Tag that should be added to the image.
         repo (str, optional): DockerHub repository that the image will be
             pushed to. Defaults to 'cropsinsilico/yggdrasil'.
@@ -77,7 +108,10 @@ def push_image(tag, repo='cropsinsilico/yggdrasil'):
     """
     assert repo and tag
     args = ['docker', 'push', f'{repo}:{tag}']
-    subprocess.call(args)
+    if parsed_args.dry_run:
+        print(f"PUSH: \"{' '.join(args)}\"")
+    else:
+        subprocess.call(args)
 
 
 def params_release(version):
@@ -199,10 +233,9 @@ def params_executable(params):
     dockerfile = os.path.join(_utils_dir, 'executable.Docker')
     repo = params["repo"]
     tag = params["tag"]
-    flags = ['--build-arg', f'base={repo}:{tag}']
     repo = repo.replace('yggdrasil', 'yggdrasil-executable')
-    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo,
-                base=params)
+    return dict(dockerfile=dockerfile, tag=tag, repo=repo,
+                base_params=params)
 
 
 def params_service(params, model_repo_commit=False):
@@ -222,7 +255,6 @@ def params_service(params, model_repo_commit=False):
     repo = params["repo"]
     tag = params["tag"]
     if model_repo_commit:
-        base = repo.replace('yggdrasil', 'yggdrasil-service')
         base_params = params_service(params)
         repo = repo.replace('yggdrasil', 'yggdrasil-loaded-service')
         dockerfile = os.path.join(_utils_dir, 'loaded_service.Docker')
@@ -232,16 +264,15 @@ def params_service(params, model_repo_commit=False):
             response = json.loads(urllib.request.urlopen(url).read())
             model_repo_commit = response['sha']
     else:
-        base = repo
         base_params = params
         repo = repo.replace('yggdrasil', 'yggdrasil-service')
         dockerfile = os.path.join(_utils_dir, 'service.Docker')
-    flags = ['--build-arg', f'base={base}:{tag}']
+    flags = []
     if model_repo_commit:
         tag += f'-{model_repo_commit}'
         flags += ['--build-arg', f'commit={model_repo_commit}']
     return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo,
-                base=base_params)
+                base_params=base_params)
 
 
 if __name__ == "__main__":
@@ -273,8 +304,14 @@ if __name__ == "__main__":
         "--python", type=str, default="3.11",
         help="Version of Python that should be used")
     parser.add_argument(
+        "--platform", type=str,
+        help="Platform that should be used for base image")
+    parser.add_argument(
         "--verbose", "-v", action="store_true",
         help="Show build output")
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Print build commant, but don't actually run it")
     parser.add_argument(
         "--push", action="store_true",
         help="After successfully building the image, push it to DockerHub.")
@@ -331,12 +368,8 @@ if __name__ == "__main__":
     elif args.type == 'external':
         params['dockerfile'] = args.dockerfile
         params['repo'] = args.repo
+        params['context'] = os.path.dirname(args.dockerfile)
     # else:
     dockerfile = params.pop('dockerfile')
     tag = params.pop('tag')
-    build(dockerfile, tag, parsed_args=args, **params)
-    if args.push:
-        assert not params['repo'].endswith('-local')
-        push_image(tag, repo=params['repo'])
-        if not args.disable_latest:
-            push_image('latest', repo=params['repo'])
+    build(args, dockerfile, tag, **params)

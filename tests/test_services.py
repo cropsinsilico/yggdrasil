@@ -252,17 +252,19 @@ class TestServices(object):
 def test_validate_model_submission():
     r"""Test validate_model_submission"""
     import git
+    yamldir = os.path.join(os.path.dirname(__file__), 'yamls')
+    repodir = os.path.join(yamldir, 'cropsinsilico')
+    fname_license = os.path.join(repodir, 'example-fakemodel', 'LICENSE')
+    assert not os.path.isdir(repodir)
     try:
-        fname = os.path.join(os.path.dirname(__file__), 'yamls',
-                             'FakePlant.yaml')
+        fname = os.path.join(yamldir, 'FakePlant.yaml')
         validate_model_submission([fname])
-        os.remove(os.path.join('cropsinsilico', 'example-fakemodel',
-                               'LICENSE'))
+        os.remove(fname_license)
         with pytest.raises(RuntimeError):
             validate_model_submission(fname)
     finally:
-        if os.path.isfile('cropsinsilico/example-fakemodel/fakemodel.yml'):
-            git.rmtree("cropsinsilico")
+        if os.path.isdir(repodir):
+            git.rmtree(repodir)
 
 
 def test_validate_model_repo():

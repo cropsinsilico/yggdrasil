@@ -317,7 +317,7 @@ def ndiff(a, b, ncontext=-1, number_lines=False, **kwargs):
     diff = list(difflib.ndiff(a, b, **kwargs))
     selected = []
     if ncontext == -1:
-        selected = slice(0, len(diff))
+        selected.append(slice(0, len(diff)))
     else:
         i = 0
         last_end = 0

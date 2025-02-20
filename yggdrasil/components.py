@@ -125,7 +125,7 @@ def get_registry(comptype=None):
         out = _registry
     else:
         from yggdrasil import constants
-        out = constants.COMPONENT_REGISTRY
+        out = getattr(constants, 'COMPONENT_REGISTRY', {})
     if comptype:
         if comptype not in out:  # pragma: debug
             raise Exception(f"Importing a component type that has not yet "
@@ -681,11 +681,15 @@ class ComponentBase(ComponentBaseUnregistered, metaclass=ComponentMeta):
                     if x in kwargs:
                         kwargs.setdefault(k, kwargs.pop(x))
         # Set attributes based on properties
+        self._properties_set = []
         for k in props:
             if k in self._schema_excluded_from_class:
                 continue
+            vset = (k in kwargs)
             v = kwargs.pop(k, None)
             if getattr(self, k, None) is None:
+                if vset and k not in self._defaults_set:
+                    self._properties_set.append(k)
                 setattr(self, k, v)
             # elif (getattr(self, k) != v) and (v is not None):
             #     warnings.warn(("The schema property '%s' is provided as a "
@@ -694,6 +698,13 @@ class ComponentBase(ComponentBaseUnregistered, metaclass=ComponentMeta):
             #                    "with the value %s.")
             #                   % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
+
+    @classmethod
+    def schema_attributes(cls):
+        r"""list: Names of schema properties assigned to attributes"""
+        props = [k for k in cls._schema_properties.keys()
+                 if k not in cls._schema_excluded_from_class]
+        return props
 
     @staticmethod
     def before_registration(cls):

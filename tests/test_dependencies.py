@@ -147,7 +147,7 @@ class TestManagedDependencyBase(base_class):
         'set': [
             ({
                 'members': [
-                    {'package': 'python'},
+                    {'package': 'python', 'operating_systems': 'linux'},
                     {'package': 'invalid1939502'},
                 ],
                 'shared_properties': {
@@ -168,6 +168,17 @@ class TestManagedDependencyBase(base_class):
             }, True, True, True),
         ],
         'options': [
+            ({
+                'package': 'invalid1939502',
+                'options': [
+                    {'package': 'invalid1939502',
+                     'package_manager': 'pip',
+                     'operating_systems': ['windows']},
+                    {'package': 'invalid1939502',
+                     'package_manager': 'conda',
+                     'operating_systems': ['linux']},
+                ],
+            }, False, False, None),
             ({
                 'package': 'pyyaml',
                 'options': [
@@ -260,7 +271,18 @@ class TestManagedDependencyBase(base_class):
     @pytest.fixture
     def instance_kwargs(self, component_subtype_param):
         r"""Keyword arguments for a new instance of the tested class."""
-        return copy.deepcopy(component_subtype_param[0])
+        out = copy.deepcopy(component_subtype_param[0])
+        if os.environ.get('CONDA_PREFIX', None):
+            package_managers = []
+            if 'shared_properties' in out:
+                package_managers += out['shared_properties'].get(
+                    'package_manager', None)
+            if 'members' in out:
+                package_managers += [x.get('package_manager', None)
+                                     for x in out['members']]
+            if 'conda' in package_managers:
+                pytest.skip("conda not installed")
+        return out
 
     @pytest.fixture
     def preinstall_status(self, component_subtype_param):
@@ -288,7 +310,17 @@ class TestManagedDependencyBase(base_class):
         with pytest.raises(dependencies.DependencyError):
             instance.uninstall(always_yes=always_yes)
 
-    def test_invalid_conda_env(self, python_class, instance_kwargs):
+    def test_missing_conda(self, python_class, instance_kwargs,
+                           requires_no_conda):
+        r"""Test that error is raised if conda_env is set, but conda
+        is not installed."""
+        if not python_class.affected_by_conda_env:
+            pytest.skip("Manager not affected by conda_env")
+        with pytest.raises(dependencies.DependencyError):
+            python_class(conda_env='invalid1939502', **instance_kwargs)
+
+    def test_invalid_conda_env(self, python_class, instance_kwargs,
+                               requires_conda):
         r"""Test that error is raised if conda_env is invalid."""
         if not python_class.affected_by_conda_env:
             pytest.skip("Manager not affected by conda_env")
@@ -307,7 +339,9 @@ class TestManagedDependencyBase(base_class):
         r"""Test install/uninstall of dependency."""
         if conda_env and not python_class.affected_by_conda_env:
             pytest.skip("Manager not affected by conda_env")
-        instance = python_class(conda_env=conda_env, **instance_kwargs)
+        if conda_env:
+            instance_kwargs['conda_env'] = conda_env
+        instance = python_class(**instance_kwargs)
         # Don't test install/uninstall if package manager not installed
         print("INSTANCE", instance, instance.is_installed)
         if not instance.manager_installed(conda_env=conda_env):
@@ -326,7 +360,7 @@ class TestManagedDependencyBase(base_class):
                                          default_to_mamba=True)
                 assert os.path.isdir(conda_prefix)
         # Test install
-        preinstall_status_any1 = instance.is_installed_by_other
+        preinstall_status_any1 = instance.is_installed_by_other()
         preinstall_status_act1 = instance.is_installed
         preuninstall_status_act1 = instance.is_uninstalled
         if install_expectation:
@@ -363,7 +397,7 @@ class TestManagedDependencyBase(base_class):
                 if e is True:
                     assert not instance.is_installed
                     assert instance.is_uninstalled
-                    assert not instance.is_installed_by_other
+                    assert not instance.is_installed_by_other()
                 else:
                     # Check that nothing changed
                     assert instance.is_installed == preinstall_status_act2

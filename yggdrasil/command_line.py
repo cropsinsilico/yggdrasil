@@ -532,15 +532,21 @@ class integration_service_manager(SubCommand):
                         (('integration-name', ),
                          {'type': str,
                           'help': ('The name that the integration should be '
-                                   'registered under or the path to a YAML '
+                                   'registered under, the path to a YAML '
                                    'file containing a list of one or more '
                                    'mappings between name and YAML '
-                                   'specification files for integrations '
+                                   'specification files, or a directory '
+                                   'containing YAML files for integrations '
                                    'that should be registered.')}),
                         (('integration-yamls', ),
                          {'nargs': '*',
                           'help': ('One or more YAML specification files '
-                                   'defining the integration.')})]),
+                                   'defining the integration.')}),
+                        (('--init', ),
+                         {'action': 'store_true', 'default': False,
+                          'help': ('Initialize the integration(s) added '
+                                   'to the registry')})
+                    ]),
                 ArgumentParser(
                     name='unregister',
                     help='Unregister an integration with the service manager.',
@@ -548,11 +554,11 @@ class integration_service_manager(SubCommand):
                         (('integration-name', ),
                          {'type': str,
                           'help': ('The name of the integration to remove '
-                                   'from the registry or the path to a YAML '
+                                   'from the registry, the path to a YAML '
                                    'file containing a list of one or more '
                                    'mappings between integration name and '
-                                   'YAML specification files for '
-                                   'integrations that should be '
+                                   'YAML specification files, or a directory '
+                                   'containing integrations that should be '
                                    'unregistered.')})]),
             ])]
 
@@ -569,19 +575,22 @@ class integration_service_manager(SubCommand):
                 if not os.path.isabs(yml):
                     yml = os.path.abspath(yml)
                 integration_yamls.append(yml)
-        elif integration_name and os.path.isfile(integration_name):
+        elif integration_name and os.path.exists(integration_name):
             if not os.path.isabs(integration_name):
                 integration_name = os.path.abspath(integration_name)
         for_request = (
             (args.action in ['status', 'register', 'unregister', 'stop'])
             or (integration_name is not None))
+        debug = False
+        if args.action == 'start':
+            debug = args.debug
         x = IntegrationServiceManager(name=args.manager_name,
                                       service_type=args.service_type,
                                       commtype=args.commtype,
                                       address=args.address,
                                       port=args.port,
                                       for_request=for_request,
-                                      debug=args.debug)
+                                      debug=debug)
         if args.action in ['start', None]:
             if integration_name is None:
                 if not x.is_running:
@@ -604,8 +613,9 @@ class integration_service_manager(SubCommand):
         elif args.action == 'status':
             x.printStatus()
         elif args.action == 'register':
-            x.registry.add(name=integration_name,
-                           yamls=integration_yamls)
+            x.registry.add(integration_name,
+                           yamls=integration_yamls,
+                           init=args.init)
         elif args.action == 'unregister':
             x.registry.remove(name=integration_name)
         else:
@@ -1067,7 +1077,12 @@ class validate_yaml(SubCommand):
         (('--model-submission', ),
          {'action': 'store_true',
           'help': ('Validate a YAML against the requirements for '
-                   'submissions to the yggdrasil model repository.')})]
+                   'submissions to the yggdrasil model repository.')}),
+        (('--dont-run', ),
+         {'action': 'store_true',
+          'help': ('If --model-submission is passed, don\'t try to run '
+                   'the model as part of the validation process.')}),
+    ]
 
     @classmethod
     def func(cls, args):
@@ -1080,7 +1095,7 @@ class validate_yaml(SubCommand):
                     x = os.path.abspath(x)
                 yamlfiles.append(x)
             print(yamlfiles)
-            validate_model_submission(yamlfiles)
+            validate_model_submission(yamlfiles, dont_run=args.dont_run)
         else:
             from yggdrasil import yamlfile
             yamlfile.parse_yaml(args.yamlfile, model_only=args.model_only,

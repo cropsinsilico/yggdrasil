@@ -888,6 +888,14 @@ def requires_conda():
     
 
 @pytest.fixture(scope="session")
+def requires_no_conda():
+    r"""Skips the test if conda is not installed."""
+    from yggdrasil.tools import get_conda_prefix
+    if get_conda_prefix():
+        pytest.skip("conda installed")
+    
+
+@pytest.fixture(scope="session")
 def logger():
     r"""Package logger."""
     import logging

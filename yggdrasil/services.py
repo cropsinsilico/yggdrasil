@@ -160,8 +160,9 @@ class ServiceBase(YggClass):
         if remote_url is None:
             remote_url = self.address
         if model_repository is not None:
-            repo_dir = self.registry.add_from_repository(model_repository)
-            os.environ.setdefault(_service_repo_dir, repo_dir)
+            self.registry.add_from_repository(model_repository)
+            os.environ.setdefault(_service_repo_dir,
+                                  self.registry.directory_for_clones)
         os.environ.setdefault(_service_host_env, remote_url)
         if self.enable_debugging:
             log_level = logging.DEBUG
@@ -1102,15 +1103,26 @@ class IntegrationServiceRegistry(object):
     r"""Class for managing integration services.
 
     Args:
-        filename (str, optional): File where the registry will be/is stored.
-            Defaults to '~/.yggdrasil_services.yml'.
+        filename (str, optional): File where the registry will be/is
+            stored. Defaults to '~/.yggdrasil_services.yml'.
+        directory_for_clones (str, optional): Local directory that
+            repositories should be cloned into. If not provided and the
+            YGGDRASIL_SERVICE_REPO_DIR environment variable is set
+            (such as by a service manager), that value will be used.
+            Otherwise, directory_for_clones will default to
+            '~/.yggdrasil_services.yml'.
 
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, directory_for_clones=None):
         if filename is None:
             filename = os.path.join('~', '.yggdrasil_services.yml')
+        if directory_for_clones is None:
+            directory_for_clones = os.environ.get(_service_repo_dir, None)
+        if directory_for_clones is None:
+            directory_for_clones = os.path.join('~', '.yggdrasil_services')
         self.filename = os.path.expanduser(filename)
+        self.directory_for_clones = os.path.expanduser(directory_for_clones)
 
     @property
     def registry(self):
@@ -1166,107 +1178,193 @@ class IntegrationServiceRegistry(object):
                 out[k].append(x)
         return out
 
-    def remove(self, name):
+    def remove(self, name, registry=None, allow_missing=False):
         r"""Remove an integration service from the registry.
 
         Args:
             name (str): Name associated with the integration service that
                 should be removed from the registry.
+            registry (dict, optional): Existing registry to update. If
+                not provided, the registry is loaded from the registry
+                file which is updated with the removed service entry.
+            allow_missing (bool, optional): Don't raise an error if the
+                service being removed is not registered.
 
         Raises:
-            KeyError: If there is not an integration service associated with
-                the specified name.
+            KeyError: If there is not an integration service associated
+                with the specified name and allow_missing is False.
 
         """
-        registry = self.load()
+        load_registry = (registry is None)
+        if load_registry:
+            registry = self.load()
         if os.path.isfile(name):
-            names = list(self.load_collection(name).keys())
+            for k in self.load_collection(name).keys():
+                self.remove(k, registry=registry,
+                            allow_missing=allow_missing)
+        elif name not in registry and os.path.isdir(name):
+            errors = []
+            for x in self.find_yamls(name):
+                try:
+                    self.remove(self.yaml2name(x), registry=registry,
+                                allow_missing=allow_missing)
+                except KeyError:
+                    errors.append(self.yaml2name(x))
+            if errors:
+                keys = list(self.registry.keys())
+                raise KeyError(f"There are not integration services "
+                               f"registered under the names {errors}. "
+                               f"Existing services are {keys}")
         else:
-            names = [name]
-        for k in names:
-            if k not in registry:
+            if name not in registry:
+                if allow_missing:
+                    return
                 keys = list(self.registry.keys())
                 raise KeyError(f"There is not an integration service "
-                               f"registered under the name '{k}'. Existing "
-                               f"services are {keys}")
-            registry.pop(k)
-        self.save(registry)
+                               f"registered under the name '{name}'. "
+                               f"Existing services are {keys}")
+            registry.pop(name)
+        if load_registry:
+            self.save(registry)
 
-    def add_from_repository(self, model_repository, directory=None):
+    def add_from_repository(self, model_repository, **kwargs):
         r"""Add integration services to the registry from a repository of
         model YAMLs.
 
         Args:
             model_repository (str): URL of directory in a Git repository
-                containing YAMLs that should be added to the model registry.
-            directory (str, optional): Directory where services from the
-                model_repository should be cloned. Defaults to
-                '~/.yggdrasil_service'.
+                containing YAMLs that should be added to the model
+                registry.
+            **kwargs: Additional keyword arguments are passed to
+                add_from_directory.
 
         Returns:
             str: The directory where the repositories were cloned.
 
         """
-        from yggdrasil.yamlfile import clone_github_repo, prep_yaml
-        if directory is None:
-            directory = os.path.expanduser(
-                os.path.join('~', '.yggdrasil_services'))
-        yaml_dir = clone_github_repo(model_repository,
-                                     directory_for_clones=directory)
-        yaml_files = (glob.glob(os.path.join(yaml_dir, '*.yaml'))
-                      + glob.glob(os.path.join(yaml_dir, '*.yml')))
-        for x in yaml_files:
-            # Calling prep_yaml allows the model repositories to be cloned
-            # in advance to circumvent the hold place on git cloning on
-            # the service manager (these models are assumed to be vetted
-            # so they do not pose a security risk).
-            prep_yaml(x, directory_for_clones=directory)
-            self.add(os.path.splitext(os.path.basename(x))[0], x)
-        return directory
+        from yggdrasil.yamlfile import clone_github_repo
+        yaml_dir = clone_github_repo(
+            model_repository,
+            directory_for_clones=self.directory_for_clones)
+        self.add_from_directory(yaml_dir, **kwargs)
+        return self.directory_for_clones
 
-    def add(self, name, yamls=None, **kwargs):
+    @classmethod
+    def find_yamls(cls, directory):
+        r"""Locate all YAML files in a given directory.
+
+        Args:
+            directory (str): Directory containing YAML files.
+
+        Returns:
+            list: Located YAML files.
+
+        """
+        return sorted(glob.glob(os.path.join(directory, '*.yml'))
+                      + glob.glob(os.path.join(directory, '*.yaml')))
+
+    @classmethod
+    def yaml2name(self, x):
+        r"""Get the name that should be used to register a YAML file.
+
+        Args:
+            x (str): YAML file containing an integration to register.
+
+        Returns:
+            str: Name that should be used to register x.
+
+        """
+        return os.path.splitext(os.path.basename(x))[0]
+
+    def add_from_directory(self, directory, registry=None, **kwargs):
+        r"""Add integration services to the registry by loading all YAML
+        files in the directory, assuming each YAML contains one entry for
+        the registry.
+
+        Args:
+            directory (str): Directory to register models from.
+            registry (dict, optional): Existing registry to update. If
+                not provided, the registry is loaded from the registry
+                file which is updated with the new service entries.
+            **kwargs: Additional keyword arguments are passed to the add
+                method for each file.
+
+        """
+        load_registry = (registry is None)
+        if load_registry:
+            registry = self.load()
+        for x in self.find_yamls(directory):
+            self.add(self.yaml2name(x), yamls=[x],
+                     registry=registry, **kwargs)
+        if load_registry:
+            self.save(registry)
+
+    def add(self, name, yamls=None, registry=None, init=False, **kwargs):
         r"""Add an integration service to the registry.
 
         Args:
             name (str): Name that will be used to access the integration
                 service when starting or stopping it.
-            yamls (str, list): Set of one or more YAML specification files
-                defining the integration.
-            **kwargs: Additional keyword arguments are added to the new entry.
+            yamls (str, list): Set of one or more YAML specification
+                files defining the integration.
+            registry (dict, optional): Existing registry to update. If
+                not provided, the registry is loaded from the registry
+                file which is updated with the new service entry.
+            init (bool, optional): If True, the YAML file will be loaded
+                so that it is validate, any git repositories are cloned,
+                and the models are initialized (e.g. compiled).
+            **kwargs: Additional keyword arguments are added to the new
+                entry.
 
         Raises:
-            ValueError: If there is already an integration with the specified
-                name.
+            ValueError: If there is already an integration with the
+                specified name.
 
         """
-        registry = self.load()
+        load_registry = (registry is None)
+        if load_registry:
+            registry = self.load()
         if os.path.isfile(name):
             assert not yamls
-            collection = {k: dict(kwargs, name=k, yamls=v)
-                          for k, v in self.load_collection(name).items()}
+            for k, v in self.load_collection(name).items():
+                self.add(k, v, registry=registry, init=init, **kwargs)
+        elif os.path.isdir(name) and not yamls:
+            self.add_from_directory(name, registry=registry,
+                                    init=init, **kwargs)
         else:
-            assert yamls
-            collection = {name: dict(kwargs, name=name, yamls=yamls)}
-        for k, v in collection.items():
-            if (k in registry) and (registry[k] != v):
-                old = pprint.pformat(registry[k])
+            v = dict(kwargs, name=name, yamls=yamls)
+            if (name in registry) and (registry[name] != v):
+                old = pprint.pformat(registry[name])
                 new = pprint.pformat(v)
-                raise ValueError(f"There is an registry integration "
-                                 f"associated with the name '{k}'. Remove "
-                                 f"the registry entry before adding a new "
-                                 f"one.\n"
-                                 f"    Registry:\n{old}\n    New:\n{new}")
-            registry[k] = v
-        self.save(registry)
+                raise ValueError(
+                    f"There is an registry integration "
+                    f"associated with the name '{name}'. Remove "
+                    f"the registry entry before adding a new "
+                    f"one.\n"
+                    f"    Registry:\n{old}\n    New:\n{new}"
+                )
+            # Calling init_yaml allows the model repositories to be cloned
+            # in advance to circumvent the hold place on git cloning on
+            # the service manager (these models are assumed to be vetted
+            # so they do not pose a security risk).
+            if init:
+                from yggdrasil.yamlfile import init_yaml
+                init_yaml(yamls,
+                          directory_for_clones=self.directory_for_clones)
+            registry[name] = v
+        if load_registry:
+            self.save(registry)
 
 
-def validate_model_submission(fname):
+def validate_model_submission(fname, dont_run=False):
     r"""Validate a YAML file according to the standards for submission to
     the yggdrasil model repository.
 
     Args:
         fname (str): YAML file to validate or directory in which to check
             each of the YAML files.
+        dont_run (bool, optional): If True, the YAML file will be loaded
+            but the model will not be run.
 
     """
     from yggdrasil import yamlfile, runner
@@ -1295,5 +1393,5 @@ def validate_model_submission(fname):
         raise RuntimeError(f"Model repository ({repo_dir}) does not "
                            f"contain a LICENSE file.")
     # 4. Run & validate
-    if is_lang_installed(yml['models'][0]['driver']):
+    if is_lang_installed(yml['models'][0]['driver']) and not dont_run:
         runner.run(fname, validate=True)

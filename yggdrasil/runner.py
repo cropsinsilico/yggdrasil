@@ -318,9 +318,6 @@ class YggRunner(YggClass):
         partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels when
             complete_partial is True. Defaults to None and will be ignored.
-        yaml_param (dict, optional): Parameters that should be used in
-            mustache formatting of YAML files. Defaults to None and is
-            ignored.
         validate (bool, optional): If True, the validation scripts for each
             modle (if present), will be run after the integration finishes
             running. Defaults to False.
@@ -341,6 +338,7 @@ class YggRunner(YggClass):
             is tested on a clean copy of the model.
         remove_products (bool, optional): If True, integration products
             will be removed after running the model.
+        **kwargs: Additional keyword arguments are passed to parse_yaml.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any
@@ -360,10 +358,10 @@ class YggRunner(YggClass):
                  ygg_debug_prefix=None, connection_task_method='thread',
                  as_service=False, complete_partial=False,
                  partial_commtype=None, production_run=False,
-                 mpi_tag_start=None, yaml_param=None, validate=False,
+                 mpi_tag_start=None, validate=False,
                  with_debugger=None, disable_python_c_api=False,
                  with_asan=False, with_omp=False, overwrite=False,
-                 remove_products=False):
+                 remove_products=False, **kwargs):
         kwargs_models = {'with_debugger': with_debugger,
                          'disable_python_c_api': disable_python_c_api,
                          'with_asan': with_asan,
@@ -412,7 +410,7 @@ class YggRunner(YggClass):
         else:
             self.drivers = yamlfile.parse_yaml(
                 modelYmls, complete_partial=complete_partial,
-                partial_commtype=partial_commtype, yaml_param=yaml_param)
+                partial_commtype=partial_commtype, **kwargs)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
             for k, v in kwargs_models.items():

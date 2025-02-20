@@ -614,6 +614,28 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     return existing
 
 
+def init_yaml(files, **kwargs):
+    r"""Parse yaml files and initialize any models described in the files
+    so that initialization tasks (e.g. compilation) don't need to be
+    performed when the integrations are run in the future.
+
+    Args:
+        files (str, list): Either the path to a single yaml file or a
+            list of yaml files. Entries can also be opened file
+            descriptors for files containing YAML documents or pre-loaded
+            YAML documents.
+        **kwargs: Additional keyword arguments are passed to YggRunner
+            constructor.
+
+    """
+    from yggdrasil.runner import YggRunner
+    kwargs.setdefault('complete_partial', True)
+    # yml = parse_yaml(files, **kwargs)
+    runner = YggRunner(files, **kwargs)
+    runner.loadDrivers()
+    runner.terminate()
+
+
 def complete_partial_integration(existing, name, partial_commtype=None):
     r"""Patch input/output channels that are not connected to a stand-in model.
 

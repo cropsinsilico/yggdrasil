@@ -8,6 +8,7 @@ import pprint
 import tempfile
 import contextlib
 from yggdrasil import tools, platform, yamlfile
+from yggdrasil.rapidjson import NormalizationError
 from yggdrasil.components import (
     ComponentBase, import_component, create_component, ComponentError,
     identify_component_subtype, get_component_classes)
@@ -217,47 +218,6 @@ def parse_version_string(version, pos=0, endswith=False):
     return out
 
 
-def is_installed_any(package, included=None, excluded=None,
-                     language=None, **kwargs):
-    r"""Check if a package is installed via any of the known package
-    managers.
-
-    Args:
-        package (str): The name of the package that should be checked.
-        included (list, optional): Set of package managers that should be
-            checked. If not provided, all of the installed package
-            managers will be checked.
-        excluded (list, optional): Set of package managers that should
-            not be checked.
-        language (str, optional): Language that the package is written in.
-        **kwargs: Additional keyword arguments are passed to the
-            constructor for each package manager dependency.
-
-    Returns:
-       str, bool: The name of the package manager that the package is
-           installed by if it is installed or False if it is not.
-
-    """
-    if included is None:
-        included = get_component_classes('dependency')
-    else:
-        included = [import_component('dependency', x) for x in included]
-    for x in included:
-        if x._schema_required != ['package']:
-            continue
-        if excluded and x._package_manager in excluded:
-            continue
-        if ((language and x.language_specific
-             and language != x.language_specific)):
-            continue
-        x_inst = x(package=package, **kwargs)
-        x_is_installed = x_inst.is_installed
-        if x_is_installed:
-            x_is_installed['package_manager'] = x_inst._package_manager
-            return x_is_installed
-    return False
-
-
 class ErrorRegistry(object):
     r"""Registry for catching and accumulating errors.
 
@@ -333,10 +293,13 @@ class ErrorRegistry(object):
                 error_count. Otherwise, the final error is returned.
 
         """
-        message = (
-            self.error_prefix + '\n\t'
-            + '\n\t'.join([str(x) for x in self.registry])
-        )
+        error_list = []
+        for x in self.registry:
+            x = str(x).splitlines()
+            error_list += [f'- {x[0]}']
+            error_list += [f' {xx}' for xx in x[1:]]
+        sep = '\n    '
+        message = self.error_prefix + sep + sep.join(error_list)
         if self.print_accumulated:
             print(message)
         if not (self.final_error
@@ -626,8 +589,9 @@ class ManagedDependencyBase(ComponentBase):
             cls._schema_properties['sourcedir'] = {'type': 'string'}
 
     def __init__(self, package=None, **kwargs):
-        super(ManagedDependencyBase, self).__init__(
-            package=package, **kwargs)
+        if package is not None:
+            kwargs['package'] = package
+        super(ManagedDependencyBase, self).__init__(**kwargs)
         for k in ['pre_install_steps', 'post_install_steps',
                   'pre_uninstall_steps', 'post_uninstall_steps',
                   'products']:
@@ -843,8 +807,10 @@ class ManagedDependencyBase(ComponentBase):
         if self.manager_installed(conda_env=self.conda_env,
                                   dont_allow_conda_install=True):
             return
-        dep = CondaDependency(package=self.manager_conda_package,
-                              conda_env=self.conda_env)
+        kws = {'package': self.manager_conda_package}
+        if self.conda_env:
+            kws['conda_env'] = self.conda_env
+        dep = CondaDependency(**kws)
         dep.install(always_yes=always_yes)
 
     @classmethod
@@ -1063,6 +1029,9 @@ class ManagedDependencyBase(ComponentBase):
                                       f'\n===={contents}\n====')
         out = []
         for x in contents.splitlines():
+            x = x.strip()
+            if not x:
+                continue
             out.append(
                 {k: v.strip() for k, v in zip(field_names, x.split())}
             )
@@ -1208,14 +1177,104 @@ class ManagedDependencyBase(ComponentBase):
                               f'"{self.package}" within package list:\n'
                               f"{pprint.pformat(package_list)}")
 
-    @property
-    def is_installed_by_other(self):
-        r"""str, bool: The name of the package manager that the package
-        is installed by if it is installed or False if it is not.
+    def alternate_manager_properties(self, manager, kwargs=None,
+                                     include=None, exclude=None):
+        r"""Get the properties for an alternate package manager.
+
+        Args:
+            manager (ManagedDependencyBase): Class that kwargs should be
+                catered to.
+            kwargs (dict, optional): Additional keyword arguments that
+                should be added to the returned dictionary, overriding
+                any values from this instance.
+            include (list, optional): Properties that should be included.
+            exclude (list, optional): Properties that should be excluded.
+
+        Returns:
+            dict: Update kwargs.
+
         """
-        return is_installed_any(
-            self.package, excluded=[self._package_manager],
-            language=self.language_specific, conda_env=self.conda_env)
+        if kwargs is None:
+            kwargs = {}
+        for k in manager._schema_properties.keys():
+            if include and k not in include:
+                continue
+            if exclude and k in exclude:
+                continue
+            if k in self._properties_set:
+                kwargs.setdefault(k, getattr(self, k))
+        return kwargs
+
+    def alternate_manager_instance(self, manager, *args, **kwargs):
+        r"""Get an instance for an alternate package manager.
+
+        Args:
+            manager (ManagedDependencyBase): Class that kwargs should be
+                catered to.
+            *args, **kwargs: Additional arguments are passed to
+                alternate_manager_properties.
+
+        Returns:
+            dict: Update kwargs.
+
+        """
+        props = self.alternate_manager_properties(manager, *args, **kwargs)
+        for k in manager._schema_required:
+            if k not in props:
+                raise NormalizationError(f"Missing required property {k}")
+        return manager(**props)
+
+    def is_installed_by_other(self, include=None, exclude=None, **kwargs):
+        r"""Check if package is installed by another package manager.
+
+        Args:
+            include (str, list, optional): Package manager(s) to
+                check. If not provided, all installed package managers
+                will be checked.
+            exclude (str, list, optional): Package manager(s) to exclude
+                from check.
+            **kwargs: Additional keyword arguments are used as inputs
+                to the other package manager constructors.
+
+        Returns:
+            ManagedDependencyBase: Alternate instance of the package
+                installed by another package manager if the package is
+                installed, False otherwise.
+
+        """
+        if include is None:
+            include = get_component_classes('dependency')
+        if isinstance(exclude, str):
+            exclude = [exclude]
+        if isinstance(include, list):
+            for x in include:
+                x_inst = self.is_installed_by_other(
+                    x, exclude=exclude, **kwargs)
+                if x_inst:
+                    return x_inst
+            return False
+        x = include
+        if not isinstance(x, type):
+            x = import_component('dependency', x)
+        if x._package_manager == self._package_manager:
+            return False
+        if exclude and x._package_manager in exclude:
+            return False
+        if x._schema_required != ['package']:
+            return False
+        if ((self.language_specific and x.language_specific
+             and self.language_specific != x.language_specific)):
+            return False
+        try:
+            x_inst = self.alternate_manager_instance(
+                x, kwargs, include=['package', 'conda_env'])
+        except NormalizationError:
+            return False
+        x_is_installed = x_inst.is_installed
+        if x_is_installed:
+            x_is_installed['package_manager'] = x._package_manager
+            return x_inst
+        return False
 
     @property
     def source_directory(self):
@@ -1411,11 +1470,11 @@ class ManagedDependencyBase(ComponentBase):
         if (not force) and installed:
             return
         if not installed:
-            alt_installed = self.is_installed_by_other
+            alt_installed = self.is_installed_by_other()
             if alt_installed:
                 msg = (
-                    f'Package {self.package} already installed via '
-                    f'{alt_installed["package_manager"]}. Installing with '
+                    f'Package {self.package} already installed as '
+                    f'{alt_installed}. Installing with '
                     f'{self._package_manager} may result in conflicts. '
                     f'Installation with {self._package_manager} '
                 )
@@ -1803,19 +1862,35 @@ class DependencySet(DependencyCollectionBase):
             'items': {'$ref': '#/definitions/dependency'}
         },
     }
+    _schema_excluded_from_inherit = ['package']
     _schema_required = ['members']
     _collection_property = 'members'
 
-    @property
-    def is_installed_by_other(self):
-        r"""str, bool: The name of the package manager that the package
-        is installed by if it is installed or False if it is not.
+    def __init__(self, *args, **kwargs):
+        self.package = None
+        super(DependencySet, self).__init__(*args, **kwargs)
+
+    def is_installed_by_other(self, *args, **kwargs):
+        r"""Check if package is installed by another package manager.
+
+        Args:
+            *args, **kwargs: Arguments are passed to the equivalent
+                method for each of the members.
+        
+        Returns:
+            ManagedDependencyBase: Alternate instance of the package
+                installed by another package manager if the package is
+                installed, False otherwise.
+
         """
-        out = [x.is_installed_by_other for x in self.members]
+        out = [
+            x.is_installed_by_other(*args, **kwargs) for x in self.members
+        ]
         if any(out):
-            return {'package_manager': tuple([x['package_manager']
-                                              for x in out if x]),
-                    'members': out}
+            for i in range(len(out)):
+                if not out[i]:
+                    out[i] = self.members[i]
+            return DependencySet(members=out)
         return False
 
     def check_validity(self, **kwargs):
@@ -1832,7 +1907,9 @@ class DependencySet(DependencyCollectionBase):
         """
         super(DependencySet, self).check_validity(**kwargs)
         for x in self.members:
-            x.check_validity(**kwargs)
+            with self.error_accumulator(DependencyValidationError,
+                                        f'Member {x} invalid:'):
+                x.check_validity(**kwargs)
         
     def check_installed(self, **kwargs):
         r"""Check if the dependency is installed.
@@ -1848,7 +1925,9 @@ class DependencySet(DependencyCollectionBase):
         # super(DependencySet, self).check_installed(**kwargs)
         out = []
         for x in self.members:
-            out.append(x.check_installed(**kwargs))
+            with self.error_accumulator(DependencyInstalledError,
+                                        f'Member {x} not installed:'):
+                out.append(x.check_installed(**kwargs))
         return out
 
     def check_uninstalled(self, **kwargs):
@@ -1866,7 +1945,9 @@ class DependencySet(DependencyCollectionBase):
         # super(DependencySet, self).check_uninstalled(**kwargs)
         out = []
         for x in self.members:
-            out.append(x.check_uninstalled(**kwargs))
+            with self.error_accumulator(DependencyUninstalledError,
+                                        f'Member {x} not uninstalled:'):
+                out.append(x.check_uninstalled(**kwargs))
         return out
 
     def is_appendable(self, solf):
@@ -1921,7 +2002,9 @@ class DependencySet(DependencyCollectionBase):
             for x in self.members:
                 if members is not None and x.package not in members:
                     continue
-                x.install(**kwargs)
+                with self.error_accumulator(DependencyError,
+                                            f'Member {x}:'):
+                    x.install(**kwargs)
 
     def uninstall(self, members=None, **kwargs):
         r"""Uninstall the dependency set.
@@ -1939,7 +2022,9 @@ class DependencySet(DependencyCollectionBase):
             for x in self.members:
                 if members is not None and x.package not in members:
                     continue
-                x.uninstall(**kwargs)
+                with self.error_accumulator(DependencyError,
+                                            f'Member {x}:'):
+                    x.uninstall(**kwargs)
 
 
 class DependencyOptions(DependencyCollectionBase):
@@ -1967,15 +2052,23 @@ class DependencyOptions(DependencyCollectionBase):
         self.selected_option = None
         super(DependencyOptions, self).__init__(*args, **kwargs)
 
-    @property
-    def is_installed_by_other(self):
-        r"""str, bool: The name of the package manager that the package
-        is installed by if it is installed or False if it is not.
+    def is_installed_by_other(self, *args, **kwargs):
+        r"""Check if package is installed by another package manager.
+
+        Args:
+            *args, **kwargs: Arguments are passed to the parent method
+                after excluding all of the package managers in the set.
+        
+        Returns:
+            ManagedDependencyBase: Alternate instance of the package
+                installed by another package manager if the package is
+                installed, False otherwise.
+
         """
-        return is_installed_any(
-            self.package, language=self.language_specific,
-            excluded=[x._package_manager for x in self.options],
-            conda_env=self.conda_env)
+        exclude = kwargs.pop('exclude', [])
+        exclude = exclude + [x._package_manager for x in self.options]
+        return super(DependencyOptions, self).is_installed_by_other(
+            *args, exclude=exclude, **kwargs)
 
     def check_validity(self, **kwargs):
         r"""Check if the dependency can be installed.
@@ -1997,7 +2090,9 @@ class DependencyOptions(DependencyCollectionBase):
                                     'None of the options are valid:',
                                     error_count=len(self.options)):
             for x in self.options:
-                x.check_validity(**kwargs)
+                with self.error_accumulator(DependencyValidationError,
+                                            f'Option {x}:'):
+                    x.check_validity(**kwargs)
         
     def check_installed(self, **kwargs):
         r"""Check if the dependency is installed.
@@ -2018,9 +2113,11 @@ class DependencyOptions(DependencyCollectionBase):
                                     'None of the options are installed:',
                                     error_count=len(self.options)):
             for x in self.options:
-                iout = x.check_installed(**kwargs)
-                if iout and out is None:
-                    out = iout
+                with self.error_accumulator(DependencyInstalledError,
+                                            f'Option {x}:'):
+                    iout = x.check_installed(**kwargs)
+                    if iout and out is None:
+                        out = iout
         return out
 
     def check_uninstalled(self, **kwargs):
@@ -2042,7 +2139,9 @@ class DependencyOptions(DependencyCollectionBase):
                                     'One or more options are not '
                                     'uninstalled:'):
             for x in self.options:
-                x.check_uninstalled(**kwargs)
+                with self.error_accumulator(DependencyUninstalledError,
+                                            f'Option {x}:'):
+                    x.check_uninstalled(**kwargs)
 
     def append(self, solf, require_all=False, init=False):
         r"""Add a dependency to the set of additional packages that will
@@ -2069,7 +2168,9 @@ class DependencyOptions(DependencyCollectionBase):
         errors = []
         with self.error_accumulator(DependencyError, registry=errors):
             for i, x in enumerate(self.options):
-                x.append(solf)
+                with self.error_accumulator(DependencyError,
+                                            f'Option {x}:'):
+                    x.append(solf)
                 if (not require_all) and (len(errors) < (i + 1)):
                     return
         if (not require_all) and (len(errors) != len(self.options)):
@@ -2096,9 +2197,12 @@ class DependencyOptions(DependencyCollectionBase):
             return
         with self.error_accumulator(DependencyError,
                                     f'Failed to install {self.package} '
-                                    f'via any of the options:'):
+                                    f'via any of the options:',
+                                    error_count=len(self.options)):
             for x in self.options:
-                x.install(**kwargs)
+                with self.error_accumulator(DependencyError,
+                                            f'Option {x}:'):
+                    x.install(**kwargs)
                 if x.is_installed:
                     self.selected_option = x
                     return
@@ -2118,14 +2222,13 @@ class DependencyOptions(DependencyCollectionBase):
             self.selected_option.uninstall(**kwargs)
             self.selected_option = None
             return
-        for x in self.options:
-            if x.is_valid:
-                return x.uninstall(**kwargs)
         with self.error_accumulator(DependencyError,
                                     f'Failed to uninstall {self.package} '
                                     f'via any of the options:'):
             for x in self.options:
-                x.uninstall(**kwargs)
+                with self.error_accumulator(DependencyError,
+                                            f'Option {x}:'):
+                    x.uninstall(**kwargs)
 
 
 class CondaDependency(ManagedDependencyBase):
@@ -2198,19 +2301,28 @@ class CondaDependency(ManagedDependencyBase):
             list: List of package information in dictionaries.
 
         """
-        field_names = None
+        field_names = ['name', 'version', 'build', 'channel']
         end_header = None
-        contents = contents.splitlines()
-        for i, x in enumerate(contents):
-            if x.startswith('# Name'):
-                field_names = [v.strip().lower() for v in x[2:].split()]
-            elif x.startswith('#'):
-                continue
-            else:
-                end_header = i
-                break
+        lines = contents.splitlines()
+        if contents.startswith('#'):
+            for i, x in enumerate(lines):
+                if x.startswith('# Name'):
+                    field_names = [v.strip().lower() for v in x[2:].split()]
+                elif x.startswith('#'):
+                    continue
+                else:
+                    end_header = i
+                    break
+        else:
+            x = x.strip()
+            for i, x in enumerate(lines):
+                if x.startswith('Name'):
+                    field_names = [v.strip().lower() for v in x[2:].split()]
+                elif x.startswith('----'):
+                    end_header = i + 1
+                    break
         out = super(CondaDependency, cls).parse_list(
-            '\n'.join(contents[end_header:]), field_names=field_names)
+            '\n'.join(lines[end_header:]), field_names=field_names)
         if dont_include_pypi:
             out = [x for x in out if out['channel'] != 'pypi']
         return out
@@ -2526,6 +2638,26 @@ class CRANDependency(ManagedDependencyBase):
             x['name'] = x['Package'].strip('"')
             x['version'] = x['Version'].strip('"')
         return out
+
+    def is_installed_by_other(self, include=None, **kwargs):
+        r"""Check if package is installed by another package manager.
+
+        Args:
+            include (str, list, optional): Package manager(s) to
+                check. If not provided, all installed package managers
+                will be checked.
+            **kwargs: Arguments are passed to the parent method.
+        
+        Returns:
+            ManagedDependencyBase: Alternate instance of the package
+                installed by another package manager if the package is
+                installed, False otherwise.
+
+        """
+        if include == 'conda' or include == CondaDependency:
+            kwargs.setdefault('package', f'r-{self.package.lower()}')
+        return super(CRANDependency, self).is_installed_by_other(
+            include=include, **kwargs)
 
     def format_constraint(self, ver=None, op=None):
         r"""Format a version constraint.
@@ -3035,13 +3167,10 @@ class SourceDependency(SourceDependencyBase):
         else:
             install_method_class = import_component(
                 'dependency', self.install_method)
-        install_method_kwargs = dict(self.extra_kwargs)
-        install_method_kwargs['sourcedir'] = self.directory
-        for k in install_method_class._schema_properties.keys():
-            if hasattr(self, k):
-                install_method_kwargs.setdefault(k, getattr(self, k))
-        self._install_method_instance = install_method_class(
-            **install_method_kwargs)
+        self._install_method_instance = self.alternate_manager_instance(
+            install_method_class,
+            dict(self.extra_kwargs, sourcedir=self.directory),
+        )
         return self._install_method_instance
 
     def determine_install_method(self):
@@ -3347,7 +3476,7 @@ class GitDependency(SourceDependency):
         'tag': {'type': 'string'},
         'branch': {'type': 'string'},
         'fstring_tag': {'type': 'string', 'default': 'v{version}'},
-        'is_private': {'type': 'string', 'default': False},
+        'is_private': {'type': 'boolean', 'default': False},
         'overwrite': {'type': 'boolean', 'default': False},
         'preserve': {'type': 'boolean', 'default': False},
     }
