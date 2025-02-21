@@ -17,7 +17,7 @@ WORKDIR /yggdrasil
 RUN python utils/setup_test_env.py env --env-name=env conda $python
 
 # Install dependencies
-RUN conda run -n env python utils/setup_test_env.py deps conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp
+RUN conda run -n env python utils/setup_test_env.py deps conda --for-devlopment --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --install-zmq --install-r --dont-install-dev
 RUN conda install -n env -y c-compiler cxx-compiler
 
 # Install yggdrasil

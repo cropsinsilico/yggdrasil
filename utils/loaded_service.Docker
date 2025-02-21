@@ -20,4 +20,5 @@ RUN conda run -n env python -m yggdrasil config --osr-repository-path yggdrasil_
 
 # Build OpenSimRoot
 # RUN conda run -n env python -m yggdrasil compile osr
-CMD ["/bin/bash", "--login"]
+# CMD ["/bin/bash", "--login"]
+CMD ["conda", "run", "-n", "env", "./launch_local.sh"]

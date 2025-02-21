@@ -292,8 +292,6 @@ class SetupParam(object):
                 allow_missing=env_created,
                 use_mamba=self.use_mamba)
             self.conda_flags += f' --name {self.conda_env}'
-        if self.for_development:
-            self.install_opts['dev'] = True
         # Methods that can be used to install deps
         self.valid_methods = ['skip']
         if self.deps_method == 'all':
@@ -384,6 +382,8 @@ class SetupParam(object):
         if require_env_name and getattr(args, 'env_name', None) is None:
             assert method is not None
             args.env_name = method + args.python.replace('.', '')
+        if args.for_development:
+            install_opts['dev'] = True
         cls.extract_install_opts_from_args(args, install_opts)
         for k in cls.args_to_copy():
             if hasattr(args, k):

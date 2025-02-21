@@ -1,3 +1,4 @@
+# TODO: Remove platform arg and just use the CLI option
 import os
 import platform
 import sys
@@ -24,7 +25,7 @@ def image_exists(tag):
 
 def build(parsed_args, dockerfile=None, tag=None, flags=None,
           repo='cropsinsilico/yggdrasil', context=_utils_dir, cwd=None,
-          base_params=None):
+          base_params=None, top_level=False):
     r"""Build a docker image.
 
     Args:
@@ -73,7 +74,7 @@ def build(parsed_args, dockerfile=None, tag=None, flags=None,
     flags += ['--build-arg', f'python={parsed_args.python}',
               '--build-arg', f'platform={parsed_args.platform}']
     args = ['docker', 'build', '-t', docker_tag, '-f', dockerfile,
-            '--platform', 'linux/amd64'] + flags
+            '--platform', f'linux/{parsed_args.platform}'] + flags
     args.append(context)
     if parsed_args.dry_run:
         print(f"BUILD: \"{' '.join(args)}\"")
@@ -89,6 +90,8 @@ def build(parsed_args, dockerfile=None, tag=None, flags=None,
             print(f"TAG LATEST: \"{' '.join(args)}\"")
         else:
             subprocess.call(args, cwd=cwd)
+    if parsed_args.run and top_level:
+        run_image(parsed_args, tag, repo=repo)
     if parsed_args.push:
         assert not repo.endswith('-local')
         push_image(parsed_args, tag, repo=repo)
@@ -110,6 +113,27 @@ def push_image(parsed_args, tag, repo='cropsinsilico/yggdrasil'):
     args = ['docker', 'push', f'{repo}:{tag}']
     if parsed_args.dry_run:
         print(f"PUSH: \"{' '.join(args)}\"")
+    else:
+        subprocess.call(args)
+
+
+def run_image(parsed_args, tag, repo='cropsinsilico/yggdrasil'):
+    r"""Run a docker image.
+
+    Args:
+        parsed_args (argparse.Namespace): Parsed arguments.
+        tag (str): Tag that should be added to the image.
+        repo (str, optional): DockerHub repository for the image that
+            will be run. Defaults to 'cropsinsilico/yggdrasil'.
+
+    """
+    assert repo and tag
+    args = ['docker', 'run', '-dit']
+    if parsed_args.type == 'service':
+        args += ['-p', '5000:5000', '-e', 'PORT=5000']
+    args += [f'{repo}:{tag}']
+    if parsed_args.dry_run:
+        print(f"RUN: \"{' '.join(args)}\"")
     else:
         subprocess.call(args)
 
@@ -316,6 +340,9 @@ if __name__ == "__main__":
         "--push", action="store_true",
         help="After successfully building the image, push it to DockerHub.")
     parser.add_argument(
+        "--run", action="store_true",
+        help="After successfully building the image, run it.")
+    parser.add_argument(
         "--disable-latest", action="store_true",
         help=("Don't tag the new image as 'latest' in addition to the "
               "version/commit specific tag."))
@@ -369,7 +396,6 @@ if __name__ == "__main__":
         params['dockerfile'] = args.dockerfile
         params['repo'] = args.repo
         params['context'] = os.path.dirname(args.dockerfile)
-    # else:
     dockerfile = params.pop('dockerfile')
     tag = params.pop('tag')
-    build(args, dockerfile, tag, **params)
+    build(args, dockerfile, tag, top_level=True, **params)

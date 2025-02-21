@@ -6,4 +6,4 @@ RUN conda install -n env gunicorn
 COPY wsgi.py .
 COPY launch_local.sh .
 
-# CMD ["conda", "run", "launch_local.sh"]
+# CMD ["conda", "run", "./launch_local.sh"]
