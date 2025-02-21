@@ -1,5 +1,4 @@
-ARG platform
-FROM --platform=linux/$platform condaforge/miniforge3
+FROM condaforge/miniforge3
 ARG python
 ARG sourcedir
 RUN apt-get --allow-releaseinfo-change update -y
@@ -22,7 +21,6 @@ RUN conda install -n env -y c-compiler cxx-compiler
 
 # Install yggdrasil
 RUN conda run -n env python -m pip install -e .
-# RUN conda run -n env python utils/setup_test_env.py install conda --for-development --always-yes --no-sudo --python-only  --without-deps --build-method=direct
 
 # Configure yggdrasil
 RUN conda run -n env yggconfig && \
@@ -32,5 +30,5 @@ RUN conda run -n env yggconfig && \
 RUN conda run -n env yggcompile c cpp
 
 WORKDIR /home
-# RUN echo "conda activate env" > ~/.bashrc
-# CMD ["/bin/bash", "--login"]
+RUN echo "conda activate env" > ~/.bashrc
+CMD ["/bin/bash", "--login"]

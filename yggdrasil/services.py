@@ -1300,7 +1300,8 @@ class IntegrationServiceRegistry(object):
             self.save(registry)
 
     def add(self, name, yamls=None, registry=None, init=False, **kwargs):
-        r"""Add an integration service to the registry.
+        r"""Add an integration service to the registry, loading the YAML
+        so that it is validated and any git repositories are cloned.
 
         Args:
             name (str): Name that will be used to access the integration
@@ -1310,9 +1311,8 @@ class IntegrationServiceRegistry(object):
             registry (dict, optional): Existing registry to update. If
                 not provided, the registry is loaded from the registry
                 file which is updated with the new service entry.
-            init (bool, optional): If True, the YAML file will be loaded
-                so that it is validate, any git repositories are cloned,
-                and the models are initialized (e.g. compiled).
+            init (bool, optional): If True, the models in the YAML file
+                will be initialized (e.g. compiled).
             **kwargs: Additional keyword arguments are added to the new
                 entry.
 
@@ -1343,14 +1343,18 @@ class IntegrationServiceRegistry(object):
                     f"one.\n"
                     f"    Registry:\n{old}\n    New:\n{new}"
                 )
-            # Calling init_yaml allows the model repositories to be cloned
-            # in advance to circumvent the hold place on git cloning on
-            # the service manager (these models are assumed to be vetted
-            # so they do not pose a security risk).
+            # Calling init_yaml/parse_yaml allows the model repositories
+            # to be cloned in advance to circumvent the hold place on git
+            # cloning on the service manager (these models are assumed to
+            # be vetted so they do not pose a security risk).
             if init:
                 from yggdrasil.yamlfile import init_yaml
                 init_yaml(yamls,
                           directory_for_clones=self.directory_for_clones)
+            else:
+                from yggdrasil.yamlfile import parse_yaml
+                parse_yaml(yamls,
+                           directory_for_clones=self.directory_for_clones)
             registry[name] = v
         if load_registry:
             self.save(registry)

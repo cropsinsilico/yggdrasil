@@ -358,6 +358,27 @@ class OSRModelDriver(ExecutableModelDriver):
                                  branch=cls.repository_branch)
         
     @classmethod
+    def configure(cls, cfg, **kwargs):
+        r"""Add configuration options for this language.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        repo = kwargs.get('repository', None)
+        if repo and not os.path.isabs(repo):
+            kwargs['repository'] = os.path.abspath(repo)
+            if not tools.is_git_repository(kwargs['repository']):  # pragma: debug
+                raise ValueError(f"Provided directory for OpenSimRoot "
+                                 f"repository is not a git repository: "
+                                 f"{kwargs['repository']}")
+        return super(OSRModelDriver, cls).configure(cfg, **kwargs)
+
+    @classmethod
     def configure_executable_type(cls, cfg):
         r"""Add configuration options specific in the executable type
         before the libraries are configured.

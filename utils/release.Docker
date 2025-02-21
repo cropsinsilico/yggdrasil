@@ -1,12 +1,11 @@
-ARG platform
-FROM --platform=linux/$platform condaforge/miniforge3
+FROM condaforge/miniforge3
 ARG python
 ARG version
 RUN conda config --add channels conda-forge && \
     conda config --set channel_priority strict
 
 # Create conda environment with yggdrasil installed
-RUN conda create -n env python=$python yggdrasil=$version yggdrasil.c yggdrasil.fortran yggdrasil.r yggdrasil.zmq yggdrasil.mpi yggdrasil.rmq yggdrasil.testing yggdrasil.docs yggdrasil.dev -y
+RUN conda create -n env python=$python yggdrasil=$version yggdrasil.c yggdrasil.fortran yggdrasil.r yggdrasil.zmq yggdrasil.mpi yggdrasil.rmq yggdrasil.testing yggdrasil.docs -y
 
 # Required so that gcc & g++ are available as paths in OpenSimRoot make
 RUN conda run -n env cp $CC $(dirname $CC)/gcc && \
@@ -20,5 +19,5 @@ RUN conda run -n yggconfig && \
 RUN conda run -n yggcompile c cpp
 
 WORKDIR /home
-# RUN echo "conda activate env" > ~/.bashrc
-# CMD ["/bin/bash", "--login"]
+RUN echo "conda activate env" > ~/.bashrc
+CMD ["/bin/bash", "--login"]

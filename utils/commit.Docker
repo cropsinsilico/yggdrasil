@@ -1,5 +1,4 @@
-ARG platform
-FROM --platform=linux/$platform condaforge/miniforge3
+FROM condaforge/miniforge3
 ARG python
 ARG commit
 RUN apt-get --allow-releaseinfo-change update -y
@@ -17,17 +16,11 @@ WORKDIR /yggdrasil
 RUN python utils/setup_test_env.py env --env-name=env conda $python
 
 # Install dependencies
-# RUN conda run -n env python utils/setup_test_env.py deps conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --install-zmq --install-r --dont-install-dev
-RUN conda run -n env python utils/setup_test_env.py deps conda --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp
+RUN conda run -n env python utils/setup_test_env.py deps conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --install-r --dont-install-dev
 RUN conda install -n env -y c-compiler cxx-compiler
-RUN conda install -n env -y zeromq
-RUN conda run -n env python utils/setup_test_env.py deps conda --always-yes --no-sudo --python-only --install-r
-COPY setup_test_env.py utils/setup_test_env.py
-RUN conda run -n env python utils/setup_test_env.py deps conda --for-development --always-yes --no-sudo --python-only --dont-install-dev
 
 # Install yggdrasil
 RUN conda run -n env python -m pip install -e .
-# RUN conda run -n env python utils/setup_test_env.py install conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --without-deps --build-method=direct
 
 # Configure yggdrasil
 RUN conda run -n env yggconfig && \
@@ -37,5 +30,5 @@ RUN conda run -n env yggconfig && \
 RUN conda run -n env yggcompile c cpp
 
 WORKDIR /home
-# RUN echo "conda activate env" > ~/.bashrc
-# CMD ["/bin/bash", "--login"]
+RUN echo "conda activate env" > ~/.bashrc
+CMD ["/bin/bash", "--login"]

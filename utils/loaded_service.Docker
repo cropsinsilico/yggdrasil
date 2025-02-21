@@ -7,18 +7,15 @@ RUN git clone --recurse-submodules https://github.com/cropsinsilico/yggdrasil_mo
     cd yggdrasil_models && \
     git checkout $commit
 
-ENV YGGDRASIL_SERVICE_REPO_DIR=yggdrasil_models/models
+ENV YGGDRASIL_SERVICE_REPO_DIR=/home/yggdrasil_models/models
 
 # Point the configuration to the validated OpenSimRoot
+RUN conda run -n env python -m yggdrasil integration-service-manager register yggdrasil_models/models
 RUN conda run -n env python -m yggdrasil config --osr-repository-path yggdrasil_models/models/langmm/OpenSimRoot
 
 # Initialize the models
-# RUN conda run -n env python -m yggdrasil integration-service-manager register yggdrasil_models/models --init
+RUN conda run -n env python -m yggdrasil info --verbose
+RUN conda run -n env python -m yggdrasil integration-service-manager register yggdrasil_models/models --init
 
 # Validate models so that they are each loaded, cloned, and built
 # RUN conda run -n env python -m yggdrasil validate yggdrasil_models/models --model-submission
-
-# Build OpenSimRoot
-# RUN conda run -n env python -m yggdrasil compile osr
-# CMD ["/bin/bash", "--login"]
-CMD ["conda", "run", "-n", "env", "./launch_local.sh"]

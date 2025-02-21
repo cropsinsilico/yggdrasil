@@ -1,10 +1,11 @@
-# TODO: Remove platform arg and just use the CLI option
+# TODO: Remove platform from tag?
 import os
 import platform
 import sys
 import argparse
 import subprocess
 import json
+import shutil
 import urllib.request
 _utils_dir = os.path.dirname(__file__)
 
@@ -64,32 +65,54 @@ def build(parsed_args, dockerfile=None, tag=None, flags=None,
     else:
         assert tag
         docker_tag = tag
-    if base_params:
-        base_tag = f"{base_params['repo']}:{base_params['tag']}"
-        if parsed_args.platform != 'amd64':
-            base_tag += f'-{parsed_args.platform}'
-        flags += ['--build-arg', f'base={base_tag}']
-        if not image_exists(base_tag):
-            build(parsed_args, **base_params)
-    flags += ['--build-arg', f'python={parsed_args.python}',
-              '--build-arg', f'platform={parsed_args.platform}']
-    args = ['docker', 'build', '-t', docker_tag, '-f', dockerfile,
-            '--platform', f'linux/{parsed_args.platform}'] + flags
-    args.append(context)
-    if parsed_args.dry_run:
-        print(f"BUILD: \"{' '.join(args)}\"")
-    else:
-        subprocess.call(args)
-    if not parsed_args.disable_latest:
-        assert repo
-        latest_tag = 'latest'
-        if parsed_args.platform != 'amd64':
-            latest_tag += f'-{parsed_args.platform}'
-        args = ['docker', 'tag', docker_tag, f"{repo}:{latest_tag}"]
-        if parsed_args.dry_run:
-            print(f"TAG LATEST: \"{' '.join(args)}\"")
-        else:
-            subprocess.call(args, cwd=cwd)
+    nested_parent_context = None
+    try:
+        parent_context = os.path.dirname(context)
+        if top_level and parsed_args.copy:
+            nested_parent_context = os.path.join(
+                context, 'parent_context')
+            if not os.path.isdir(nested_parent_context):
+                os.mkdir(nested_parent_context)
+            for x in parsed_args.copy:
+                if not os.path.isabs(x):
+                    x = os.path.abspath(x)
+                dst = os.path.join(
+                    nested_parent_context,
+                    os.path.relpath(x, parent_context)
+                )
+                dst_dir = os.path.dirname(dst)
+                if not os.path.isdir(dst_dir):
+                    os.makedirs(dst_dir)
+                shutil.copy2(x, dst)
+        if base_params:
+            base_tag = f"{base_params['repo']}:{base_params['tag']}"
+            if parsed_args.platform != 'amd64':
+                base_tag += f'-{parsed_args.platform}'
+            flags += ['--build-arg', f'base={base_tag}']
+            if not image_exists(base_tag):
+                build(parsed_args, **base_params)
+        flags += ['--build-arg', f'python={parsed_args.python}']
+        args = ['docker', 'build', '-t', docker_tag, '-f', dockerfile,
+                '--platform', f'linux/{parsed_args.platform}'] + flags
+        args.append(context)
+        if not parsed_args.dont_build:
+            if parsed_args.dry_run:
+                print(f"BUILD: \"{' '.join(args)}\"")
+            else:
+                subprocess.call(args)
+        if not (parsed_args.disable_latest or parsed_args.dont_build):
+            assert repo
+            latest_tag = 'latest'
+            if parsed_args.platform != 'amd64':
+                latest_tag += f'-{parsed_args.platform}'
+            args = ['docker', 'tag', docker_tag, f"{repo}:{latest_tag}"]
+            if parsed_args.dry_run:
+                print(f"TAG LATEST: \"{' '.join(args)}\"")
+            else:
+                subprocess.call(args, cwd=cwd)
+    finally:
+        if nested_parent_context and os.path.isdir(nested_parent_context):
+            shutil.rmtree(nested_parent_context)
     if parsed_args.run and top_level:
         run_image(parsed_args, tag, repo=repo)
     if parsed_args.push:
@@ -299,14 +322,110 @@ def params_service(params, model_repo_commit=False):
                 base_params=base_params)
 
 
+def add_argument_subparsers(subparsers, *args, group=False, **kwargs):
+    r"""Add an argument to all of the subparsers in a set.
+
+    Args:
+        subparsers (list): Subparsers to add argument to.
+        group (bool, optional): If True, one mutually exclusive group
+            will be initialized for each subparser and the list will be
+            returned.
+        *args, **kwargs: Additional arguments are passed to add_argument
+            for each subparser.
+
+    """
+    if not isinstance(subparsers, list):
+        subparsers = [subparsers]
+    out = []
+    for i, x in enumerate(subparsers):
+        if group:
+            out.append(x.add_mutually_exclusive_group())
+        else:
+            x.add_argument(*args, **kwargs)
+    if group:
+        return out
+
+
+class GroupWrapper(object):
+    
+    def __init__(self, groups=None):
+        if groups is None:
+            groups = []
+        self.groups = groups
+
+    def append(self, group):
+        self.groups.append(group)
+
+    def add_argument(self, *args, **kwargs):
+        for x in self.groups:
+            x.add_argument(*args, **kwargs)
+
+    def add_mutually_exclusive_group(self, *args, **kwargs):
+        return GroupWrapper([
+            x.add_mutually_exclusive_group(*args, **kwargs)
+            for x in self.groups
+        ])
+
+                
+class ArgumentParser(argparse.ArgumentParser):
+
+    def __init__(self, *args, **kwargs):
+        self._subparsers_sets = {}
+        self._subparsers_objects = {}
+        super(ArgumentParser, self).__init__(*args, **kwargs)
+
+    def add_subparsers(self, *args, **kwargs):
+        name = kwargs['dest']
+        assert name not in self._subparsers_objects
+        out = super(ArgumentParser, self).add_subparsers(*args, **kwargs)
+        self._subparsers_objects[name] = out
+        self._subparsers_sets[name] = GroupWrapper()
+        return out
+
+    def add_subparser(self, name, *args, **kwargs):
+        assert name in self._subparsers_objects
+        out = self._subparsers_objects[name].add_parser(*args, **kwargs)
+        self._subparsers_sets[name].append(out)
+        return out
+
+    def add_argument(self, *args, **kwargs):
+        if self._subparsers_objects:
+            for v in self._subparsers_sets.values():
+                v.add_argument(*args, **kwargs)
+            return
+        super(ArgumentParser, self).add_argument(*args, **kwargs)
+
+    def add_mutually_exclusive_group(self, *args, **kwargs):
+        if self._subparsers_objects:
+            return GroupWrapper([
+                v.add_mutually_exclusive_group(*args, **kwargs)
+                for v in self._subparsers_sets.values()
+            ])
+        return super(ArgumentParser, self).add_mutually_exclusive_group(
+            *args, **kwargs)
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         "Build a docker image containing a version of yggdrasil.")
-    # parser.add_argument(
-    #     "type", type=str, default="environment",
-    #     choices=["environment", "executable", "service"],
-    #     help=("Type of docker image that should be built."
-    #           ""))
+
+    # Subparsers
+    subparsers = parser.add_subparsers(
+        dest="type",
+        help=("Type of docker image that should be built "
+              "(Defaults to 'environment')."))
+    parser_env = parser.add_subparser(
+        "type", "environment",
+        help="Image that will be used as a virutal environment.")
+    parser_exe = parser.add_subparser(
+        "type", "executable",
+        help="Executable image for running yggdrasil integrations.")
+    parser_srv = parser.add_subparser(
+        "type", "service",
+        help=("Service image for running a yggdrasil integrations service "
+              "manager web application."))
+
+    # Mutually exclusive group
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "--version", type=str,
@@ -324,6 +443,8 @@ if __name__ == "__main__":
         "--local", type=str,
         help=("Local directory containing yggdrasil version that should "
               "be installed in the image."))
+
+    # General arguments
     parser.add_argument(
         "--python", type=str, default="3.11",
         help="Version of Python that should be used")
@@ -343,23 +464,17 @@ if __name__ == "__main__":
         "--run", action="store_true",
         help="After successfully building the image, run it.")
     parser.add_argument(
+        "--dont-build", action="store_true",
+        help="Don't build the image.")
+    parser.add_argument(
         "--disable-latest", action="store_true",
         help=("Don't tag the new image as 'latest' in addition to the "
               "version/commit specific tag."))
-    subparsers = parser.add_subparsers(
-        dest="type",
-        help=("Type of docker image that should be built "
-              "(Defaults to 'environment')."))
-    parser_env = subparsers.add_parser(
-        "environment",
-        help="Image that will be used as a virutal environment.")
-    parser_exe = subparsers.add_parser(
-        "executable",
-        help="Executable image for running yggdrasil integrations.")
-    parser_srv = subparsers.add_parser(
-        "service",
-        help=("Service image for running a yggdrasil integrations service "
-              "manager web application."))
+    parser.add_argument(
+        "--copy", nargs='+', type=str, action='extend',
+        help=("Copy one or more files from the parent context into the "
+              "build context"))
+    # Subparser specific arguments
     parser_srv.add_argument(
         "--model-repo-commit", type=str,
         help=("Commit from the yggdrasil model repository that should "

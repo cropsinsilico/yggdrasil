@@ -8,6 +8,7 @@ import pprint
 import tempfile
 import contextlib
 from yggdrasil import tools, platform, yamlfile
+from yggdrasil.services import _service_repo_dir
 from yggdrasil.rapidjson import NormalizationError
 from yggdrasil.components import (
     ComponentBase, import_component, create_component, ComponentError,
@@ -28,7 +29,9 @@ _version_part_regex = re.compile(
     + _base_version_regex
 )
 _in_github_action = bool(os.environ.get('GITHUB_ACTIONS', False))
-_default_always_yes = _in_github_action
+_default_always_yes = (
+    _in_github_action or os.environ.get(_service_repo_dir, False)
+)
 _cached_results = {}
 if platform._is_mac:
     _default_package_manager = ['conda', 'brew', 'apt', 'choco', 'vcpkg']
@@ -283,6 +286,26 @@ class ErrorRegistry(object):
             ext = None
         return out
 
+    @classmethod
+    def format_errors(cls, prefix, errors):
+        r"""Format a list of errors.
+
+        Args:
+            prefix (str): Error prefix.
+            errors (list): List of errors.
+
+        Returns:
+            str: Formated error message.
+
+        """
+        error_list = []
+        for x in errors:
+            x = str(x).splitlines()
+            error_list += [f'- {x[0]}']
+            error_list += [f' {xx}' for xx in x[1:]]
+        sep = '\n    '
+        return prefix + sep + sep.join(error_list)
+
     def finalize(self):
         r"""Finalize the registry, raising the final error if
         appropriate.
@@ -293,13 +316,7 @@ class ErrorRegistry(object):
                 error_count. Otherwise, the final error is returned.
 
         """
-        error_list = []
-        for x in self.registry:
-            x = str(x).splitlines()
-            error_list += [f'- {x[0]}']
-            error_list += [f' {xx}' for xx in x[1:]]
-        sep = '\n    '
-        message = self.error_prefix + sep + sep.join(error_list)
+        message = self.format_errors(self.error_prefix, self.registry)
         if self.print_accumulated:
             print(message)
         if not (self.final_error
@@ -1169,6 +1186,8 @@ class ManagedDependencyBase(ComponentBase):
             kwargs.setdefault('conda_env', self.conda_env)
             package_list = self.list(package=package, **kwargs)
         for x in package_list:
+            if 'name' not in x:
+                raise RuntimeError(f'{self}: Invalid package from list: {x}')
             if ((x['name'].lower() == package.lower()
                  and self.check_version(x.get('version', None),
                                         base_version=version))):
@@ -2176,10 +2195,10 @@ class DependencyOptions(DependencyCollectionBase):
         if (not require_all) and (len(errors) != len(self.options)):
             return
         key = 'all' if require_all else 'any'
-        raise DependencyError(f"Dependency ({solf}) cannot be appended "
-                              f"to {key} of the options in this set "
-                              f"({self.options}). Errors:\n\t"
-                              + '\n\t'.join(errors))
+        raise DependencyError(ErrorRegistry.format_errors(
+            f"Dependency ({solf}) cannot be appended "
+            f"to {key} of the options in this set "
+            f"({self.options}):", errors))
         
     def install(self, **kwargs):
         r"""Install the dependency.
@@ -2301,7 +2320,7 @@ class CondaDependency(ManagedDependencyBase):
             list: List of package information in dictionaries.
 
         """
-        field_names = ['name', 'version', 'build', 'channel']
+        field_names = None
         end_header = None
         lines = contents.splitlines()
         if contents.startswith('#'):
@@ -2317,10 +2336,12 @@ class CondaDependency(ManagedDependencyBase):
             for i, x in enumerate(lines):
                 x = x.strip()
                 if x.startswith('Name'):
-                    field_names = [v.strip().lower() for v in x[2:].split()]
-                elif x.startswith('----'):
+                    field_names = [v.strip().lower() for v in x.split()]
+                elif field_names and x.startswith('----'):
                     end_header = i + 1
                     break
+        if field_names is None:
+            field_names = ['name', 'version', 'build', 'channel']
         out = super(CondaDependency, cls).parse_list(
             '\n'.join(lines[end_header:]), field_names=field_names)
         if dont_include_pypi:

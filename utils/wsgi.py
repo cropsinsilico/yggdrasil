@@ -7,7 +7,8 @@ repo_directory = os.environ.get(_service_repo_dir, None)
 
 
 x = IntegrationServiceManager(is_app=True)
-if 'photosynthesis' not in x.registry.registry:
+if ((os.path.isfile(services_file)
+     and 'photosynthesis' not in x.registry.registry)):
     x.registry.add(name=services_file)
 if repo_directory and os.path.isdir(repo_directory):
     x.registry.add(repo_directory)

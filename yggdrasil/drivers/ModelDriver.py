@@ -1321,7 +1321,9 @@ class ModelDriver(Driver):
         return cls.install_dependency(deps, **kwargs)
 
     @classmethod
-    def install_dependency(cls, package=None, always_yes=False, **kwargs):
+    def install_dependency(cls, package=None,
+                           always_yes=dependencies._default_always_yes,
+                           **kwargs):
         r"""Install a dependency.
 
         Args:
@@ -1342,8 +1344,6 @@ class ModelDriver(Driver):
             ManagedDependencyBase: Dependency instance.
 
         """
-        if bool(os.environ.get('GITHUB_ACTIONS', False)):
-            always_yes = True
         kwargs.setdefault('default_package_manager',
                           cls.default_package_manager)
         if not isinstance(package, dependencies.ManagedDependencyBase):
