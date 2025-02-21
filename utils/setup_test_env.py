@@ -382,7 +382,7 @@ class SetupParam(object):
         if require_env_name and getattr(args, 'env_name', None) is None:
             assert method is not None
             args.env_name = method + args.python.replace('.', '')
-        if args.for_development:
+        if getattr(args, 'for_development', None):
             install_opts['dev'] = True
         cls.extract_install_opts_from_args(args, install_opts)
         for k in cls.args_to_copy():

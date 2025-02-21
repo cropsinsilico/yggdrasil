@@ -2314,8 +2314,8 @@ class CondaDependency(ManagedDependencyBase):
                     end_header = i
                     break
         else:
-            x = x.strip()
             for i, x in enumerate(lines):
+                x = x.strip()
                 if x.startswith('Name'):
                     field_names = [v.strip().lower() for v in x[2:].split()]
                 elif x.startswith('----'):
