@@ -45,7 +45,7 @@ classifiers = [
     "Natural Language :: English",
     "Topic :: Scientific/Engineering",
 ]
-python_requires = ">=3.7"
+requires-python = ">= 3.7"
 
 [project.entry-points]
 console_scripts = {file = "console_scripts.txt"}

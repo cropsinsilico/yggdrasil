@@ -21,13 +21,15 @@ if not os.path.isfile(config.usr_config_file):  # pragma: config
                      for x in sys.argv)
     in_config = any(x.endswith(('yggconfig.exe', 'config'))
                     for x in sys.argv)
+    in_flags = any(x.endswith('flags')
+                   for x in sys.argv)
     if not in_install:
         from yggdrasil.languages import install_languages
         shutil.copy(config.def_config_file, config.usr_config_file)
         install_languages.install_all_languages(from_setup=True)
         if not in_config:
             # Don't configure if that is going to happen anyway
-            config.update_language_config(verbose=True)
+            config.update_language_config(verbose=(not in_flags))
 
 
 def import_as_function(model_yaml, service_address=None, **kwargs):
