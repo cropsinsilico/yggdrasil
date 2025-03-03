@@ -657,7 +657,12 @@ class ygginfo(SubCommand):
                 (('--flags', ),
                  {'action': 'store_true',
                   'help': ('Display the flags that yggdrasil will '
-                           ' pass to the tool when it is called.')}),
+                           'pass to the tool when it is called.')}),
+                (('--exports', ),
+                 {'type': str.lower,
+                  'choices': LANGUAGES_WITH_ALIASES.get('build', []),
+                  'help': ('Get the name of the generated exports '
+                           'file(s) for the given build tool')}),
                 (('--fullpath', ),
                  {'action': 'store_true',
                   'help': 'Get the full path to the tool exectuable.'}),
@@ -666,6 +671,14 @@ class ygginfo(SubCommand):
                   'help': ('Convert flags to use dashes (-) instead of '
                            'forward slashes (/) (used only with MSVC '
                            'compilation tools.')}),
+                (('--interface', ),
+                 {'action': 'store_true',
+                  'help': ('Get information about the yggdrasil '
+                           'interface for the specified language/tool')}),
+                (('--build-deps', ),
+                 {'action': 'store_true',
+                  'help': ('Build the necessary dependencies to use the '
+                           'tool if they do not already exist.')}),
             ] + DependencySpecialization.command_line_options,
             parsers=[
                 ArgumentParser(
@@ -678,9 +691,33 @@ class ygginfo(SubCommand):
                         (('--library', ),
                          {'action': 'store_true',
                           'help': 'Get flags for linking a library.'})]),
-                ArgumentParser(
-                    name='archiver',
-                    help='Get information about a archiver.')])]
+            ])]
+
+    @classmethod
+    def get_dep(cls, args):
+        from yggdrasil.components import import_component
+        drv = import_component('model', args.language)
+        kws = {}
+        if args.toolname:
+            kws[args.tools] = args.toolname
+        kws.update(DependencySpecialization.from_command_args(args))
+        for k in ['dry_run']:
+            kws.pop(k, None)
+        if args.interface:
+            dep = drv.interface_dep(**kws)
+        else:
+            kws['for_model'] = True
+            if args.tool == 'compiler':
+                kws['libtype'] = 'object'
+            elif args.tool == 'archiver':
+                kws['libtype'] = 'static'
+            elif args.tool == 'linker':
+                if getattr(args, 'library', False):
+                    kws['libtype'] = 'shared'
+                else:
+                    kws['libtype'] = 'executable'
+            dep = drv.create_dep(**kws)
+        return dep
 
     @classmethod
     def func(cls, args, return_str=False):
@@ -689,20 +726,7 @@ class ygginfo(SubCommand):
         if args.tool:
             drv = import_component('model', args.language)
             if args.flags:
-                kws = {'for_model': True,
-                       args.tool: args.toolname}
-                kws.update(
-                    DependencySpecialization.from_command_args(args))
-                if args.tool == 'compiler':
-                    kws['libtype'] = 'object'
-                elif args.tool == 'archiver':
-                    kws['libtype'] = 'static'
-                elif args.tool == 'linker':
-                    if getattr(args, 'library', False):
-                        kws['libtype'] = 'shared'
-                    else:
-                        kws['libtype'] = 'executable'
-                dep = drv.create_dep(**kws)
+                dep = cls.get_dep(args)
                 tool = dep.tool(args.tool)
                 flags = dep.tool_flags(
                     args.tool,
@@ -712,12 +736,22 @@ class ygginfo(SubCommand):
                 out = ' '.join(
                     tool.fix_flags(flags, context='cmd', tool=tool,
                                    for_gnu=args.gnu_style_flags))
+                if args.build_deps:
+                    dep.build_dependencies()
                 # if platform._is_win:  # pragma: windows
                 #     if args.gnu_style_flags:
                 #         out = out.replace('/', '-')
                 #     out = out.replace('\\', '/')
             elif args.fullpath:
                 out = drv.get_tool(args.tool).get_executable(full_path=True)
+            elif args.exports:
+                build_driver = import_component('model', args.exports)
+                dep = cls.get_dep(args)
+                out = dep.get('exportsfile', default='', dry_run=True,
+                              build_driver=build_driver)
+                out = str(out) if out else ''
+                if args.build_deps:
+                    dep.build(build_driver=build_driver)
             else:
                 out = drv.get_tool(args.tool, return_prop='name')
             if return_str:
@@ -1189,6 +1223,9 @@ class yggcompile(SubCommand):
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
                    "(only used if the provided source language is R).")}),
+        (('--dont-overwrite', ),
+         {'action': 'store_true',
+          'help': "Only build missing dependencies."}),
     ] + DependencySpecialization.command_line_options
 
     @classmethod
@@ -1204,13 +1241,14 @@ class yggcompile(SubCommand):
                 languages.append(x)
             else:
                 sources.append(x)
-        if languages:
+        if languages and not args.dont_overwrite:
             args.languages = languages
             yggclean.func(args, verbose=False)
         kwargs = DependencySpecialization.from_command_args(args)
         for lang in list(languages):
-            drv = import_component('model', lang)
-            drv.cleanup_dependencies(**kwargs)
+            if not args.dont_overwrite:
+                drv = import_component('model', lang)
+                drv.cleanup_dependencies(**kwargs)
             # Prevent language from being recompiled more than
             # once as a dependency
             for base_lang in drv.base_languages:
@@ -1338,6 +1376,14 @@ class cc_flags(cc_toolname):
           'help': ('Convert flags to use dashes (-) instead of '
                    'forward slashes (/) (used only with MSVC '
                    'compilation tools.')}),
+        (('--interface', ),
+         {'action': 'store_true',
+          'help': ('Get information about the yggdrasil '
+                   'interface for the specified language/tool')}),
+        (('--build-deps', ),
+         {'action': 'store_true',
+          'help': ('Build the necessary dependencies to use the '
+                   'tool if they do not already exist.')}),
     ] + DependencySpecialization.command_line_options
 
     @classmethod
@@ -1365,6 +1411,14 @@ class ld_flags(cc_toolname):
           'help': ('Convert flags to use dashes (-) instead of '
                    'forward slashes (/) (used only with MSVC '
                    'compilation tools.')}),
+        (('--interface', ),
+         {'action': 'store_true',
+          'help': ('Get information about the yggdrasil '
+                   'interface for the specified language/tool')}),
+        (('--build-deps', ),
+         {'action': 'store_true',
+          'help': ('Build the necessary dependencies to use the '
+                   'tool if they do not already exist.')}),
     ] + DependencySpecialization.command_line_options
 
     @classmethod

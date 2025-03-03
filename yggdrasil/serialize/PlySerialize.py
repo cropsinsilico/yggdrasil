@@ -25,7 +25,8 @@ class GeometryBase:
             for p in d.result.pointList:
                 new_vert = {}
                 for k in ['x', 'y', 'z']:
-                    new_vert[k] = conversion * getattr(p, k)
+                    new_vert[k] = float(conversion * getattr(p, k))
+                out.setdefault('vertices', [])
                 out['vertices'].append(new_vert)
             # Colors
             if d.result.colorPerVertex and d.result.colorList:
@@ -46,12 +47,15 @@ class GeometryBase:
             # Faces
             if _as_obj:
                 for i3 in d.result.indexList:
-                    out['faces'].append([{'vertex_index': i3[j]}
+                    out.setdefault('faces', [])
+                    out['faces'].append([{'vertex_index': int(i3[j])}
                                          for j in range(len(i3))])
             else:
                 for i3 in d.result.indexList:
-                    out['faces'].append({'vertex_index': [i3[j] for j in
-                                                          range(len(i3))]})
+                    out.setdefault('faces', [])
+                    out['faces'].append(
+                        {'vertex_index': [int(i3[j]) for j in
+                                          range(len(i3))]})
             return cls.from_dict(out)
 
     @classmethod

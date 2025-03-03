@@ -66,6 +66,9 @@ def build(parsed_args, dockerfile=None, tag=None, flags=None,
         assert tag
         docker_tag = tag
     nested_parent_context = None
+    latest_tag = 'latest'
+    if parsed_args.platform != 'amd64':
+        latest_tag += f'-{parsed_args.platform}'
     try:
         parent_context = os.path.dirname(context)
         if top_level and parsed_args.copy:
@@ -102,9 +105,6 @@ def build(parsed_args, dockerfile=None, tag=None, flags=None,
                 subprocess.call(args)
         if not (parsed_args.disable_latest or parsed_args.dont_build):
             assert repo
-            latest_tag = 'latest'
-            if parsed_args.platform != 'amd64':
-                latest_tag += f'-{parsed_args.platform}'
             args = ['docker', 'tag', docker_tag, f"{repo}:{latest_tag}"]
             if parsed_args.dry_run:
                 print(f"TAG LATEST: \"{' '.join(args)}\"")
@@ -119,7 +119,7 @@ def build(parsed_args, dockerfile=None, tag=None, flags=None,
         assert not repo.endswith('-local')
         push_image(parsed_args, tag, repo=repo)
         if not parsed_args.disable_latest:
-            push_image(parsed_args, 'latest', repo=repo)
+            push_image(parsed_args, latest_tag, repo=repo)
 
 
 def push_image(parsed_args, tag, repo='cropsinsilico/yggdrasil'):

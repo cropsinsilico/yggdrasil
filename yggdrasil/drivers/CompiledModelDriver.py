@@ -3167,6 +3167,13 @@ class CompilationDependency(object):
         return self._relative_to_directory(
             out, directory=self.get('builddir', None))
 
+    def _exportsfile(self, **kwargs):
+        build_driver = kwargs.pop('build_driver',
+                                  self.get('build_driver', None))
+        if self.is_interface and build_driver:
+            return build_driver.create_exports(self, **kwargs)[-1]
+        return None
+
     def _result(self, **kwargs):
         if self.origin in ['external', 'standard', 'language']:
             return self._search(**kwargs)
@@ -7312,6 +7319,35 @@ class CompiledModelDriver(ModelDriver):
     def libraries_instance(self, **kwargs):
         r"""Get the libraries specialized for this instance."""
         return self.libraries_class(self, **kwargs)
+
+    @classmethod
+    def interface_dep(cls, dep=None, **kwargs):
+        r"""Get the dependency instance for one of the interface
+        dependencies.
+
+        Args:
+            dep (str, optional): Name of interface dependencies. If not
+                provided, the interface library will be assumed.
+            **kwargs: Additional keyword arguments are used to specialize
+                the dependency (library type, compilation tools, etc).
+
+        Returns:
+            CompilationDependency: Interface dependency.
+
+        """
+        if dep is None:
+            dep = cls.interface_library
+        if dep is None or not cls.is_installed():
+            return None
+        kwargs = DependencySpecialization.select(kwargs, no_remainder=True)
+        basetool = cls.get_tool(
+            'basetool',
+            toolname=kwargs.pop(
+                'toolname', kwargs.get(
+                    'basetool', kwargs.get(
+                        cls.basetool, None))))
+        kwargs[basetool.tooltype] = basetool
+        return cls.libraries[dep].specialized(**kwargs)
 
     @classmethod
     def compile_dependencies(cls, dep=None, add_all_products=False,
