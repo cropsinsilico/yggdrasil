@@ -1834,6 +1834,11 @@ definitions:
       endrow:
         description: Row to stop read at (non-inclusive).
         type: integer
+      expected_result:
+        description: Path to an existing file that contains the result expected when
+          the default inputs & outputs are used. This parameter is only valid for
+          output files.
+        type: string
       field_names:
         aliases:
         - column_names
@@ -3486,6 +3491,12 @@ definitions:
           - string
           - number
         type: array
+      build_commands:
+        description: Set of commands that should be run in order to build the model
+          if different from the standard set of commands.
+        items:
+          type: string
+        type: array
       builddir:
         description: Path to the directory that will contain build products. Can be
           absolute or relative to working_dir. Defaults to builddir_base. If builddir
@@ -3565,6 +3576,12 @@ definitions:
           use any of the files located there since OSR always assumes the included
           file paths are relative. Defaults to False.
         type: boolean
+      definitions:
+        default: []
+        description: Definitions that should be added to compilation options.
+        items:
+          type: string
+        type: array
       dependencies:
         description: A list of packages required by the model that are written in
           the same language as the model. If the package requires dependencies outside
@@ -3886,6 +3903,12 @@ definitions:
         items:
           type: string
         type: array
+      skip_compile:
+        default: false
+        description: If True, don't compile the model during initialization. This
+          assumes that the model executable will have already been compiled against
+          the appropriate yggdrasil interface.
+        type: boolean
       skip_interpreter:
         default: false
         description: If True, no interpreter will be added to the arguments. This
@@ -4119,6 +4142,10 @@ definitions:
         description: Working directory. If not provided, the current working directory
           is used.
         type: string
+      yggdrasil_option:
+        description: Build option that can be set to build against the yggdrasil library.
+          If provided, the cmake file will not be modified.
+        type: string
     pushProperties:
       $properties/inputs/items/anyOf/0/allOf/0/properties/default_file:
       - working_dir
@@ -4160,6 +4187,12 @@ definitions:
           - string
           - number
         type: array
+      build_commands:
+        description: Set of commands that should be run in order to build the model
+          if different from the standard set of commands.
+        items:
+          type: string
+        type: array
       compile_working_dir:
         description: Directory where compilation should be invoked from if it is not
           the same as the provided working_dir.
@@ -4171,6 +4204,12 @@ definitions:
         default: []
         description: Flags that should be passed to the compilerwhen building the
           model
+        items:
+          type: string
+        type: array
+      definitions:
+        default: []
+        description: Definitions that should be added to compilation options.
         items:
           type: string
         type: array
@@ -4200,6 +4239,12 @@ definitions:
         items:
           type: string
         type: array
+      skip_compile:
+        default: false
+        description: If True, don't compile the model during initialization. This
+          assumes that the model executable will have already been compiled against
+          the appropriate yggdrasil interface.
+        type: boolean
       source_files:
         default: []
         description: Source files that should be compiled into an executable. Defaults
@@ -4238,6 +4283,12 @@ definitions:
           - string
           - number
         type: array
+      build_commands:
+        description: Set of commands that should be run in order to build the model
+          if different from the standard set of commands.
+        items:
+          type: string
+        type: array
       builddir:
         description: Path to the directory that will contain build products. Can be
           absolute or relative to working_dir. Defaults to builddir_base. If builddir
@@ -4273,6 +4324,12 @@ definitions:
         default: []
         description: Flags that should be passed to the configurerwhen building the
           model
+        items:
+          type: string
+        type: array
+      definitions:
+        default: []
+        description: Definitions that should be added to compilation options.
         items:
           type: string
         type: array
@@ -4316,6 +4373,12 @@ definitions:
         enum:
         - cmake
         type: string
+      skip_compile:
+        default: false
+        description: If True, don't compile the model during initialization. This
+          assumes that the model executable will have already been compiled against
+          the appropriate yggdrasil interface.
+        type: boolean
       source_files:
         default: []
         description: Source files that should be compiled into an executable. Defaults
@@ -4376,6 +4439,10 @@ definitions:
         description: If True, the model will be compiled and linked with OpenMP if
           OpenMP is installed and can be located.
         type: boolean
+      yggdrasil_option:
+        description: Build option that can be set to build against the yggdrasil library.
+          If provided, the cmake file will not be modified.
+        type: string
     required:
     - args
     - language
@@ -4406,6 +4473,12 @@ definitions:
           - string
           - number
         type: array
+      build_commands:
+        description: Set of commands that should be run in order to build the model
+          if different from the standard set of commands.
+        items:
+          type: string
+        type: array
       compile_working_dir:
         description: Directory where compilation should be invoked from if it is not
           the same as the provided working_dir.
@@ -4417,6 +4490,12 @@ definitions:
         default: []
         description: Flags that should be passed to the compilerwhen building the
           model
+        items:
+          type: string
+        type: array
+      definitions:
+        default: []
+        description: Definitions that should be added to compilation options.
         items:
           type: string
         type: array
@@ -4448,6 +4527,12 @@ definitions:
         items:
           type: string
         type: array
+      skip_compile:
+        default: false
+        description: If True, don't compile the model during initialization. This
+          assumes that the model executable will have already been compiled against
+          the appropriate yggdrasil interface.
+        type: boolean
       source_files:
         default: []
         description: Source files that should be compiled into an executable. Defaults
@@ -4582,6 +4667,12 @@ definitions:
           - string
           - number
         type: array
+      build_commands:
+        description: Set of commands that should be run in order to build the model
+          if different from the standard set of commands.
+        items:
+          type: string
+        type: array
       compile_working_dir:
         description: Directory where compilation should be invoked from if it is not
           the same as the provided working_dir.
@@ -4593,6 +4684,12 @@ definitions:
         default: []
         description: Flags that should be passed to the compilerwhen building the
           model
+        items:
+          type: string
+        type: array
+      definitions:
+        default: []
+        description: Definitions that should be added to compilation options.
         items:
           type: string
         type: array
@@ -4621,6 +4718,12 @@ definitions:
         items:
           type: string
         type: array
+      skip_compile:
+        default: false
+        description: If True, don't compile the model during initialization. This
+          assumes that the model executable will have already been compiled against
+          the appropriate yggdrasil interface.
+        type: boolean
       source_files:
         default: []
         description: Source files that should be compiled into an executable. Defaults
@@ -4772,6 +4875,12 @@ definitions:
           - string
           - number
         type: array
+      build_commands:
+        description: Set of commands that should be run in order to build the model
+          if different from the standard set of commands.
+        items:
+          type: string
+        type: array
       builddir:
         description: Path to the directory that will contain build products. Can be
           absolute or relative to working_dir. Defaults to builddir_base. If builddir
@@ -4796,6 +4905,12 @@ definitions:
         description: Directory where compilation should be invoked from if it is not
           the same as the provided working_dir.
         type: string
+      definitions:
+        default: []
+        description: Definitions that should be added to compilation options.
+        items:
+          type: string
+        type: array
       disable_python_c_api:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
@@ -4837,6 +4952,12 @@ definitions:
         enum:
         - make
         type: string
+      skip_compile:
+        default: false
+        description: If True, don't compile the model during initialization. This
+          assumes that the model executable will have already been compiled against
+          the appropriate yggdrasil interface.
+        type: boolean
       source_files:
         default: []
         description: Source files that should be compiled into an executable. Defaults

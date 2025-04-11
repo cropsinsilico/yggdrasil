@@ -3364,7 +3364,7 @@ class CompilationDependency(object):
                               [x for x in out if select_dep(x)])
 
     @classmethod
-    def tool_parameters_class(self, tool):
+    def tool_parameters_class(cls, tool):
         r"""Get the parameters associated with a tool.
 
         Args:
@@ -3383,7 +3383,7 @@ class CompilationDependency(object):
             tool = _tool_registry._bases[tool]
         out += list(tool.flag_options.keys())
         out += tool.build_params
-        for k in self.tool_specific_parameters:
+        for k in cls.tool_specific_parameters:
             out.append(f"{tool.tooltype}_{k}")
         return out
 
@@ -6523,6 +6523,15 @@ class CompiledModelDriver(ModelDriver):
         compile_working_dir (str, optional): Directory where compilation
             should be invoked from if it is not the same as the provided
             working_dir.
+        definitions (list, optional): Definitions that should be added
+            to compilation options.
+        skip_compile (bool, optional): If True, don't compile the model
+            during initialization. This assumes that the model executable
+            will have already been compiled against the appropriate
+            yggdrasil interface.
+        build_commands (list, optional): Set of commands that should be
+            run in order to build the model if different from the
+            standard set of commands.
         **kwargs: Additional keyword arguments are passed to parent class
 
     Class Attributes:
@@ -6564,7 +6573,13 @@ class CompiledModelDriver(ModelDriver):
                          'default': []},
         'disable_python_c_api': {'type': 'boolean', 'default': False},
         'with_asan': {'type': 'boolean', 'default': False},
-        'with_omp': {'type': 'boolean', 'default': False}}
+        'with_omp': {'type': 'boolean', 'default': False},
+        'definitions': {'type': 'array', 'items': {'type': 'string'},
+                        'default': []},
+        'skip_compile': {'type': 'boolean', 'default': False},
+        'build_commands': {'type': 'array',
+                           'items': {'type': 'string'}},
+    }
     executable_type = 'compiler'
     is_build_tool = False
     allow_parallel_build = False
@@ -6577,9 +6592,8 @@ class CompiledModelDriver(ModelDriver):
     tooltypes = []
     optional_tooltypes = ['disassembler']
 
-    def __init__(self, name, args, skip_compile=False, **kwargs):
+    def __init__(self, name, args, **kwargs):
         self.model_dep = None
-        self.skip_compile = skip_compile
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
 
     @staticmethod
@@ -7420,6 +7434,12 @@ class CompiledModelDriver(ModelDriver):
             str: Compiled model file path.
 
         """
+        if self.build_commands:
+            if kwargs.get('dry_run', False):
+                return
+            for x in self.build_commands:
+                subprocess.check_call(x.split(), cwd=self.working_dir)
+            return
         if source_files:
             kwargs['source'] = source_files
         if dep is None:

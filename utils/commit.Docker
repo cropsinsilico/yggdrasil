@@ -12,6 +12,8 @@ RUN git clone --recurse-submodules https://github.com/cropsinsilico/yggdrasil.gi
     git submodule update --recursive
 WORKDIR /yggdrasil
 
+# Copy setup files
+
 # Create environment
 RUN python utils/setup_test_env.py env --env-name=env conda $python
 
@@ -19,8 +21,12 @@ RUN python utils/setup_test_env.py env --env-name=env conda $python
 RUN conda run -n env python utils/setup_test_env.py deps conda --for-development --always-yes --no-sudo --python-only --install-mpi --install-rmq --install-sbml --install-omp --install-r --dont-install-dev
 RUN conda install -n env -y c-compiler cxx-compiler
 
+# Copy installation files
+
 # Install yggdrasil
 RUN conda run -n env python -m pip install -e .
+
+# Copy configuration files
 
 # Configure yggdrasil
 RUN conda run -n env yggconfig && \
@@ -28,6 +34,8 @@ RUN conda run -n env yggconfig && \
 
 # Compile interfaces
 RUN conda run -n env yggcompile c cpp
+
+# Copy local files
 
 WORKDIR /home
 RUN echo "conda activate env" > ~/.bashrc

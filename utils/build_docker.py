@@ -8,6 +8,8 @@ import json
 import shutil
 import urllib.request
 _utils_dir = os.path.dirname(__file__)
+_tmp_dir = os.path.join(_utils_dir, '_tmp_dockerfiles')
+_ygg_github_api = "https://api.github.com/repos/cropsinsilico/yggdrasil"
 
 
 def image_exists(tag):
@@ -21,305 +23,766 @@ def image_exists(tag):
 
     """
     # TODO: Actually check
-    return False
-
-
-def build(parsed_args, dockerfile=None, tag=None, flags=None,
-          repo='cropsinsilico/yggdrasil', context=_utils_dir, cwd=None,
-          base_params=None, top_level=False):
-    r"""Build a docker image.
-
-    Args:
-        parsed_args (argparse.Namespace): Parsed arguments.
-        dockerfile (str): Full path to the docker file that should be used.
-        tag (str): Tag that should be added to the image.
-        flags (list, optional): Additional flags that should be passed to
-            the build command. Defaults to [].
-        repo (str, optional): DockerHub repository that the image will be
-            pushed to. Defaults to 'cropsinsilico/yggdrasil'.
-        context (str, optional): Directory that should be provided as the
-            context for the image. Defaults to the directory containing this
-            script.
-        base_params (dict, optional): Parameters for the base image.
-
-    """
-    # TODO: Update so multiple targets are built
-    # https://docs.docker.com/build/building/multi-platform/
-    # TODO: Update sysv_ipc & czmq to have linux/aarch64 builds
-    if flags is None:
-        flags = []
-    if not parsed_args.platform:
-        if sys.platform == 'darwin' and platform.machine().lower() == 'arm64':
-            parsed_args.platform = 'arm64'
-        else:
-            parsed_args.platform = 'amd64'
-    if sys.platform == 'darwin' and platform.machine().lower() == 'arm64':
-        assert parsed_args.platform == 'arm64'
-    if parsed_args.platform != 'amd64':
-        tag += f'-{parsed_args.platform}'
-    if parsed_args.verbose:
-        flags += ['--progress', 'plain']
-    if repo:
-        assert tag
-        docker_tag = f'{repo}:{tag}'
-    else:
-        assert tag
-        docker_tag = tag
-    nested_parent_context = None
-    latest_tag = 'latest'
-    if parsed_args.platform != 'amd64':
-        latest_tag += f'-{parsed_args.platform}'
+    args = ['docker', 'image', 'inspect', tag, '--format="ignore me"']
     try:
-        parent_context = os.path.dirname(context)
-        if top_level and parsed_args.copy:
-            nested_parent_context = os.path.join(
-                context, 'parent_context')
-            if not os.path.isdir(nested_parent_context):
-                os.mkdir(nested_parent_context)
-            for x in parsed_args.copy:
-                if not os.path.isabs(x):
-                    x = os.path.abspath(x)
-                dst = os.path.join(
-                    nested_parent_context,
-                    os.path.relpath(x, parent_context)
-                )
-                dst_dir = os.path.dirname(dst)
-                if not os.path.isdir(dst_dir):
-                    os.makedirs(dst_dir)
-                shutil.copy2(x, dst)
-        if base_params:
-            base_tag = f"{base_params['repo']}:{base_params['tag']}"
-            if parsed_args.platform != 'amd64':
-                base_tag += f'-{parsed_args.platform}'
-            flags += ['--build-arg', f'base={base_tag}']
-            if not image_exists(base_tag):
-                build(parsed_args, **base_params)
-        flags += ['--build-arg', f'python={parsed_args.python}']
-        args = ['docker', 'build', '-t', docker_tag, '-f', dockerfile,
-                '--platform', f'linux/{parsed_args.platform}'] + flags
-        args.append(context)
-        if not parsed_args.dont_build:
-            if parsed_args.dry_run:
-                print(f"BUILD: \"{' '.join(args)}\"")
+        subprocess.check_call(args)
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+
+class FileCopy(object):
+    r"""Class for managing a file copied into an image.
+
+    Args:
+        source (str): Path to local file that should be copied. Can be
+            an absolute or relative path (taken relative to the working
+            directory).
+        source_dir (str, optional): Root directory within the source
+            that corresponds with the docker_dir.
+        context (str, optional): Path to the context that docker
+            build will be called with.
+        docker_dir (str, optional): Directory within the docker
+            image that the source should be copied into, replicating the
+            path to the file starting at source_dir.
+        local_dir (str, optional): Name of intermediate directory within
+            the docker context that should be used for copying files from
+            outside the docker context.
+
+    """
+
+    _parent_context_dir = 'parent_context'
+
+    def __init__(self, source, source_dir=None, context=_utils_dir,
+                 docker_dir='/yggdrasil', local_dir='parent_context',
+                 stage=None):
+        if source_dir is None:
+            source_dir = os.path.dirname(_utils_dir)
+        self.source = source
+        self.source_dir = source_dir
+        self.context = context
+        self.docker_dir = docker_dir
+        for k in ['source', 'source_dir', 'context']:
+            v = getattr(self, k)
+            # if not os.path.isabs(v):
+            setattr(self, k, os.path.normpath(v))
+        self.local_dir = os.path.join(self.context, local_dir)
+        self.stage = stage
+        self.inside_context = self.source_dir.startswith(self.context)
+        self.base = os.path.relpath(self.source, self.source_dir)
+        if self.inside_context:
+            self.source_context = self.source
+        else:
+            self.source_context = os.path.join(self.local_dir, self.base)
+        self.source_local = os.path.relpath(
+            self.source_context, self.context)
+        self.docker_path = os.path.join(self.docker_dir, self.base)
+
+    @property
+    def docker_copy_command(self):
+        r"""str: Docker command to copy file from the context into the
+        image."""
+        return f'COPY {self.source_local} {self.docker_path}'
+
+    def ensure_local(self):
+        r"""Ensure that there is a local copy of the file within the
+        context that can be copied via the docker COPY command.
+
+        Returns:
+            list: Set of files or directories created.
+
+        """
+        if self.inside_context:
+            return []
+        out = []
+        parent = os.path.dirname(self.source_context)
+        if not os.path.isdir(parent):
+            os.makedirs(parent)
+            out.append(parent)
+        shutil.copy2(self.source, self.source_context)
+        out.append(self.source_context)
+        return out
+
+
+# Builder classes
+class BuilderMeta(type):
+    r"""Meta class for builders."""
+
+    _registry = {}
+
+    def __new__(meta, name, bases, class_dict):
+        cls = type.__new__(meta, name, bases, class_dict)
+        if cls._name is not None:
+            meta._registry[cls._name] = cls
+        return cls
+
+
+class BuilderBase(object, metaclass=BuilderMeta):
+    r"""Class for building docker image.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        context (str, optional): Directory that should be provided as the
+            context for the image. Defaults to the directory containing
+            this script.
+        base (BuilderBase, optional): Base builder for the image that
+            this image depends on.
+        **kwargs: Additional keyword arguments are passed to the base
+            class constructure if base is not provided and this builder
+            requires a base.
+
+    """
+
+    _name = None
+    _dockerfile = None
+    _repo = None
+    _copy_flags = {}
+    _allows_push = True
+
+    def __init__(self, args, context=_utils_dir,
+                 tag=None, **kwargs):
+        self._generated = []
+        self.args = args
+        self.context = context
+        self._tag = tag
+        self.platform = args.platform
+        self.copy_files = {}
+        for k in self._copy_flags.keys():
+            v = getattr(args, f'copy_{k}')
+            if v:
+                self.add_copy_files(v, stage=k)
+                # Prevent other classes from using this
+                setattr(args, f'copy_{k}', None)
+        if not self.platform:
+            if ((sys.platform == 'darwin'
+                 and platform.machine().lower() == 'arm64')):
+                self.platform = 'arm64'
             else:
-                subprocess.call(args)
-        if not (parsed_args.disable_latest or parsed_args.dont_build):
-            assert repo
-            args = ['docker', 'tag', docker_tag, f"{repo}:{latest_tag}"]
-            if parsed_args.dry_run:
-                print(f"TAG LATEST: \"{' '.join(args)}\"")
-            else:
-                subprocess.call(args, cwd=cwd)
-    finally:
-        if nested_parent_context and os.path.isdir(nested_parent_context):
-            shutil.rmtree(nested_parent_context)
-    if parsed_args.run and top_level:
-        run_image(parsed_args, tag, repo=repo)
-    if parsed_args.push:
-        assert not repo.endswith('-local')
-        push_image(parsed_args, tag, repo=repo)
-        if not parsed_args.disable_latest:
-            push_image(parsed_args, latest_tag, repo=repo)
+                self.platform = 'amd64'
+
+    def add_copy_files(self, files, stage=None):
+        r"""Add a set of files to the class.
+
+        Args:
+            files (list): Set of files to add.
+            stage (str, optional): Stage that files should be copied at
+                in the docker image.
+
+        """
+        files = [
+            FileCopy(x, context=self.context, stage=stage) for x in files
+        ]
+        for x in files:
+            if x.stage not in self._copy_flags:
+                self.error(f'File copying not supported for stage: '
+                           f'{x.stage}')
+            self.copy_files.setdefault(x.stage, [])
+            self.copy_files[x.stage].append(x)
+
+    @classmethod
+    def create_builder(cls, args, name=None, **kwargs):
+        r"""Create a builder instance.
+
+        Args:
+        args (argparse.Namespace): Parsed arguments.
+            name (str, optional): Name of the builder class to use. If
+                not provided, this class will be used.
+            **kwargs: Additional keyword arguments are passed to the
+                class constructor.
+
+        Returns:
+            BuilderBase: Builder instance.
+        
+        """
+        if name is None:
+            name = cls.args2class(args)
+        cls = BuilderMeta._registry[name]
+        out = cls(args, **kwargs)
+        return out
+
+    @classmethod
+    def args2class(cls, args, for_base=False):
+        r"""Get a builder class based on the arguments.
+
+        Args:
+            args (argparse.Namespace): Parsed arguments.
+            for_base (bool, optional): If True, determine the base class
+                excluding explicit type information.
+
+        Returns:
+            str: Name of the builder class that should be used.
+
+        """
+        if (not for_base) and args.type and args.type != 'environment':
+            name = args.type
+        elif args.local:
+            name = 'local'
+        elif args.commit or args.branch:
+            if args.branch and not args.commit:
+                args.commit = 'latest'
+            name = 'commit'
+        elif args.conda_version:
+            name = 'conda-release'
+        else:
+            name = 'release'
+        return name
+
+    def error(self, cls, message=''):
+        r"""Raise an error message with some context.
+
+        Args:
+            cls (type): Error class to raise.
+            message (str, optional): Error message.
+
+        """
+        raise cls(f'{self._name}: {message}')
+
+    def log(self, message=''):
+        r"""Emit a log message.
+
+        Args:
+            message (str, optional): Log message.
+
+        """
+        print(f'{self._name}: {message}')
+
+    def call(self, args, context='', dry_run=None, **kwargs):
+        r"""Call a subprocess.
+
+        Args:
+            args (list): Argument list.
+            context (str, optional): Context for log message.
+            dry_run (bool, optional): If True, show the command, but dont
+                run it.
+            **kwargs: Additional keyword arguments are passed to
+                subprocess.call.
+
+        """
+        self.log(f"{context}\"{' '.join(args)}\"")
+        if dry_run is None:
+            dry_run = self.args.dry_run
+        if dry_run:
+            return
+        subprocess.call(args, **kwargs)
+
+    def cleanup(self, **kwargs):
+        r"""Clean up files produced by a build."""
+        # for k in self._generated:
+        #     if os.path.isfile(k):
+        #         os.remove(k)
+        #     elif os.path.isdir(k):
+        #         os.rmdir(k)
+        pass
+
+    @property
+    def repo(self):
+        r"""str: DockerHub repository that the image should be pushed
+        to."""
+        if self._repo is not None:
+            return self._repo
+        return f'cropsinsilico/yggdrasil-{self._name}'
+
+    @property
+    def dockerfile(self):
+        r"""str: Path to the docker file to build."""
+        base = self._dockerfile
+        if base is None:
+            base = f'{self._name.replace("-", "_")}.Docker'
+        out = os.path.join(_utils_dir, base)
+        return out
+
+    def generate_tag(self, base):
+        r"""Generate a tag including platform information.
+
+        Args:
+            base (str): Tag base.
+
+        Returns:
+            str: Tag.
+
+        """
+        out = base
+        if self.platform != 'amd64':
+            out += f'-{self.platform}'
+        return out
+
+    @property
+    def tag(self):
+        r"""str: Image tag."""
+        return self.generate_tag(self._tag)
+
+    @property
+    def tag_latest(self):
+        r"""str: String for latest tag."""
+        return self.generate_tag('latest')
+
+    @property
+    def dockertag(self):
+        r"""str: Image tag with repo."""
+        if not self.repo:
+            return self.tag
+        return f'{self.repo}:{self.tag}'
+
+    @property
+    def dockertag_latest(self):
+        r"""str: Latest image tag with repo."""
+        if not self.repo:
+            return self.tag_latest
+        return f'{self.repo}:{self.tag_latest}'
+
+    @property
+    def exists(self):
+        r"""bool: True if the image exists."""
+        return image_exists(self.dockertag)
+
+    @property
+    def args_build(self):
+        r"""list: Arguments for docker build."""
+        out = ['--build-arg', f'python={self.args.python}']
+        return out
+
+    def build(self, top_level=True, verbose=None, dry_run=None):
+        r"""Build the image and any non-existent base images.
+
+        Args:
+            top_level (bool, optional): True if this is the top-level
+                build call (i.e. not built as a dependency).
+            verbose (bool, optional): If True, turn on verbose output
+                for the build.
+            dry_run (bool, optional): If True, show the build commands,
+                but dont run them.
+
+        """
+        if verbose is None:
+            verbose = self.args.verbose
+        if dry_run is None:
+            dry_run = self.args.dry_run
+        dockerfile = self.dockerfile
+        self.log(f'Building \"{dockerfile}\"')
+        try:
+            if self.copy_files:
+                old = dockerfile
+                dockerfile = old + '_copy'
+                # if not os.path.isdir(_tmp_dir):
+                #     os.mkdir(_tmp_dir)
+                # dockerfile = os.path.join(
+                #     _tmp_dir, os.path.basename(old) + '_copy')
+                contents = open(old, 'r').read()
+                for stage, files in self.copy_files.items():
+                    copy_flag = self._copy_flags[stage]
+                    for x in files:
+                        self._generated += x.ensure_local()
+                    assert contents.count(copy_flag) == 1
+                    new_contents = [x.docker_copy_command for x in files]
+                    new_contents = (
+                        copy_flag + '\n' + '\n'.join(new_contents)
+                    )
+                    contents = new_contents.join(
+                        contents.split(copy_flag))
+                with open(dockerfile, 'w') as fd:
+                    fd.write(contents)
+            args = [
+                'docker', 'build', '-t', self.dockertag,
+                '-f', dockerfile,
+                '--platform', f'linux/{self.platform}'
+            ]
+            if self.args.sudo:
+                args.insert(0, 'sudo')
+            args += self.args_build
+            if verbose:
+                args += ['--progress', 'plain']
+            args.append(self.context)
+            if not self.args.dont_build:
+                self.call(args, 'BUILD: ')
+                if (not dry_run) and (not self.exists):
+                    self.error(
+                        RuntimeError,
+                        f"Failed to build image \"{self.dockertag}\""
+                    )
+            if not (self.args.disable_latest or self.args.dont_build):
+                assert self.repo
+                args = [
+                    'docker', 'tag', self.dockertag,
+                    self.dockertag_latest,
+                ]
+                self.call(args, 'TAG LATEST: ', cwd=None)  # TODO:?
+        finally:
+            if top_level:
+                self.cleanup()
+
+    @property
+    def args_run(self):
+        r"""list: docker run arguments for this image."""
+        return ['-dit']
+
+    def run(self):
+        r"""Run the docker image."""
+        args = ['docker', 'run'] + self.args_run + [self.dockertag]
+        self.call(args, 'RUN: ')
+
+    @property
+    def args_push(self):
+        r"""list: docker push arguments for this image."""
+        return []
+
+    def push(self, tag=None):
+        r"""Push the docker image to DockerHub.
+
+        Args:
+            tag (str): Tag (with repo name) to push other than the
+                default.
+
+        """
+        if not self._allows_push:
+            self.error(RuntimeError, 'Push not allowed')
+        do_latest = (tag is None and not self.args.disable_latest)
+        if tag is None:
+            tag = self.dockertag
+        args = ['docker', 'push'] + self.args_push + [tag]
+        self.call(args, 'PUSH: ')
+        if do_latest:
+            self.push(tag=self.dockertag_latest)
 
 
-def push_image(parsed_args, tag, repo='cropsinsilico/yggdrasil'):
-    r"""Push a docker image to DockerHub.
+# Builders that install yggdrasil
+class InstallBuilderBase(BuilderBase):
+    r"""Base class for builders that install yggdrasil."""
 
-    Args:
-        parsed_args (argparse.Namespace): Parsed arguments.
-        tag (str): Tag that should be added to the image.
-        repo (str, optional): DockerHub repository that the image will be
-            pushed to. Defaults to 'cropsinsilico/yggdrasil'.
-
-    """
-    assert repo and tag
-    args = ['docker', 'push', f'{repo}:{tag}']
-    if parsed_args.dry_run:
-        print(f"PUSH: \"{' '.join(args)}\"")
-    else:
-        subprocess.call(args)
+    _is_root = True
 
 
-def run_image(parsed_args, tag, repo='cropsinsilico/yggdrasil'):
-    r"""Run a docker image.
-
-    Args:
-        parsed_args (argparse.Namespace): Parsed arguments.
-        tag (str): Tag that should be added to the image.
-        repo (str, optional): DockerHub repository for the image that
-            will be run. Defaults to 'cropsinsilico/yggdrasil'.
-
-    """
-    assert repo and tag
-    args = ['docker', 'run', '-dit']
-    if parsed_args.type == 'service':
-        args += ['-p', '5000:5000', '-e', 'PORT=5000']
-    args += [f'{repo}:{tag}']
-    if parsed_args.dry_run:
-        print(f"RUN: \"{' '.join(args)}\"")
-    else:
-        subprocess.call(args)
-
-
-def params_release(version):
-    r"""Get parameters to build a docker image containing an yggdrasil
-    release.
-
-    Args:
-        version (str): Release version to install in the image.
-
-    Returns:
-        dict: Docker build parameters.
-
-    """
-    if version is None:
-        url = "https://api.github.com/repos/cropsinsilico/yggdrasil/tags"
-        tags = json.loads(urllib.request.urlopen(url).read())
-        version = max(tags, key=lambda x: x['name'])['name'].lstrip('v')
-    dockerfile = os.path.join(_utils_dir, 'commit.Docker')
-    tag = f'v{version}'
-    flags = ['--build-arg', f'commit=tags/v{version}']
-    repo = 'cropsinsilico/yggdrasil'
-    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
-
-
-def params_conda_release(version):
-    r"""Get parameters to build a docker image containing an yggdrasil
-    release installed from conda.
-
-    Args:
-        version (str): Release version to install in the image.
-
-    Returns:
-        dict: Docker build parameters.
-
-    """
-    if version is None:
-        url = "https://api.github.com/repos/cropsinsilico/yggdrasil/tags"
-        tags = json.loads(urllib.request.urlopen(url).read())
-        version = max(tags, key=lambda x: x['name'])['name'].lstrip('v')
-    dockerfile = os.path.join(_utils_dir, 'release.Docker')
-    tag = f'v{version}'
-    flags = ['--build-arg', f'version={version}']
-    repo = 'cropsinsilico/yggdrasil'
-    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
-
-
-def params_commit(commit, branch=None):
-    r"""Get parameters to build a docker image containing a version of
-    yggdrasil specific to a commit.
-
-    Args:
-        commit (str): ID for commit to install from the yggdrasil git
-            repo. If 'latest', the most recent commit on the specified
-            branch will be used.
-        branch (str, optional): Branch that commit should come from if
-            commit is 'latest'. Defaults to 'main' if not provided.
-
-    Returns:
-        dict: Docker build parameters.
-
-    """
-    dockerfile = os.path.join(_utils_dir, 'commit.Docker')
-    if commit == 'latest':
-        if branch is None:
-            branch = 'main'
-        url = ("https://api.github.com/repos/cropsinsilico/yggdrasil/"
-               "commits/" + branch)
-        response = json.loads(urllib.request.urlopen(url).read())
-        commit = response['sha']
-    tag = commit
-    flags = ['--build-arg', f'commit={commit}']
-    repo = 'cropsinsilico/yggdrasil-dev'
-    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo)
-
-
-def params_local(source_dir, commit=None):
-    r"""Get parameters to build a docker image containing a local version
+class ReleaseBuilder(InstallBuilderBase):
+    r"""Class for building an environment from a specific version of
     yggdrasil.
 
     Args:
+        args (argparse.Namespace): Parsed arguments.
+        version (str, optional): Version that should be installed. If not
+            provided, the latest release will be used.
+
+    """
+
+    _name = 'release'
+    _dockerfile = 'commit.Docker'
+    _repo = 'cropsinsilico/yggdrasil'
+
+    def __init__(self, args, version=None, **kwargs):
+        if version is None:
+            version = args.version
+        if version is None:
+            url = f"{_ygg_github_api}/tags"
+            tags = json.loads(urllib.request.urlopen(url).read())
+            version = max(tags, key=lambda x: x['name'])['name'].lstrip('v')
+        self.version = version
+        tag = f'v{version}'
+        super(ReleaseBuilder, self).__init__(args, tag=tag, **kwargs)
+
+    @property
+    def args_build(self):
+        r"""list: Arguments for docker build."""
+        out = ['--build-arg', f'commit=tags/v{self.version}']
+        out += super(ReleaseBuilder, self).args_build
+        return out
+
+
+class CondaReleaseBuilder(ReleaseBuilder):
+    r"""Class for building an environment from a specific version of
+    yggdrasil installed via conda.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        version (str, optional): Version that should be installed. If not
+            provided, the latest release will be used.
+
+    """
+
+    _name = 'conda-release'
+    _dockerfile = 'release.Docker'
+    _copy_flags = {
+        'install': '# Copy installation files',
+        'config': '# Copy configuration files',
+        'local': '# Copy local files',
+    }
+
+    def __init__(self, args, version=None, **kwargs):
+        if version is None:
+            version = args.conda_version
+        super(CondaReleaseBuilder, self).__init__(args, version=version,
+                                                  **kwargs)
+            
+    @property
+    def args_build(self):
+        r"""list: Arguments for docker build."""
+        out = ['--build-arg', f'version={self.version}']
+        # Skip above parent class
+        out += super(ReleaseBuilder, self).args_build
+        return out
+
+
+class CommitBuilder(InstallBuilderBase):
+    r"""Class for building an environment from a specific commit.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        commit (str): Yggdrasil commit that should be built.
+        branch (str, optional): Branch that should be used if commit is
+            'latest'.
+
+    """
+
+    _name = 'commit'
+    _repo = 'cropsinsilico/yggdrasil-dev'
+    _copy_flags = {
+        'setup': '# Copy setup files',
+        'install': '# Copy installation files',
+        'config': '# Copy configuration files',
+        'local': '# Copy local files',
+    }
+
+    def __init__(self, args, commit=None, branch=None, **kwargs):
+        if commit is None:
+            commit = args.commit
+        if branch is None:
+            branch = args.branch
+        if commit == 'latest':
+            if branch is None:
+                branch = 'main'
+            url = f"{_ygg_github_api}/commits/{branch}"
+            response = json.loads(urllib.request.urlopen(url).read())
+            commit = response['sha']
+        self.commit = commit
+        self.branch = branch
+        super(CommitBuilder, self).__init__(args, tag=self.commit,
+                                            **kwargs)
+
+    @property
+    def args_build(self):
+        r"""list: Arguments for docker build."""
+        out = ['--build-arg', f'commit={self.commit}']
+        out += super(CommitBuilder, self).args_build
+        return out
+
+
+class LocalBuilder(InstallBuilderBase):
+    r"""Class for building a docker image from the local yggdrasil
+    source code.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
         source_dir (str): Path to the directory containing yggdrasil.
-
-    Returns:
-        dict: Docker build parameters.
+        commit (str, optional): Commit that should be built.
 
     """
-    source_dir = os.path.abspath(source_dir)
-    dockerfile = os.path.join(_utils_dir, 'local.Docker')
-    if commit is None:
-        commit = 'latest'
-    if commit == 'latest':
-        import git
-        repo = git.Repo(source_dir)
-        commit = str(repo.commit())
-        if repo.is_dirty():
-            commit += '-dirty'
-        repo.close()
-    tag = commit
-    context = _utils_dir
-    source_dir = os.path.relpath(source_dir, context) + '/'
-    flags = ['--build-arg', f'sourcedir={source_dir}']
-    repo = 'cropsinsilico/yggdrasil-local'
-    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo,
-                context=context)
+
+    _name = 'local'
+    _allows_push = False
+
+    def __init__(self, args, source_dir=None, commit=None, **kwargs):
+        if source_dir is None:
+            source_dir = args.local
+        if commit is None:
+            commit = args.commit
+        if source_dir is None:
+            source_dir = os.path.dirname(_utils_dir)
+        source_dir = os.path.abspath(source_dir)
+        if commit is None:
+            commit = 'latest'
+        if commit == 'latest':
+            import git
+            repo = git.Repo(source_dir)
+            commit = str(repo.commit())
+            if repo.is_dirty():
+                commit += '-dirty'
+            repo.close()
+        self.source_dir = source_dir
+        self.commit = commit
+        super(LocalBuilder, self).__init__(args, tag=self.commit,
+                                           **kwargs)
+
+    @property
+    def args_build(self):
+        r"""list: Arguments for docker build."""
+        source_dir = os.path.relpath(self.source_dir, self.context) + '/'
+        out = ['--build-arg', f'sourcedir={source_dir}']
+        out += super(LocalBuilder, self).args_build
+        return out
 
 
-def params_executable(params):
-    r"""Get parameters to build a docker image containing a version of
-    yggdrasil specific to a commit or tagged release that can be used as an
-    executable.
+# Classes for images based on installations
+class ExtensionBuilderBase(BuilderBase):
+    r"""Class for building docker images based on other images.
 
     Args:
-        params (dict): Docker build parameters set based on the base type.
-
-    Returns:
-        dict: Docker build parameters.
+        args (argparse.Namespace): Parsed arguments.
+        base (BuilderBase, optional): Base builder for the image that
+            this image depends on.
+        **kwargs: Additional keyword arguments are passed to the base
+            class constructure if base is not provided and the BuilderBase
+            constructor.
 
     """
-    dockerfile = os.path.join(_utils_dir, 'executable.Docker')
-    repo = params["repo"]
-    tag = params["tag"]
-    repo = repo.replace('yggdrasil', 'yggdrasil-executable')
-    return dict(dockerfile=dockerfile, tag=tag, repo=repo,
-                base_params=params)
+
+    _is_root = False
+    _base_class = None
+
+    def __init__(self, args, base=None, **kwargs):
+        self.base = base
+        if self.base is None:
+            base_class = self._base_class
+            if not isinstance(base_class, str):
+                base_class = self.args2class(args, for_base=True)
+            self.base = self.create_builder(args, name=base_class,
+                                            **kwargs)
+        super(ExtensionBuilderBase, self).__init__(args, **kwargs)
+
+    @property
+    def repo(self):
+        r"""str: DockerHub repository that the image should be pushed
+        to."""
+        if self._repo is None:
+            return self.base.repo.replace(
+                'yggdrasil', f'yggdrasil-{self._name}')
+        return super(ExtensionBuilderBase, self).repo
+
+    @property
+    def tag(self):
+        r"""str: Image tag."""
+        return self.base.tag
+
+    @property
+    def tag_latest(self):
+        r"""str: String for latest tag."""
+        return self.base.tag_latest
+
+    @property
+    def args_build(self):
+        r"""list: Arguments for docker build."""
+        out = super(ExtensionBuilderBase, self).args_build
+        out += ['--build-arg', f'base={self.base.dockertag}']
+        return out
+
+    def build(self, top_level=True, **kwargs):
+        r"""Build the image and any non-existent base images.
+
+        Args:
+            top_level (bool, optional): True if this is the top-level
+                build call (i.e. not built as a dependency).
+            **kwargs: Additional keyword arguments are passed to the
+                base class's build method and the parent class's method.
+
+        """
+        if not self.base.exists:
+            self.base.build(top_level=False, **kwargs)
+        super(ExtensionBuilderBase, self).build(
+            top_level=top_level, **kwargs)
+
+    def cleanup(self, **kwargs):
+        r"""Clean up files produced by a build."""
+        super(ExtensionBuilderBase, self).cleanup(**kwargs)
+        self.base.cleanup(**kwargs)
 
 
-def params_service(params, model_repo_commit=False):
-    r"""Get parameters to build a docker image containing a version of
-    yggdrasil sepcific to a commit or tagged release that runs an yggdrasil
-    integration service manager.
+class ExecutableBuilder(ExtensionBuilderBase):
+    r"""Class for building a docker image from the local yggdrasil
+    source code."""
+
+    _name = 'executable'
+
+
+class ServiceBuilder(ExtensionBuilderBase):
+    r"""Class for building a docker image that runs a yggdrasil
+    integration service manager."""
+
+    _name = 'service'
+
+    @property
+    def args_run(self):
+        r"""list: docker run arguments for this image."""
+        out = super(ServiceBuilder, self).args_run
+        out += ['-p', '5000:5000', '-e', 'PORT=5000']
+        return out
+
+
+class LoadedServiceBuilder(ServiceBuilder):
+    r"""Class for building a docker image that runs a yggdrasil
+    integration service manager with models loaded.
 
     Args:
-        params (dict): Docker build parameters set based on the base type.
-        model_repo_commit (str, optional): Commit from yggdrasil model
-            repository that should be cloned inside the image.
-
-    Returns:
-        dict: Docker build parameters.
+        args (argparse.Namespace): Parsed arguments.
+        model_repo_commit (str, optional): Commit from the yggdrasil
+            model repository that models should be loaded from.
+        **kwargs: Additional keyword arguments are passed to the parent
+            class constructor.
 
     """
-    repo = params["repo"]
-    tag = params["tag"]
-    if model_repo_commit:
-        base_params = params_service(params)
-        repo = repo.replace('yggdrasil', 'yggdrasil-loaded-service')
-        dockerfile = os.path.join(_utils_dir, 'loaded_service.Docker')
+
+    _name = 'loaded-service'
+    _base_class = 'service'
+
+    def __init__(self, args, model_repo_commit=None, **kwargs):
+        if model_repo_commit is None:
+            model_repo_commit = args.model_repo_commit
+        if model_repo_commit is None:
+            model_repo_commit = 'latest'
         if model_repo_commit == 'latest':
             url = ("https://api.github.com/repos/cropsinsilico/"
                    "yggdrasil_models/commits/main")
             response = json.loads(urllib.request.urlopen(url).read())
             model_repo_commit = response['sha']
-    else:
-        base_params = params
-        repo = repo.replace('yggdrasil', 'yggdrasil-service')
-        dockerfile = os.path.join(_utils_dir, 'service.Docker')
-    flags = []
-    if model_repo_commit:
-        tag += f'-{model_repo_commit}'
-        flags += ['--build-arg', f'commit={model_repo_commit}']
-    return dict(dockerfile=dockerfile, tag=tag, flags=flags, repo=repo,
-                base_params=base_params)
+        self.model_repo_commit = model_repo_commit
+        super(LoadedServiceBuilder, self).__init__(args, **kwargs)
+
+    @property
+    def tag(self):
+        r"""str: Image tag."""
+        out = super(LoadedServiceBuilder, self).tag
+        out += f'-{self.model_repo_commit}'
+        return out
+
+    @property
+    def args_build(self):
+        r"""list: Arguments for docker build."""
+        out = super(LoadedServiceBuilder, self).args_build
+        out += ['--build-arg', f'commit={self.model_repo_commit}']
+        return out
+
+
+class ExternalBuilder(ExtensionBuilderBase):
+    r"""Class for building an external docker images that uses yggdrasil
+    as its base.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        **kwargs: Additional keyword arguments are passed to the parent
+            class constructor.
+
+    """
+
+    _name = 'external'
+
+    def __init__(self, args, dockerfile=None, repo=None,
+                 context=None, **kwargs):
+        if dockerfile is None:
+            dockerfile = args.dockerfile
+        if repo is None:
+            repo = args.repo
+        if context is None:
+            context = os.path.dirname(dockerfile)
+        self.external_dockerfile = dockerfile
+        self.external_repo = repo
+        super(ExternalBuilder, self).__init__(args, context=context,
+                                              **kwargs)
+
+    @property
+    def dockerfile(self):
+        r"""str: Path to the docker file to build."""
+        return self.external_dockerfile
+
+    @property
+    def repo(self):
+        r"""str: DockerHub repository that the image should be pushed
+        to."""
+        return self.external_repo
 
 
 def add_argument_subparsers(subparsers, *args, group=False, **kwargs):
@@ -471,9 +934,30 @@ if __name__ == "__main__":
         help=("Don't tag the new image as 'latest' in addition to the "
               "version/commit specific tag."))
     parser.add_argument(
-        "--copy", nargs='+', type=str, action='extend',
+        "--copy-setup", nargs='+', type=str, action='extend',
         help=("Copy one or more files from the parent context into the "
-              "build context"))
+              "build context, adding \"COPY\" commands to the docker "
+              "file before the yggdrasil environment is set up."))
+    parser.add_argument(
+        "--copy-install", nargs='+', type=str, action='extend',
+        help=("Copy one or more files from the parent context into the "
+              "build context, adding \"COPY\" commands to the docker "
+              "file after the yggdrasil environment is set up, but "
+              "before yggdrasil is installed."))
+    parser.add_argument(
+        "--copy-config", nargs='+', type=str, action='extend',
+        help=("Copy one or more files from the parent context into the "
+              "build context, adding \"COPY\" commands to the docker "
+              "file after yggdrasil has been installed, but before it "
+              "is configured."))
+    parser.add_argument(
+        "--copy-local", "--copy", nargs='+', type=str, action='extend',
+        help=("Copy one or more files from the parent context into the "
+              "build context, adding \"COPY\" commands to the docker "
+              "file after yggdrasil has been installed and configured."))
+    parser.add_argument(
+        "--sudo", action='store_true',
+        help=("Run build with sudo"))
     # Subparser specific arguments
     parser_srv.add_argument(
         "--model-repo-commit", type=str,
@@ -492,25 +976,9 @@ if __name__ == "__main__":
         "--repo", type=str,
         help="Repository that the built image should be pushed to")
     args = parser.parse_args()
-    if args.local:
-        params = params_local(args.local, commit=args.commit)
-    elif args.commit or args.branch:
-        if args.branch and not args.commit:
-            args.commit = 'latest'
-        params = params_commit(args.commit, branch=args.branch)
-    elif args.conda_version:
-        params = params_conda_release(args.conda_version)
-    else:
-        params = params_release(args.version)
-    if args.type == 'executable':
-        params = params_executable(params)
-    elif args.type == 'service':
-        params = params_service(params,
-                                model_repo_commit=args.model_repo_commit)
-    elif args.type == 'external':
-        params['dockerfile'] = args.dockerfile
-        params['repo'] = args.repo
-        params['context'] = os.path.dirname(args.dockerfile)
-    dockerfile = params.pop('dockerfile')
-    tag = params.pop('tag')
-    build(args, dockerfile, tag, top_level=True, **params)
+    builder = BuilderBase.create_builder(args)
+    builder.build()
+    if args.run:
+        builder.run()
+    if args.push:
+        builder.push()

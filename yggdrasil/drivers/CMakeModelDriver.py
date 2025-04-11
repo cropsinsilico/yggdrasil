@@ -419,6 +419,9 @@ class CMakeModelDriver(BuildModelDriver):
             target) and any arguments for the executable.
         configuration (str, optional): Build type/configuration that
             should be built. Defaults to 'Release'.
+        yggdrasil_option (str, optional): Build option that can be set
+            to build against the yggdrasil library. If provided, the
+            cmake file will not be modified.
         **kwargs: Additional keyword arguments are passed to parent
             class.
 
@@ -428,6 +431,9 @@ class CMakeModelDriver(BuildModelDriver):
             False, interface libraries are found using FIND_LIBRARY.
         configuration (str): Build type/configuration that should be
             built. This is only used on Windows.
+        yggdrasil_option (str): Build option that can be set to build
+            against the yggdrasil library. If provided, the cmake file
+            will not be modified.
 
     Raises:
         RuntimeError: If neither the IPC or ZMQ C libraries are
@@ -437,8 +443,13 @@ class CMakeModelDriver(BuildModelDriver):
 
     _schema_subtype_description = ('Model is written in C/C++ and has a '
                                    'CMake build system.')
-    _schema_properties = {'configuration': {'type': 'string',
-                                            'default': 'Release'}}
+    _schema_properties = {
+        'configuration': {
+            'type': 'string',
+            'default': 'Release'
+        },
+        'yggdrasil_option': {'type': 'string'},
+    }
     language = 'cmake'
     add_libraries = CMakeConfigure.add_libraries
     target_flags_in_env = False
@@ -456,6 +467,10 @@ class CMakeModelDriver(BuildModelDriver):
                 parent class's method.
 
         """
+        if self.yggdrasil_option:
+            if not self.definitions:
+                self.definitions = []
+            self.definitions.append(self.yggdrasil_option)
         if self.target is None:
             self.builddir_base = 'yggbuild'
         else:

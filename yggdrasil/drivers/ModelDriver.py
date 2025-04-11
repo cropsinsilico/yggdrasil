@@ -1468,10 +1468,21 @@ class ModelDriver(Driver):
 
     def run_validation(self):
         r"""Run the validation script for the model."""
-        if not self.validation_command:
-            return
-        subprocess.check_call(self.validation_command.split(),
-                              cwd=self.working_dir)
+        if self.validation_command:
+            subprocess.check_call(self.validation_command.split(),
+                                  cwd=self.working_dir)
+        for x in self.outputs:
+            actual = x.get('default_file', {}).get('address', False)
+            expected = x.get('default_file', {}).get(
+                'expected_result', False)
+            if not (actual and expected):
+                continue
+            if not os.path.isabs(expected):
+                expected = os.path.join(x['working_dir'], expected)
+            contents_actual = open(actual, 'r').read()
+            contents_expected = open(expected, 'r').read()
+            assert contents_actual == contents_expected
+            # raise NotImplementedError(pformat(x))
         
     def run_model(self, command=None, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using

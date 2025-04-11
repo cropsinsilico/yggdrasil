@@ -104,6 +104,9 @@ class FileComm(CommBase.CommBase):
         wait_for_creation (float, optional): Time (in seconds) that should be
             waited before opening for the file to be created if it dosn't exist.
             Defaults to 0 s and file will attempt to be opened immediately.
+        expected_result (str, optional): Path to an existing file that
+            contains the result expected when the default inputs & outputs
+            are used. This parameter is only valid for output files.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -148,7 +151,9 @@ class FileComm(CommBase.CommBase):
         'wait_for_creation': {'type': 'number', 'default': 0.0},
         'serializer': {'allOf': [
             {'default': {}},
-            {'$ref': '#/definitions/serializer'}]}}
+            {'$ref': '#/definitions/serializer'}]},
+        'expected_result': {'type': 'string'},
+    }
     _schema_excluded_from_inherit = (
         ['commtype', 'datatype', 'read_meth', 'serializer']
         + CommBase.CommBase._model_schema_prop)
