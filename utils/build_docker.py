@@ -215,6 +215,8 @@ class BuilderBase(object, metaclass=BuilderMeta):
         """
         if (not for_base) and args.type and args.type != 'environment':
             name = args.type
+            if name == 'service' and args.model_repo_commit:
+                name = 'loaded-service'
         elif args.local:
             name = 'local'
         elif args.commit or args.branch:

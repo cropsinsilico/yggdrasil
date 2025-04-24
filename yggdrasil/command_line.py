@@ -1327,6 +1327,7 @@ class cc_toolname(SubCommand):
         args.tool = 'compiler'
         args.toolname = None
         args.flags = False
+        args.exports = None
         if args.cpp:
             args.language = 'cpp'
         else:
