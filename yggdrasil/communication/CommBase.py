@@ -6,11 +6,13 @@ import logging
 import types
 import time
 import collections
+import pprint
 import numpy as np
 from yggdrasil import tools, multitasking, constants, rapidjson
 from yggdrasil.communication import (
-    new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
-    import_comm, check_env_for_address, AddressError)
+    new_comm, get_comm, TemporaryCommunicationError,
+    CloseCommunicatorError, import_comm, checkEnv, envName, AddressError
+)
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
 from yggdrasil.datatypes import DataTypeError, type2numpy
@@ -20,7 +22,7 @@ from yggdrasil.serialize import consolidate_array
 
 
 logger = logging.getLogger(__name__)
-_registered_servers = multitasking.LockedDict(task_method='thread')
+_registered_proxies = multitasking.LockedDict(task_method='thread')
 _registered_comms = multitasking.LockedDict(task_method='thread')
 
 
@@ -31,13 +33,20 @@ FLAG_SKIP = 3
 FLAG_EOF = 4
 FLAG_INCOMPLETE = 5
 FLAG_EMPTY = 6
+COMM_FLAGS = ['FAILURE', 'SUCCESS', 'TRYAGAIN', 'SKIP', 'EOF',
+              'INCOMPLETE', 'EMPTY']
+FLAG_TO_STRING = {eval(f'FLAG_{x}'): f'FLAG_{x}' for x in COMM_FLAGS}
 
 
 class NeverMatch(Exception):
     'An exception class that is never raised by any code anywhere'
 
 
-class IncompleteBaseComm(Exception):
+class CommError(Exception):
+    r"""Exception class for communicators."""
+
+
+class IncompleteBaseComm(CommError):
     r"""An exception class for methods that are incomplete for base classes."""
 
 
@@ -293,56 +302,543 @@ class CommTaskLoop(multitasking.YggTaskLoop):
         super(CommTaskLoop, self).on_main_terminated()
 
 
-class CommServer(multitasking.YggTaskLoop):
-    r"""Basic server object to keep track of clients.
+class CommProxy(multitasking.YggTaskLoop):
+    r"""Basic proxy object to track clients and servers.
+
+    Args:
+        srv_address (str, optional): Server address.
+        cli_address (str, optional): Client address.
+        name (str, optional): Server name.
+        allow_no_servers (bool, optional): If True, don't terminate the
+            proxy loop when the server count drops to 0.
+        allow_no_clients (bool, optional): If True, don't terminate the
+            proxy loop when the client count drops to 0.
+        is_partner (bool, optional): If True, this is a stand in for the
+            proxy started by the partner communicator.
+        **kwargs: Additional keyword arguments are passed to the
+            YggTaskLoop constructor.
 
     Attributes:
-        cli_count (int): Number of clients that have connected to this server.
+        srv_address (str): Address that faces the server(s).
+        cli_address (str): Address that faces the client(s).
+        servers (list): Names of servers that have connected to this
+            proxy.
+        clients (list): Names of clients that have connected to this
+            proxy.
+        backlog (list): Messages received from clients when no servers
+            were connected.
+        nsignon_proxy_sent (int): Number of proxy signon messages that
+            have been sent.
+        nsignon_proxy_recv (int): Number of proxy signon messages that
+            have been received.
 
     """
-    def __init__(self, srv_address, cli_address=None, name=None, **kwargs):
-        global _registered_servers
-        self.cli_count = 0
-        self.srv_count = 0
-        if cli_address is None:
-            cli_address = srv_address
+
+    proxy_signon_count_msg = b'PROXY_SIGNON_COUNT::'
+    proxy_signon_msg = b'PROXY_SIGNING_ON::'
+    server_signon_msg = b'SERVER_SIGNING_ON::'
+    client_signon_msg = b'CLIENT_SIGNING_ON::'
+    proxy_signoff_msg = b'PROXY_SIGNING_OFF::'
+    server_signoff_msg = b'SERVER_SIGNING_OFF::'
+    client_signoff_msg = b'CLIENT_SIGNING_OFF::'
+
+    def __init__(self, srv_address=None, cli_address=None, name=None,
+                 allow_no_servers=False, allow_no_clients=False,
+                 is_partner=False, **kwargs):
+        global _registered_proxies
+        self.servers = []
+        self.clients = []
+        self.is_partner = is_partner
+        if not self.is_partner:
+            if cli_address is None:
+                assert srv_address is not None
+                cli_address = srv_address
+            elif srv_address is None:
+                srv_address = cli_address
         self.srv_address = srv_address
         self.cli_address = cli_address
-        super(CommServer, self).__init__('CommServer(%s).%s.to.%s' % (
-            name, cli_address, srv_address), **kwargs)
-        _registered_servers[self.srv_address] = self
+        self.allow_no_servers = allow_no_servers
+        self.allow_no_clients = allow_no_clients
+        self.backlog = []
+        self.nsignon_proxy_sent = 0
+        self.nsignon_proxy_recv = 0
+        if name is None:
+            name = 'Unnamed'
+        name += f'.{cli_address}'
+        if srv_address != cli_address:
+            name += f'.to.{srv_address}'
+        if self.is_partner:
+            name += '-PARTNER'
+        super(CommProxy, self).__init__(name, **kwargs)
+        if not self.is_partner:
+            _registered_proxies[self.srv_address] = self
 
-    # def add_server(self):
-    #     r"""Increment the server count."""
-    #     global _registered_servers
-    #     _registered_servers[self.srv_address].srv_count += 1
-    #     self.debug("Added server to server: nservers = %d", self.srv_count)
+    @property
+    def srv_count(self):
+        r"""int: Number of servers connected to this proxy."""
+        with self.lock:
+            return len(self.servers)
 
-    def add_client(self):
-        r"""Increment the client count."""
-        global _registered_servers
-        _registered_servers[self.srv_address].cli_count += 1
-        self.debug("Added client to server: nclients = %d", self.cli_count)
+    @property
+    def cli_count(self):
+        r"""int: Number of clients connected to this proxy."""
+        with self.lock:
+            return len(self.clients)
 
-    # def remove_server(self):
-    #     r"""Decrement the client count, closing the server if all clients done."""
-    #     global _registered_servers
-    #     self.debug("Removing server from server")
-    #     _registered_servers[self.srv_address].srv_count -= 1
-    #     if _registered_servers[self.srv_address].srv_count <= 0:
-    #         self.debug("Shutting down server")
-    #         self.terminate()
-    #         _registered_servers.pop(self.srv_address)
-            
-    def remove_client(self):
-        r"""Decrement the client count, closing the server if all clients done."""
-        global _registered_servers
-        self.debug("Removing client from server")
-        _registered_servers[self.srv_address].cli_count -= 1
-        if _registered_servers[self.srv_address].cli_count <= 0:
-            self.debug("Shutting down server")
+    @property
+    def signons_processed(self):
+        r"""bool: True if all server sign-on messages have been responded
+        to."""
+        with self.lock:
+            return (
+                self.nsignon_proxy_send > 0
+                and self.nsignon_proxy_send == self.nsignon_proxy_recv
+            )
+            # if not self.is_partner:
+            #     if self.srv_count > 0 and self.nsignon_server_send == 0:
+            #         return True
+            # return (
+            #     self.nsignon_server_send > 0
+            #     and self.nsignon_server_send == self.nsignon_proxy_recv
+            # )
+
+    @property
+    def signons_unprocessed(self):
+        r"""bool: True if there were more server sign-on messages sent
+        than have been responded to by the proxy."""
+        return (not self.signons_processed)
+
+    def run_loop(self):
+        r"""Forward messages from client to server."""
+        if self.is_partner or self.cli_address == self.srv_address:
+            self.wait_flag_attr('break_flag')
+            return
+        if self.poll_client():
+            message = self.client_recv()
+            if message is not None:
+                self.debug(f'Forwarding message of size {len(message)}')
+                self.server_send(message)
+        sleep = False
+        with self.lock:
+            if self.srv_count == 0 or self.nsignon_proxy_sent == 0:
+                sleep = True
+                self.send_proxy_signon()
+        if sleep:
+            self.sleep()
+
+    def after_loop(self):
+        r"""Close sockets after the loop finishes."""
+        if not self.is_partner:
+            try:
+                with self.lock:
+                    self.server_send(self.proxy_signoff_msg)
+            except BaseException:
+                pass
+        self.cleanup()
+        super(CommProxy, self).after_loop()
+
+    def _poll_client(self):
+        return False
+
+    def poll_client(self):
+        r"""Poll to check if there is a message from the client.
+
+        Returns:
+            bool: True if there is a message waiting, False otherwise.
+
+        """
+        with self.lock:
+            if self.was_break:  # pragma: debug
+                return False
+            if self.backlog and self.srv_count > 0:
+                return True
+        return self._poll_client()
+
+    def _poll_server(self):
+        return False
+
+    def poll_server(self):
+        r""""Poll to check if there is a message on the server end of
+        the proxy.
+
+        Returns:
+            bool: True if there is a message waiting, False otherwise.
+
+        """
+        assert self.is_partner
+        return self._poll_server()
+
+    def client_recv(self):
+        r"""Receive single message from the client.
+
+        Returns:
+            str: Received message.
+
+        """
+        assert not self.is_partner
+        if self.cli_address == self.srv_address:
+            return
+        with self.lock:
+            if self.was_break:  # pragma: debug
+                return None
+            from_backlog = False
+            if self.backlog and self.srv_count > 0:
+                from_backlog = True
+                msg = self.backlog.pop(0)
+                self.debug(f"Processing backlogged message: {msg}")
+            else:
+                msg = self._client_recv()
+                self.debug(f"Proxy forwarding message: {msg}")
+            self.debug(f"CLIENT_RECV: {msg}")
+            if self.check_for_proxy_message(msg):
+                self.proxy_response_to_proxy_message(
+                    msg, from_backlog=from_backlog)
+                return None
+            if self.srv_count <= 0:
+                self.debug("Backlogging message")
+                self.backlog.append(msg)
+                return None
+            return msg
+
+    def server_send(self, msg):
+        r"""Send single message to the server.
+
+        Args:
+            msg (str): Message.
+
+        """
+        assert not self.is_partner
+        if self.cli_address == self.srv_address:
+            return
+        if msg is None:  # pragma: debug
+            return
+        if self.was_break:  # pragma: debug
+            return None
+        # self.debug(f"SERVER_SEND: {msg}")
+        self._server_send(msg)
+
+    def _client_send(self, msg):
+        pass
+
+    def client_send(self, msg):
+        r"""Send a message to the client side of the proxy.
+
+        Args:
+            msg (str): Message to send.
+
+        """
+        self.debug(f"CLIENT_SEND: {msg}")
+        if self.is_partner:
+            self._client_send(msg)
+        else:
+            with self.lock:
+                self.backlog.append(msg)
+
+    def _server_recv(self):
+        pass
+
+    def server_recv(self):
+        r"""Receive a message from the server side of the proxy.
+
+        Returns:
+            str: Received message.
+
+        """
+        out = self._server_recv()
+        self.debug(f"SERVER_RECV: {out}")
+        return out
+
+    def add_server(self, name):
+        r"""Increment the server count.
+
+        Args:
+            name (str): Name of the server being added.
+
+        """
+        if self.is_partner:
+            # Don't send server signon as it will be handled during
+            # receipt from the proxy which will also provide the
+            # client address
+            return
+        self.servers.append(name)
+        self.debug(f"Added server \"{name}\" to proxy: "
+                   f"nservers = {self.srv_count}")
+
+    def add_client(self, name):
+        r"""Increment the client count.
+
+        Args:
+            name (str): Name of the client being added.
+
+        """
+        if self.is_partner:
+            self.client_send(self.client_signon_msg
+                             + name.encode('utf-8'))
+            return
+        self.clients.append(name)
+        self.debug(f"Added client \"{name}\" to proxy: "
+                   f"nclients = {self.cli_count}")
+
+    def requeue_messages(self, messages):
+        r"""Requeue a set of messages.
+
+        Args:
+            message (list): Messages that should be requeued if possible.
+
+        """
+        messages = [x.msg if isinstance(x, CommMessage) else x
+                    for x in messages]
+        if self.is_partner:
+            try:
+                for x in messages:
+                    self.client_send(x)
+            except BaseException as e:
+                self.error(f"Cannot requeue {len(messages)} messages. "
+                           f"There was an error when trying to send "
+                           f"them to the proxy: {e}")
+            return
+        if not self.is_alive():
+            self.error(f"Cannot requeue {len(messages)} messages "
+                       f"because the proxy has been shut down.")
+            return
+        for x in messages:
+            self.backlog.append(x)
+
+    def remove_server(self, name, in_loop=False, messages=None):
+        r"""Decrement the client count, closing the server if all
+        clients done.
+
+        Args:
+            name (str): Name of the server to remove.
+            in_loop (bool, optional): True if this is called from within
+                the proxy loop.
+            messages (list, optional): Messages that should be requeued
+                if possible.
+
+        """
+        if messages:
+            self.requeue_messages(messages)
+        self.debug(f"Removing server \"{name}\" from proxy")
+        if self.is_partner:
+            try:
+                self.client_send(self.server_signoff_msg
+                                 + name.encode('utf-8'))
+            except BaseException:
+                pass
             self.terminate()
-            _registered_servers.pop(self.srv_address)
+            return
+        global _registered_proxies
+        self.servers.remove(name)
+        if self.srv_count == 0 and not self.allow_no_servers:
+            self.debug(f"Shutting down proxy due to absence of "
+                       f"servers. {len(self.backlog)} messages "
+                       f"discarded")
+            self.terminate(no_wait=in_loop)
+            with _registered_proxies.lock:
+                if self.srv_address in _registered_proxies:
+                    _registered_proxies.pop(self.srv_address)
+            
+    def remove_client(self, name, in_loop=False):
+        r"""Decrement the client count, closing the server if all clients done.
+
+        Args:
+            name (str): Name of the client to remove.
+            in_loop (bool, optional): True if this is called from within
+                the proxy loop.
+
+        """
+        if self.is_partner:
+            self.client_send(self.client_signoff_msg
+                             + name.encode('utf-8'))
+            self.terminate()
+            return
+        global _registered_proxies
+        self.debug(f"Removing client \"{name}\" from proxy")
+        self.clients.remove(name)
+        if (not self.allow_no_clients) and self.cli_count == 0:
+            self.debug(f"Shutting down proxy due to absence of clients. "
+                       f"{len(self.backlog)} messages discarded")
+            self.terminate()
+            with _registered_proxies.lock:
+                if self.srv_address in _registered_proxies:
+                    _registered_proxies.pop(self.srv_address)
+
+    def send_proxy_signon(self):
+        r"""Send a proxy signon message requesting the server to
+        acknowledge it is ready to receive messages."""
+        msg = self.proxy_signon_msg + self.cli_address.encode('utf-8')
+        with self.lock:
+            self.debug(
+                f"Sending proxy signon message "
+                f"#{self.nsignon_proxy_sent + 1}: {msg}")
+            self.server_send(msg)
+            self.nsignon_proxy_sent += 1
+
+    @classmethod
+    def check_for_proxy_message(cls, msg):
+        r"""Check if a message was sent by a proxy.
+
+        Args:
+            msg (str): Message to check.
+
+        Returns:
+            bool: True if the message is from a proxy, False otherwise.
+
+        """
+        if not isinstance(msg, (str, bytes)):
+            return False
+        flags = [
+            cls.proxy_signon_msg, cls.proxy_signoff_msg,
+            cls.proxy_signon_count_msg,
+            cls.server_signon_msg, cls.server_signoff_msg,
+            cls.client_signon_msg, cls.client_signoff_msg,
+        ]
+        for x in flags:
+            if msg.startswith(x):
+                return True
+        return False
+
+    def proxy_response_to_proxy_message(self, msg, from_backlog=False):
+        r"""Respond to a message received by the proxy.
+
+        Args:
+            msg (str): Message.
+            from_backlog (bool, optional): If True, the message came
+                from the backlog and may be passed directly.
+
+        """
+        assert not self.is_partner
+        if msg.startswith(self.server_signon_msg):
+            name = msg.split(self.server_signon_msg)[-1]
+            self.debug(f"Received server signon from {name}")
+            if self.srv_count == 0:
+                self.debug(f"A server signed on after "
+                           f"{self.nsignon_proxy_sent} proxy signon "
+                           f"messages.")
+            self.add_server(name)
+            self.server_send(
+                self.proxy_signon_count_msg
+                + str(self.nsignon_proxy_sent).encode('utf-8')
+            )
+            return None
+        elif msg.startswith(self.client_signon_msg):
+            name = msg.split(self.client_signon_msg)[-1]
+            self.debug(f"Received client signon from {name}")
+            self.add_client(name)
+            return None
+        elif msg.startswith(self.server_signoff_msg):
+            name = msg.split(self.server_signoff_msg)[-1]
+            self.debug(f"Received server signoff from {name}")
+            self.remove_server(name, in_loop=True)
+            return None
+        elif msg.startswith(self.client_signoff_msg):
+            name = msg.split(self.client_signoff_msg)[-1]
+            self.debug(f"Received client signoff from {name}")
+            self.remove_client(name, in_loop=True)
+            return None
+        elif from_backlog:
+            return msg
+        else:  # pragma: debug
+            raise NotImplementedError(
+                f"Unsupported proxy message received by the proxy: "
+                f"{msg}")
+
+    def server_response_to_proxy_message(self, name, msg):
+        r"""Respond to a message sent by the proxy.
+
+        Args:
+            name (str): Name of communicator that received the message.
+            msg (CommMessage): Message.
+
+        """
+        msg_s = msg
+        if isinstance(msg, CommMessage):
+            msg_s = msg.msg
+            msg.flag = FLAG_SKIP
+        if msg_s.startswith(self.proxy_signon_msg):
+            self.respond_to_proxy_signon(name, msg_s)
+        elif msg_s.startswith(self.proxy_signon_count_msg):
+            self.respond_to_proxy_signon_count(name, msg_s)
+        elif msg_s.startswith(self.proxy_signoff_msg):
+            raise CloseCommunicatorError("Proxy signed off")
+        else:  # pragma: debug
+            raise NotImplementedError(
+                f"Unsupported proxy message received by a server: "
+                f"{msg_s}")
+        return msg
+
+    def respond_to_proxy_signon(self, name, msg):
+        r"""Respond to a proxy signon message sent by the proxy.
+
+        Args:
+            name (str): Name of communicator that received the message.
+            msg (str): Proxy signon message.
+
+        """
+        assert msg.startswith(self.proxy_signon_msg)
+        cli_address = msg.split(self.proxy_signon_msg)[-1].decode('utf-8')
+        with self.lock:
+            self.nsignon_proxy_recv += 1
+            if self.cli_address is None:
+                self.cli_address = cli_address
+            else:
+                assert cli_address == self.cli_address
+            if self.nsignon_proxy_recv == 1:
+                self.debug(f"Received proxy signon from proxy: {msg}")
+                self.client_send(self.server_signon_msg
+                                 + name.encode('utf-8'))
+            else:
+                self.verbose_debug(f"Received extra client signon from "
+                                   f"proxy: {msg}")
+
+    def respond_to_proxy_signon_count(self, name, msg):
+        r"""Respond to a proxy signon message sent by the proxy.
+
+        Args:
+            name (str): Name of communicator that received the message.
+            msg (str): Proxy signon message.
+
+        """
+        assert msg.startswith(self.proxy_signon_count_msg)
+        nsignon_proxy_sent = int(
+            msg.split(self.proxy_signon_count_msg)[-1].decode('utf-8'))
+        self.debug(f"Received proxy signon from proxy: {msg}")
+        with self.lock:
+            if self.is_partner:
+                self.nsignon_proxy_sent = nsignon_proxy_sent
+            else:
+                assert nsignon_proxy_sent == self.nsignon_proxy_sent
+
+    def parse_message(self, name, msg):
+        with self.lock:
+            cli_address = msg.header['__meta__'].get(
+                'proxy_client_address', None)
+            if not (self.is_partner and self.cli_address is None
+                    and cli_address is not None):
+                return
+            self.cli_address = cli_address
+            self.client_send(self.server_signon_msg
+                             + name.encode('utf-8'))
+
+    def preparse_message(self, name, msg):
+        if self.is_partner or msg.flag == FLAG_EOF:
+            return
+        msg.header['__meta__'].setdefault(
+            'proxy_client_address', self.cli_address)
+
+    @classmethod
+    def create_partner(cls, **kwargs):
+        r"""Create a partner dummy proxy.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the class
+                constructor.
+
+        Returns:
+            CommProxy: Partner proxy.
+
+        """
+        return cls(is_partner=True, **kwargs)
 
 
 class CommBase(tools.YggClass):
@@ -414,6 +910,9 @@ class CommBase(tools.YggClass):
         allow_multiple_comms (bool, optional): If True, initialize the comm
             such that mulitiple comms can connect to the same address. Defaults
             to False.
+        direct_connection (bool, optional): If True, the comm will be
+            directly connected to directly to its partner comm without
+            a connection driver.
         is_client (bool, optional): If True, the comm is one of many potential
             clients that will be sending messages to one or more servers.
             Defaults to False.
@@ -465,6 +964,14 @@ class CommBase(tools.YggClass):
         for_service (bool, optional): If True, this comm bridges the gap to
             an integration running as a service, possibly on a remote machine.
             Defaults to False.
+        is_async (bool, optional): If True, this communicator will be
+            wrapped in an asynchronous wrapper that continuously checks
+            for messages in a thread.
+        create_proxy (bool, optional): If True, a proxy will be created
+            to forward messages between multiple communicators. If not
+            provided a proxy will only be created when is_client or
+            allow_multiple_comms is True for non-interface send
+            communicators that are not MPI or REST communicators.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -587,6 +1094,7 @@ class CommBase(tools.YggClass):
     _maxMsgSize = 0
     address_description = None
     no_serialization = False
+    pass_comm_message = False
     _model_schema_prop = ['is_default', 'outside_loop', 'dont_copy',
                           'default_file', 'default_value']
     _disconnect_attr = (tools.YggClass._disconnect_attr
@@ -596,16 +1104,18 @@ class CommBase(tools.YggClass):
                             'skip_processing', 'skip_language2python',
                             'after_prepare_message']
     _finalize_message_kws = ['skip_python2language', 'after_finalize_message']
+    _proxy_class = CommProxy
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, env=None, partner_copies=0,
                  partner_model=None, partner_language='python', partner_mpi_ranks=[],
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
-                 allow_multiple_comms=False,
+                 allow_multiple_comms=False, direct_connection=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 is_async=False, **kwargs):
+                 is_async=False, create_proxy=None, proxy_kwargs=None,
+                 **kwargs):
         kwargs['additional_component_properties'] = {'name': name}
         tmp_seri = self._update_serializer_kwargs(kwargs)
         super(CommBase, self).__init__(name, **kwargs)
@@ -617,15 +1127,13 @@ class CommBase(tools.YggClass):
             raise RuntimeError("Comm class %s not installed" % self.__class__)
         if (partner_model is None) and (not is_interface):
             no_suffix = True
-        suffix = determine_suffix(no_suffix=no_suffix,
-                                  reverse_names=reverse_names,
-                                  direction=direction)
         if env is None:
             env = os.environ.copy()
         self.env = env
         self.name_base = name
-        self.suffix = suffix
-        self._name = name + suffix
+        self._name = envName(name, env=self.env, no_suffix=no_suffix,
+                             reverse_names=reverse_names,
+                             direction=direction)
         self.direction = direction
         self._update_address(address)
         if is_interface is None:
@@ -637,6 +1145,13 @@ class CommBase(tools.YggClass):
             partner_language = 'python'
             partner_copies = 1
             recv_timeout = False
+            if self.name_base.startswith(f"{self.model_name}:"):
+                self.name_base = self.name_base.split(
+                    f"{self.model_name}:", 1)[-1]
+        elif (reverse_names and partner_model
+              and self.name_base.startswith(f"{partner_model}:")):
+            self.name_base = self.name_base.split(
+                f"{partner_model}:", 1)[-1]
         if language is None:
             language = 'python'
         self.language = language
@@ -655,7 +1170,7 @@ class CommBase(tools.YggClass):
         self.is_async = is_async
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
-        self._server = None
+        self.proxy = None
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
         self.close_on_eof_send = close_on_eof_send
@@ -665,13 +1180,12 @@ class CommBase(tools.YggClass):
         self._multiple_first_send = True
         self._n_sent = 0
         self._n_recv = 0
+        self._openned = False
         self._bound = False
         self._last_send = None
         self._last_recv = None
         self._type_errors = []
         self._timeout_drain = False
-        self._server_class = CommServer
-        self._server_kwargs = {}
         self._send_serializer = True
         self.allow_multiple_comms = allow_multiple_comms
         if (((not self.single_use)
@@ -679,12 +1193,26 @@ class CommBase(tools.YggClass):
                   or (self.model_copies > 1) or (self.partner_copies > 1)
                   or self.for_service))):
             self.allow_multiple_comms = True
+        self.direct_connection = direct_connection
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
-        self.create_proxy = ((self.is_client or self.allow_multiple_comms)
-                             and (not self.is_interface)
-                             and (self.direction != 'recv')
-                             and (self._commtype not in ['mpi', 'rest']))
+        if create_proxy is None:
+            create_proxy = (
+                (self.is_client or self.allow_multiple_comms)
+                and (not self.is_interface)
+                and (self.direction != 'recv')
+                and (self._commtype not in ['mpi', 'rest'])
+            )
+        self.create_proxy = create_proxy
+        self.create_proxy_partner = (
+            (not self.create_proxy)
+            and (self.is_server or self.allow_multiple_comms)
+            and self.direction != 'send'
+            and (self._commtype not in ['mpi', 'rest'])
+        )
+        if proxy_kwargs is None:
+            proxy_kwargs = {}
+        self.proxy_kwargs = proxy_kwargs
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -787,13 +1315,10 @@ class CommBase(tools.YggClass):
             self.address = address
             return
         try:
-            self.address = check_env_for_address(self.env, self.name)
-        except AddressError:
-            model_name = self.model_name
-            prefix = '%s:' % model_name
-            if model_name and (not self.name.startswith(prefix)):
-                self._name = prefix + self.name
-            self.address = check_env_for_address(self.env, self.name)
+            self.address = checkEnv(self.name, env=self.env)
+        except KeyError:
+            raise AddressError(f'Cannot see {self.name} in env. '
+                               f'Env:\n{pprint.pformat(self.env)}')
 
     def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base
@@ -1096,6 +1621,11 @@ class CommBase(tools.YggClass):
         unregister_comm(commtype, key, dont_close=dont_close)
 
     @classmethod
+    def registered_comms(cls):
+        r"""list: Names of registered communicators."""
+        return list(cls.comm_registry().keys())
+
+    @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
@@ -1134,20 +1664,83 @@ class CommBase(tools.YggClass):
             out[self.partner_model] = self.opp_comms
         return out
 
+    def model_partner_comm(self, model=None):
+        r"""Return the communicator that is partnered with a specific
+        model.
+
+        Args:
+            model (str, optional): Model name. If not provided, a
+                dictionary will be returned with all partner models as
+                keys and the corresponding communicators as values.
+
+        Returns:
+            CommBase: Model communicator.
+
+        Raises:
+            CommError: If there is not a communicator partnered with the
+                named model.
+
+        """
+        if model is None:
+            out = {}
+            if self.partner_model:
+                out[self.partner_model] = [self]
+            return out
+        if self.partner_model == model:
+            return self
+        raise CommError(f"Could not locate communicator partnered with "
+                        f"model \"{model}\" (partner_model = "
+                        f"{self.partner_model})")
+
+    @property
+    def model_comm_kwargs(self):
+        r"""dict: Parameters that should be used for initializing the
+        partner comm created by the model interface."""
+        out = {
+            'address': self.opp_address,
+            'commtype': self.opp_commtype,
+            'direction': self.opp_direction,
+            'direct_connection': self.direct_connection,
+        }
+        if self.partner_model:
+            out['model'] = self.partner_model
+        return out
+
     @property
     def opp_name(self):
         r"""str: Name that should be used for the opposite comm."""
         return self.name
+
+    @property
+    def opp_commtype(self):
+        r"""str: Communicator type for opposite comm."""
+        return self._commtype
         
     @property
     def opp_address(self):
         r"""str: Address for opposite comm."""
+        if self.create_proxy:
+            if self.proxy is None:  # pragma: debug
+                raise Exception("The proxy does not yet have an address.")
+            if self.direction == 'send':
+                return self.proxy.srv_address
+            else:
+                return self.proxy.cli_address
         return self.address
+
+    @property
+    def opp_direction(self):
+        r"""str: Direction for opposite comm."""
+        if self.direction == 'send':
+            return 'recv'
+        else:
+            return 'send'
 
     @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
-        return {self.opp_name: self.opp_address}
+        return {self.opp_name: self.opp_address,
+                (self.opp_name + '_COMM'): self.opp_commtype}
 
     def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
@@ -1162,17 +1755,15 @@ class CommBase(tools.YggClass):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = {'commtype': self._commtype, 'use_async': self.is_async,
-                  'allow_multiple_comms': self.allow_multiple_comms}
-        kwargs['address'] = self.opp_address
+        kwargs = self.model_comm_kwargs
+        kwargs.update(
+            use_async=self.is_async,
+            allow_multiple_comms=self.allow_multiple_comms,
+        )
         if not for_yaml:
             kwargs['serializer'] = self.serializer
         kwargs.update(self.serializer.input_kwargs)
         # TODO: Pass copies/partner_copies in kwargs?
-        if self.direction == 'send':
-            kwargs['direction'] = 'recv'
-        else:
-            kwargs['direction'] = 'send'
         if for_yaml:
             for k in ['use_async', 'allow_multiple_comms', 'direction',
                       'comment', 'newline', 'seritype']:
@@ -1183,12 +1774,11 @@ class CommBase(tools.YggClass):
 
     def bind(self):
         r"""Bind in place of open."""
-        if self.create_proxy:
-            self.signon_to_server()
+        self.signon_to_proxy()
 
     def open(self):
         r"""Open the connection."""
-        self.debug("Opening %s", self.address)
+        self.debug(f"Opening {self.address} for {self.direction}")
         self.bind()
 
     def _close(self, *args, **kwargs):
@@ -1213,15 +1803,13 @@ class CommBase(tools.YggClass):
             linger = False
         # Close with lock
         with self._closing_thread.lock:
+            self.signoff_from_proxy()
             self._close(linger=linger)
             self._n_sent = 0
             self._n_recv = 0
-            if self.create_proxy:
-                self.debug("Signing off from server")
-                self.signoff_from_server()
             if len(self._work_comms) > 0:
                 self.debug(
-                    "Cleaning up %d work comms", len(self._work_comms))
+                    f"Cleaning up {len(self._work_comms)} work comms")
                 keys = [k for k in self._work_comms.keys()]
                 for c in keys:
                     self.remove_work_comm(c, linger=linger)
@@ -1293,9 +1881,15 @@ class CommBase(tools.YggClass):
             f'close_alive={self._closing_thread.is_alive()}')
 
     @property
+    def _is_open(self):  # pragma: debug
+        return self._openned
+
+    @property
     def is_open(self):
         r"""bool: True if the connection is open."""
-        return False  # pragma: debug
+        if self.proxy and not self.proxy.is_alive():
+            return False
+        return self._is_open
 
     @property
     def is_closed(self):
@@ -1625,7 +2219,7 @@ class CommBase(tools.YggClass):
                 action.
 
         """
-        if (((self._commtype not in ['server', 'client'])
+        if (((self._commtype not in ['server', 'client', 'model_function'])
              and (self.direction != direction))):
             raise RuntimeError(("This comm (%s, %s) is designated to %s and "
                                 "therefore cannot %s.")
@@ -1636,61 +2230,55 @@ class CommBase(tools.YggClass):
                                % (self.name, self.address))
 
     # CLIENT/SERVER METHODS
-    def server_exists(self, srv_address):
-        r"""Determine if a server exists.
-
-        Args:
-            srv_address (str): Address of server comm.
-
-        Returns:
-            bool: True if a server with the provided address exists, False
-                otherwise.
-
-        """
-        global _registered_servers
-        return (srv_address in _registered_servers)
-
-    def new_server(self, srv_address):
-        r"""Create a new server.
-
-        Args:
-            srv_address (str): Address of server comm.
-
-        """
-        return self._server_class(srv_address, name=self.name,
-                                  **self._server_kwargs)
-
-    def signon_to_server(self):
-        r"""Add a client to an existing server or create one."""
-        global _registered_servers
-        with _registered_servers.lock:
-            if self._server is None:
-                assert not self.server_exists(self.address)
-                self.debug("Creating new server")
-                self._server = self.new_server(self.address)
-                self._server.start()
-                # Currently server are only started once per model
-                # self._server = _registered_servers[self.address]
+    def signon_to_proxy(self):
+        r"""Add a client/server to an existing proxy or create one."""
+        global _registered_proxies
+        with _registered_proxies.lock:
+            if self.proxy is not None:
+                return
+            kws = dict(self.proxy_kwargs, name=self.name)
+            if self.create_proxy:
+                if self.address in _registered_proxies:
+                    self.debug("Using existing proxy")
+                    self.proxy = _registered_proxies[self.address]
+                else:
+                    self.debug("Creating new proxy")
+                    if self.direction == 'send':
+                        kws['srv_address'] = self.address
+                    else:
+                        kws['cli_address'] = self.address
+                    self.proxy = self._proxy_class(**kws)
+                    self.proxy.start()
                 if self.direction == 'send':
-                    self._server.add_client()
-                    self.address = self._server.cli_address
-                else:  # pragma: debug
-                    # self._server.add_server()
-                    # self.address = self._server.srv_address
-                    raise RuntimeError("Receive-side proxy untested")
-
-    def signoff_from_server(self):
-        r"""Remove a client from the server."""
-        global _registered_servers
-        with _registered_servers.lock:
-            if self._server is not None:
-                self.debug("Signing off")
+                    self.address = self.proxy.cli_address
+                else:
+                    self.address = self.proxy.srv_address
+            elif self.create_proxy_partner:
+                self.debug("Creating new proxy partner")
                 if self.direction == 'send':
-                    self._server.remove_client()
-                else:  # pragma: debug
-                    # self._server.remove_server()
-                    raise RuntimeError("Receive-side proxy untested")
-                self._server = None
+                    kws['cli_address'] = self.address
+                else:
+                    kws['srv_address'] = self.address
+                self.proxy = self._proxy_class.create_partner(**kws)
+                self.proxy.start()
+            if self.proxy:
+                if self.direction == 'send':
+                    self.proxy.add_client(self.name)
+                else:
+                    self.proxy.add_server(self.name)
+
+    def signoff_from_proxy(self, **kwargs):
+        r"""Remove a client/server from the proxy."""
+        global _registered_proxies
+        with _registered_proxies.lock:
+            if self.proxy is None:
+                return
+            self.debug("Signing off from proxy")
+            if self.direction == 'send':
+                self.proxy.remove_client(self.name, **kwargs)
+            else:
+                self.proxy.remove_server(self.name, **kwargs)
+            self.proxy = None
 
     # TEMP COMMS
     @property
@@ -1948,7 +2536,11 @@ class CommBase(tools.YggClass):
             if skip_safe_send:
                 pass
             elif not msg.sent:
-                if not self._safe_send(msg.msg, **kwargs):  # pragma: debug
+                if self.pass_comm_message:
+                    imsg = msg
+                else:
+                    imsg = msg.msg
+                if not self._safe_send(imsg, **kwargs):  # pragma: debug
                     self.special_debug('Failed to send %d bytes', msg.length)
                     return False
                 msg.sent = True
@@ -1985,6 +2577,10 @@ class CommBase(tools.YggClass):
                 with self._closing_thread.lock:
                     self._eof_sent.clear()
             raise
+        except CloseCommunicatorError:
+            self.debug('Comm closing')
+            self.close()
+            return False
         except BaseException:
             # if (msg.flag == FLAG_EOF) and self._used:  # pragma: intermittent
             #     # This will only be called if the EOF send fails because
@@ -2007,8 +2603,6 @@ class CommBase(tools.YggClass):
             header_kwargs = {}
         model_name = self.full_model_name
         if model_name:
-            if header_kwargs is None:  # pragma: debug
-                header_kwargs = {}
             header_kwargs.setdefault('__meta__', {})
             header_kwargs['__meta__'].setdefault('model', model_name)
         return header_kwargs
@@ -2071,6 +2665,9 @@ class CommBase(tools.YggClass):
             # 3. Check if the message is EOF or YGG_CLIENT_EOF
             if self.is_eof(msg.args):
                 msg.flag = FLAG_EOF
+        # Add proxy info
+        if self.proxy:
+            self.proxy.preparse_message(self.name, msg)
         # Make duplicates
         once_per_partner = ((msg.flag == FLAG_EOF)
                             or (isinstance(msg.args, bytes)
@@ -2114,9 +2711,13 @@ class CommBase(tools.YggClass):
             for x in [msg] + msg.additional_messages:
                 # 7. Serialize the message
                 if self.no_serialization:
-                    x.msg = x.args
+                    if self.no_serialization == 'normalize':
+                        x.msg = self.serializer.normalize(x.args)
+                    else:
+                        x.msg = x.args
                     x.length = 1
-                    x.flag = FLAG_SUCCESS
+                    if x.flag != FLAG_EOF:
+                        x.flag = FLAG_SUCCESS
                 else:
                     if x.flag == FLAG_EOF:
                         if x.header:
@@ -2263,7 +2864,8 @@ class CommBase(tools.YggClass):
             CommMessage: Received message.
 
         """
-        no_serialization = (skip_deserialization or self.no_serialization)
+        no_serialization = (
+            True if skip_deserialization else self.no_serialization)
         if self.is_closed:
             self.debug('Comm closed')
             return CommMessage(flag=FLAG_FAILURE)
@@ -2275,13 +2877,21 @@ class CommBase(tools.YggClass):
             if not flag:
                 msg.flag = FLAG_FAILURE
                 return msg
+            if self._proxy_class.check_for_proxy_message(msg.msg):
+                return self.proxy.server_response_to_proxy_message(
+                    self.name, msg)
             if no_serialization:
-                msg.args = msg.msg
+                if no_serialization == 'normalize':
+                    msg.args = self.serializer.normalize(msg.msg)
+                else:
+                    msg.args = msg.msg
                 msg.header = {'__meta__': {}}
                 if isinstance(msg.msg, bytes):
                     msg.header['__meta__']['size'] = len(msg.msg)
             else:
                 msg.args, msg.header = self.deserialize(msg.msg)
+            if self.proxy:
+                self.proxy.parse_message(self.name, msg)
             msg.flag = FLAG_SUCCESS
             if msg.header.get('incomplete', False):
                 msg.msg = msg.args
@@ -2300,15 +2910,22 @@ class CommBase(tools.YggClass):
                            msg.header['__meta__']['size'])
                 if msg.flag in [FLAG_INCOMPLETE, FLAG_SUCCESS]:
                     msg.args = msg.msg
-                    if not (no_serialization or msg.header.get('raw', False)):
-                        msg.args, msg.header = self.deserialize(msg.msg,
-                                                                metadata=msg.header)
+                    if not msg.header.get('raw', False):
+                        if not no_serialization:
+                            msg.args, msg.header = self.deserialize(
+                                msg.msg, metadata=msg.header)
+                        elif no_serialization == 'normalize':
+                            msg.args = self.serializer.normalize(msg.msg)
                     msg.flag = FLAG_SUCCESS
                 msg.worker.linger_close()
-            if not no_serialization:
+            if (not no_serialization) or no_serialization == 'normalize':
                 self.update_message_from_serializer(msg)
         except TemporaryCommunicationError if self.is_async else NeverMatch:
             raise
+        except CloseCommunicatorError:
+            self.debug('Comm closing')
+            self.close()
+            return CommMessage(flag=FLAG_FAILURE)
         except BaseException:
             self.exception('Failed to recv.')
             self.close()
@@ -2397,11 +3014,6 @@ class CommBase(tools.YggClass):
     def recv_nolimit(self, *args, **kwargs):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
-
-    def drain_server_signon_messages(self, **kwargs):
-        r"""Drain server signon messages. This should only be used
-        for testing purposes."""
-        pass
 
     def drain_messages(self, direction=None, timeout=None, variable=None):
         r"""Sleep while waiting for messages to be drained."""

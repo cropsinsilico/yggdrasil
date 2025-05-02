@@ -1,7 +1,6 @@
 import subprocess
 import os
 import copy
-import pprint
 from contextlib import contextmanager
 from yggdrasil.components import import_component
 
@@ -61,27 +60,9 @@ class FatalCommunicationError(Exception):
     pass
 
 
-def check_env_for_address(env, name):
-    r"""Check for a channel name in a dictionary of environment variables.
-
-    Args:
-        env (dict): Environment variables to check.
-        name (str): Name of the channel to check for.
-
-    Returns:
-        str: The value stored in the environment variable for the channel.
-
-    Raises:
-        AddressError: If the channel cannot be located.
-
-    """
-    check_names = [name, name.replace(':', '__COLON__')]
-    check_names += [x.upper() for x in copy.copy(check_names)]
-    for x in check_names:
-        if x in env:
-            return env[x]
-    raise AddressError(f'Cannot see {name} in env. '
-                       f'Env:\n{pprint.pformat(env)}')
+class CloseCommunicatorError(Exception):
+    r"""Raised when something happens that closes the communicator."""
+    pass
 
 
 def import_comm(commtype=None):
@@ -95,8 +76,9 @@ def import_comm(commtype=None):
         CommBase: Associated communication class.
 
     """
-    if commtype in ['server', 'client', 'fork']:
-        commtype = '%sComm' % commtype.title()
+    if commtype in ['server', 'client', 'fork',
+                    'model_function', 'dummy']:
+        commtype = '%sComm' % commtype.title().replace('_', '')
     return import_component('comm', commtype)
 
 
@@ -135,6 +117,74 @@ def determine_suffix(no_suffix=False, reverse_names=False,
     return suffix
 
 
+def envName(name, env=None, **kwargs):
+    r"""Generate the key that would be used to store a communicator
+    address as an environment variable.
+
+    Args:
+        name (str): Communicator name.
+        env (dict, optional): Environment variables for the communicator.
+            If not provided, os.environ will be used.
+        **kwargs: Additional keyword arguments will be passed to
+            determine_suffix.
+
+    Returns:
+        str: Environment variable key.
+
+    """
+    if env is None:
+        env = os.environ
+    prefix = ''
+    suffix = determine_suffix(**kwargs)
+    model_name = env.get('YGG_MODEL_NAME', None)
+    if model_name:
+        prefix = f'{model_name}:'
+    if name.startswith(prefix):
+        prefix = ''
+    return prefix + name + suffix
+
+
+def envComm(name, **kwargs):
+    r"""Generate the key that would be used to store a communicator
+    type as an environment variable.
+
+    Args:
+        name (str): Communicator name.
+        **kwargs: Additional keyword arguments will be passed to envName.
+
+    Returns:
+        str: Environment variable key.
+
+    """
+    return envName(name, **kwargs) + '_COMM'
+
+
+def checkEnv(name, env=None):
+    r"""Check for an environment key, including aliases with colons
+    escaped.
+
+    Args:
+        name (str): Environment variable to check for.
+        env (dict, optional): Environment variables to check. If not
+            provided, os.environ will be used.
+
+    Returns:
+        str: Contents of the environment variable if it is present.
+
+    Raises:
+        KeyError: If the name is not present in any form.
+
+    """
+    if env is None:
+        env = os.environ
+    check_names = [name, name.replace(':', '__COLON__')]
+    check_names += [x.upper() for x in copy.copy(check_names)]
+    for x in check_names:
+        if x in env:
+            return env[x]
+    raise KeyError(name)
+
+
 def new_comm(name, commtype=None, use_async=False, **kwargs):
     r"""Return a new communicator, creating necessary components for
     communication (queues, sockets, channels, etc.).
@@ -166,6 +216,12 @@ def new_comm(name, commtype=None, use_async=False, **kwargs):
             commtype = 'fork'
     if (commtype is None) and kwargs.get('filetype', None):
         commtype = kwargs.pop('filetype')
+    if commtype in [None, 'default'] and kwargs.get('is_interface', False):
+        try:
+            commtype = checkEnv(envComm(name, **kwargs),
+                                env=kwargs.get('env', None))
+        except KeyError:
+            pass
     comm_cls = import_comm(commtype)
     if kwargs.get('is_interface', False):
         use_async = False
@@ -178,7 +234,8 @@ def new_comm(name, commtype=None, use_async=False, **kwargs):
         kwargs['is_async'] = True
     out = comm_cls.new_comm(name, **kwargs)
     if use_async and (out._commtype not in [None, 'client',
-                                            'server', 'fork']):
+                                            'server', 'fork',
+                                            'dummy']):
         from yggdrasil.communication.AsyncComm import AsyncComm
         out = AsyncComm(out, **async_kws)
     return out

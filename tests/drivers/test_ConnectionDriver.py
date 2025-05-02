@@ -319,12 +319,13 @@ class TestConnectionDriver(base_class):
         return before_instance_started_w
     
     @pytest.fixture
-    def after_instance_started(self, wait_on_function, recv_comm):
+    def after_instance_started(self, recv_comm, wait_on_function,
+                               drain_proxy_signon_messages):
         r"""Action taken after the instance is started, but before tests
         begin."""
         def after_instance_started_w(instance):
             wait_on_function(lambda: instance.is_valid)
-            recv_comm.drain_server_signon_messages()
+            drain_proxy_signon_messages(recv_comm)
         return after_instance_started_w
         
     def test_init_del(self, started_instance):

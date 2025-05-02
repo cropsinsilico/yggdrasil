@@ -26,10 +26,10 @@ class DedicatedFileBase(FileComm):
         return False
 
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection is open."""
         if self._stores_fd:
-            return super(DedicatedFileBase, self).is_open
+            return super(DedicatedFileBase, self)._is_open
         return bool(self._external_fd)
 
     @property

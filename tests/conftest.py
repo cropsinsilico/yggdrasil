@@ -1135,6 +1135,18 @@ def with_coverage(pytestconfig):
 
 
 @pytest.fixture(scope="session")
+def remote_model_service(remote_model_service_address):
+    r"""IntegrationServiceManager instance for remote service."""
+    from yggdrasil.services import IntegrationServiceManager
+    cli = IntegrationServiceManager(
+        service_type='flask', for_request=True,
+        address=remote_model_service_address,
+    )
+    cli.wait_for_server(timeout=600.0)
+    return cli
+
+
+@pytest.fixture(scope="session")
 def running_service(with_coverage, check_service_manager_settings,
                     project_dir, external_dir, logger):
     r"""Context manager to run and clean-up an integration service."""
@@ -1605,6 +1617,25 @@ def close_comm():
 
 
 @pytest.fixture(scope="session")
+def drain_proxy_signon_messages(wait_on_function):
+    r"""Drain signon messages."""
+    def drain_proxy_signon_messages_w(comm):
+        if not (comm.proxy and comm.direction == 'recv'
+                and comm.proxy.is_partner):
+            return
+
+        def _drain_signon():
+            if not comm.is_async:
+                flag, msg = comm.recv(timeout=0)
+                assert flag
+                assert comm.is_empty_recv(msg)
+            return comm.proxy.signons_processed
+
+        wait_on_function(_drain_signon, timeout=10.0)
+    return drain_proxy_signon_messages_w
+
+
+@pytest.fixture(scope="session")
 def count_comms(communicator_types):
     r"""Count the number of communicators in existence."""
     def count_comms_w(classes=None):
@@ -1613,6 +1644,20 @@ def count_comms(communicator_types):
             classes = communicator_types
         return sum(import_comm(k).comm_count() for k in classes)
     return count_comms_w
+
+
+@pytest.fixture(scope="session")
+def list_comms(communicator_types):
+    r"""List the name of communicators in existence."""
+    def list_comms_w(classes=None):
+        from yggdrasil.communication import import_comm
+        if classes is None:
+            classes = communicator_types
+        out = []
+        for k in classes:
+            out += import_comm(k).registered_comms()
+        return out
+    return list_comms_w
 
 
 @pytest.fixture(scope="session")
@@ -1718,16 +1763,23 @@ def verify_count_threads(wait_on_function):
 
 
 @pytest.fixture
-def verify_count_comms(wait_on_function, count_comms, communicator_types):
+def verify_count_comms(wait_on_function, count_comms, list_comms,
+                       communicator_types):
     r"""Verify that comms created during a test are cleaned up."""
     global _dont_verify_count_comms
     _dont_verify_count_comms = False
+    comms = {k: list_comms([k]) for k in communicator_types}
     ncomm = count_comms()
     yield
 
     if not _dont_verify_count_comms:
+        new_comms = {k: [x for x in list_comms([k])
+                         if x not in comms[k]]
+                     for k in communicator_types}
+
         def on_timeout():  # pragma: debug
-            comms = '\n\t'.join([f"{x}:\t{count_comms([x])}"
+            comms = '\n\t'.join([(f"{x}:\t{count_comms([x])}\t"
+                                  f"{new_comms[x]}")
                                  for x in communicator_types])
             raise AssertionError(f"{count_comms()} comms "
                                  f"in registry, but the test started with "
@@ -1975,3 +2027,9 @@ def temporary_products():
         yield products
     finally:
         products.teardown()
+
+
+@pytest.fixture(scope="session")
+def remote_model_service_address():
+    r"""str: Address of the service demo on render."""
+    return "https://model-service-demo.onrender.com/"

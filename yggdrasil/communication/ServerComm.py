@@ -25,8 +25,6 @@ class ServerComm(CommBase.CommBase):
             the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
-        direct_connection (bool, optional): If True, the comm will be
-            directly connected to a ServerComm. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the input comm.
 
     Attributes:
@@ -40,8 +38,7 @@ class ServerComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_commtype=None, response_kwargs=None,
-                 dont_open=False, is_async=False, direct_connection=False,
-                 **kwargs):
+                 dont_open=False, is_async=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         icomm_name = name
@@ -53,17 +50,14 @@ class ServerComm(CommBase.CommBase):
         icomm_kwargs.setdefault('use_async', is_async)
         if icomm_kwargs.get('use_async', False):
             icomm_kwargs.setdefault('async_recv_method', 'recv_message')
-        self.direct_connection = direct_connection
         self.response_kwargs = response_kwargs
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
         self.ocomm = OrderedDict()
         self.requests = OrderedDict()
-        self.response_kwargs.setdefault('is_interface', self.icomm.is_interface)
+        for k in ['is_interface', 'recv_timeout', 'language', 'env']:
+            self.response_kwargs.setdefault(k, getattr(self.icomm, k))
         self.response_kwargs.setdefault('commtype', self.icomm._commtype)
-        self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
-        self.response_kwargs.setdefault('language', self.icomm.language)
         self.response_kwargs.setdefault('use_async', self.icomm.is_async)
-        self.response_kwargs.setdefault('env', self.icomm.env)
         self.clients = []
         self.closed_clients = []
         self.nclients_expected = int(os.environ.get('YGG_NCLIENTS', 0))
@@ -138,6 +132,26 @@ class ServerComm(CommBase.CommBase):
         return args, kwargs
 
     @property
+    def model_comm_kwargs(self):
+        r"""dict: Parameters that should be used for initializing the
+        partner comm created by the model interface."""
+        out = super(ServerComm, self).model_comm_kwargs
+        out.update(
+            request_commtype=self.icomm._commtype,
+        )
+        return out
+
+    @property
+    def opp_commtype(self):
+        r"""str: Communicator type for opposite comm."""
+        return "client"
+
+    @property
+    def opp_address(self):
+        r"""str: Address for opposite comm."""
+        return self.icomm.opp_address
+        
+    @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
         out = super(ServerComm, self).opp_comms
@@ -158,10 +172,7 @@ class ServerComm(CommBase.CommBase):
 
         """
         kwargs = super(ServerComm, self).opp_comm_kwargs(for_yaml=for_yaml)
-        kwargs['commtype'] = "client"
-        kwargs['request_commtype'] = self.icomm._commtype
         kwargs['response_kwargs'] = self.response_kwargs
-        kwargs['direct_connection'] = self.direct_connection
         return kwargs
         
     def open(self):
@@ -177,7 +188,7 @@ class ServerComm(CommBase.CommBase):
         super(ServerComm, self).close(*args, **kwargs)
 
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection is open."""
         return self.icomm.is_open
 

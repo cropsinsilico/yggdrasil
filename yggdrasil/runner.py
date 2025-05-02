@@ -12,11 +12,12 @@ from collections import OrderedDict
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile, rapidjson
-from yggdrasil.drivers import create_driver
+from yggdrasil.drivers import create_driver, DirectConnectionDriver
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import init_mpi
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.broker import YggBroker
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -86,6 +87,9 @@ class YggFunction(YggClass):
     # def widget(self, *args, **kwargs):
     #     from ipywidgets import interact_manual
     #     return interact_manual(self.widget_function, *args, **kwargs)
+
+    def __del__(self):
+        self.stop()
         
     def __call__(self, *args, **kwargs):
         r"""Call the model as a function by sending variables.
@@ -122,14 +126,16 @@ class YggFunction(YggClass):
                         kwargs[a] = {k: kwargs[k] for k in a_kws}
                     else:  # pragma: debug
                         # TODO: Get default data from file if available
-                        raise RuntimeError(f"Required argument {a} not provided.")
+                        raise RuntimeError(f"Required argument \"{a}\" "
+                                           f"not provided.")
             # Send
             for k, v in self.inputs.items():
-                flag = v['comm'].send([kwargs[a] for a in v['vars']])
+                flag = v['comm'].send(*[kwargs[a] for a in v['vars']])
                 if not flag:  # pragma: debug
                     raise RuntimeError(f"Failed to send {k}")
             # Receive
             out = {}
+            vars_out = []
             for k, v in self.outputs.items():
                 flag, data = v['comm'].recv(timeout=60.0)
                 if not flag:  # pragma: debug
@@ -143,7 +149,10 @@ class YggFunction(YggClass):
                 else:
                     assert len(ivars) == 1
                     out[ivars[0]] = data
+                vars_out += ivars
             self.runner.pause()
+            if len(vars_out) == 1:
+                out = out[vars_out[0]]
             return out
         except BaseException as e:
             print(f"STOPPING DUE TO ERROR: {e}")
@@ -157,6 +166,8 @@ class YggFunction(YggClass):
             return
         from yggdrasil.languages.Python.YggInterface import (
             YggInput, YggOutput, YggRpcClient)
+        from yggdrasil import tools
+        self._stop_called = False
         self.runner = YggRunner(self.model_yaml, **self.runner_kwargs)
         # Start the drivers
         # TODO: Allow call directly?
@@ -171,56 +182,49 @@ class YggFunction(YggClass):
         self.inputs = {}
         self.outputs = {}
         self.argument_datatypes = {}
-        # import zmq; ctx = zmq.Context()
         self.old_environ = os.environ.copy()
-        for drv in self.model_driver['input_drivers']:
-            for env in drv['instance'].model_env.values():
-                os.environ.update(env)
-            channel_name = drv['instance'].ocomm.name
-            # var_name = drv['name'].split('function_')[-1]
-            var_name = drv['inputs'][0]['name'].split(
-                drv['inputs'][0]['partner_model'] + ':')[-1]
-            self.outputs[var_name] = drv.copy()
-            self.outputs[var_name]['comm'] = YggInput(
-                channel_name, no_suffix=True)  # context=ctx)
-            if 'vars' in drv['inputs'][0]:
-                self.outputs[var_name]['vars'] = drv['inputs'][0]['vars']
-            else:
-                self.outputs[var_name]['vars'] = [var_name]
-        for drv in self.model_driver['output_drivers']:
-            for env in drv['instance'].model_env.values():
-                os.environ.update(env)
-            channel_name = drv['instance'].icomm.name
-            var_name = drv['outputs'][0]['name'].split(
-                drv['outputs'][0]['partner_model'] + ':')[-1]
-            # var_name = drv['name'].split('function_')[-1]
-            self.inputs[var_name] = drv.copy()
-            if drv['instance']._connection_type == 'rpc_request':
-                self.inputs[var_name]['comm'] = YggRpcClient(
-                    channel_name, no_suffix=True)
+        with tools.updated_environment(self.model_driver['instance'].set_env()):
+            for drv in self.model_driver['input_drivers']:
+                channel_name = drv['instance'].ocomm_kws['name']
+                var_name = drv['instance'].icomm_kws['name'].split(
+                    ':', 1)[-1]
                 self.outputs[var_name] = drv.copy()
-                self.outputs[var_name]['comm'] = self.inputs[var_name]['comm']
-                if drv['outputs'][0].get('server_replaces', False):
-                    srv = drv['outputs'][0]['server_replaces']
-                    self.inputs[var_name]['vars'] = srv['input']['vars']
-                    self.outputs[var_name]['vars'] = srv['output']['vars']
-            else:
-                self.inputs[var_name]['comm'] = YggOutput(
+                self.outputs[var_name]['comm'] = YggInput(
                     channel_name, no_suffix=True)  # context=ctx)
-                if 'vars' in drv['outputs'][0]:
-                    self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
-                    for v in self.inputs[var_name]['vars']:
-                        if isinstance(v, dict) and 'datatype' in v:
-                            self.argument_datatypes.setdefault(
-                                v['name'], v['datatype'])
+                if 'vars' in drv['inputs'][0]:
+                    self.outputs[var_name]['vars'] = drv['inputs'][0]['vars']
                 else:
-                    self.inputs[var_name]['vars'] = [var_name]
-                    self.argument_datatypes.setdefault(
-                        var_name, drv['outputs'][0].get("datatype", {}))
+                    self.outputs[var_name]['vars'] = [var_name]
+            for drv in self.model_driver['output_drivers']:
+                channel_name = drv['instance'].icomm_kws['name']
+                var_name = drv['instance'].ocomm_kws['name'].split(
+                    ':', 1)[-1]
+                self.inputs[var_name] = drv.copy()
+                if drv['instance']._connection_type == 'rpc_request':
+                    self.inputs[var_name]['comm'] = YggRpcClient(
+                        channel_name, no_suffix=True)
+                    self.outputs[var_name] = drv.copy()
+                    self.outputs[var_name]['comm'] = self.inputs[var_name]['comm']
+                    if drv['outputs'][0].get('server_replaces', False):
+                        srv = drv['outputs'][0]['server_replaces']
+                        self.inputs[var_name]['vars'] = srv['input']['vars']
+                        self.outputs[var_name]['vars'] = srv['output']['vars']
+                else:
+                    self.inputs[var_name]['comm'] = YggOutput(
+                        channel_name, no_suffix=True)  # context=ctx)
+                    if 'vars' in drv['outputs'][0]:
+                        self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
+                        for v in self.inputs[var_name]['vars']:
+                            if isinstance(v, dict) and 'datatype' in v:
+                                self.argument_datatypes.setdefault(
+                                    v['name'], v['datatype'])
+                    else:
+                        self.inputs[var_name]['vars'] = [var_name]
+                        self.argument_datatypes.setdefault(
+                            var_name, drv['outputs'][0].get("datatype", {}))
         self.debug('inputs: %s, outputs: %s',
                    list(self.inputs.keys()),
                    list(self.outputs.keys()))
-        self._stop_called = False
         atexit.register(self.stop)
         # Ensure that vars are strings
         for k, v in chain(self.inputs.items(), self.outputs.items()):
@@ -428,6 +432,7 @@ class YggRunner(YggClass):
                         for io in x['input_drivers']:
                             for comm in io['outputs']:
                                 comm['for_service'] = True
+            self.broker = YggBroker(self.drivers)
 
     def pprint(self, *args):
         r"""Print with color."""
@@ -521,6 +526,7 @@ class YggRunner(YggClass):
             self.loadDrivers()
             times['load drivers'] = timer()
             self.startDrivers()
+            self.broker.start()
             times['start drivers'] = timer()
             self.set_signal_handler(signal_handler)
             if not self.complete_partial:
@@ -690,17 +696,25 @@ class YggRunner(YggClass):
             object: An instance of the specified driver.
 
         """
-        yml['task_method'] = self.connection_task_method
-        drv = self.create_driver(yml)
-        # Transfer connection addresses to model via env
-        # TODO: Change to server that tracks connections
-        for model, env in drv.model_env.items():
-            env_key = 'env'
-            if (model not in self.modelcopies) and (model not in self.modeldrivers):
-                env_key = 'env_%s' % model
-            for x in self.get_models(model):
-                x.setdefault(env_key, {})
-                x[env_key].update(env)
+        # TODO: Verify if this should be overridden
+        yml.setdefault('task_method', self.connection_task_method)
+        driver0 = yml['driver']
+        try:
+            yml['driver'] = 'DirectConnectionDriver'
+            drv = self.create_driver(yml)
+        except DirectConnectionDriver.DirectConnectionError:
+            yml['driver'] = driver0
+            drv = self.create_driver(yml)
+            # Transfer connection addresses to model via env
+            # TODO: Change to server that tracks connections
+            for model, env in drv.model_env.items():
+                env_key = 'env'
+                if (((model not in self.modelcopies)
+                     and (model not in self.modeldrivers))):
+                    env_key = f'env_{model}'
+                for x in self.get_models(model):
+                    x.setdefault(env_key, {})
+                    x[env_key].update(env)
         return drv
 
     def distribute_mpi(self):
@@ -844,7 +858,6 @@ class YggRunner(YggClass):
             # Create I/O drivers
             self.debug("Loading connection drivers")
             for driver in self.connectiondrivers.values():
-                driver['task_method'] = self.connection_task_method
                 self.create_connection_driver(driver)
             # Create model drivers
             self.debug("Loading model drivers")
@@ -942,6 +955,11 @@ class YggRunner(YggClass):
                                   key_suffix='.waitModels')
         while ((len(running) > 0) and (not self.error_flag)
                and (not Tout.is_out)):
+            if not self.broker.is_alive():
+                if self.broker.errors:
+                    self.error('Error on broker')
+                    self.error_flag = True
+                break
             for drv in running:
                 d = drv['instance']
                 if d.errors:  # pragma: debug
@@ -953,6 +971,8 @@ class YggRunner(YggClass):
                                % drv['name'])
                     self.error_flag = True
                     break
+                elif d.disabled:
+                    d.terminate()
                 d.join(1)
                 if not d.is_alive():
                     if not d.errors:
@@ -1034,6 +1054,7 @@ class YggRunner(YggClass):
     def pause(self):
         r"""Pause all drivers."""
         self.debug('')
+        self.broker.pause()
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].pause()
@@ -1041,6 +1062,7 @@ class YggRunner(YggClass):
     def resume(self):
         r"""Resume all paused drivers."""
         self.debug('')
+        self.broker.resume()
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].resume()
@@ -1049,6 +1071,7 @@ class YggRunner(YggClass):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         self.debug('')
         self.resume()
+        self.broker.terminate()
         for driver in self.all_drivers:
             if 'instance' in driver:
                 self.debug('Stop %s', driver['name'])
@@ -1060,6 +1083,7 @@ class YggRunner(YggClass):
     def cleanup(self):
         r"""Perform cleanup operations for all drivers."""
         self.debug('')
+        self.broker.cleanup()
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].cleanup()

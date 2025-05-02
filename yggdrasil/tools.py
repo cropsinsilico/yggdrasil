@@ -527,7 +527,7 @@ def updated_environment(env, exclusive=False):
     cache_environ()
     update_environ(env, exclusive=exclusive)
     yield
-    restored_cached_environ
+    restored_cached_environ()
 
 
 def get_numpy_c_library(allow_failure=False, libtype=None):
@@ -2327,7 +2327,7 @@ class YggClass(ComponentBase):
         t = self._timeouts[key]
         if t.is_out and t.max_time > 0:
             if quiet:
-                self.debug("Timeout for %s at %5.2f/%5.2f s" % (
+                self.verbose_debug("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
             else:
                 self.info("Timeout for %s at %5.2f/%5.2f s" % (

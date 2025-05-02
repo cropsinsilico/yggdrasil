@@ -1453,7 +1453,8 @@ class YggTask(tools.YggClass):
     
     def __init__(self, name=None, target=None, args=(), kwargs=None,
                  daemon=False, group=None, task_method='thread',
-                 context=None, with_pipe=False, env=None, **ygg_kwargs):
+                 context=None, with_pipe=False, env=None,
+                 disabled=False, **ygg_kwargs):
         if kwargs is None:
             kwargs = {}
         if (target is not None) and ('target' in self._schema_properties):
@@ -1484,6 +1485,7 @@ class YggTask(tools.YggClass):
         self.create_flag_attr('terminate_flag')
         self._calling_thread = None
         self.state = ''
+        self.disabled = disabled
         super(YggTask, self).__init__(name, **ygg_kwargs)
         if not self.as_process:
             global _thread_registry
@@ -1546,13 +1548,16 @@ class YggTask(tools.YggClass):
 
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""
+        if self.disabled:
+            self.set_started_flag()
+            self.state = 'running'
+            return
         self.state = 'starting'
         if not self.was_terminated:
             self.set_started_flag()
             self.before_start()
         with self.process_instance._multitasking_on_path():
             self.process_instance.start(*args, **kwargs)
-        # self._calling_thread = self.get_current_task()
 
     def before_start(self):
         r"""Actions to perform on the main thread/process before
@@ -1604,10 +1609,14 @@ class YggTask(tools.YggClass):
 
     def join(self, *args, **kwargs):
         r"""Join the process/thread."""
+        if self.disabled:
+            return (self.state == 'running')
         return self.process_instance.join(*args, **kwargs)
 
     def is_alive(self, *args, **kwargs):
         r"""Determine if the process/thread is alive."""
+        if self.disabled:
+            return (self.state == 'running')
         return self.process_instance.is_alive(*args, **kwargs)
 
     @property
@@ -1628,7 +1637,7 @@ class YggTask(tools.YggClass):
     @property
     def exitcode(self):
         r"""Exit code."""
-        if self.as_process:
+        if self.as_process and not self.disabled:
             out = int(self.check_flag_attr('error_flag'))
             if self.process_instance.exitcode:
                 out = self.process_instance.exitcode
@@ -1643,7 +1652,8 @@ class YggTask(tools.YggClass):
 
     def kill(self, *args, **kwargs):
         r"""Kill the process."""
-        self.process_instance.kill(*args, **kwargs)
+        if not self.disabled:
+            self.process_instance.kill(*args, **kwargs)
         return self.terminate(*args, **kwargs)
 
     def terminate(self, no_wait=False):
@@ -1665,6 +1675,8 @@ class YggTask(tools.YggClass):
                 self.debug('Driver already terminated.')
                 return
             self.set_terminated_flag()
+        if self.disabled:
+            self.state = 'finished'
         if not no_wait:
             # if self.is_alive():
             #     self.join(self.timeout)
@@ -1723,6 +1735,8 @@ class YggTask(tools.YggClass):
                 Defaults to None and is set based on the stack trace.
 
         """
+        if self.disabled:
+            return
         self.wait_on_function(lambda: not self.is_alive(),
                               timeout=timeout, key_level=1, key=key)
 
@@ -1779,6 +1793,13 @@ class YggTaskLoop(YggTask):
             self.debug("on_main_terminated")
             self.set_break_flag()
 
+    def start(self, *args, **kwargs):
+        r"""Start thread/process and print info."""
+        super(YggTaskLoop, self).start(*args, **kwargs)
+        if self.disabled:
+            self.set_loop_flag()
+            self._loop_count = 1
+
     def set_break_flag(self, value=True, break_stack=None):
         r"""Set the break flag for the thread/process to True."""
         if self.break_stack is None:
@@ -1788,6 +1809,8 @@ class YggTaskLoop(YggTask):
             self.break_stack = break_stack
         self.set_flag_attr('break_flag', value=value)
         if value:
+            if self.disabled:
+                self.state = 'finished'
             self.set_flag_attr('unpause_flag', value=True)
 
     def pause(self):

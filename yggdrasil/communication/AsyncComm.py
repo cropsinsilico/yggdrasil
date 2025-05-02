@@ -142,23 +142,18 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 comm. Defaults to False.
 
         """
+        wrapped_proxy = None
         with self._closing_thread.lock:
+            wrapped_proxy = self._wrapped.proxy
             self._wrapped.close(linger=linger)
             self._close_backlog(wait=linger)
         with self.backlog_thread.lock:
             self._closed = True
         # Requeue messages for other servers
-        if ((self.is_server and (self.model_copies > 1)
-             and self._backlog_buffer)):  # pragma: debug
-            # client_kws = self.opp_comm_kwargs
-            # client_kws.update(use_async=False)
-            # client = get_comm(self.name + '_client', **client_kws)
-            # for msg in self._backlog_buffer:
-            #     self.info("Resending: %s", msg)
-            #     client.send(msg[0])
-            # client.close()
-            raise RuntimeError("Returning backlogged messages to the server "
-                               "is untested.")
+        if ((wrapped_proxy and self.direction == 'recv'
+             and self._backlog_buffer)):
+            wrapped_proxy.requeue_messages(self._backlog_buffer)
+            self._backlog_buffer.clear()
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread."""
@@ -172,7 +167,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             self._wrapped._close_backlog(wait=wait)
 
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the backlog is open."""
         if self.direction == 'send':
             return self._wrapped.is_open and self.is_open_backlog

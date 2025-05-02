@@ -175,12 +175,13 @@ def ipcrm_queues(queue_keys=None, by_id=False):
         logger.warn("IPC not installed. ipcrm cannot be run.")
 
 
-class IPCServer(CommBase.CommServer):
-    r"""IPC server object for cleaning up server queue."""
+class IPCProxy(CommBase.CommProxy):
+    r"""IPC proxy object for cleaning up server queue."""
 
     def terminate(self, *args, **kwargs):
+        # TODO: Verify this works for server-side proxy
         IPCComm.unregister_comm(self.srv_address)
-        super(IPCServer, self).terminate(*args, **kwargs)
+        super(IPCProxy, self).terminate(*args, **kwargs)
 
 
 class IPCComm(CommBase.CommBase):
@@ -207,7 +208,7 @@ class IPCComm(CommBase.CommBase):
     def _init_before_open(self, **kwargs):
         r"""Initialize empty queue and server class."""
         self.q = None
-        self._server_class = IPCServer
+        self._server_class = IPCProxy
         super(IPCComm, self)._init_before_open(**kwargs)
             
     @classmethod
@@ -273,7 +274,7 @@ class IPCComm(CommBase.CommBase):
         super(IPCComm, self).atexit()
         
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the queue is not None."""
         if self.q is None:
             return False

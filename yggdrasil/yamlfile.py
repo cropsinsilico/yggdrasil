@@ -557,7 +557,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
                     break
             else:
                 raise YAMLSpecificationError(
-                    "Server '%s' does not have any clients.", k)
+                    f"Server '{k}' does not have any clients.")
         elif v.get('client_of', False):
             for s in v['client_of']:
                 missing_servers = []
@@ -683,7 +683,8 @@ def complete_partial_integration(existing, name, partial_commtype=None):
         for i in miss[io1]:
             dummy_channel = f"{name}:dummy_{i.replace(':', '-')}"
             dummy_comm = copy.deepcopy(existing[io1][i])
-            for k in ['address', 'for_service', 'commtype', 'host']:
+            for k in ['address', 'for_service', 'commtype', 'host',
+                      'transform', 'filter', 'datatype']:
                 dummy_comm.pop(k, None)
             dummy_comm['name'] = dummy_channel
             if partial_commtype is not None:

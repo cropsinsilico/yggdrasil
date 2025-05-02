@@ -10,7 +10,6 @@ class ValueComm(CommBase):
     no_serialization = True
 
     def __init__(self, *args, **kwargs):
-        self._is_open = False
         super(ValueComm, self).__init__(*args, **kwargs)
         assert self.direction == 'recv'
         self.remaining = self.count
@@ -38,18 +37,13 @@ class ValueComm(CommBase):
     def open(self):
         r"""Open the connection."""
         super(ValueComm, self).open()
-        self._is_open = True
+        self._openned = True
 
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
-        self._is_open = False
+        self._openned = False
         super(ValueComm, self)._close()
 
-    @property
-    def is_open(self):
-        r"""bool: True if the connection is open."""
-        return self._is_open
-    
     @property
     def n_msg_recv(self):
         r"""int: The number of incoming messages in the connection."""

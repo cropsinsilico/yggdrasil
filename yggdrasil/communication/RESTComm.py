@@ -76,25 +76,16 @@ class RESTComm(CommBase.CommBase):
         'port': {'type': 'int'}}
     _maxMsgSize = 2048  # Based on limit for GET requests on most servers
 
-    def __init__(self, *args, **kwargs):
-        self._is_open = False
-        super(RESTComm, self).__init__(*args, **kwargs)
-
     def atexit(self):  # pragma: debug
         r"""Close operations."""
         if self.direction == 'send':
             self.linger()
         super(RESTComm, self).atexit()
         
-    @property
-    def is_open(self):
-        r"""bool: True if the connection is open."""
-        return self._is_open
-    
     def open(self, *args, **kwargs):
         r"""Open the connection."""
         super(RESTComm, self).open(*args, **kwargs)
-        self._is_open = True
+        self._openned = True
 
     def bind(self, *args, **kwargs):
         r"""Bind to address based on information provided."""
@@ -118,21 +109,12 @@ class RESTComm(CommBase.CommBase):
             self.address = f'{host}{client_id}/{model}/{name}'
         return super(RESTComm, self).bind(*args, **kwargs)
 
-    def opp_comm_kwargs(self, for_yaml=False):
-        r"""Get keyword arguments to initialize communication with opposite
-        comm object.
-
-        Args:
-            for_yaml (bool, optional): If True, the returned dict will only
-                contain values that can be specified in a YAML file. Defaults
-                to False.
-
-        Returns:
-            dict: Keyword arguments for opposite comm object.
-
-        """
+    @property
+    def model_comm_kwargs(self):
+        r"""dict: Parameters that should be used for initializing the
+        partner comm created by the model interface."""
         from yggdrasil.services import _service_host_env
-        out = super(RESTComm, self).opp_comm_kwargs(for_yaml=for_yaml)
+        out = super(RESTComm, self).model_comm_kwargs
         if _service_host_env in os.environ:
             out['host'] = os.environ[_service_host_env]
             out['address'] = out['address'].replace(self.host.rstrip('/'),
@@ -140,10 +122,10 @@ class RESTComm(CommBase.CommBase):
         else:
             out['host'] = self.host
         return out
-
+        
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
-        self._is_open = False
+        self._openned = False
         if self.address != 'address':
             r = requests.get(
                 self.address + '/remove',

@@ -1,5 +1,6 @@
 import copy
 import numpy as np
+import pandas as pd
 from yggdrasil import rapidjson
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 
@@ -85,6 +86,12 @@ class MapTransform(TransformBase):
         elif isinstance(x, np.ndarray):
             field_names = list(x.dtype.names)
             out = {k: x[k] for k in field_names}
+        elif isinstance(x, pd.DataFrame):
+            field_names = list(x.columns)
+            if len(x) == 1:
+                out = {k: x[k].iloc[0] for k in field_names}
+            else:
+                out = {k: x[k].to_numpy() for k in field_names}
         elif isinstance(x, (rapidjson.geometry.Ply,
                             rapidjson.geometry.ObjWavefront)):
             out = x.as_dict()

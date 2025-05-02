@@ -15,6 +15,10 @@ class TaskThreadError(RuntimeError):
     pass
 
 
+class ConnectionError(RuntimeError):
+    pass
+
+
 def run_remotely(method):
     r"""Decorator for methods that should be run remotely."""
     @functools.wraps(method)
@@ -159,6 +163,9 @@ class ConnectionDriver(Driver):
         onexit (str, optional): Class method that should be called when a
             model that the connection interacts with exits, but before the
             connection driver is shut down. Defaults to None.
+        no_direct_connection (bool, optional): If True, the connection
+            will not be converted to a direct connection, even if that
+            is possible.
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -259,7 +266,7 @@ class ConnectionDriver(Driver):
         'icomm', 'ocomm']
 
     def __init__(self, name, single_use=False, onexit=None,
-                 models=None, **kwargs):
+                 models=None, no_direct_connection=False, **kwargs):
         # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
@@ -283,6 +290,7 @@ class ConnectionDriver(Driver):
             self.transform = []
         elif not isinstance(self.transform, list):
             self.transform = [self.transform]
+        self._raw_transform = copy.deepcopy(self.transform)
         for i, t in enumerate(self.transform):
             if isinstance(t, dict):
                 self.transform[i] = create_component('transform', **t)
@@ -291,28 +299,18 @@ class ConnectionDriver(Driver):
         if (onexit is not None) and (not hasattr(self, onexit)):
             raise ValueError("onexit '%s' is not a class method." % onexit)
         self.onexit = onexit
+        self.no_direct_connection = no_direct_connection
         # Add comms and print debug info
-        self._init_comms(name, **kwargs)
         self.models = models
-        if self.models is None:
-            self.models = {'input': list(self.icomm.model_env.keys()),
-                           'output': list(self.ocomm.model_env.keys())}
         self.models_recvd = {}
-        # self.debug('    env: %s', str(self.env))
-        self.debug(('\n' + 80 * '=' + '\n'
-                    + 'class = %s\n'
-                    + '    input: name = %s, address = %s, models=%s\n'
-                    + '    output: name = %s, address = %s, models=%s\n'
-                    + (80 * '=')), self.__class__,
-                   self.icomm.name, self.icomm.address, self.models['input'],
-                   self.ocomm.name, self.ocomm.address, self.models['output'])
+        self._init_comms(name, **kwargs)
 
     def _init_single_comm(self, io, comm_list):
         r"""Parse keyword arguments for input/output comm."""
-        self.debug("Creating %s comm", io)
+        self.debug(f"Creating {io} comm")
         comm_kws = dict()
         assert isinstance(comm_list, list)
-        assert comm_list
+        # assert comm_list
         if io == 'input':
             direction = 'recv'
             attr_comm = 'icomm'
@@ -363,7 +361,7 @@ class ConnectionDriver(Driver):
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
 
-    def _init_comms(self, name, **kwargs):
+    def _init_comms(self, name, models=None, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
         self._init_single_comm('input', self.inputs)
         try:
@@ -377,6 +375,17 @@ class ConnectionDriver(Driver):
             kwargs.setdefault('timeout_send_1st', 60)
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
+        if self.models is None:
+            self.models = {'input': list(self.icomm.model_env.keys()),
+                           'output': list(self.ocomm.model_env.keys())}
+        # self.debug('    env: %s', str(self.env))
+        self.debug(('\n' + 80 * '=' + '\n'
+                    + 'class = %s\n'
+                    + '    input: name = %s, address = %s, models=%s\n'
+                    + '    output: name = %s, address = %s, models=%s\n'
+                    + (80 * '=')), self.__class__,
+                   self.icomm.name, self.icomm.address, self.models['input'],
+                   self.ocomm.name, self.ocomm.address, self.models['output'])
 
     def __setstate__(self, state):
         super(ConnectionDriver, self).__setstate__(state)
@@ -558,7 +567,7 @@ class ConnectionDriver(Driver):
 
     def start(self):
         r"""Open connection before running."""
-        if not self.as_process:
+        if not (self.as_process or self.disabled):
             self.open_comm()
             Tout = self.start_timeout()
             while (not self.is_comm_open) and (not Tout.is_out):
@@ -568,7 +577,7 @@ class ConnectionDriver(Driver):
                 raise Exception("Connection never finished opening.")
         super(ConnectionDriver, self).start()
         self.debug('Started connection process')
-        if self.as_process:
+        if self.as_process and not self.disabled:
             self.wait_flag_attr('loop_flag', timeout=120.0)
             self.icomm.disconnect()
             self.ocomm.disconnect()
@@ -637,6 +646,8 @@ class ConnectionDriver(Driver):
                 off; False otherwise.
 
         """
+        if self.disabled:
+            return True
         if not self.remove_model(direction, name):
             self.debug("%s models remain: %s",
                        direction, self.models[direction])

@@ -135,16 +135,16 @@ def check_rmq_server(url=None, **kwargs):
     return out
 
 
-class RMQServer(CommBase.CommServer):
+class RMQProxy(CommBase.CommProxy):
     r"""RMQ server object for cleaning up server connections."""
 
     def __init__(self, *args, **kwargs):
         self.comm_cls = kwargs.get('comm_cls', RMQComm)
-        super(RMQServer, self).__init__(*args, **kwargs)
+        super(RMQProxy, self).__init__(*args, **kwargs)
 
     def terminate(self, *args, **kwargs):
         self.comm_cls.unregister_comm(self.srv_address)
-        super(RMQServer, self).terminate(*args, **kwargs)
+        super(RMQProxy, self).terminate(*args, **kwargs)
 
 
 class RMQComm(CommBase.CommBase):
@@ -182,6 +182,7 @@ class RMQComm(CommBase.CommBase):
                         + ['_opening', '_closing'])
     _deprecated_drivers = ['RMQInputDriver', 'RMQOutputDriver',
                            'InputDriver', 'OutputDriver']
+    _proxy_class = RMQProxy
     
     def _init_before_open(self, **kwargs):
         r"""Set null connection and channel."""
@@ -191,8 +192,7 @@ class RMQComm(CommBase.CommBase):
         self.channel = None
         self._opening = multitasking.ProcessEvent()
         self._closing = multitasking.ProcessEvent()
-        self._server_class = RMQServer
-        self._server_kwargs = {'comm_cls': self.__class__}
+        self.proxy_kwargs.update(comm_cls=self.__class__)
         super(RMQComm, self)._init_before_open(**kwargs)
 
     @property
@@ -255,22 +255,6 @@ class RMQComm(CommBase.CommBase):
                 queue=queue)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
-
-    def opp_comm_kwargs(self, for_yaml=False):
-        r"""Get keyword arguments to initialize communication with opposite
-        comm object.
-
-        Args:
-            for_yaml (bool, optional): If True, the returned dict will only
-                contain values that can be specified in a YAML file. Defaults
-                to False.
-
-        Returns:
-            dict: Keyword arguments for opposite comm object.
-
-        """
-        kwargs = super(RMQComm, self).opp_comm_kwargs(for_yaml=for_yaml)
-        return kwargs
 
     def bind(self):
         r"""Declare queue to get random new queue."""
@@ -366,7 +350,7 @@ class RMQComm(CommBase.CommBase):
         super(RMQComm, self).atexit()
         
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection and channel are open."""
         with self.rmq_lock:
             if self.channel is None or self.connection is None:

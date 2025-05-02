@@ -166,7 +166,7 @@ class MPIComm(CommBase.CommBase):
         self.requires_disconnect = False
         self.last_request = None
         self.mpi_comm = MPI.COMM_WORLD
-        self._is_open = False
+        self._openned = False
         self.response_tags = []
         self.eof_recv = {}
         kwargs['no_suffix'] = True
@@ -328,7 +328,7 @@ class MPIComm(CommBase.CommBase):
         r"""Open the queue."""
         super(MPIComm, self).open()
         if not self.is_open:
-            self._is_open = True
+            self._openned = True
             assert self.mpi_comm.Get_rank() not in self.ranks
             
     def _close(self, linger=False):
@@ -357,9 +357,9 @@ class MPIComm(CommBase.CommBase):
             self.requests = complete_requests
 
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the queue is not None."""
-        return (self.mpi_comm is not None) and self._is_open
+        return (self.mpi_comm is not None) and self._openned
         
     def confirm_send(self, noblock=False):
         r"""Confirm that sent message was received."""

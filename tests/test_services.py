@@ -4,7 +4,7 @@ import pytest
 import itertools
 import shutil
 from yggdrasil.services import (
-    IntegrationServiceManager, ServerError, validate_model_submission)
+    ServerError, validate_model_submission)
 from yggdrasil.examples import yamls as ex_yamls
 from yggdrasil import runner, import_as_function
 
@@ -16,7 +16,8 @@ def _make_ids(ids):
 @pytest.mark.remote_service
 @pytest.mark.language('c')
 @pytest.mark.language('c++')
-def test_call_integration_remote():
+def test_call_integration_remote(remote_model_service_address,
+                                 remote_model_service):
     r"""Test with remote integration service."""
     name = 'photosynthesis'
     test_yml = ex_yamls['fakeplant']['python']
@@ -26,30 +27,24 @@ def test_call_integration_remote():
     yamls.remove(test_yml)
     yamls.remove(copy_yml)
     yamls.append(remote_yml)
-    # address = 'https://model-service-demo.herokuapp.com/'
-    # address = "https://model-service-demo.fly.dev/"
-    address = "https://model-service-demo.onrender.com/"
-    service_type = 'flask'
-    cli = IntegrationServiceManager(service_type=service_type,
-                                    for_request=True,
-                                    address=address)
-    cli.wait_for_server(timeout=600.0)
-    if not cli.is_running:  # pragma: debug
+    if not remote_model_service.is_running:  # pragma: debug
         pytest.skip("Web service app is not running.")
     try:
         shutil.copy(copy_yml, remote_yml)
         with open(remote_yml, 'a') as fd:
-            fd.write('\n'.join(['service:',
-                                f'    name: {name}',
-                                f'    type: {service_type}',
-                                f'    address: {address}']))
+            fd.write('\n'.join([
+                'service:',
+                f'    name: {name}',
+                '    type: flask',
+                f'    address: {remote_model_service_address}'
+            ]))
         r = runner.get_runner(yamls)
         r.run()
         assert not r.error_flag
     finally:
         if os.path.isfile(remote_yml):
             os.remove(remote_yml)
-        cli.send_request(name, action='stop')
+        remote_model_service.send_request(name, action='stop')
 
 
 class TestServices(object):

@@ -240,6 +240,42 @@ class ForkComm(CommBase.CommBase):
                 out[k].update(v)
         return out
 
+    def model_partner_comm(self, model=None):
+        r"""Return the communicator that is partnered with a specific
+        model.
+
+        Args:
+            model (str, optional): Model name. If not provided, a
+                dictionary will be returned with all partner models as
+                keys and the corresponding communicators as values.
+
+        Returns:
+            CommBase: Model communicator.
+
+        Raises:
+            CommError: If there is not a communicator partnered with the
+                named model.
+
+        """
+        if self.partner_model:
+            return super(ForkComm, self).model_partner_comm(model)
+        if model is None:
+            out = {}
+            for x in self.comm_list:
+                iout = x.model_partner_comm()
+                for k, v in iout.items():
+                    out.setdefault(k, [])
+                    out[k] += v
+            return out
+        for x in self.comm_list:
+            try:
+                return x.model_partner_comm(model)
+            except CommBase.CommError:
+                continue
+        raise CommBase.CommError(
+            f"Could not locate communicator partnered with "
+            f"model \"{model}\" within ForkComm")
+
     # @property
     # def mpi_model_kws(self):
     #     r"""dict: Mapping between model name and opposite comm keyword
@@ -254,6 +290,17 @@ class ForkComm(CommBase.CommBase):
     #     return out
 
     @property
+    def model_comm_kwargs(self):
+        r"""dict: Parameters that should be used for initializing the
+        partner comm created by the model interface."""
+        out = super(ForkComm, self).model_comm_kwargs
+        out['commtype'] = [x.model_comm_kwargs for x in self.comm_list]
+        opp_pattern = self.opp_pattern
+        if opp_pattern:
+            out['pattern'] = opp_pattern
+        return out
+
+    @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
         out = super(ForkComm, self).opp_comms
@@ -261,6 +308,13 @@ class ForkComm(CommBase.CommBase):
         for x in self.comm_list:
             out.update(**x.opp_comms)
         return out
+
+    @property
+    def opp_pattern(self):
+        r"""str: Pattern to use for the opposite comm."""
+        for pair in _pattern_pairs:
+            if self.pattern in pair:
+                return pair[(pair.index(self.pattern) + 1) % 2]
 
     def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
@@ -276,11 +330,9 @@ class ForkComm(CommBase.CommBase):
 
         """
         kwargs = super(ForkComm, self).opp_comm_kwargs(for_yaml=for_yaml)
+        kwargs['commtype'] = self.opp_commtype
         kwargs['comm_list'] = [x.opp_comm_kwargs(for_yaml=for_yaml)
                                for x in self.comm_list]
-        for pair in _pattern_pairs:
-            if self.pattern in pair:
-                kwargs['pattern'] = pair[(pair.index(self.pattern) + 1) % 2]
         return kwargs
 
     @property
@@ -309,7 +361,7 @@ class ForkComm(CommBase.CommBase):
         raise Exception("ForkComm should not be closed in thread.")
 
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection is open."""
         for x in self.comm_list:
             if x.is_open:

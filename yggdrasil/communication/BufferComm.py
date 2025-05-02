@@ -116,7 +116,7 @@ class BufferComm(CommBase.CommBase):
             self.address._closed.clear()
         
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection is open."""
         return (not self.address.closed)
         

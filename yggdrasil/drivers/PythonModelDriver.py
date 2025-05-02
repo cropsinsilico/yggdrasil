@@ -236,6 +236,69 @@ class PythonModelDriver(InterpretedModelDriver):
         return super(PythonModelDriver, self).run_validation()
 
     @classmethod
+    def can_call_function(cls, func_language):
+        r"""Check if a model written in this language can call a function
+        written in another.
+
+        Args:
+            func_language (Str): Language that the function is written in.
+
+        Returns:
+            bool: True if a function in func_language can be called,
+                False otherwise.
+
+        """
+        return hasattr(cls, f'import_{func_language}')
+
+    @classmethod
+    def import_function(cls, language, library, name):
+        r"""Import a function from another language.
+
+        Args:
+            language (str): Language that the function is written in.
+            library (str): Library or script containing name.
+            name (str): Function name.
+
+        Returns:
+            object: The function.
+
+        """
+        return getattr(cls, f'import_{language}')(library, name)
+
+    @classmethod
+    def import_python(cls, library, name):
+        r"""Import a Python function.
+
+        Args:
+            library (str): Library or script containing name.
+            name (str): Function name.
+
+        Returns:
+            object: The function.
+
+        """
+        if os.path.isfile(library):
+            library = os.path.splitext(os.path.basename(library))[0]
+        lib = importlib.import_module(library)
+        return getattr(lib, name)
+
+    @classmethod
+    def import_R(cls, library, name):
+        r"""Import an R function.
+
+        Args:
+            library (str): Library or script containing name.
+            name (str): Function name.
+
+        Returns:
+            object: The function.
+
+        """
+        # TODO: Generalize this using components
+        from yggdrasil.drivers.RModelDriver import RFunctionWrapper
+        return RFunctionWrapper(library, name)
+        
+    @classmethod
     def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
@@ -254,3 +317,37 @@ class PythonModelDriver(InterpretedModelDriver):
                        'requests', 'pyyaml']
         out['kwargs']['interpreter'] = sys.executable
         return out
+
+
+class FunctionWrapperBase(object):
+    r"""Base class for wrapping functions in other languages.
+
+    Args:
+        library (str): Library or script containing name.
+        name (str): Function name.
+
+    """
+
+    language = None
+
+    def __init__(self, library, name):
+        self.library = library
+        self.name = name
+        self.function = self.load_function(self.library, self.name)
+
+    def __call__(self, *args, **kwargs):
+        return self.function(*args, **kwargs)
+
+    @classmethod
+    def load_function(cls, library, name):
+        r"""Load the function for the class.
+
+        Args:
+            library (str): Library or script containing name.
+            name (str): Function name.
+
+        Returns:
+            object: The function.
+
+        """
+        raise NotImplementedError(cls.language)

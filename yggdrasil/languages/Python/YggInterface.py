@@ -1,15 +1,9 @@
-import os
-from yggdrasil import tools, constants
-from yggdrasil.communication.DefaultComm import DefaultComm
+from yggdrasil import tools, constants, broker
 
 
 YGG_MSG_MAX = tools.get_YGG_MSG_MAX()
 YGG_MSG_EOF = constants.YGG_MSG_EOF
 YGG_MSG_BUF = constants.YGG_MSG_BUF
-YGG_SERVER_INPUT = os.environ.get('YGG_SERVER_INPUT', False)
-YGG_SERVER_OUTPUT = os.environ.get('YGG_SERVER_OUTPUT', False)
-YGG_MODEL_NAME = os.environ.get('YGG_MODEL_NAME', False)
-_global_scope_comms = {}
 
 
 def maxMsgSize():
@@ -61,31 +55,18 @@ def YggInit(_type, args=None, kwargs=None):
     return obj
 
 
-def InterfaceComm(name, comm_class=None, global_scope=False, **kwargs):
-    r"""Short hand for initializing a default comm for use as an interface.
+def InterfaceComm(name, **kwargs):
+    r"""Short hand for initializing a default comm for use as an
+    interface.
 
     Args:
         name (str): The name of the message queue.
-        comm_class (CommBase, optional): Communication class that should be
-            used. Defaults to DefaultComm if not provided.
-        global_scope (bool, optional): If True, the comm will be checked
-            for in the global scope before creating a new one. Defaults to
-            False.
-        **kwargs: Additional keyword arguments are passed to DefaultComm.
+        **kwargs: Additional keyword arguments are passed to
+            broker.YggBroker.model_comm.
 
     """
-    global _global_scope_comms
-    if global_scope and (name in _global_scope_comms):
-        return _global_scope_comms[name]
-    if comm_class is None:
-        comm_class = DefaultComm
-    kwargs.update(is_interface=True)
-    if 'language' not in kwargs:
-        kwargs['language'] = tools.get_subprocess_language()
-    out = comm_class(name, **kwargs)
-    if global_scope:
-        _global_scope_comms[name] = out
-    return out
+    return broker.YggBroker.model_comm(name, kwargs.pop('direction'),
+                                       **kwargs)
 
 
 def YggInput(name, format_str=None, **kwargs):
@@ -104,11 +85,6 @@ def YggInput(name, format_str=None, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if ((YGG_SERVER_INPUT
-         and ((name == YGG_SERVER_INPUT)
-              or (('%s:%s' % (YGG_MODEL_NAME, name)) == YGG_SERVER_INPUT)))):
-        return YggRpcServer(YGG_MODEL_NAME, infmt=format_str,
-                            outfmt=None, global_scope=True)
     if format_str is not None:
         kwargs['format_str'] = format_str
     kwargs.update(direction='recv', recv_timeout=False)
@@ -131,11 +107,6 @@ def YggOutput(name, format_str=None, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if ((YGG_SERVER_OUTPUT
-         and ((name == YGG_SERVER_OUTPUT)
-              or (('%s:%s' % (YGG_MODEL_NAME, name)) == YGG_SERVER_OUTPUT)))):
-        return YggRpcServer(YGG_MODEL_NAME, outfmt=format_str,
-                            infmt=None, global_scope=True)
     if format_str is not None:
         kwargs['format_str'] = format_str
     kwargs.update(direction='send')
@@ -157,15 +128,18 @@ def YggRpcServer(name, infmt=None, outfmt=None, **kwargs):
         :class:.ServerComm: Communication object.
         
     """
-    from yggdrasil.communication import ServerComm
     icomm_kwargs = {}
     ocomm_kwargs = {}
     if infmt is not None:
         icomm_kwargs['format_str'] = infmt
     if outfmt is not None:
         ocomm_kwargs['format_str'] = outfmt
-    kwargs.update(icomm_kwargs, comm_class=ServerComm.ServerComm,
-                  response_kwargs=ocomm_kwargs)
+    kwargs.update(
+        icomm_kwargs,
+        commtype='server',
+        direction='recv',
+        response_kwargs=ocomm_kwargs,
+    )
     kwargs.setdefault('recv_timeout', False)
     return InterfaceComm(name, **kwargs)
 
@@ -186,15 +160,18 @@ def YggRpcClient(name, outfmt=None, infmt=None, **kwargs):
         :class:.ClientComm: Communication object.
         
     """
-    from yggdrasil.communication import ClientComm
     icomm_kwargs = {}
     ocomm_kwargs = {}
     if infmt is not None:
         icomm_kwargs['format_str'] = infmt
     if outfmt is not None:
         ocomm_kwargs['format_str'] = outfmt
-    kwargs.update(ocomm_kwargs, comm_class=ClientComm.ClientComm,
-                  response_kwargs=icomm_kwargs)
+    kwargs.update(
+        ocomm_kwargs,
+        commtype='client',
+        direction='send',
+        response_kwargs=icomm_kwargs,
+    )
     kwargs.setdefault('recv_timeout', False)
     return InterfaceComm(name, **kwargs)
 
@@ -212,8 +189,10 @@ def YggTimesyncServer(name='timesync', **kwargs):
         :class:.ServerComm: Communication object.
         
     """
-    from yggdrasil.communication import ServerComm
-    kwargs['comm_class'] = ServerComm.ServerComm
+    kwargs.update(
+        commtype='server',
+        direction='recv',
+    )
     kwargs.setdefault('recv_timeout', False)
     return InterfaceComm(name, **kwargs)
     
@@ -230,8 +209,10 @@ def YggTimesync(name='timesync', **kwargs):
         :class:.ClientComm: Communication object.
         
     """
-    from yggdrasil.communication import ClientComm
-    kwargs['comm_class'] = ClientComm.ClientComm
+    kwargs.update(
+        commtype='client',
+        direction='send',
+    )
     kwargs.setdefault('recv_timeout', False)
     return InterfaceComm(name, **kwargs)
 
@@ -338,8 +319,6 @@ def YggAsciiArrayOutput(name, fmt=None, **kwargs):
         DefaultComm: Communication object.
         
     """
-    if 'language' not in kwargs:
-        kwargs['language'] = tools.get_subprocess_language()
     kwargs.update(as_array=True, send_converter='table')
     return YggAsciiTableOutput(name, fmt, **kwargs)
 

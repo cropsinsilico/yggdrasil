@@ -722,7 +722,7 @@ class FileComm(CommBase.CommBase):
         pass
 
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection is open."""
         try:
             return (self.fd is not None) and (not self.fd.closed)

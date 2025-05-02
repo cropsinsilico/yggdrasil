@@ -513,6 +513,7 @@ definitions:
     - $ref: '#/definitions/connection-subtype-base'
     - anyOf:
       - $ref: '#/definitions/connection-subtype-connection'
+      - $ref: '#/definitions/connection-subtype-direct'
       - $ref: '#/definitions/connection-subtype-file_input'
       - $ref: '#/definitions/connection-subtype-file_output'
       - $ref: '#/definitions/connection-subtype-input'
@@ -536,6 +537,7 @@ definitions:
         description: Connection between one or more comms/files and one or more comms/files.
         enum:
         - connection
+        - direct
         - file_input
         - file_output
         - input
@@ -548,6 +550,7 @@ definitions:
         description: '[DEPRECATED] Name of driver class that should be used.'
         enum:
         - ConnectionDriver
+        - DirectConnectionDriver
         - FileInputDriver
         - FileOutputDriver
         - InputDriver
@@ -716,6 +719,24 @@ definitions:
         - ConnectionDriver
         type: string
     title: yggdrasil.drivers.ConnectionDriver.ConnectionDriver
+    type: object
+  connection-subtype-direct:
+    additionalProperties: true
+    description: Schema for connection component ['direct'] subtype.
+    properties:
+      connection_type:
+        default: direct
+        description: Connection between one or more comms/files and one or more comms/files.
+        enum:
+        - direct
+        type: string
+      driver:
+        deprecated: true
+        description: '[DEPRECATED] Name of driver class that should be used.'
+        enum:
+        - DirectConnectionDriver
+        type: string
+    title: yggdrasil.drivers.DirectConnectionDriver.DirectConnectionDriver
     type: object
   connection-subtype-file_input:
     additionalProperties: true

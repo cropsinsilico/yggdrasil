@@ -7,7 +7,8 @@ import warnings
 from collections import OrderedDict
 from yggdrasil import serialize, platform, constants
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
+from yggdrasil.drivers.PythonModelDriver import (
+    PythonModelDriver, FunctionWrapperBase)
 from yggdrasil.drivers.CModelDriver import CModelDriver
 from yggdrasil.languages.R import install
 if platform._numpy2:
@@ -584,3 +585,62 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                  pd.DataFrame.from_dict({'a': np.zeros(5, dtype='int32')}))],
             invalid_libraries=['invalid_unicorn'])
         return out
+
+
+class RFunctionWrapper(FunctionWrapperBase):
+    r"""Class for wrapping R functions."""
+
+    language = 'R'
+
+    def __init__(self, *args, **kwargs):
+        self.converter = self.create_converter()
+        super(RFunctionWrapper, self).__init__(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        with self.converter.context():
+            out = super(RFunctionWrapper, self).__call__(*args, **kwargs)
+        return out
+
+    @classmethod
+    def _py2rpy_dict(cls, x):
+        from rpy2.rinterface import StrSexpVector, ListSexpVector
+        out = ListSexpVector(x.values())
+        out.names = StrSexpVector(x.keys())
+        return out
+
+    @classmethod
+    def create_converter(cls):
+        r"""Create a rpy2 converter."""
+        import rpy2.robjects as robjects
+        from rpy2.robjects import default_converter, pandas2ri
+        converter = robjects.conversion.Converter('RFunctionWrapper')
+        converter.py2rpy.register(dict, cls._py2rpy_dict)
+        converter += default_converter
+        converter += pandas2ri.converter
+        return converter
+
+    @classmethod
+    def load_function(cls, library, name):
+        r"""Load the function for the class.
+
+        Args:
+            library (str): Library or script containing name.
+            name (str): Function name.
+
+        Returns:
+            object: The function.
+
+        """
+        func = None
+        if os.path.isfile(library):
+            import rpy2.robjects as robjects
+            r = robjects.r
+            r['source'](library)
+            func = robjects.globalenv[name]
+        else:
+            from rpy2.robjects.packages import importr
+            lib = importr(library)
+            func = getattr(lib, name)
+        return func
+        
+    

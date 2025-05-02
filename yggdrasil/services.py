@@ -928,6 +928,8 @@ def create_service_manager_class(service_type=None):
                 dict: Output from model call.
 
             """
+            if self.for_request:
+                return self.send_request(request, model=model)
             if model not in self.functions:
                 reg = self.registry.registry.get(model, None)
                 if reg is None:

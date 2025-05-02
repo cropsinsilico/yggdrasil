@@ -100,13 +100,13 @@ class BaseComm(TestComponentBase):
         return x
 
     def create_recv_comm(self, name, commtype, send_comm, testing_options,
-                         **kwargs):
+                         drain_proxy_signon_messages, **kwargs):
         r"""Create a receive communicator."""
         kws = self.get_recv_comm_kwargs(commtype, send_comm,
                                         testing_options, **kwargs)
         x = get_comm(name, **kws)
         assert x.is_open
-        x.drain_server_signon_messages()
+        drain_proxy_signon_messages(x)
         return x
 
     @pytest.fixture(scope="class")
@@ -212,11 +212,13 @@ class BaseComm(TestComponentBase):
 
     @pytest.fixture(scope="class")
     def global_recv_comm(self, global_name, commtype, global_send_comm,
-                         sleep_after_connect, testing_options, close_comm):
+                         sleep_after_connect, testing_options, close_comm,
+                         drain_proxy_signon_messages):
         r"""Communicator for receiving messages."""
         recv_comm = self.create_recv_comm(global_name, commtype,
                                           global_send_comm,
-                                          testing_options)
+                                          testing_options,
+                                          drain_proxy_signon_messages)
         if sleep_after_connect:
             recv_comm.sleep(sleep_after_connect)
         yield recv_comm
@@ -240,10 +242,12 @@ class BaseComm(TestComponentBase):
 
     @pytest.fixture
     def recv_comm(self, name, commtype, send_comm, testing_options,
-                  sleep_after_connect, close_comm):
+                  sleep_after_connect, close_comm,
+                  drain_proxy_signon_messages):
         r"""Communicator for receiving messages."""
         recv_comm = self.create_recv_comm(name, commtype, send_comm,
-                                          testing_options)
+                                          testing_options,
+                                          drain_proxy_signon_messages)
         if sleep_after_connect:
             recv_comm.sleep(sleep_after_connect)
         yield recv_comm

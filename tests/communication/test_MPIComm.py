@@ -136,7 +136,8 @@ class TestMPIComm(base_class):
 
     @pytest.fixture
     def local_comm(self, mpi_rank, root_comm, rank_comm, sync,
-                   alt_sleep_after_connect, use_async):
+                   alt_sleep_after_connect, use_async,
+                   drain_proxy_signon_messages):
         r"""Communicator for the current MPI process."""
         if mpi_rank == 0:
             x = root_comm
@@ -144,9 +145,9 @@ class TestMPIComm(base_class):
             x = rank_comm
         if alt_sleep_after_connect:  # pragma: testing
             x.sleep()
-        assert(x.is_open)
+        assert x.is_open
         if x.direction == 'recv':
-            x.drain_server_signon_messages()
+            drain_proxy_signon_messages(x)
         sync(x)
         yield x
         # Even up send/recv calls since the same comm will be used for
@@ -180,12 +181,12 @@ class TestMPIComm(base_class):
         after close returns false."""
         local_comm.open()
         local_comm.close()
-        assert(local_comm.is_closed)
+        assert local_comm.is_closed
         if local_comm.direction == 'send':
             flag = local_comm.send(testing_options['msg'])
         elif local_comm.direction == 'recv':
             flag, msg_recv = local_comm.recv()
-        assert(not flag)
+        assert not flag
 
     def test_send_after_close(self, use_async, local_comm, testing_options,
                               sync):
@@ -199,7 +200,7 @@ class TestMPIComm(base_class):
         sync(local_comm)
         if local_comm.direction == 'send':
             flag = local_comm.send(testing_options['msg'])
-            assert(flag)
+            assert flag
 
     # def test_work_comm(self, local_comm, testing_options, uuid, timeout):
     #     r"""Test creating/removing a work comm."""
@@ -219,10 +220,10 @@ class TestMPIComm(base_class):
     #     wc_recv = local_comm.create_work_comm(**recv_kwargs)
     #     # wc_recv = local_comm.get_work_comm(header_recv)
     #     flag = wc_send.send(testing_options['msg'])
-    #     assert(flag)
+    #     assert flag
     #     flag, msg_recv = wc_recv.recv(timeout)
-    #     assert(flag)
-    #     assert(msg_recv == testing_options['msg'])
+    #     assert flag
+    #     assert msg_recv == testing_options['msg']
     #     # Assert errors on second attempt
     #     # with pytest.raises(RuntimeError):
     #     #     wc_send.send(testing_options['msg'])
@@ -240,7 +241,7 @@ class TestMPIComm(base_class):
         r"""Factory for method to perform send/recv checks for comms."""
 
         def do_send(send_comm, send_params):
-            assert(send_comm.n_msg_send == send_params.get('n_init', 0))
+            assert send_comm.n_msg_send == send_params.get('n_init', 0)
             send_params.setdefault('count', 1)
             if 'eof' not in send_params.get('method', 'send'):
                 send_params['count'] *= len(send_comm.ranks)
@@ -250,23 +251,23 @@ class TestMPIComm(base_class):
             for _ in range(send_params.get('count', 1)):
                 flag = getattr(send_comm, send_params.get('method', 'send'))(
                     *send_params['args'], **send_params.get('kwargs', {}))
-                assert(flag == send_params.get('flag', True))
+                assert flag == send_params.get('flag', True)
             if not send_params.get('skip_wait', False):
                 wait_on_function(
                     lambda: send_comm.is_closed or (send_comm.n_msg_send == 0))
             send_comm.printStatus(level='debug')
             if 'eof' not in send_params.get('method', 'send'):
                 send_comm.wait_for_confirm(timeout=timeout)
-                assert(send_comm.is_confirmed)
+                assert send_comm.is_confirmed
                 send_comm.confirm(noblock=True)
-            assert(send_comm.n_msg_send == 0)
+            assert send_comm.n_msg_send == 0
             sync(send_comm)
             
         def do_recv(recv_comm, recv_params):
             if (((not recv_comm.is_eof(recv_params['message']))
                  and (recv_params['message'] != b''))):
                 recv_params['count'] *= len(recv_comm.ranks)
-            assert(recv_comm.n_msg_recv == recv_params.get('n_init', 0))
+            assert recv_comm.n_msg_recv == recv_params.get('n_init', 0)
             sync(recv_comm)
             logger.debug(f"expecting {recv_params.get('count', 1)} "
                          f"copies of {recv_params['message']!s:.100}")
@@ -278,14 +279,14 @@ class TestMPIComm(base_class):
                 flag, msg = getattr(
                     recv_comm, recv_params.get('method', 'recv'))(
                         **recv_params.get('kwargs', {'timeout': 0.1}))
-                assert(flag == recv_params.get('flag', True))
-                assert(msg == nested_approx(recv_params['message']))
+                assert flag == recv_params.get('flag', True)
+                assert msg == nested_approx(recv_params['message'])
             recv_comm.printStatus()
             if not recv_comm.is_eof(recv_params['message']):
                 recv_comm.wait_for_confirm(timeout=timeout)
-                assert(recv_comm.is_confirmed)
+                assert recv_comm.is_confirmed
                 recv_comm.confirm(noblock=True)
-            assert(recv_comm.n_msg_recv == 0)
+            assert recv_comm.n_msg_recv == 0
             sync(recv_comm)
 
         def wrapped(send_comm, recv_comm, message=None,
@@ -324,13 +325,13 @@ class TestMPIComm(base_class):
     def test_cleanup_comms(self, local_comm):
         r"""Test cleanup_comms for comm class."""
         local_comm.cleanup_comms()
-        assert(len(local_comm.comm_registry()) == 0)
+        assert len(local_comm.comm_registry()) == 0
 
     def test_drain_messages(self, local_comm, timeout):
         r"""Test waiting for messages to drain."""
         local_comm.drain_messages(timeout=timeout)
-        assert(getattr(local_comm,
-                       'n_msg_%s_drain' % local_comm.direction) == 0)
+        assert (getattr(local_comm,
+                        'n_msg_%s_drain' % local_comm.direction) == 0)
         with pytest.raises(ValueError):
             local_comm.drain_messages(variable='n_msg_invalid')
 
@@ -338,8 +339,8 @@ class TestMPIComm(base_class):
         r"""Test recieve when there is no waiting message."""
         if local_comm.direction == 'recv':
             flag, msg_recv = local_comm.recv(timeout=polling_interval)
-            assert(flag)
-            assert(not msg_recv)
+            assert flag
+            assert not msg_recv
         else:
             local_comm.sleep()
 
@@ -362,7 +363,7 @@ class TestMPIComm(base_class):
 
             def fcond(x):
                 try:
-                    assert(x == msg_filter_recv)
+                    assert x == msg_filter_recv
                     return False
                 except BaseException:
                     return True
@@ -381,45 +382,45 @@ class TestMPIComm(base_class):
 
         if local_comm.direction == 'send':
             for _ in range(len(local_comm.ranks)):
-                assert(local_comm.send(testing_options['msg']))
+                assert local_comm.send(testing_options['msg'])
         else:
             for _ in range(len(local_comm.ranks)):
                 msg = local_comm.recv(
                     timeout=60.0, skip_deserialization=True,
                     return_message_object=True,
                     after_finalize_message=[dummy])
-                assert(msg.finalized)
-                assert(local_comm.finalize_message(msg) == msg)
+                assert msg.finalized
+                assert local_comm.finalize_message(msg) == msg
                 msg.finalized = False
-                assert(local_comm.is_empty_recv(msg.args))
+                assert local_comm.is_empty_recv(msg.args)
                 msg = local_comm.finalize_message(msg)
-                assert(msg.flag == CommBase.FLAG_EMPTY)
+                assert msg.flag == CommBase.FLAG_EMPTY
 
     def test_purge(self, use_async, local_comm, testing_options,
                    wait_on_function, n_msg_expected, sync):
         r"""Test purging messages from the comm."""
-        assert(local_comm.n_msg == 0)
+        assert local_comm.n_msg == 0
         if local_comm.direction == 'send':
             if local_comm.is_async:
-                assert(local_comm.n_msg_direct == 0)
+                assert local_comm.n_msg_direct == 0
             sync(local_comm)
             for _ in range(len(local_comm.ranks)):
                 flag = local_comm.send(testing_options['msg'])
-            assert(flag)
+            assert flag
             # local_comm.purge()
-            # assert(local_comm.n_msg == 0)
+            # assert local_comm.n_msg == 0
             wait_on_function(lambda: local_comm.n_msg == 0)
             if use_async:
                 local_comm._wrapped.wait_for_confirm()
             # sync(local_comm)
         else:
             if local_comm.is_async:
-                assert(local_comm.n_msg_direct == 0)
+                assert local_comm.n_msg_direct == 0
             sync(local_comm)
             wait_on_function(lambda: local_comm.n_msg == n_msg_expected)
-            assert(local_comm.n_msg > 0)
+            assert local_comm.n_msg > 0
             local_comm.purge()
-            assert(local_comm.n_msg == 0)
+            assert local_comm.n_msg == 0
             # Purge recv while closed
             local_comm.close()
             local_comm.purge()

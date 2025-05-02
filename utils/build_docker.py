@@ -735,6 +735,15 @@ class LoadedServiceBuilder(ServiceBuilder):
         super(LoadedServiceBuilder, self).__init__(args, **kwargs)
 
     @property
+    def repo(self):
+        r"""str: DockerHub repository that the image should be pushed
+        to."""
+        if self._repo is None:
+            return self.base.repo.replace(
+                'yggdrasil-service', f'yggdrasil-{self._name}')
+        return super(LoadedServiceBuilder, self).repo
+
+    @property
     def tag(self):
         r"""str: Image tag."""
         out = super(LoadedServiceBuilder, self).tag

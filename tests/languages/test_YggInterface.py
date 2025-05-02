@@ -2,39 +2,101 @@ import pytest
 import os
 import numpy as np
 import copy
+import contextlib
 from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
-from yggdrasil import constants
-from yggdrasil.tools import get_YGG_MSG_MAX, is_lang_installed
+from yggdrasil import constants, broker
+from yggdrasil.tools import (
+    get_YGG_MSG_MAX, is_lang_installed, updated_environment)
 from yggdrasil.components import import_component
-from yggdrasil.drivers import ConnectionDriver
 from tests import TestClassBase as base_class
 
 
 YGG_MSG_MAX = get_YGG_MSG_MAX()
 
 
-class ModelEnv(object):
-    
-    def __init__(self, language=None, **new_kw):
-        new_kw['YGG_SUBPROCESS'] = 'True'
-        if language is not None:
-            new_kw['YGG_MODEL_LANGUAGE'] = language
-        # Send environment keyword to fake language
-        self.old_kw = {}
-        for k, v in new_kw.items():
-            self.old_kw[k] = os.environ.get(k, None)
-            os.environ[k] = v
-            
-    def __enter__(self):
-        return None
+@pytest.fixture(scope='session')
+def temporary_broker(autouse=True):
+    r"""Broker for simulating models to test interfaces."""
+    tmp = broker.YggBroker()
+    tmp.start()
+    yield tmp
+    tmp.terminate()
 
-    def __exit__(self, type, value, traceback):
-        for k, v in self.old_kw.items():
-            if v is None:
-                del os.environ[k]
-            else:  # pragma: no cover
-                os.environ[k] = v
+
+@pytest.fixture
+def temporary_model(temporary_broker):
+    r"""Context that creates a temporary model driver for interface
+    testing."""
+
+    @contextlib.contextmanager
+    def _temporary_model(name, language='python', env=None):
+        if env is None:
+            env = {}
+        env.update(
+            YGG_SUBPROCESS='True',
+            YGG_MODEL_NAME=name,
+            YGG_MODEL_LANGUAGE=language,
+        )
+        yml = {
+            'name': name,
+            'language': language,
+            'args': ['dummy'],
+            'disabled': True,
+        }
+        drv = temporary_broker.add_model(yml)
+        try:
+            with updated_environment(env):
+                temporary_broker.get_client(name)
+                yield drv
+        finally:
+            temporary_broker.remove_client(name)
+            temporary_broker.remove_model(name)
+
+    return _temporary_model
+
+
+@pytest.fixture
+def temporary_connection(temporary_broker):
+    r"""Context that create a temporary connection to simulate I/O for
+    interface testing."""
+
+    @contextlib.contextmanager
+    def _temporary_connection(name=None, inputs=None, outputs=None,
+                              modelA='model1', modelB='model2',
+                              languageA='python', languageB='python',
+                              connection_type='connection', **kwargs):
+        if name is None:
+            name = f'{modelA}_to_{modelB}'
+        if inputs is None:
+            inputs = [
+                {'partner_model': modelA,
+                 'partner_language': languageA,
+                 'allow_multiple_comms': True}
+            ]
+        if outputs is None:
+            outputs = [
+                {'partner_model': modelB,
+                 'partner_language': languageB,
+                 'allow_multiple_comms': True}
+            ]
+        yml = {
+            'name': name,
+            'inputs': inputs,
+            'outputs': outputs,
+            'no_direct_connection': True,
+            'connection_type': connection_type,
+        }
+        yml.update(**kwargs)
+        drv = temporary_broker.add_connection(yml)
+        try:
+            assert (temporary_broker.was_started
+                    and temporary_broker.is_alive())
+            yield drv
+        finally:
+            temporary_broker.remove_connection(name)
+
+    return _temporary_connection
 
 
 def test_maxMsgSize():
@@ -60,42 +122,27 @@ def test_init():
         YggInterface.YggOutput('error')
 
 
-def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)],
-                 input_interface='YggInput', output_interface='YggOutput'):
-    r"""Function to perform simple send/receive between two comms using a
-    language interface that calls the Python interface.
-    
-    Args:
-        language (str, optional): Language that should be mimicked for the
-            interface test. Defaults to 'python'.
-        fmt (str, optional): Format string to use for the test. Defaults to
-            '%f\\n%d'.
-        msg (object, optional): Message object that should be used for the
-            test. Defaults to [float(1.0), int(2)].
-        input_interface (str, optional): Name of the interface function/class
-            that should be used for the test. Defaults to 'YggInput'.
-        output_interface (str, optional): Name of the interface function/class
-            that should be used for the test. Defaults to 'YggOutput'.
-
-    """
-    name = 'test_%s' % language
-    # Set converter based on language driver
+@pytest.mark.parametrize("language", ['python', 'matlab', 'R'])
+@pytest.mark.parametrize("input_interface,output_interface", [
+    ('YggInput', 'YggOutput'),
+    ('CisInput', 'PsiOutput'),
+])
+def test_YggInit_language(temporary_connection,
+                          temporary_model, language,
+                          input_interface, output_interface):
+    r"""Test access to YggInit via languages that call the Python interface."""
+    fmt = '%f\\n%d'
+    msg = [float(1.0), np.int32(2)]
+    if not is_lang_installed(language):
+        pytest.skip(f'{language} not installed')
+    name = f'test_{language}'
     ldrv = import_component('model', language)
     converter = ldrv.python2language
-    # Create and start drivers to transport messages
-    iodrv = ConnectionDriver.ConnectionDriver(
-        name,
-        inputs=[{'partner_model': 'model1', 'allow_multiple_comms': True}],
-        outputs=[{'partner_model': 'model2', 'allow_multiple_comms': True}])
-    iodrv.start()
-    os.environ.update(iodrv.icomm.opp_comms)
-    os.environ.update(iodrv.ocomm.opp_comms)
-    # Connect and utilize interface under disguise as target language
-    try:
-        with ModelEnv(language=language, YGG_THREADING='True'):
+    with temporary_connection(name, modelA=name, modelB=name):
+        with temporary_model(name, language=language,
+                             env={'YGG_THREADING': 'True'}):
             # Ensure start-up by waiting for signon message
             i = YggInterface.YggInit(input_interface, (name, fmt))
-            i.drain_server_signon_messages()
             # Output
             o = YggInterface.YggInit(output_interface, (name, fmt))
             o.send(*msg)
@@ -104,22 +151,6 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)]
             # Input
             assert i.recv() == (True, converter(msg))
             assert i.recv() == (False, converter(constants.YGG_MSG_EOF))
-    finally:
-        iodrv.terminate()
-
-
-def test_YggInit_language():
-    r"""Test access to YggInit via languages that call the Python interface."""
-    for language in ['matlab', 'R']:
-        if not is_lang_installed(language):
-            continue
-        do_send_recv(language=language)
-
-
-def test_YggInit_backwards():
-    r"""Check access to old class names for backwards compat."""
-    do_send_recv(input_interface='CisInput',
-                 output_interface='PsiOutput')
 
 
 def test_YggInit_variables():
@@ -152,7 +183,8 @@ class TestYggClass(base_class):
         r"""Name of class that will be tested."""
         return request.param
 
-    @pytest.fixture(scope="class", autouse=True, params=[None, 'matlab'])
+    @pytest.fixture(scope="class", autouse=True,
+                    params=['python', 'matlab'])
     def interface_language(self, request, filecomm, direction):
         r"""str: Language being tested."""
         if ((request.param and filecomm
@@ -244,34 +276,45 @@ class TestYggClass(base_class):
             return import_component('file', filecomm)
 
     @pytest.fixture(scope="class")
-    def iodriver_class(self, direction, filecomm):
-        r"""class: Input/output driver class."""
+    def connection_type(self, direction, filecomm):
+        r"""str: Connection type."""
         if filecomm:
-            return import_component('connection', 'file_' + direction)
-        return ConnectionDriver.ConnectionDriver
-        
+            return 'file_' + direction
+        return 'connection'
+
     @pytest.fixture
-    def iodriver_args(self, testing_options, name, model1, model2,
-                      filecomm, filename, direction):
-        r"""list: Connection driver arguments."""
-        args = [name]
-        kwargs = {'inputs': [{'partner_model': model1}],
-                  'outputs': [{'partner_model': model2}]}
+    def connection_inputs(self, testing_options, model1, filecomm,
+                          direction):
+        r"""list: Connection inputs."""
+        if filecomm and direction == 'input':
+            filecomm_kwargs = copy.deepcopy(testing_options['kwargs'])
+            filecomm_kwargs['filetype'] = filecomm
+            return [filecomm_kwargs]
+        return [{'partner_model': model1}]
+
+    @pytest.fixture
+    def connection_outputs(self, testing_options, model2, filecomm,
+                           direction):
+        r"""list: Connection outputs."""
+        if filecomm and direction == 'output':
+            filecomm_kwargs = copy.deepcopy(testing_options['kwargs'])
+            filecomm_kwargs['filetype'] = filecomm
+            return [filecomm_kwargs]
+        return [{'partner_model': model2}]
+
+    @pytest.fixture
+    def connection_kwargs(self, name, connection_inputs,
+                          connection_outputs, filecomm, filename,
+                          connection_type):
+        out = {
+            'name': name,
+            'inputs': connection_inputs,
+            'outputs': connection_outputs,
+            'connection_type': connection_type,
+        }
         if filecomm:
-            args += [filename]
-            if (direction == 'output'):
-                filecomm_kwargs = copy.deepcopy(testing_options['kwargs'])
-                filecomm_kwargs['filetype'] = filecomm
-                return ([name, filename],
-                        {'inputs': kwargs['inputs'],
-                         'outputs': [filecomm_kwargs]})
-            elif (direction == 'input'):
-                filecomm_kwargs = copy.deepcopy(testing_options['kwargs'])
-                filecomm_kwargs['filetype'] = filecomm
-                return ([name, filename],
-                        {'inputs': [filecomm_kwargs],
-                         'outputs': kwargs['outputs']})
-        return (args, kwargs)
+            out['args'] = filename
+        return out
 
     @pytest.fixture(scope="class", autouse=True)
     def options(self, class_name):
@@ -303,19 +346,11 @@ class TestYggClass(base_class):
                 os.remove(filename)
 
     @pytest.fixture(autouse=True)
-    def iodriver(self, input_file, iodriver_class, iodriver_args,
+    def iodriver(self, temporary_connection, connection_kwargs,
                  verify_count_threads, verify_count_comms,
                  verify_count_fds):
-        iodriver = iodriver_class(*iodriver_args[0], **iodriver_args[1])
-        iodriver.start()
-        iodriver.wait_for_loop()
-        try:
-            yield iodriver
-        finally:
-            iodriver.terminate()
-            iodriver.cleanup()
-            iodriver.disconnect()
-            del iodriver
+        with temporary_connection(**connection_kwargs) as drv:
+            yield drv
 
     @pytest.fixture(autouse=True)
     def test_comm(self, iodriver, direction, filecomm, test_comm_kwargs,
@@ -338,22 +373,33 @@ class TestYggClass(base_class):
                 close_comm(test_comm)
 
     @pytest.fixture
-    def model_env(self, direction, iodriver, model1, model2):
+    def model_name(self, direction, model1, model2):
+        r"""str: Model name."""
+        if direction == 'input':
+            return model2
+        else:
+            assert direction == 'output'
+            return model1
+
+    @pytest.fixture
+    def model_env(self, direction):
         r"""Environment variables that should be set for interface."""
         out = {}
-        if direction == 'input':
-            out.update(iodriver.ocomm.opp_comms,
-                       YGG_MODEL_NAME=model2)
-        elif direction == 'output':
-            out.update(iodriver.icomm.opp_comms,
-                       YGG_MODEL_NAME=model1)
+        # if direction == 'input':
+        #     out.update(iodriver.ocomm.opp_comms,
+        #                YGG_MODEL_NAME=model_name)
+        # elif direction == 'output':
+        #     out.update(iodriver.icomm.opp_comms,
+        #                YGG_MODEL_NAME=model_name)
         return out
 
     @pytest.fixture
-    def instance(self, python_class, instance_args, instance_kwargs,
-                 interface_language, model_env, close_comm):
+    def instance(self, iodriver, python_class, instance_args,
+                 instance_kwargs, interface_language, temporary_model,
+                 model_name, model_env, close_comm):
         r"""New instance of the python class for testing."""
-        with ModelEnv(language=interface_language, **model_env):
+        with temporary_model(model_name, language=interface_language,
+                             env=model_env):
             out = python_class(*instance_args, **instance_kwargs)
             yield out
             out.is_interface = False
@@ -452,39 +498,38 @@ class TestYggRpcClient(TestYggClass):
         return out
     
     @pytest.fixture(autouse=True)
-    def drain_signon(self, class_name, instance, test_comm):
+    def drain_signon(self, class_name, instance, test_comm,
+                     drain_proxy_signon_messages):
         r"""Drain server signon messages."""
         if class_name == 'YggRpcClient':
-            test_comm.drain_server_signon_messages()
+            server = test_comm
         else:
-            instance.drain_server_signon_messages()
+            server = instance
+        drain_proxy_signon_messages(server)
         
     @pytest.fixture(scope="class")
-    def iodriver_class(self):
-        r"""class: Input/output driver class."""
-        return import_component('connection', 'rpc_request')
+    def connection_type(self, direction, filecomm):
+        r"""str: Connection type."""
+        return "rpc_request"
 
     @pytest.fixture
-    def iodriver_args(self, testing_options, name, model1, model2,
-                      filecomm, filename):
-        r"""list: Connection driver arguments."""
-        args = [name]
-        kwargs = {'inputs': [{'partner_model': model1,
-                              'name': f"{model1}:{name}_{model1}"}],
-                  'outputs': [{'partner_model': model2}]}
-        return (args, kwargs)
+    def connection_inputs(self, testing_options, model1, filecomm,
+                          name, direction):
+        return [{'partner_model': model1,
+                 'name': f"{model1}:{name}_{model1}"}]
 
     @pytest.fixture
-    def model_env(self, direction, iodriver, model1, model2):
+    def model_env(self, direction):
         r"""Environment variables that should be set for interface."""
         out = {}
         if direction == 'input':  # YggRpcServer
-            out.update(iodriver.ocomm.opp_comms,
-                       YGG_MODEL_NAME=model2,
-                       YGG_NCLIENTS='1')
-        elif direction == 'output':
-            out.update(iodriver.icomm.opp_comms,
-                       YGG_MODEL_NAME=model1)
+            out['YGG_NCLIENTS'] = '1'
+        #     out.update(iodriver.ocomm.opp_comms,
+        #                YGG_MODEL_NAME=model_name,
+        #                YGG_NCLIENTS='1')
+        # elif direction == 'output':
+        #     out.update(iodriver.icomm.opp_comms,
+        #                YGG_MODEL_NAME=model_name)
         return out
 
     def test_msg(self, filecomm, testing_options, instance, timeout,

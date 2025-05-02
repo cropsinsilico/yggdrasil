@@ -8,7 +8,7 @@ class RPCRequestDriver(ConnectionDriver):
     r"""Class for handling client side RPC type communication.
 
     Args:
-        model_request_name (str): The name of the channel used by the client
+        name (str): The name of the channel used by the client
             model to send requests.
         **kwargs: Additional keyword arguments are passed to parent class.
 
@@ -19,14 +19,14 @@ class RPCRequestDriver(ConnectionDriver):
 
     _connection_type = 'rpc_request'
 
-    def __init__(self, model_request_name, response_kwargs=None, **kwargs):
+    def __init__(self, name, response_kwargs=None, **kwargs):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
-        # inputs[0]['name'] = model_request_name + '.client_model_request'
+        # inputs[0]['name'] = name + '.client_model_request'
         kwargs['inputs'] = inputs
         # Output communicator
         outputs = kwargs.get('outputs', [{}])
-        # outputs[0]['name'] = model_request_name + '.server_model_request'
+        # outputs[0]['name'] = name + '.server_model_request'
         outputs[0]['is_client'] = True
         outputs[0]['close_on_eof_send'] = False
         kwargs['outputs'] = outputs
@@ -34,7 +34,7 @@ class RPCRequestDriver(ConnectionDriver):
             response_kwargs = {}
         self.response_kwargs = response_kwargs
         # Parent and attributes
-        super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
+        super(RPCRequestDriver, self).__init__(name, **kwargs)
         self.response_drivers = {}
         self._block_response = False
 

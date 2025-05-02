@@ -210,9 +210,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
         super(RMQComm.RMQComm, self).atexit()
         
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection and channel are open."""
-        return (super(RMQAsyncComm, self).is_open
+        return (super(RMQAsyncComm, self)._is_open
                 or self._reconnecting.is_running())
 
     @property

@@ -13,8 +13,6 @@ class ClientComm(CommBase.CommBase):
             the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
-        direct_connection (bool, optional): If True, the comm will be
-            directly connected to a ServerComm. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the output comm.
 
     Attributes:
@@ -30,8 +28,7 @@ class ClientComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_commtype=None, response_kwargs=None,
-                 dont_open=False, is_async=False, direct_connection=False,
-                 **kwargs):
+                 dont_open=False, is_async=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         ocomm_name = name
@@ -40,9 +37,8 @@ class ClientComm(CommBase.CommBase):
         ocomm_kwargs['dont_open'] = True
         ocomm_kwargs['commtype'] = request_commtype
         ocomm_kwargs.setdefault('use_async', is_async)
-        if direct_connection:
+        if kwargs.get('direct_connection', False):
             ocomm_kwargs.setdefault('is_client', True)
-        self.direct_connection = direct_connection
         self.response_kwargs = response_kwargs
         self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
         self.icomm = None
@@ -126,6 +122,21 @@ class ClientComm(CommBase.CommBase):
         return args, kwargs
 
     @property
+    def model_comm_kwargs(self):
+        r"""dict: Parameters that should be used for initializing the
+        partner comm created by the model interface."""
+        out = super(ClientComm, self).model_comm_kwargs
+        out.update(
+            request_commtype=self.ocomm._commtype,
+        )
+        return out
+
+    @property
+    def opp_commtype(self):
+        r"""str: Communicator type for opposite comm."""
+        return "server"
+
+    @property
     def opp_address(self):
         r"""str: Address for opposite comm."""
         return self.ocomm.opp_address
@@ -151,10 +162,7 @@ class ClientComm(CommBase.CommBase):
 
         """
         kwargs = super(ClientComm, self).opp_comm_kwargs(for_yaml=for_yaml)
-        kwargs['commtype'] = "server"
-        kwargs['request_commtype'] = self.ocomm._commtype
         kwargs['response_kwargs'] = self.response_kwargs
-        kwargs['direct_connection'] = self.direct_connection
         return kwargs
         
     def open(self):
@@ -170,7 +178,7 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).close(*args, **kwargs)
 
     @property
-    def is_open(self):
+    def _is_open(self):
         r"""bool: True if the connection is open."""
         return self.ocomm.is_open
 

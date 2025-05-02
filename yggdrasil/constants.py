@@ -167,6 +167,7 @@ COMPONENT_REGISTRY = {
         'module': 'yggdrasil.drivers',
         'subtype_modules': {
             'connection': 'ConnectionDriver',
+            'direct': 'DirectConnectionDriver',
             'file_input': 'FileInputDriver',
             'file_output': 'FileOutputDriver',
             'input': 'InputDriver',
@@ -176,6 +177,7 @@ COMPONENT_REGISTRY = {
         },
         'subtypes': {
             'connection': 'ConnectionDriver',
+            'direct': 'DirectConnectionDriver',
             'file_input': 'FileInputDriver',
             'file_output': 'FileOutputDriver',
             'input': 'InputDriver',

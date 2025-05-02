@@ -808,6 +808,7 @@ class ModelDriver(Driver):
                  'FILELOCKS': 5,
                  'LOCKFILE': 6,
                  'UNLOCKFILE': 7}
+    _can_call_languages = []
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  preparsed_function=None, outputs_in_inputs=None,
@@ -859,13 +860,14 @@ class ModelDriver(Driver):
         for k in self.env_copy:
             if k in os.environ:
                 self.env[k] = os.environ[k]
-        if not self.is_installed():
+        if not (self.is_installed() or self.disabled):
             raise RuntimeError(f"{self.language} is not installed")
         self.raw_model_file = None
         self.model_function_file = None
         self.model_function_info = None
         self.model_function_inputs = None
         self.model_function_outputs = None
+        self.model_function_called_direct = False
         self.model_file = None
         self.model_args = []
         self.model_dir = None
@@ -1241,6 +1243,10 @@ class ModelDriver(Driver):
         self.model_function_inputs = self.preparsed_function['inputs']
         self.model_function_outputs = self.preparsed_function['outputs']
         self.model_outputs_in_inputs = self.preparsed_function['outputs_in_inputs']
+        self.model_function_called_direct = self.preparsed_function[
+            'model_function_called_direct']
+        if self.model_function_called_direct:
+            return self.model_function_file
         model_dir, model_base = os.path.split(self.model_function_file)
         model_base = os.path.splitext(model_base)[0]
         wrapper_fname = os.path.join(
@@ -1497,6 +1503,8 @@ class ModelDriver(Driver):
             **kwargs: Keyword arguments are passed to run_executable.
 
         """
+        if self.model_function_called_direct:
+            return
         env = self.set_env()
         if command is None:
             command = self.model_command()
@@ -2740,6 +2748,8 @@ class ModelDriver(Driver):
             'copies': yml.get('copies', 1),
             'iter_function_over': yml.get('iter_function_over', []),
             'skip_update_io': True}
+        yml['preparsed_function']['model_function_called_direct'] = (
+            cls.check_called_direct(yml))
         return yml['preparsed_function']
     
     @classmethod
@@ -4802,6 +4812,94 @@ class ModelDriver(Driver):
                                           cls.function_param.get(
                                               'block_end', '')))
         return out
+
+    @classmethod
+    def check_called_direct(cls, yml):
+        r"""Check if a model can be called directly.
+
+        Args:
+            yml (dict): Model yaml.
+
+        Returns:
+            bool: True if the model can be called directly, False
+                otherwise.
+
+        """
+        if (((not yml.get('function', False))
+             or yml.get('iter_function_over', False)
+             or len(yml['input_drivers']) > 1
+             or len(yml['output_drivers']) > 1
+             or any(io.get('transform', False) for io in
+                    yml['input_drivers'])
+             or any(io.get('transform', False) for io in
+                    yml['output_drivers']))):
+            return False
+        src_models = []
+        src_languages = []
+        dst_models = []
+        dst_languages = []
+        # TODO: Check for files?
+        # TODO: Composite if inputs/outputs split between multiple
+        #   models
+        for io in yml['input_drivers']:
+            src_models += io['src_models']
+            src_languages += [x['partner_language'] for x in io['inputs']]
+        for io in yml['output_drivers']:
+            dst_models += io['dst_models']
+            dst_languages += [x['partner_language'] for x in io['outputs']]
+        src_models = set(src_models)
+        dst_models = set(dst_models)
+        src_languages = set(src_languages)
+        dst_languages = set(dst_languages)
+        if len(src_models) > 1 or src_models != dst_models:
+            return
+        # src_model = list(src_models)[0]
+        src_language = list(src_languages)[0]
+        dst_language = cls._language
+        src_drv = import_component('model', src_language)
+        out = src_drv.can_call_function(dst_language)
+        if not out:
+            return out
+        model_file = yml['preparsed_function']['model_file']['model_file']
+        address = f"{dst_language}::{model_file}::{yml['function']}"
+        yml['disabled'] = True
+        # Version that allows generic handling of direct connections
+        for io in yml['input_drivers']:
+            for x in io['outputs']:
+                x.update(
+                    commtype='model_function',
+                    address=address,
+                    language=dst_language,
+                )
+        for io in yml['output_drivers']:
+            for x in io['inputs']:
+                x.update(
+                    commtype='model_function',
+                    address=address,
+                    language=dst_language,
+                )
+        return out
+
+    @classmethod
+    def can_call_function(cls, func_language):
+        r"""Check if a model written in this language can call a function
+        written in another.
+
+        Args:
+            func_language (Str): Language that the function is written in.
+
+        Returns:
+            bool: True if a function in func_language can be called,
+                False otherwise.
+
+        """
+        if not cls.base_languages:
+            return (func_language in cls._can_call_languages)
+        for x in cls.base_languages:
+            if not import_component('model', x).can_call_function(
+                    func_language):
+                return False
+        return True
 
     @classmethod
     def get_testing_options(cls, **kwargs):
