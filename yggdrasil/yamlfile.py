@@ -126,7 +126,7 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
     reponame = splitpath[2]
     # the full path is the file name and location
     # turn the file path into an os based format
-    if directory_for_clones is not None:
+    if directory_for_clones:
         repository_dir = os.path.join(directory_for_clones, owner,
                                       reponame)
     if repository_dir is None:

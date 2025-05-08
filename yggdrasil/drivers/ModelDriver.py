@@ -2946,7 +2946,8 @@ class ModelDriver(Driver):
                             inputs=[], outputs=[], model_flag=None,
                             outputs_in_inputs=None, verbose=False, copies=1,
                             iter_function_over=[], verbose_model=False,
-                            skip_update_io=False, model_name=None):
+                            skip_update_io=False, model_name=None,
+                            model_function_called_direct=False):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -2980,6 +2981,8 @@ class ModelDriver(Driver):
                 be added after every line in the model. Defaults to False.
             model_name (str, optional): Name given to the model. Defaults to
                 None.
+            model_function_called_direct (bool, optional): If True, the
+                model can be called directly from its partner model.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary

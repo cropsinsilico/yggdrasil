@@ -530,7 +530,7 @@ class integration_service_manager(SubCommand):
                     help='Register an integration with the service manager.',
                     arguments=[
                         (('integration-name', ),
-                         {'type': str,
+                         {'type': str, 'nargs': '?',
                           'help': ('The name that the integration should be '
                                    'registered under, the path to a YAML '
                                    'file containing a list of one or more '
@@ -549,6 +549,17 @@ class integration_service_manager(SubCommand):
                         (('--dont-validate', ),
                          {'action': 'store_true', 'default': False,
                           'help': ('Don\'t validate the integration YAML')}),
+                        (('--skip-model', ),
+                         {'action': 'append', 'dest': 'skip_models',
+                          'help': ('One or more models that should not '
+                                   'be registered')}),
+                        (('--load-model-repo', ),
+                         {'nargs': '?', 'const': True, 'default': False,
+                          'help': ('Register the models from the '
+                                   'yggdrasil model repository. If a '
+                                   'string is provided, it will be used '
+                                   'as the directory that the model '
+                                   'repo should be cloned into.')}),
                     ]),
                 ArgumentParser(
                     name='unregister',
@@ -567,7 +578,8 @@ class integration_service_manager(SubCommand):
 
     @classmethod
     def func(cls, args):
-        from yggdrasil.services import IntegrationServiceManager
+        from yggdrasil.services import (
+            _model_repository, IntegrationServiceManager)
         integration_name = getattr(args, 'integration-name',
                                    getattr(args, 'integration_name', None))
         integration_yamls0 = getattr(args, 'integration-yamls',
@@ -616,10 +628,20 @@ class integration_service_manager(SubCommand):
         elif args.action == 'status':
             x.printStatus()
         elif args.action == 'register':
-            x.registry.add(integration_name,
-                           yamls=integration_yamls,
-                           init=args.init,
-                           dont_validate=args.dont_validate)
+            if integration_name:
+                x.registry.add(integration_name,
+                               yamls=integration_yamls,
+                               init=args.init,
+                               dont_validate=args.dont_validate,
+                               skip_models=args.skip_models)
+            if args.load_model_repo:
+                kws = {}
+                if isinstance(args.load_model_repo, str):
+                    kws['repository_dir'] = args.load_model_repo
+                x.registry.add(_model_repository,
+                               init=args.init,
+                               dont_validate=args.dont_validate,
+                               skip_models=args.skip_models, **kws)
         elif args.action == 'unregister':
             x.registry.remove(name=integration_name)
         else:

@@ -20,6 +20,7 @@ from yggdrasil.config import ygg_cfg
 
 _service_host_env = 'YGGDRASIL_SERVICE_HOST_URL'
 _service_repo_dir = 'YGGDRASIL_SERVICE_REPO_DIR'
+_model_repository = 'https://github.com/cropsinsilico/yggdrasil_models/models'
 _default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
 _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
@@ -1233,7 +1234,8 @@ class IntegrationServiceRegistry(object):
         if load_registry:
             self.save(registry)
 
-    def add_from_repository(self, model_repository, **kwargs):
+    def add_from_repository(self, model_repository, repository_dir=None,
+                            **kwargs):
         r"""Add integration services to the registry from a repository of
         model YAMLs.
 
@@ -1241,6 +1243,8 @@ class IntegrationServiceRegistry(object):
             model_repository (str): URL of directory in a Git repository
                 containing YAMLs that should be added to the model
                 registry.
+            repository_dir (str, optional): Directory where the model
+                repository should be cloned.
             **kwargs: Additional keyword arguments are passed to
                 add_from_directory.
 
@@ -1250,8 +1254,9 @@ class IntegrationServiceRegistry(object):
         """
         from yggdrasil.yamlfile import clone_github_repo
         yaml_dir = clone_github_repo(
-            model_repository,
-            directory_for_clones=self.directory_for_clones)
+            model_repository, repository_dir=repository_dir,
+            directory_for_clones=(
+                False if repository_dir else self.directory_for_clones))
         self.add_from_directory(yaml_dir, **kwargs)
         return self.directory_for_clones
 
@@ -1306,7 +1311,7 @@ class IntegrationServiceRegistry(object):
             self.save(registry)
 
     def add(self, name, yamls=None, registry=None, init=False,
-            dont_validate=False, **kwargs):
+            dont_validate=False, skip_models=None, **kwargs):
         r"""Add an integration service to the registry, loading the YAML
         so that it is validated and any git repositories are cloned.
 
@@ -1322,6 +1327,8 @@ class IntegrationServiceRegistry(object):
                 will be initialized (e.g. compiled).
             dont_validate (bool, optional): If True, the YAML will not be
                 validated.
+            skip_models (list, optional): The names of models that should
+                not be registered.
             **kwargs: Additional keyword arguments are added to the new
                 entry.
 
@@ -1330,6 +1337,10 @@ class IntegrationServiceRegistry(object):
                 specified name.
 
         """
+        if skip_models is None:
+            skip_models = []
+        if name in skip_models:
+            return
         load_registry = (registry is None)
         if load_registry:
             registry = self.load()
@@ -1337,12 +1348,20 @@ class IntegrationServiceRegistry(object):
             assert not yamls
             for k, v in self.load_collection(name).items():
                 self.add(k, v, registry=registry, init=init,
-                         dont_validate=dont_validate, **kwargs)
+                         dont_validate=dont_validate,
+                         skip_models=skip_models, **kwargs)
         elif os.path.isdir(name) and not yamls:
             self.add_from_directory(name, registry=registry,
                                     dont_validate=dont_validate,
-                                    init=init, **kwargs)
+                                    init=init, skip_models=skip_models,
+                                    **kwargs)
+        elif name.startswith('http') and not yamls:
+            self.add_from_repository(name, registry=registry,
+                                     dont_validate=dont_validate,
+                                     init=init, skip_models=skip_models,
+                                     **kwargs)
         else:
+            print(f'Registering {name}')
             v = dict(kwargs, name=name, yamls=yamls)
             if (name in registry) and (registry[name] != v):
                 old = pprint.pformat(registry[name])
