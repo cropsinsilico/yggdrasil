@@ -419,6 +419,44 @@ class yggexample(yggrun):
         return out
 
 
+class ping_remote_service_manager(SubCommand):
+    r"""Ping a remote service manager continuously to prevent it from
+    going to sleep."""
+
+    name = "ping-remote-service-manager"
+    help = ("Ping a remote service manager continuously to prevent it "
+            "from going to sleep.")
+    arguments = [
+        (('address', ),
+         {'type': str, 'nargs': '?', 'default': '',
+          'help': 'Address of the remote service manager.'}),
+        (('--interval', ),
+         {'type': int, 'default': 600,
+          'help': 'Number of seconds to wait between pings.'}),
+    ]
+
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.tools import sleep
+        from yggdrasil.services import _remote_service_address
+        from yggdrasil.services import IntegrationServiceManager
+        if not args.address:
+            args.address = _remote_service_address
+        cli = IntegrationServiceManager(
+            service_type='flask', for_request=True,
+            address=args.address,
+        )
+        count = 0
+        cli.wait_for_server(timeout=600.0)
+        if not cli.is_running:  # pragma: debug
+            raise RuntimeError("Service manager never started")
+        while True:
+            sleep(args.interval)
+            assert cli.is_running
+            print(f"SUCCESS! (#{count})")
+            count += 1
+
+
 class integration_service_manager(SubCommand):
     r"""Start or manage the yggdrasil service manager."""
 
@@ -494,10 +532,20 @@ class integration_service_manager(SubCommand):
                          {'action': 'store_true',
                           'help': ('Enable coverage cleanup for testing.')}),
                         (('--model-repository', ),
-                         {'type': str,
+                         {'nargs': '?', 'const': True, 'default': False,
                           'help': ('URL for a directory in a Git repository '
                                    'containing models that should be loaded '
-                                   'into the service manager registry.')}),
+                                   'into the service manager registry. If '
+                                   'no value is provided, the yggdrasil '
+                                   'model repository will be used.')}),
+                        (('--model-repository-dir', ),
+                         {'type': str,
+                          'help': ('Local directory that should be used '
+                                   'for the supplied model repository. ')}),
+                        (('--skip-model', ),
+                         {'action': 'append', 'dest': 'skip_models',
+                          'help': ('One or more models that should not '
+                                   'be registered')}),
                         (('--track-memory', ),
                          {'action': 'store_true',
                           'help': ('Track the memory used by the '
@@ -549,17 +597,21 @@ class integration_service_manager(SubCommand):
                         (('--dont-validate', ),
                          {'action': 'store_true', 'default': False,
                           'help': ('Don\'t validate the integration YAML')}),
+                        (('--model-repository', ),
+                         {'nargs': '?', 'const': True, 'default': False,
+                          'help': ('URL for a directory in a Git repository '
+                                   'containing models that should be loaded '
+                                   'into the service manager registry. If '
+                                   'no value is provided, the yggdrasil '
+                                   'model repository will be used.')}),
+                        (('--model-repository-dir', ),
+                         {'type': str,
+                          'help': ('Local directory that should be used '
+                                   'for the supplied model repository. ')}),
                         (('--skip-model', ),
                          {'action': 'append', 'dest': 'skip_models',
                           'help': ('One or more models that should not '
                                    'be registered')}),
-                        (('--load-model-repo', ),
-                         {'nargs': '?', 'const': True, 'default': False,
-                          'help': ('Register the models from the '
-                                   'yggdrasil model repository. If a '
-                                   'string is provided, it will be used '
-                                   'as the directory that the model '
-                                   'repo should be cloned into.')}),
                     ]),
                 ArgumentParser(
                     name='unregister',
@@ -606,16 +658,26 @@ class integration_service_manager(SubCommand):
                                       port=args.port,
                                       for_request=for_request,
                                       debug=debug)
+        if getattr(args, 'model_repository', None) is True:
+            args.model_repository = os.path.join(
+                _model_repository, 'models')
         if args.action in ['start', None]:
             if integration_name is None:
                 if not x.is_running:
                     x.start_server(
                         remote_url=getattr(args, 'remote_url', None),
-                        with_coverage=getattr(args, 'with_coverage', False),
-                        model_repository=getattr(args, 'model_repository',
-                                                 None),
+                        with_coverage=getattr(
+                            args, 'with_coverage', False),
+                        model_repository=getattr(
+                            args, 'model_repository', None),
+                        model_repository_dir=getattr(
+                            args, 'model_repository_dir', None),
+                        skip_models=getattr(
+                            args, 'skip_models', None),
                         log_level=getattr(args, 'log_level', None),
-                        track_memory=getattr(args, 'track_memory', False))
+                        track_memory=getattr(
+                            args, 'track_memory', False),
+                    )
             else:
                 x.send_request(integration_name,
                                yamls=integration_yamls,
@@ -634,11 +696,11 @@ class integration_service_manager(SubCommand):
                                init=args.init,
                                dont_validate=args.dont_validate,
                                skip_models=args.skip_models)
-            if args.load_model_repo:
+            if args.model_repository:
                 kws = {}
-                if isinstance(args.load_model_repo, str):
-                    kws['repository_dir'] = args.load_model_repo
-                x.registry.add(_model_repository,
+                if args.model_repository_dir:
+                    kws['repository_dir'] = args.model_repository_dir
+                x.registry.add(args.model_repository,
                                init=args.init,
                                dont_validate=args.dont_validate,
                                skip_models=args.skip_models, **kws)
@@ -2014,13 +2076,16 @@ class main(SubCommand):
     help = (
         "Command line interface for the yggdrasil package.")
     arguments = []
-    subcommands = [yggrun, ygginfo, validate_yaml, yggexample,
-                   yggcc, yggcompile, yggclean,
-                   ygginstall, update_config, regen_schema,
-                   yggmodelform, yggdevup,
-                   timing_plots, generate_gha_workflow,
-                   integration_service_manager,
-                   coveragerc, file_converter]
+    subcommands = [
+        yggrun, ygginfo, validate_yaml, yggexample,
+        yggcc, yggcompile, yggclean,
+        ygginstall, update_config, regen_schema,
+        yggmodelform, yggdevup,
+        timing_plots, generate_gha_workflow,
+        integration_service_manager,
+        coveragerc, file_converter,
+        ping_remote_service_manager,
+    ]
 
     @classmethod
     def get_parser(cls, **kwargs):

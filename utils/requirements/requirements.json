@@ -435,7 +435,8 @@
               "method": "conda_skip"
             }
           ]
-        }
+        },
+        "rpy2"
       ]
     },
     "zmq": {

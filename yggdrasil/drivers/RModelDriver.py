@@ -632,15 +632,17 @@ class RFunctionWrapper(FunctionWrapperBase):
 
         """
         func = None
-        if os.path.isfile(library):
-            import rpy2.robjects as robjects
-            r = robjects.r
-            r['source'](library)
-            func = robjects.globalenv[name]
-        else:
-            from rpy2.robjects.packages import importr
-            lib = importr(library)
-            func = getattr(lib, name)
-        return func
+        import rpy2.robjects as robjects
+        from rpy2.robjects import conversion, default_converter
+        from rpy2.robjects.packages import importr
+        with conversion.localconverter(default_converter):
+            if os.path.isfile(library):
+                r = robjects.r
+                r['source'](library)
+                func = robjects.globalenv[name]
+            else:
+                lib = importr(library)
+                func = getattr(lib, name)
+            return func
         
     

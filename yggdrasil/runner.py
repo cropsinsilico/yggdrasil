@@ -111,49 +111,21 @@ class YggFunction(YggClass):
         """
         try:
             self.runner.resume()
-            # Check for arguments
-            for a, arg in zip(self.arguments, args):
-                assert a not in kwargs
-                kwargs[a] = arg
-            for a in self.arguments:
-                if a not in kwargs:
-                    a_dtype = self.argument_datatypes.get(a, {})
-                    if ((len(args) == 0 and len(self.arguments) == 1
-                         and a_dtype.get('type', '') == 'object')):
-                        a_kws = list(kwargs.keys())
-                        if not a_dtype.get('additionalProperties', True):
-                            a_kws = list(a_dtype.get('properties', {}).keys())
-                        kwargs[a] = {k: kwargs[k] for k in a_kws}
-                    else:  # pragma: debug
-                        # TODO: Get default data from file if available
-                        raise RuntimeError(f"Required argument \"{a}\" "
-                                           f"not provided.")
+            data = self._transform_input(args, kwargs)
             # Send
             for k, v in self.inputs.items():
-                flag = v['comm'].send(*[kwargs[a] for a in v['vars']])
+                flag = v['comm'].send(*data[k])
                 if not flag:  # pragma: debug
                     raise RuntimeError(f"Failed to send {k}")
             # Receive
             out = {}
-            vars_out = []
             for k, v in self.outputs.items():
                 flag, data = v['comm'].recv(timeout=60.0)
                 if not flag:  # pragma: debug
-                    raise RuntimeError(f"Failed to receive variable {v}")
-                ivars = v['vars']
-                if ((isinstance(data, (list, tuple))
-                     and (len(ivars) > 1 or len(data) == len(ivars)))):
-                    assert len(data) == len(ivars)
-                    for a, d in zip(ivars, data):
-                        out[a] = d
-                else:
-                    assert len(ivars) == 1
-                    out[ivars[0]] = data
-                vars_out += ivars
+                    raise RuntimeError(f"Failed to receive {k}")
+                out[k] = data
             self.runner.pause()
-            if len(vars_out) == 1:
-                out = out[vars_out[0]]
-            return out
+            return self._transform_output(out)
         except BaseException as e:
             print(f"STOPPING DUE TO ERROR: {e}")
             self.stop(error=True)
@@ -179,9 +151,9 @@ class YggFunction(YggClass):
                 break
         self.debug("run started")
         # Create input/output channels
+        self._vars = {'input': {}, 'output': {}}
         self.inputs = {}
         self.outputs = {}
-        self.argument_datatypes = {}
         self.old_environ = os.environ.copy()
         with tools.updated_environment(self.model_driver['instance'].set_env()):
             for drv in self.model_driver['input_drivers']:
@@ -191,10 +163,8 @@ class YggFunction(YggClass):
                 self.outputs[var_name] = drv.copy()
                 self.outputs[var_name]['comm'] = YggInput(
                     channel_name, no_suffix=True)  # context=ctx)
-                if 'vars' in drv['inputs'][0]:
-                    self.outputs[var_name]['vars'] = drv['inputs'][0]['vars']
-                else:
-                    self.outputs[var_name]['vars'] = [var_name]
+                self.outputs[var_name]['vars'] = drv['inputs'][0].get(
+                    'vars', [var_name])
             for drv in self.model_driver['output_drivers']:
                 channel_name = drv['instance'].icomm_kws['name']
                 var_name = drv['instance'].ocomm_kws['name'].split(
@@ -212,41 +182,149 @@ class YggFunction(YggClass):
                 else:
                     self.inputs[var_name]['comm'] = YggOutput(
                         channel_name, no_suffix=True)  # context=ctx)
-                    if 'vars' in drv['outputs'][0]:
-                        self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
-                        for v in self.inputs[var_name]['vars']:
-                            if isinstance(v, dict) and 'datatype' in v:
-                                self.argument_datatypes.setdefault(
-                                    v['name'], v['datatype'])
-                    else:
-                        self.inputs[var_name]['vars'] = [var_name]
-                        self.argument_datatypes.setdefault(
-                            var_name, drv['outputs'][0].get("datatype", {}))
-        self.debug('inputs: %s, outputs: %s',
-                   list(self.inputs.keys()),
-                   list(self.outputs.keys()))
+                    self.inputs[var_name]['vars'] = drv['outputs'][0].get(
+                        'vars', [var_name])
+        self.debug(f'inputs: {list(self.inputs.keys())}, '
+                   f'outputs: {list(self.outputs.keys())}')
         atexit.register(self.stop)
         # Ensure that vars are strings
-        for k, v in chain(self.inputs.items(), self.outputs.items()):
-            v_vars = []
-            for iv in v['vars']:
-                if isinstance(iv, dict):
-                    if not iv.get('is_length_var', False):
-                        v_vars.append(iv['name'])
-                else:
-                    v_vars.append(iv)
-            v['vars'] = v_vars
+        for io in ['input', 'output']:
+            for k, v in getattr(self, f'{io}s').items():
+                v['var_names'] = []
+                v['vars_datatypes'] = {}
+                for iv in v['vars']:
+                    if isinstance(iv, dict):
+                        if iv.get('is_length_var', False):
+                            continue
+                        if 'datatype' in iv:
+                            v['vars_datatypes'][iv['name']] = iv['datatype']
+                        iv = iv['name']
+                    v['var_names'].append(iv)
+                    self._vars[io][iv] = v
         # Get arguments
-        self.arguments = []
-        for k, v in self.inputs.items():
-            self.arguments += v['vars']
-        self.returns = []
-        for k, v in self.outputs.items():
-            self.returns += v['vars']
-        self.debug("arguments: %s, returns: %s", self.arguments, self.returns)
+        self.debug(f"arguments: {self.arguments}, "
+                   f"returns: {self.returns}")
         self.runner.pause()
         if self.service_address:
             os.remove(self.model_yaml)
+
+    def argument_datatype(self, name):
+        r"""Get the datatype for an argument.
+
+        Args:
+            name (str): Argument name.
+
+        Returns:
+            dict: JSON schema describing the data type.
+
+        """
+        if name in self._vars['input'][name]['vars_datatypes']:
+            return self._vars['input'][name]['vars_datatypes'][name]
+        comm = self._vars['input'][name]['comm']
+        if comm.commtype == 'client':
+            out = comm.ocomm.serializer.datatype
+        else:
+            out = comm.serializer.datatype
+        return out
+
+    def return_datatype(self, name):
+        r"""Get the datatype for a returned variable.
+
+        Args:
+            name (str): Variable name.
+
+        Returns:
+            dict: JSON schema describing the data type.
+
+        """
+        if name in self._vars['output'][name]['vars_datatypes']:
+            out = self._vars['output'][name]['vars_datatypes'][name]
+        else:
+            comm = self._vars['output'][name]['comm']
+            if comm.commtype == 'client':
+                out = comm.icomm.serializer.datatype
+            else:
+                out = comm.serializer.datatype
+        return out
+
+    @property
+    def argument_info(self):
+        r"""dict: Information about the function."""
+        out = {
+            'arguments': self.argument_datatypes,
+            'returns': self.return_datatypes,
+        }
+        return out
+
+    @property
+    def argument_datatypes(self):
+        r"""dict: Datatypes for each function argument."""
+        out = {}
+        for v in self._vars['input'].keys():
+            out[v] = self.argument_datatype(v)
+        return out
+
+    @property
+    def return_datatypes(self):
+        r"""dict: Datatypes for each function return variable."""
+        out = {}
+        for v in self._vars['output'].keys():
+            out[v] = self.return_datatype(v)
+        if len(out) == 1:
+            out = out[list(out.keys())[0]]
+        return out
+
+    @property
+    def arguments(self):
+        r"""list: Names of function arguments."""
+        return list(self._vars['input'].keys())
+
+    @property
+    def returns(self):
+        r"""list: Name of function output variables."""
+        return list(self._vars['output'].keys())
+
+    def _transform_input(self, args, kwargs):
+        out = {}
+        for a, arg in zip(self.arguments, args):
+            assert a not in kwargs
+            kwargs[a] = arg
+        for a in self.arguments:
+            if a in kwargs:
+                continue
+            a_dtype = self.argument_datatype(a)
+            if ((len(args) == 0 and len(self.arguments) == 1
+                 and a_dtype.get('type', '') == 'object')):
+                a_kws = list(kwargs.keys())
+                if not a_dtype.get('additionalProperties', True):
+                    a_kws = list(a_dtype.get('properties', {}).keys())
+                kwargs[a] = {k: kwargs[k] for k in a_kws}
+            else:  # pragma: debug
+                # TODO: Get default data from file if available
+                raise RuntimeError(f"Required argument \"{a}\" "
+                                   f"not provided.")
+        for k, v in self.inputs.items():
+            out[k] = [kwargs[a] for a in v['var_names']]
+        return out
+
+    def _transform_output(self, data):
+        out = {}
+        vars_out = []
+        for k, idata in data.items():
+            v = self.outputs[k]
+            ivars = v['var_names']
+            if ((isinstance(idata, (list, tuple))
+                 and (len(ivars) > 1 or len(idata) == len(ivars)))):
+                assert len(idata) == len(ivars)
+                for a, d in zip(ivars, idata):
+                    out[a] = d
+            else:
+                assert len(ivars) == 1
+                out[ivars[0]] = idata
+            vars_out += ivars
+        if len(vars_out) == 1:
+            out = out[vars_out[0]]
+        return out
 
     def reload(self):
         r"""Reload the model"""
@@ -290,9 +368,9 @@ class YggFunction(YggClass):
             % (', '.join([x['name'] for x in
                           self.runner.modeldrivers.values()
                           if x['name'] != self.dummy_name]),
-               '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+               '\n'.join(['\t%s (vars=%s)' % (k, v['var_names'])
                           for k, v in self.inputs.items()]),
-               '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+               '\n'.join(['\t%s (vars=%s)' % (k, v['var_names'])
                           for k, v in self.outputs.items()])))
 
 

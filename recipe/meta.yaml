@@ -151,6 +151,7 @@ outputs:
         - r-reticulate
         - r-units
         - r-zeallot
+        - rpy2
   - name: yggdrasil.zmq
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

@@ -3,6 +3,7 @@ import sys
 import signal
 import uuid
 import json
+from yggdrasil import rapidjson
 import traceback
 import yaml
 import glob
@@ -20,7 +21,8 @@ from yggdrasil.config import ygg_cfg
 
 _service_host_env = 'YGGDRASIL_SERVICE_HOST_URL'
 _service_repo_dir = 'YGGDRASIL_SERVICE_REPO_DIR'
-_model_repository = 'https://github.com/cropsinsilico/yggdrasil_models/models'
+_remote_service_address = 'https://model-service-demo.onrender.com/'
+_model_repository = 'https://github.com/cropsinsilico/yggdrasil_models'
 _default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
 _default_commtype = ygg_cfg.get('services', 'default_comm', None)
 _default_address = ygg_cfg.get('services', 'address', None)
@@ -135,6 +137,7 @@ class ServiceBase(YggClass):
 
     def start_server(self, remote_url=None, with_coverage=False,
                      log_level=None, model_repository=None,
+                     model_repository_dir=None, skip_models=None,
                      track_memory=False):
         r"""Start the server.
 
@@ -151,6 +154,10 @@ class ServiceBase(YggClass):
             model_repository (str, optional): URL of directory in a Git
                 repository containing YAMLs that should be added to the model
                 registry. Defaults to None and is ignored.
+            model_repository_dir (str, optional): Local directory where
+                the model_repository should be cloned.
+            skip_models (list, optional): Names of models that should be
+                skipped when adding models from model_repository.
             track_memory (boolean, optional): If True, the memory used
                 by the server will be reported at shutdown. Defaults
                 to False.
@@ -161,7 +168,10 @@ class ServiceBase(YggClass):
         if remote_url is None:
             remote_url = self.address
         if model_repository is not None:
-            self.registry.add_from_repository(model_repository)
+            self.registry.add_from_repository(
+                model_repository, repository_dir=model_repository_dir,
+                skip_models=skip_models,
+            )
             os.environ.setdefault(_service_repo_dir,
                                   self.registry.directory_for_clones)
         os.environ.setdefault(_service_host_env, remote_url)
@@ -213,7 +223,8 @@ class ServiceBase(YggClass):
         r"""Shutdown the process from the server."""
         raise NotImplementedError  # pragma: no cover
 
-    def process_request(self, request, **kwargs):
+    def process_request(self, request, dont_serialize_response=False,
+                        **kwargs):
         r"""Process a request and return a response.
 
         Args:
@@ -227,6 +238,8 @@ class ServiceBase(YggClass):
         """
         request = self.deserialize_request(request)
         response = self.respond(request, **kwargs)
+        if dont_serialize_response:
+            return response
         return self.serialize_response(response)
 
     def process_response(self, response):
@@ -671,7 +684,8 @@ def create_service_manager_class(service_type=None):
 
         """
 
-        def __init__(self, name=None, commtype=None, is_app=False, **kwargs):
+        def __init__(self, name=None, commtype=None, is_app=False,
+                     **kwargs):
             if name is None:
                 name = 'ygg_integrations'
             self.functions = {}
@@ -774,7 +788,15 @@ def create_service_manager_class(service_type=None):
                 def call(model):
                     r"""Call a model as a function."""
                     return self.process_request(self.request.json,
-                                                model_function=model)
+                                                model_function=model,
+                                                action='call')
+
+                @self.app.route('/<model>/<action>', methods=['POST'])
+                def manage(model, action):
+                    r"""Manage a model function."""
+                    return self.process_request(self.request.json,
+                                                model_function=model,
+                                                action=action)
 
                 from yggdrasil.communication import RESTComm
                 RESTComm.add_comm_server_to_app(self.app)
@@ -917,35 +939,56 @@ def create_service_manager_class(service_type=None):
                 # is running (perhaps in a future callback?)
                 return True
 
-        def call_model_function(self, model, request):
-            r"""Call a model function, adding it to the loaded functions
-            if it is not already present.
+        def respond_function(self, name, action, request=None):
+            r"""Respond to an integration function request.
 
             Args:
-                model (str): Name of the model to call.
-                request (dict): Input to model call.
-
-            Returns:
-                dict: Output from model call.
+                name (str): Name of the integration function.
+                action (str): Action that should be taken for the
+                    integration function.
+                request (dict, optional): Additional request data.
 
             """
-            if self.for_request:
-                return self.send_request(request, model=model)
-            if model in self.functions:
-                function = self.functions[model]
+            function = None
+            if action in ['call', 'info']:
+                if name not in self.functions:
+                    self.respond_function(name, 'create')
+                function = self.functions[name]
+                # TODO: restart if function has errors
+            if action == 'create':
+                if name in self.functions:
+                    function = self.functions[name]
+                    response = {'status': 'exists'}
+                else:
+                    reg = self.registry.registry.get(name, None)
+                    if reg is None:
+                        raise KeyError(
+                            f'No integration with the name "{name}" in '
+                            f'the registry. Valid integrations include: '
+                            f'{list(self.registry.registry.keys())}')
+                    function = runner.YggFunction(
+                        reg['yamls'], signal_handler=False)
+                    self.functions[name] = function
+                    response = {'status': 'created'}
+            elif action == 'delete':
+                if name in self.functions:
+                    function = self.functions.pop(name)
+                    function.stop()
+                    response = {'status': 'deleted'}
+                else:
+                    response = {'status': 'missing'}
+            elif action == 'call':
+                assert request is not None
+                try:
+                    response = function(**request)
+                except BaseException:
+                    self.respond_function(name, 'delete')
+                    raise
+                response = rapidjson.as_pure_json(response)
+            elif action == 'info':
+                response = function.argument_info
             else:
-                reg = self.registry.registry.get(model, None)
-                if reg is None:
-                    raise KeyError(
-                        f'No model with the name "{model}" in '
-                        f'the registry. Valid models include: '
-                        f'{list(self.registry.registry.keys())}')
-                function = runner.YggFunction(
-                    reg['yamls'], signal_handler=False)
-                self.functions[model] = function
-            response = function(**request)
-            # TODO: Fix time change between consecutive sends
-            # function.stop()
+                raise RuntimeError(f"Unsupported action: '{action}'")
             return response
 
         def respond(self, request, model_function=None, **kwargs):
@@ -965,18 +1008,22 @@ def create_service_manager_class(service_type=None):
             client_id = None
             try:
                 if model_function is not None:
-                    return self.call_model_function(model_function,
-                                                    request)
-                name = request.pop('name')
-                action = request.pop('action')
-                yamls = request.pop('yamls')
-                client_id = request.pop('client_id')
+                    name = model_function
+                    action = kwargs.pop('action')
+                else:
+                    name = request.pop('name')
+                    action = request.pop('action')
+                    yamls = request.pop('yamls')
+                    client_id = request.pop('client_id')
                 if client_id is not None:
                     self.integrations.setdefault(client_id, {})
                     self.stopped_integrations.setdefault(client_id, {})
                 if isinstance(name, list):
                     name = tuple(name)
-                if action == 'start':
+                if model_function is not None:
+                    response = self.respond_function(name, action,
+                                                     request=request)
+                elif action == 'start':
                     if not yamls:
                         reg = self.registry.registry.get(name, None)
                         if isinstance(name, tuple):
@@ -1117,7 +1164,7 @@ class IntegrationServiceRegistry(object):
             YGGDRASIL_SERVICE_REPO_DIR environment variable is set
             (such as by a service manager), that value will be used.
             Otherwise, directory_for_clones will default to
-            '~/.yggdrasil_services.yml'.
+            '~/.yggdrasil_services'.
 
     """
 
@@ -1126,15 +1173,20 @@ class IntegrationServiceRegistry(object):
             filename = os.path.join('~', '.yggdrasil_services.yml')
         if directory_for_clones is None:
             directory_for_clones = os.environ.get(_service_repo_dir, None)
-        if directory_for_clones is None:
-            directory_for_clones = os.path.join('~', '.yggdrasil_services')
         self.filename = os.path.expanduser(filename)
-        self.directory_for_clones = os.path.expanduser(directory_for_clones)
+        self._directory_for_clones = directory_for_clones
 
     @property
     def registry(self):
         r"""dict: Existing registry of integrations."""
         return self.load()
+
+    @property
+    def directory_for_clones(self):
+        out = self._directory_for_clones
+        if out is None:
+            out = os.path.join('~', '.yggdrasil_services')
+        return os.path.expanduser(out)
 
     def load(self):
         r"""Load the dictionary of existing integrations that have been
@@ -1257,8 +1309,10 @@ class IntegrationServiceRegistry(object):
             model_repository, repository_dir=repository_dir,
             directory_for_clones=(
                 False if repository_dir else self.directory_for_clones))
+        if self._directory_for_clones is None and repository_dir:
+            self._directory_for_clones = yaml_dir
         self.add_from_directory(yaml_dir, **kwargs)
-        return self.directory_for_clones
+        return yaml_dir
 
     @classmethod
     def find_yamls(cls, directory):

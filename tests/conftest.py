@@ -1134,6 +1134,13 @@ def with_coverage(pytestconfig):
     return False
 
 
+@pytest.fixture
+def local_model_service(running_service):
+    r"""IntegrationServiceManager instance for local service."""
+    with running_service('flask') as cli:
+        yield cli
+
+
 @pytest.fixture(scope="session")
 def remote_model_service(remote_model_service_address):
     r"""IntegrationServiceManager instance for remote service."""
@@ -1143,30 +1150,35 @@ def remote_model_service(remote_model_service_address):
         address=remote_model_service_address,
     )
     cli.wait_for_server(timeout=600.0)
+    if not cli.is_running:  # pragma: debug
+        pytest.skip("Web service app is not running.")
     return cli
 
 
 @pytest.fixture(scope="session")
 def running_service(with_coverage, check_service_manager_settings,
-                    project_dir, external_dir, logger):
+                    project_dir, external_dir, logger,
+                    yggdrasil_model_repository_url,
+                    yggdrasil_model_repository_dir):
     r"""Context manager to run and clean-up an integration service."""
 
     @contextlib.contextmanager
     def running_service_w(service_type, partial_commtype=None,
                           track_memory=False, debug=False):
-        from yggdrasil.services import (
-            IntegrationServiceManager)
+        from yggdrasil.services import IntegrationServiceManager
         if ((((service_type, partial_commtype) == ('flask', 'rmq'))
              and platform._is_win)):
             pytest.skip("excluded on windows")
         check_service_manager_settings(service_type, partial_commtype)
-        model_repo = "https://github.com/cropsinsilico/yggdrasil_models_test/models"
+        model_repo = yggdrasil_model_repository_url + '/models'
+        model_dir = os.path.join(yggdrasil_model_repository_dir)
         log_level = logging.ERROR
         args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
                 f"--service-type={service_type}"]
         if partial_commtype is not None:
             args.append(f"--commtype={partial_commtype}")
         args += ["start", f"--model-repository={model_repo}",
+                 f"--model-repository-dir={model_dir}",
                  f"--log-level={log_level}"]
         if track_memory:
             args.append("--track-memory")
@@ -2033,3 +2045,25 @@ def temporary_products():
 def remote_model_service_address():
     r"""str: Address of the service demo on render."""
     return "https://model-service-demo.onrender.com/"
+
+
+@pytest.fixture(scope="session")
+def yggdrasil_model_repository_url():
+    r"""str: Address of the production model repository."""
+    from yggdrasil import services
+    out = services._model_repository
+    assert out.endswith('yggdrasil_models')
+    return out
+
+
+@pytest.fixture(scope="session")
+def yggdrasil_model_repository_dir():
+    r"""str: Local directory containing the model repository."""
+    out = '/Users/langmm/yggdrasil_models'
+    if not os.path.isdir(out):
+        from yggdrasil import services
+        registry = services.IntegrationServiceRegistry()
+        out = os.path.join(registry.directory_for_clones,
+                           'cropsinsilico', 'yggdrasil_models')
+    assert out.endswith('yggdrasil_models')
+    return out

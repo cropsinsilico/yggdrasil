@@ -27,8 +27,6 @@ def test_call_integration_remote(remote_model_service_address,
     yamls.remove(test_yml)
     yamls.remove(copy_yml)
     yamls.append(remote_yml)
-    if not remote_model_service.is_running:  # pragma: debug
-        pytest.skip("Web service app is not running.")
     try:
         shutil.copy(copy_yml, remote_yml)
         with open(remote_yml, 'a') as fd:
@@ -262,12 +260,13 @@ def test_validate_model_submission():
             git.rmtree(repodir)
 
 
-def test_validate_model_repo():
+def test_validate_model_repo(yggdrasil_model_repository_url,
+                             yggdrasil_model_repository_dir):
     r"""Test validation of YAMLs in the model repository."""
     import git
     import tempfile
-    dest0 = '/Users/langmm/yggdrasil_models'
-    url0 = "https://github.com/cropsinsilico/yggdrasil_models"
+    dest0 = yggdrasil_model_repository_dir
+    url0 = yggdrasil_model_repository_url
     for suffix in ["", "_test"]:
         dest = dest0 + suffix
         dest_exists = os.path.isdir(dest)
@@ -287,3 +286,205 @@ def test_validate_model_repo():
             if not dest_exists:
                 if os.path.isdir(dest):
                     git.rmtree(dest)
+
+
+class TestRegisteredIntegrationFunction(object):
+    r"""Class to test calling a registered integration function."""
+
+    name = None
+    request = None
+    nrep = 2
+
+    @pytest.fixture(
+        scope="class", params=['function', 'local', 'remote']
+    )
+    def service_type(self, request):
+        r"""str: Type of service to test."""
+        if self.name is None:
+            pytest.skip("name not set")
+        # TODO: Remove this for push
+        if request.param == 'remote':
+            pytest.skip("remote")
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def service_client(self, service_type, running_service,
+                       remote_model_service,
+                       yggdrasil_model_repository_dir):
+        r"""Service manager client."""
+        if service_type == 'local':
+            with running_service('flask') as cli:
+                yield cli
+        elif service_type == 'remote':
+            yield remote_model_service
+        elif service_type == 'function':
+            yaml = os.path.join(yggdrasil_model_repository_dir, 'models',
+                                f'{self.name}.yaml')
+            function = runner.YggFunction(yaml)
+            yield function
+            function.stop()
+
+    @pytest.fixture(scope="class")
+    def service_address(self, service_type, service_client):
+        r"""Address for the current service."""
+        if service_type == 'function':
+            return None
+        address = service_client.address
+        if not address.endswith('/'):
+            address += '/'
+        address += self.name
+        return address
+
+    @pytest.fixture(scope="class")
+    def action_address(self, service_address):
+        r"""Get a REST API service address.
+
+        Args:
+            action (str, optional): Action that address should be
+                returned for.
+
+        Returns:
+            str: Address for service action REST API call.
+
+        """
+
+        def _action_address(action=None):
+            address = service_address
+            if action:
+                address += f'/{action}'
+            return address
+
+        return _action_address
+
+    @pytest.fixture(scope="class")
+    def function_request(self, service_client):
+        r"""Perform a function request.
+        
+        Args:
+            request (dict, optional): Request to send.
+            action (str, optional): Action that address should be
+                returned for.
+
+        Returns:
+            dict: Response to request.
+
+        """
+        function = service_client
+
+        def _function_request(request={}, action=None):
+            if action in ['call', None]:
+                return function(**request)
+            elif action == 'info':
+                return function.argument_info
+            else:
+                raise ValueError(f"Unsupported action: {action}")
+
+        return _function_request
+
+    @pytest.fixture(scope="class")
+    def service_request(self, service_type, action_address,
+                        function_request):
+        r"""Send a request to the REST API for a service action via
+        POST.
+
+        Args:
+            request (dict, optional): Request to send.
+            action (str, optional): Action that address should be
+                returned for.
+
+        Returns:
+            dict: Response to request.
+
+        """
+
+        if service_type == 'function':
+            _service_request = function_request
+        else:
+            def _service_request(request={}, action=None):
+                import requests
+                address = action_address(action=action)
+                r = requests.post(address, json=request)
+                r.raise_for_status()
+                response = r.json()
+                if 'error' in response:
+                    print(response['traceback'])
+                    raise RuntimeError(response['error'])
+                return response
+        return _service_request
+
+    @pytest.fixture
+    def call_method(self, service_type, service_request):
+        r"""Allow call method to be parametrized via string."""
+
+        def call(request):
+            if service_type in ['local', 'remote']:
+                service_request(action='delete')
+            return service_request(request)
+
+        return call
+
+    @pytest.fixture
+    def base_request(self):
+        r"""dict: Base request."""
+        if self.request is None:
+            pytest.skip("request not set")
+        return self.request
+
+    @pytest.fixture(scope="class")
+    def check_response(self):
+        r"""Check if the response matches expectations."""
+
+        def _check_response(request, response):
+            return True
+
+        return _check_response
+
+    def test_request(self, call_method, base_request,
+                     check_response):
+        r"""Test call to the registered integration."""
+        for _ in range(self.nrep):
+            response = call_method(base_request)
+            check_response(base_request, response)
+
+    def test_info(self, service_request):
+        r"""Test function info."""
+        import pprint
+        pprint.pprint(service_request(action='info'))
+
+
+class TestRegisteredBioCro(TestRegisteredIntegrationFunction):
+    r"""Test registered BioCro integration function."""
+
+    name = 'BioCro'
+    keys = ['hour', 'year', 'Grain']
+
+    @pytest.fixture(
+        params=[
+            {'crop': 'soybean', 'year': 2002, 'doy': 152},
+            {'crop': 'soybean', 'year': 2002, 'doy': 152,
+             'output_timesteps': True},
+        ]
+    )
+    def base_request(self, request):
+        r"""dict: Base request."""
+        return request.param
+
+    @pytest.fixture(scope="class")
+    def check_response(self, service_type):
+        r"""Check if the response matches expectations."""
+        import numpy as np
+
+        def _check_response(request, response):
+            assert isinstance(response, dict)
+            for k in self.keys:
+                assert k in response
+            assert len(response) == 462
+            if request.get('output_timesteps', False):
+                for v in response.values():
+                    if service_type == 'function':
+                        assert isinstance(v, np.ndarray)
+                    else:
+                        assert isinstance(v, list)
+                    assert len(v) == 3288
+
+        return _check_response

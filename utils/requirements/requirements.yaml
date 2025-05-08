@@ -248,6 +248,8 @@ extras:
         - method: skip
           os: win
         - method: conda_skip
+    - rpy2
+
   zmq:
     description: Dependencies required to run models using ZeroMQ sockets for communication in C/C++/Fortran
     requirements:
