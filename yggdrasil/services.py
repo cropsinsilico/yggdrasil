@@ -930,17 +930,21 @@ def create_service_manager_class(service_type=None):
             """
             if self.for_request:
                 return self.send_request(request, model=model)
-            if model not in self.functions:
+            if model in self.functions:
+                function = self.functions[model]
+            else:
                 reg = self.registry.registry.get(model, None)
                 if reg is None:
                     raise KeyError(
                         f'No model with the name "{model}" in '
                         f'the registry. Valid models include: '
                         f'{list(self.registry.registry.keys())}')
-                self.functions[model] = runner.YggFunction(
+                function = runner.YggFunction(
                     reg['yamls'], signal_handler=False)
-            # TODO: Pass object untouched for single argument
-            response = self.functions[model](**request)
+                self.functions[model] = function
+            response = function(**request)
+            # TODO: Fix time change between consecutive sends
+            # function.stop()
             return response
 
         def respond(self, request, model_function=None, **kwargs):
@@ -1301,7 +1305,8 @@ class IntegrationServiceRegistry(object):
         if load_registry:
             self.save(registry)
 
-    def add(self, name, yamls=None, registry=None, init=False, **kwargs):
+    def add(self, name, yamls=None, registry=None, init=False,
+            dont_validate=False, **kwargs):
         r"""Add an integration service to the registry, loading the YAML
         so that it is validated and any git repositories are cloned.
 
@@ -1315,6 +1320,8 @@ class IntegrationServiceRegistry(object):
                 file which is updated with the new service entry.
             init (bool, optional): If True, the models in the YAML file
                 will be initialized (e.g. compiled).
+            dont_validate (bool, optional): If True, the YAML will not be
+                validated.
             **kwargs: Additional keyword arguments are added to the new
                 entry.
 
@@ -1329,9 +1336,11 @@ class IntegrationServiceRegistry(object):
         if os.path.isfile(name):
             assert not yamls
             for k, v in self.load_collection(name).items():
-                self.add(k, v, registry=registry, init=init, **kwargs)
+                self.add(k, v, registry=registry, init=init,
+                         dont_validate=dont_validate, **kwargs)
         elif os.path.isdir(name) and not yamls:
             self.add_from_directory(name, registry=registry,
+                                    dont_validate=dont_validate,
                                     init=init, **kwargs)
         else:
             v = dict(kwargs, name=name, yamls=yamls)
@@ -1353,7 +1362,7 @@ class IntegrationServiceRegistry(object):
                 from yggdrasil.yamlfile import init_yaml
                 init_yaml(yamls,
                           directory_for_clones=self.directory_for_clones)
-            else:
+            elif not dont_validate:
                 from yggdrasil.yamlfile import parse_yaml
                 parse_yaml(yamls,
                            directory_for_clones=self.directory_for_clones)

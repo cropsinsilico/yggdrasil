@@ -545,7 +545,10 @@ class integration_service_manager(SubCommand):
                         (('--init', ),
                          {'action': 'store_true', 'default': False,
                           'help': ('Initialize the integration(s) added '
-                                   'to the registry')})
+                                   'to the registry')}),
+                        (('--dont-validate', ),
+                         {'action': 'store_true', 'default': False,
+                          'help': ('Don\'t validate the integration YAML')}),
                     ]),
                 ArgumentParser(
                     name='unregister',
@@ -615,7 +618,8 @@ class integration_service_manager(SubCommand):
         elif args.action == 'register':
             x.registry.add(integration_name,
                            yamls=integration_yamls,
-                           init=args.init)
+                           init=args.init,
+                           dont_validate=args.dont_validate)
         elif args.action == 'unregister':
             x.registry.remove(name=integration_name)
         else:

@@ -51,9 +51,12 @@ class YggBroker(multitasking.YggTaskLoop):
         self._models = {}
         # TODO: Once broker handles model driver creation & managment
         #   in place of the runner, this won't be necessary
-        assert self._server_address_env not in os.environ
+        # assert self._server_address_env not in os.environ
         os.environ[self._server_address_env] = self.address
         super(YggBroker, self).__init__('YggBroker')
+
+    def __del__(self):
+        os.environ.pop(self._server_address_env, None)
 
     @property
     def address(self):

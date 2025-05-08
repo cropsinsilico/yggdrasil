@@ -263,13 +263,16 @@ class YggFunction(YggClass):
             self._stop_called = True
             if not error:
                 for x in self.inputs.values():
-                    x['comm'].send_eof()
+                    if 'comm' in x:
+                        x['comm'].send_eof()
             self.model_driver['instance'].set_break_flag()
             self.runner.waitModels(timeout=10)
             for x in self.inputs.values():
-                x['comm'].close()
+                if 'comm' in x:
+                    x['comm'].close()
             for x in self.outputs.values():
-                x['comm'].close()
+                if 'comm' in x:
+                    x['comm'].close()
             self.runner.terminate()
             self.runner.atexit()
             os.environ.clear()
