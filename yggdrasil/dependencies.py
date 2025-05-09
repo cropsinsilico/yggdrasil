@@ -24,9 +24,13 @@ _base_version_regex = r'(?P<ver>[\.\w\-\_\#]+)'
 _min_version_regex = r'\>(?P<eq>\=)\s*' + _base_version_regex
 _max_version_regex = r'\<(?P<eq>\=)\s*' + _base_version_regex
 _strict_version_regex = r'(?P<eq>\=\=\s*)?' + _base_version_regex
+_comp_version_regex = r'\s*(?:(?P<op>=?[\=\<\>]=?)\s*)?'
+_version_part_regex_search = re.compile(
+    _comp_version_regex + _base_version_regex
+)
 _version_part_regex = re.compile(
-    r'(?:(?:^)|(?:\s*,))\s*(?:(?P<op>=?[\=\<\>]=?)\s*)?'
-    + _base_version_regex
+    r'(?:(?:^)|(?:\s*,))'
+    + _comp_version_regex + _base_version_regex
 )
 _in_github_action = bool(os.environ.get('GITHUB_ACTIONS', False))
 _default_always_yes = (
@@ -177,10 +181,16 @@ def parse_version_string(version, pos=0, endswith=False):
     out = {'constraints': []}
     pos_orig = pos
     while pos < len(version):
-        if endswith and pos == 0:
-            match = _version_part_regex.search(version, pos)
+        is_relative = False
+        if endswith and pos == pos_orig:
+            match = _version_part_regex_search.search(version, pos)
         else:
             match = _version_part_regex.match(version, pos)
+            if pos > 0 and pos == pos_orig and not match:
+                match_2 = _version_part_regex.match(version[pos:])
+                if match_2:
+                    match = match_2
+                    is_relative = True
         if not match:
             raise VersionParsingError(
                 f"Version does not match expected pattern: "
@@ -188,6 +198,8 @@ def parse_version_string(version, pos=0, endswith=False):
                 f"position {pos})")
         if pos_orig > 0 and 'start' not in out:
             out['start'] = match.start()
+            if is_relative:
+                out['start'] += pos
         val = match.groupdict()
         if match.group('op') and '<' in match.group('op'):
             dst = 'max'
@@ -217,7 +229,10 @@ def parse_version_string(version, pos=0, endswith=False):
             out[dst] = val['ver']
             out[f'{dst}eq'] = bool(match.group('op')
                                    and ('=' in match.group('op')))
-        pos = match.end()
+        if is_relative:
+            pos += match.end()
+        else:
+            pos = match.end()
     return out
 
 

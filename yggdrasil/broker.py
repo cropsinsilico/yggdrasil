@@ -7,7 +7,8 @@ import atexit
 import traceback
 import itertools
 from yggdrasil import multitasking
-from yggdrasil.communication import CommBase, new_comm, get_comm
+from yggdrasil.communication import (
+    CommBase, new_comm, get_comm, strip_model_prefix)
 from yggdrasil.drivers import create_driver, DirectConnectionDriver
 from yggdrasil.components import create_component
 
@@ -40,9 +41,12 @@ class YggBroker(multitasking.YggTaskLoop):
         self.yaml = yaml
         self.server_comm = new_comm(
             'YggBroker', commtype='server', use_async=False,
-            direct_connection=True, datatype={'type': 'object'},
+            direct_connection=True,
             allow_multiple_comms=True, no_suffix=True,
             create_proxy=True, no_request_reply=True,
+            datatype={'type': 'object',
+                      'additionalProperties': {'type': 'any'}},
+            response_kwargs={'datatype': {'type': 'any'}},
         )
         self._delayed_requests = []
         self._current_request = None
@@ -91,14 +95,14 @@ class YggBroker(multitasking.YggTaskLoop):
             name = comm['name']
             direction = comm['direction']
             model = comm['model']
-            if name.startswith(f'{model}:'):
-                name = name.split(f'{model}:', 1)[-1]
+            name = strip_model_prefix(name, model)
             if isinstance(comm['commtype'], list):
                 commlist = comm['commtype']
         else:
-            name = comm.name_base
+            name = comm.opp_name
             direction = comm.opp_direction
             model = comm.partner_model
+            name = strip_model_prefix(name, model)
             if comm._commtype == 'fork':
                 commlist = comm.comm_list
             elif comm._commtype == 'server' and direction == 'send':
@@ -139,8 +143,7 @@ class YggBroker(multitasking.YggTaskLoop):
             BrokerError: If a matching communicator cannot be located.
 
         """
-        if name.startswith(f"{model}:"):
-            name = name.split(f"{model}:", 1)[-1]
+        name = strip_model_prefix(name, model)
         for x in self.connections:
             for io in ['input', 'output']:
                 if model not in x.models[io]:
@@ -439,7 +442,11 @@ class YggBroker(multitasking.YggTaskLoop):
                 f"YggBroker-{model}", commtype='client',
                 address=server_address,
                 use_async=False, direct_connection=True,
-                create_proxy=False, no_request_reply=True)
+                create_proxy=False, no_request_reply=True,
+                datatype={'type': 'object',
+                          'additionalProperties': {'type': 'any'}},
+                response_kwargs={'datatype': {'type': 'any'}},
+            )
         return cls._clients[model]
 
     @classmethod
@@ -571,7 +578,7 @@ class YggBroker(multitasking.YggTaskLoop):
         """
         kwargs = dict(cls.model_comm_kwargs(name, direction), **kwargs)
         assert direction == kwargs['direction']
-        name = kwargs.pop('name')
+        name = kwargs['name']
         global_scope = kwargs.pop('global_scope', False)
         global_name = name
         if isinstance(global_scope, str):
@@ -582,10 +589,10 @@ class YggBroker(multitasking.YggTaskLoop):
             # two aliases
             return cls._global_scope_comms[global_name]
         if 'address' in kwargs:
-            out = get_comm(name, **kwargs)
+            out = get_comm(**kwargs)
         else:
-            partner_name = kwargs.pop('partner_name')
-            out = new_comm(name, **kwargs)
+            partner_name = kwargs['partner_name']
+            out = new_comm(**kwargs)
             cls.update_model_comm_kwargs(
                 partner_name, out.model_comm_kwargs)
         if global_scope:

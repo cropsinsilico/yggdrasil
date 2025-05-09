@@ -42,6 +42,15 @@ class DirectConnectionDriver(ConnectionDriver):
                 assert isinstance(x, dict)
         models = []
         for x in comm_list:
+            if x.get('for_service', False):
+                # TODO: This may be possible?
+                raise DirectConnectionError(
+                    "Cannot make a direct service connection.")
+            if 'filetype' in x:
+                # TODO: This is only true for C based interfaces
+                x['commtype'] = 'file'
+                raise DirectConnectionError(
+                    "Cannot make a direct connection to a file.")
             x.update(
                 model=x.pop('partner_model'),
                 direct_connection=True,
@@ -51,11 +60,9 @@ class DirectConnectionDriver(ConnectionDriver):
                 x['model_copies'] = x.pop('partner_copies')
             if 'partner_language' in x:
                 x['language'] = x.pop('partner_language')
-            if 'filetype' in x:
-                # TODO: This is only true for C based interfaces
-                x['commtype'] = 'file'
-                raise DirectConnectionError(
-                    "Cannot make a direct connection to a file.")
+                if x['language'] in ['c', 'c++', 'fortran']:
+                    raise DirectConnectionError(
+                        "C use of comm broker not yet implemented")
             x.setdefault('commtype', comm_type)
             if x['commtype'] == 'mpi':
                 raise DirectConnectionError(

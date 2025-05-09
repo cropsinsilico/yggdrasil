@@ -1164,22 +1164,30 @@ def running_service(with_coverage, check_service_manager_settings,
 
     @contextlib.contextmanager
     def running_service_w(service_type, partial_commtype=None,
-                          track_memory=False, debug=False):
+                          track_memory=False, debug=False,
+                          include_yggdrasil_models='test'):
         from yggdrasil.services import IntegrationServiceManager
         if ((((service_type, partial_commtype) == ('flask', 'rmq'))
              and platform._is_win)):
             pytest.skip("excluded on windows")
         check_service_manager_settings(service_type, partial_commtype)
-        model_repo = yggdrasil_model_repository_url + '/models'
-        model_dir = os.path.join(yggdrasil_model_repository_dir)
+        model_repo = None
+        model_dir = None
+        if include_yggdrasil_models == 'test':
+            model_repo = yggdrasil_model_repository_url + '_test/models'
+        elif include_yggdrasil_models:
+            model_repo = yggdrasil_model_repository_url + '/models'
+            model_dir = os.path.join(yggdrasil_model_repository_dir)
         log_level = logging.ERROR
         args = [sys.executable, "-m", "yggdrasil", "integration-service-manager",
                 f"--service-type={service_type}"]
         if partial_commtype is not None:
             args.append(f"--commtype={partial_commtype}")
-        args += ["start", f"--model-repository={model_repo}",
-                 f"--model-repository-dir={model_dir}",
-                 f"--log-level={log_level}"]
+        args += ["start", f"--log-level={log_level}"]
+        if model_repo:
+            args += [f"--model-repository={model_repo}"]
+        if model_dir:
+            args += [f"--model-repository-dir={model_dir}"]
         if track_memory:
             args.append("--track-memory")
         if debug:
@@ -1203,6 +1211,7 @@ def running_service(with_coverage, check_service_manager_settings,
                 f'srv.start_server(with_coverage={with_coverage},',
                 f'                 log_level={log_level},',
                 f'                 model_repository=\'{model_repo}\',',
+                f'                 model_repository_dir=\'{model_dir}\','
                 f'                 track_memory={track_memory})']
             with open(script_path, 'w') as fd:
                 fd.write('\n'.join(lines))

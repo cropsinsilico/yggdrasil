@@ -77,16 +77,18 @@ class DummyModelDriver(InterpretedModelDriver):
     def service_partner(self):
         r"""dict: YAML representation of the dummy model that should
         stand-in for the model client-side."""
+        from yggdrasil.communication import strip_model_prefix
         out = {'inputs': [], 'outputs': []}
         dir2opp = {'input': 'output', 'output': 'input'}
         for io1, io2 in dir2opp.items():
-            for drv in self.yml['%s_drivers' % io1]:
+            for drv in self.yml[f'{io1}_drivers']:
                 name = drv[io1 + 's'][0]['name']
-                comm = getattr(drv['instance'], '%scomm' % io2[0])
+                name = strip_model_prefix(
+                    name, drv[f'{io1}s'][0]['partner_model'])
+                comm = getattr(drv['instance'], f'{io2[0]}comm')
                 x = comm.opp_comm_kwargs(for_yaml=True)
-                x['name'] = name.split(
-                    drv[io1 + 's'][0]['partner_model'] + ':')[-1]
-                out[io2 + 's'].append(x)
+                x['name'] = name
+                out[f'{io2}s'].append(x)
                 if drv['instance']._connection_type.startswith('rpc_'):
                     assert io2 == 'input'
                     out[io1 + 's'].append({'name': x['name'] + '_response'})

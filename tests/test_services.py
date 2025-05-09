@@ -294,6 +294,7 @@ class TestRegisteredIntegrationFunction(object):
     name = None
     request = None
     nrep = 2
+    _write_keys = False
 
     @pytest.fixture(
         scope="class", params=['function', 'local', 'remote']
@@ -302,9 +303,6 @@ class TestRegisteredIntegrationFunction(object):
         r"""str: Type of service to test."""
         if self.name is None:
             pytest.skip("name not set")
-        # TODO: Remove this for push
-        if request.param == 'remote':
-            pytest.skip("remote")
         return request.param
 
     @pytest.fixture(scope="class")
@@ -313,7 +311,7 @@ class TestRegisteredIntegrationFunction(object):
                        yggdrasil_model_repository_dir):
         r"""Service manager client."""
         if service_type == 'local':
-            with running_service('flask') as cli:
+            with running_service('flask', include_yggdrasil_models=True) as cli:
                 yield cli
         elif service_type == 'remote':
             yield remote_model_service
@@ -375,7 +373,9 @@ class TestRegisteredIntegrationFunction(object):
             if action in ['call', None]:
                 return function(**request)
             elif action == 'info':
-                return function.argument_info
+                return function.function_info
+            elif action == 'n8n_form_node':
+                return function.n8n_form_node
             else:
                 raise ValueError(f"Unsupported action: {action}")
 
@@ -431,6 +431,26 @@ class TestRegisteredIntegrationFunction(object):
         return self.request
 
     @pytest.fixture(scope="class")
+    def write_keys(self, service_type):
+        r"""Write the response keys to a file.
+
+        Args:
+            response (dict): Response.
+
+        """
+
+        def _write_keys(response):
+            if not self._write_keys:
+                return
+            fname = os.path.join(os.getcwd(),
+                                 f'{self.name}_{service_type}_keys.txt')
+            with open(fname, 'w') as fd:
+                fd.write('\n'.join(sorted(list(response.keys()))))
+            print(f"WROTE RESPONSE KEYS TO {fname}")
+
+        return _write_keys
+
+    @pytest.fixture(scope="class")
     def check_response(self):
         r"""Check if the response matches expectations."""
 
@@ -438,6 +458,22 @@ class TestRegisteredIntegrationFunction(object):
             return True
 
         return _check_response
+
+    def test_landing(self, service_type, service_client, base_request,
+                     call_method):
+        r"""Test that the landing page returns properly before and
+        after function called."""
+        if service_type == 'function':
+            service_client.printStatus()
+            assert isinstance(
+                service_client.printStatus(return_str=True), str)
+            return
+        import requests
+        r = requests.get(service_client.address)
+        r.raise_for_status()
+        call_method(base_request)
+        r = requests.get(service_client.address)
+        r.raise_for_status()
 
     def test_request(self, call_method, base_request,
                      check_response):
@@ -450,6 +486,11 @@ class TestRegisteredIntegrationFunction(object):
         r"""Test function info."""
         import pprint
         pprint.pprint(service_request(action='info'))
+
+    def test_n8n_form_node(self, service_request):
+        r"""Test function n8n_form_node."""
+        import pprint
+        pprint.pprint(service_request(action='n8n_form_node'))
 
 
 class TestRegisteredBioCro(TestRegisteredIntegrationFunction):
@@ -470,15 +511,21 @@ class TestRegisteredBioCro(TestRegisteredIntegrationFunction):
         return request.param
 
     @pytest.fixture(scope="class")
-    def check_response(self, service_type):
+    def check_response(self, service_type, write_keys):
         r"""Check if the response matches expectations."""
         import numpy as np
 
         def _check_response(request, response):
             assert isinstance(response, dict)
-            for k in self.keys:
-                assert k in response
-            assert len(response) == 462
+            write_keys(response)
+            try:
+                for k in self.keys:
+                    assert k in response
+                assert len(response) == 479
+            except AssertionError:
+                self._write_keys = True
+                write_keys(response)
+                raise
             if request.get('output_timesteps', False):
                 for v in response.values():
                     if service_type == 'function':

@@ -3,6 +3,7 @@ import sys
 import os
 import time
 import copy
+import uuid
 import signal
 import atexit
 from pprint import pformat
@@ -56,7 +57,6 @@ class YggFunction(YggClass):
     
     def __init__(self, model_yaml, service_address=None,
                  signal_handler=None, **kwargs):
-        import uuid
         super(YggFunction, self).__init__()
         # Create and start runner in another process
         self.dummy_name = 'func' + str(uuid.uuid4()).split('-')[0]
@@ -64,6 +64,10 @@ class YggFunction(YggClass):
         self.service_address = service_address
         self.runner_kwargs = kwargs
         self.runner_kwargs['complete_partial'] = self.dummy_name
+        self._stop_called = False
+        self._comms = {'input': {}, 'output': {}}
+        self._vars = {'input': {}, 'output': {}}
+        self.old_environ = os.environ.copy()
         if service_address:
             # Temporary YAML describing the service
             contents = (f'service:\n'
@@ -136,10 +140,8 @@ class YggFunction(YggClass):
         if self.runner is not None:
             self.info("Model already running")
             return
-        from yggdrasil.languages.Python.YggInterface import (
-            YggInput, YggOutput, YggRpcClient)
+        from yggdrasil.languages.Python.YggInterface import InterfaceComm
         from yggdrasil import tools
-        self._stop_called = False
         self.runner = YggRunner(self.model_yaml, **self.runner_kwargs)
         # Start the drivers
         # TODO: Allow call directly?
@@ -151,39 +153,44 @@ class YggFunction(YggClass):
                 break
         self.debug("run started")
         # Create input/output channels
-        self._vars = {'input': {}, 'output': {}}
-        self.inputs = {}
-        self.outputs = {}
-        self.old_environ = os.environ.copy()
         with tools.updated_environment(self.model_driver['instance'].set_env()):
-            for drv in self.model_driver['input_drivers']:
-                channel_name = drv['instance'].ocomm_kws['name']
-                var_name = drv['instance'].icomm_kws['name'].split(
-                    ':', 1)[-1]
-                self.outputs[var_name] = drv.copy()
-                self.outputs[var_name]['comm'] = YggInput(
-                    channel_name, no_suffix=True)  # context=ctx)
-                self.outputs[var_name]['vars'] = drv['inputs'][0].get(
-                    'vars', [var_name])
-            for drv in self.model_driver['output_drivers']:
-                channel_name = drv['instance'].icomm_kws['name']
-                var_name = drv['instance'].ocomm_kws['name'].split(
-                    ':', 1)[-1]
-                self.inputs[var_name] = drv.copy()
-                if drv['instance']._connection_type == 'rpc_request':
-                    self.inputs[var_name]['comm'] = YggRpcClient(
-                        channel_name, no_suffix=True)
-                    self.outputs[var_name] = drv.copy()
-                    self.outputs[var_name]['comm'] = self.inputs[var_name]['comm']
-                    if drv['outputs'][0].get('server_replaces', False):
-                        srv = drv['outputs'][0]['server_replaces']
-                        self.inputs[var_name]['vars'] = srv['input']['vars']
-                        self.outputs[var_name]['vars'] = srv['output']['vars']
-                else:
-                    self.inputs[var_name]['comm'] = YggOutput(
-                        channel_name, no_suffix=True)  # context=ctx)
-                    self.inputs[var_name]['vars'] = drv['outputs'][0].get(
-                        'vars', [var_name])
+            for io in ['output', 'input']:
+                io_opp = 'output' if io == 'input' else 'input'
+                direction = 'send' if io == 'input' else 'recv'
+                for drv in self.model_driver[f'{io_opp}_drivers']:
+                    channel_name = getattr(
+                        drv['instance'], f'{io[0]}comm_kws')['name']
+                    var_name = getattr(
+                        drv['instance'], f'{io_opp[0]}comm_kws')['name']
+                    var_name = var_name.split(':', 1)[-1]
+                    self._comms[io][var_name] = drv.copy()
+                    kws = {
+                        'direction': direction,
+                        'no_suffix': True,
+                        # 'context': ctx,
+                    }
+                    if drv['instance']._connection_type == 'rpc_request':
+                        kws['commtype'] = 'client'
+                    self._comms[io][var_name]['comm'] = InterfaceComm(
+                        channel_name, **kws)
+                    if drv['instance']._connection_type == 'rpc_request':
+                        self._comms[io_opp][var_name] = drv.copy()
+                        self._comms[io_opp][var_name]['comm'] = (
+                            self._comms[io][var_name]['comm'])
+                        if drv['outputs'][0].get('server_replaces', False):
+                            srv = drv['outputs'][0]['server_replaces']
+                            self._comms[io][var_name]['vars'] = (
+                                srv[io]['vars'])
+                            self._comms[io_opp][var_name]['vars'] = (
+                                srv[io_opp]['vars'])
+                        else:
+                            self._comms[io_opp][var_name]['vars'] = (
+                                drv[f'{io_opp}'][0].get(
+                                    'response_kwargs', {}).get(
+                                        'vars', [var_name]))
+                    if 'vars' not in self._comms[io][var_name]:
+                        self._comms[io][var_name]['vars'] = (
+                            drv[f'{io_opp}s'][0].get('vars', [var_name]))
         self.debug(f'inputs: {list(self.inputs.keys())}, '
                    f'outputs: {list(self.outputs.keys())}')
         atexit.register(self.stop)
@@ -208,51 +215,134 @@ class YggFunction(YggClass):
         if self.service_address:
             os.remove(self.model_yaml)
 
-    def argument_datatype(self, name):
+    def argument_models(self, io, name):
+        r"""Get the name of the model that the argument is passed to.
+
+        Args:
+            io (str): Direction of argument ('input' or 'output').
+            name (str): Argument name.
+
+        Returns:
+            list: Names of models that the argument is passed to.
+
+        """
+        comm = self._vars[io][name]
+        if io == 'input':
+            out = [x['partner_model'] for x in comm['outputs']]
+        else:
+            out = [x['partner_model'] for x in comm['inputs']]
+        return out
+
+    def argument_datatype(self, io, name):
         r"""Get the datatype for an argument.
 
         Args:
+            io (str): Direction of argument ('input' or 'output').
             name (str): Argument name.
 
         Returns:
             dict: JSON schema describing the data type.
 
         """
-        if name in self._vars['input'][name]['vars_datatypes']:
-            return self._vars['input'][name]['vars_datatypes'][name]
-        comm = self._vars['input'][name]['comm']
+        if name in self._vars[io][name]['vars_datatypes']:
+            return self._vars[io][name]['vars_datatypes'][name]
+        comm = self._vars[io][name]['comm']
         if comm.commtype == 'client':
-            out = comm.ocomm.serializer.datatype
+            if io == 'input':
+                out = comm.ocomm.serializer.datatype
+            else:
+                out = comm.icomm.serializer.datatype
         else:
             out = comm.serializer.datatype
         return out
 
-    def return_datatype(self, name):
-        r"""Get the datatype for a returned variable.
+    def comm_info(self, io, name):
+        r"""Get information about a communicator.
 
         Args:
-            name (str): Variable name.
+            io (str): Direction of communicator ('input' or 'output').
+            name (str): Communicator name.
 
         Returns:
-            dict: JSON schema describing the data type.
+            dict: Info about the communicator.
 
         """
-        if name in self._vars['output'][name]['vars_datatypes']:
-            out = self._vars['output'][name]['vars_datatypes'][name]
+        comm = self._comms[io][name]
+        out = {'arguments': comm['var_names']}
+        if io == 'input':
+            out['models'] = [x['partner_model'] for x in comm['outputs']]
         else:
-            comm = self._vars['output'][name]['comm']
-            if comm.commtype == 'client':
-                out = comm.icomm.serializer.datatype
-            else:
-                out = comm.serializer.datatype
+            out['models'] = [x['partner_model'] for x in comm['inputs']]
+        return out
+
+    def argument_info(self, io, name):
+        r"""Get information about an argument.
+
+        Args:
+            io (str): Direction of argument ('input' or 'output').
+            name (str): Argument name.
+
+        Returns:
+            dict: Info about the argument.
+
+        """
+        out = {
+            'models': self.argument_models(io, name),
+            'datatype': self.argument_datatype(io, name),
+        }
+        # TODO: Add description
         return out
 
     @property
-    def argument_info(self):
+    def inputs(self):
+        r"""dict: Input communicators."""
+        return self._comms['input']
+
+    @property
+    def outputs(self):
+        r"""dict: Output communicators."""
+        return self._comms['output']
+
+    @property
+    def function_info(self):
         r"""dict: Information about the function."""
         out = {
-            'arguments': self.argument_datatypes,
-            'returns': self.return_datatypes,
+            'models': [
+                x['name'] for x in self.runner.modeldrivers.values()
+                if x['name'] != self.dummy_name
+            ],
+        }
+        for io in ['input', 'output']:
+            out[io] = {}
+            for v in self._vars[io].keys():
+                out[io][v] = self.argument_info(io, v)
+        return out
+
+    @property
+    def n8n_form_node(self):
+        r"""dict: Parameters describing an n8n tool for this function."""
+        name = self.runner.name
+        values = []
+        for k, v in self._vars['input'].items():
+            datatype = self.argument_datatype('input', k)
+            ivalue = {
+                "fieldLabel": k,
+                "fieldType": datatype['type'],
+            }
+            if 'default' in datatype:
+                ivalue["placeholder"] = datatype['default']
+            values.append(ivalue)
+        out = {
+            "name": "n8n Form Trigger",
+            "id": str(uuid.uuid4()),
+            "type": "n8n-nodes-base.formTrigger",
+            "parameters": {
+                "formTitle": f"Run {name} model/integration",
+                "formFields": {
+                    "values": values,
+                },
+                "options": {},
+            },
         }
         return out
 
@@ -261,7 +351,7 @@ class YggFunction(YggClass):
         r"""dict: Datatypes for each function argument."""
         out = {}
         for v in self._vars['input'].keys():
-            out[v] = self.argument_datatype(v)
+            out[v] = self.argument_datatype('input', v)
         return out
 
     @property
@@ -269,7 +359,7 @@ class YggFunction(YggClass):
         r"""dict: Datatypes for each function return variable."""
         out = {}
         for v in self._vars['output'].keys():
-            out[v] = self.return_datatype(v)
+            out[v] = self.argument_datatype('output', v)
         if len(out) == 1:
             out = out[list(out.keys())[0]]
         return out
@@ -292,7 +382,7 @@ class YggFunction(YggClass):
         for a in self.arguments:
             if a in kwargs:
                 continue
-            a_dtype = self.argument_datatype(a)
+            a_dtype = self.argument_datatype('input', a)
             if ((len(args) == 0 and len(self.arguments) == 1
                  and a_dtype.get('type', '') == 'object')):
                 a_kws = list(kwargs.keys())
@@ -363,15 +453,28 @@ class YggFunction(YggClass):
         self.printStatus()
 
     def printStatus(self, level='info', return_str=False):
-        getattr(self.logger, level)(
-            "Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
-            % (', '.join([x['name'] for x in
-                          self.runner.modeldrivers.values()
-                          if x['name'] != self.dummy_name]),
-               '\n'.join(['\t%s (vars=%s)' % (k, v['var_names'])
-                          for k, v in self.inputs.items()]),
-               '\n'.join(['\t%s (vars=%s)' % (k, v['var_names'])
-                          for k, v in self.outputs.items()])))
+        info = self.function_info
+        t = '   '
+        msg = f"Models: {', '.join(info['models'])}\n"
+        for io in ['input', 'output']:
+            msg += f'{io.title()}s:\n'
+            for k, v in info[io].items():
+                msg += f"{t}{k}:\n"
+                datatype_str = pformat(v['datatype'])
+                datatype_lines = datatype_str.splitlines()
+                if len(datatype_lines) > 1:
+                    datatype_str = (
+                        f'\n{3 * t}' + f'\n{3 * t}'.join(datatype_lines)
+                    )
+                if 'description' in v:
+                    msg += f"{2 * t}description: {v['description']}\n"
+                msg += (
+                    f"{2 * t}models: {', '.join(v['models'])}\n"
+                    f"{2 * t}datatype: {datatype_str}\n"
+                )
+        if return_str:
+            return msg
+        getattr(self.logger, level)(msg)
 
 
 class YggRunner(YggClass):
@@ -446,7 +549,7 @@ class YggRunner(YggClass):
                  mpi_tag_start=None, validate=False,
                  with_debugger=None, disable_python_c_api=False,
                  with_asan=False, with_omp=False, overwrite=False,
-                 remove_products=False, **kwargs):
+                 remove_products=False, name='runner', **kwargs):
         kwargs_models = {'with_debugger': with_debugger,
                          'disable_python_c_api': disable_python_c_api,
                          'with_asan': with_asan,
@@ -454,7 +557,6 @@ class YggRunner(YggClass):
                          'overwrite': overwrite,
                          'remove_products': remove_products}
         self.mpi_comm = None
-        name = 'runner'
         MPI = init_mpi()
         if MPI is not None:
             comm = MPI.COMM_WORLD
@@ -1152,13 +1254,13 @@ class YggRunner(YggClass):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         self.debug('')
         self.resume()
-        self.broker.terminate()
         for driver in self.all_drivers:
             if 'instance' in driver:
                 self.debug('Stop %s', driver['name'])
                 driver['instance'].terminate()
                 # Terminate should ensure instance not alive
                 assert not driver['instance'].is_alive()
+        self.broker.terminate()
         self.debug('Returning')
 
     def cleanup(self):

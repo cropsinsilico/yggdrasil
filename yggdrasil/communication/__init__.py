@@ -82,6 +82,46 @@ def import_comm(commtype=None):
     return import_component('comm', commtype)
 
 
+def strip_model_prefix(name, model):
+    r"""Strip the model prefix from a communicator name.
+
+    Args:
+        name (str): Communicator name.
+        model (str, list): One or more model names to strip.
+
+    Returns:
+        str: Stripped name.
+
+    """
+    if not model:
+        return name
+    if isinstance(model, list):
+        for x in model:
+            name = strip_model_prefix(name, x)
+        return name
+    if name.startswith(f'{model}:'):
+        name = name.split(f'{model}:', 1)[-1]
+    return name
+
+
+def add_model_prefix(name, model):
+    r"""Add the model prefix to a communicator name.
+
+    Args:
+        name (str): Communicator name.
+        model (str): Model names to add.
+
+    Returns:
+        str: Updated name.
+
+    """
+    if not model:
+        return name
+    if not name.startswith(f'{model}:'):
+        name = f'{model}:{name}'
+    return name
+
+
 def determine_suffix(no_suffix=False, reverse_names=False,
                      direction='send', **kwargs):
     r"""Determine the suffix that should be used for the comm name.
@@ -134,14 +174,10 @@ def envName(name, env=None, **kwargs):
     """
     if env is None:
         env = os.environ
-    prefix = ''
     suffix = determine_suffix(**kwargs)
     model_name = env.get('YGG_MODEL_NAME', None)
-    if model_name:
-        prefix = f'{model_name}:'
-    if name.startswith(prefix):
-        prefix = ''
-    return prefix + name + suffix
+    name = add_model_prefix(name, model_name)
+    return name + suffix
 
 
 def envComm(name, **kwargs):

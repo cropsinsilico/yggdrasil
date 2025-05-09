@@ -148,13 +148,15 @@ def clone_github_repo(fname, commit=None, branch=None, tag=None,
                 raise
     if repo is None:
         if os.environ.get(_service_host_env, False):
-            raise RuntimeError("Cloning of unvetted git repo is "
-                               "not permitted on a integration "
-                               "service manager. All of the required "
-                               "repositories should be included as part "
-                               "of the service repository as submodules "
-                               "or clone by the Docker image used to "
-                               "deploy the service manager.")
+            raise RuntimeError(
+                f"Cloning of unvetted git repo is "
+                f"not permitted on a integration "
+                f"service manager. All of the required "
+                f"repositories should be included as part "
+                f"of the service repository as submodules "
+                f"or clone by the Docker image used to "
+                f"deploy the service manager. Failed to clone "
+                f"{url} into {repository_dir}")
         # create the url for cloning the repo
         cloneurl = parsed.scheme + '://' + parsed.netloc + '/' + owner + '/' +\
             reponame

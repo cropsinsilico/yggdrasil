@@ -532,7 +532,7 @@ class integration_service_manager(SubCommand):
                          {'action': 'store_true',
                           'help': ('Enable coverage cleanup for testing.')}),
                         (('--model-repository', ),
-                         {'nargs': '?', 'const': True, 'default': False,
+                         {'nargs': '?', 'const': True, 'default': None,
                           'help': ('URL for a directory in a Git repository '
                                    'containing models that should be loaded '
                                    'into the service manager registry. If '
@@ -598,7 +598,7 @@ class integration_service_manager(SubCommand):
                          {'action': 'store_true', 'default': False,
                           'help': ('Don\'t validate the integration YAML')}),
                         (('--model-repository', ),
-                         {'nargs': '?', 'const': True, 'default': False,
+                         {'nargs': '?', 'const': True, 'default': None,
                           'help': ('URL for a directory in a Git repository '
                                    'containing models that should be loaded '
                                    'into the service manager registry. If '
@@ -700,10 +700,12 @@ class integration_service_manager(SubCommand):
                 kws = {}
                 if args.model_repository_dir:
                     kws['repository_dir'] = args.model_repository_dir
-                x.registry.add(args.model_repository,
-                               init=args.init,
-                               dont_validate=args.dont_validate,
-                               skip_models=args.skip_models, **kws)
+                x.registry.add_from_repository(
+                    args.model_repository,
+                    init=args.init,
+                    dont_validate=args.dont_validate,
+                    skip_models=args.skip_models, **kws
+                )
         elif args.action == 'unregister':
             x.registry.remove(name=integration_name)
         else:

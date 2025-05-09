@@ -240,42 +240,6 @@ class ForkComm(CommBase.CommBase):
                 out[k].update(v)
         return out
 
-    def model_partner_comm(self, model=None):
-        r"""Return the communicator that is partnered with a specific
-        model.
-
-        Args:
-            model (str, optional): Model name. If not provided, a
-                dictionary will be returned with all partner models as
-                keys and the corresponding communicators as values.
-
-        Returns:
-            CommBase: Model communicator.
-
-        Raises:
-            CommError: If there is not a communicator partnered with the
-                named model.
-
-        """
-        if self.partner_model:
-            return super(ForkComm, self).model_partner_comm(model)
-        if model is None:
-            out = {}
-            for x in self.comm_list:
-                iout = x.model_partner_comm()
-                for k, v in iout.items():
-                    out.setdefault(k, [])
-                    out[k] += v
-            return out
-        for x in self.comm_list:
-            try:
-                return x.model_partner_comm(model)
-            except CommBase.CommError:
-                continue
-        raise CommBase.CommError(
-            f"Could not locate communicator partnered with "
-            f"model \"{model}\" within ForkComm")
-
     # @property
     # def mpi_model_kws(self):
     #     r"""dict: Mapping between model name and opposite comm keyword

@@ -11,6 +11,7 @@ import pprint
 import functools
 import threading
 import logging
+import requests
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.multitasking import (
@@ -465,7 +466,6 @@ class FlaskService(ServiceBase):
             object: Response.
 
         """
-        import requests
         if address is None:
             address = self.address + self.name
         try:
@@ -711,7 +711,7 @@ def create_service_manager_class(service_type=None):
                 _client_id = str(uuid.uuid4())
             return _client_id
 
-        def send_request(self, name=None, yamls=None, action='start',
+        def send_request(self, name=None, yamls=None, action=None,
                          model=None, **kwargs):
             r"""Send a request.
 
@@ -735,14 +735,17 @@ def create_service_manager_class(service_type=None):
                     yamls = [yamls]
                 if name is None:
                     name = yamls
+                if action is None:
+                    action = 'start'
                 request = dict(kwargs, name=name, yamls=yamls,
                                action=action)
                 request.setdefault('client_id', self.client_id)
             else:
-                action = None
                 assert isinstance(name, dict)
                 request = name
                 request_kws['address'] = self.address + model
+                if action:
+                    request_kws['address'] += f'/{action}'
             wait_for_complete = ((action in ['start', 'stop', 'shutdown'])
                                  and (service_type != RMQService))
             out = super(IntegrationServiceManager, self).send_request(
@@ -766,22 +769,28 @@ def create_service_manager_class(service_type=None):
                 def landing_page():
                     from flask import render_template
                     import yaml
-                    kwargs = {
-                        'address': self.address,
-                        'available': {
-                            k: yaml.dump(v).splitlines()
-                            for k, v in self.registry.registry.items()},
-                        'running': {
-                            k: {k2: v2.printStatus(return_str=True).splitlines()
+                    try:
+                        kwargs = {
+                            'address': self.address,
+                            'available': {
+                                k: yaml.dump(v).splitlines()
+                                for k, v in self.registry.registry.items()},
+                            'running': {
+                                k: {k2: v2.printStatus(return_str=True).splitlines()
+                                    for k2, v2 in v.items()}
+                                for k, v in self.integrations.items()},
+                        }
+                        for k, v in self.functions.items():
+                            kwargs['running'][f'{k}[FUNCTION]'] = {
+                                k2: k2.printStatus(return_str=True).splitlines()
                                 for k2, v2 in v.items()}
-                            for k, v in self.integrations.items()},
-                    }
-                    for k, v in self.functions.items():
-                        kwargs['running'][f'{k}[FUNCTION]'] = {
-                            k2: k2.printStatus(return_str=True).splitlines()
-                            for k2, v2 in v.items()}
-                    out = render_template(
-                        'service_manager_index.html', **kwargs)
+                        out = render_template(
+                            'service_manager_index.html', **kwargs)
+                    except BaseException:
+                        error = traceback.format_exc().splitlines()
+                        out = render_template(
+                            'service_manager_index_error.html',
+                            error=error)
                     return out
 
                 @self.app.route('/<model>', methods=['POST'])
@@ -950,7 +959,7 @@ def create_service_manager_class(service_type=None):
 
             """
             function = None
-            if action in ['call', 'info']:
+            if action in ['call', 'info', 'n8n_form_node']:
                 if name not in self.functions:
                     self.respond_function(name, 'create')
                 function = self.functions[name]
@@ -967,7 +976,9 @@ def create_service_manager_class(service_type=None):
                             f'the registry. Valid integrations include: '
                             f'{list(self.registry.registry.keys())}')
                     function = runner.YggFunction(
-                        reg['yamls'], signal_handler=False)
+                        reg['yamls'], signal_handler=False,
+                        name=name,
+                    )
                     self.functions[name] = function
                     response = {'status': 'created'}
             elif action == 'delete':
@@ -986,7 +997,9 @@ def create_service_manager_class(service_type=None):
                     raise
                 response = rapidjson.as_pure_json(response)
             elif action == 'info':
-                response = function.argument_info
+                response = function.function_info
+            elif action == 'n8n_form_node':
+                response = function.n8n_form_node
             else:
                 raise RuntimeError(f"Unsupported action: '{action}'")
             return response
@@ -1126,7 +1139,95 @@ def create_service_manager_class(service_type=None):
                 msg, _ = self.logger.process(status['status'], {})
                 return msg
             getattr(self.logger, level)(status['status'])
-            
+
+        def create_n8n_tool(self, name, n8n_address=None,
+                            service_address=None,
+                            credentials=None):  # pragma: no cover
+            r"""Create an n8n tool for a service via the API.
+
+            Args:
+                name (str): Service name (model or integration).
+                n8n_address (str): Address of the n8n workspace.
+                service_address (str, optional): Address of the remote
+                    service. If not provided, the current address will be
+                    used.
+                credentials (str, optional): Credentials that should be
+                    supplied via X-N8N-API-KEY in the header for requests
+                    to the n8n API. If not provided, the environment
+                    variable "X-N8N-API-KEY" will be checked.
+
+            """
+            if n8n_address is None:
+                n8n_address = "https://tools.uiuc.chat/api/v1"
+            if credentials is None:
+                credentials = os.environ.get('X-N8N-API-KEY', None)
+                if credentials is None:
+                    raise RuntimeError("No credentials provided and "
+                                       "\"X-N8N-API-KEY\" environment "
+                                       "variable not set")
+            assert self.for_request
+            if service_address is None:
+                service_address = self.address
+            nodes = [
+                self.send_request(action='n8n_form_node'),
+                {
+                    "name": "HTTP Request",
+                    "type": "n8n-nodes-base.httpRequest",
+                    "parameters": {
+                        "method": "POST",
+                        "url": f"{service_address.rstrip('/')}/{name}",
+                        "sendBody": True,
+                        "specifyBody": "json",
+                        "jsonBody": "={{$json.toJsonString()}}",
+                        "options": {
+                            "response": {
+                                "response": {
+                                    "responseFormat": "json"
+                                }
+                            }
+                        },
+                    },
+                }
+            ]
+            request = {
+                'name': f"{name} Tool",
+                'id': str(uuid.uuid4()),
+                'nodes': nodes,
+                'connections': {
+                    "n8n Form Trigger": {
+                        "main": [[{
+                            "node": "HTTP Request",
+                            "type": "main",
+                            "index": 0,
+                        }]]
+                    },
+                },
+                'settings': {
+                    # 'saveExecutionProgress': False,
+                    # 'saveManualExecutions': False,
+                    # 'saveDataErrorExecution': 'all',
+                    # 'saveDataSuccessExecution': 'all',
+                    # 'executionTimeout': 3600,
+                    # 'errorWorkflow': 'name of error workflow',
+                    # 'timezone': '?',
+                    "executionOrder": "v1",
+                },
+            }
+            headers = {'X-N8N-API-KEY': credentials}
+            r = requests.get(f'{n8n_address}/workflows',
+                             params={'name': request['name']},
+                             headers=headers)
+            r.raise_for_status()
+            response = r.json()
+            if len(response['data']) > 0:
+                raise Exception(f"Tool already exists with name "
+                                f"{request['name']}")
+            r = requests.post(f'{n8n_address}/workflows', json=request,
+                              headers=headers)
+            r.raise_for_status()
+            response = r.json()
+            pprint.pprint(response)
+
     return IntegrationServiceManager
 
 

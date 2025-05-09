@@ -11,7 +11,8 @@ import numpy as np
 from yggdrasil import tools, multitasking, constants, rapidjson
 from yggdrasil.communication import (
     new_comm, get_comm, TemporaryCommunicationError,
-    CloseCommunicatorError, import_comm, checkEnv, envName, AddressError
+    CloseCommunicatorError, import_comm, checkEnv, envName, AddressError,
+    strip_model_prefix, add_model_prefix, determine_suffix,
 )
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
@@ -1108,7 +1109,8 @@ class CommBase(tools.YggClass):
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, env=None, partner_copies=0,
-                 partner_model=None, partner_language='python', partner_mpi_ranks=[],
+                 partner_model=None, partner_language='python',
+                 partner_mpi_ranks=[], partner_name=None,
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  allow_multiple_comms=False, direct_connection=False,
@@ -1130,7 +1132,11 @@ class CommBase(tools.YggClass):
         if env is None:
             env = os.environ.copy()
         self.env = env
-        self.name_base = name
+        self.name_base = strip_model_prefix(
+            name, [self.model_name, partner_model])
+        self._suffix = determine_suffix(no_suffix=no_suffix,
+                                        reverse_names=reverse_names,
+                                        direction=direction)
         self._name = envName(name, env=self.env, no_suffix=no_suffix,
                              reverse_names=reverse_names,
                              direction=direction)
@@ -1140,18 +1146,11 @@ class CommBase(tools.YggClass):
             is_interface = False  # tools.is_subprocess()
         self.is_interface = is_interface
         if self.is_interface:
-            # All models connect to python connection drivers
-            partner_model = None
-            partner_language = 'python'
-            partner_copies = 1
+            # # All models connect to python connection drivers
+            # partner_model = None
+            # partner_language = 'python'
+            # partner_copies = 1
             recv_timeout = False
-            if self.name_base.startswith(f"{self.model_name}:"):
-                self.name_base = self.name_base.split(
-                    f"{self.model_name}:", 1)[-1]
-        elif (reverse_names and partner_model
-              and self.name_base.startswith(f"{partner_model}:")):
-            self.name_base = self.name_base.split(
-                f"{partner_model}:", 1)[-1]
         if language is None:
             language = 'python'
         self.language = language
@@ -1159,6 +1158,7 @@ class CommBase(tools.YggClass):
         self.partner_copies = partner_copies
         self.partner_language = partner_language
         self.partner_language_driver = None
+        self.partner_name = partner_name
         if self.partner_language:
             self.partner_language_driver = import_component(
                 'model', self.partner_language)
@@ -1664,52 +1664,41 @@ class CommBase(tools.YggClass):
             out[self.partner_model] = self.opp_comms
         return out
 
-    def model_partner_comm(self, model=None):
-        r"""Return the communicator that is partnered with a specific
-        model.
-
-        Args:
-            model (str, optional): Model name. If not provided, a
-                dictionary will be returned with all partner models as
-                keys and the corresponding communicators as values.
-
-        Returns:
-            CommBase: Model communicator.
-
-        Raises:
-            CommError: If there is not a communicator partnered with the
-                named model.
-
-        """
-        if model is None:
-            out = {}
-            if self.partner_model:
-                out[self.partner_model] = [self]
-            return out
-        if self.partner_model == model:
-            return self
-        raise CommError(f"Could not locate communicator partnered with "
-                        f"model \"{model}\" (partner_model = "
-                        f"{self.partner_model})")
-
     @property
     def model_comm_kwargs(self):
         r"""dict: Parameters that should be used for initializing the
         partner comm created by the model interface."""
         out = {
+            'name': self.opp_name,
             'address': self.opp_address,
             'commtype': self.opp_commtype,
             'direction': self.opp_direction,
             'direct_connection': self.direct_connection,
         }
-        if self.partner_model:
-            out['model'] = self.partner_model
+        if self.opp_model:
+            out['model'] = self.opp_model
         return out
 
     @property
     def opp_name(self):
         r"""str: Name that should be used for the opposite comm."""
-        return self.name
+        out = self.name_base
+        if self.partner_name:
+            out = self.partner_name
+        out = strip_model_prefix(out, [self.model_name])
+        out = add_model_prefix(out, self.partner_model)
+        return out
+
+    @property
+    def opp_name_env(self):
+        r"""str: Name that should be used for the opposite comm in
+        environment variables."""
+        return self.opp_name + self._suffix
+
+    @property
+    def opp_model(self):
+        r"""str: Name of the model for the opposite comm."""
+        return self.partner_model
 
     @property
     def opp_commtype(self):
@@ -1739,8 +1728,8 @@ class CommBase(tools.YggClass):
     @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
-        return {self.opp_name: self.opp_address,
-                (self.opp_name + '_COMM'): self.opp_commtype}
+        return {self.opp_name_env: self.opp_address,
+                (self.opp_name_env + '_COMM'): self.opp_commtype}
 
     def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
