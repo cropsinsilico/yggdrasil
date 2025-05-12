@@ -23,8 +23,9 @@
     default_file:
       name: ./Output/output.txt
       filetype: table
+      expected_result: ./Output/expected.txt
   repository_url: https://github.com/cropsinsilico/example-fakemodel
-  repository_commit: 498d04b7c98078fbd8d608f860882dc571476fd8
+  repository_commit: 16d1d47f4aa6a8a2fdcb219ae5072ca884fc2afb
   description: Example model submission
   validation_command: validate.py
   dependencies:

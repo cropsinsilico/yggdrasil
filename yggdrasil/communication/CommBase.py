@@ -2442,33 +2442,42 @@ class CommBase(tools.YggClass):
         return self.serializer.deserialize(*args, **kwargs)
 
     # SEND METHODS
-    def _safe_send(self, *args, **kwargs):
+    def _safe_send(self, msg, **kwargs):
         r"""Send message checking if is 1st message and then waiting."""
+        if self.pass_comm_message:
+            msg_send = msg
+        else:
+            msg_send = msg.msg
         timeout = kwargs.pop('timeout', self.timeout)
         quiet_timeout = kwargs.pop('quiet_timeout', False)
-        send_1st = ((not self._used) and self._multiple_first_send)
+        send_1st = ((not self._used) and self._multiple_first_send
+                    and (msg.flag != FLAG_EOF))
         if send_1st:
             timeout = max(timeout, self.timeout)
             self.suppress_special_debug = True
         Tout = self.start_timeout(timeout, key_suffix='._safe_send')
         out = False
         error = None
-        while (not Tout.is_out):
-            error = None
-            try:
-                with self._closing_thread.lock:
-                    if self.is_open:
-                        out = self._send(*args, **kwargs)
-                        if out or (not send_1st):
+        try:
+            while (not Tout.is_out):
+                error = None
+                try:
+                    with self._closing_thread.lock:
+                        if self.is_open:
+                            out = self._send(msg_send, **kwargs)
+                            if out or (not send_1st):
+                                break
+                        else:  # pragma: debug
+                            self.debug('Comm closed')
+                            out = False
                             break
-                    else:  # pragma: debug
-                        self.debug('Comm closed')
-                        out = False
-                        break
-            except TemporaryCommunicationError as e:
-                error = e
-                self.special_debug("TemporaryCommunicationError: %s" % e)
-            self.sleep()
+                except TemporaryCommunicationError as e:
+                    error = e
+                    self.special_debug("TemporaryCommunicationError: %s" % e)
+                self.sleep()
+        except BaseException:
+            self.stop_timeout(key_suffix='._safe_send', quiet=True)
+            raise
         self.stop_timeout(key_suffix='._safe_send',
                           quiet=quiet_timeout)
         if error and self.is_async:
@@ -2525,11 +2534,7 @@ class CommBase(tools.YggClass):
             if skip_safe_send:
                 pass
             elif not msg.sent:
-                if self.pass_comm_message:
-                    imsg = msg
-                else:
-                    imsg = msg.msg
-                if not self._safe_send(imsg, **kwargs):  # pragma: debug
+                if not self._safe_send(msg, **kwargs):  # pragma: debug
                     self.special_debug('Failed to send %d bytes', msg.length)
                     return False
                 msg.sent = True

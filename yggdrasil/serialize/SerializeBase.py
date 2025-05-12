@@ -73,6 +73,7 @@ class SerializeBase(tools.YggClass):
         super(SerializeBase, self).__init__(**kwargs)
         kwargs = self.extra_kwargs
         self.extra_kwargs = {}
+        self.extra_kwargs_used = {}
         self._initialized = False
         # Update datatype from other keyword arguments
         if self.datatype is not None:
@@ -502,8 +503,14 @@ class SerializeBase(tools.YggClass):
                 may contain additional information for initializing the serializer.
 
         """
-        if ((self.initialized or metadata.get('raw', False)
-             or metadata.get('incomplete', False))):
+        if metadata.get('raw', False) or metadata.get('incomplete', False):
+            return
+        if ((self.initialized and serializer
+             and 'format_str' in serializer
+             and 'format_str' not in self.extra_kwargs_used)):
+            serializer = {'format_str': serializer['format_str'],
+                          'datatype': copy.deepcopy(self.datatype)}
+        elif self.initialized:
             return
         if serializer is None:
             serializer = {}
@@ -585,7 +592,14 @@ class SerializeBase(tools.YggClass):
                 #     self.datatype['allowWrapped'] = True
             # Check to see if new datatype is compatible with new one
             if old_datatype and datatype:
-                rapidjson.compare_schemas(self.datatype, old_datatype)
+                try:
+                    rapidjson.compare_schemas(self.datatype, old_datatype)
+                except rapidjson.ComparisonError:
+                    import pprint
+                    self.error(
+                        f"BEFORE:\n{pprint.pformat(old_datatype)}\n"
+                        f"AFTER:\n{pprint.pformat(self.datatype)}")
+                    raise
         # Enfore that strings used with messages are in bytes
         for k in self._attr_conv:
             v = getattr(self, k, None)
@@ -634,6 +648,11 @@ class SerializeBase(tools.YggClass):
                     typedef.clear()
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
+                        if isinstance(typedef.get('items', []), dict):
+                            typedef['items'] = [
+                                copy.deepcopy(typedef['items'])
+                                for _ in range(len(fmts))
+                            ]
                         assert len(typedef.get('items', [])) == len(fmts)
                     elif len(fmts) == 1:
                         cpy = copy.deepcopy(typedef)
@@ -659,7 +678,8 @@ class SerializeBase(tools.YggClass):
                         typedef['items'].append(itype_fmt)
                         continue
                     itype = typedef['items'][i]
-                    itype_fmt['type'] = itype['type']
+                    if itype['type'] in ['scalar', '1darray', 'ndarray']:
+                        itype_fmt['type'] = itype['type']
                     if ((itype_fmt['subtype'] in constants.FLEXIBLE_TYPES
                          and (itype_fmt['type'] == 'scalar'
                               or ('encoding' in itype
@@ -718,6 +738,7 @@ class SerializeBase(tools.YggClass):
             for rk in used:
                 if rk in self.extra_kwargs:
                     del self.extra_kwargs[rk]
+                self.extra_kwargs_used[rk] = v
             for rk in updated:
                 if rk in self.extra_kwargs:
                     self.extra_kwargs[rk] = v

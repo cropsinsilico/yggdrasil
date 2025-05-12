@@ -125,33 +125,44 @@ class RESTComm(CommBase.CommBase):
         
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
-        self._openned = False
-        if self.address != 'address':
-            r = requests.get(
-                self.address + '/remove',
+        if self.address != 'address' and self._openned:
+            try:
+                r = requests.get(
+                    self.address + '/remove',
+                    params=self.params,
+                    cookies=self.cookies)
+                r.raise_for_status()
+            except requests.exceptions.RequestException:
+                pass
+            self._openned = False
+        
+    def _send(self, payload):
+        try:
+            r = requests.post(
+                self.address,
+                data=payload,
                 params=self.params,
                 cookies=self.cookies)
             r.raise_for_status()
-        
-    def _send(self, payload):
-        r = requests.post(
-            self.address,
-            data=payload,
-            params=self.params,
-            cookies=self.cookies)
-        r.raise_for_status()
-        return True
+            return True
+        except requests.exceptions.RequestException:
+            self._openned = False
+            raise
 
     def _recv(self, **kwargs):
-        r = requests.get(
-            self.address,
-            params=self.params,
-            cookies=self.cookies)
-        r.raise_for_status()
-        msg = r.content
-        if msg == b'':
-            raise NoMessages("No messages queued on the server.")
-        return (True, msg)
+        try:
+            r = requests.get(
+                self.address,
+                params=self.params,
+                cookies=self.cookies)
+            r.raise_for_status()
+            msg = r.content
+            if msg == b'':
+                raise NoMessages("No messages queued on the server.")
+            return (True, msg)
+        except requests.exceptions.RequestException:
+            self._openned = False
+            raise
 
     @property
     def n_msg_recv(self):
@@ -164,6 +175,7 @@ class RESTComm(CommBase.CommBase):
             r.raise_for_status()
             return int(r.content)
         except requests.exceptions.RequestException:  # pragma: debug
+            self._openned = False
             return 0
 
     @property
@@ -173,11 +185,15 @@ class RESTComm(CommBase.CommBase):
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        r = requests.get(
-            self.address + '/purge',
-            params=self.params,
-            cookies=self.cookies)
-        r.raise_for_status()
+        try:
+            r = requests.get(
+                self.address + '/purge',
+                params=self.params,
+                cookies=self.cookies)
+            r.raise_for_status()
+        except requests.exceptions.RequestException:
+            self._openned = False
+            raise
         self._n_sent = 0
         self._n_recv = 0
         self._last_send = None

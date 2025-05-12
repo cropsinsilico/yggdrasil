@@ -210,6 +210,10 @@ class YggBroker(multitasking.YggTaskLoop):
             atexit.register(self.terminate)
         super(YggBroker, self).start()
 
+    def stop(self):
+        r"""Stop the loop thread."""
+        self.terminate()
+
     def before_loop(self):
         r"""Actions performed before the loop."""
         super(YggBroker, self).before_loop()

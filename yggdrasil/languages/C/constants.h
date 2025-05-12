@@ -11,12 +11,18 @@
 #define YGG_MSG_EOF "EOF!!!"
 /*! @brief End of client message. */
 #define YGG_CLIENT_EOF "YGG_END_CLIENT"
-/*! @brief Client signing on. */
-#define YGG_CLIENT_SIGNON "CLIENT_SIGNON::"
-#define YGG_CLIENT_SIGNON_LEN 15
-/*! @brief Server signing on. */
-#define YGG_SERVER_SIGNON "SERVER_SIGNON::"
-#define YGG_SERVER_SIGNON_LEN 15
+/*! @brief Proxy signing on. */
+#define YGG_PROXY_SIGNON "PROXY_SIGNING_ON::"
+#define YGG_PROXY_SIGNON_LEN 18
+/*! @brief Count of proxy signon messages. */
+#define YGG_PROXY_SIGNON_COUNT "PROXY_SIGNON_COUNT::"
+#define YGG_PROXY_SIGNON_COUNT_LEN 20
+/*! @brief Proxy signing off. */
+#define YGG_PROXY_SIGNOFF "PROXY_SIGNING_OFF::"
+#define YGG_PROXY_SIGNOFF_LEN 19
+/*! @brief Server signon */
+#define YGG_SERVER_SIGNON "SERVER_SIGNING_ON::"
+#define YGG_SERVER_SIGNON_LEN 19
 /*! @brief Resonable size for buffer. */
 #define YGG_MSG_BUF 2048
 /*! @brief Sleep time in micro-seconds */
@@ -46,8 +52,9 @@
 #define HEAD_TEMPORARY       0x00000040
 #define HEAD_FLAG_EOF        0x00000080
 #define HEAD_FLAG_CLIENT_EOF 0x00000100
-#define HEAD_FLAG_CLIENT_SIGNON 0x00000200
-#define HEAD_FLAG_SERVER_SIGNON 0x00000400
-#define HEAD_FLAG_REPEAT 0x00000800
+#define HEAD_FLAG_PROXY_SIGNON 0x00000200
+#define HEAD_FLAG_PROXY_SIGNON_COUNT 0x00000400
+#define HEAD_FLAG_PROXY_SIGNOFF 0x00000800
+#define HEAD_FLAG_REPEAT 0x00001000
 
 #endif // YGGCONSTANTS_H_

@@ -5,27 +5,40 @@
 <h2>{{ name }} Status</h2>
 <p>{{ status }}</p>
 {% else %}
-<h2>Address</h2>
-<p>{{ address }}</p>
 <h2>Available Services</h2>
 {% for integration, body in available.items() %}
 <h3>{{ integration }}</h3>
+<tt>
   <p>
     {% for line in body %}
     {{ line }}<br>
     {% endfor %}
   </p>
+</tt>
 {% endfor %}
-<h2>Running Services</h2>
+<h2>Running Integrations</h2>
 {% for client, integrations in running.items() %}
 <h3>Client {{ client }}</h3>
 {% for integration, body in integrations.items() %}
-<h4>Integration/Function {{ integration }}</h4>
+<h4>Integration {{ integration }}</h4>
+<tt>
   <p>
     {% for line in body %}
     {{ line }}<br>
     {% endfor %}
   </p>
+</tt>
 {% endfor %}
+{% endfor %}
+<h2>Created Functions</h2>
+{% for function, body in functions.items() %}  
+<h3>{{ function }}</h3>
+<tt>
+  <p>
+    {% for line in body %}
+    {{ line }}<br>
+    {% endfor %}
+  </p>
+</tt>
 {% endfor %}
 {% endif %}

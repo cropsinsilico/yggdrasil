@@ -91,7 +91,7 @@ general:
   - pyyaml
   - pyzmq
   - requests
-  - scikit-build-core:
+  - scikit-build-core<0.11.2:  # Pin until scripts fixed https://github.com/scikit-build/scikit-build-core/pull/1047
       host: True
       flags:
         build: True

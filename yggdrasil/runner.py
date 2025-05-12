@@ -3,7 +3,6 @@ import sys
 import os
 import time
 import copy
-import uuid
 import signal
 import atexit
 from pprint import pformat
@@ -15,7 +14,7 @@ from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile, rapidjson
 from yggdrasil.drivers import create_driver, DirectConnectionDriver
 from yggdrasil.components import import_component
-from yggdrasil.multitasking import init_mpi
+from yggdrasil.multitasking import init_mpi, YggTaskLoop, AsyncResult
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.broker import YggBroker
@@ -28,6 +27,15 @@ COLOR_NORMAL = '\033[0m'
 class IntegrationError(BaseException):
     r"""Error raised when there is an error in an integration."""
     pass
+
+
+class IntegrationFunctionError(IntegrationError):
+    r"""Error raised when an error occurs during a call to an
+    integration function."""
+
+    def __init__(self, msg, partial_output=None):
+        self.partial_output = partial_output
+        super(IntegrationFunctionError, self).__init__(msg)
 
 
 class YggFunction(YggClass):
@@ -56,27 +64,23 @@ class YggFunction(YggClass):
     """
     
     def __init__(self, model_yaml, service_address=None,
-                 signal_handler=None, **kwargs):
+                 signal_handler=None, name=None, **kwargs):
         super(YggFunction, self).__init__()
         # Create and start runner in another process
-        self.dummy_name = 'func' + str(uuid.uuid4()).split('-')[0]
+        if name is None:
+            name = os.path.splitext(os.path.basename(model_yaml))[0]
+        self.dummy_name = f'{name}-FUNCTION'
         self.model_yaml = model_yaml
         self.service_address = service_address
-        self.runner_kwargs = kwargs
+        self.runner_kwargs = dict(
+            kwargs, name=name,
+            complete_partial=self.dummy_name,
+        )
         self.runner_kwargs['complete_partial'] = self.dummy_name
         self._stop_called = False
         self._comms = {'input': {}, 'output': {}}
+        self._opp_comms = {'input': {}, 'output': {}}
         self._vars = {'input': {}, 'output': {}}
-        self.old_environ = os.environ.copy()
-        if service_address:
-            # Temporary YAML describing the service
-            contents = (f'service:\n'
-                        f'    name: {self.model_yaml}\n'
-                        f'    address: {service_address}\n')
-            self.model_yaml = os.path.join(os.getcwd(),
-                                           self.dummy_name + '.yml')
-            with open(self.model_yaml, 'w') as fd:
-                fd.write(contents)
         self.runner = None
         self.run(signal_handler=signal_handler)
 
@@ -95,125 +99,10 @@ class YggFunction(YggClass):
     def __del__(self):
         self.stop()
         
-    def __call__(self, *args, **kwargs):
-        r"""Call the model as a function by sending variables.
-
-        Args:
-           *args: Any positional arguments are expected to be input variables
-               in the correct order.
-           **kwargs: Any keyword arguments are expected to be named input
-               variables for the model.
-
-        Raises:
-            RuntimeError: If an input argument is missing.
-            RuntimeError: If sending an input argument to a model fails.
-            RuntimeError: If receiving an output value from a model fails.
-
-        Returns:
-            dict: Returned values for each return variable.
-
-        """
-        try:
-            self.runner.resume()
-            data = self._transform_input(args, kwargs)
-            # Send
-            for k, v in self.inputs.items():
-                flag = v['comm'].send(*data[k])
-                if not flag:  # pragma: debug
-                    raise RuntimeError(f"Failed to send {k}")
-            # Receive
-            out = {}
-            for k, v in self.outputs.items():
-                flag, data = v['comm'].recv(timeout=60.0)
-                if not flag:  # pragma: debug
-                    raise RuntimeError(f"Failed to receive {k}")
-                out[k] = data
-            self.runner.pause()
-            return self._transform_output(out)
-        except BaseException as e:
-            print(f"STOPPING DUE TO ERROR: {e}")
-            self.stop(error=True)
-            raise
-
-    def run(self, **kwargs):
-        r"""Run the model"""
-        if self.runner is not None:
-            self.info("Model already running")
-            return
-        from yggdrasil.languages.Python.YggInterface import InterfaceComm
-        from yggdrasil import tools
-        self.runner = YggRunner(self.model_yaml, **self.runner_kwargs)
-        # Start the drivers
-        # TODO: Allow call directly?
-        self.runner.run(**kwargs)
-        self.model_driver = self.runner.modeldrivers[self.dummy_name]
-        for k in self.runner.modeldrivers.keys():
-            if k != self.dummy_name:
-                self.__name__ = k
-                break
-        self.debug("run started")
-        # Create input/output channels
-        with tools.updated_environment(self.model_driver['instance'].set_env()):
-            for io in ['output', 'input']:
-                io_opp = 'output' if io == 'input' else 'input'
-                direction = 'send' if io == 'input' else 'recv'
-                for drv in self.model_driver[f'{io_opp}_drivers']:
-                    channel_name = getattr(
-                        drv['instance'], f'{io[0]}comm_kws')['name']
-                    var_name = getattr(
-                        drv['instance'], f'{io_opp[0]}comm_kws')['name']
-                    var_name = var_name.split(':', 1)[-1]
-                    self._comms[io][var_name] = drv.copy()
-                    kws = {
-                        'direction': direction,
-                        'no_suffix': True,
-                        # 'context': ctx,
-                    }
-                    if drv['instance']._connection_type == 'rpc_request':
-                        kws['commtype'] = 'client'
-                    self._comms[io][var_name]['comm'] = InterfaceComm(
-                        channel_name, **kws)
-                    if drv['instance']._connection_type == 'rpc_request':
-                        self._comms[io_opp][var_name] = drv.copy()
-                        self._comms[io_opp][var_name]['comm'] = (
-                            self._comms[io][var_name]['comm'])
-                        if drv['outputs'][0].get('server_replaces', False):
-                            srv = drv['outputs'][0]['server_replaces']
-                            self._comms[io][var_name]['vars'] = (
-                                srv[io]['vars'])
-                            self._comms[io_opp][var_name]['vars'] = (
-                                srv[io_opp]['vars'])
-                        else:
-                            self._comms[io_opp][var_name]['vars'] = (
-                                drv[f'{io_opp}'][0].get(
-                                    'response_kwargs', {}).get(
-                                        'vars', [var_name]))
-                    if 'vars' not in self._comms[io][var_name]:
-                        self._comms[io][var_name]['vars'] = (
-                            drv[f'{io_opp}s'][0].get('vars', [var_name]))
-        self.debug(f'inputs: {list(self.inputs.keys())}, '
-                   f'outputs: {list(self.outputs.keys())}')
-        atexit.register(self.stop)
-        # Ensure that vars are strings
-        for io in ['input', 'output']:
-            for k, v in getattr(self, f'{io}s').items():
-                v['var_names'] = []
-                v['vars_datatypes'] = {}
-                for iv in v['vars']:
-                    if isinstance(iv, dict):
-                        if iv.get('is_length_var', False):
-                            continue
-                        if 'datatype' in iv:
-                            v['vars_datatypes'][iv['name']] = iv['datatype']
-                        iv = iv['name']
-                    v['var_names'].append(iv)
-                    self._vars[io][iv] = v
-        # Get arguments
-        self.debug(f"arguments: {self.arguments}, "
-                   f"returns: {self.returns}")
-        self.runner.pause()
-        if self.service_address:
-            os.remove(self.model_yaml)
+    def is_alive(self):
+        r"""bool: True if the function is still alive."""
+        return (self.runner is not None and self.runner.is_alive
+                and not self._stop_called)
 
     def argument_models(self, io, name):
         r"""Get the name of the model that the argument is passed to.
@@ -255,6 +144,25 @@ class YggFunction(YggClass):
         else:
             out = comm.serializer.datatype
         return out
+
+    # def comm_datatype(self, io, name):
+    #     r"""Get the datatype for a communicator.
+
+    #     Args:
+    #         io (str): Direction of communicator ('input' or 'output').
+    #         name (str): Communicator name.
+
+    #     Returns:
+    #         dict: JSON schema describing the data type.
+
+    #     """
+    #     comm = self._opp_comms[io][name]
+    #     out = {}
+    #     import pprint
+    #     print(io, name)
+    #     pprint.pprint(comm)
+    #     import pdb; pdb.set_trace()
+    #     return out
 
     def comm_info(self, io, name):
         r"""Get information about a communicator.
@@ -321,28 +229,62 @@ class YggFunction(YggClass):
     @property
     def n8n_form_node(self):
         r"""dict: Parameters describing an n8n tool for this function."""
+
+        def n8n_dtype(x):
+            out = x['type']
+            if out in ['1darray', 'ndarray']:
+                out = 'array'
+            elif out in ['scalar']:
+                if x['subtype'] in ['string', 'bytes', 'unicode']:
+                    out = 'string'
+                else:
+                    out = 'number'
+            if out not in ['array', 'object', 'string', 'number',
+                           'integer', 'boolean', 'null']:
+                raise TypeError(f"Cannot create an n8n form argument "
+                                f"with type \"{out}\"")
+            return out
+
         name = self.runner.name
         values = []
+        datatypes = []
         for k, v in self._vars['input'].items():
             datatype = self.argument_datatype('input', k)
             ivalue = {
                 "fieldLabel": k,
-                "fieldType": datatype['type'],
+                "fieldType": n8n_dtype(datatype),
+                "requiredField": True,
             }
             if 'default' in datatype:
                 ivalue["placeholder"] = datatype['default']
             values.append(ivalue)
+            datatypes.append(datatype)
+        if ((len(values) == 1 and values[0]["fieldType"] == "object"
+             and datatypes[0].get('properties', None))):
+            values = []
+            for k, v in datatypes[0]['properties'].items():
+                ivalue = {
+                    "fieldLabel": k,
+                    "fieldType": n8n_dtype(v),
+                }
+                if 'default' in v:
+                    ivalue["placeholder"] = v['default']
+                if k in datatypes[0].get('required', []):
+                    ivalue["requiredField"] = True
+                values.append(ivalue)
         out = {
             "name": "n8n Form Trigger",
-            "id": str(uuid.uuid4()),
             "type": "n8n-nodes-base.formTrigger",
+            "typeVersion": 2.1,
             "parameters": {
+                "path": f"{name}-form".lower(),
                 "formTitle": f"Run {name} model/integration",
                 "formFields": {
                     "values": values,
+                    "options": {},
                 },
-                "options": {},
             },
+            "position": [600, 380],
         }
         return out
 
@@ -373,6 +315,122 @@ class YggFunction(YggClass):
     def returns(self):
         r"""list: Name of function output variables."""
         return list(self._vars['output'].keys())
+
+    def __call__(self, *args, **kwargs):
+        return self.call(*args, **kwargs)
+
+    def call(self, *args, **kwargs):
+        r"""Call the model as a function by sending variables.
+
+        Args:
+           *args: Input variables in the correct order.
+           **kwargs: Name input variables.
+
+        Raises:
+            IntegrationFunctionError: If there is an error during the
+                call.
+
+        Returns:
+            dict: Returned values for each return variable.
+
+        """
+        self.send(*args, **kwargs)
+        return self.recv()
+
+    def send(self, *args, **kwargs):
+        r"""Send input to the integration model(s).
+
+        Args:
+           *args: Input variables in the correct order.
+           **kwargs: Name input variables.
+
+        Raises:
+            IntegrationFunctionError: If an input argument is missing.
+            IntegrationFunctionError: If sending an input argument to a
+                model fails.
+
+        """
+        try:
+            self.runner.resume()
+            data = self._transform_input(args, kwargs)
+            # Send
+            for k, v in self.inputs.items():
+                flag = v['comm'].send(*data[k])
+                if not flag:  # pragma: debug
+                    raise IntegrationFunctionError(
+                        f"Failed to send {k}")
+            self.runner.pause()
+        except BaseException as e:
+            self.info(f"STOPPING DUE TO ERROR DURING SEND: {e}")
+            self.stop(error=True)
+            raise
+
+    def recv(self, timeout=None, existing_output=None, in_async=False):
+        r"""Receive output from the integration model(s).
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be
+                waited for the call to finish. A value of None will wait
+                indefinitely.
+            existing_output (dict, optional): Existing output for each
+                integration communicator that new outputs should be
+                added to.
+            in_async (bool, optional): If True, this method is being
+                called from an AsyncFunctionOutput instance.
+
+        Raises:
+            IntegrationFunctionError: If receiving an output value from
+                a model fails.
+
+        Returns:
+            dict: Returned values for each return variable.
+
+        """
+        from yggdrasil.communication.CommBase import (
+            FLAG_EMPTY, FLAG_SUCCESS)
+        out = {}
+        if existing_output is not None:
+            out = existing_output
+        try:
+            self.runner.resume()
+            Tout = self.start_timeout(t=timeout,
+                                      key_suffix='.function_recv')
+
+            def is_complete():
+                return (all((k in out) for k in self.outputs)
+                        or Tout.is_out)
+
+            while not is_complete():
+                for k, v in self.outputs.items():
+                    if k in out:
+                        continue
+                    msg = v['comm'].recv(return_message_object=True,
+                                         timeout=0.0,
+                                         quiet_timeout=True)
+                    if msg.flag == FLAG_EMPTY:
+                        continue
+                    if msg.flag != FLAG_SUCCESS:  # pragma: debug
+                        raise IntegrationFunctionError(
+                            f"Failed to receive {k}",
+                            partial_output=out)
+                    out[k] = msg.args
+                if in_async:
+                    break
+                if not is_complete():
+                    self.sleep()
+            self.stop_timeout(key_suffix='.function_recv',
+                              quiet=True)
+            self.runner.pause()
+        except BaseException as e:
+            self.info(f"STOPPING DUE TO ERROR DURING RECV: {e}")
+            self.stop(error=True)
+            raise
+        if in_async:
+            return out
+        if not all((k in out) for k in self.outputs):
+            raise IntegrationFunctionError(
+                "Function receive timed out", partial_output=out)
+        return self._transform_output(out)
 
     def _transform_input(self, args, kwargs):
         out = {}
@@ -412,9 +470,105 @@ class YggFunction(YggClass):
                 assert len(ivars) == 1
                 out[ivars[0]] = idata
             vars_out += ivars
-        if len(vars_out) == 1:
+        if len(vars_out) == 1 and isinstance(out[vars_out[0]], dict):
             out = out[vars_out[0]]
         return out
+
+    def create_runner(self, **kwargs):
+        r"""Create a runner."""
+        assert self.runner is None
+        model_yaml = self.model_yaml
+        if self.service_address:
+            # Temporary YAML describing the service
+            contents = (f'service:\n'
+                        f'    name: {model_yaml}\n'
+                        f'    address: {self.service_address}\n')
+            model_yaml = os.path.join(os.getcwd(),
+                                      self.dummy_name + '.yml')
+            with open(model_yaml, 'w') as fd:
+                fd.write(contents)
+        try:
+            self.runner = YggRunner(model_yaml, **self.runner_kwargs)
+            self.runner.run(**kwargs)
+            self.model_driver = self.runner.modeldrivers[self.dummy_name]
+            for k in self.runner.modeldrivers.keys():
+                if k != self.dummy_name:
+                    self.__name__ = k
+                    break
+            self.debug("run started")
+        finally:
+            if self.service_address and os.path.isfile(model_yaml):
+                os.remove(model_yaml)
+
+    def run(self, **kwargs):
+        r"""Run the model"""
+        if self.runner is not None:
+            self.info("Function runner already exists")
+            return
+        from yggdrasil.languages.Python.YggInterface import InterfaceComm
+        from yggdrasil import tools
+        self.create_runner(**kwargs)
+        # Create input/output channels
+        with tools.updated_environment(self.model_driver['instance'].set_env()):
+            for io in ['output', 'input']:
+                io_opp = 'output' if io == 'input' else 'input'
+                direction = 'send' if io == 'input' else 'recv'
+                for drv in self.model_driver[f'{io_opp}_drivers']:
+                    channels = drv['instance'].model_comm_kwargs(
+                        io, self.dummy_name)
+                    assert len(channels) == 1
+                    self._opp_comms[io].update(channels)
+                    channel_name = list(channels.keys())[0]
+                    var_name = channel_name
+                    self._comms[io][var_name] = drv.copy()
+                    kws = {
+                        'direction': direction,
+                        'no_suffix': True,
+                        # 'context': ctx,
+                    }
+                    if drv['instance']._connection_type == 'rpc_request':
+                        kws['commtype'] = 'client'
+                    self._comms[io][var_name]['comm'] = InterfaceComm(
+                        channel_name, **kws)
+                    if drv['instance']._connection_type == 'rpc_request':
+                        self._comms[io_opp][var_name] = drv.copy()
+                        self._comms[io_opp][var_name]['comm'] = (
+                            self._comms[io][var_name]['comm'])
+                        if drv['outputs'][0].get('server_replaces', False):
+                            srv = drv['outputs'][0]['server_replaces']
+                            self._comms[io][var_name]['vars'] = (
+                                srv[io]['vars'])
+                            self._comms[io_opp][var_name]['vars'] = (
+                                srv[io_opp]['vars'])
+                        else:
+                            self._comms[io_opp][var_name]['vars'] = (
+                                drv[f'{io_opp}'][0].get(
+                                    'response_kwargs', {}).get(
+                                        'vars', [var_name]))
+                    if 'vars' not in self._comms[io][var_name]:
+                        self._comms[io][var_name]['vars'] = (
+                            drv[f'{io_opp}s'][0].get('vars', [var_name]))
+        self.debug(f'inputs: {list(self.inputs.keys())}, '
+                   f'outputs: {list(self.outputs.keys())}')
+        atexit.register(self.stop)
+        # Ensure that vars are strings
+        for io in ['input', 'output']:
+            for k, v in getattr(self, f'{io}s').items():
+                v['var_names'] = []
+                v['vars_datatypes'] = {}
+                for iv in v['vars']:
+                    if isinstance(iv, dict):
+                        if iv.get('is_length_var', False):
+                            continue
+                        if 'datatype' in iv:
+                            v['vars_datatypes'][iv['name']] = iv['datatype']
+                        iv = iv['name']
+                    v['var_names'].append(iv)
+                    self._vars[io][iv] = v
+        # Get arguments
+        self.debug(f"arguments: {self.arguments}, "
+                   f"returns: {self.returns}")
+        self.runner.pause()
 
     def reload(self):
         r"""Reload the model"""
@@ -422,9 +576,17 @@ class YggFunction(YggClass):
         self.run()
 
     def stop(self, error=False):
-        r"""Stop the model(s) from running."""
+        r"""Stop the model(s) from running.
+
+        Args:
+            error (bool, optional): If True, the function is being
+                stopped due to an error and the drivers should be
+                terminated directly instead of allowing them to exit
+                gravefully.
+
+        """
         if self.runner is None:
-            self.info("Model already stopped")
+            self.info("Runner already stopped")
             return
         self.runner.resume()
         if not self._stop_called:
@@ -433,8 +595,8 @@ class YggFunction(YggClass):
                 for x in self.inputs.values():
                     if 'comm' in x:
                         x['comm'].send_eof()
-            self.model_driver['instance'].set_break_flag()
-            self.runner.waitModels(timeout=10)
+            if not error:
+                self.runner.waitModels()
             for x in self.inputs.values():
                 if 'comm' in x:
                     x['comm'].close()
@@ -443,16 +605,19 @@ class YggFunction(YggClass):
                     x['comm'].close()
             self.runner.terminate()
             self.runner.atexit()
-            os.environ.clear()
-            os.environ.update(self.old_environ)
             self.runner = None
             self._stop_called = False
 
-    def model_info(self):
-        r"""Display information about the wrapped model(s)."""
-        self.printStatus()
-
     def printStatus(self, level='info', return_str=False):
+        r"""Print the status of the function as a log message.
+
+        Args:
+            level (str, optional): Debug level that log message should be
+                emitted at.
+            return_str (bool, optional): If True, return the message
+                string instead of emitting it as a log message.
+
+        """
         info = self.function_info
         t = '   '
         msg = f"Models: {', '.join(info['models'])}\n"
@@ -475,6 +640,181 @@ class YggFunction(YggClass):
         if return_str:
             return msg
         getattr(self.logger, level)(msg)
+
+
+class YggAsyncFunctionResult(AsyncResult):
+    r"""Result from call to asynchronous integration function.
+
+    Args:
+        args (tuple): Arguments provided to call.
+        kwargs (dict): Keyword arguments provided to call.
+        lock (multitasking.RLock): Lock to use for result.
+
+    """
+
+    def __init__(self, args, kwargs, lock):
+        self.args = args
+        self.kwargs = kwargs
+        self.sent = False
+        self.output_keys = None
+        self.partial = {}
+        super(YggAsyncFunctionResult, self).__init__(lock=lock)
+
+
+class YggAsyncFunction(YggTaskLoop):
+    r"""Version of YggFunction that returns asynchronous results.
+
+    Args:
+        *args, **kwargs: All arguments are passed to the YggFunction
+            constructor.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._function = None
+        self._function_args = args
+        self._function_kwargs = kwargs
+        self._output_keys = None
+        self._arguments = None
+        self._returns = None
+        self._backlog_external = []
+        self._backlog_internal = []
+        super(YggAsyncFunction, self).__init__()
+        self.start()
+        self.wait_for_loop()
+
+    def before_loop(self):
+        r"""Actions performed before the loop."""
+        super(YggAsyncFunction, self).before_loop()
+        with self.lock:
+            self._function = YggFunction(*self._function_args,
+                                         **self._function_kwargs)
+            self._output_keys = list(self._function.outputs.keys())
+            self._arguments = self._function.arguments
+            self._returns = self._function.returns
+
+    def run_loop(self):
+        r"""Actions performed on each loop iteration."""
+        if not self._function.is_alive():
+            raise IntegrationFunctionError("Function is not alive")
+        # Move back log into loop
+        with self.lock:
+            self._backlog_internal += self.backlog_external
+            self._backlog_external = []
+        # Send unsent messages
+        for x in self._backlog_internal:
+            with x.lock:
+                if not x.sent:
+                    self._function.send(*x.args, **x.kwargs)
+                    x.sent = True
+        # Check for new received messages & update first request
+        #   missing each of the recieved values
+        out = self._function.recv(in_async=True)
+        for k, v in out.items():
+            assert k in self._output_keys
+            for x in self._backlog_internal:
+                if self._update(x, k, v):
+                    break
+            else:
+                raise IntegrationFunctionError(
+                    f"Extra input received from \"{k}\": {v}")
+        # Remove finalized messages
+        self._backlog_internal = [
+            x for x in self._backlog_internal if not x.is_complete()
+        ]
+
+    def _update(self, x, k, v):
+        with x.lock:
+            if k in x.partial:
+                return False
+            x.partial[k] = v
+            if all(kk in x.partial for kk in self._output_keys):
+                x.set(self._function._transform_output(x.partial))
+        return True
+
+    def after_loop(self):
+        r"""Actions performed after the loop."""
+        super(YggAsyncFunction, self).after_loop()
+        with self.lock:
+            for x in self._backlog_internal:
+                x.set_error("Loop exiting")
+            self._function.stop()
+
+    @property
+    def function_info(self):
+        r"""dict: Information about the function."""
+        with self.lock:
+            if self._function is None:
+                raise IntegrationFunctionError(
+                    "Function not yet initialized")
+            return self._function.function_info
+
+    @property
+    def n8n_form_node(self):
+        r"""dict: Parameters describing an n8n tool for this function."""
+        with self.lock:
+            if self._function is None:
+                raise IntegrationFunctionError(
+                    "Function not yet initialized")
+            return self._function.n8n_form_node
+
+    @property
+    def arguments(self):
+        r"""list: Names of function arguments."""
+        return self._arguments
+
+    @property
+    def returns(self):
+        r"""list: Name of function output variables."""
+        return self._returns
+
+    def __call__(self, *args, **kwargs):
+        return self.call(args, kwargs)
+
+    def call(self, *args, **kwargs):
+        r"""Call the model as a function by sending variables.
+
+        Args:
+           *args: Input variables in the correct order.
+           **kwargs: Name input variables.
+
+        Raises:
+            IntegrationFunctionError: If there is an error during the
+                call.
+
+        Returns:
+            dict: Returned values for each return variable.
+
+        """
+        out = YggAsyncFunctionResult(args, kwargs,
+                                     self.context.RLock())
+        with self.lock:
+            self._backlog_external.append(out)
+        return out
+
+    def printStatus(self, level='info', return_str=False):
+        r"""Print the status of the function as a log message.
+
+        Args:
+            level (str, optional): Debug level that log message should be
+                emitted at.
+            return_str (bool, optional): If True, return the message
+                string instead of emitting it as a log message.
+
+        """
+        with self.lock:
+            if self._function is None:
+                msg = 'Function not yet constructed'
+            else:
+                msg = self._function.printStatus(return_str=True)
+        if return_str:
+            return msg
+        getattr(self.logger, level)(msg)
+
+    def reload(self):
+        r"""Reload the model"""
+        raise IntegrationFunctionError("Cannot reload an asynchronous "
+                                       "integration function")
 
 
 class YggRunner(YggClass):
@@ -569,7 +909,7 @@ class YggRunner(YggClass):
             namespace = ygg_cfg.get('rmq', 'namespace', False)
         if not namespace:  # pragma: debug
             raise Exception('rmq:namespace not set in config file')
-        if as_service:
+        if as_service and not complete_partial:
             complete_partial = True
         self.namespace = namespace
         self.host = host
@@ -1081,6 +1421,12 @@ class YggRunner(YggClass):
         x = self.modeldrivers[name]['instance']
         x.stop()
 
+    def stop_dummy_models(self):
+        r"""Stop all dummy models that are running."""
+        for x in self.modeldrivers.values():
+            if x['instance'].language == 'dummy':
+                x['instance'].set_break_flag()
+
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         if not self.mpi_comm or (self.rank == 0):
@@ -1180,6 +1526,7 @@ class YggRunner(YggClass):
                 self.error_flag = True
         if not self.error_flag:
             self.info('All models completed')
+            self.broker.stop()
         else:
             self.error('One or more models generated errors.')
             self.printStatus()
@@ -1275,7 +1622,13 @@ class YggRunner(YggClass):
         # self.modeldrivers = {}
 
     def printStatus(self, return_str=False):
-        r"""Print the status of all drivers, starting with the IO drivers."""
+        r"""Print the status of all drivers, starting with the IO drivers.
+
+        Args:
+            return_str (bool, optional): If True, return the message
+                string instead of emitting it as a log message.
+
+        """
         self.debug('')
         out = []
         for driver in self.all_drivers:

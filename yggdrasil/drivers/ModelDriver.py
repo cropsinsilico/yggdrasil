@@ -1484,12 +1484,17 @@ class ModelDriver(Driver):
             if not (actual and expected):
                 continue
             if not os.path.isabs(expected):
-                expected = os.path.join(x['working_dir'], expected)
+                expected = os.path.join(
+                    x['default_file']['working_dir'], expected)
             contents_actual = open(actual, 'r').read()
             contents_expected = open(expected, 'r').read()
-            assert contents_actual == contents_expected
-            # raise NotImplementedError(pformat(x))
-        
+            try:
+                assert contents_actual == contents_expected
+            except AssertionError:  # pragma: debug
+                print(f"ACTUAL\n{contents_actual}")
+                print(f"EXPECTED\n{contents_expected}")
+                raise
+
     def run_model(self, command=None, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
         run_executable.
@@ -2219,6 +2224,10 @@ class ModelDriver(Driver):
                 return
         self.wait_process(self.timeout, key_suffix='.after_loop')
         self.kill_process()
+        self.close_connections()
+
+    def close_connections(self):
+        r"""Perform model exits for connections to this model."""
         self.debug(("Closing input/output drivers:\n"
                     "\tinput: %s\n\toutput: %s")
                    % ([drv['name'] for drv in
@@ -2350,6 +2359,25 @@ class ModelDriver(Driver):
         if self.remove_products:
             self.products.teardown()
         self.products.restore_modified()
+
+    def printStatus(self, beg_msg='', end_msg='',
+                    verbose=False, return_str=False):
+        r"""Print information on the status of the ConnectionDriver.
+
+        Arguments:
+            beg_msg (str, optional): Additional message to print at beginning.
+            end_msg (str, optional): Additional message to print at end.
+            verbose (bool, optional): If True, the status of
+                individual comms will be displayed. Defaults to
+                False.
+            return_str (bool, optional): If True, the message string is
+                returned. Defaults to False.
+
+        """
+        msg = beg_msg
+        msg += '%-50s' % (self.__module__.split('.')[-1] + '(' + self.name + '): ')
+        msg += self.model_file
+        return msg
 
     def on_error_code(self, code):
         r"""Perform actions in response to an error code returned by

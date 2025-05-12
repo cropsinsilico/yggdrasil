@@ -1,6 +1,7 @@
 import os
 import sys
 import six
+import uuid
 import atexit
 import weakref
 import logging
@@ -1938,13 +1939,127 @@ class MemoryTracker(YggTaskLoop):
             return
         process = psutil.Process(self.track_pid)
         children = process.children(recursive=True)
-        total_mem = process.memory_info().rss / 1024 ** 2
+        total_mem = self._safe_memory(process)
         child_mem = 0
         for x in children:
-            child_mem += x.memory_info().rss / 1024 ** 2
+            child_mem += self._safe_memory(x)
         self.record.append(total_mem + child_mem)
         tools.sleep(self.track_interval)
+
+    @classmethod
+    def _safe_memory(cls, x):
+        import psutil
+        try:
+            return x.memory_info().rss / 1024 ** 2
+        except (psutil.ZombieProcess, psutil.NoSuchProcess):
+            return 0
 
     @property
     def max_memory(self):
         return max(self.record)
+
+
+class AsyncResultError(RuntimeError):
+    r"""Errors relating to asynchronous results."""
+    pass
+
+
+class AsyncNoResult(object):
+    r"""Class indicating an asynchronous result is not ready."""
+    pass
+
+
+class AsyncResult(object):
+    r"""Asynchronous result.
+
+    Args:
+        lock (RLock, optional): Recursive lock to use for accessing the
+            result.
+
+    """
+
+    def __init__(self, lock=None, context=None, context_method='thread'):
+        if lock is None:
+            lock = RLock(context=context, context_method=context_method)
+        self.lock = lock
+        self.id = str(uuid.uuid4())
+        self._result = AsyncNoResult
+        self._error = None
+
+    def is_complete(self):
+        r"""bool: True if the result is ready, False otherwise."""
+        with self.lock:
+            return (self._result is not AsyncNoResult
+                    or self._error is not None)
+
+    def wait(self, timeout=None):
+        r"""Wait for the result to be available.
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be
+                waited for the result to be available. A value of None
+                will wait indefinitely.
+
+        Returns:
+            bool: True if the result is available after the timeout,
+                False otherwise.
+
+        """
+        return wait_on_function(lambda: self.is_complete(),
+                                timeout=timeout,
+                                on_timeout=True)
+
+    def get(self, timeout=None):
+        r"""Get the asynchronous result.
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be
+                waited for the call to finish. A value of None will wait
+                indefinitely.
+
+        Returns:
+            object: Result.
+
+        Raises:
+            AsyncResultError: If the result is not set when the provided
+                timeout elapses.
+
+        """
+        if not self.wait(timeout=timeout):
+            raise AsyncResultError("Async result not yet available")
+        with self.lock:
+            if self._error:
+                raise AsyncResultError(f"Error set: {self._error}")
+            assert self._result != AsyncNoResult
+            return self._result
+
+    def set(self, value):
+        r"""Set the result.
+
+        Args:
+            value (object): Value to set the result to.
+
+        Raises:
+            AsyncResultError: If the result has already been set.
+
+        """
+        with self.lock:
+            if self._result != AsyncNoResult:
+                raise AsyncResultError("Result already set")
+            self._result = value
+
+    def set_error(self, msg):
+        r"""Set the error message for the result. If the error message
+        is already set, it will not be overridden.
+
+        Args:
+            msg (str): Error message.
+
+        """
+        import warnings
+        with self.lock:
+            if self._error is not None:
+                warnings.warn(f"Error already set, discarding later "
+                              f"error: \"{msg}\"")
+                return
+            self._error = msg

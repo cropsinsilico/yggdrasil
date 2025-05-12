@@ -25,6 +25,11 @@ model:
       default_file:
         name: ./Input/co2.txt
         filetype: table
+      datatype:
+        type: array
+        items:
+          type: number
+        allowSingular: true
       # datatype:
       #   type: array
   outputs:

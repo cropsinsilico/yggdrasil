@@ -52,7 +52,7 @@ requirements:
     - numpy >=1.13.0
     - python                                 # [build_platform != target_platform]
     - python-build
-    - scikit-build-core
+    - scikit-build-core <0.11.2
     - setuptools_scm
     - {{ compiler('c') }}                    # [not win]
     - {{ compiler('cxx') }}                  # [not win]
@@ -62,7 +62,7 @@ requirements:
     - numpy >=1.13.0
     - pip
     - python
-    - scikit-build-core
+    - scikit-build-core <0.11.2
     - setuptools_scm
     - sysv_ipc  # [not win]
     - {{ compiler('c') }}  # [not win]

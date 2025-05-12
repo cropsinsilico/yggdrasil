@@ -135,7 +135,7 @@
     "pyzmq",
     "requests",
     {
-      "scikit-build-core": {
+      "scikit-build-core<0.11.2": {
         "host": true,
         "flags": {
           "build": true,

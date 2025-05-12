@@ -766,10 +766,13 @@ public:
       flags |= HEAD_FLAG_EOF;
     else if (strcmp(msg, YGG_CLIENT_EOF) == 0)
       flags |= HEAD_FLAG_CLIENT_EOF;
-    else if (strncmp(msg, YGG_CLIENT_SIGNON, YGG_CLIENT_SIGNON_LEN) == 0)
-      flags |= HEAD_FLAG_CLIENT_SIGNON;
-    else if (strncmp(msg, YGG_SERVER_SIGNON, YGG_SERVER_SIGNON_LEN) == 0)
-      flags |= HEAD_FLAG_SERVER_SIGNON;
+    else if (strncmp(msg, YGG_PROXY_SIGNON, YGG_PROXY_SIGNON_LEN) == 0)
+      flags |= HEAD_FLAG_PROXY_SIGNON;
+    else if (strncmp(msg, YGG_PROXY_SIGNON_COUNT,
+                     YGG_PROXY_SIGNON_COUNT_LEN) == 0)
+      flags |= HEAD_FLAG_PROXY_SIGNON_COUNT;
+    else if (strncmp(msg, YGG_PROXY_SIGNOFF, YGG_PROXY_SIGNOFF_LEN) == 0)
+      flags |= HEAD_FLAG_PROXY_SIGNOFF;
   }
 
   /*!
@@ -779,8 +782,9 @@ public:
   void for_send(Metadata* metadata0, const char* msg, const size_t len) {
     // flags |= (HEAD_FLAG_ALLOW_REALLOC | HEAD_FLAG_OWNSDATA);
     setMessageFlags(msg, len);
-    if (metadata0 != NULL && !(flags & (HEAD_FLAG_CLIENT_SIGNON |
-					HEAD_FLAG_SERVER_SIGNON)))
+    if (metadata0 != NULL && !(flags & (HEAD_FLAG_PROXY_SIGNON |
+					HEAD_FLAG_PROXY_SIGNON_COUNT |
+                                        HEAD_FLAG_PROXY_SIGNOFF)))
       fromMetadata(*metadata0);
     initMeta();
     SetMetaID("id");

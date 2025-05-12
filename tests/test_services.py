@@ -209,7 +209,7 @@ class TestServices(object):
             input_args = {}
             for x in fmodel.arguments:
                 input_args[x] = 1.0
-            fmodel.model_info()
+            fmodel.printStatus()
             result = fmodel(**input_args)
             for x in fmodel.returns:
                 assert x in result
@@ -292,6 +292,7 @@ class TestRegisteredIntegrationFunction(object):
     r"""Class to test calling a registered integration function."""
 
     name = None
+    name_n8n = None
     request = None
     nrep = 2
     _write_keys = False
@@ -417,9 +418,15 @@ class TestRegisteredIntegrationFunction(object):
         r"""Allow call method to be parametrized via string."""
 
         def call(request):
-            if service_type in ['local', 'remote']:
-                service_request(action='delete')
-            return service_request(request)
+            try:
+                return service_request(request)
+            except BaseException as e:
+                import traceback
+                print("ERROR", e)
+                print(traceback.format_exc())
+                if service_type in ['local', 'remote']:
+                    service_request(action='delete')
+                raise
 
         return call
 
@@ -460,7 +467,7 @@ class TestRegisteredIntegrationFunction(object):
         return _check_response
 
     def test_landing(self, service_type, service_client, base_request,
-                     call_method):
+                     call_method, service_request):
         r"""Test that the landing page returns properly before and
         after function called."""
         if service_type == 'function':
@@ -472,6 +479,9 @@ class TestRegisteredIntegrationFunction(object):
         r = requests.get(service_client.address)
         r.raise_for_status()
         call_method(base_request)
+        r = requests.get(service_client.address)
+        r.raise_for_status()
+        service_request(action='delete')
         r = requests.get(service_client.address)
         r.raise_for_status()
 
@@ -492,11 +502,43 @@ class TestRegisteredIntegrationFunction(object):
         import pprint
         pprint.pprint(service_request(action='n8n_form_node'))
 
+    def test_create_n8n_tool(self, service_type, service_client):
+        r"""Test programmatic creation of an n8n tool"""
+        if service_type != 'remote':
+            pytest.skip("Cannot create n8n tool directly via function "
+                        "or from local service")
+        if 'X_N8N_API_KEY' not in os.environ:
+            pytest.skip("X_N8N_API_KEY not set")
+        toolname = self.name_n8n
+        if toolname is None:
+            toolname = f'{self.name} Tool'
+        pytest.raises(ServerError, service_client.create_n8n_tool,
+                      self.name, toolname=toolname)
+        outputfile = 'generated_tool.json'
+        try:
+            service_client.create_n8n_tool(
+                self.name, toolname=(toolname + '-test'),
+                outputfile=outputfile,
+            )
+            assert os.path.isfile(outputfile)
+            service_client.create_n8n_tool(
+                self.name, toolname=(toolname + '-test'))
+            # import pdb; pdb.set_trace()
+        finally:
+            if os.path.isfile(outputfile):
+                # print(outputfile)
+                # import pdb; pdb.set_trace()
+                os.remove(outputfile)
+            service_client.remove_n8n_tool(
+                self.name, toolname=(toolname + '-test')
+            )
+
 
 class TestRegisteredBioCro(TestRegisteredIntegrationFunction):
     r"""Test registered BioCro integration function."""
 
     name = 'BioCro'
+    name_n8n = 'BioCro2 Tool'
     keys = ['hour', 'year', 'Grain']
 
     @pytest.fixture(

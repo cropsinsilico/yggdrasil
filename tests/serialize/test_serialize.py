@@ -37,36 +37,78 @@ if np.dtype('int_') != np.dtype('longlong'):
     else:  # pragma: debug
         map_nptype2cformat.append(('longlong', '%lld'))
         map_nptype2cformat.append(('ulonglong', '%llu'))
-map_cformat2pyscanf = [(['%5s', '%s'], '%s'),
-                       ('%s', '%s'),
-                       # (['%hhd', '%hd', '%d', '%ld', '%lld', '%l64d'], '%d'),
-                       # (['%hhu', '%hu', '%u', '%lu', '%llu', '%l64u'], '%u'),
-                       ('%g%+gj', '%g%+gj'),
-                       # ('%l64d', '%ld'),
-                       ]
+map_cformat2pyscanf = [
+    (['%5s', '%s'], '%s'),
+    ('%s', '%s'),
+    # (['%hhd', '%hd', '%d', '%ld', '%lld', '%l64d'], '%d'),
+    # (['%hhu', '%hu', '%u', '%lu', '%llu', '%l64u'], '%u'),
+    ('%g%+gj', '%g%+gj'),
+    # ('%l64d', '%ld'),
+]
 
 unsupported_cfmt = ['a', 'A', 'p', 'n', '']
-map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
-                      # (['f', 'F', 'e', 'E', 'g', 'G'], 'float32'),
-                      # (['lf', 'lF', 'le', 'lE', 'lg', 'lG'], 'float64'),
-                      (['hhd', 'hhi'], 'int8'),
-                      (['hd', 'hi'], 'short'),
-                      (['d', 'i'], 'intc'),
-                      (['lld', 'lli', 'l64d'], 'longlong'),
-                      (['hhu', 'hho', 'hhx', 'hhX'], 'uint8'),
-                      (['hu', 'ho', 'hx', 'hX'], 'ushort'),
-                      (['u', 'o', 'x', 'X'], 'uintc'),
-                      (['lu', 'lo', 'lx', 'lX'], 'uint64'),
-                      (['llu', 'llo', 'llx', 'llX', 'l64u'], 'ulonglong'),
-                      (['c', 's'], 'S'),
-                      ('s', 'S')]
+map_cformat2nptype = [
+    (['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
+    # (['f', 'F', 'e', 'E', 'g', 'G'], 'float32'),
+    # (['lf', 'lF', 'le', 'lE', 'lg', 'lG'], 'float64'),
+    (['hhd', 'hhi'], 'int8'),
+    (['hd', 'hi'], 'short'),
+    (['d', 'i'], 'intc'),
+    (['lld', 'lli', 'l64d'], 'longlong'),
+    (['hhu', 'hho', 'hhx', 'hhX'], 'uint8'),
+    (['hu', 'ho', 'hx', 'hX'], 'ushort'),
+    (['u', 'o', 'x', 'X'], 'uintc'),
+    (['lu', 'lo', 'lx', 'lX'], 'uint64'),
+    (['llu', 'llo', 'llx', 'llX', 'l64u'], 'ulonglong'),
+    (['c', 's'], 'S'),
+    ('s', 'S'),
+]
+map_cformat2schema = [
+    (['f', 'F', 'e', 'E', 'g', 'G'],
+     {'type': 'scalar', 'subtype': 'float', 'precision': 8}),
+    # (['f', 'F', 'e', 'E', 'g', 'G'], 'float32'),
+    # (['lf', 'lF', 'le', 'lE', 'lg', 'lG'], 'float64'),
+    (['hhd', 'hhi'],
+     {'type': 'scalar', 'subtype': 'int', 'precision': 1}),
+    (['hd', 'hi'],
+     {'type': 'scalar', 'subtype': 'int', 'precision': 2}),
+    (['d', 'i'],
+     {'type': 'scalar', 'subtype': 'int', 'precision': 4}),
+    (['lld', 'lli', 'l64d'],
+     {'type': 'scalar', 'subtype': 'int', 'precision': 8}),
+    (['hhu', 'hho', 'hhx', 'hhX'],
+     {'type': 'scalar', 'subtype': 'uint', 'precision': 1}),
+    (['hu', 'ho', 'hx', 'hX'],
+     {'type': 'scalar', 'subtype': 'uint', 'precision': 2}),
+    (['u', 'o', 'x', 'X'],
+     {'type': 'scalar', 'subtype': 'uint', 'precision': 4}),
+    (['lu', 'lo', 'lx', 'lX'],
+     {'type': 'scalar', 'subtype': 'uint', 'precision': 8}),
+    (['llu', 'llo', 'llx', 'llX', 'l64u'],
+     {'type': 'scalar', 'subtype': 'uint', 'precision': 8}),
+    (['10c', '10s'],
+     {'type': 'scalar', 'subtype': 'string', 'precision': 10}),
+]
 if platform._is_win and platform._numpy2:  # pragma: windows:
     map_cformat2nptype.append((['ld', 'li'], 'intc'))
+    map_cformat2schema.append((
+        ['ld', 'li'],
+        {'type': 'scalar', 'subtype': 'int', 'precision': 4}
+    ))
 else:
     map_cformat2nptype.append((['ld', 'li'], 'int_'))
-map_cformat2nptype.append(
-    (['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
-     'complex128'))
+    map_cformat2schema.append((
+        ['ld', 'li'],
+        {'type': 'scalar', 'subtype': 'int', 'precision': 8}
+    ))
+map_cformat2nptype.append((
+    ['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
+    'complex128'
+))
+map_cformat2schema.append((
+    ['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
+    {'type': 'scalar', 'subtype': 'complex', 'precision': 16}
+))
 
 
 def _expand_keys(x):
@@ -80,6 +122,7 @@ def _expand_keys(x):
 map_nptype2cformat_expanded = _expand_keys(map_nptype2cformat)
 map_cformat2nptype_expanded = _expand_keys(map_cformat2nptype)
 map_cformat2pyscanf_expanded = _expand_keys(map_cformat2pyscanf)
+map_cformat2schema_expanded = _expand_keys(map_cformat2schema)
 
 
 def test_extract_formats():
@@ -137,8 +180,31 @@ def test_cformat2nptype(a, b):
         ia = a.encode("utf-8")
     else:
         ia = constants.FMT_CHAR + a.encode("utf-8")
-    assert serialize.cformat2nptype(ia) == np.dtype(b)  # .str)
-    # assert serialize.cformat2nptype(ia) == np.dtype(b).str
+    assert serialize.cformat2nptype(ia) == np.dtype(b)
+    if b == 'S':
+        assert (serialize.cformat2nptype(ia, str_as_unicode=True)
+                == np.dtype('U'))
+
+
+@pytest.mark.parametrize('a,b', map_cformat2schema_expanded)
+def test_cformat2schema(a, b):
+    r"""Test conversion from C format string to schema."""
+    if a.startswith(constants.FMT_CHAR_STR):
+        ia = a.encode("utf-8")
+    else:
+        ia = constants.FMT_CHAR + a.encode("utf-8")
+    assert serialize.cformat2schema(ia) == b
+    if b.get('subtype', None) == 'string':
+        balt = dict(b)
+        precision = balt.pop('precision')
+        assert serialize.cformat2schema(ia, minimal=True) == balt
+        balt['encoding'] = 'UCS4'
+        assert (serialize.cformat2schema(ia, minimal=True,
+                                         str_as_unicode=True)
+                == balt)
+        balt['precision'] = 4 * precision
+        assert (serialize.cformat2schema(ia, str_as_unicode=True)
+                == balt)
 
 
 def test_cformat2nptype_errors():

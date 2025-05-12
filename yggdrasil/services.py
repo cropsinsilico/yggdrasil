@@ -15,7 +15,7 @@ import requests
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.multitasking import (
-    wait_on_function, ValueEvent, MemoryTracker)
+    wait_on_function, ValueEvent, MemoryTracker, AsyncResult)
 from yggdrasil.tools import YggClass, kill
 from yggdrasil.config import ygg_cfg
 
@@ -688,6 +688,7 @@ def create_service_manager_class(service_type=None):
                      **kwargs):
             if name is None:
                 name = 'ygg_integrations'
+            self.async_tasks = {}
             self.functions = {}
             self.integrations = {}
             self.stopped_integrations = {}
@@ -711,6 +712,23 @@ def create_service_manager_class(service_type=None):
                 _client_id = str(uuid.uuid4())
             return _client_id
 
+        def send_request_function(self, name, action=None, request=None):
+            r"""Send a request to a service function.
+
+            Args:
+                name (str): Name of service function.
+                action (str, optional): Action that is being requested.
+                    Defaults to 'call'.
+                request (dict, optional): Request body.
+
+            Returns:
+                dict: Response.
+
+            """
+            if request is None:
+                request = {}
+            return self.send_request(request, action=action, model=name)
+
         def send_request(self, name=None, yamls=None, action=None,
                          model=None, **kwargs):
             r"""Send a request.
@@ -727,6 +745,9 @@ def create_service_manager_class(service_type=None):
                     should be sent to.
                 **kwargs: Additional keyword arguments are included in the
                     request.
+
+            Returns:
+                dict: Response.
 
             """
             request_kws = {}
@@ -759,6 +780,23 @@ def create_service_manager_class(service_type=None):
                 wait_on_function(
                     is_complete, timeout=30, polling_interval=0.5,
                     on_timeout=f"Request did not complete: {request}")
+            if action == 'start':
+                out.update(service_address=self.address)
+            if ((isinstance(out, dict) and 'static' in out
+                 and out['status'] == 'async task')):
+                if 'result' not in out:
+                    def is_complete():
+                        out.update(
+                            super(IntegrationServiceManager, self).send_request({
+                                'action': 'async task',
+                                'task_id': out['task_id'],
+                            })
+                        )
+                        return ('result' in out)
+                    wait_on_function(
+                        is_complete, timeout=30, polling_interval=0.5,
+                        on_timeout=f"Request did not complete: {request}")
+                out = out['result']
             return out
 
         def setup_server(self, *args, **kwargs):
@@ -769,28 +807,37 @@ def create_service_manager_class(service_type=None):
                 def landing_page():
                     from flask import render_template
                     import yaml
+                    space_char = '&nbsp;'
+                    space_temp = 'SPACE'
+
+                    def str2html(x):
+                        return x.replace(' ', space_temp).splitlines()
+
                     try:
                         kwargs = {
-                            'address': self.address,
                             'available': {
-                                k: yaml.dump(v).splitlines()
-                                for k, v in self.registry.registry.items()},
+                                k: str2html(yaml.dump(v))
+                                for k, v in self.registry.registry.items()
+                                if v['yamls']},
                             'running': {
-                                k: {k2: v2.printStatus(return_str=True).splitlines()
+                                k: {k2: str2html(v2.printStatus(return_str=True))
                                     for k2, v2 in v.items()}
-                                for k, v in self.integrations.items()},
+                                for k, v in self.integrations.items()
+                                if v},
+                            'functions': {
+                                k: str2html(v.printStatus(return_str=True))
+                                for k, v in self.functions.items()
+                            }
                         }
-                        for k, v in self.functions.items():
-                            kwargs['running'][f'{k}[FUNCTION]'] = {
-                                k2: k2.printStatus(return_str=True).splitlines()
-                                for k2, v2 in v.items()}
                         out = render_template(
-                            'service_manager_index.html', **kwargs)
+                            'service_manager_index.html', **kwargs).replace(
+                                space_temp, space_char)
                     except BaseException:
-                        error = traceback.format_exc().splitlines()
+                        error = str2html(traceback.format_exc())
                         out = render_template(
                             'service_manager_index_error.html',
-                            error=error)
+                            error=error).replace(
+                                space_temp, space_char)
                     return out
 
                 @self.app.route('/<model>', methods=['POST'])
@@ -851,9 +898,20 @@ def create_service_manager_class(service_type=None):
                 partial_commtype = {'commtype': self.commtype}
                 if self.commtype == 'rest':
                     partial_commtype['client_id'] = client_id
+                if isinstance(x, tuple):
+                    name = '-'.join([
+                        os.path.splitext(os.path.basename(iyml))[0]
+                        for iyml in x])
+                else:
+                    name = x
+                    if os.path.isfile(name):
+                        name = os.path.splitext(os.path.basename(name))[0]
+                service_name = f'{name}-SERVICE'
                 integrations[x] = runner.get_runner(
-                    yamls, complete_partial=True, as_service=True,
-                    partial_commtype=partial_commtype, **kwargs)
+                    yamls, complete_partial=service_name,
+                    as_service=True,
+                    partial_commtype=partial_commtype,
+                    name=service_name, **kwargs)
                 integrations[x].run(signal_handler=False)
             return True
 
@@ -922,14 +980,10 @@ def create_service_manager_class(service_type=None):
             integrations = self.integrations[client_id]
             if x not in integrations:  # pragma: debug
                 raise KeyError(f"Integration defined by {x} not running")
-            m = integrations[x].modeldrivers['dummy_model']
+            name = integrations[x].name
+            m = integrations[x].modeldrivers[name]
             out = m['instance'].service_partner
-            name = 'dummy'
-            if isinstance(x, str) and (not os.path.isfile(x)):
-                name = x
-            out.update(name=name,
-                       args=name,
-                       language='dummy')
+            out.update(client_id=client_id, service=x)
             return out
 
         @property
@@ -995,7 +1049,8 @@ def create_service_manager_class(service_type=None):
                 except BaseException:
                     self.respond_function(name, 'delete')
                     raise
-                response = rapidjson.as_pure_json(response)
+                if not isinstance(response, AsyncResult):
+                    response = rapidjson.as_pure_json(response)
             elif action == 'info':
                 response = function.function_info
             elif action == 'n8n_form_node':
@@ -1024,10 +1079,11 @@ def create_service_manager_class(service_type=None):
                     name = model_function
                     action = kwargs.pop('action')
                 else:
-                    name = request.pop('name')
                     action = request.pop('action')
-                    yamls = request.pop('yamls')
-                    client_id = request.pop('client_id')
+                    if action not in ['async task']:
+                        name = request.pop('name')
+                        yamls = request.pop('yamls')
+                        client_id = request.pop('client_id')
                 if client_id is not None:
                     self.integrations.setdefault(client_id, {})
                     self.stopped_integrations.setdefault(client_id, {})
@@ -1099,9 +1155,32 @@ def create_service_manager_class(service_type=None):
                             self.integrations[client_id][name].printStatus(
                                 return_str=True))
                 elif action == 'ping':
-                    response = {'status': 'running'}
+                    if name is None:
+                        response = {'status': 'running'}
+                    elif name not in self.registry.registry:
+                        response = {'status': 'missing'}
+                    elif name not in self.integrations[client_id]:
+                        response = {'status': 'not started'}
+                    elif self.integrations[client_id][name].is_alive:
+                        response = {'status': 'running'}
+                    else:
+                        self.stop_integration(client_id, name)
+                        response = {'status': 'stopping'}
+                elif action == 'async task':
+                    response = self.async_tasks[request['task_id']]
                 else:
                     raise RuntimeError(f"Unsupported action: '{action}'")
+                if isinstance(response, AsyncResult):
+                    async_result = response
+                    response = {'status': 'async task',
+                                'task_id': async_result.id}
+                    if async_result.is_complete():
+                        response['result'] = rapidjson.as_pure_json(
+                            async_result.get())
+                        self.async_tasks.pop(async_result.id, None)
+                    elif action != 'async task':
+                        assert async_result.id not in self.async_tasks
+                        self.async_tasks[async_result.id] = async_result
             except BaseException as e:
                 tb = traceback.format_exc()
                 response = {'error': str(e), 'traceback': tb}
@@ -1140,39 +1219,84 @@ def create_service_manager_class(service_type=None):
                 return msg
             getattr(self.logger, level)(status['status'])
 
-        def create_n8n_tool(self, name, n8n_address=None,
-                            service_address=None,
-                            credentials=None):  # pragma: no cover
+        def n8n_api_request(self, path, action, n8n_address=None,
+                            credentials=None, headers=None,
+                            **kwargs):  # pragma: no cover
+            r"""Make a request to the n8n API.
+
+            Args:
+                path (str): Path to API endpoint that should be used.
+                action (str): API action (e.g. 'get', 'post'). Must be
+                    the name of a function in the requests library.
+                n8n_address (str, optional): Address of the n8n api.
+                credentials (str, optional): Credentials that should be
+                    supplied via X-N8N-API-KEY in the header for requests
+                    to the n8n API. If not provided, the environment
+                    variable "X_N8N_API_KEY" will be checked.
+                headers (dict, optional): Request header parameters.
+                **kwargs: Additional keyword arguments are passed to the
+                    requests library function for the specified action.
+
+            Returns:
+                dict: Response to the request.
+
+            """
+            assert self.for_request
+            if n8n_address is None:
+                n8n_address = "https://tools.uiuc.chat/api/v1"
+            if headers is None:
+                headers = {}
+            if credentials is None:
+                credentials = headers.get('X-N8N-API-KEY', None)
+            if credentials is None:
+                credentials = os.environ.get('X_N8N_API_KEY', None)
+                if credentials is None:
+                    raise RuntimeError("No credentials provided and "
+                                       "\"X_N8N_API_KEY\" environment "
+                                       "variable not set")
+            headers['X-N8N-API-KEY'] = credentials
+            r = getattr(requests, action)(
+                f'{n8n_address}/{path}',
+                headers=headers,
+                **kwargs
+            )
+            r.raise_for_status()
+            out = r.json()
+            print(action.upper(), f'{n8n_address}/{path}')
+            pprint.pprint(out)
+            return out
+
+        def create_n8n_tool(self, name, toolname=None,
+                            service_address=None, outputfile=None,
+                            **kwargs):  # pragma: no cover
             r"""Create an n8n tool for a service via the API.
 
             Args:
                 name (str): Service name (model or integration).
-                n8n_address (str): Address of the n8n workspace.
+                toolname (str, optional): Name of tool that should be
+                    created. If not provided, the tool name will be
+                    f'{name} Tool'.
                 service_address (str, optional): Address of the remote
                     service. If not provided, the current address will be
                     used.
-                credentials (str, optional): Credentials that should be
-                    supplied via X-N8N-API-KEY in the header for requests
-                    to the n8n API. If not provided, the environment
-                    variable "X-N8N-API-KEY" will be checked.
+                outputfile (str, optional): Name of file where a JSON
+                    representation of the tool should be saved instead
+                    of posting to the n8n API.
+                **kwargs: Additional keyword arguments are passed to
+                    n8n_api_request.
 
             """
-            if n8n_address is None:
-                n8n_address = "https://tools.uiuc.chat/api/v1"
-            if credentials is None:
-                credentials = os.environ.get('X-N8N-API-KEY', None)
-                if credentials is None:
-                    raise RuntimeError("No credentials provided and "
-                                       "\"X-N8N-API-KEY\" environment "
-                                       "variable not set")
             assert self.for_request
+            if toolname is None:
+                toolname = f'{name} Tool'
             if service_address is None:
                 service_address = self.address
             nodes = [
-                self.send_request(action='n8n_form_node'),
+                self.send_request_function(name, action='n8n_form_node'),
                 {
                     "name": "HTTP Request",
                     "type": "n8n-nodes-base.httpRequest",
+                    "typeVersion": 4.2,
                     "parameters": {
                         "method": "POST",
                         "url": f"{service_address.rstrip('/')}/{name}",
@@ -1187,46 +1311,76 @@ def create_service_manager_class(service_type=None):
                             }
                         },
                     },
+                    "position": [820, 320],
                 }
             ]
             request = {
-                'name': f"{name} Tool",
-                'id': str(uuid.uuid4()),
-                'nodes': nodes,
-                'connections': {
+                "name": toolname,
+                "nodes": nodes,
+                "connections": {
                     "n8n Form Trigger": {
-                        "main": [[{
+                        "main": [{
                             "node": "HTTP Request",
                             "type": "main",
                             "index": 0,
-                        }]]
+                        }],
                     },
                 },
-                'settings': {
-                    # 'saveExecutionProgress': False,
-                    # 'saveManualExecutions': False,
-                    # 'saveDataErrorExecution': 'all',
-                    # 'saveDataSuccessExecution': 'all',
-                    # 'executionTimeout': 3600,
-                    # 'errorWorkflow': 'name of error workflow',
-                    # 'timezone': '?',
+                "settings": {
+                    # "saveExecutionProgress": False,
+                    "saveManualExecutions": False,
+                    # "saveDataErrorExecution": "none",
+                    # "saveDataSuccessExecution": "none",
+                    # "executionTimeout": 3600,
+                    # "errorWorkflow": "",
+                    # "timezone": "America/New_York",
                     "executionOrder": "v1",
                 },
             }
-            headers = {'X-N8N-API-KEY': credentials}
-            r = requests.get(f'{n8n_address}/workflows',
-                             params={'name': request['name']},
-                             headers=headers)
-            r.raise_for_status()
-            response = r.json()
+            response = self.n8n_api_request(
+                'workflows', 'get', params={'name': toolname}, **kwargs
+            )
             if len(response['data']) > 0:
-                raise Exception(f"Tool already exists with name "
-                                f"{request['name']}")
-            r = requests.post(f'{n8n_address}/workflows', json=request,
-                              headers=headers)
-            r.raise_for_status()
-            response = r.json()
-            pprint.pprint(response)
+                raise ServerError(
+                    f"Tool(s) already exists with name \"{toolname}\":\n"
+                    f"{pprint.pformat(response['data'])}")
+            if outputfile is not None:
+                with open(outputfile, 'w') as fd:
+                    json.dump(request, fd)
+                return
+            return self.n8n_api_request(
+                'workflows', 'post', json=request,
+                headers={'accept': 'application/json'}, **kwargs)
+
+        def remove_n8n_tool(self, name, toolname=None,
+                            **kwargs):  # pragma: no cover
+            r"""Remove an n8n tool for a service via the API.
+
+            Args:
+                name (str): Service name (model or integration).
+                toolname (str, optional): Name of tool that should be
+                    created. If not provided, the tool name will be
+                    f'{name} Tool'.
+                **kwargs: Additional keyword arguments are passed to
+                    n8n_api_request.
+
+            """
+            if toolname is None:
+                toolname = f'{name} Tool'
+            response = self.n8n_api_request(
+                'workflows', 'get', params={'name': toolname}, **kwargs
+            )
+            if len(response['data']) == 0:
+                raise ServerError(
+                    f"No tool found matching name \"{toolname}\"")
+            elif len(response['data']) > 1:
+                raise ServerError(
+                    f"More than one tool matching name \"{toolname}\":\n"
+                    f"{pprint.pformat(response['data'])}")
+            idstr = response['data'][0]["id"]
+            return self.n8n_api_request(
+                f'workflows/{idstr}', 'delete', **kwargs
+            )
 
     return IntegrationServiceManager
 

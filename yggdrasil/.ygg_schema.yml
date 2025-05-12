@@ -3538,6 +3538,8 @@ definitions:
           or relative to compile_working_dir (if provided), builddir (if provided),
           or the source directory containing the model source files that will be built.
         type: string
+      client_id:
+        type: string
       client_of:
         allowSingular: true
         default: []
@@ -3921,6 +3923,14 @@ definitions:
         default: []
         description: Variables to include in the output. Defaults to None and the
           time/floating selections will be returned.
+        items:
+          type: string
+        type: array
+      service:
+        type: string
+      service_address:
+        type: string
+      service_models:
         items:
           type: string
         type: array
@@ -4592,6 +4602,8 @@ definitions:
           - string
           - number
         type: array
+      client_id:
+        type: string
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'
@@ -4620,6 +4632,14 @@ definitions:
         enum:
         - dummy
         type: string
+      service:
+        type: string
+      service_address:
+        type: string
+      service_models:
+        items:
+          type: string
+        type: array
       skip_interpreter:
         default: false
         description: If True, no interpreter will be added to the arguments. This

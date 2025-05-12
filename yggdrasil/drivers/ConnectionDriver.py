@@ -5,7 +5,7 @@ import numpy as np
 import functools
 import queue
 from yggdrasil import multitasking
-from yggdrasil.communication import new_comm, CommBase
+from yggdrasil.communication import new_comm, CommBase, strip_model_prefix
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import create_component, isinstance_component
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
@@ -284,7 +284,7 @@ class ConnectionDriver(Driver):
         self.task_thread = None
         if self.as_process:
             self.task_thread = RemoteTaskLoop(
-                self, name=('%s.TaskThread' % self.name))
+                self, name=f'{self.name}.TaskThread')
         # Translator
         if self.transform is None:
             self.transform = []
@@ -303,6 +303,7 @@ class ConnectionDriver(Driver):
         # Add comms and print debug info
         self.models = models
         self.models_recvd = {}
+        self.models_added_by_input = []
         self._init_comms(name, **kwargs)
 
     def _init_single_comm(self, io, comm_list):
@@ -391,6 +392,31 @@ class ConnectionDriver(Driver):
         super(ConnectionDriver, self).__setstate__(state)
         if self.as_process:
             self.task_thread.connection = self
+
+    def model_comm_kwargs(self, io, model):
+        r"""Get the communicators that partner with the specified model.
+
+        Args:
+            io (str): Direction that should be checked ('input' or
+                'output').
+            model (str): Model name.
+
+        Returns:
+            dict: Mapping between channel name and comm kwargs.
+
+        """
+        out = {}
+        comm_kws = getattr(self, f'{io[0]}comm_kws')
+        if 'partner_model' in comm_kws:
+            if comm_kws['partner_model'] == model:
+                name = strip_model_prefix(comm_kws['name'], model)
+                out[name] = comm_kws
+        elif isinstance(comm_kws['commtype'], list):
+            for x in comm_kws['commtype']:
+                if 'partner_model' in x and x['partner_model'] == model:
+                    name = strip_model_prefix(x['name'], model)
+                    out[name] = x
+        return out
 
     @property
     def model_env(self):
@@ -661,12 +687,14 @@ class ConnectionDriver(Driver):
             getattr(self, self.onexit)()
         if not errors:
             if direction == 'output':
-                T = self.start_timeout(60, key_suffix='.model_exit')
+                T = self.start_timeout(
+                    60, key_suffix=f'.{direction}_model_exit')
                 while (not T.is_out) and self.models['input']:
                     self.debug("remaining input models: %s",
                                self.models['input'])
                     self.sleep(10 * self.sleeptime)
-                self.stop_timeout(key_suffix='.model_exit')
+                self.stop_timeout(
+                    key_suffix=f'.{direction}_model_exit')
                 self.drain_input(timeout=self.timeout)
         if direction == 'input':
             if not errors:
@@ -872,12 +900,16 @@ class ConnectionDriver(Driver):
                 return False
             msg = self.icomm.recv(return_message_object=True, **kwargs)
             self.errors += self.icomm.errors
-        if msg.header and ('model' in msg.header.get('__meta__', {})):
-            self.models_recvd.setdefault(msg.header['__meta__']['model'], 0)
-            self.models_recvd[msg.header['__meta__']['model']] += 1
-            if ((self.models_recvd[msg.header['__meta__']['model']] == 1
-                 and msg.header['__meta__']['model'] not in self.models['input'])):
-                self.models['input'].append(msg.header['__meta__']['model'])
+            model = msg.header.get('__meta__', {}).get('model', '')
+            if model:
+                self.models_recvd.setdefault(model, 0)
+                self.models_recvd[model] += 1
+                if ((self.models_recvd[model] == 1
+                     and model not in self.models['input']
+                     and not self.icomm.for_service)):
+                    self.debug(f"Adding input model from message: {model}")
+                    self.models['input'].append(model)
+                    self.models_added_by_input.append(model)
         if msg.flag == CommBase.FLAG_EOF:
             return self.on_eof(msg)
         if msg.flag == CommBase.FLAG_SUCCESS:
@@ -895,7 +927,11 @@ class ConnectionDriver(Driver):
             CommMessage, bool: Value that should be returned by recv_message on EOF.
 
         """
+        model = msg.header.get('__meta__', {}).get('model', '')
         with self.lock:
+            if model and model in self.models_added_by_input:
+                self.debug(f"Removing model based on EOF: {model}")
+                self.remove_model('input', model)
             self.debug('EOF received')
             self.state = 'eof'
             self.set_close_state('eof')

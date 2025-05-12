@@ -219,6 +219,8 @@ def _cformat2nptype(flags, width, precision, length, specifier,
         specifier (str): Field specifier.
         *complex_args: Additional arguments indicate that the cformat is
             for a complex field.
+        as_bytes (bool, optional): If True, strings are treated as bytes
+            instead of unicode.
 
     Returns:
         str: Regex expression that will match the provided components.
@@ -269,10 +271,10 @@ def _cformat2nptype(flags, width, precision, length, specifier,
     elif specifier in 'cs':
         lint = int(width) if width else 0
         lsiz = lint * np.dtype('S1').itemsize
-        # if as_bytes:
-        out = f'S{lsiz}'
-        # else:
-        #     out = f'U{lsiz}'
+        if as_bytes:
+            out = f'S{lsiz}'
+        else:
+            out = f'U{lsiz}'
     if out is None:
         raise ValueError(f"Could not find match for length "
                          f"\"{length}\" for format specification "
@@ -535,7 +537,7 @@ def cformat2pyformat(format):
     return revised
 
 
-def cformat2nptype(format, names=None):
+def cformat2nptype(format, names=None, str_as_unicode=False):
     r"""Convert a c format string to a numpy data type.
 
     Args:
@@ -543,6 +545,8 @@ def cformat2nptype(format, names=None):
         names (list, optional): Names that should be assigned to fields in the
             format string if there is more than one. If not provided, names
             are generated based on the order of the format codes.
+        str_as_unicode (bool, optional): If True, strings are treated as
+            unicode instead of bytes.
 
     Returns:
         np.dtype: Corresponding numpy data type.
@@ -552,15 +556,14 @@ def cformat2nptype(format, names=None):
     if isinstance(format, list):
         dtypes = [cformat2nptype(x) for x in format]
     else:
-        as_bytes = isinstance(format, bytes)
-        if as_bytes:
+        if isinstance(format, bytes):
             format = format.decode('utf-8')
-        dtypes = [_match2nptype(match, as_bytes=as_bytes)
+        dtypes = [_match2nptype(match, as_bytes=(not str_as_unicode))
                   for match in findall_cformats(format)]
     if len(dtypes) == 0:
         raise ValueError(f"Could not locate any format codes in the"
                          f" provided format string ({format}).")
-    elif len(dtypes) == 1:
+    elif len(dtypes) == 1 and names is None:
         return dtypes[0]
     else:
         if names is None:

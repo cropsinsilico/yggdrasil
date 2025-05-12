@@ -993,9 +993,15 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
     return ret;
   }
   // Check for server signon and respond
-  while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0 ||
-	 strncmp((char*)zframe_data(out), "ZMQ_CLIENT_SIGNED_ON::", 22) == 0) {
-    if (strncmp((char*)zframe_data(out), "ZMQ_CLIENT_SIGNED_ON::", 22) == 0) {
+  while (strncmp((char*)zframe_data(out), YGG_PROXY_SIGNON,
+                 YGG_PROXY_SIGNON_LEN) == 0 ||
+	 strncmp((char*)zframe_data(out), YGG_PROXY_SIGNON_COUNT,
+                 YGG_PROXY_SIGNON_COUNT_LEN) == 0 ||
+         strncmp((char*)zframe_data(out), YGG_PROXY_SIGNOFF,
+                 YGG_PROXY_SIGNOFF_LEN) == 0) {
+    if (strncmp((char*)zframe_data(out), YGG_PROXY_SIGNON_COUNT,
+                YGG_PROXY_SIGNON_COUNT_LEN) == 0) {
+      ygglog_debug("zmq_comm_recv(%s): proxy signon count", x->name);
       zframe_destroy(&out);
       out = zmq_comm_recv_zframe(x);
       if (out == NULL) {
@@ -1003,9 +1009,17 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
 	return ret;
       }
       continue;
+    } else if (strncmp((char*)zframe_data(out), YGG_PROXY_SIGNOFF,
+                       YGG_PROXY_SIGNOFF_LEN) == 0) {
+      ygglog_debug("zmq_comm_recv(%s): proxy signed off", x->name);
+      // TODO: Anything else?
+      zframe_destroy(&out);
+      ygglog_debug("zmq_comm_recv(%s): proxy signed off", x->name);
+      return ret;
     }
-    char* client_address = (char*)zframe_data(out) + 23;
-    client_address[zframe_size(out) - 23] = '\0';
+    ygglog_debug("zmq_comm_recv(%s): proxy signed on", x->name);
+    char* client_address = (char*)zframe_data(out) + YGG_PROXY_SIGNON_LEN;
+    client_address[zframe_size(out) - YGG_PROXY_SIGNON_LEN] = '\0';
     ygglog_debug("zmq_comm_recv(%s): Received sign-on: %s", x->name, client_address);
     
     // create a DEALER socket and connect to address
@@ -1024,7 +1038,8 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       ygg_zsock_destroy(&client_socket);
       return ret;
     }
-    zframe_t *response = zframe_new(zframe_data(out), zframe_size(out));
+    size_t response_len = YGG_SERVER_SIGNON_LEN + strlen(x->name) + 1;
+    zframe_t *response = zframe_new(NULL, response_len);
     if (response == NULL) {
       ygglog_error("zmq_comm_recv(%s): Error creating response message frame.", x->name);
       zframe_destroy(&out);
@@ -1032,6 +1047,10 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       ygg_zsock_destroy(&client_socket);
       return ret;
     }
+    snprintf((char*)(zframe_data(response)), response_len, "%s%s",
+             YGG_SERVER_SIGNON, x->name);
+    ygglog_debug("zmq_comm_recv(%s): sending server signon \"%s\"",
+                 x->name, (char*)(zframe_data(response)));
     if (zframe_send(&response, client_socket, 0) < 0) {
       ygglog_error("zmq_comm_recv(%s): Error sending response message.", x->name);
       zframe_destroy(&out);

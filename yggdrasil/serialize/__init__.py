@@ -148,7 +148,7 @@ def nptype2cformat(nptype, asbytes=False):
     return cfmt
 
 
-def cformat2nptype(cfmt, names=None):
+def cformat2nptype(cfmt, names=None, str_as_unicode=False):
     r"""Convert a c format string to a numpy data type.
 
     Args:
@@ -156,6 +156,8 @@ def cformat2nptype(cfmt, names=None):
         names (list, optional): Names that should be assigned to fields in the
             format string if there is more than one. If not provided, names
             are generated based on the order of the format codes.
+        str_as_unicode (bool, optional): If True, strings are treated as
+            unicode instead of bytes.
 
     Returns:
         np.dtype: Corresponding numpy data type.
@@ -172,7 +174,8 @@ def cformat2nptype(cfmt, names=None):
     if not (isinstance(cfmt, list) or isinstance(cfmt, (str, bytes))):
         raise TypeError(f"Input must be a string, bytes string, or list,"
                         f" not {type(cfmt)}")
-    return scanf.cformat2nptype(cfmt, names=names)
+    return scanf.cformat2nptype(cfmt, names=names,
+                                str_as_unicode=str_as_unicode)
 
 
 def cformat2pyscanf(cfmt):
@@ -223,6 +226,47 @@ def cformat2pyscanf(cfmt):
     if as_bytes:
         cfmt_out = cfmt_out.encode("utf-8")
     return cfmt_out
+
+
+def cformat2schema(cfmt, as_array=False, minimal=False, **kwargs):
+    r"""Convert a c format string to a JSON type schema.
+
+    Args:
+        cfmt (str): C-style format string.
+        as_array (bool, optional): If True, the data type for items in
+            each field will be set to a 1D array.
+        minimal (bool, optional): If True, the returned schema will be
+            only as specific as necessary to identify the type (e.g.
+            scalar precision for flexible types will not be specified).
+        **kwargs: Additional keyword arguments are passed to cformat2nptype
+            when processing each field in the format string.
+
+    Returns:
+        dict: JSON schema.
+
+    """
+    from yggdrasil import rapidjson
+    nptype = cformat2nptype(cfmt, **kwargs)
+    if nptype.names:
+        dtypes = [nptype.fields[x] for x in nptype.names]
+    else:
+        dtypes = [nptype]
+    items = []
+    for i, idtype in enumerate(dtypes):
+        item = rapidjson.encode_schema(np.ones(1, nptype), minimal=minimal)
+        if as_array:
+            item['type'] = '1darray'
+        else:
+            item['type'] = 'scalar'
+            item.pop('shape', None)
+            if minimal and item['subtype'] in constants.FLEXIBLE_TYPES:
+                item.pop('precision', None)
+        items.append(item)
+    if nptype.names:
+        for i, x in enumerate(items):
+            x['title'] = nptype.names[i]
+        return {'type': 'array', 'items': items}
+    return items[0]
 
 
 def format_message(args, fmt_str):

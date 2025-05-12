@@ -179,6 +179,32 @@ class DirectConnectionDriver(ConnectionDriver):
         self._init_single_comm('output', self.outputs)
         self._add_partners()
 
+    def model_comm_kwargs(self, io, model):
+        r"""Get the communicators that partner with the specified model.
+
+        Args:
+            io (str): Direction that should be checked ('input' or
+                'output').
+            model (str): Model name.
+
+        Returns:
+            dict: Mapping between channel name and comm kwargs.
+
+        """
+        from yggdrasil.communication import strip_model_prefix
+        out = {}
+        comm_kws = getattr(self, f'{io[0]}comm_kws')
+        if 'model' in comm_kws:
+            if comm_kws['model'] == model:
+                name = strip_model_prefix(comm_kws['name'], model)
+                out[name] = comm_kws
+        elif isinstance(comm_kws['commtype'], list):
+            for x in comm_kws['commtype']:
+                if 'model' in x and x['model'] == model:
+                    name = strip_model_prefix(x['name'], model)
+                    out[name] = x
+        return out
+
     @property
     def model_env(self):
         r"""dict: Mapping between model name and opposite comm

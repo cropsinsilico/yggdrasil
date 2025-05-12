@@ -409,7 +409,9 @@ def prep_yaml(files, model_submission=False, **kwargs):
             x.setdefault('for_request', True)
             cli = IntegrationServiceManager(**x)
             response = cli.send_request(**request)
-            response['working_dir'] = os.getcwd()
+            response.update(
+                working_dir=os.getcwd(),
+            )
             assert response.pop('status') == 'complete'
             y['models'].append(response)
     # Combine models & connections
@@ -506,11 +508,16 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     # Parse models, then connections to ensure connections can be processed
     existing = {k: {} for k in
                 ['input', 'output', 'model', 'connection', 'server']}
-    existing['aliases'] = {'inputs': {}, 'outputs': {}}
+    existing['aliases'] = {'inputs': {}, 'outputs': {}, 'models': {}}
     existing['pairs'] = []
     existing['input_drivers'] = []
     existing['output_drivers'] = []
     existing['backward'] = run_backwards_compat
+    for yml in yml_norm['models']:
+        if yml['language'] == 'dummy' and 'service_models' in yml:
+            for x in yml['service_models']:
+                assert x not in existing['aliases']['models']
+                existing['aliases']['models'][x] = yml['name']
     for yml in yml_norm['models']:
         existing = parse_component(yml, 'model', existing=existing)
     backward_compat(yml_norm, existing)
@@ -540,7 +547,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         yml = {'inputs': [{'name': x} for x in clients],
                'outputs': [{'name': srv}],
                'driver': 'RPCRequestDriver',
-               'name': existing['input'][srv]['model_driver'][0]}
+               'name': existing['input'][srv]['partner_model']}
         if srv_info.get('replaces', None):
             yml['outputs'][0].update({
                 k: v for k, v in srv_info['replaces']['input'].items()
@@ -602,11 +609,11 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
                         "No driver established for %s channel %s" % (io, k))
         # Remove unused default channels
         for k in remove:
-            for m in existing[io][k]['model_driver']:
-                for i, x in enumerate(existing['model'][m][io + 's']):
-                    if x['name'] == k:
-                        existing['model'][m][io + 's'].pop(i)
-                        break
+            m = existing[io][k]['partner_model']
+            for i, x in enumerate(existing['model'][m][io + 's']):
+                if x['name'] == k:
+                    existing['model'][m][io + 's'].pop(i)
+                    break
             existing[io].pop(k)
     __display_progress(verbose, existing,
                        "After initializing model IO")
@@ -652,6 +659,8 @@ def complete_partial_integration(existing, name, partial_commtype=None):
         dict: Updated dictionary of components.
 
     """
+    from yggdrasil.communication import (
+        strip_model_prefix, add_model_prefix)
     if isinstance(name, bool):
         name = 'dummy_model'
     new_model = {'name': name,
@@ -683,10 +692,12 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     # Create connections to dummy model
     for io1, io2 in dir2opp.items():
         for i in miss[io1]:
-            dummy_channel = f"{name}:dummy_{i.replace(':', '-')}"
             dummy_comm = copy.deepcopy(existing[io1][i])
+            dummy_channel = add_model_prefix(strip_model_prefix(
+                i, dummy_comm.get('partner_model', None)), name)
             for k in ['address', 'for_service', 'commtype', 'host',
-                      'transform', 'filter', 'datatype']:
+                      'transform', 'filter', 'datatype', 'model',
+                      'partner_model', 'partner_language']:
                 dummy_comm.pop(k, None)
             dummy_comm['name'] = dummy_channel
             if partial_commtype is not None:
@@ -813,18 +824,24 @@ def parse_model(yml, existing):
         yml['client_of'] += timesync
     # Add client output
     if yml.get('client_of', []):
+        client_of = []
         for srv in yml['client_of']:
-            srv_name = f'{srv}:{srv}'
             if srv in timesync:
                 cli_name = '%s:%s' % (yml['name'], srv)
             else:
                 cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
             cli = {'name': cli_name,
                    'working_dir': yml['working_dir']}
+            srv_alias = existing['aliases']['models'].get(srv, srv)
+            srv_name = f'{srv_alias}:{srv_alias}'
             yml['outputs'].append(cli)
-            existing['server'].setdefault(srv_name, {'clients': [],
-                                                     'model_name': srv})
+            existing['server'].setdefault(
+                srv_name,
+                {'clients': [], 'model_name': srv_alias}
+            )
             existing['server'][srv_name]['clients'].append(cli_name)
+            client_of.append(srv_alias)
+        yml['client_of'] = client_of
     # Model index and I/O channels
     yml['model_index'] = len(existing['model'])
     prefix = yml['name'] + ':'
@@ -844,8 +861,6 @@ def parse_model(yml, existing):
                     (yml.get('copies', 1) > 1)
                     and (not x.get('dont_copy', False))):
                 x['allow_multiple_comms'] = True
-            # TODO: Replace model_driver with partner_model?
-            x['model_driver'] = [yml['name']]
             x['partner_model'] = yml['name']
             if yml.get('copies', 1) > 1:
                 x['partner_copies'] = yml['copies']
@@ -955,7 +970,8 @@ def parse_connection(yml, existing):
             for k, v in y.items():
                 new.setdefault(k, v)
             xx['inputs'].append(new)
-            xx['src_models'] += existing['output'][y['name']]['model_driver']
+            xx['src_models'].append(
+                existing['output'][y['name']]['partner_model'])
             new.setdefault('__connection_count', 0)
             new['__connection_count'] += 1
     for i, y in enumerate(yml['outputs']):
@@ -966,7 +982,8 @@ def parse_connection(yml, existing):
             for k, v in y.items():
                 new.setdefault(k, v)
             xx['outputs'].append(new)
-            xx['dst_models'] += existing['input'][y['name']]['model_driver']
+            xx['dst_models'].append(
+                existing['input'][y['name']]['partner_model'])
             new.setdefault('__connection_count', 0)
             new['__connection_count'] += 1
     # TODO: Combine inputs/outputs that access variables from the same
