@@ -228,8 +228,29 @@ def cformat2pyscanf(cfmt):
     return cfmt_out
 
 
+def schema2cformat(schema, asbytes=False, **kwargs):
+    r"""Convert a JSON type schema to a C-style format string.
+
+    Args:
+        schema (dict): JSON type schema.
+        asbytes (bool, optional): If True, the returned format codes will be
+            in bytes format (str for Python 2, bytes for Python 3). Defaults to
+            False.
+        **kwargs: Additional keyword arguments are passed to table2format.
+
+    Returns:
+        str, bytes: C-style format string.
+
+    """
+    from yggdrasil import datatypes
+    out = datatypes.Datatype(schema, **kwargs).format_str
+    if not asbytes:
+        out = tools.bytes2str(out)
+    return out
+
+
 def cformat2schema(cfmt, as_array=False, minimal=False, **kwargs):
-    r"""Convert a c format string to a JSON type schema.
+    r"""Convert a C-style format string to a JSON type schema.
 
     Args:
         cfmt (str): C-style format string.

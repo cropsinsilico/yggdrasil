@@ -1,6 +1,7 @@
 import copy
 import numpy as np
-from yggdrasil.communication.transforms.TransformBase import TransformBase
+from yggdrasil.communication.transforms.TransformBase import (
+    TransformBase, TransformError)
 
 
 class IterateTransform(TransformBase):
@@ -9,7 +10,7 @@ class IterateTransform(TransformBase):
     _schema_subtype_description = (
         "Split messages up into their iterable components")
 
-    def validate_datatype(self, datatype):
+    def _validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
         
         Args:
@@ -19,8 +20,8 @@ class IterateTransform(TransformBase):
             AssertionError: If the datatype is not valid.
 
         """
-        assert datatype.get('type', None) in ['array', 'object', '1darray',
-                                              'ndarray']
+        assert datatype.get('type', None) in [
+            'array', 'object', '1darray', 'ndarray']
 
     def get_elements(self, datatype):
         r"""Get a list of elements in the datatype for iteration.
@@ -32,30 +33,31 @@ class IterateTransform(TransformBase):
             list: List of datatypes for the elements iterated over.
 
         """
-        if datatype.get('type', None) == 'array':
-            if isinstance(datatype.get('items', None), dict):
-                out = [datatype['items']]
-            else:
-                out = datatype['items']
-        elif datatype.get('type', None) == 'object':
-            out = [v for v in datatype.get('properties', {}).values()]
-            if 'additionalProperties' in datatype:
-                out.append(datatype['additionalProperties'])
-        elif datatype.get('type', None) == '1darray':
-            out = [dict(datatype, type='scalar')]
+        # TODO: Allow iteration over rows in structured array
+        field_items = datatype.field_items
+        if field_items:
+            return field_items
+        if ((datatype['type'] == 'array'
+             and isinstance(datatype.get('items', None), dict))):
+            out = [datatype['items']]
+        elif (datatype['type'] == 'object'
+              and isinstance(datatype.get('additionalProperties', None),
+                             dict)):
+            out = [datatype['additionalProperties']]
+        elif datatype['type'] == '1darray':
+            out = [dict(datatype.datatype, type='scalar')]
             out[0].pop('length', None)
-        elif datatype.get('type', None) == 'ndarray':
-            if len(datatype['shape']) > 2:
-                out = [dict(datatype, shape=datatype['shape'][1:])]
-            else:
-                out = [dict(datatype, type='1darray',
-                            length=datatype['shape'][-1])]
+        elif datatype['type'] == 'ndarray':
+            if len(datatype['shape']) == 1:
+                out = [dict(datatype.datatype, type='scalar')]
                 out[0].pop('shape', None)
+            else:
+                out = [dict(datatype, shape=datatype['shape'][1:])]
         else:  # pragma: debug
-            raise ValueError("Unsupported datatype: %s" % datatype)
+            raise TransformError(f"Unsupported datatype: {datatype}")
         return out
     
-    def transform_datatype(self, datatype):
+    def _transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 
@@ -68,10 +70,10 @@ class IterateTransform(TransformBase):
         """
         elements = self.get_elements(datatype)
         if all(elements[0] == x for x in elements[1:]):
-            datatype = copy.deepcopy(elements[0])
+            out = copy.deepcopy(elements[0])
         else:
-            datatype = {'type': 'any'}
-        return datatype
+            out = {'type': 'any'}
+        return datatype.subschema(out)
 
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.

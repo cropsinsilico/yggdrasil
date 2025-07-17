@@ -64,27 +64,30 @@ class SerializeBase(tools.YggClass):
     is_framed = False
     concats_as_str = True
     
-    def __init__(self, partial_datatype=None, **kwargs):
-        self.partial_datatype = partial_datatype
-        if ('format_str' in kwargs):
+    def __init__(self, **kwargs):
+        datatype_kwargs = {}
+        for k in datatypes.Datatype.copy_keys():
+            if k in kwargs:
+                datatype_kwargs[k] = kwargs.pop(k)
+        if 'format_str' in datatype_kwargs:
             drv = tools.get_subprocess_language_driver()
             if drv.decode_format is not None:
-                kwargs['format_str'] = drv.decode_format(kwargs['format_str'])
+                datatype_kwargs['format_str'] = drv.decode_format(
+                    datatype_kwargs['format_str'])
         super(SerializeBase, self).__init__(**kwargs)
-        kwargs = self.extra_kwargs
-        self.extra_kwargs = {}
-        self.extra_kwargs_used = {}
-        self._initialized = False
-        # Update datatype from other keyword arguments
-        if self.datatype is not None:
-            kwargs['datatype'] = self.datatype
-        self.datatype = self.default_datatype
-        self.update_serializer(**kwargs)
+        datatype_kwargs['datatype'] = self.datatype
+        self.datatype = datatypes.Datatype()
+        self.update_serializer(**datatype_kwargs)
+
+    @property
+    def newline(self):
+        r"""bytes: Newline character."""
+        return self.datatype.newline
 
     @property
     def initialized(self):
         r"""bool: True if the serializer has been initialized."""
-        return self._initialized or self.datatype != self.default_datatype
+        return self.datatype.initialized
 
     @staticmethod
     def before_registration(cls):
@@ -372,7 +375,10 @@ class SerializeBase(tools.YggClass):
         for k in self._schema_properties.keys():
             if (k != 'seritype') and (k in self._defaults_set):
                 continue
-            v = getattr(self, k, None)
+            if k == 'datatype':
+                v = self.datatype.datatype
+            else:
+                v = getattr(self, k, None)
             if v is not None:
                 out[k] = copy.deepcopy(v)
         for k in out.keys():
@@ -386,7 +392,7 @@ class SerializeBase(tools.YggClass):
     @property
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
-        return datatypes.get_empty_msg(self.datatype)
+        return self.datatype.empty_msg
 
     # def is_empty(self, obj):
     #     r"""Determine if an object represents an empty message for this serializer.
@@ -413,23 +419,7 @@ class SerializeBase(tools.YggClass):
             list: Names for each field in the data type.
 
         """
-        if getattr(self, 'field_names', None) is not None:
-            out = copy.deepcopy(self.field_names)
-        elif ((self.datatype['type'] != 'array')
-              or ('items' not in self.datatype)):
-            out = None
-        elif isinstance(self.datatype['items'], dict):  # pragma: debug
-            raise Exception("Variable number of items not yet supported.")
-        elif isinstance(self.datatype['items'], list):
-            out = []
-            any_names = False
-            for i, x in enumerate(self.datatype['items']):
-                out.append(x.get('title', 'f%d' % i))
-                if len(x.get('title', '')) > 0:
-                    any_names = True
-            # Don't use field names if they are all defaults
-            if not any_names:
-                out = None
+        out = self.datatype.field_names
         if (out is not None):
             if as_bytes:
                 out = tools.str2bytes(out, recurse=True)
@@ -449,31 +439,9 @@ class SerializeBase(tools.YggClass):
             list: Units for each field in the data type.
 
         """
-        if self.datatype['type'] != 'array':
-            return None
-        out = None
-        if getattr(self, 'field_units', None) is not None:
-            out = [str(units.Units(x)) for x in self.field_units]
-        elif 'items' in self.datatype:
-            if isinstance(self.datatype['items'], dict):  # pragma: debug
-                if self.field_names:
-                    if len(self.datatype['items'].get('units', '')) > 0:
-                        out = [self.datatype['items']['units']
-                               for _ in self.field_names]
-                else:
-                    raise Exception("Variable number of items not yet "
-                                    "supported.")
-            elif isinstance(self.datatype['items'], list):
-                out = []
-                any_units = False
-                for i, x in enumerate(self.datatype['items']):
-                    out.append(x.get('units', ''))
-                    if len(x.get('units', '')) > 0:
-                        any_units = True
-                # Don't use field units if they are all defaults
-                if not any_units:
-                    out = None
-        if (out is not None):
+        out = self.datatype.field_units
+        if out is not None:
+            out = [str(units.Units(x)) for x in out]
             if as_bytes:
                 out = tools.str2bytes(out, recurse=True)
             else:
@@ -484,7 +452,7 @@ class SerializeBase(tools.YggClass):
     def numpy_dtype(self):
         r"""np.dtype: Corresponding structured data type. Will be None unless the
         type is an array of 1darrays."""
-        return datatypes.type2numpy(self.datatype)
+        return self.datatype.dtype
 
     @property
     def typedef(self):  # pragma: deprecated
@@ -492,7 +460,7 @@ class SerializeBase(tools.YggClass):
         warnings.warn(message=("`typedef` attribute is deprecated`; use "
                                " `datatype` instead."),
                       category=DeprecationWarning)
-        return self.datatype
+        return self.datatype.datatype
 
     def initialize_from_message(self, msg, serializer=None, **metadata):
         r"""Initialize the serializer based on recieved message.
@@ -503,20 +471,16 @@ class SerializeBase(tools.YggClass):
                 may contain additional information for initializing the serializer.
 
         """
-        if metadata.get('raw', False) or metadata.get('incomplete', False):
-            return
-        if ((self.initialized and serializer
-             and 'format_str' in serializer
-             and 'format_str' not in self.extra_kwargs_used)):
-            serializer = {'format_str': serializer['format_str'],
-                          'datatype': copy.deepcopy(self.datatype)}
-        elif self.initialized:
+        if ((metadata.get('raw', False)
+             or metadata.get('incomplete', False)
+             or self.datatype.initialized_from_message)):
             return
         if serializer is None:
             serializer = {}
         if 'datatype' not in serializer:
             try:
-                serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
+                serializer['datatype'] = rapidjson.encode_schema(
+                    msg, minimal=True)
             except TypeError as e:
                 raise serialize.SerializationError(e)
         self.update_serializer(from_message=msg, **serializer)
@@ -536,12 +500,17 @@ class SerializeBase(tools.YggClass):
         self.update_serializer(**metadata.get('serializer', {}))
 
     def update_serializer(self, skip_type=False, seritype=None,
-                          datatype=None, from_message=False, **kwargs):
+                          datatype=None, from_message=None, **kwargs):
         r"""Update serializer with provided information.
 
         Args:
             skip_type (bool, optional): If True, everything is updated except
                 the data type. Defaults to False.
+            seritype (str, optional): Serializer type. It must be compatible
+                with the instance's serializer type.
+            datatype (dict, optional): JSON schema describing the datatype.
+            from_message (object, optional): Message that the serializer
+                is being updated from.
             **kwargs: Additional keyword arguments are processed as part of
                 they type definition and are parsed for old-style keywords.
 
@@ -553,198 +522,32 @@ class SerializeBase(tools.YggClass):
         if seritype not in [None, self._seritype, 'default']:  # pragma: debug
             raise Exception(f"Cannot change types form {self._seritype} "
                             f"to {seritype}.")
+        datatype_kwargs = {
+            k: kwargs.pop(k) for k in datatypes.Datatype.copy_keys()
+            if k in kwargs
+        }
         # Set attributes and remove unused metadata keys
         for k in self._schema_properties.keys():
             if k in kwargs:
+                # self.info(f'update_serializer: {k} = {kwargs[k]}')
+                # import pdb; pdb.set_trace()
                 setattr(self, k, kwargs.pop(k))
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-            self.debug("Extra kwargs: %.100s..." % str(self.extra_kwargs))
+            self.info("Extra kwargs: %.100s..." % str(self.extra_kwargs))
         # Update type
         if not skip_type:
-            old_datatype = None
-            if self.initialized:
-                old_datatype = copy.deepcopy(self.datatype)
-            if datatype is None:
-                datatype = {}
-            # Update datatype from oldstyle keywords in extra_kwargs
-            if ((from_message is not False
-                 or (datatype and datatype != self.default_datatype))):
-                datatype = self.update_typedef_from_oldstyle(datatype)
-            if 'type' in datatype:
-                # TODO: Fix push/pull of schema properties
-                if ((self.partial_datatype
-                     and (from_message is not False
-                          or datatype != self.default_datatype))):
-                    datatype.update(self.partial_datatype)
-                    self.partial_datatype = None
-                self.datatype = rapidjson.normalize(datatype,
-                                                    {'type': 'schema'})
-                if from_message is not False:
-                    self._initialized = True
-                if ((self.datatype['type'] == 'array'
-                     and isinstance(self.datatype.get('items', None), list)
-                     and len(self.datatype['items']) == 1)):
-                    self.datatype['allowSingular'] = True
-                    self.datatype['items'][0].pop('allowWrapped', False)
-                # elif self.datatype['type'] not in ['array', 'object']:
-                #     self.datatype['allowWrapped'] = True
-            # Check to see if new datatype is compatible with new one
-            if old_datatype and datatype:
-                try:
-                    rapidjson.compare_schemas(self.datatype, old_datatype)
-                except rapidjson.ComparisonError:
-                    import pprint
-                    self.error(
-                        f"BEFORE:\n{pprint.pformat(old_datatype)}\n"
-                        f"AFTER:\n{pprint.pformat(self.datatype)}")
-                    raise
-        # Enfore that strings used with messages are in bytes
+            self.datatype.update(datatype, message=from_message,
+                                 **datatype_kwargs)
+        # Ensure that strings used with messages are in bytes
+        datatype_keys = datatypes.Datatype.copy_keys()
         for k in self._attr_conv:
+            if k in datatype_keys:
+                continue
             v = getattr(self, k, None)
             if isinstance(v, (str, bytes)):
                 setattr(self, k, tools.str2bytes(v))
-
-    def cformat2nptype(self, *args, **kwargs):
-        r"""Method to convert c format string to numpy data type.
-
-        Args:
-            *args: Arguments are passed to serialize.cformat2nptype.
-            **kwargs: Keyword arguments are passed to serialize.cformat2nptype.
-
-        Returns:
-            np.dtype: Corresponding numpy data type.
-
-        """
-        return serialize.cformat2nptype(*args, **kwargs)
-
-    def update_typedef_from_oldstyle(self, typedef):
-        r"""Update a given typedef using an old, table-style serialization spec.
-        Existing typedef values are not overwritten and warnings are raised if the
-        provided serialization spec is not compatible with the type definition.
-
-        Args:
-            typedef (dict): Type definition to update.
-
-        Returns:
-            dict: Updated typedef.
-
-        """
-        for k in self._oldstyle_kws:
-            used = []
-            updated = []
-            v = self.extra_kwargs.get(k, getattr(self, k, None))
-            if v is None:
-                continue
-            # Check status
-            if ((k != 'format_str') and (typedef.get('type', None) != 'array')):
-                continue
-            # Key specific changes to type
-            if k == 'format_str':
-                v = tools.bytes2str(v)
-                fmts = serialize.extract_formats(v)
-                if typedef == self.default_datatype:
-                    typedef.clear()
-                if 'type' in typedef:
-                    if (typedef.get('type', None) == 'array'):
-                        if isinstance(typedef.get('items', []), dict):
-                            typedef['items'] = [
-                                copy.deepcopy(typedef['items'])
-                                for _ in range(len(fmts))
-                            ]
-                        assert len(typedef.get('items', [])) == len(fmts)
-                    elif len(fmts) == 1:
-                        cpy = copy.deepcopy(typedef)
-                        typedef.clear()
-                        typedef.update(type='array', items=[cpy])
-                    else:  # pragma: debug
-                        continue
-                as_array = self.extra_kwargs.get('as_array',
-                                                 getattr(self, 'as_array', False))
-                typedef.setdefault('type', 'array')
-                typedef.setdefault('items', [])
-                for i, fmt in enumerate(fmts):
-                    nptype = self.cformat2nptype(fmt)
-                    itype_fmt = rapidjson.encode_schema(
-                        np.ones(1, nptype), minimal=True)
-                    if as_array:
-                        itype_fmt['type'] = '1darray'
-                    else:
-                        itype_fmt['type'] = 'scalar'
-                        if itype_fmt['subtype'] in constants.FLEXIBLE_TYPES:
-                            itype_fmt.pop('precision', None)
-                    if len(typedef['items']) < (i + 1):
-                        typedef['items'].append(itype_fmt)
-                        continue
-                    itype = typedef['items'][i]
-                    if itype['type'] in ['scalar', '1darray', 'ndarray']:
-                        itype_fmt['type'] = itype['type']
-                    if ((itype_fmt['subtype'] in constants.FLEXIBLE_TYPES
-                         and (itype_fmt['type'] == 'scalar'
-                              or ('encoding' in itype
-                                  and 'encoding' not in itype_fmt
-                                  and 'precision' in itype)))):
-                        itype_fmt.pop('precision', None)
-                    typedef['items'][i].update(itype_fmt)
-                used.append('as_array')
-                updated.append('format_str')
-            elif k == 'as_array':
-                # Can only be used in conjunction with format_str
-                pass
-            elif k in ['field_names', 'field_units']:
-                v = tools.bytes2str(v, recurse=True)
-                if k == 'field_names':
-                    tk = 'title'
-                else:
-                    tk = 'units'
-                if isinstance(typedef.get('items', []), dict):
-                    typedef['items'] = [copy.deepcopy(typedef['items'])
-                                        for _ in range(len(v))]
-                if ((len(v) != len(typedef.get('items', []))
-                     and (len(v) == 1)
-                     and (len(v[0].split(',')) == len(typedef.get(
-                         'items', []))))):
-                    valt = v[0].split(',')
-                    v[0] = valt[0]
-                    for vv in valt[1:]:
-                        v.append(vv)
-                assert len(v) == len(typedef.get('items', []))
-                # if len(v) != len(typedef.get('items', [])):
-                #     warnings.warn('%d %ss provided, but only %d items in typedef.'
-                #                   % (len(v), k, len(typedef.get('items', []))))
-                #     continue
-                all_updated = True
-                for iv, itype in zip(v, typedef.get('items', [])):
-                    if tk in itype:
-                        all_updated = False
-                    if tk == 'units':
-                        if units.is_null_unit(iv):
-                            continue
-                        iv = str(units.Units(iv))
-                        type_map = {'number': 'float',
-                                    'integer': 'int'}
-                        if itype['type'] in type_map:
-                            itype.update(type='scalar',
-                                         subtype=type_map[itype['type']],
-                                         precision=8)
-                    itype.setdefault(tk, iv)
-                if all_updated:
-                    used.append(k)
-                updated.append(k)  # Won't change anything unless its an attribute
-            else:  # pragma: debug
-                raise ValueError(
-                    "Unrecognized table-style specification keyword: '%s'." % k)
-            for rk in used:
-                if rk in self.extra_kwargs:
-                    del self.extra_kwargs[rk]
-                self.extra_kwargs_used[rk] = v
-            for rk in updated:
-                if rk in self.extra_kwargs:
-                    self.extra_kwargs[rk] = v
-                elif hasattr(self, rk):
-                    setattr(self, rk, v)
-        return typedef
 
     def func_serialize(self, args):  # pragma: debug
         r"""Serialize a message.
@@ -781,17 +584,7 @@ class SerializeBase(tools.YggClass):
             object: Normalized message.
 
         """
-        if self.initialized:
-            # try:
-            args = rapidjson.normalize(args, self.datatype)
-            # except rapidjson.NormalizationError:
-            #     self.info(f"args = {args}, datatype = {self.datatype}")
-            #     if ((isinstance(args, (list, tuple)) and len(args) == 1
-            #          and 'allowWrapped' not in self.datatype)):
-            #         self.datatype['allowWrapped'] = True
-            #         return rapidjson.normalize(args, self.datatype)
-            #     raise
-        return args
+        return self.datatype.normalize(args)
 
     def serialize(self, args, metadata=None, add_serializer_info=False,
                   no_metadata=False, max_header_size=0):

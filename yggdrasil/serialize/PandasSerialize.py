@@ -114,22 +114,6 @@ class PandasSerialize(AsciiTableSerialize):
             frame = frame[field_names]
         return frame
 
-    def cformat2nptype(self, *args, **kwargs):
-        r"""Method to convert c format string to numpy data type.
-
-        Args:
-            *args: Arguments are passed to serialize.cformat2nptype.
-            **kwargs: Keyword arguments are passed to serialize.cformat2nptype.
-
-        Returns:
-            np.dtype: Corresponding numpy data type.
-
-        """
-        out = super(PandasSerialize, self).cformat2nptype(*args, **kwargs)
-        if (out.char == 'S') and (not self.str_as_bytes):
-            out = np.dtype('U%d' % out.itemsize)
-        return out
-    
     def initialize_from_message(self, msg, **kwargs):
         r"""Initialize the serializer based on recieved message.
 
@@ -153,6 +137,7 @@ class PandasSerialize(AsciiTableSerialize):
             object: Normalized message.
 
         """
+        # TODO: Replace this with transform
         from yggdrasil.serialize import numpy2pandas, list2pandas
         args = super(PandasSerialize, self).normalize(args)
         if isinstance(args, np.ndarray):

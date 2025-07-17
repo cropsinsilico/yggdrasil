@@ -2,7 +2,9 @@ import numpy as np
 import pandas
 import copy
 from yggdrasil import serialize
-from yggdrasil.communication.transforms.TransformBase import TransformBase
+from yggdrasil.communication.transforms.TransformBase import (
+    TransformError, TransformBase
+)
 
 
 class SelectFieldsTransform(TransformBase):
@@ -27,24 +29,23 @@ class SelectFieldsTransform(TransformBase):
                           'single_as_scalar': {'type': 'boolean'}}
     _schema_subtype_description = "Select a subset of fields from a message"
 
-    def set_original_datatype(self, datatype):
+    def set_original_datatype(self, datatype, force=False, **kwargs):
         r"""Set datatype.
 
         Args:
-            datatype (dict): Datatype.
+            datatype (datatypes.Datatype, dict): Datatype.
+            force (bool, optional): If True, set the original datatype
+                even if it is already set.
+            **kwargs: Additional keyword arguments are passed to the
+                Datatype constructor.
 
         """
-        super(SelectFieldsTransform, self).set_original_datatype(datatype)
+        kwargs.setdefault('force_default_field_names', True)
+        kwargs.setdefault('field_names', self.original_order)
+        super(SelectFieldsTransform, self).set_original_datatype(
+            datatype, force=force, **kwargs)
         if not self.original_order:
-            self.original_order = self.original_datatype.get('field_names', None)
-        if not self.original_order:
-            if (((datatype['type'] == 'array')
-                 and isinstance(datatype['items'], list))):
-                self.original_order = [x.get('title', 'f%d' % i) for i, x in
-                                       enumerate(self.original_datatype['items'])]
-            elif datatype['type'] == 'object':
-                self.original_order = sorted(
-                    list(datatype['properties'].keys()))
+            self.original_order = self.original_datatype.field_names
         if self.original_order:
             for i in range(len(self.selected)):
                 if not isinstance(self.selected[i], str):
@@ -56,7 +57,7 @@ class SelectFieldsTransform(TransformBase):
         r"""bool: True if there is a single element to return."""
         return (self.single_as_scalar and (len(self.selected) == 1))
 
-    def validate_datatype(self, datatype):
+    def _validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
         
         Args:
@@ -66,9 +67,12 @@ class SelectFieldsTransform(TransformBase):
             AssertionError: If the datatype is not valid.
 
         """
-        assert datatype.get('type', None) in ['array', 'object']
+        if ((datatype['type'] == 'array'
+             and isinstance(datatype.get('items', None), dict))):
+            return
+        assert datatype.field_items is not None
         
-    def transform_datatype(self, datatype):
+    def _transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 
@@ -79,41 +83,37 @@ class SelectFieldsTransform(TransformBase):
             dict: Transformed datatype.
 
         """
-        if (((datatype.get('type', None) == 'array')
-             and isinstance(datatype.get('items', None), list))):
-            order = datatype.get('field_names',
-                                 [x.get('title', 'f%d' % i)
-                                  for i, x in enumerate(datatype['items'])])
-            if self.as_single:
-                datatype = copy.deepcopy(datatype['items'][
-                    order.index(self.selected[0])])
-                datatype['title'] = self.selected[0]
-            else:
-                datatype = copy.deepcopy(datatype)
-                datatype['items'] = [datatype['items'][order.index(k)]
-                                     for k in self.selected]
-                for i, k in enumerate(self.selected):
-                    datatype['items'][i]['title'] = k
-                if 'field_names' in datatype:
-                    datatype['field_names'] = copy.deepcopy(self.selected)
-                if 'format_str' in datatype:
-                    info = serialize.format2table(datatype['format_str'])
-                    info['fmts'] = [info['fmts'][order.index(k)]
-                                    for k in self.selected]
-                    datatype['format_str'] = serialize.table2format(**info)
-        elif (((datatype.get('type', None) == 'array')
-               and isinstance(datatype.get('items', None), dict)
-               and self.as_single)):
-            datatype = copy.deepcopy(datatype['items'])
-        elif datatype.get('type', None) == 'object':
-            if self.as_single:
-                datatype = copy.deepcopy(datatype['properties'][self.selected[0]])
-                datatype.setdefault('title', self.selected[0])
-            else:
-                datatype = copy.deepcopy(datatype)
-                datatype['properties'] = {k: datatype['properties'][k]
-                                          for k in self.selected}
-        return datatype
+        # TODO: Fix this
+        field_items = datatype.field_items
+        format_str = None
+        if ((field_items is None and datatype['type'] == 'array'
+             and isinstance(datatype.get('items', None), dict))):
+            items = [copy.deepcopy(datatype['items'])
+                     for k in self.selected]
+        elif (field_items is None and datatype['type'] == 'object'
+              and isinstance(datatype.get('additionalProperties', None), dict)):
+            items = [copy.deepcopy(datatype['additionalProperties'])
+                     for k in self.selected]
+        else:
+            assert field_items is not None
+            order = datatype.field_names
+            items = [field_items[order.index(k)] for k in self.selected]
+            if datatype._format_str:
+                info = serialize.format2table(datatype.format_str)
+                info['fmts'] = [info['fmts'][order.index(k)]
+                                for k in self.selected]
+                format_str = serialize.table2format(**info)
+        if self.as_single:
+            return datatype.subschema(items[0])
+        schema = {'type': datatype['type']}
+        if datatype['type'] == 'array':
+            schema['items'] = items
+        else:
+            assert datatype['type'] == 'object'
+            schema['properties'] = {k: v for k, v in
+                                    zip(self.selected, items)}
+        return datatype.subschema(schema, field_names=self.selected,
+                                  format_str=format_str)
     
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.
@@ -149,7 +149,8 @@ class SelectFieldsTransform(TransformBase):
             else:
                 out = x[self.selected]
         else:
-            raise TypeError("Cannot select fields from object of type '%s'" % type(x))
+            raise TransformError(f"Cannot select fields from object of "
+                                 f"type '{type(x)}'")
         if not no_copy:
             out = copy.deepcopy(out)
         return out

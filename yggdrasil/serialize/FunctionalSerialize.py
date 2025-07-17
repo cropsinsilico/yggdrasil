@@ -50,4 +50,4 @@ class FunctionalSerialize(SerializeBase):
     @property
     def serializer_info(self):
         r"""dict: Serializer info."""
-        return {'datatype': copy.deepcopy(self.datatype)}
+        return {'datatype': copy.deepcopy(self.datatype.datatype)}

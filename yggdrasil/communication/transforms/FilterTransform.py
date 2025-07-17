@@ -24,7 +24,7 @@ class FilterTransform(TransformBase):
                               subtype=filter_schema.identify_subtype(self.filter))
             self.filter = create_component('filter', **filter_kws)
     
-    def transform_datatype(self, datatype):
+    def _transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 

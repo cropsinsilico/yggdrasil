@@ -7,7 +7,7 @@ import queue
 from yggdrasil import multitasking
 from yggdrasil.communication import new_comm, CommBase, strip_model_prefix
 from yggdrasil.drivers.Driver import Driver
-from yggdrasil.components import create_component, isinstance_component
+from yggdrasil.components import create_component
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 
 
@@ -949,10 +949,10 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
-        if (self.ocomm._send_serializer) and self.icomm.serializer.initialized:
-            self.update_serializer(msg)
         for t in self.transform:
-            msg.args = t(msg.args)
+            msg = t(msg)
+        if self.ocomm._send_serializer and self.icomm.serializer.initialized:
+            self.update_serializer(msg)
         return msg
 
     def update_serializer(self, msg):
@@ -960,12 +960,6 @@ class ConnectionDriver(Driver):
         self.debug('Before update:\n  icomm:%s\n  ocomm:%s\n'
                    % ("\n".join(self.icomm.get_status_message(nindent=1)[0][1:]),
                       "\n".join(self.ocomm.get_status_message(nindent=1)[0][1:])))
-        for t in self.transform:
-            if isinstance_component(t, 'transform'):
-                t.set_original_datatype(msg.stype)
-                msg.stype = t.transformed_datatype
-        if self.transform:
-            msg.sinfo = {}
         # This can be removed if send_message is set up to update and send the
         # received message rather than create a new one by sending msg.args
         self.ocomm.update_serializer_from_message(msg)

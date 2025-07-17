@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil import serialize, tools, constants, datatypes
+from yggdrasil import serialize, tools, constants
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
@@ -68,6 +68,32 @@ class AsciiTableSerialize(DefaultSerialize):
         self._explicit_delimiter = ('delimiter' in kwargs)
         super(AsciiTableSerialize, self).__init__(**kwargs)
 
+    @property
+    def format_str(self):
+        r"""str: C-style format string for fields in the data type."""
+        return self.datatype.format_str
+
+    @property
+    def as_array(self):
+        r"""bool: True if the table is expressed as an array, False
+        otherwise."""
+        return self.datatype.as_array
+
+    @property
+    def field_names(self):
+        r"""list: Field names."""
+        return self.datatype.field_names
+
+    @property
+    def field_units(self):
+        r"""list: Field units."""
+        return self.datatype.field_units
+
+    @property
+    def delimiter(self):
+        r"""bytes: Table delimiter."""
+        return self.datatype.delimiter
+
     def update_serializer(self, *args, **kwargs):
         # if 'delimiter' in kwargs:
         #     self._explicit_delimiter = True
@@ -77,75 +103,29 @@ class AsciiTableSerialize(DefaultSerialize):
             info.setdefault('comment', '')
             info.setdefault('newline', '')
             kwargs['format_str'] = serialize.table2format(**info)
-        # Transform scalar into array for table
-        old_typedef = kwargs.get('datatype', {})
-        if old_typedef.get('type', 'array') != 'array':
-            new_typedef = None
-            old_typedef = kwargs.pop('datatype')
-            if old_typedef['type'] == 'object':
-                names = self.get_field_names()
-                if not names:
-                    names = list(old_typedef.get('properties', {}).keys())
-                assert len(old_typedef.get('properties', {})) == len(names)
-                if names:
-                    new_typedef = {'type': 'array', 'items': []}
-                    for n in names:
-                        new_typedef['items'].append(dict(
-                            old_typedef['properties'][n], title=n))
-            else:
-                new_typedef = {'type': 'array', 'items': [old_typedef]}
-            if new_typedef:
-                kwargs['datatype'] = new_typedef
-        out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
-        if ((kwargs.get('from_message', False) is not False
-             and self.initialized
-             and not self.field_names
+        if ((kwargs.get('from_message', None) is not None
+             and not self.initialized
+             and not self.datatype._field_names
+             and 'field_names' not in kwargs
              and isinstance(kwargs['from_message'], np.ndarray)
-             and kwargs['from_message'].dtype.names
-             and self.datatype['type'] == 'array'
-             and isinstance(self.datatype['items'], dict))):
-            self.field_names = list(kwargs['from_message'].dtype.names)
+             and kwargs['from_message'].dtype.names)):
+            kwargs['field_names'] = list(kwargs['from_message'].dtype.names)
+        out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
+        if ((kwargs.get('from_message', None) is not None
+             and self.initialized
+             and self.datatype.datatype['type'] != 'array')):
+            table_datatype = self.datatype.table_datatype
+            assert table_datatype is not None
+            self.datatype = table_datatype
         self.update_format_str()
-        self.update_field_names()
-        self.update_field_units()
         return out
 
     def update_format_str(self):
         r"""Update the format string based on the type definition."""
-        # Get format information from precision etc.
-        if (self.format_str is None) and self.initialized:
-            assert self.datatype['type'] == 'array'
-            fmts = []
-            if isinstance(self.datatype['items'], dict):  # pragma: debug
-                idtype = datatypes.definition2dtype(self.datatype['items'])
-                ifmt = serialize.nptype2cformat(idtype, asbytes=True)
-                if self.field_names:
-                    fmts = [ifmt for x in self.field_names]
-                else:
-                    raise Exception(f"Variable number of items not yet "
-                                    f"supported (ifmt={ifmt}, "
-                                    f"idtype={idtype}).")
-            elif isinstance(self.datatype['items'], list):
-                for x in self.datatype['items']:
-                    idtype = datatypes.definition2dtype(x)
-                    ifmt = serialize.nptype2cformat(idtype, asbytes=True)
-                    fmts.append(ifmt)
-            if fmts:
-                self.format_str = serialize.table2format(
-                    fmts=fmts, delimiter=self.delimiter, newline=self.newline,
-                    comment=b'')
-
-    def update_field_names(self):
-        r"""list: Names for each field in the data type."""
-        if (self.field_names is None) and self.initialized:
-            assert self.datatype['type'] == 'array'
-            self.field_names = self.get_field_names()
-
-    def update_field_units(self):
-        r"""list: Units for each field in the data type."""
-        if (self.field_units is None) and self.initialized:
-            assert self.datatype['type'] == 'array'
-            self.field_units = self.get_field_units()
+        if self.datatype._format_str is None and self.initialized:
+            format_str = self.format_str
+            if format_str:
+                self.datatype.format_str = format_str
 
     def normalize(self, args):
         r"""Normalize a message to conform to the expected datatype.
@@ -239,7 +219,9 @@ class AsciiTableSerialize(DefaultSerialize):
             format_str=self.format_str,
             field_names=self.get_field_names(as_bytes=True),
             field_units=self.get_field_units(as_bytes=True),
-            comment=self.comment, newline=self.newline, delimiter=self.delimiter)
+            comment=self.comment, newline=self.newline,
+            delimiter=self.delimiter,
+        )
         return out
 
     def deserialize_file_header(self, fd):
@@ -251,5 +233,7 @@ class AsciiTableSerialize(DefaultSerialize):
 
         """
         fd.seek(0)
-        serialize.discover_header(fd, self, newline=self.newline,
-                                  comment=self.comment, delimiter=self.delimiter)
+        serialize.discover_header(
+            fd, self, newline=self.newline,
+            comment=self.comment, delimiter=self.delimiter,
+        )

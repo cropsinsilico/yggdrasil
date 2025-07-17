@@ -32,7 +32,7 @@ class MapTransform(TransformBase):
                 return out
         return [f'f{i}' for i in range(N)]
 
-    def transform_datatype(self, datatype):
+    def _transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the
         transform to the supplied datatype.
 

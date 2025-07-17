@@ -3,6 +3,7 @@ from tests import TestComponentBase as base_class
 import collections
 import numpy as np
 import copy
+from yggdrasil.datatypes import Datatype
 from yggdrasil.communication import new_comm
 
 
@@ -67,15 +68,16 @@ class TestTransformBase(base_class):
                     with pytest.raises(typ_exp):
                         inst.validate_datatype(typ_in)
                 else:
+                    exp = Datatype(typ_exp)
                     inst.validate_datatype(typ_in)
                     typ_out = inst.transform_datatype(typ_in)
-                    if typ_out != typ_exp:
+                    if typ_out != exp:
                         import pprint
                         print(f"Test {itest}, type {ityp}")
                         print(f"INPUT:\n{pprint.pformat(typ_in)}")
                         print(f"ACTUAL:\n{pprint.pformat(typ_out)}")
-                        print(f"EXPECTED:\n{pprint.pformat(typ_exp)}")
-                    assert typ_out == typ_exp
+                        print(f"EXPECTED:\n{pprint.pformat(exp)}")
+                    assert typ_out == exp
                 assert typ_in == orig
 
     def test_transform_empty(self, instance):

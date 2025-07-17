@@ -4872,18 +4872,33 @@ class ModelDriver(Driver):
         # TODO: Check for files?
         # TODO: Composite if inputs/outputs split between multiple
         #   models
-        for io in yml['input_drivers']:
-            src_models += io['src_models']
-            src_languages += [x['partner_language'] for x in io['inputs']]
-        for io in yml['output_drivers']:
-            dst_models += io['dst_models']
-            dst_languages += [x['partner_language'] for x in io['outputs']]
+        try:
+            for io in yml['input_drivers']:
+                src_models += io['src_models']
+                if any('filetype' in x for x in io['inputs']):
+                    return False
+                src_languages += [
+                    x['partner_language'] for x in io['inputs']
+                ]
+            for io in yml['output_drivers']:
+                dst_models += io['dst_models']
+                if any('filetype' in x for x in io['outputs']):
+                    return False
+                dst_languages += [
+                    x['partner_language'] for x in io['outputs']
+                ]
+        except KeyError:
+            import pprint
+            import pdb
+            pprint.pprint(yml)
+            pdb.set_trace()
+            raise
         src_models = set(src_models)
         dst_models = set(dst_models)
         src_languages = set(src_languages)
         dst_languages = set(dst_languages)
         if len(src_models) > 1 or src_models != dst_models:
-            return
+            return False
         # src_model = list(src_models)[0]
         src_language = list(src_languages)[0]
         dst_language = cls._language

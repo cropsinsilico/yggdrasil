@@ -1,6 +1,7 @@
 import copy
 import numpy as np
-from yggdrasil.communication.transforms.TransformBase import TransformBase
+from yggdrasil.communication.transforms.TransformBase import (
+    TransformBase, TransformError)
 
 
 class MapFieldsTransform(TransformBase):
@@ -18,7 +19,7 @@ class MapFieldsTransform(TransformBase):
                                   'additionalProperties': {'type': 'string'}}}
     _schema_subtype_description = "Change the names of fields in a message"
 
-    def transform_datatype(self, datatype):
+    def _transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 
@@ -29,17 +30,13 @@ class MapFieldsTransform(TransformBase):
             dict: Transformed datatype.
 
         """
-        if (((datatype.get('type', None) == 'array')
-             and isinstance(datatype.get('items', None), list))):
-            datatype = copy.deepcopy(datatype)
-            for i, x in enumerate(datatype['items']):
-                if x.get('title', 'f%d' % i) in self.map:
-                    x['title'] = self.map[x['title']]
-        elif datatype.get('type', None) == 'object':
-            datatype = copy.deepcopy(datatype)
-            for kold, knew in self.map.items():
-                datatype['properties'][knew] = datatype['properties'].pop(kold)
-        return datatype
+        field_names = datatype.field_names
+        if field_names is None:
+            return datatype
+        field_names = [self.map.get(k, k) for k in field_names]
+        out = datatype.copy(field_names=field_names)
+        out.field_names = field_names
+        return out
     
     def evaluate_transform(self, x, no_copy=False):
         r"""Call transform on the provided message.
@@ -70,7 +67,8 @@ class MapFieldsTransform(TransformBase):
                 new_names[new_names.index(kold)] = knew
             out.dtype.names = new_names
         else:
-            raise TypeError("Cannot map fields from object of type '%s'" % type(x))
+            raise TransformError(f"Cannot map fields from object of "
+                                 f"type '{type(x)}'")
         return out
     
     @classmethod

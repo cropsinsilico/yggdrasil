@@ -16,7 +16,7 @@ from yggdrasil.communication import (
 )
 from yggdrasil.components import (
     import_component, create_component, ComponentError)
-from yggdrasil.datatypes import DataTypeError, type2numpy
+from yggdrasil.datatypes import DatatypeError, type2numpy
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 from yggdrasil.serialize import consolidate_array
 # from yggdrasil.serialize.SerializeBase import SerializeBase
@@ -78,7 +78,7 @@ class CommMessage(object):
 
     __slots__ = ['msg', 'length', 'flag', 'args', 'header',
                  'additional_messages', 'worker', 'worker_messages',
-                 'sent', 'finalized', 'singular', 'stype', 'sinfo']
+                 'sent', 'finalized', 'singular', 'sinfo', 'stype']
 
     def __init__(self, msg=None, length=0, flag=None, args=None, header=None):
         self.msg = msg
@@ -94,8 +94,8 @@ class CommMessage(object):
         self.sent = False
         self.finalized = False
         self.singular = False
-        self.stype = None
         self.sinfo = None
+        self.stype = None
 
     def __str__(self):
         return 'CommMessage(flag=%s, %.100s..., sent=%s)' % (
@@ -2015,19 +2015,17 @@ class CommBase(tools.YggClass):
         out = (isinstance(msg, bytes) and (msg == self.eof_msg))
         return out
 
-    def update_message_from_serializer(self, msg):
-        r"""Update a message with information about the serializer.
+    # def update_message_from_serializer(self, msg):
+    #     r"""Update a message with information about the serializer.
 
-        Args:
-            msg (CommMessage): Incoming message.
+    #     Args:
+    #         msg (CommMessage): Incoming message.
 
-        """
-        if self.serializer.initialized:
-            msg.sinfo = self.serializer.serializer_info
-            msg.stype = msg.sinfo['datatype']
-            for k in ['format_str', 'field_names', 'field_units']:
-                if k in msg.sinfo:
-                    msg.stype[k] = msg.sinfo[k]
+    #     """
+    #     # RECV VERSION
+    #     if self.serializer.initialized:
+    #         msg.sinfo = self.serializer.serializer_info
+    #         msg.stype = self.serializer.datatype
 
     def update_serializer_from_message(self, msg):
         r"""Update the serializer based on information stored in a message.
@@ -2036,46 +2034,28 @@ class CommBase(tools.YggClass):
             msg (CommMessage): Outgoing message.
 
         """
+        # SEND VERSION
         if msg.sinfo is None:
             return
-        msg.stype = self.apply_transform_to_type(msg.stype)
-        msg.sinfo.pop('seritype', None)
-        for k in ['format_str', 'field_names', 'field_units']:
-            if k in msg.stype:
-                msg.sinfo[k] = msg.stype.pop(k)
-        msg.sinfo['datatype'] = msg.stype
+        # TODO: Ensure this is done by apply_transform
+        # msg.stype = self.apply_transform_to_type(msg.stype)
+        sinfo = {k: v for k, v in msg.sinfo.items()
+                 if k not in ['seritype', 'datatype']}
         if not self.serializer.initialized:
-            self.serializer.update_serializer(from_message=msg.args,
-                                              **msg.sinfo)
-
-    def apply_transform_to_type(self, typedef):
-        r"""Evaluate the transform to alter the type definition.
-
-        Args:
-            typedef (dict): Type definition to transform.
-
-        Returns:
-            dict: Transformed type definition.
-
-        """
-        for iconv in self.transform:
-            if not iconv.original_datatype:
-                iconv.set_original_datatype(typedef)
-            typedef = iconv.transformed_datatype
-        return typedef
+            self.serializer.update_serializer(
+                from_message=msg.args, datatype=msg.stype, **sinfo
+            )
 
     def apply_transform(self, msg_in, for_empty=False, header=False):
         r"""Evaluate the transform to alter the emssage being sent/received.
 
         Args:
-            msg_in (object): Message being transformed.
+            msg_in (CommMessage, object): Message being transformed.
             for_empty (bool, optional): If True, the transformation is being used
                 to check for an empty message and errors will be caught. Defaults
                 to False.
             header (dict, optional): Header keyword arguments associated
                 with a message. Defaults to False and is ignored.
-            typedef (dict, optiona): Type to transform. Default to None and will
-                be determined by the serializer if receiving.
 
         Returns:
             object: Transformed message.
@@ -2083,21 +2063,10 @@ class CommBase(tools.YggClass):
         """
         if not self.transform:
             return msg_in
+        if isinstance(msg_in, CommMessage):
+            header = msg_in.header
+            for_empty = (msg_in.flag == FLAG_EMPTY)
         self.debug(f"Applying transformations to message during {self.direction}.")
-        # If receiving, update the expected datatypes to use information
-        # about the received datatype that was recorded by the serializer
-        if (((self.direction == 'recv') and self.serializer.initialized
-             and (not for_empty))):
-            assert self.transform[0].original_datatype
-        # if (((self.direction == 'recv')
-        #      and self.serializer.initialized
-        #      and (not self.transform[0].original_datatype))):
-        #     typedef = self.serializer.datatype
-        #     for iconv in self.transform:
-        #         if not iconv.original_datatype:
-        #             iconv.set_original_datatype(typedef)
-        #         typedef = iconv.transformed_datatype
-        # Actual conversion
         msg_out = msg_in
         no_init = (for_empty or ((self.direction == 'recv')
                                  and (not self.serializer.initialized)))
@@ -2429,17 +2398,77 @@ class CommBase(tools.YggClass):
         return c
 
     # SERIALIZATION/DESERIALIZATION METHODS
-    def serialize(self, *args, **kwargs):
-        r"""Serialize a message using the associated serializer."""
-        kwargs.setdefault('add_serializer_info',
-                          (self._send_serializer and (not self.is_file)))
-        kwargs.setdefault('no_metadata', self.is_file)
-        kwargs.setdefault('max_header_size', self.maxMsgSize)
-        return self.serializer.serialize(*args, **kwargs)
+    def serialize(self, x):
+        r"""Serialize a message using the associated serializer.
 
-    def deserialize(self, *args, **kwargs):
-        r"""Deserialize a message using the associated deserializer."""
-        return self.serializer.deserialize(*args, **kwargs)
+        Args:
+            x (CommMessage): Message to serialize. The serialized
+                message will be used to populate the msg attribute of x.
+
+        Returns:
+            str: Serialized message.
+
+        """
+        if self.no_serialization:
+            if self.no_serialization == 'normalize':
+                x.msg = self.serializer.normalize(x.args)
+            else:
+                x.msg = x.args
+            x.length = 1
+        elif x.flag == FLAG_EOF and not x.header:
+            x.msg = x.args
+            x.length = len(x.msg)
+        else:
+            x.msg = self.serializer.serialize(
+                x.args, metadata=x.header,
+                add_serializer_info=(
+                    (x.flag == FLAG_EOF and x.header)
+                    or (self._send_serializer and (not self.is_file))
+                ),
+                no_metadata=self.is_file,
+                max_header_size=self.maxMsgSize,
+            )
+            x.length = len(x.msg)
+        if x.flag != FLAG_EOF:
+            x.flag = FLAG_SUCCESS
+        return x.msg
+
+    def deserialize(self, x, skip_deserialization=False):
+        r"""Deserialize a message using the associated deserializer.
+
+        Args:
+            x (CommMessage): Message to deserialize. The deserialized
+                message will be used to populate the args attribute of x.
+            skip_deserialization (bool, optional): If True,
+                deserialization is not actually performed, but the
+                args attribute of x will be populated with the serialized
+                message.
+
+        Returns:
+            tuple: Deserialized message and header.
+
+        """
+        no_serialization = (
+            True if (skip_deserialization or x.header.get('raw', False))
+            else self.no_serialization
+        )
+        if no_serialization:
+            if no_serialization == 'normalize':
+                x.args = self.serializer.normalize(x.msg)
+            else:
+                x.args = x.msg
+            if not x.header:
+                x.header = {'__meta__': {}}
+                if isinstance(x.msg, bytes):
+                    x.header['__meta__']['size'] = len(x.msg)
+        else:
+            x.args, x.header = self.serializer.deserialize(
+                x.msg, metadata=x.header)
+        x.flag = FLAG_SUCCESS
+        if self.serializer.initialized:
+            x.sinfo = self.serializer.serializer_info
+            x.stype = self.serializer.datatype
+        return (x.args, x.header)
 
     # SEND METHODS
     def _safe_send(self, msg, **kwargs):
@@ -2560,7 +2589,7 @@ class CommBase(tools.YggClass):
                 self.linger_close()
                 # self.close_in_thread(no_wait=True, timeout=False)
             return True
-        except DataTypeError as e:  # pragma: debug
+        except DatatypeError as e:  # pragma: debug
             self._type_errors.append(e)
             try:
                 self.exception('Failed to send: %.100s.', str(msg.args))
@@ -2682,20 +2711,21 @@ class CommBase(tools.YggClass):
                     return msg
             # 5. Transform the message
             if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
-                args = self.apply_transform(msg.args, header=msg.header)
-                if isinstance(args, collections.abc.Iterator):
+                msgT = self.apply_transform(msg)  # send
+                if isinstance(msgT, collections.abc.Iterator):
                     try:
-                        msg.args = args.__next__()
+                        msg = msgT.__next__()
                     except StopIteration:
                         msg.args = None
                         msg.flag = FLAG_SKIP
                         return msg
-                    for iarg in args:
-                        msg.add_message(args=iarg,
+                    for imsg in msgT:
+                        # TODO: Use header from imsg?
+                        msg.add_message(args=imsg.args,
                                         header=copy.deepcopy(msg.header))
                 else:
-                    msg.args = args
-                self.update_serializer_from_message(msg)
+                    msg = msgT
+                # self.update_serializer_from_message(msg)
             # 6. Apply after_prepare_message function
             if after_prepare_message:
                 for x in after_prepare_message:
@@ -2704,39 +2734,22 @@ class CommBase(tools.YggClass):
         if (msg.flag not in [FLAG_SKIP]) and (not skip_serialization):
             for x in [msg] + msg.additional_messages:
                 # 7. Serialize the message
-                if self.no_serialization:
-                    if self.no_serialization == 'normalize':
-                        x.msg = self.serializer.normalize(x.args)
-                    else:
-                        x.msg = x.args
-                    x.length = 1
-                    if x.flag != FLAG_EOF:
-                        x.flag = FLAG_SUCCESS
-                else:
-                    if x.flag == FLAG_EOF:
-                        if x.header:
-                            x.msg = self.serialize(x.args, metadata=x.header,
-                                                   add_serializer_info=True)
-                        else:
-                            x.msg = x.args
-                    else:
-                        x.msg = self.serialize(x.args, metadata=x.header)
-                        x.flag = FLAG_SUCCESS
-                    x.length = len(x.msg)
+                self.serialize(x)
                 # 8. Create a work comm if the message is too large to be sent all
                 #    at once and re-serialize the message w/ the work comm info in it
                 if (x.length > self.maxMsgSize) and (self.maxMsgSize != 0):
                     if x.flag == FLAG_EOF:  # pragma: debug
-                        raise NotImplementedError(("EOF message with header (%d) "
-                                                   "exceeds max message size (%d).")
-                                                  % (msg.length, self.maxMsgSize))
+                        raise NotImplementedError(
+                            f"EOF message with header ({x.length}) "
+                            f"exceeds max message size "
+                            f"({self.maxMsgSize}).")
                     x.worker = self.create_work_comm()
                     # if 'address' not in x.header:
                     #     x.worker = self.create_work_comm()
                     # else:
                     #     x.worker = self.get_work_comm(x.header)
                     x.header = self.workcomm2header(x.worker, **x.header)
-                    total = self.serialize(x.args, metadata=x.header)
+                    total = self.serialize(x)
                     x.msg = total[:self.maxMsgSize]
                     x.length = len(x.msg)
                     for imsg in self.chunk_message(total[self.maxMsgSize:]):
@@ -2858,8 +2871,8 @@ class CommBase(tools.YggClass):
             CommMessage: Received message.
 
         """
-        no_serialization = (
-            True if skip_deserialization else self.no_serialization)
+        # no_serialization = (
+        #     True if skip_deserialization else self.no_serialization)
         if self.is_closed:
             self.debug('Comm closed')
             return CommMessage(flag=FLAG_FAILURE)
@@ -2874,19 +2887,9 @@ class CommBase(tools.YggClass):
             if self._proxy_class.check_for_proxy_message(msg.msg):
                 return self.proxy.server_response_to_proxy_message(
                     self.name, msg)
-            if no_serialization:
-                if no_serialization == 'normalize':
-                    msg.args = self.serializer.normalize(msg.msg)
-                else:
-                    msg.args = msg.msg
-                msg.header = {'__meta__': {}}
-                if isinstance(msg.msg, bytes):
-                    msg.header['__meta__']['size'] = len(msg.msg)
-            else:
-                msg.args, msg.header = self.deserialize(msg.msg)
+            self.deserialize(msg, skip_deserialization=skip_deserialization)
             if self.proxy:
                 self.proxy.parse_message(self.name, msg)
-            msg.flag = FLAG_SUCCESS
             if msg.header.get('incomplete', False):
                 msg.msg = msg.args
                 msg.worker = self.get_work_comm(msg.header)
@@ -2903,17 +2906,12 @@ class CommBase(tools.YggClass):
                 self.debug("Received %d/%d bytes", len(msg.msg),
                            msg.header['__meta__']['size'])
                 if msg.flag in [FLAG_INCOMPLETE, FLAG_SUCCESS]:
-                    msg.args = msg.msg
-                    if not msg.header.get('raw', False):
-                        if not no_serialization:
-                            msg.args, msg.header = self.deserialize(
-                                msg.msg, metadata=msg.header)
-                        elif no_serialization == 'normalize':
-                            msg.args = self.serializer.normalize(msg.msg)
-                    msg.flag = FLAG_SUCCESS
+                    self.deserialize(
+                        msg, skip_deserialization=skip_deserialization
+                    )
                 msg.worker.linger_close()
-            if (not no_serialization) or no_serialization == 'normalize':
-                self.update_message_from_serializer(msg)
+            # if (not no_serialization) or no_serialization == 'normalize':
+            #     self.update_message_from_serializer(msg)
         except TemporaryCommunicationError if self.is_async else NeverMatch:
             raise
         except CloseCommunicatorError:
@@ -2969,11 +2967,7 @@ class CommBase(tools.YggClass):
         if not skip_processing:
             # 1. Transform the message
             if msg.flag == FLAG_SUCCESS:
-                if msg.stype is not None:
-                    msg.stype = self.apply_transform_to_type(msg.stype)
-                msg.args = self.apply_transform(msg.args)
-            elif msg.flag == FLAG_EMPTY:
-                msg.args = self.empty_obj_recv
+                msg = self.apply_transform(msg)  # receive
             # 2. Filter
             if (msg.flag == FLAG_SUCCESS) and (not self.evaluate_filter(msg.args)):
                 msg.flag = FLAG_SKIP

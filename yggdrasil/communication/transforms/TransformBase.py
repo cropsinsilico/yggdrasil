@@ -1,7 +1,12 @@
 import copy
 import collections
-from yggdrasil import rapidjson
+from yggdrasil import datatypes
 from yggdrasil.components import ComponentBase
+
+
+class TransformError(ValueError):
+    r"""Errors encountered during transformation."""
+    pass
 
 
 class TransformBase(ComponentBase):
@@ -18,13 +23,34 @@ class TransformBase(ComponentBase):
     _schema_subtype_key = 'transformtype'
     _schema_properties = {'original_datatype': {'type': 'schema'}}
     _schema_additional_kwargs = {'allowSingular': 'transformtype'}
+    _transform_datatype = None
 
     def __init__(self, *args, **kwargs):
         self._state = {}
         super(TransformBase, self).__init__(*args, **kwargs)
         self._transformed_datatype = None
         if self.original_datatype:
-            self.set_original_datatype(self.original_datatype)
+            self.set_original_datatype(self.original_datatype, force=True)
+
+    @classmethod
+    def _get_datatype(cls, data):
+        from yggdrasil.communication.CommBase import CommMessage
+        if isinstance(data, collections.abc.Iterator):
+            item_type = None
+            for x in copy.deepcopy(data):
+                x_type = cls._get_datatype(x)
+                if item_type is None:
+                    item_type = x_type
+                elif item_type != x_type:
+                    item_type = datatypes.Datatype({"type": "any"})
+                    break
+            return item_type
+        elif isinstance(data, CommMessage):
+            if data.stype:
+                assert isinstance(data.stype, datatypes.Datatype)
+                return data.stype
+            data = data.args
+        return datatypes.Datatype.from_data(data, minimal=True)
 
     @property
     def transformed_datatype(self):
@@ -36,53 +62,61 @@ class TransformBase(ComponentBase):
             return out
         return self._transformed_datatype
 
-    def set_original_datatype(self, datatype):
-        r"""Set datatype.
+    def set_original_datatype(self, datatype, force=False, **kwargs):
+        r"""Set datatype if not already set.
 
         Args:
-            datatype (dict): Datatype.
+            datatype (datatypes.Datatype, dict): Datatype.
+            force (bool, optional): If True, set the original datatype
+                even if it is already set.
+            **kwargs: Additional keyword arguments are passed to the
+                Datatype constructor.
 
         """
-        self.validate_datatype(datatype)
-        self.original_datatype = datatype
+        if force or not self.original_datatype:
+            datatype = datatypes.Datatype(datatype, **kwargs)
+            self.validate_datatype(datatype)
+            self.original_datatype = datatype
 
-    def set_original_datatype_from_data(self, data):
+    def set_original_datatype_from_data(self, data, force=False,
+                                        **kwargs):
         r"""Set datatype from data.
 
         Args:
             data (object): Data object.
+            force (bool, optional): If True, set the original datatype
+                even if it is already set.
+            **kwargs: Additional keyword arguments are passed to
+                set_original_datatype.
 
         """
-        self.set_original_datatype(rapidjson.encode_schema(data, minimal=True))
+        self.set_original_datatype(self._get_datatype(data),
+                                   force=force, **kwargs)
 
-    def set_transformed_datatype(self, datatype):
+    def set_transformed_datatype(self, datatype, **kwargs):
         r"""Set datatype.
 
         Args:
-            datatype (dict): Datatype.
+            datatype (datatypes.Datatype, dict): Datatype.
+            **kwargs: Additional keyword arguments are passed to the
+                Datatype constructor.
 
         """
-        self._transformed_datatype = datatype
+        self._transformed_datatype = datatypes.Datatype(datatype, **kwargs)
 
-    def set_transformed_datatype_from_data(self, data):
+    def set_transformed_datatype_from_data(self, data, **kwargs):
         r"""Set datatype from data.
 
         Args:
             data (object): Data object.
+            **kwargs: Additional keyword arguments are passed to
+                set_transformed_datatype.
 
         """
-        if isinstance(data, collections.abc.Iterator):
-            item_type = None
-            for x in copy.deepcopy(data):
-                x_type = rapidjson.encode_schema(x, minimal=True)
-                if item_type is None:
-                    item_type = x_type
-                elif item_type != x_type:
-                    item_type = {"type": "any"}
-                    break
-            return self.set_transformed_datatype(item_type)
-        self.set_transformed_datatype(
-            rapidjson.encode_schema(data, minimal=True))
+        self.set_transformed_datatype(self._get_datatype(data), **kwargs)
+
+    def _validate_datatype(self, datatype):
+        pass
         
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
@@ -94,29 +128,39 @@ class TransformBase(ComponentBase):
             AssertionError: If the datatype is not valid.
 
         """
-        pass
-        
-    def transform_datatype(self, datatype):
+        if not isinstance(datatype, datatypes.Datatype):
+            datatype = datatypes.Datatype(datatype)
+        self._validate_datatype(datatype)
+
+    def transform_datatype(self, datatype, skip_class_method=False,
+                           **kwargs):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 
         Args:
             datatype (dict): Datatype to transform.
+            skip_class_method (bool, optional): If True, the class's
+                _transform_datatype method will not be called.
+            **kwargs: Additional keyword arguments are passed to
+                _transform_datatype if it is defined.
 
         Returns:
             dict: Transformed datatype.
 
         """
+        if not isinstance(datatype, datatypes.Datatype):
+            datatype = datatypes.Datatype(datatype)
+        if (not skip_class_method) and self._transform_datatype is not None:
+            return self._transform_datatype(datatype, **kwargs)
         try:
-            out = rapidjson.encode_schema(self(rapidjson.generate_data(datatype)),
-                                          minimal=True)
-            if (((out['type'] == 'array') and (datatype['type'] == 'array')
-                 and isinstance(out['items'], list)
-                 and isinstance(datatype['items'], list)
-                 and (len(out['items']) == len(datatype['items'])))):
-                for x, y in zip(out['items'], datatype['items']):
-                    if 'title' in y:
-                        x.setdefault('title', y['title'])
+            out = datatypes.Datatype.from_data(
+                self(datatype.example_data), minimal=True)
+            out_nfields = out.nfields
+            if ((out_nfields is not None and not out.field_names
+                 and out_nfields == datatype.nfields
+                 and datatype.field_names)):
+                out.field_names = datatype.field_names
+                assert out.field_names == datatype.field_names
             return out
         except NotImplementedError:  # pragma: debug
             return datatype
@@ -150,9 +194,19 @@ class TransformBase(ComponentBase):
             object: The transformed message.
 
         """
-        if (not self.original_datatype) and (not no_init):
+        from yggdrasil.communication.CommBase import CommMessage, FLAG_EMPTY
+        if not no_init:
             self.set_original_datatype_from_data(x)
-        out = self.evaluate_transform(x, **kwargs)
+        if isinstance(x, CommMessage):
+            out = CommMessage(flag=x.flag, header=copy.deepcopy(x.header))
+            if self._transform_datatype is not None:
+                out.stype = self._transform_datatype(x.stype)
+            if x.flag == FLAG_EMPTY and out.stype:
+                out.args = out.stype.empty_msg
+            else:
+                out.args = self.evaluate_transform(x.args, **kwargs)
+        else:
+            out = self.evaluate_transform(x, **kwargs)
         if (not self._transformed_datatype) and (not no_init):
             self.set_transformed_datatype_from_data(out)
         return out

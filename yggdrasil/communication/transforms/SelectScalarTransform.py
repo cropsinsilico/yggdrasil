@@ -1,4 +1,3 @@
-import copy
 from yggdrasil.communication.transforms.SelectFieldsTransform import (
     SelectFieldsTransform)
 
@@ -29,7 +28,7 @@ class SelectScalarTransform(SelectFieldsTransform):
         r"""list: Selected fields for use by base class."""
         return [self.index]
     
-    def transform_datatype(self, datatype):
+    def _transform_datatype(self, datatype):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 
@@ -41,11 +40,9 @@ class SelectScalarTransform(SelectFieldsTransform):
 
         """
         if isinstance(self.index, int):
-            if ((datatype.get('type', None) == 'array'
-                 and isinstance(datatype.get('items', None), list))):
-                return copy.deepcopy(datatype['items'][self.index])
-            elif datatype.get('type', None) == 'object':
-                self.index = sorted(list(datatype['properties'].keys()))[self.index]
+            field_names = datatype.field_names
+            if field_names is not None:
+                self.index = field_names[self.index]
         return super(SelectScalarTransform, self).transform_datatype(
             datatype)
 
@@ -62,8 +59,10 @@ class SelectScalarTransform(SelectFieldsTransform):
 
         """
         if isinstance(self.index, int):
-            if isinstance(x, dict):
-                self.index = sorted(x.keys())[0]
+            if self.original_datatype.field_names is not None:
+                self.index = self.original_datatype.field_names[self.index]
+            elif isinstance(x, dict):
+                self.index = sorted(x.keys())[self.index]
             else:
                 return x[self.index]
         assert isinstance(self.index, str)

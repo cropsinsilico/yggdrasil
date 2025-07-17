@@ -21,25 +21,23 @@ class ArrayTransform(TransformBase):
                                           'items': {'type': 'string'}}}
     _schema_subtype_description = "Consolidate values into an array"
 
-    def set_original_datatype(self, datatype):
+    def set_original_datatype(self, datatype, force=False, **kwargs):
         r"""Set datatype.
 
         Args:
-            datatype (dict): Datatype.
+            datatype (datatypes.Datatype, dict): Datatype.
+            force (bool, optional): If True, set the original datatype
+                even if it is already set.
+            **kwargs: Additional keyword arguments are passed to the
+                Datatype constructor.
 
         """
-        super(ArrayTransform, self).set_original_datatype(datatype)
+        kwargs.setdefault('force_default_field_names', True)
+        kwargs.setdefault('field_names', self.field_names)
+        super(ArrayTransform, self).set_original_datatype(
+            datatype, force=force, **kwargs)
         if not self.field_names:
-            self.field_names = self.original_datatype.get('field_names', None)
-        if not self.field_names:
-            if (((datatype['type'] == 'array')
-                 and isinstance(datatype['items'], list)
-                 and all([('title' in x) for x in
-                          self.original_datatype['items']]))):
-                self.field_names = [x.get('title', 'f%d' % i) for i, x in
-                                    enumerate(self.original_datatype['items'])]
-            elif datatype['type'] == 'object':
-                self.field_names = list(datatype['properties'].keys())
+            self.field_names = self.original_datatype.field_names
 
     @classmethod
     def get_summary(cls, x, subtype=False):
@@ -79,7 +77,7 @@ class ArrayTransform(TransformBase):
                                   "to array elements.") % x['type'])
         subt = x.get('subtype', x['type'])
         title = x.get('title', None)
-        assert subt in constants.VALID_TYPES
+        # assert subt in constants.VALID_TYPES + ['any']
         if subtype:
             out = {'type': t, 'subtype': subt,
                    'shape': s, 'title': title}
@@ -203,7 +201,7 @@ class ArrayTransform(TransformBase):
                     pass
             raise e
 
-    def validate_datatype(self, datatype):
+    def _validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
         
         Args:
@@ -213,22 +211,7 @@ class ArrayTransform(TransformBase):
             AssertionError: If the datatype is not valid.
 
         """
-        if datatype['type'] in ['1darray', 'ndarray']:
-            pass
-        elif datatype['type'] == 'array':
-            self.check_array_items(datatype['items'],
-                                   order=self.field_names)
-        elif datatype['type'] == 'object':
-            order = self.field_names
-            if 'properties' in datatype:
-                if order is None:
-                    order = list(datatype['properties'].keys())
-                self.check_array_items([datatype['properties'][k]
-                                        for k in order])
-            if 'additionalProperties' in datatype:
-                self.check_array_items(datatype['additionalProperties'])
-        else:
-            raise AssertionError("Invalid datatypes: %s" % datatype)
+        assert datatype.dtype is not None
 
     @classmethod
     def transform_array_items(cls, items, order=None):
@@ -311,7 +294,7 @@ class ArrayTransform(TransformBase):
                     x.pop('precision')
         return out
         
-    def transform_datatype(self, datatype, order=None):
+    def _transform_datatype(self, datatype, order=None):
         r"""Determine the datatype that will result from applying the transform
         to the supplied datatype.
 
@@ -329,6 +312,7 @@ class ArrayTransform(TransformBase):
             order = self.field_names
         elif self.field_names is not None:
             assert len(order) == len(self.field_names)
+        # TODO: WIP
         out = copy.deepcopy(datatype)
         if datatype['type'] == 'array':
             out['items'] = self.transform_array_items(
