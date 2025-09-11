@@ -4,7 +4,6 @@ import os
 import sys
 import shutil
 from yggdrasil import platform, config
-from yggdrasil.runner import YggFunction
 _test_package_name = None
 _test_package = None
 config.cfg_logging()
@@ -51,6 +50,7 @@ def import_as_function(model_yaml, service_address=None, **kwargs):
         YggFunction: Callable wrapper for model.
 
     """
+    from yggdrasil.runner import YggFunction
     return YggFunction(model_yaml, service_address=service_address, **kwargs)
 
 

@@ -16,7 +16,6 @@ from yggdrasil.drivers import create_driver, DirectConnectionDriver
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import init_mpi, YggTaskLoop, AsyncResult
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
-from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.broker import YggBroker
 
 
@@ -1245,6 +1244,7 @@ class YggRunner(YggClass):
         size = self.mpi_comm.Get_size()
         if self.rank == 0:
             from yggdrasil.communication.MPIComm import MPIComm
+            from yggdrasil.drivers.ModelDriver import ModelDriver
             self.expand_duplicates()
             # Set the rank and index for each model
             for i, v in enumerate(self.modeldrivers.values()):

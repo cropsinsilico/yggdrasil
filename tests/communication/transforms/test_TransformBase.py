@@ -96,7 +96,9 @@ class TestTransformBase(base_class):
             send_comm = new_comm('test_send', reverse_names=True,
                                  direction='send', use_async=False,
                                  transform=[python_class(**x.get('kwargs', {}))])
-            recv_comm = new_comm('test_recv', **send_comm.opp_comm_kwargs())
+            recv_comm_kwargs = send_comm.opp_comm_kwargs()
+            recv_comm_kwargs.pop('name')
+            recv_comm = new_comm('test_recv', **recv_comm_kwargs)
             if isinstance(msg_in, collections.abc.Iterator):
                 msg_out_list = list(msg_out)
                 msg_out = iter(msg_out_list)
@@ -148,6 +150,7 @@ class TestTransformBase(base_class):
                                  direction='send', use_async=False)
             recv_kwargs = send_comm.opp_comm_kwargs()
             recv_kwargs['transform'] = [python_class(**x.get('kwargs', {}))]
+            recv_kwargs.pop('name')
             recv_comm = new_comm('test_recv', **recv_kwargs)
             if isinstance(msg_in, collections.abc.Iterator):
                 msg_out_list = list(msg_out)
