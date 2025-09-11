@@ -35,7 +35,6 @@ class TemporaryCommunicationError(Exception):
         super(TemporaryCommunicationError, self).__init__(msg, **kwargs)
         self.max_consecutive_allowed = max_consecutive_allowed
         if max_consecutive_allowed is not None:
-            global _temp_error_registry
             assert registry_key is not None
             _temp_error_registry.setdefault(registry_key, 0)
             _temp_error_registry[registry_key] += 1
@@ -46,7 +45,6 @@ class TemporaryCommunicationError(Exception):
     @classmethod
     def reset(cls, registry_key):
         r"""Reset the registry for a TemporaryCommunicationError."""
-        global _temp_error_registry
         _temp_error_registry.pop(registry_key, None)
 
 

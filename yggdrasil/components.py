@@ -99,7 +99,6 @@ def registering(recurse=False):
 def init_registry(recurse=False):
     r"""Initialize the registries and schema."""
     from yggdrasil.tools import import_all_modules
-    global _registry
     global _registry_complete
     with registering(recurse=recurse):
         import_all_modules(exclude=['yggdrasil.examples',
@@ -120,7 +119,6 @@ def get_registry(comptype=None):
             returned.
 
     """
-    global _registry
     if registration_in_progress():
         out = _registry
     else:
@@ -456,7 +454,6 @@ class ComponentMeta(type):
                             f"from {bases}.")
                     cls._schema_base_class = base_comp
             # Register
-            global _registry
             yaml_typ = cls._schema_type
             default_subtype = cls._schema_properties.get(
                 cls._schema_subtype_key, {}).get('default',

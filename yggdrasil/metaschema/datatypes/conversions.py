@@ -15,7 +15,6 @@ def register_conversion(from_type, to_type):
         function: Decorator that will register the conversion.
 
     """
-    global _conversion_registry
     key = (from_type, to_type)
     if key in _conversion_registry:
         raise ValueError("Conversion '%s' to '%s' already in registry." % key)

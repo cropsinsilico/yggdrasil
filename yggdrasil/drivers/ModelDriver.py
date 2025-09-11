@@ -171,7 +171,6 @@ class LockedFileSet(OrderedDict):
                 if self._is_global:
                     self.insert(fname, **kwargs)
                 else:
-                    global _file_locks
                     self[fname] = _file_locks.find(fname, **kwargs)
             return self[fname]
 

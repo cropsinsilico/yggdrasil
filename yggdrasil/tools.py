@@ -500,13 +500,11 @@ def update_environ(env, exclusive=False):
 
 def cache_environ():
     r"""Cache the current environment variables."""
-    global _environ_cache
     _environ_cache.append(copy.deepcopy(os.environ))
 
 
 def restored_cached_environ():
     r"""Restore the last set of cached environment variables."""
-    global _environ_cache
     oldenv = _environ_cache.pop()
     update_environ(oldenv, exclusive=True)
 

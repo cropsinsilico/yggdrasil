@@ -173,7 +173,6 @@ def is_registered(commtype, key):
         key (str): Key that should be checked.
 
     """
-    global _registered_comms
     with _registered_comms.lock:
         if commtype not in _registered_comms:
             return False
@@ -207,7 +206,6 @@ def register_comm(commtype, key, value):
         value (obj): Object being registered.
 
     """
-    global _registered_comms
     with _registered_comms.lock:
         if commtype not in _registered_comms:
             _registered_comms.add_subdict(commtype)
@@ -228,7 +226,6 @@ def unregister_comm(commtype, key, dont_close=False):
         bool: True if an object was closed.
 
     """
-    global _registered_comms
     with _registered_comms.lock:
         if commtype not in _registered_comms:
             return False
@@ -255,7 +252,6 @@ def cleanup_comms(commtype, close_func=None):
     count = 0
     # if commtype is None:
     #     return count
-    global _registered_comms
     with _registered_comms.lock:
         if commtype in _registered_comms:
             keys = list(_registered_comms[commtype].keys())
@@ -346,7 +342,6 @@ class CommProxy(multitasking.YggTaskLoop):
     def __init__(self, srv_address=None, cli_address=None, name=None,
                  allow_no_servers=False, allow_no_clients=False,
                  is_partner=False, **kwargs):
-        global _registered_proxies
         self.servers = []
         self.clients = []
         self.is_partner = is_partner
@@ -628,7 +623,6 @@ class CommProxy(multitasking.YggTaskLoop):
                 pass
             self.terminate()
             return
-        global _registered_proxies
         self.servers.remove(name)
         if self.srv_count == 0 and not self.allow_no_servers:
             self.debug(f"Shutting down proxy due to absence of "
@@ -653,7 +647,6 @@ class CommProxy(multitasking.YggTaskLoop):
                              + name.encode('utf-8'))
             self.terminate()
             return
-        global _registered_proxies
         self.debug(f"Removing client \"{name}\" from proxy")
         self.clients.remove(name)
         if (not self.allow_no_clients) and self.cli_count == 0:
@@ -2221,7 +2214,6 @@ class CommBase(tools.YggClass):
     # CLIENT/SERVER METHODS
     def signon_to_proxy(self):
         r"""Add a client/server to an existing proxy or create one."""
-        global _registered_proxies
         with _registered_proxies.lock:
             if self.proxy is not None:
                 return
@@ -2258,7 +2250,6 @@ class CommBase(tools.YggClass):
 
     def signoff_from_proxy(self, **kwargs):
         r"""Remove a client/server from the proxy."""
-        global _registered_proxies
         with _registered_proxies.lock:
             if self.proxy is None:
                 return

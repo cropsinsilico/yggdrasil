@@ -41,7 +41,6 @@ def on_mpi():
 
     """
     init_mpi()
-    global _on_mpi
     return _on_mpi
 
 
@@ -1489,8 +1488,6 @@ class YggTask(tools.YggClass):
         self.disabled = disabled
         super(YggTask, self).__init__(name, **ygg_kwargs)
         if not self.as_process:
-            global _thread_registry
-            global _lock_registry
             _thread_registry[self.name] = self.process_instance._base
             _lock_registry[self.name] = self.lock._base
             atexit.register(self.atexit)

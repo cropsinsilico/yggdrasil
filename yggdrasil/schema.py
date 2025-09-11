@@ -120,7 +120,6 @@ def get_schema(fname=None):
         dict: yggdrasil YAML options.
 
     """
-    global _schema
     if fname is None:
         init_schema()
         out = _schema

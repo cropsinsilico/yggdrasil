@@ -735,7 +735,6 @@ def get_tool_registry(languages=None):
         CompilationToolRegistry: Global tool registry.
     
     """
-    global _tool_registry
     if languages:
         _tool_registry._init_languages(languages)
     return _tool_registry
@@ -2338,7 +2337,6 @@ class CompilationDependency(object):
             else:
                 language = self.parameters.get(f"{tooltype0}_language",
                                                self.language)
-                global _tool_registry
                 out = _tool_registry.tool_instance(
                     tooltype0, language=language,
                     driver=self.parent_driver,
@@ -2925,7 +2923,6 @@ class CompilationDependency(object):
                 language, tooltype = filetype.split('_', 1)
                 out = self.get(tooltype, **kwargs)
                 if (not out) or (language not in out.languages):
-                    global _tool_registry
                     out = _tool_registry.tool_instance(
                         tooltype, language=language,
                         compatible_with=self.basetool,
@@ -3379,7 +3376,6 @@ class CompilationDependency(object):
             return []
         out = ['working_dir']
         if isinstance(tool, str):
-            global _tool_registry
             tool = _tool_registry._bases[tool]
         out += list(tool.flag_options.keys())
         out += tool.build_params
@@ -4090,7 +4086,6 @@ class CompilationToolMeta(type):
     r"""Meta class for registering compilers."""
     def __new__(meta, name, bases, class_dict):
         cls = type.__new__(meta, name, bases, class_dict)
-        global _tool_registry
         _tool_registry.register(cls)
         return cls
 
@@ -4379,7 +4374,6 @@ class CompilationToolBase(object):
             stage_name = f"{stage_base}{stage_type.title()}"
             for k in copy_attr:
                 stage_attr.setdefault(k, getattr(cls, k))
-            global _tool_registry
             base_cls = cls.create_next_stage_tool.get(
                 'base_classes', (_tool_registry._bases[stage_type], ))
             stage_cls = type(stage_name, base_cls, stage_attr)
@@ -4415,7 +4409,6 @@ class CompilationToolBase(object):
             CompilationToolBase: Tool class associated with this compiler.
 
         """
-        global _tool_registry
         if ((tooltype == cls.tooltype
              and kwargs.get('language', None) in cls.languages
              and _tool_registry._matches(cls, **kwargs))):
@@ -4636,7 +4629,6 @@ class CompilationToolBase(object):
                 to the provided toolname.
 
         """
-        global _tool_registry
         if (language is not None) and (language not in cls.languages):
             if toolname is None:
                 toolname = cls.toolname
@@ -4989,7 +4981,6 @@ class CompilationToolBase(object):
             str: Product file type.
 
         """
-        global _tool_registry
         if no_additional_stages or not cls.builtin_next_stage:
             return cls.default_libtype
         return _tool_registry._bases[cls.builtin_next_stage].default_libtype
@@ -6602,7 +6593,6 @@ class CompiledModelDriver(ModelDriver):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        global _tool_registry
         if not cls.tooltypes:
             cls.tooltypes = _tool_registry.tooltypes(cls.basetool)
             cls._config_keys = cls.tooltypes
@@ -6642,7 +6632,6 @@ class CompiledModelDriver(ModelDriver):
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
         """
-        global _tool_registry
         ModelDriver.after_registration(cls, **kwargs)
         for k in cls.tooltypes:
             # Set default linker/archiver based on compiler
@@ -6846,7 +6835,6 @@ class CompiledModelDriver(ModelDriver):
             dict: Registry of tools for this language.
 
         """
-        global _tool_registry
         if tooltype == 'basetool':
             tooltype = cls.basetool
         reg = _tool_registry.language[tooltype].get(cls.language,
@@ -6886,7 +6874,6 @@ class CompiledModelDriver(ModelDriver):
             ValueError: If return_prop is not 'tool', 'name', or 'flags'.
 
         """
-        global _tool_registry
         if return_prop == 'tool':
             return _tool_registry.tool_instance(
                 tooltype, toolname=toolname, language=language,
@@ -7171,7 +7158,6 @@ class CompiledModelDriver(ModelDriver):
                 be set.
 
         """
-        global _tool_registry
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)
         for k, v in kwargs.items():
@@ -7219,7 +7205,6 @@ class CompiledModelDriver(ModelDriver):
                 be set.
 
         """
-        global _tool_registry
         out = super(CompiledModelDriver, cls).configure_executable_type(cfg)
         for k in cls.tooltypes:
             default_tool_name = _tool_registry.toolname(
