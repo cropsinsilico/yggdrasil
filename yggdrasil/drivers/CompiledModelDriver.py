@@ -4583,11 +4583,19 @@ class CompilationToolBase(object):
         if 'forwardslash' in actions:
             out = out.replace('\\', re.escape('/'))
         if 'doublequote' in actions:
+            if '"' in out:
+                out = out.replace('"', '\\"')
             out = f'"{out}"'
         elif 'singlequote' in actions:
+            if "'" in out:
+                out = out.replace("'", "\\'")
             out = f"'{out}'"
         if 'escapespace' in actions:
             out = out.replace(' ', r'\\ ')
+        if 'escapedoublequote' in actions:
+            out = out.replace('"', '\\"')
+        if 'escapesinglequote' in actions:
+            out = out.replace("'", "\\'")
         # TODO: Add extra backslashes in contexts where string will be
         #   expanded before it is used
         return out
@@ -5645,9 +5653,15 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
+            cmd = cls.fix_flags(cmd, context='cmd')
             message_before = (
                 format_out('Working Dir', working_dir)
-                + format_out('Command', f"\"{' '.join(cmd)}\""))
+                + format_out('Raw Command',
+                             pprint.pformat(cmd))
+                + format_out('Command', f"{' '.join(cmd)}")
+                + format_out('Popen Kwargs',
+                             pprint.pformat(unused_kwargs))
+            )
             if not for_version:
                 try:
                     message_before = (

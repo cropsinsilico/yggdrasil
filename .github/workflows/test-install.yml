@@ -502,9 +502,6 @@ jobs:
         ${{ env.PYTHONVERSION }}
 
         '
-    - if: runner.os == 'Linux' && matrix.install-sbml == true
-      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
     - continue-on-error: true
       id: conda_install
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -917,9 +914,6 @@ jobs:
         ${{ env.PYTHONVERSION }}
 
         '
-    - if: runner.os == 'Linux' && matrix.install-sbml == true
-      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
     - continue-on-error: true
       id: conda_install
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -1308,9 +1302,6 @@ jobs:
         ${{ env.PYTHONVERSION }}
 
         '
-    - if: runner.os == 'Linux' && matrix.install-sbml == true
-      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
     - continue-on-error: true
       id: conda_install
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -1680,9 +1671,6 @@ jobs:
         ${{ env.PYTHONVERSION }}
 
         '
-    - if: runner.os == 'Linux' && matrix.install-sbml == true
-      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
     - continue-on-error: true
       id: conda_install
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'
@@ -2051,9 +2039,6 @@ jobs:
         ${{ env.PYTHONVERSION }}
 
         '
-    - if: runner.os == 'Linux' && matrix.install-sbml == true
-      name: (LINUX) Install ncurses 5 for SBML runs with libroadrunner
-      run: sudo apt-get install libncurses5 libncurses5-dev libncursesw5-dev
     - continue-on-error: true
       id: conda_install
       if: matrix.install-method == 'conda' || matrix.install-method == 'mamba'

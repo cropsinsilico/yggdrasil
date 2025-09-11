@@ -385,8 +385,10 @@ class BuildModelDriver(CompiledModelDriver):
                     components.import_component(
                         'model', self.target_language))
         if not self.target_language_driver.is_installed():
-            raise BuildError(f"Target language \"{self.language}\" is "
-                             f"not installed")
+            raise BuildError(
+                f"Target language "
+                f"\"{self.target_language_driver.language}\" is "
+                f"not installed")
         if self.target_compiler is None:
             self.target_compiler = self.target_language_driver.get_tool(
                 'compiler', return_prop='name')

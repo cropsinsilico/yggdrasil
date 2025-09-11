@@ -44,7 +44,8 @@ def test_CMakeModelDriver_no_cmake(scripts):  # pragma: windows
 @pytest.mark.absent_language('c++')
 def test_CMakeModelDriver_no_C_library(scripts):  # pragma: windows
     r"""Test CMakeModelDriver error when C++ library not installed."""
-    with pytest.raises(RuntimeError):
+    from yggdrasil.drivers.BuildModelDriver import BuildError
+    with pytest.raises(BuildError):
         CMakeModelDriver('test', scripts['cmake'])
 
 
@@ -145,5 +146,7 @@ class TestCMakeModelDriver_wd(TestCMakeModelDriver):
                     namespace=namespace, env_compiler='CXX',
                     env_compiler_flags='CXXFLAGS',
                     sourcedir='.', builddir='build',
+                    configurer_flags=[
+                        '-DPATH_WITH_SPACE:FILENAME="/Path Space/file"'],
                     compiler_flags=['-Wdev'], skip_compiler=True,
                     remove_products=True)

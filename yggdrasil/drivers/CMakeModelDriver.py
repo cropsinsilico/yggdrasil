@@ -294,13 +294,18 @@ class CMakeConfigure(ConfigurerBase):
                  parent class.
 
         """
-        if ((isinstance(flags, str)  # and ' ' in flags
-             and kwargs.get('context', None) == 'flag')):
-            if '"' in flags:
-                flags = flags.replace('"', '\\"')
-            flags = f'"{flags}"'
-        print(f"CMakeConfigure FIX_FLAGS: {type(flags)}, {flags}")
-        return super(CMakeConfigure, cls).fix_flags(flags, **kwargs)
+        # if ((isinstance(flags, str)  # and ' ' in flags
+        #      and kwargs.get('context', None) == 'flag')):
+        #     if '"' in flags:
+        #         flags = flags.replace('"', '\\"')
+        #     flags = f'"{flags}"'
+        out = super(CMakeConfigure, cls).fix_flags(flags, **kwargs)
+        print(f"CMakeConfigure FIX_FLAGS: {type(flags)}, {flags}, {out}")
+        if ((isinstance(flags, str) and ' ' in flags
+             and kwargs.get('context', None) == 'cmd')):
+            out = cls.fix_path(out, actions=['doublequote'])
+            print(f"CMakeConfigure FIX_FLAGS OUT: {out}")
+        return out
         
     @classmethod
     def fix_path(cls, path, **kwargs):
@@ -325,8 +330,11 @@ class CMakeConfigure(ConfigurerBase):
         elif kwargs.get('context', None) == 'flag':
             default_actions = ['forwardslash']
             if ' ' in path:
-                default_actions.append('doublequote')
+                default_actions += ['doublequote']
             kwargs.setdefault('actions', default_actions)
+        # elif kwargs.get('context', None) == 'cmd':
+        #     if ' ' in path:
+        #         kwargs.setdefault('actions', ['doublequote'])
         return super(CMakeConfigure, cls).fix_path(path, **kwargs)
 
 
