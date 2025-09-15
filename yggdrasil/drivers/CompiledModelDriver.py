@@ -5384,8 +5384,8 @@ class CompilationToolBase(object):
         # Form command
         if executable is None:
             executable = cls.get_executable(full_path=True, cfg=cfg)
-        cmd = flags + args + library_flags
-        cmd = [executable] + cmd
+        cmd = [x for x in (flags + args + library_flags) if x]
+        cmd = [executable] + cls.fix_flags(cmd, context='cmd')
         if use_ccache and shutil.which('ccache'):
             cmd = ['ccache'] + cmd
         # Pop library flags so it is not an unused_kwarg in cases of
@@ -5653,7 +5653,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            cmd = cls.fix_flags(cmd, context='cmd')
+            # cmd = cls.fix_flags(cmd, context='cmd')
             message_before = (
                 format_out('Working Dir', working_dir)
                 + format_out('Raw Command',
@@ -7028,7 +7028,10 @@ class CompiledModelDriver(ModelDriver):
 
         """
         basetool = cls.get_tool('basetool', toolname=toolname)
-        return basetool.tool_version(**kwargs).splitlines()[0].strip()
+        out = basetool.tool_version(**kwargs).splitlines()
+        if not out:
+            return ''
+        return out[0].strip()
         
     def run_model(self, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
