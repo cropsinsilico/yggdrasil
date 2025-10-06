@@ -418,6 +418,8 @@ class ModelDriver(Driver):
         preserve_cache (bool, optional): [DEPRECATED] If True model
             products will be kept following the run, otherwise all
             products will be cleaned up.
+        dont_queue_output (bool, optional): If True, model output will not
+            be captured.
         with_strace (bool, optional): If True, the command is run with strace (on
             Linux) or dtrace (on MacOS). Defaults to False.
         strace_flags (list, optional): Flags to pass to strace (or dtrace).
@@ -673,6 +675,7 @@ class ModelDriver(Driver):
         'overwrite': {'type': 'boolean', 'default': False},
         'remove_products': {'type': 'boolean', 'default': False},
         'preserve_cache': {'type': 'boolean', 'default': True},
+        'dont_queue_output': {'type': 'boolean', 'default': False},
         'function': {'type': 'string'},
         'iter_function_over': {'type': 'array', 'default': [],
                                'items': {'type': 'string'}},
@@ -827,8 +830,10 @@ class ModelDriver(Driver):
         # TODO: Pass removable_source_exts used by Compiled drivers
         # Setup process things
         self.model_process = None
-        self.queue = multitasking.Queue()
+        self.queue = None
         self.queue_thread = None
+        if not self.dont_queue_output:
+            self.queue = multitasking.Queue()
         self.event_process_kill_called = multitasking.Event()
         self.event_process_kill_complete = multitasking.Event()
         # Tools
@@ -1525,7 +1530,8 @@ class ModelDriver(Driver):
         # not running locally.
         default_kwargs = dict(env=env, working_dir=self.working_dir,
                               forward_signals=False,
-                              shell=platform._is_win)
+                              shell=platform._is_win,
+                              allow_buffer=self.dont_queue_output)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
         return self.run_executable(command, return_process=return_process, **kwargs)
@@ -2025,7 +2031,7 @@ class ModelDriver(Driver):
         """
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
-        if not no_queue_thread:
+        if not (no_queue_thread or self.dont_queue_output):
             self.queue_thread = multitasking.YggTaskLoop(
                 target=self.enqueue_output_loop,
                 name=self.name + '.EnqueueLoop')
@@ -2035,10 +2041,12 @@ class ModelDriver(Driver):
 
     def queue_close(self):
         r"""Close the queue for messages from the model process."""
-        self.model_process.stdout.close()
+        if not self.dont_queue_output:
+            self.model_process.stdout.close()
 
     def queue_recv(self):
         r"""Receive a message from the model process."""
+        assert not self.dont_queue_output
         return self.model_process.stdout.readline()
 
     def enqueue_output_loop(self):
@@ -2185,6 +2193,13 @@ class ModelDriver(Driver):
             self.set_break_flag()
         for k in self._mpi_requests_checked:
             self.check_mpi_request(k)
+        if self.dont_queue_output:
+            if self.model_process_complete:
+                self.debug("Model process complete")
+                self.set_break_flag()
+            else:
+                self.sleep()
+            return
         try:
             line = self.queue.get_nowait()
         except Empty:

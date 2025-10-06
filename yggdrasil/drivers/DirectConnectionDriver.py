@@ -60,7 +60,7 @@ class DirectConnectionDriver(ConnectionDriver):
                 x['model_copies'] = x.pop('partner_copies')
             if 'partner_language' in x:
                 x['language'] = x.pop('partner_language')
-                if x['language'] in ['c', 'c++', 'fortran']:
+                if x['language'] in ['c', 'c++', 'cpp', 'fortran']:
                     raise DirectConnectionError(
                         "C use of comm broker not yet implemented")
             x.setdefault('commtype', comm_type)

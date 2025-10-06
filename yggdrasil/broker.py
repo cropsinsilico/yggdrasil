@@ -49,6 +49,7 @@ class YggBroker(multitasking.YggTaskLoop):
             response_kwargs={'datatype': {'type': 'any'}},
         )
         self._delayed_requests = []
+        self._awaiting_comm = []
         self._current_request = None
         self._comms = None
         self._connections = {}
@@ -230,12 +231,14 @@ class YggBroker(multitasking.YggTaskLoop):
             timeout=0.1, return_message_object=True,
             quiet_timeout=True)
         if msg.flag in [CommBase.FLAG_EOF, CommBase.FLAG_EMPTY]:
+            if self._delayed_requests:
+                self.complete_request(self._delayed_requests.pop(0))
             return
         elif msg.flag != CommBase.FLAG_SUCCESS:
             raise BrokerError(f"Error receiving inside loop: "
                               f"{CommBase.FLAG_TO_STRING[msg.flag]}")
-        if self._delayed_requests:
-            self.complete_request(self._delayed_requests.pop(0))
+        msg.args['id'] = msg.header['__meta__']['request_id']
+        # self.server_comm.info(f"REQUEST [{msg.args['action']}]")
         self.complete_request(msg.args)
 
     def run_finally(self):
@@ -264,15 +267,21 @@ class YggBroker(multitasking.YggTaskLoop):
         """
         error = None
         try:
+            # self.server_comm.info(f"PROCESS REQUEST "
+            #                       f"[{request['action']}]: {request}")
             response = self.process_request(request)
         except DelayedRequestError:
+            # self.server_comm.info(f"DELAYED REQUEST "
+            #                       f"[{request['action']}]")
             self._delayed_requests.append(request)
             return
         except BaseException as e:
             error = e
             tb = traceback.format_exc()
             response = {'error': str(e), 'traceback': tb}
-        flag = self.server_comm.send(response)
+        # self.server_comm.info(f"RESPONSE [{request['action']}]: "
+        #                       f"{response}")
+        flag = self.server_comm.send_to(request['id'], response)
         if error:
             raise error
         if not flag:
@@ -483,15 +492,22 @@ class YggBroker(multitasking.YggTaskLoop):
             'kwargs': kwargs,
         }
         client = cls.get_client()
-        flag, response = client.call(request)
+        # client.info(f"REQUEST [{action}]")
+        flag = client.send(request)
         if not flag:
             raise BrokerError(f"{model}: Failed to send request to "
                               f"the broker {request}")
+        msg = client.recv(return_message_object=True, timeout=False)
+        if msg.flag != CommBase.FLAG_SUCCESS:
+            raise BrokerError(f"{model}: Failed to receive response from "
+                              f"the broker {request} ({msg.flag})")
+        response = msg.args
         if 'error' in response:
             raise BrokerError(f"{model}: Error on broker process during "
                               f"response to request {request}.\n"
                               f"{response['error']}\n"
                               f"{response['traceback']}")
+        # client.info(f"RESPONSE [{action}]: {response['return']}")
         return response['return']
 
     @classmethod
@@ -513,6 +529,10 @@ class YggBroker(multitasking.YggTaskLoop):
         assert isinstance(comm, dict)
         comm.update(kwargs)
         assert comm['direction'] == direction
+        if name in self._awaiting_comm:
+            assert 'address' in comm
+            # self.server_comm.info(f"UNLOCKING: {name}")
+            self._awaiting_comm.remove(name)
 
     @classmethod
     def model_comm_kwargs(cls, name, direction, self=None):
@@ -536,6 +556,11 @@ class YggBroker(multitasking.YggTaskLoop):
         out = {}
         is_split_server = False
         language = None
+        if name in self._awaiting_comm:
+            # self.server_comm.info(f"LOCKED {name}")
+            raise DelayedRequestError(
+                f"Delaying creationg of {name} comm until "
+                f"the partner comm finishing creation")
         with self.lock:
             model_driver = self._models[model]
             language = model_driver.language
@@ -564,6 +589,9 @@ class YggBroker(multitasking.YggTaskLoop):
         )
         if is_split_server or out['commtype'] == 'model_function':
             out['global_scope'] = model
+        if 'address' not in out and 'partner_name' in out:
+            # self.server_comm.info(f"LOCKING {out['partner_name']}")
+            self._awaiting_comm.append(out['partner_name'])
         return out
 
     @classmethod

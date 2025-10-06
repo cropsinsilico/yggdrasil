@@ -1576,7 +1576,8 @@ class YggPopen(subprocess.Popen):
         **kwargs: Additional keywords arguments are passed to Popen.
 
     """
-    def __init__(self, cmd_args, forward_signals=True, for_matlab=False, **kwargs):
+    def __init__(self, cmd_args, forward_signals=True, for_matlab=False,
+                 allow_buffer=False, **kwargs):
         # stdbuf only for linux
         if platform._is_linux:
             stdbuf_args = ['stdbuf', '-o0', '-e0']
@@ -1584,9 +1585,10 @@ class YggPopen(subprocess.Popen):
                 cmd_args = ' '.join(stdbuf_args + [cmd_args])
             else:
                 cmd_args = stdbuf_args + cmd_args
-        kwargs.setdefault('bufsize', 0)
-        kwargs.setdefault('stdout', subprocess.PIPE)
-        kwargs.setdefault('stderr', subprocess.STDOUT)
+        if not allow_buffer:
+            kwargs.setdefault('bufsize', 0)
+            kwargs.setdefault('stdout', subprocess.PIPE)
+            kwargs.setdefault('stderr', subprocess.STDOUT)
         # To prevent forward of signals, process will have a new process group
         if not forward_signals:
             if platform._is_win:  # pragma: windows

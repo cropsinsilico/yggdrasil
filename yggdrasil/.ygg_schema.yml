@@ -3621,6 +3621,10 @@ definitions:
         default: false
         description: If True, the Python C API will be disabled. Defaults to False.
         type: boolean
+      dont_queue_output:
+        default: false
+        description: If True, model output will not be captured.
+        type: boolean
       driver:
         deprecated: true
         description: '[DEPRECATED] Name of driver class that should be used.'

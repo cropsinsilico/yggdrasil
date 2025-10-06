@@ -1,6 +1,6 @@
 [submodule "yggdrasil/rapidjson"]
 	path = yggdrasil/rapidjson
-	url = https://github.com/cropsinsilico/rapidjson
+	url = https://github.com/cropsinsilico/yggdrasil-rapidjson
 	branch = yggdrasil
 [submodule "yggdrasil/FSPM2020_yggdrasil_workshop"]
 	path = yggdrasil/demos/fspm2020
@@ -11,5 +11,5 @@
 	url = https://github.com/cropsinsilico/CiS2021-hackathon
 [submodule "python-rapidjson"]
 	path = yggdrasil/python-rapidjson
-	url = https://github.com/cropsinsilico/python-rapidjson.git
+	url = https://github.com/cropsinsilico/yggdrasil-python-rapidjson
 	branch = yggdrasil

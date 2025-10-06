@@ -478,7 +478,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         """
         # Sleep until there is a message
         if timeout is None:
-            timeout = kwargs.get('timeout', self.recv_timeout)
+            timeout = self.recv_timeout
         T = self.start_timeout(timeout, key_suffix='.recv:backlog')
         while (not T.is_out) and (not self.backlog_ready.is_set()):
             self.backlog_ready.wait(self.sleeptime)
