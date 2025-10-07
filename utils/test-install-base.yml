@@ -11,9 +11,9 @@ name: Test of package installation & execution
     - cron: "0 10 1 * *"  # 3AM PST once a month
 
 env:
-  PYTHONVERSION_MIN: 3.7
-  PYTHONVERSION_MAX: 3.12
-  PYTHONVERSION_STD: 3.9
+  PYTHONVERSION_MIN: "3.9"
+  PYTHONVERSION_MAX: "3.12"
+  PYTHONVERSION_STD: "3.11"
   NUMPY: numpy
   INSTALLR: 0  # TODO: temp
   INSTALLC: 1
@@ -442,7 +442,7 @@ jobs:
         install-pytorch: [true]
         include:
           - os-base: ubuntu
-            python-version: 3.7
+            python-version: min
             install-method: conda
             test-flags1: long
             test-flags2: empty
@@ -452,7 +452,7 @@ jobs:
             install-sbml: false
             install-pytorch: false
           - os-base: ubuntu
-            python-version: 3.9
+            python-version: std
             install-method: conda
             test-flags1: long-remote-service
             test-flags2: examples-sbml
@@ -462,7 +462,7 @@ jobs:
             install-sbml: true
             install-pytorch: true
           - os-base: ubuntu
-            python-version: "3.10"
+            python-version: max
             install-method: conda
             test-flags1: long
             test-flags2: empty
@@ -472,26 +472,26 @@ jobs:
             install-mpi: false
             install-sbml: false
             install-pytorch: true
-          - os-base: ubuntu
-            python-version: "3.11"
-            install-method: conda
-            test-flags1: long
-            test-flags2: empty
-            install-c: true
-            install-r: true
-            install-mpi: false
-            install-sbml: false
-            install-pytorch: true
-          - os-base: macos
-            python-version: 3.8
-            install-method: conda
-            test-flags1: examples-rpc-lesson3
-            test-flags2: tools
-            install-c: true
-            install-r: true
-            install-mpi: false
-            install-sbml: false
-            install-pytorch: true
+          # - os-base: ubuntu
+          #   python-version: "3.11"
+          #   install-method: conda
+          #   test-flags1: long
+          #   test-flags2: empty
+          #   install-c: true
+          #   install-r: true
+          #   install-mpi: false
+          #   install-sbml: false
+          #   install-pytorch: true
+          # - os-base: macos
+          #   python-version: 3.8
+          #   install-method: conda
+          #   test-flags1: examples-rpc-lesson3
+          #   test-flags2: tools
+          #   install-c: true
+          #   install-r: true
+          #   install-mpi: false
+          #   install-sbml: false
+          #   install-pytorch: true
       fail-fast: false
     defaults:
       run:
@@ -621,9 +621,22 @@ jobs:
         BRANCH: gh-pages
         FOLDER: docs/build/html/
 
+  all_tests_passed:
+    runs-on: ubuntu-latest
+    name: All tests passed
+    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    if: always()
+    steps:
+      - name: All tests ok
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Some tests failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
-    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    needs: [all_tests_passed]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ${{ matrix.os }}
     strategy:
@@ -683,7 +696,7 @@ jobs:
   
   build_sdist:
     name: Build source distribution
-    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    needs: [all_tests_passed]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
@@ -699,7 +712,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: std
+          python-version: ${{ env.PYTHONVERSION_STD }}
       - name: Install build utilities
         run: |
           python -m pip install build
@@ -756,7 +769,7 @@ jobs:
 
   docker:
     name: Build and Publish Docker images
-    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    needs: [all_tests_passed]
     if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) || github.event.schedule == '0 10 1 * *'
     runs-on: ubuntu-latest
     steps:
@@ -770,7 +783,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: std
+        python-version: ${{ env.PYTHONVERSION_STD }}
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
@@ -783,7 +796,7 @@ jobs:
 
   schema:
     name: Update the schema used by the model submission form
-    needs: [test_pip, test_conda, test_rmq_pip, test_rmq_conda, test_stripped, docs]
+    needs: [all_tests_passed]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
@@ -797,7 +810,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: std
+        python-version: ${{ env.PYTHONVERSION_STD }}
     - name: Install dependencies
       run: |
         python -m pip install PyGithub

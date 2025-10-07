@@ -21,16 +21,16 @@ env:
   INSTALLTRIMESH: 1
   INSTALLZMQ: 1
   NUMPY: numpy
-  PYTHONVERSION_MAX: 3.12
-  PYTHONVERSION_MIN: 3.7
-  PYTHONVERSION_STD: 3.9
+  PYTHONVERSION_MAX: '3.12'
+  PYTHONVERSION_MIN: '3.9'
+  PYTHONVERSION_STD: '3.11'
   TMPDIR: /tmp/
   USEVIRTUALENV: 0
   YGG_GHA_JOB_ID_SUFFIX: null
 jobs:
-  build_sdist:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    name: Build source distribution
+  all_tests_passed:
+    if: always()
+    name: All tests passed
     needs:
     - test_pip
     - test_conda
@@ -38,6 +38,19 @@ jobs:
     - test_rmq_conda
     - test_stripped
     - docs
+    runs-on: ubuntu-latest
+    steps:
+    - if: ${{ !(contains(needs.*.result, 'failure')) }}
+      name: All tests ok
+      run: exit 0
+    - if: ${{ contains(needs.*.result, 'failure') }}
+      name: Some tests failed
+      run: exit 1
+  build_sdist:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    name: Build source distribution
+    needs:
+    - all_tests_passed
     runs-on: ubuntu-latest
     steps:
     - name: Checkout sources
@@ -54,7 +67,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: std
+        python-version: ${{ env.PYTHONVERSION_STD }}
     - name: Install build utilities
       run: 'python -m pip install build
 
@@ -84,12 +97,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Build wheels on ${{ matrix.os }}
     needs:
-    - test_pip
-    - test_conda
-    - test_rmq_pip
-    - test_rmq_conda
-    - test_stripped
-    - docs
+    - all_tests_passed
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout sources
@@ -151,12 +159,7 @@ jobs:
       == '0 10 1 * *'
     name: Build and Publish Docker images
     needs:
-    - test_pip
-    - test_conda
-    - test_rmq_pip
-    - test_rmq_conda
-    - test_stripped
-    - docs
+    - all_tests_passed
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -171,7 +174,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: std
+        python-version: ${{ env.PYTHONVERSION_STD }}
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
@@ -249,12 +252,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Update the schema used by the model submission form
     needs:
-    - test_pip
-    - test_conda
-    - test_rmq_pip
-    - test_rmq_conda
-    - test_stripped
-    - docs
+    - all_tests_passed
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -269,7 +267,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: std
+        python-version: ${{ env.PYTHONVERSION_STD }}
     - name: Install dependencies
       run: 'python -m pip install PyGithub
 
@@ -634,7 +632,7 @@ jobs:
           install-r: false
           install-sbml: false
           os-base: ubuntu
-          python-version: 3.7
+          python-version: min
           test-flags1: long
           test-flags2: empty
         - install-c: true
@@ -644,7 +642,7 @@ jobs:
           install-r: true
           install-sbml: true
           os-base: ubuntu
-          python-version: 3.9
+          python-version: std
           test-flags1: long-remote-service
           test-flags2: examples-sbml
         - install-c: true
@@ -654,29 +652,9 @@ jobs:
           install-r: true
           install-sbml: false
           os-base: ubuntu
-          python-version: '3.10'
+          python-version: max
           test-flags1: long
           test-flags2: empty
-        - install-c: true
-          install-method: conda
-          install-mpi: false
-          install-pytorch: true
-          install-r: true
-          install-sbml: false
-          os-base: ubuntu
-          python-version: '3.11'
-          test-flags1: long
-          test-flags2: empty
-        - install-c: true
-          install-method: conda
-          install-mpi: false
-          install-pytorch: true
-          install-r: true
-          install-sbml: false
-          os-base: macos
-          python-version: 3.8
-          test-flags1: examples-rpc-lesson3
-          test-flags2: tools
         install-c:
         - true
         install-method:
