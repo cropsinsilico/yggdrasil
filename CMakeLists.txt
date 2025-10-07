@@ -1,5 +1,9 @@
 # YGGDRASIL CMAKELISTS
 cmake_minimum_required(VERSION 3.16)
+if(NOT SKBUILD)
+  message(FATAL_ERROR "Must be built via scikit-build-core")
+endif()
+PROJECT(${SKBUILD_PROJECT_NAME} VERSION "${SKBUILD_PROJECT_VERSION}")
 
 cmake_path(
   APPEND CMAKE_CURRENT_SOURCE_DIR yggdrasil core
@@ -16,11 +20,15 @@ set(PYRJ_DIR "${DEFAULT_PYRJ_DIR}" CACHE PATH
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PYRJ_DIR}/cmake")
 include(ygg_options)
 
+############################
+# python-rapidjson module
+############################
+
 message(STATUS "${PYTHON_PREFIX}_INSTALL_DIR = ${${PYTHON_PREFIX}_INSTALL_DIR}")
 message(STATUS "CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "PYRJ_DIR = ${PYRJ_DIR}")
 
-set(PYRJ_ALTERNATE_MODULE yggdrasil.rapidjson)
+set(PYRJ_ALTERNATE_MODULE "yggdrasil.rapidjson" CACHE STRING "Name of the python-rapidjson Python modules that should be built")
 
 set(${PYTHON_PREFIX}_INSTALL_DIR ".")
 if (PYRJ_DIR STREQUAL "${DEFAULT_PYRJ_DIR}")
