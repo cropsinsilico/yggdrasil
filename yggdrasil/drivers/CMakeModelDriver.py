@@ -300,11 +300,13 @@ class CMakeConfigure(ConfigurerBase):
         #         flags = flags.replace('"', '\\"')
         #     flags = f'"{flags}"'
         out = super(CMakeConfigure, cls).fix_flags(flags, **kwargs)
-        logger.info(f"CMakeConfigure FIX_FLAGS: {type(flags)}, {flags}, {out}")
-        if ((isinstance(flags, str) and ' ' in flags
-             and kwargs.get('context', None) == 'cmd')):
-            out = cls.fix_path(out, actions=['doublequote'])
-            logger.info(f"CMakeConfigure FIX_FLAGS OUT: {out}")
+        if isinstance(flags, str) and ' ' in flags:
+            logger.info(f"CMakeConfigure FIX_FLAGS: "
+                        f"{type(flags)}, {flags}, {out}")
+        # if ((isinstance(flags, str) and ' ' in flags
+        #      and kwargs.get('context', None) == 'cmd')):
+        #     out = cls.fix_path(out, actions=['doublequote'])
+        #     logger.info(f"CMakeConfigure FIX_FLAGS OUT: {out}")
         return out
         
     @classmethod
