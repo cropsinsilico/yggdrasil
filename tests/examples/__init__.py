@@ -284,3 +284,4 @@ class TestExample(base_class):
         finally:
             if mpi_rank == 0:
                 example_cleanup()
+            r.terminate()

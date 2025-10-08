@@ -129,12 +129,12 @@ def train_model():
                     pred.argmax(1) == y).type(torch.float).sum().item()
         test_loss /= num_batches
         correct /= size
-        print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, "
+        print(f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, "
               f"Avg loss: {test_loss:>8f} \n")
 
     epochs = 5
     for t in range(epochs):
-        print(f"Epoch {t+1}\n-------------------------------")
+        print(f"Epoch {t + 1}\n-------------------------------")
         train(train_dataloader, model, loss_fn, optimizer)
         test(test_dataloader, model, loss_fn)
         print("Done!")
