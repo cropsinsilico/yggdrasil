@@ -305,7 +305,8 @@
               {
                 "method": "apt",
                 "add": [
-                  "r-base-dev"
+                  "r-base-dev",
+                  "libtirpc-dev"
                 ]
               },
               {

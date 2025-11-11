@@ -198,7 +198,7 @@ extras:
           method: conda
           host: True
         - method: apt
-          add: [r-base-dev]
+          add: [r-base-dev, libtirpc-dev]
         - name: r
           method: brew
     - r-devtools:
