@@ -22,6 +22,12 @@ general:
           method: pip
         - name: python-build
           method: conda
+  # - binutils:
+  #     method: conda_recipe
+  #     host: True
+  #     flags:
+  #       build: True
+  #       build_only: True
   - chevron
   - "cross-python_{{ target_platform }}":
       method: conda_recipe
@@ -29,20 +35,34 @@ general:
         build: True
         build_only: True
         cross_build: True
+  - "{{ stdlib('c') }}":
+      method: conda_recipe
+      # host: True
+      # os: unix
+      flags:
+        build: True
+        build_only: True
   - "{{ compiler('c') }}":
       method: conda_recipe
-      host: True
-      os: unix
+      # host: True
+      # os: unix
       flags:
         build: True
         build_only: True
   - "{{ compiler('cxx') }}":
       method: conda_recipe
-      host: True
-      os: unix
+      # host: True
+      # os: unix
       flags:
         build: True
         build_only: True
+  # - "{{ compiler('fortran') }}":
+  #     method: conda_recipe
+  #     # host: True
+  #     # os: unix
+  #     flags:
+  #       build: True
+  #       build_only: True
   - cmake>=3.16:
       method: conda_recipe
       flags:
@@ -58,9 +78,10 @@ general:
         os: win
   - hatch-fancy-pypi-readme:
       host: True
-      flags:
-        build: True
-        build_only: True
+      host_only: True
+      # flags:
+      #   build: True
+      #   build_only: True
   - matplotlib:
       flags:
         from_env: MATPLOTLIB
@@ -69,6 +90,12 @@ general:
         method: conda
       - name: matplotlib
         method: pip
+  - ninja:
+      method: conda_recipe
+      host: True
+      flags:
+        build: True
+        build_only: True
   - numpy>=1.13.0:
       host: true
       flags:
@@ -80,6 +107,12 @@ general:
       method: conda_recipe
       host: True
       host_only: True
+  # - pkgconfig:
+  #     method: conda_recipe
+  #     host: True
+  #     flags:
+  #       build: True
+  #       build_only: True
   - psutil
   - pyperf
   - python:
@@ -93,28 +126,20 @@ general:
   - requests
   - scikit-build-core<0.11.2:  # Pin until scripts fixed https://github.com/scikit-build/scikit-build-core/pull/1047
       host: True
-      flags:
-        build: True
-        build_only: True
+      host_only: True
+      # flags:
+      #   build: True
+      #   build_only: True
   - scipy:
       flags:
         method_in_setup: conda
   - setuptools_scm:
       method: conda_recipe
       host: True
-      flags:
-        build: True
-        build_only: True
-  - libxcrypt:
-      method: conda_recipe
-      host: True
       host_only: True
-      flags:
-        conda_selectors: [py<38]
-  - urllib3<2.2.2:
-      method: conda_recipe
-      flags:
-        conda_selectors: [py<38]
+      # flags:
+      #   build: True
+      #   build_only: True
   - six
   - toml
   - unyt
@@ -130,51 +155,62 @@ extras:
     - name: zmq
       os: win
     requirements:
-    - cmake:
+    - cmake>=3.16:
         method: conda
-        os: unix
+        # os: unix
+    # - make:
+    #     - method: conda
+    #       os: unix
+    #     - name: m2w64-make
+    #       method: conda
+    #       os: win
+    - binutils:
+        method: conda
     - make:
-        - method: conda
-          os: unix
-        - name: m2w64-make
-          method: conda
-          os: win
-    - "{{ compiler('c') }}":
-        method: conda_recipe
-    - "{{ compiler('cxx') }}":
-        method: conda_recipe
-    # - c-compiler:
-    #   - name: "{{ compiler('c') }}"
-    #     method: conda_recipe
-    #   - name: c-compiler
-    #     method: conda
-    #     os: unix
-    # - cxx-compiler:
-    #   - name: "{{ compiler('cxx') }}"
-    #     method: conda_recipe
-    #   - name: cxx-compiler
-    #     method: conda
-    #     os: unix
-    - compiler-rt:
         method: conda
-        os: osx
+    - ninja:
+        method: conda
+    - pkgconfig:
+        method: conda
+    - c-stdlib:
+      - name: "{{ stdlib('c') }}"
+        method: conda_recipe
+    - c-compiler:
+      - name: "{{ compiler('c') }}"
+        method: conda_recipe
+      - method: conda
+    - cxx-compiler:
+      - name: "{{ compiler('cxx') }}"
+        method: conda_recipe
+      - method: conda
+    # - "{{ stdlib('m2w64_c') }}":
+    #     method: conda_recipe
+    #     os: win
+    # - "{{ compiler('m2w64_c') }}":
+    #     method: conda_recipe
+    #     os: win
+    # - "{{ compiler('m2w64_cxx') }}":
+    #     method: conda_recipe
+    #     os: win
+    # - compiler-rt:
+    #     method: conda
+    #     os: osx
   fortran:
     description: Dependencies required to compile and run models written in Fortran as part of yggdrasil integrations
     requires_extras: [c]
     requirements:
-    - gfortran:
+    - fortran-compiler:
         - name: "{{ compiler('fortran') }}"
           method: conda_recipe
-          os: unix
-        - name: fortran-compiler
-          os: unix
-          method: conda
+          # os: unix
+        - method: conda
+          # os: unix
         # - name: gfortran
         # - name: "{{ compiler('m2w64_fortran') }}"
-        - name: m2w64-gcc-fortran
-          os: win
-          method: conda
-          add: [m2w64-toolchain_win-64]
+        # - name: m2w64-gcc-fortran
+        #   os: win
+        #   method: conda
+        #   add: [m2w64-toolchain_win-64]
         - name: gfortran
           method: apt
         - name: gfortran
@@ -188,6 +224,9 @@ extras:
         # Alternate source for windows
         # - name: vcpkg-gfortran
         #   method: vcpkg
+    # - "{{ compiler('m2w64_fortran') }}":
+    #     method: conda_recipe
+    #     os: win
   r:
     description: Dependencies required to run models written in R as part of yggdrasil integrations
     requirements:
@@ -197,23 +236,31 @@ extras:
         - name: r-base>3.5
           method: conda
           host: True
+          add:
+            - name: r-devtools
+              method: conda
+              os: unix
+              host: True
         - method: apt
-          add: [r-base-dev, libtirpc-dev]
+          add:
+            - r-base-dev
+            - libtirpc-dev
+            - r-cran-devtools
         - name: r
           method: brew
-    - r-devtools:
-        options:
-        - method: conda
-          host: True
-          os: unix
-        - method: cran
-        - method: skip
-          os: win
+    # - r-devtools:
+    #     options:
+    #     - method: conda
+    #       host: True
+    #       os: unix
+    #     - method: cran
+    #     - method: skip
+    #       os: win
     - harfbuzz:
         options:
         - name: libharfbuzz-dev
           method: apt
-          add: [libfribidi-dev, r-cran-devtools]
+          add: libfribidi-dev
         - name: harfbuzz
           add: [fribidi, libgit2]
           method: brew
@@ -224,22 +271,27 @@ extras:
         - method: conda
           host: True
         - method: cran
+          name: bit64
     - r-r6:
         - method: conda
           host: True
         - method: cran
+          name: R6
     - r-reticulate:
         - method: conda
           host: True
         - method: cran
+          name: reticulate
     - r-zeallot:
         - method: conda
           host: True
         - method: cran
+          name: zeallot
     - r-units:
         - method: conda
           host: True
         - method: cran
+          name: units
     - udunits:
         - name: libudunits2-dev
           method: apt
@@ -275,8 +327,6 @@ extras:
           method: apt
         - name: zmq
           method: brew
-          flags:
-            from_src_on_travis: true
         - method: vcpkg
   julia:
     description: Dependencies required to run models written in R as part of yggdrasil integrations
@@ -309,10 +359,13 @@ extras:
         - name: msmpi
           os: win
           method: conda
-        - name: openmpi-bin
+        - name: msmpi
+          os: win
+          method: vcpkg
+        - name: openmpi-bin  # mpich
           method: apt
           add: [libopenmpi-dev]
-        - name: openmpi
+        - name: openmpi  # open-mpi
           method: brew
           flags:
             method_validate: conda_supp
@@ -332,6 +385,12 @@ extras:
     description: Dependencies required to run integrations with RabbitMQ communication
     requirements:
     - pika>=1.0.0
+    # - name: rabbitmq-c
+    #   method: brew
+    #   os: osx
+    # - name: librabbitmq-dev
+    #   method: apt
+    #   os: linux
   sbml:
     description: Dependencies required to run SBML models as part of yggdrasil integrations
     requirements:
@@ -456,6 +515,7 @@ extras:
     - breathe
     - doxygen:
         - method: conda
+          add: [graphviz]
         - method: apt
         - method: brew
         - method: choco

@@ -1,0 +1,86 @@
+name: Test of conda recipe build
+'on':
+  push:
+    branches-ignore:
+     - gh-pages
+    tags:
+     - '*'
+  schedule:
+  - cron: 0 10 * * 1
+jobs:
+  build_conda_recipe:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.11"]
+        builder: [conda, rattler]
+      fail-fast: false
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      ###################################
+      # CONDA SETUP
+      ###################################
+      - name: Set up MSVC Compiler on windows
+        uses: ilammy/msvc-dev-cmd@v1
+        if: matrix.os == 'windows-latest'
+      - name: Set up miniconda test environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ""
+          auto-activate-base: true
+          auto-update-conda: true
+          channels: conda-forge
+          channel-priority: strict
+          miniforge-version: latest
+      - name: Install conda-build
+        if: matrix.builder == 'conda'
+        run: |
+          conda info
+          conda list
+          conda install conda-build cmake numpy -y
+      - name: Install rattler-build
+        if: matrix.builder == 'rattler'
+        run: |
+          conda info
+          conda list
+          conda install "rattler-build<=0.48.0" -y
+      - name: Check conda installation
+        run: |
+          conda info
+          conda list
+      - name: Build conda recipe (using conda-build)
+        if: matrix.builder == 'conda'
+        run: |
+          conda-build --no-anaconda-upload --output-folder $HOME/local_channel/ --python ${{ matrix.python-version }} recipe/
+      - name: Build conda recipe (using rattler-build)
+        if: matrix.builder == 'rattler'
+        run: |
+          rattler-build build --recipe "conda.recipe/recipe.yaml" --output-dir $HOME/local_channel/ --variant python=${{ matrix.python-version }}
+      # - name: Build conda recipe (using rattler-build action)
+      #   uses: prefix-dev/rattler-build-action@v0.2.34
+      #   if: matrix.builder == 'rattler'
+      #   with:
+      #     upload-artifact: false
+      #     build-args: --output-dir $HOME/local_channel/ --variant python=${{ matrix.python-version }}
+
+
+  all_recipes_built:
+    runs-on: ubuntu-latest
+    name: All recipes were successfully built
+    needs: [build_conda_recipe]
+    if: always()
+    steps:
+      - name: All tests ok
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Some tests failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

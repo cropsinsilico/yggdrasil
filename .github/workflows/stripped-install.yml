@@ -1,0 +1,210 @@
+name: Test of package installation & execution
+'on':
+  push:
+    branches-ignore:
+     - gh-pages
+    tags:
+     - '*'
+  schedule:
+    - cron: 0 10 * * 1  # 3AM PST
+    - cron: "0 10 1 * *"  # 3AM PST once a month
+jobs:
+  params:
+    name: Prepare test parameters
+    runs-on: ubuntu-latest
+    outputs:
+      os-versions: ${{ steps.set-os-versions.outputs.versions }}
+    steps:
+      - id: set-os-versions
+        run: echo "versions={\"ubuntu\":\"latest\", \"macos\":\"latest\", \"windows\":\"latest\"}" >> $GITHUB_OUTPUT
+  run_tests:
+    needs: params
+    runs-on: ${{ matrix.os-base }}-${{ fromJSON(needs.params.outputs.os-versions)[matrix.os-base] }}
+    # services:
+    #   rabbitmq:
+    #     image: rabbitmq:latest
+    #     ports:
+    #       - 5672:5672
+    #     options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+    strategy:
+      matrix:
+        os-base: [ubuntu, macos, windows]
+        python-install: [pip, conda]
+        python-version: ["3.11"]
+        install-c: [true]
+        install-fortran: [false]
+        install-r: [false]
+        install-julia: [false]
+        install-matlab: [false]
+        install-lpy: [false]
+        install-sbml: [false]
+        install-pytorch: [false]
+        install-zmq: [true]
+        install-mpi: [false]
+        install-rmq: [false]
+        install-omp: [false]
+        # astropy, trimesh, pygments, images, seq, excel, docs, dev
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
+        timeout-minutes: 30
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Get tags required by setuptools_scm to generate version
+        run: |
+          git fetch --prune --unshallow
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Set up compiler (Windows)
+        uses: ilammy/msvc-dev-cmd@v1
+        if: matrix.os-base == 'windows'
+      - name: Setup package manager (Windows)
+        if: matrix.os-base == 'windows'
+        run: |
+          echo "VCPKG_TRIPLET=x64-windows" >> "$GITHUB_ENV"
+      - name: Setup package manager (Ubuntu)
+        if: matrix.os-base == 'ubuntu'
+        run: |
+          sudo apt-get update
+          sudo apt upgrade --fix-missing
+
+      - name: Create files containing lists of dependencies
+        run: |
+          python -m pip install pyyaml
+          python utils/manage_requirements.py select --output-per-method --output-file=ci_requirements.txt --install-c=${{ matrix.install-c }} --install-fortran=${{ matrix.install.fortran }} --install-r=${{ matrix.install-r }} --install-julia=${{ matrix.install-julia }} --install-matlab=${{ matrix.install-matlab }} --install-lpy=${{ matrix.install-lpy }} --install-sbml=${{ matrix.install-sbml }} --install-pytorch=${{ matrix.install-pytorch }} --install-zmq=${{ matrix.install-zmq }} --install-mpi=${{ matrix.install-mpi }} --install-rmq=${{ matrix.install-rmq }} --install-omp=${{ matrix.install-omp }} --install-testing=true --exclude-dep=r-base ${{ matrix.python-install }}
+
+      ###################################
+      # PIP SETUP
+      ###################################
+      - name: Install dependencies using apt-get (Ubuntu)
+        if: matrix.os-base == 'ubuntu' && matrix.python-install == 'pip'
+        run: |
+          sudo apt-get install -y $(cat ci_requirements_apt.txt)
+      - name: Install dependencies using brew (Mac)
+        if: matrix.os-base == 'macos' && matrix.python-install == 'pip'
+        run: |
+          brew install $(cat ci_requirements_brew.txt)
+          # Required for compiling with clang & gfortran
+          echo "FC=$(which gfortran-12)" >> "$GITHUB_ENV"
+      - name: Install dependencies using vcpkg (Windows)
+        if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
+        run: |
+          vcpkg.exe install $(cat ci_requirements_vcpkg.txt) --triplet $env:VCPKG_TRIPLET
+      - name: Install dependencies using choco (Windows)
+        if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
+        run: |
+          choco install $(cat ci_requirements_choco.txt)
+
+      # RabbitMQ server
+      - name: Install & start RabbitMQ server (Ubuntu)
+        if: matrix.os-base == 'ubuntu' && matrix.install-rmq
+        run: |
+          sudo apt-get install -y rabbitmq-server
+          sudo systemctl start rabbitmq-server
+      - name: Install & start RabbitMQ server (Mac)
+        if: matrix.os-base == 'macos' && matrix.install-rmq
+        run: |
+          brew install rabbitmq
+          brew services start rabbitmq
+      # - name: Install & start RabbitMQ server (Windows)
+      #   if: matrix.os-base == 'windows' && matrix.install-rmq
+      #   run: |
+      #     choco install rabbitmq
+      #     vcpkg.exe install librabbitmq --triplet $env:VCPKG_TRIPLET
+
+      - name: Setup Python
+        if: matrix.python-install == 'pip'
+        id: pysetup
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Fix Python path on mac
+        if: matrix.os-base == 'macos' && matrix.python-install == 'pip'
+        run: |
+          tee -a ~/.profile <<<'export PATH="${pythonLocation}/bin:${PATH}"'
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        if: matrix.python-method == 'pip' && matrix.install-r
+      - name: Install R dependencies via CRAN
+        if: matrix.python-method == 'pip' && matrix.install-r
+        run: |
+          Rscript -e "install.packages(readLines(\"ci_requirements_cran.txt\"))"
+
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
+        if: matrix.install-method == 'pip' && matrix.install-julia
+
+      ###################################
+      # CONDA SETUP
+      ###################################
+      - name: Set up miniconda test environment
+        if: matrix.python-install == 'conda'
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: yggdrasil
+          environment-file: ci_requirements_conda.yml
+          auto-update-conda: true
+          python-version: ${{ env.PYTHONVERSION }}
+          channels: conda-forge
+          channel-priority: strict
+          miniforge-version: latest
+
+
+      ###################################
+      # SETUP FOR BOTH PIP & CONDA
+      ###################################
+      
+      - name: Install Python dependencies via pip
+        run: |
+          python -m pip install -r ci_requirements_pip.txt
+      - name: Set up Matlab
+        uses: matlab-actions/setup-matlab@v1
+        if: matrix.install-matlab
+      
+      ###################################
+      # Install
+      ###################################
+      - name: Install the package via pip
+        run: |
+          python -m pip install . -v --no-deps --no-build-isolation
+      - name: Configure yggdrasil
+        run: |
+          yggconfig
+          ygginfo
+      - name: (WINDOWS,PIP) Set the vcpkg root config value
+        if: matrix.os-base == 'windows' && matrix.install-method == 'pip' && matrix.install-c
+        run: |
+          yggconfig --vcpkg-dir=C:\\vcpkg
+      - name: (WINDOWS,PIP) Update R requirements
+        if: matrix.os-base == 'windows' && matrix.install-method == 'pip' && matrix.install-r
+        run: |
+          ygginstall R --update-r-requirements
+      - name: Verify installation
+        run: |
+          ygginfo
+      - name: Compile libraries
+        run: yggcompile
+
+      ###################################
+      # TEST
+      ###################################
+
+      - name: Basic communication tests
+        run: |
+          pytest --ci --cov-append --suites communication
+
+  all_tests_passed:
+    runs-on: ubuntu-latest
+    name: All tests passed
+    needs: [run_tests]
+    if: always()
+    steps:
+      - name: All tests ok
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Some tests failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

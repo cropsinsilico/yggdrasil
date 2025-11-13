@@ -30,10 +30,17 @@
       }
     },
     {
+      "{{ stdlib('c') }}": {
+        "method": "conda_recipe",
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
+      }
+    },
+    {
       "{{ compiler('c') }}": {
         "method": "conda_recipe",
-        "host": true,
-        "os": "unix",
         "flags": {
           "build": true,
           "build_only": true
@@ -43,8 +50,6 @@
     {
       "{{ compiler('cxx') }}": {
         "method": "conda_recipe",
-        "host": true,
-        "os": "unix",
         "flags": {
           "build": true,
           "build_only": true
@@ -78,10 +83,7 @@
     {
       "hatch-fancy-pypi-readme": {
         "host": true,
-        "flags": {
-          "build": true,
-          "build_only": true
-        }
+        "host_only": true
       }
     },
     {
@@ -99,6 +101,16 @@
             "method": "pip"
           }
         ]
+      }
+    },
+    {
+      "ninja": {
+        "method": "conda_recipe",
+        "host": true,
+        "flags": {
+          "build": true,
+          "build_only": true
+        }
       }
     },
     {
@@ -137,10 +149,7 @@
     {
       "scikit-build-core<0.11.2": {
         "host": true,
-        "flags": {
-          "build": true,
-          "build_only": true
-        }
+        "host_only": true
       }
     },
     {
@@ -154,32 +163,7 @@
       "setuptools_scm": {
         "method": "conda_recipe",
         "host": true,
-        "flags": {
-          "build": true,
-          "build_only": true
-        }
-      }
-    },
-    {
-      "libxcrypt": {
-        "method": "conda_recipe",
-        "host": true,
-        "host_only": true,
-        "flags": {
-          "conda_selectors": [
-            "py<38"
-          ]
-        }
-      }
-    },
-    {
-      "urllib3<2.2.2": {
-        "method": "conda_recipe",
-        "flags": {
-          "conda_selectors": [
-            "py<38"
-          ]
-        }
+        "host_only": true
       }
     },
     "six",
@@ -204,39 +188,59 @@
       ],
       "requirements": [
         {
-          "cmake": {
-            "method": "conda",
-            "os": "unix"
+          "cmake>=3.16": {
+            "method": "conda"
           }
         },
         {
-          "make": [
+          "binutils": {
+            "method": "conda"
+          }
+        },
+        {
+          "make": {
+            "method": "conda"
+          }
+        },
+        {
+          "ninja": {
+            "method": "conda"
+          }
+        },
+        {
+          "pkgconfig": {
+            "method": "conda"
+          }
+        },
+        {
+          "c-stdlib": [
             {
-              "method": "conda",
-              "os": "unix"
-            },
-            {
-              "name": "m2w64-make",
-              "method": "conda",
-              "os": "win"
+              "name": "{{ stdlib('c') }}",
+              "method": "conda_recipe"
             }
           ]
         },
         {
-          "{{ compiler('c') }}": {
-            "method": "conda_recipe"
-          }
+          "c-compiler": [
+            {
+              "name": "{{ compiler('c') }}",
+              "method": "conda_recipe"
+            },
+            {
+              "method": "conda"
+            }
+          ]
         },
         {
-          "{{ compiler('cxx') }}": {
-            "method": "conda_recipe"
-          }
-        },
-        {
-          "compiler-rt": {
-            "method": "conda",
-            "os": "osx"
-          }
+          "cxx-compiler": [
+            {
+              "name": "{{ compiler('cxx') }}",
+              "method": "conda_recipe"
+            },
+            {
+              "method": "conda"
+            }
+          ]
         }
       ]
     },
@@ -247,24 +251,13 @@
       ],
       "requirements": [
         {
-          "gfortran": [
+          "fortran-compiler": [
             {
               "name": "{{ compiler('fortran') }}",
-              "method": "conda_recipe",
-              "os": "unix"
+              "method": "conda_recipe"
             },
             {
-              "name": "fortran-compiler",
-              "os": "unix",
               "method": "conda"
-            },
-            {
-              "name": "m2w64-gcc-fortran",
-              "os": "win",
-              "method": "conda",
-              "add": [
-                "m2w64-toolchain_win-64"
-              ]
             },
             {
               "name": "gfortran",
@@ -300,13 +293,22 @@
               {
                 "name": "r-base>3.5",
                 "method": "conda",
-                "host": true
+                "host": true,
+                "add": [
+                  {
+                    "name": "r-devtools",
+                    "method": "conda",
+                    "os": "unix",
+                    "host": true
+                  }
+                ]
               },
               {
                 "method": "apt",
                 "add": [
                   "r-base-dev",
-                  "libtirpc-dev"
+                  "libtirpc-dev",
+                  "r-cran-devtools"
                 ]
               },
               {
@@ -317,33 +319,12 @@
           }
         },
         {
-          "r-devtools": {
-            "options": [
-              {
-                "method": "conda",
-                "host": true,
-                "os": "unix"
-              },
-              {
-                "method": "cran"
-              },
-              {
-                "method": "skip",
-                "os": "win"
-              }
-            ]
-          }
-        },
-        {
           "harfbuzz": {
             "options": [
               {
                 "name": "libharfbuzz-dev",
                 "method": "apt",
-                "add": [
-                  "libfribidi-dev",
-                  "r-cran-devtools"
-                ]
+                "add": "libfribidi-dev"
               },
               {
                 "name": "harfbuzz",
@@ -370,7 +351,8 @@
               "host": true
             },
             {
-              "method": "cran"
+              "method": "cran",
+              "name": "bit64"
             }
           ]
         },
@@ -381,7 +363,8 @@
               "host": true
             },
             {
-              "method": "cran"
+              "method": "cran",
+              "name": "R6"
             }
           ]
         },
@@ -392,7 +375,8 @@
               "host": true
             },
             {
-              "method": "cran"
+              "method": "cran",
+              "name": "reticulate"
             }
           ]
         },
@@ -403,7 +387,8 @@
               "host": true
             },
             {
-              "method": "cran"
+              "method": "cran",
+              "name": "zeallot"
             }
           ]
         },
@@ -414,7 +399,8 @@
               "host": true
             },
             {
-              "method": "cran"
+              "method": "cran",
+              "name": "units"
             }
           ]
         },
@@ -489,10 +475,7 @@
             },
             {
               "name": "zmq",
-              "method": "brew",
-              "flags": {
-                "from_src_on_travis": true
-              }
+              "method": "brew"
             },
             {
               "method": "vcpkg"
@@ -544,6 +527,11 @@
               "name": "msmpi",
               "os": "win",
               "method": "conda"
+            },
+            {
+              "name": "msmpi",
+              "os": "win",
+              "method": "vcpkg"
             },
             {
               "name": "openmpi-bin",
@@ -754,7 +742,10 @@
         {
           "doxygen": [
             {
-              "method": "conda"
+              "method": "conda",
+              "add": [
+                "graphviz"
+              ]
             },
             {
               "method": "apt"

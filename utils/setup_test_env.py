@@ -78,6 +78,18 @@ else:
 PYTHON_CMD = sys.executable
 
 
+def boolean_str(x):
+    if isinstance(x, bool):
+        return x
+    if not isinstance(x, str):
+        raise TypeError(type(x))
+    if x.lower() in ['true', 'on']:
+        return True
+    elif x.lower() in ['false', 'off']:
+        return False
+    raise ValueError(f'Error parsing string as boolean: \"{x}\"')
+
+
 class SetupParam(object):
     r"""Storage for setup parameters.
 
@@ -155,8 +167,8 @@ class SetupParam(object):
             'help': "Don't actually run any commands"}),
         ('--deps-method', ['install'], {
             'type': str,
-            'choices': ["all", "env", "unique", "supplemental",
-                        "conda_recipe"],
+            # 'choices': ["all", "env", "unique", "supplemental",
+            #             "conda_recipe"],
             'default': 'env',
             'help': (
                 "How the method should be used to select"
@@ -295,9 +307,11 @@ class SetupParam(object):
         # Methods that can be used to install deps
         self.valid_methods = ['skip']
         if self.deps_method == 'all':
-            self.valid_methods += ['python', 'pip', 'pip_skip',
-                                   'conda', 'conda_skip', 'cran',
-                                   'brew', 'apt', 'choco', 'vcpkg']
+            self.valid_methods += [
+                'python', 'pip', 'pip_skip',
+                'conda', 'conda_skip',
+                'cran', 'brew', 'apt', 'choco', 'vcpkg',
+            ]
         elif self.deps_method in ['env', 'supplemental']:
             self.valid_methods += ['python', 'pip', 'pip_skip']
             if self.fallback_to_conda:
@@ -325,9 +339,15 @@ class SetupParam(object):
         elif self.deps_method == 'unique':
             self.valid_methods += [f'{self.method_base}_skip',
                                    self.method_base]
-        elif self.deps_method == 'conda_recipe':
-            self.valid_methods += ['conda', 'conda_skip',
-                                   'conda_recipe', 'python']
+        elif self.deps_method in ['conda_recipe', 'conda_env',
+                                  'rattler_recipe']:
+            self.valid_methods += ['conda', 'conda_skip', 'python']
+            if self.deps_method in ['conda_recipe', 'rattler_recipe']:
+                self.valid_methods.append(self.deps_method)
+            if self.deps_method == 'rattler_recipe':
+                self.valid_methods.append('conda_recipe')
+        elif isinstance(self.deps_method, str):
+            self.valid_methods += [self.deps_method]
         if self.only_python:
             for k in ['cran', 'apt', 'brew', 'choco', 'vcpkg']:
                 if k in self.valid_methods:
@@ -384,6 +404,15 @@ class SetupParam(object):
             args.env_name = method + args.python.replace('.', '')
         if getattr(args, 'for_development', None):
             install_opts['dev'] = True
+        if getattr(args, 'target_os', None) == 'current':
+            if _is_win:
+                args.target_os = 'win'
+            elif _is_osx:
+                args.target_os = 'osx'
+            elif _is_linux:
+                args.target_os = 'linux'
+            else:
+                raise ValueError('Could not determine current OS')
         cls.extract_install_opts_from_args(args, install_opts)
         for k in cls.args_to_copy():
             if hasattr(args, k):
@@ -397,6 +426,8 @@ class SetupParam(object):
         for k, v in install_opts.items():
             if k == 'no_sudo':
                 new_opts[k] = bool(getattr(args, k, False))
+            elif args.install_all:
+                new_opts[k] = True
             elif v and getattr(args, f'dont_install_{k}', False):
                 new_opts[k] = False
             elif (not v) and getattr(args, f'install_{k}', False):
@@ -504,21 +535,27 @@ class SetupParam(object):
         if not isinstance(install_opts, dict):
             install_opts = get_install_opts(
                 empty=(install_opts == 'empty'))
+        parser.add_argument(
+            '--install-all', action='store_true',
+            help='Set all install options to true')
         for k, v in install_opts.items():
             if k in ['os'] or args_match((f'--dont-install-{k}', ), skip):
                 continue
             elif k == 'no_sudo':
                 parser.add_argument(
-                    '--no-sudo', action='store_true',
+                    '--no-sudo', default=None,
+                    type=boolean_str, nargs='?', const=True,
                     help="Don't use sudo during installation.")
                 continue
             if v:
                 parser.add_argument(
-                    '--dont-install-%s' % k, action='store_true',
+                    '--dont-install-%s' % k, default=None,
+                    type=boolean_str, nargs='?', const=True,
                     help=("Don't install %s" % k))
             else:
                 parser.add_argument(
-                    '--install-%s' % k, action='store_true',
+                    '--install-%s' % k, default=None,
+                    type=boolean_str, nargs='?', const=True,
                     help=("Install %s" % k))
 
 
@@ -864,6 +901,8 @@ def get_install_opts(old=None, empty=False):
             'lpy': False,
             'r': False,
             'fortran': False,
+            'julia': False,
+            'matlab': False,
             'zmq': False,
             'sbml': False,
             'astropy': False,
@@ -889,6 +928,7 @@ def get_install_opts(old=None, empty=False):
             'r': (os.environ.get('INSTALLR', '0') == '1'),
             'fortran': (os.environ.get('INSTALLFORTRAN', '0') == '1'),
             'julia': (os.environ.get('INSTALLJULIA', '0') == '1'),
+            'matlab': (os.environ.get('INSTALLMATLAB', '0') == '1'),
             'zmq': (os.environ.get('INSTALLZMQ', '0') == '1'),
             'sbml': (os.environ.get('INSTALLSBML', '0') == '1'),
             'astropy': (os.environ.get('INSTALLAPY', '0') == '1'),
@@ -915,6 +955,7 @@ def get_install_opts(old=None, empty=False):
             'r': True,
             'fortran': True,
             'julia': True,
+            'matlab': True,
             'zmq': True,
             'sbml': False,
             'astropy': False,

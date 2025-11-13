@@ -7,7 +7,8 @@ import shutil
 import uuid
 import json
 import copy
-from collections import UserList, UserDict, OrderedDict
+import collections
+from collections import UserList, UserDict
 from setup_test_env import (
     SetupParam, get_install_opts, _on_travis, call_script,
     get_summary_commands)
@@ -20,6 +21,11 @@ _pip_os_map = {'osx': 'Darwin',
                'linux': 'Linux'}
 _rev_pip_os_map = {v.lower(): k for k, v in _pip_os_map.items()}
 _req_dir = os.path.join(os.path.dirname(__file__), 'requirements')
+_pkg_dir = os.path.dirname(os.path.dirname(__file__))
+_file_types = [
+    'pip', 'conda_recipe', 'rattler_recipe', 'conda_env',
+    'extras_require', 'json',
+]
 
 
 class NoValidRequirementOptions(Exception):
@@ -30,6 +36,123 @@ class NoValidRequirementOptions(Exception):
 class DependencyNotFound(BaseException):
     r"""Exception raised when a dependency cannot be located."""
     pass
+
+
+class OrderedDict(collections.OrderedDict):
+
+    @classmethod
+    def _representer(cls, dumper, data):
+        return dumper.represent_mapping(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            data.items())
+
+    @classmethod
+    def _constructor(cls, loader, node):
+        return OrderedDict(loader.construct_pairs(node))
+
+
+class OrderedDumper(yaml.SafeDumper):
+
+    def increase_indent(self, flow=False, indentless=False):
+        return super(OrderedDumper, self).increase_indent(
+            flow, False)
+
+    def choose_scalar_style(self, *args, **kwargs):
+        out = super(OrderedDumper, self).choose_scalar_style(
+            *args, **kwargs)
+        if out in ["\"", "\'"] and self.event.style is not None:
+            return self.event.style
+        return out
+
+
+class OrderedLoader(yaml.SafeLoader):
+    pass
+
+
+class NoQuoteString:
+
+    style = ''
+    tag = '__NO_QUOTE_STRING__'
+
+    def __init__(self, x):
+        self.value = x
+
+    def __repr__(self):
+        return self.value
+
+    def __str__(self):
+        return self.value
+
+    def __lt__(self, solf):
+        return self.value < solf.value
+
+    @classmethod
+    def _representer(cls, dumper, data):
+        return dumper.represent_scalar(
+            yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG,
+            data.value, style=cls.style)
+
+
+class DoubleQuoteString(NoQuoteString):
+
+    style = '"'
+    tag = '__DOUBLE_QUOTE_STRING__'
+
+
+class SingleQuoteString(NoQuoteString):
+
+    style = '\''
+    tag = '__SINGLE_QUOTE_STRING__'
+
+
+class LiteralString(NoQuoteString):
+
+    style = '|'
+    tag = '__LITERAL_QUOTE_STRING__'
+
+
+class CondaRecipeDumper(OrderedDumper):
+
+    _standard = 'conda_recipe'
+    _padding = 0
+    _for_build = False
+
+
+class CondaRecipeLoader(OrderedLoader):
+    pass
+
+
+class RattlerRecipeDumper(CondaRecipeDumper):
+    
+    _standard = 'rattler_recipe'
+
+
+class RattlerRecipeLoader(CondaRecipeLoader):
+    pass
+
+
+for x in [OrderedDict]:
+    for loader in [OrderedLoader, CondaRecipeLoader, RattlerRecipeLoader]:
+        loader.add_constructor(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            x._constructor)
+for x in [NoQuoteString, DoubleQuoteString, SingleQuoteString,
+          LiteralString, OrderedDict]:
+    for dumper in [OrderedDumper, CondaRecipeDumper, RattlerRecipeDumper]:
+        dumper.add_representer(x, x._representer)
+
+
+def load_entry_points():
+    r"""Load all of the entry points from console_scripts.txt.
+
+    Returns:
+       list: Set of entry points for the packages.
+
+    """
+    fname_entry_points = os.path.join(_pkg_dir, 'console_scripts.txt')
+    entry_points = open(fname_entry_points, 'r').read()
+    entry_points = entry_points.replace('=', ' = ').splitlines()
+    return entry_points
 
 
 def isolate_package_name(entry):
@@ -172,31 +295,67 @@ class YggRequirements(UserDict):
             YggRequirementsList: Extra requirements.
 
         """
-        if extra is None or extra == 'general':
+        if isinstance(extra, list):
+            out = YggRequirementsList()
+            for k in extra:
+                out += self.select_extra(k)
+            return out
+        elif extra == 'all':
+            return self.select_extra(
+                ['general'] + list(self.data['extras'].keys()))
+        elif extra is None or extra == 'general':
             return self.data['general']
         return self.data['extras'][extra]
 
-    def select(self, param, **kwargs):
+    def create_param(self, extra=None, **kwargs):
+        r"""Create a parameter set defininig an installation.
+
+        Args:
+            extra (str, list, optional): Extra(s) to select. If not
+                provided, the extras selected by param will be used.
+ 
+        """
+        install_opts = get_install_opts(empty=True)
+        if extra is not None:
+            if isinstance(extra, str):
+                if extra == 'all':
+                    extra = list(self.data['extras'].keys())
+                else:
+                    extra = [extra]
+            for k in extra:
+                if k == 'general':
+                    continue
+                for x in self.data['extras'][k].extras:
+                    install_opts[x['name']] = True
+        if ((isinstance(kwargs.get('deps_method', None), str)
+             and kwargs['deps_method'].startswith(('conda', 'rattler')))):
+            kwargs.setdefault('method', 'conda')
+        return SetupParam(install_opts=install_opts, **kwargs)
+
+    def select(self, param, extra=None, **kwargs):
         r"""Select requirements that are valid for the provided
         installation options.
 
         Args:
             param (SetupParam): Setup parameters instance.
+            extra (str, list, optional): Extra(s) to select. If not
+                provided, the extras selected by param will be used.
             **kwargs: Additional keyword arguments are passed to
                 select methods for YggRequirementList members.
 
         """
+        if extra is not None:
+            return self.select_extra(extra).select(param, **kwargs)
         out = YggRequirementsList()
         if param.for_development:
-            out += self.data['general'].select(param, **kwargs)
-        for extra in self.data['extras'].keys():
-            if not param.install_opts[extra]:
+            out += self.select_extra('general').select(param, **kwargs)
+        for k in self.data['extras'].keys():
+            if not param.install_opts[k]:
                 continue
-            out += self.data['extras'][extra].select(param, **kwargs)
+            out += self.select_extra(k).select(param, **kwargs)
         return out
 
-    def create_requirements_file_varient(self, varient=None,
-                                         save=False, fname=None,
+    def create_requirements_file_varient(self, varient=None, fname=None,
                                          param=None, format_kws=None):
         r"""Create a requirements file for a varient.
 
@@ -204,11 +363,9 @@ class YggRequirements(UserDict):
             varient (str, optional): Build varient that requirements
                 should be taken from. Defaults to None and the general
                 requirements will be used.
-            save (bool, optional): If True and fname is not provided,
-                the requirements will be saved to a file with a name
-                based on the varient. Defaults to False.
-            fname (str, optional): File where requirements should be
-                saved. Defaults to None and is ignored.
+            fname (str, bool, optional): File where requirements should
+                be saved. If True, a file name will be created. Defaults
+                to None and is ignored.
             param (SetupParam, optional): Parameters that should be
                 used to select requirements. Defaults to all Python
                 requirements by default.
@@ -218,86 +375,66 @@ class YggRequirements(UserDict):
         """
         if format_kws is None:
             format_kws = {}
+        format_kws.setdefault('standard', 'pip')
         if param is None:
-            install_opts = get_install_opts(empty=True)
-            kwargs = {}
-            if varient is not None:
-                for x in self.data['extras'][varient].extras:
-                    install_opts[x['name']] = True
-            elif 'conda' not in format_kws.get('included_methods', []):
-                kwargs['fallback_to_conda'] = False
-            param = SetupParam(install_opts=install_opts, **kwargs)
-        if save and fname is None:
-            if varient is None:
-                fname = os.path.join(
-                    os.path.dirname(os.path.dirname(__file__)),
-                    'requirements.txt')
+            param_kws = {'extra': varient}
+            if ((varient in [None, 'general', 'all']
+                 and 'conda' not in format_kws.get('included_methods', []))):
+                param_kws['fallback_to_conda'] = False
+            param = self.create_param(**param_kws)
+        if fname is True:
+            if varient in [None, 'general']:
+                fname = os.path.join(_pkg_dir, 'requirements.txt')
             else:
+                assert isinstance(varient, str)
                 fname = os.path.join(
                     _req_dir, f'requirements_{varient}.txt')
-        reqs = self.select_extra(varient).select(
-            param, allow_multiple=True, allow_missing=True,
-            ignore_existing=True,
-            deselect_flags={'not_in_txt': True})
-        lines = reqs.format(standard='pip', fname=fname, **format_kws)
-        if fname is not None:
-            lines_str = '\n\t'.join(lines)
-            print(f"Created '{fname}':\n\t{lines_str}")
-        return lines
+        reqs = self.select(
+            param, extra=varient,
+            ignore_existing=True, allow_multiple=True,
+            allow_missing=True,
+            deselect_flags={'not_in_txt': True},
+        )
+        return reqs.format(fname=fname, **format_kws)
 
     def create_requirements_files(self):
         r"""Create requirements files for all available varients."""
-        self.create_requirements_file_varient(save=True,
-                                              format_kws={'excluded_methods': ['conda']})
+        self.create_requirements_file_varient(
+            varient='general', fname=True,
+            format_kws={'excluded_methods': ['conda']},
+        )
         extras_sep = ['dev', 'testing', 'docs']
-        format_kws = {'included_methods': ['conda']}
+        format_kws = {'included_methods': ['conda', 'python', 'pip']}
         for k in extras_sep:
             self.create_requirements_file_varient(
-                k, save=True, format_kws=format_kws)
+                k, fname=True, format_kws=format_kws,
+            )
         # Optional requirements
+        extras_join = [k for k in self.extras() if k not in extras_sep]
         format_kws = {'include_extra': True,
                       'excluded_methods': ['conda', 'pip']}
-        lines = []
-        for k in self.extras():
-            if k in extras_sep:
-                continue
-            lines += self.create_requirements_file_varient(
-                k, format_kws=format_kws)
-        lines = sorted(lines)
-        fname_opt = os.path.join(
-            _req_dir, 'requirements_optional.txt')
-        with open(fname_opt, 'w') as fd:
-            fd.write('\n'.join(lines) + '\n')
-        lines_str = '\n\t'.join(lines)
-        print(f"Created '{fname_opt}':\n\t{lines_str}")
+        self.create_requirements_file_varient(
+            extras_join, format_kws=format_kws,
+            fname=os.path.join(_req_dir, 'requirements_optional.txt'),
+        )
         # Piponly/condaonly
         for method in ['pip', 'conda']:
+            extras_only = extras_join
             if method == 'pip':
                 excluded = 'conda'
             else:
                 excluded = 'pip'
+                extras_only = ['general'] + extras_only
             format_kws = {'include_extra': True,
                           'included_methods': [method],
                           'excluded_methods': [excluded, 'python']}
-            fname = os.path.join(
-                _req_dir,
-                f'requirements_{method}only.txt')
-            lines = []
-            if method == 'conda':
-                lines += self.create_requirements_file_varient(
-                    format_kws=format_kws)
-            for k in self.extras():
-                if k in extras_sep:
-                    continue
-                lines += self.create_requirements_file_varient(
-                    k, format_kws=format_kws)
-            lines = sorted(lines)
-            with open(fname, 'w') as fd:
-                fd.write('\n'.join(lines) + '\n')
-            lines_str = '\n\t'.join(lines)
-            print(f"Created '{fname}':\n\t{lines_str}")
+            self.create_requirements_file_varient(
+                extras_only, format_kws=format_kws,
+                fname=os.path.join(
+                    _req_dir, f'requirements_{method}only.txt'),
+            )
 
-    def create_conda_recipe_varient(self, varient=None,
+    def create_conda_recipe_varient(self, varient=None, fname=None,
                                     param=None, format_kws=None):
         r"""Create a conda entry for a varient.
 
@@ -305,6 +442,9 @@ class YggRequirements(UserDict):
             varient (str, optional): Build varient that requirements
                 should be taken from. Defaults to None and the general
                 requirements will be used.
+            fname (str, bool, optional): File where requirements should
+                be saved. If True, a file name will be created. Defaults
+                to None and is ignored.
             param (SetupParam, optional): Parameters that should be
                 used to select requirements. Defaults to all Python
                 requirements by default.
@@ -315,29 +455,81 @@ class YggRequirements(UserDict):
             dict: Entry for the varient.
 
         """
-        if param is None:
-            install_opts = get_install_opts(empty=True)
-            if varient is not None:
-                for x in self.data['extras'][varient].extras:
-                    install_opts[x['name']] = True
-            param = SetupParam('conda', install_opts=install_opts,
-                               deps_method='conda_recipe')
         if format_kws is None:
             format_kws = {}
-        format_kws.setdefault('included_methods', ['conda_recipe'])
-        reqs = self.select_extra(varient).select(
-            param, ignore_existing=True, allow_multiple=True,
-            deselect_flags={'not_in_recipe': True})
+        format_kws.setdefault('standard', 'conda_recipe')
+        if param is None:
+            param = self.create_param(
+                method='conda', deps_method=format_kws['standard'],
+                extra=varient,
+            )
+        if fname is True:
+            assert isinstance(varient, str) or varient is None
+            base = format_kws['standard']
+            suffix = (
+                '' if varient in [None, 'general'] else f'_{varient}'
+            )
+            fname = os.path.join(_req_dir, f'{base}{suffix}.yaml')
+        reqs = self.select(
+            param, extra=varient,
+            ignore_existing=True, allow_multiple=True,
+            deselect_flags={'not_in_recipe': True},
+        )
         if not reqs:
             return {}
-        deps = reqs.format(standard='conda', **format_kws)
-        return deps
+        return reqs.format(fname=fname, **format_kws)
 
-    def create_conda_recipe(self):
-        r"""Create a conda recipe file."""
-        fname = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'recipe', 'meta.yaml')
+    def create_rattler_recipe(self, fname=None):
+        r"""Create a conda recipe file for rattler build.
+
+        Args:
+            fname (str, optional): Path where the generated file should be
+                saved.
+
+        """
+        if fname is None:
+            fname = os.path.join(_pkg_dir, 'conda.recipe', 'recipe.yaml')
+        with open(fname, 'r') as fd:
+            orig = yaml.load(fd, Loader=RattlerRecipeLoader)
+        out = copy.deepcopy(orig)
+        # TODO: Update version & version_major
+        # out['context']['version'] = version_str
+        # out['context']['version_major'] = version_str.split('.')[0]
+        for k in ['name', 'python_name', 'version', 'version_major']:
+            out['context'][k] = DoubleQuoteString(out['context'][k])
+        for k in ['description']:
+            out['about'][k] = LiteralString(out['about'][k])
+        format_kws = {'standard': 'rattler_recipe'}
+        out['build']['entry_points'] = load_entry_points()
+        out.update(**self.create_conda_recipe_varient(
+            'general', format_kws=format_kws))
+        out['outputs'].clear()
+        out['outputs'].append({'name': 'yggdrasil'})
+        for k in self.extras():
+            k_out = self.create_conda_recipe_varient(
+                k, format_kws=format_kws)
+            if k_out:
+                out['outputs'].append(k_out)
+        with open(fname, 'w') as fd:
+            yaml.dump(out, fd, Dumper=RattlerRecipeDumper,
+                      default_flow_style=False,
+                      width=1000)
+        return out
+
+    def create_conda_recipe(self, fname=None, rattler=False):
+        r"""Create a conda recipe file.
+
+        Args:
+            fname (str, optional): Path where the generated file should be
+                saved.
+            rattler (bool, optional): If True, create a conda recipe for
+                rattler-build.
+
+        """
+        if rattler:
+            return self.create_rattler_recipe(fname=fname)
+        if fname is None:
+            fname = os.path.join(_pkg_dir, 'recipe', 'meta.yaml')
         lines = open(fname, 'r').read()
         bound_defs = {
             'version': ('{% set version = "', '"'),
@@ -354,36 +546,12 @@ class YggRequirements(UserDict):
         if any(x[0] == -1 or x[1] == -1 for x in bounds.values()):
             raise ValueError(f"Could not find indices to replace: "
                              f"{bounds}")
-        
-        class OrderedDumper(yaml.SafeDumper):
-
-            def increase_indent(self, flow=False, indentless=False):
-                return super(OrderedDumper, self).increase_indent(
-                    flow, False)
-
-            def choose_scalar_style(self, *args, **kwargs):
-                out = super(OrderedDumper, self).choose_scalar_style(
-                    *args, **kwargs)
-                if out in ["\"", "\'"]:
-                    return None
-                return out
-
-        def _dict_representer(dumper, data):
-            return dumper.represent_mapping(
-                yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-                data.items())
-
-        OrderedDumper.add_representer(OrderedDict, _dict_representer)
-        yaml_kws = {"Dumper": OrderedDumper,
+        yaml_kws = {"Dumper": CondaRecipeDumper,
                     'default_flow_style': False,
                     'width': 1000}
         # Base package
-        fname_entry_points = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'console_scripts.txt')
-        entry_points = open(fname_entry_points, 'r').read()
-        entry_points = entry_points.replace('=', ' = ').splitlines()
-        deps = self.create_conda_recipe_varient()
+        entry_points = load_entry_points()
+        deps = self.create_conda_recipe_varient('general')
         new_lines = lines[:bounds['entry_points'][0]]
         new_lines += '\n    - ' + '\n    - '.join(entry_points) + '\n'
         new_lines += lines[bounds['entry_points'][1]:bounds['requirements'][0]]
@@ -402,6 +570,73 @@ class YggRequirements(UserDict):
             fd.write(new_lines)
         print(f"Created '{fname}':\n{new_lines}")
 
+    def create_conda_env_varient(self, varient=None, fname=None,
+                                 param=None, format_kws=None,
+                                 channels=None, env_name=None):
+        r"""Create a conda environment file for a varient.
+
+        Args:
+            varient (str, optional): Build varient that requirements
+                should be taken from. Defaults to None and the general
+                requirements will be used.
+            fname (str, bool, optional): File where requirements should
+                be saved. If True, a file name will be created. Defaults
+                to None and is ignored.
+            param (SetupParam, optional): Parameters that should be
+                used to select requirements. Defaults to all Python
+                requirements by default.
+            format_kws (dict, optional): Keyword arguments to pass to
+                the format operation for each requirement.
+            channels (list, optional): Set of channels that file should
+                include. Defaults to ['conda_forge'].
+            env_name (str, optional): Name of the environment that the
+                environment file should create.
+
+        Returns:
+            dict: Environment data for the varient.
+
+        """
+        if format_kws is None:
+            format_kws = {}
+        format_kws.setdefault('standard', 'conda_env')
+        if channels is not None:
+            format_kws.setdefault('channels', channels)
+        if env_name is not None:
+            format_kws.setdefault('env_name', env_name)
+        if param is None:
+            param = self.create_param(
+                method='conda', deps_method='conda_env',
+                extra=varient,
+            )
+        if fname is True:
+            if varient in [None, 'general']:
+                fname = os.path.join(_pkg_dir, 'environment.yml')
+            else:
+                assert isinstance(varient, str)
+                fname = os.path.join(
+                    _pkg_dir, f'environment_{varient}.yml')
+        reqs = self.select(
+            param, extra=varient,
+            ignore_existing=True, allow_missing=True,
+            for_setup=True,
+        )
+        if not reqs:
+            return {}
+        return reqs.format(fname=fname, **format_kws)
+
+    def create_conda_env(self, fname=None, **kwargs):
+        r"""Create a conda environment file.
+
+        Args:
+            fname (str, optional): Path where the generated file should be
+                saved.
+
+        """
+        if fname is None:
+            fname = True
+        self.create_conda_env_varient(varient='general', fname=fname,
+                                      **kwargs)
+            
     def create_extras_require(self):
         r"""Create a config file containing extras_require."""
         import configparser
@@ -431,6 +666,45 @@ class YggRequirements(UserDict):
 
 class YggRequirementsList(UserList):
     r"""Set of requirements."""
+
+    @classmethod
+    def _representer(cls, dumper, data):
+        if isinstance(dumper, CondaRecipeDumper):
+            if ((all(x.flags.get('build', False) for x in data.data)
+                 and not all(x.host for x in data.data))):
+                dumper._padding = 39
+                dumper._for_build = True
+        try:
+            if isinstance(dumper, RattlerRecipeDumper):
+                deps = []
+                deps_cond = OrderedDict()
+                for x in data.data:
+                    varients = x.conda_varients(
+                        for_build=dumper._for_build)
+                    if not varients:
+                        deps.append(x)
+                        continue
+                    cond = YggRequirement.format_varients(
+                        varients, as_condition=True)
+                    deps_cond.setdefault(cond, [])
+                    deps_cond[cond].append(x)
+                if deps_cond:
+                    for k, v in deps_cond.items():
+                        deps.append(OrderedDict([
+                            ('if', k),
+                            ('then', v),
+                        ]))
+                    return dumper.represent_sequence(
+                        yaml.resolver.BaseResolver.DEFAULT_SEQUENCE_TAG,
+                        deps
+                    )
+            return dumper.represent_sequence(
+                yaml.resolver.BaseResolver.DEFAULT_SEQUENCE_TAG,
+                data.data)
+        finally:
+            if isinstance(dumper, CondaRecipeDumper):
+                dumper._padding = 0
+                dumper._for_build = False
 
     def __init__(self, *args, **kwargs):
         if len(args) == 1 and isinstance(args[0], dict):
@@ -497,19 +771,78 @@ class YggRequirementsList(UserList):
             packages.append(pkg_name)
         return out
 
-    def flatten(self):
+    def sort_in_place(self):
+        r"""Sort the requirements in place."""
+
+        def sort_key(x):
+            return ((not x.is_pin), x.full_name)
+
+        self.data = sorted(self.data, key=sort_key)
+
+    def flatten(self, sort=False):
         r"""Return a list of requirements that is flattened so that
         members do not have any 'add' members.
 
+        Args:
+            sort (bool, optional): If True, sort the dependencies in
+                the returned YggRequirementsList.
+
         Returns:
-            list: Complete list of requirements covered by this set.
+            YggRequirementsList: Complete list of requirements covered
+                by this set.
 
         """
-        if not any(x.add for x in self.data):
-            return self
         out = YggRequirementsList(extras=self.extras)
         for x in self.data:
             out += x.flatten()
+        if sort:
+            out.sort_in_place()
+        return out
+
+    def select_by_keys(self, makecopy=False, **kwargs):
+        r"""Select a sub set of the requirements based on a set of
+        key/value pairs.
+
+        Args:
+            makecopy (bool, optional): If True, copy elements in returned
+                list.
+            **kwargs: Keyword arguments are intepreted as key/value
+                pairs for selection via the sortkey method.
+
+        Returns:
+            YggRequirementList: Selected requirements.
+
+        """
+        method = tuple(kwargs.keys())
+        value = tuple(kwargs.values())
+        return self.select_by_key(value, method, makecopy=makecopy)
+
+    def select_by_key(self, value, method, makecopy=False):
+        r"""Select a sub set of the requirements based on the provided
+        key value.
+
+        Args:
+            value (object, tuple): One or more key values that the
+                selected subset of requirements should match.
+            method (str, tuple): One or more keys that should be used to
+                select the subset of requirements. If a tuple, value
+                must also be a tuple with one value for each element in
+                the method tuple.
+            makecopy (bool, optional): If True, copy elements in returned
+                list.
+
+        Returns:
+            YggRequirementList: Selected requirements.
+
+        """
+        out = YggRequirementsList(extras=self.extras,
+                                  requires_extras=self.requires_extras)
+        for x in self.data:
+            if x.sortkey(method) == value:
+                if makecopy:
+                    x = copy.deepcopy(x)
+                    assert not isinstance(x, str)
+                out.append(x)
         return out
 
     def has_method(self, methods):
@@ -547,23 +880,25 @@ class YggRequirementsList(UserList):
 
         """
         if included_methods is None:
-            included_methods = []
+            included_methods = ['all']
         if excluded_methods is None:
             excluded_methods = []
         out = YggRequirementsList(extras=self.extras,
                                   requires_extras=self.requires_extras)
         for x in self.data:
-            if ((x.method in included_methods
+            if (((x.method in included_methods
+                  or 'all' in included_methods)
                  and x.method not in excluded_methods)):
                 out.append(x)
         return out
 
-    def select(self, param, **kwargs):
+    def select(self, param, exclude=None, **kwargs):
         r"""Select requirements that are valid for the provided
         installation options.
 
         Args:
             param (SetupParam): Setup parameters instance.
+            exclude (list, optional): Dependencies to exclude.
             **kwargs: Additional keyword arguments are passed to
                 the add_option method of member YggRequirement
                 instances.
@@ -572,9 +907,13 @@ class YggRequirementsList(UserList):
             YggRequirementsList: List of selected requirements.
 
         """
+        if exclude is None:
+            exclude = []
         out = YggRequirementsList(extras=self.extras,
                                   requires_extras=self.requires_extras)
         for x in self.data:
+            if x.name in exclude:
+                continue
             x.add_option(out, param, **kwargs)
         return out
 
@@ -603,8 +942,31 @@ class YggRequirementsList(UserList):
                 out[k] = out[k].flatten()
         return out
 
+    @classmethod
+    def conda_build_string(cls, rattler=False):
+        if rattler:
+            return (
+                "py${{ python | version_to_buildstring }}h"
+                "${{ hash }}_${{ build_number }}"
+            )
+        return (
+            "py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h"
+            "{{ PKG_HASH }}_{{ PKG_BUILDNUM }}"
+        )
+
+    @classmethod
+    def conda_pin_subpackage(cls, name, rattler=False, exact=False):
+        args = ''
+        if exact:
+            args += ', exact=True'
+        out = f"{{{{ pin_subpackage('{name}'{args}) }}}}"
+        if rattler:
+            out = '$' + out
+        return out
+
     def format(self, fname=None, included_methods=None,
-               excluded_methods=None, standard='pip', **kwargs):
+               excluded_methods=None, standard='pip',
+               env_name=None, channels=None, **kwargs):
         r"""Format this set of requirements according to a certain
         standard.
 
@@ -618,6 +980,12 @@ class YggRequirementsList(UserList):
                 will be skipped.
             excluded_methods (list, optional): Installation methods
                 that should be excluded. Defaults to empty list.
+            env_name (str, optional): Name of the environment that should
+                be set in a conda environment file. Only valid for
+                standard of 'conda_env'.
+            channels (list, optional): Set of conda channels to include
+                in a conda environment file. Only valid for standard of
+                'conda_env'.
             **kwargs: Additional keyword arguments are passed to the
                 format method for each requirement.
 
@@ -626,67 +994,96 @@ class YggRequirementsList(UserList):
 
         """
         if included_methods is None:
-            included_methods = []
-        included_methods += ['python', standard]
+            included_methods = ['python', standard]
+            if standard in ['conda_recipe', 'rattler_recipe',
+                            'conda_env']:
+                included_methods.append('conda')
+            if standard == 'rattler_recipe':
+                included_methods.append('conda_recipe')
         selected = self.select_method(
             included_methods=included_methods,
-            excluded_methods=excluded_methods).flatten()
+            excluded_methods=excluded_methods).flatten(sort=True)
+        if 'conda_recipe' not in included_methods:
+            selected = selected.select_by_keys(
+                host_only=False, build_only=False,
+            )
+        rattler = (standard == 'rattler_recipe')
         kwargs['standard'] = standard
-        out = [
-            x.format(**kwargs) for x in selected
-            if not (x.host_only or x.flags.get('build_only', False))]
-        out = sorted(list(set(out)))
-        if standard == 'conda':
-            req = out
+        if standard == 'conda_env':
+            if env_name is None:
+                env_name = 'yggdrasil'
+            if channels is None:
+                channels = ['conda-forge']
+            out = OrderedDict([
+                ('name', env_name),
+                ('channels', channels),
+                ('dependencies', [x.format(**kwargs) for x in selected]),
+            ])
+            if fname is not None:
+                with open(fname, 'w') as fd:
+                    yaml.dump(
+                        out, fd, Dumper=OrderedDumper,
+                        default_flow_style=False,
+                        width=1000,
+                    )
+        elif standard in ['conda_recipe', 'rattler_recipe']:
+            core = selected.select_by_keys(
+                host_only=False, build_only=False, makecopy=True,
+            )
+            dumper = (
+                RattlerRecipeDumper
+                if standard == 'rattler_recipe' else CondaRecipeDumper
+            )
             out = OrderedDict()
-            host_req = [
-                x.format(**kwargs) for x in selected if x.host]
-            build_req = [
-                x.format(for_build=True, padding=39, **kwargs)
-                for x in selected
-                if x.flags.get('build', False)]
+            host_req = selected.select_by_keys(host=True, makecopy=True)
+            build_req = selected.select_by_keys(build=True, makecopy=True)
             if self.extras:
-                host_req.append('python')
+                host_req.append(YggRequirement('python', host=True))
+                host_req.sort_in_place()
                 name = self.extras[0]['name']
                 out['name'] = f"yggdrasil.{name}"
                 out['build'] = OrderedDict([
-                    ('string', (
-                        "py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h"
-                        "{{ PKG_HASH }}_{{ PKG_BUILDNUM }}")),
+                    ('string', self.conda_build_string(rattler=rattler)),
                     ('run_exports', [
-                        f"{{{{ pin_subpackage('yggdrasil.{name}') }}}}"
-                    ])
+                        YggRequirement(f'yggdrasil.{name}',
+                                       flags={'pin': True}),
+                    ]),
                 ])
             if self.requires_extras:
-                req_old = req
-                req = []
+                extra_count = 0
                 for x in self.requires_extras:
                     kws = dict(x)
                     kws.pop('name')
-                    name = (f"{{{{ pin_subpackage("
-                            f"'yggdrasil.{x['name']}', "
-                            f"exact=True) }}}}")
-                    v = YggRequirement(name, **kws)
-                    req.append(v.conda_requirement(dont_isolate=True))
-                req += req_old
+                    kws.setdefault('flags', {})
+                    kws['flags']['pin'] = 'exact'
+                    v = YggRequirement(f'yggdrasil.{x["name"]}', **kws)
+                    core.insert(extra_count, v)
+                    extra_count += 1
             elif self.extras:
-                req.insert(
-                    0, "{{ pin_subpackage('yggdrasil', exact=True) }}")
+                core.insert(0, YggRequirement('yggdrasil',
+                                              flags={'pin': 'exact'}))
             out['requirements'] = OrderedDict()
             if build_req:
-                out['requirements']['build'] = sorted(build_req)
+                out['requirements']['build'] = build_req
             if host_req:
-                out['requirements']['host'] = sorted(host_req)
-            if build_req:
-                out['requirements']['build'] = sorted(build_req)
-            out['requirements']['run'] = req
+                out['requirements']['host'] = host_req
+            out['requirements']['run'] = core
             if fname is not None:
                 with open(fname, 'w') as fd:
-                    yaml.write(fd, out)
+                    yaml.dump(
+                        out, fd, Dumper=dumper,
+                        default_flow_style=False,
+                        width=1000,
+                    )
         else:
+            out = [x.format(**kwargs) for x in selected]
             if fname is not None:
                 with open(fname, 'w') as fd:
                     fd.write('\n'.join(out) + '\n')
+        if fname is not None:
+            with open(fname, 'r') as fd:
+                contents = '\n\t' + '\n\t'.join(fd.read().splitlines())
+            print(f"Created '{fname}':{contents}")
         return out
 
     def install(self, param, return_commands=False, **kwargs):
@@ -759,6 +1156,11 @@ class YggRequirementsList(UserList):
         return cmds
 
 
+for dumper in [CondaRecipeDumper, RattlerRecipeDumper]:
+    dumper.add_representer(YggRequirementsList,
+                           YggRequirementsList._representer)
+
+
 class YggRequirement(object):
     r"""Yggdrasil requirement.
 
@@ -784,6 +1186,21 @@ class YggRequirement(object):
             during installation. Defaults to empty dict.
 
     """
+
+    @classmethod
+    def _representer(cls, dumper, data):
+        format_kws = {}
+        if isinstance(dumper, CondaRecipeDumper):
+            format_kws.update(
+                standard=dumper._standard,
+                padding=dumper._padding,
+                for_build=dumper._for_build,
+                exclude_add=True,
+            )
+        name = data.format(**format_kws)
+        return dumper.represent_scalar(
+            yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG, name,
+            style='')
 
     def __init__(self, name, os=None, method='python', add=None,
                  executable=None, extras=None, options=None,
@@ -818,6 +1235,51 @@ class YggRequirement(object):
         if flags is None:
             flags = {}
         self.flags = flags
+
+    def __deepcopy__(self, memo):
+        kws = copy.deepcopy(self.kwargs, memo)
+        name = kws.pop('name')
+        return YggRequirement(name, **kws)
+
+    @property
+    def is_pin(self):
+        r"""bool: True if the pin flag is set."""
+        return self.flags.get('pin', False)
+
+    def sortkey(self, method):
+        r"""Retrieve a value that can be used to sort the requirement.
+
+        Args:
+            method (str, tuple): The method that should be used to
+                generate the key. If a tuple is provided, a tuple will
+                be returned containing the keys retrieved for the
+                elements in the method tuple.
+
+        Returns:
+            object: Key value.
+
+        """
+        if isinstance(method, (list, tuple)):
+            return tuple([self.sortkey(x) for x in method])
+        if method in ['os', 'method', 'host', 'host_only', 'is_pin',
+                      'conda_varients']:
+            return getattr(self, method)
+        elif method in ['build', 'build_only', 'pin']:
+            return self.flags.get(method, False)
+        raise ValueError(method)
+
+    def conda_varients(self, for_build=False):
+        r"""tuple: Set of varients."""
+        varients = []
+        if self.flags.get("cross_build", False) and for_build:
+            varients.append("build_platform != target_platform")
+        varients += self.flags.get("conda_selectors", [])
+        if self.os is not None:
+            if self.os == 'unix':
+                varients.append('not win')
+            else:
+                varients.append(self.os)
+        return tuple(varients)
 
     @property
     def kwargs(self):
@@ -988,17 +1450,23 @@ class YggRequirement(object):
     @property
     def full_name(self):
         r"""str: Full name of the package."""
+        out = self.name
         if self.flags and self.flags.get('from_env', False):
             env = self.name.upper()
             if isinstance(self.flags['from_env'], str):
                 env = self.flags['from_env']
             if env in os.environ and os.environ[env] != self.name:
-                return os.environ[env]
-        return self.name
+                out = os.environ[env]
+        if self.is_pin:
+            args = ''
+            if self.flags.get('pin', False) == 'exact':
+                args += ', exact=True'
+            out = f"{{{{ pin_subpackage('{out}'{args}) }}}}"
+        return out
 
     def pip_requirement(self, include_os=True, include_extra=False,
                         include_method=True, padding=17,
-                        name_only=False):
+                        name_only=False, exclude_add=False):
         r"""Get the formatted pip requirement string.
 
         Args:
@@ -1019,6 +1487,8 @@ class YggRequirement(object):
                information will be added to the requirement. Implies
                include_os==True, include_extra==True, and
                include_method==True. Defaults to False.
+            exclude_add (bool, optional): If True, don't include added
+               dependencies.
 
         Returns:
             str: Pip requirement.
@@ -1046,7 +1516,7 @@ class YggRequirement(object):
         if varients:
             suffix = self.format_varients(varients)
             out = self.add_padded_suffix(out, suffix, padding=padding)
-        if self.add:
+        if self.add and not exclude_add:
             out = [out]
             for x in self.add:
                 out.append(
@@ -1059,7 +1529,8 @@ class YggRequirement(object):
         return out
 
     def conda_requirement(self, for_build=False, padding=0,
-                          dont_isolate=False, varients=None):
+                          dont_isolate=False, varients=None,
+                          name_only=False, exclude_add=False):
         r"""Get the formatted conda requirement string.
 
         Args:
@@ -1072,6 +1543,11 @@ class YggRequirement(object):
             dont_isolate (bool, optional): If True, don't isolate the
                package name. Defaults to False.
             varients (list, optional): Selectors that should be used
+            name_only (bool, optional): If True, no additional
+               information will be added to the requirement. Ignores all
+               varients.
+            exclude_add (bool, optional): If True, don't include added
+               dependencies.
 
         Returns:
             str: Conda requirement.
@@ -1079,41 +1555,46 @@ class YggRequirement(object):
         """
         if varients is None:
             varients = []
-        if self.flags.get("cross_build", False) and for_build:
-            varients.append("build_platform != target_platform")
-        varients += self.flags.get("conda_selectors", [])
-        if self.os is not None:
-            if self.os == 'unix':
-                varients.append('not win')
-            else:
-                varients.append(self.os)
+        varients += self.conda_varients(for_build=for_build)
         out = self.full_name
-        if not dont_isolate:
+        if not (dont_isolate or self.is_pin):
             out_name = isolate_package_name(out)
             if out_name != out:
                 out = out.replace(out_name, out_name + ' ')
-        if varients:
+        if varients and not name_only:
             suffix = self.format_varients(varients)
             out = self.add_padded_suffix(out, suffix, padding=padding)
-        if self.add:
+        if self.add and not exclude_add:
             out = [out]
             for x in self.add:
-                out.append(x.conda_requirement())
+                out.append(x.conda_requirement(name_only=name_only))
             out = '\n'.join(out)
         return out
 
-    def format_varients(self, varients):
+    @classmethod
+    def format_varients(cls, varients, as_condition=False):
         r"""Format varients into the comment form that should be used
         at the end of a requirement line.
 
         Args:
             varients (list): Varient tags indicating under what
                 conditions a requirement should be used.
+            as_condition (bool, optional): If True, format the varients
+                as a Python condition.
 
         Returns:
             str: Formatted varients string for end of requirement.
 
         """
+        if as_condition:
+            varients = [
+                'unix' if x == 'not win' else x for x in varients
+            ]
+            if len(varients) > 1:
+                varients = [
+                    f'({x})' if ' ' in x else x for x in varients
+                ]
+            return ' and '.join(sorted(varients))
         return f"# [{','.join(varients)}]"
 
     def has_method(self, methods):
@@ -1172,10 +1653,20 @@ class YggRequirement(object):
             str: Formated requirement line.
 
         """
+        if self.is_pin:
+            assert standard in ['conda_recipe', 'rattler_recipe']
         if standard == 'pip':
             return self.pip_requirement(**kwargs)
-        elif standard == 'conda':
-            return self.conda_requirement(**kwargs)
+        elif standard in ['conda', 'conda_env', 'conda_recipe',
+                          'rattler_recipe']:
+            if standard in ['rattler_recipe', 'conda_env']:
+                kwargs['name_only'] = True
+            if standard == 'conda_env':
+                kwargs['dont_isolate'] = True
+            out = self.conda_requirement(**kwargs)
+            if standard == 'rattler_recipe':
+                out = out.replace('{{', '${{')
+            return out
         else:  # pragma: debug
             raise ValueError(
                 f"Standard must be one of ['pip', 'conda'], not"
@@ -1293,12 +1784,6 @@ class YggRequirement(object):
             bool: True if the requirement is selected, False otherwise
 
         """
-        # print(self.name, not self.os_matches(param),
-        #       not self.method_selected(param),
-        #       not self.flags_selected(select_flags=select_flags,
-        #                               deselect_flags=deselect_flags,
-        #                               required_flags=required_flags),
-        #       ((not ignore_existing) and self.executable_exists()))
         if not self.os_matches(param):
             return False
         if not self.method_selected(param):
@@ -1315,8 +1800,6 @@ class YggRequirement(object):
                 os_mark = ['osx', 'linux']
             else:
                 os_mark = [self.os]
-            
-            # if (not allow_multiple) and
             if all(os_covered[k] for k in os_mark):
                 return False
             for k in os_mark:
@@ -1382,6 +1865,7 @@ class YggRequirement(object):
                 raise NoValidRequirementOptions(
                     f"Failed to find valid option for: {self}"
                     f" (os_covered = {os_covered})")
+            return match
         return False
 
     def __str__(self):
@@ -1557,17 +2041,24 @@ class YggRequirement(object):
         return cls(name, **kwargs)
 
 
-def select_requirements(param, fname=None, req=None, **kwargs):
+for dumper in [CondaRecipeDumper, RattlerRecipeDumper]:
+    dumper.add_representer(YggRequirement, YggRequirement._representer)
+
+
+def select_requirements(param, fname_base=None, req=None, varient=None,
+                        exclude=None, **kwargs):
     r"""Select requirements that are valid for the provided
     installation options.
 
     Args:
         param (SetupParam): Setup parameters instance.
-        fname (str, optional): Path to YAML/JSON file containing
+        fname_base (str, optional): Path to YAML/JSON file containing
             requirements. Defaults to 'yggdrasil/requirements.yaml'
             unless pyyaml is not installed and then json will be used.
         req (list, optional): Pre-loaded list of requirements. If not
-            provided, requirements will be loaded from fname.
+            provided, requirements will be loaded from fname_base.
+        varient (str, optional): Varient that should be selected.
+        exclude (list, optional): Dependencies to exclude.
         **kwargs: Additional keyword arguments are passed to
             YggRequirements.select.
 
@@ -1576,9 +2067,71 @@ def select_requirements(param, fname=None, req=None, **kwargs):
 
     """
     if req is None:
-        req = YggRequirements.from_file(fname)
-    return req.select(param, **kwargs).sorted_by_method(
-        format_names=True)
+        req = YggRequirements.from_file(fname_base)
+    return req.select_extra(varient).select(
+        param, exclude=exclude, **kwargs)
+
+
+def select_requirements_from_args(args, install_opts, target_os=None):
+    if args.output_per_os and target_os is None:
+        for target_os in ['linux', 'osx', 'win']:
+            select_requirements_from_args(
+                args, copy.deepcopy(install_opts),
+                target_os=target_os,
+            )
+    if target_os is not None:
+        args.target_os = target_os
+    args.dry_run = True
+    if args.method == 'pip':
+        args.fallback_to_conda = False
+    param = SetupParam.from_args(args, install_opts)
+    x = select_requirements(
+        param, varient=args.varient,
+        allow_missing=(not args.dont_allow_missing),
+        ignore_existing=(not args.check_existing),
+        exclude=args.exclude_dep,
+    )
+    if not args.output_file:
+        pprint.pprint(x.sorted_by_method(format_names=True))
+    if args.output_per_method:
+        for method in param.valid_methods:
+            if method.endswith('skip') or method == 'python':
+                continue
+            include_methods = [method]
+            if method == args.method:
+                include_methods.append('python')
+            istandard = args.output_format
+            iname_only = (args.output_name_only or method != 'pip')
+            if not istandard:
+                if method == 'conda':
+                    istandard = 'conda_env'
+                else:
+                    istandard = 'pip'
+            ifname = None
+            if args.output_file:
+                base, ext = os.path.splitext(args.output_file)
+                if istandard == 'conda_env':
+                    ext = '.yml'
+                if target_os is not None:
+                    base += f'_{target_os}'
+                base += f'_{method}'
+                ifname = base + ext
+            lines = x.format(fname=ifname, standard=istandard,
+                             name_only=iname_only,
+                             included_methods=include_methods)
+            print(80 * '=')
+            print(f'{method}: {ifname}')
+            print(80 * '=')
+            pprint.pprint(lines)
+            print(80 * '=')
+        return
+    if not args.output_format:
+        args.output_format = 'pip'
+    lines = x.format(standard=args.output_format,
+                     fname=args.output_file,
+                     name_only=args.output_name_only,
+                     included_methods=param.valid_methods)
+    print('\n'.join(lines))
 
 
 def create_requirements(standard, fname=None, req=None):
@@ -1597,12 +2150,16 @@ def create_requirements(standard, fname=None, req=None):
     if req is None:
         req = YggRequirements.from_file(fname, force_yaml=True)
     if standard == 'all':
-        for k in ['pip', 'conda', 'extras_require', 'json']:
+        for k in _file_types:
             create_requirements(k, req=req)
     elif standard == 'pip':
         req.create_requirements_files()
-    elif standard == 'conda':
+    elif standard == 'conda_recipe':
         req.create_conda_recipe()
+    elif standard == 'rattler_recipe':
+        req.create_rattler_recipe()
+    elif standard == 'conda_env':
+        req.create_conda_env()
     elif standard == 'extras_require':
         req.create_extras_require()
     elif standard == 'json':
@@ -1614,7 +2171,6 @@ def create_requirements(standard, fname=None, req=None):
 
 
 def create_environment_file(param, fname=None, req=None, add=None,
-                            channels=None,
                             fname_out='environment.yml', **kwargs):
     r"""Create an yaml file describing a conda environment.
 
@@ -1628,13 +2184,10 @@ def create_environment_file(param, fname=None, req=None, add=None,
             and add.
         add (list, optional): Additional packages that should be
             installed. Defaults to None and is ignored.
-        channels (list, optional): Conda channels that should be used
-            in the environment file. Defaults to []. 'conda-forge'
-            will be added if it is not already present.
         fname_out (str, optional): Path where the generate file should
             be saved. Defaults to 'environment.yml'.
         **kwargs: Additional keyword arguments are passed to
-            YggRequirements.select.
+            YggRequirements.create_conda_env.
 
     """
     if req is None:
@@ -1644,17 +2197,10 @@ def create_environment_file(param, fname=None, req=None, add=None,
             req = YggRequirements.from_files(fname, **file_kwargs)
         else:
             req = YggRequirements.from_file(fname, **file_kwargs)
-    kwargs.setdefault('for_setup', True)
-    deps = req.select(param, **kwargs).format(name_only=True)
-    if channels is None:
-        channels = []
-    if 'conda-forge' not in channels:
-        channels.append('conda-forge')
-    out = {'name': param.conda_env,
-           'channels': channels,
-           'dependencies': deps}
-    with open(fname_out, 'w') as fd:
-        yaml.dump(out, fd, Dumper=yaml.SafeDumper)
+    out = req.create_conda_env(
+        fname=fname_out, param=param,
+        env_name=param.conda_env, **kwargs
+    )
     return out
 
 
@@ -1770,6 +2316,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             if not excl_method:
                 excl_method = []
             excl_method.append('python')
+        if 'pip' not in incl_method:
+            incl_method = list(incl_method) + ['pip']
     format_kws = dict(included_methods=incl_method,
                       excluded_methods=excl_method,
                       include_os=True, include_extra=True,
@@ -1821,23 +2369,48 @@ if __name__ == "__main__":
     SetupParam.add_parser_args(
         parser_req, install_opts=install_opts,
         skip=['conda-env', 'python'],
-        skip_types=['install'],
         method_choices=['conda', 'pip', 'mamba',
                         'conda-dev', 'pip-dev', 'mamba-dev'],
-        target_os_choices=['any', 'win', 'osx', 'linux'],
-        target_os_default='any',
+        deps_method_default='env',
+        skip_types=['run'],
+        target_os_choices=['any', 'win', 'osx', 'linux', 'current'],
+        target_os_default='current',
         additional_args=[
-            (('--allow-missing', ),
+            (('--varient', ),
+             {'type': str, 'default': 'all',
+              'help': "Varient that dependencies should be selected for."}),
+            (('--output-per-method', ),
              {'action': 'store_true',
-              'help': "Ignore requirements with no valid options"}),
+              'help': "Output a file for each install method"}),
+            (('--output-per-os', ),
+             {'action': 'store_true',
+              'help': "Output a file for each supported OS"}),
+            (('--output-file', ),
+             {'type': str,
+              'help': "File where requirements should be saved."}),
+            (('--output-format', ),
+             {'choices': ['pip', 'conda'],
+              'help': "Format that requirements should be written in."}),
+            (('--output-name-only', ),
+             {'action': 'store_true',
+              'help': "Only output dependencies as names."}),
+            (('--dont-allow-missing', ),
+             {'action': 'store_true',
+              'help': "Don\'t ignore requirements with no valid options"}),
+            (('--check-existing', ),
+             {'action': 'store_true',
+              'help': ("Only include requirements that are not already "
+                       "installed")}),
+            (('--exclude-dep', ),
+             {'action': 'append', 'type': str,
+              'help': "Exclude the named dependency"}),
         ])
     # Create requirements
     parser_cre = subparsers.add_parser(
         'create', help="Create requirements files.")
     parser_cre.add_argument(
         'standard',
-        choices=['conda', 'pip', 'extras_require', 'json',
-                 'env', 'all'],
+        choices=(['all'] + _file_types),
         help="Type of requirements file to create.")
     # Create a conda environment file
     parser_env = subparsers.add_parser(
@@ -1882,10 +2455,7 @@ if __name__ == "__main__":
     # Call methods
     args = parser.parse_args()
     if args.operation == 'select':
-        param = SetupParam.from_args(args, install_opts)
-        x = select_requirements(param,
-                                allow_missing=args.allow_missing)
-        pprint.pprint(x)
+        select_requirements_from_args(args, install_opts)
     elif args.operation == 'create':
         create_requirements(args.standard)
     elif args.operation == 'env':

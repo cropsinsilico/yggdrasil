@@ -2202,6 +2202,7 @@ name: Test of package installation & execution
   push:
     branches-ignore:
     - gh-pages
+    - topic/cache
     tags:
     - '*'
   schedule:

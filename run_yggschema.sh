@@ -50,8 +50,8 @@ if [ ! -n "$DONT_BUILD" ]; then
        rm -rf "${CONDA_PREFIX}/lib/python3.9/site-packages/yggdrasil_framework*"
     fi
     pip install \
-	--config-settings=cmake.define.RAPIDJSON_INCLUDE_DIRS=../rapidjson/include/ \
-	--config-settings=cmake.define.PYRJ_DIR=../python-rapidjson/ \
+	--config-settings=cmake.define.RAPIDJSON_INCLUDE_DIRS=../yggdrasil_rapidjson/include/ \
+	--config-settings=cmake.define.PYRJ_DIR=../yggdrasil-python-rapidjson/ \
 	$BUILD_ARGS .
 fi
 

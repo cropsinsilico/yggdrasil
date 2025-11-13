@@ -1,5 +1,6 @@
 breathe
 doxygen          # [conda]
+graphviz         # [conda]
 pypandoc
 r-roxygen2       # [conda]
 sphinx

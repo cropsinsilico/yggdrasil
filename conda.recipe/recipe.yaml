@@ -1,22 +1,20 @@
-{% set name = "yggdrasil" %}
-{% set version = "1.10.2" %}
-{% set PY_VER_MAJOR = PY_VER.split('.')[0] %}
-{% set PY_VER_MINOR = PY_VER.split('.')[1] %}
-
+context:
+  name: "yggdrasil"
+  python_name: "yggdrasil"
+  version: "1.10.2"
+  version_major: "1"
+  build_number: 0
 package:
-  name: {{ name|lower }}
-  version: {{ version }}
-
+  name: ${{ name|lower }}
+  version: ${{ version }}
 source:
   path: ../
-
 build:
-  number: 0
-  string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+  number: ${{ build_number }}
+  string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
   run_exports:
-    - {{ pin_subpackage('yggdrasil', max_pin='x.x.x') }}
+    - ${{ pin_subpackage('yggdrasil', max_pin='x.x.x') }}
   script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation'
-  skip: true  # [(win and vc<14) or py<35]
   entry_points:
     - yggdrasil = yggdrasil.command_line:main
     - ygginfo = yggdrasil.command_line:ygginfo
@@ -43,18 +41,19 @@ build:
     - yggmodelform = yggdrasil.command_line:yggmodelform
     - yggdevup = yggdrasil.command_line:yggdevup
     - ygggha = yggdrasil.command_line:generate_gha_workflow
-
 requirements:
   build:
     - cmake >=3.16
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
     - ninja
     - numpy >=1.13.0
-    - python                                 # [build_platform != target_platform]
     - python-build
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
-    - {{ stdlib('c') }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - ${{ stdlib('c') }}
+    - if: build_platform != target_platform
+      then:
+        - cross-python_${{ target_platform }}
+        - python
   host:
     - hatch-fancy-pypi-readme
     - ninja
@@ -63,14 +62,14 @@ requirements:
     - python
     - scikit-build-core <0.11.2
     - setuptools_scm
-    - sysv_ipc  # [not win]
+    - if: unix
+      then:
+        - sysv_ipc
   run:
     - GitPython
     - chevron
     - deprecation
     - flask
-    - git  # [not win]
-    - m2w64-crt-git  # [win]
     - matplotlib-base
     - numpy >=1.13.0
     - pandas
@@ -82,77 +81,82 @@ requirements:
     - requests
     - scipy
     - six
-    - sysv_ipc  # [not win]
     - toml
     - unyt
-
-test:
-  imports:
-    - yggdrasil
-  commands:
-    - yggrun -h
-
+    - if: unix
+      then:
+        - git
+        - sysv_ipc
+    - if: win
+      then:
+        - m2w64-crt-git
 outputs:
   - name: yggdrasil
   - name: yggdrasil.c
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.c') }}
+        - ${{ pin_subpackage('yggdrasil.c') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil.zmq', exact=True) }}  # [win]
         - binutils
         - cmake >=3.16
         - make
         - ninja
         - pkgconfig
-        - {{ compiler('c') }}
-        - {{ compiler('cxx') }}
-        - {{ stdlib('c') }}
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - if: win
+          then:
+            - ${{ pin_subpackage('yggdrasil.zmq', exact=True) }}
   - name: yggdrasil.fortran
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.fortran') }}
+        - ${{ pin_subpackage('yggdrasil.fortran') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil.c', exact=True) }}
-        - {{ compiler('fortran') }}
+        - ${{ pin_subpackage('yggdrasil.c', exact=True) }}
+        - ${{ compiler('fortran') }}
   - name: yggdrasil.r
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.r') }}
+        - ${{ pin_subpackage('yggdrasil.r') }}
     requirements:
       host:
         - python
         - r-base >3.5
         - r-bit64
-        - r-devtools  # [not win]
         - r-r6
         - r-reticulate
         - r-units
         - r-zeallot
+        - if: unix
+          then:
+            - r-devtools
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - r-base >3.5
         - r-bit64
-        - r-devtools  # [not win]
         - r-r6
         - r-reticulate
         - r-units
         - r-zeallot
         - rpy2
+        - if: unix
+          then:
+            - r-devtools
   - name: yggdrasil.zmq
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.zmq') }}
+        - ${{ pin_subpackage('yggdrasil.zmq') }}
     requirements:
       host:
         - czmq
@@ -160,104 +164,112 @@ outputs:
         - python
         - zeromq
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - czmq
         - lz4
         - zeromq
   - name: yggdrasil.julia
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.julia') }}
+        - ${{ pin_subpackage('yggdrasil.julia') }}
     requirements:
       host:
         - juliaup
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - juliaup
   - name: yggdrasil.mpi
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.mpi') }}
+        - ${{ pin_subpackage('yggdrasil.mpi') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - mpi4py
-        - mpich  # [linux]
-        - msmpi  # [win]
-        - openmpi  # [osx]
+        - if: linux
+          then:
+            - mpich
+        - if: win
+          then:
+            - msmpi
+        - if: osx
+          then:
+            - openmpi
   - name: yggdrasil.rmq
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.rmq') }}
+        - ${{ pin_subpackage('yggdrasil.rmq') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - pika >=1.0.0
   - name: yggdrasil.images
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.images') }}
+        - ${{ pin_subpackage('yggdrasil.images') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - ghostscript
         - pillow
   - name: yggdrasil.seq
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.seq') }}
+        - ${{ pin_subpackage('yggdrasil.seq') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - biopython
   - name: yggdrasil.pytorch
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.pytorch') }}
+        - ${{ pin_subpackage('yggdrasil.pytorch') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
-        - pytorch  # [not win]
-        - torchvision  # [not win]
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
+        - if: unix
+          then:
+            - pytorch
+            - torchvision
   - name: yggdrasil.excel
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.excel') }}
+        - ${{ pin_subpackage('yggdrasil.excel') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - openpyxl
         - pandas
   - name: yggdrasil.testing
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.testing') }}
+        - ${{ pin_subpackage('yggdrasil.testing') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - conda-tree
         - coverage[toml]
         - flake8
@@ -271,14 +283,14 @@ outputs:
         - pytest-xdist
   - name: yggdrasil.docs
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.docs') }}
+        - ${{ pin_subpackage('yggdrasil.docs') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - breathe
         - doxygen
         - graphviz
@@ -289,14 +301,14 @@ outputs:
         - sphinx_rtd_theme
   - name: yggdrasil.dev
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.dev') }}
+        - ${{ pin_subpackage('yggdrasil.dev') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - PyGithub
         - black
         - emacs
@@ -304,46 +316,63 @@ outputs:
         - pre-commit
   - name: yggdrasil.astropy
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.astropy') }}
+        - ${{ pin_subpackage('yggdrasil.astropy') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - astropy
   - name: yggdrasil.pygments
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.pygments') }}
+        - ${{ pin_subpackage('yggdrasil.pygments') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - pygments
   - name: yggdrasil.trimesh
     build:
-      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - {{ pin_subpackage('yggdrasil.trimesh') }}
+        - ${{ pin_subpackage('yggdrasil.trimesh') }}
     requirements:
       host:
         - python
       run:
-        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - trimesh
-
-
+tests:
+  - python:
+      imports:
+        - yggdrasil
+  - script:
+      - yggrun -h
+    requirements:
+      run:
+        - pytest
+        - flask
+        - ninja
+        - cmake
+        - ${{ stdlib('c') }}
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
+        - ${{ compiler('fortran') }}
+    files:
+      source:
+        - tests/
 about:
-  home: https://github.com/cropsinsilico/yggdrasil
+  homepage: https://github.com/cropsinsilico/yggdrasil
+  repository: https://github.com/cropsinsilico/yggdrasil
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE.txt
   summary: A framework for connecting computational models from multiple languages.
-
   description: |
     The Crops in Silico (CiS) framework, yggdrasil, provides support for
     connecting scientific models written in different programming languages.
@@ -354,10 +383,7 @@ about:
     on parallel processes and orchestrate asynchronous communication between them.
     Although designed for connecting crop models, yggdrasil can be used to
     connect scientific models from any domain.
-  doc_url: https://cropsinsilico.github.io/yggdrasil
-  dev_url: https://github.com/cropsinsilico/yggdrasil
-
+  documentation: https://cropsinsilico.github.io/yggdrasil
 extra:
   recipe-maintainers:
     - langmm
-    - conda-forge/r
