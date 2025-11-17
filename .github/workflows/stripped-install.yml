@@ -91,7 +91,7 @@ jobs:
       - name: Install dependencies using vcpkg (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
-          vcpkg.exe install $(cat ci_requirements_vcpkg.txt) --triplet $env:VCPKG_TRIPLET
+          vcpkg.exe install $(cat ci_requirements_vcpkg.txt) --triplet ${{ env.VCPKG_TRIPLET }}
       - name: Install dependencies using choco (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
@@ -162,6 +162,14 @@ jobs:
       - name: Set up Matlab
         uses: matlab-actions/setup-matlab@v1
         if: matrix.install-matlab
+      - name: Check the packages installed via pip
+        run: |
+          python -m pip list
+      - name: Check the packages installed via conda
+        if: matrix.python-install == 'conda'
+        run: |
+          conda info
+          conda list
       
       ###################################
       # Install

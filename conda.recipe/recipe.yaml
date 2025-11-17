@@ -16,8 +16,14 @@ outputs:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
       run_exports:
-        - ${{ pin_subpackage('yggdrasil', max_pin='x.x.x') }}
-      script: ${{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation
+        - ${{ pin_subpackage('yggdrasil', upper_bound='x.x.x') }}
+      script:
+        - if: unix
+          then: ${{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation
+        - if: win
+          then:
+            - set "SKBUILD_CMAKE_ARGS=-G Ninja"
+            - ${{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation
       entry_points:
         - yggdrasil = yggdrasil.command_line:main
         - ygginfo = yggdrasil.command_line:ygginfo

@@ -15,7 +15,8 @@ build:
   string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
   run_exports:
     - {{ pin_subpackage('yggdrasil', max_pin='x.x.x') }}
-  script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation'
+  script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation'  # [unix]
+  script: 'set "SKBUILD_CMAKE_ARGS=-G Ninja" && {{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation'  # [win]
   skip: true  # [(win and vc<14) or py<35]
   entry_points:
     - yggdrasil = yggdrasil.command_line:main

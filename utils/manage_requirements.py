@@ -972,7 +972,8 @@ class YggRequirementsList(UserList):
 
     def format(self, fname=None, included_methods=None,
                excluded_methods=None, standard='pip',
-               env_name=None, channels=None, **kwargs):
+               env_name=None, channels=None, include_build=False,
+               **kwargs):
         r"""Format this set of requirements according to a certain
         standard.
 
@@ -992,6 +993,8 @@ class YggRequirementsList(UserList):
             channels (list, optional): Set of conda channels to include
                 in a conda environment file. Only valid for standard of
                 'conda_env'.
+            include_build (bool, optional): If True, include build
+                requirements.
             **kwargs: Additional keyword arguments are passed to the
                 format method for each requirement.
 
@@ -1009,7 +1012,7 @@ class YggRequirementsList(UserList):
         selected = self.select_method(
             included_methods=included_methods,
             excluded_methods=excluded_methods).flatten(sort=True)
-        if 'conda_recipe' not in included_methods:
+        if not (include_build or 'conda_recipe' in included_methods):
             selected = selected.select_by_keys(
                 host_only=False, build_only=False,
             )
@@ -1056,7 +1059,7 @@ class YggRequirementsList(UserList):
                 if rattler:
                     out['package'] = {'name': name}
                     if name == 'yggdrasil':
-                        exports_flags['max_pin'] = 'x.x.x'
+                        exports_flags['upper_bound'] = 'x.x.x'
                 else:
                     out['name'] = name
                 out['build'] = OrderedDict()
@@ -1479,8 +1482,9 @@ class YggRequirement(object):
             args = ''
             if self.flags.get('pin', False) == 'exact':
                 args += ', exact=True'
-            if self.flags.get('max_pin', False):
-                args += f', max_pin=\'{self.flags["max_pin"]}\''
+            for k in ['max_pin', 'upper_bound']:
+                if self.flags.get(k, False):
+                    args += f', {k}=\'{self.flags[k]}\''
             out = f"{{{{ pin_subpackage('{out}'{args}) }}}}"
         return out
 
@@ -2138,7 +2142,8 @@ def select_requirements_from_args(args, install_opts, target_os=None):
                 ifname = base + ext
             lines = x.format(fname=ifname, standard=istandard,
                              name_only=iname_only,
-                             included_methods=include_methods)
+                             included_methods=include_methods,
+                             include_build=param.install_opts['dev'])
             print(80 * '=')
             print(f'{method}: {ifname}')
             print(80 * '=')
@@ -2150,7 +2155,8 @@ def select_requirements_from_args(args, install_opts, target_os=None):
     lines = x.format(standard=args.output_format,
                      fname=args.output_file,
                      name_only=args.output_name_only,
-                     included_methods=param.valid_methods)
+                     included_methods=param.valid_methods,
+                     include_build=param.install_opts['dev'])
     print('\n'.join(lines))
 
 
