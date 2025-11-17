@@ -507,6 +507,8 @@ class YggRequirements(UserDict):
         prev.update(**base['build'])
         prev['entry_points'] = load_entry_points()
         base['build'] = prev
+        base['tests'] = out.pop(
+            'tests', out['outputs'][0].get('tests', None))
         out['outputs'].clear()
         out['outputs'].append(base)
         for k in self.extras():

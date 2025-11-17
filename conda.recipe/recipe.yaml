@@ -93,6 +93,25 @@ outputs:
         - if: win
           then:
             - m2w64-crt-git
+    tests:
+      - python:
+          imports:
+            - yggdrasil
+      - script:
+          - yggrun -h
+        requirements:
+          run:
+            - pytest
+            - flask
+            - ninja
+            - cmake
+            - ${{ stdlib('c') }}
+            - ${{ compiler('c') }}
+            - ${{ compiler('cxx') }}
+            - ${{ compiler('fortran') }}
+        files:
+          source:
+            - tests/
   - package:
       name: yggdrasil.c
     build:
@@ -382,25 +401,6 @@ outputs:
       run:
         - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - trimesh
-tests:
-  - python:
-      imports:
-        - yggdrasil
-  - script:
-      - yggrun -h
-    requirements:
-      run:
-        - pytest
-        - flask
-        - ninja
-        - cmake
-        - ${{ stdlib('c') }}
-        - ${{ compiler('c') }}
-        - ${{ compiler('cxx') }}
-        - ${{ compiler('fortran') }}
-    files:
-      source:
-        - tests/
 about:
   homepage: https://github.com/cropsinsilico/yggdrasil
   repository: https://github.com/cropsinsilico/yggdrasil
