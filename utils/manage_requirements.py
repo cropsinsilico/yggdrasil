@@ -500,11 +500,15 @@ class YggRequirements(UserDict):
         for k in ['description']:
             out['about'][k] = LiteralString(out['about'][k])
         format_kws = {'standard': 'rattler_recipe'}
-        out['build']['entry_points'] = load_entry_points()
-        out.update(**self.create_conda_recipe_varient(
-            'general', format_kws=format_kws))
+        # out['build']['entry_points'] = load_entry_points()
+        base = self.create_conda_recipe_varient(
+            'general', format_kws=format_kws)
+        prev = out.pop('build', out['outputs'][0]['build'])
+        prev.update(**base['build'])
+        prev['entry_points'] = load_entry_points()
+        base['build'] = prev
         out['outputs'].clear()
-        out['outputs'].append({'name': 'yggdrasil'})
+        out['outputs'].append(base)
         for k in self.extras():
             k_out = self.create_conda_recipe_varient(
                 k, format_kws=format_kws)
@@ -1034,21 +1038,33 @@ class YggRequirementsList(UserList):
                 RattlerRecipeDumper
                 if standard == 'rattler_recipe' else CondaRecipeDumper
             )
+            
             out = OrderedDict()
             host_req = selected.select_by_keys(host=True, makecopy=True)
             build_req = selected.select_by_keys(build=True, makecopy=True)
+            name = None
             if self.extras:
                 host_req.append(YggRequirement('python', host=True))
                 host_req.sort_in_place()
-                name = self.extras[0]['name']
-                out['name'] = f"yggdrasil.{name}"
-                out['build'] = OrderedDict([
-                    ('string', self.conda_build_string(rattler=rattler)),
-                    ('run_exports', [
-                        YggRequirement(f'yggdrasil.{name}',
-                                       flags={'pin': True}),
-                    ]),
-                ])
+                name = f"yggdrasil.{self.extras[0]['name']}"
+            elif rattler:
+                name = 'yggdrasil'
+            if name is not None:
+                exports_flags = {'pin': True}
+                if rattler:
+                    out['package'] = {'name': name}
+                    if name == 'yggdrasil':
+                        exports_flags['max_pin'] = 'x.x.x'
+                else:
+                    out['name'] = name
+                out['build'] = OrderedDict()
+                if rattler:
+                    out['build']['number'] = '${{ build_number }}'
+                out['build']['string'] = self.conda_build_string(
+                    rattler=rattler)
+                out['build']['run_exports'] = [
+                    YggRequirement(name, flags=exports_flags)
+                ]
             if self.requires_extras:
                 extra_count = 0
                 for x in self.requires_extras:
@@ -1461,6 +1477,8 @@ class YggRequirement(object):
             args = ''
             if self.flags.get('pin', False) == 'exact':
                 args += ', exact=True'
+            if self.flags.get('max_pin', False):
+                args += f', max_pin=\'{self.flags["max_pin"]}\''
             out = f"{{{{ pin_subpackage('{out}'{args}) }}}}"
         return out
 
