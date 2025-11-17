@@ -134,7 +134,6 @@ general:
       flags:
         method_in_setup: conda
   - setuptools_scm:
-      method: conda_recipe
       host: True
       host_only: True
       # flags:

@@ -500,12 +500,11 @@ class YggRequirements(UserDict):
         for k in ['description']:
             out['about'][k] = LiteralString(out['about'][k])
         format_kws = {'standard': 'rattler_recipe'}
-        # out['build']['entry_points'] = load_entry_points()
         base = self.create_conda_recipe_varient(
             'general', format_kws=format_kws)
         prev = out.pop('build', out['outputs'][0]['build'])
         prev.update(**base['build'])
-        prev['entry_points'] = load_entry_points()
+        prev['python'] = {'entry_points': load_entry_points()}
         base['build'] = prev
         base['tests'] = out.pop(
             'tests', out['outputs'][0].get('tests', None))
