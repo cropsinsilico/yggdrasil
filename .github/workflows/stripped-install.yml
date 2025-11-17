@@ -73,7 +73,7 @@ jobs:
       - name: Create files containing lists of dependencies
         run: |
           python -m pip install pyyaml
-          python utils/manage_requirements.py select --output-per-method --output-file=ci_requirements.txt --install-c=${{ matrix.install-c }} --install-fortran=${{ matrix.install-fortran }} --install-r=${{ matrix.install-r }} --install-julia=${{ matrix.install-julia }} --install-matlab=${{ matrix.install-matlab }} --install-lpy=${{ matrix.install-lpy }} --install-sbml=${{ matrix.install-sbml }} --install-pytorch=${{ matrix.install-pytorch }} --install-zmq=${{ matrix.install-zmq }} --install-mpi=${{ matrix.install-mpi }} --install-rmq=${{ matrix.install-rmq }} --install-omp=${{ matrix.install-omp }} --install-testing=true --exclude-dep=r-base ${{ matrix.python-install }}
+          python utils/manage_requirements.py select --output-per-method --output-file=ci_requirements.txt --install-c=${{ matrix.install-c }} --install-fortran=${{ matrix.install-fortran }} --install-r=${{ matrix.install-r }} --install-julia=${{ matrix.install-julia }} --install-matlab=${{ matrix.install-matlab }} --install-lpy=${{ matrix.install-lpy }} --install-sbml=${{ matrix.install-sbml }} --install-pytorch=${{ matrix.install-pytorch }} --install-zmq=${{ matrix.install-zmq }} --install-mpi=${{ matrix.install-mpi }} --install-rmq=${{ matrix.install-rmq }} --install-omp=${{ matrix.install-omp }} --install-testing=true --install-dev=true --exclude-dep=r-base ${{ matrix.python-install }}
 
       ###################################
       # PIP SETUP
@@ -91,7 +91,7 @@ jobs:
       - name: Install dependencies using vcpkg (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
-          vcpkg.exe install $(cat ci_requirements_vcpkg.txt) --triplet ${{ env.VCPKG_TRIPLET }}
+          cat ci_requirements_vcpkg.txt | xargs -n1 vcpkg.exe install --classic --triplet ${{ env.VCPKG_TRIPLET }}
       - name: Install dependencies using choco (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
