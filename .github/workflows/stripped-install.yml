@@ -91,7 +91,7 @@ jobs:
       - name: Install dependencies using vcpkg (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
-          cat ci_requirements_vcpkg.txt | xargs -n1 vcpkg.exe install --classic --triplet ${{ env.VCPKG_TRIPLET }}
+          cat ci_requirements_vcpkg.txt | tr '\n' ' ' | xargs -n1 vcpkg.exe install --classic --triplet ${{ env.VCPKG_TRIPLET }}
       - name: Install dependencies using choco (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
@@ -201,7 +201,7 @@ jobs:
 
       - name: Basic communication tests
         run: |
-          pytest --ci --cov-append --suites communication
+          pytest --ci --cov-append --suites comms
 
   all_tests_passed:
     runs-on: ubuntu-latest

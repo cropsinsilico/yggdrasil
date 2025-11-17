@@ -15,8 +15,6 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
-      run_exports:
-        - ${{ pin_subpackage('yggdrasil', upper_bound='x.x.x') }}
       script:
         - if: unix
           then: ${{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv --no-build-isolation
@@ -52,6 +50,8 @@ outputs:
           - yggdevup = yggdrasil.command_line:yggdevup
           - ygggha = yggdrasil.command_line:generate_gha_workflow
     requirements:
+      run_exports:
+        - ${{ pin_subpackage('yggdrasil') }}
       build:
         - cmake >=3.16
         - ninja
@@ -366,9 +366,11 @@ outputs:
         - ${{ pin_subpackage('yggdrasil', exact=True) }}
         - PyGithub
         - black
-        - emacs
         - ipython
         - pre-commit
+        - if: unix
+          then:
+            - emacs
   - package:
       name: yggdrasil.astropy
     build:

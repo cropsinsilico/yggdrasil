@@ -544,6 +544,7 @@ extras:
     - pre-commit
     - emacs:
         method: conda
+        os: unix
 bespoke_extras:
 - astropy
 - pygments

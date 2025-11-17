@@ -1066,9 +1066,10 @@ class YggRequirementsList(UserList):
                     out['build']['number'] = '${{ build_number }}'
                 out['build']['string'] = self.conda_build_string(
                     rattler=rattler)
-                out['build']['run_exports'] = [
-                    YggRequirement(name, flags=exports_flags)
-                ]
+                if name != 'yggdrasil':
+                    out['build']['run_exports'] = [
+                        YggRequirement(name, flags=exports_flags)
+                    ]
             if self.requires_extras:
                 extra_count = 0
                 for x in self.requires_extras:
@@ -1083,6 +1084,10 @@ class YggRequirementsList(UserList):
                 core.insert(0, YggRequirement('yggdrasil',
                                               flags={'pin': 'exact'}))
             out['requirements'] = OrderedDict()
+            if rattler and name == 'yggdrasil':
+                out['requirements']['run_exports'] = [
+                    YggRequirement(name, flags={'pin': True})
+                ]
             if build_req:
                 out['requirements']['build'] = build_req
             if host_req:

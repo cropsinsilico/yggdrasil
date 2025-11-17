@@ -300,7 +300,7 @@ outputs:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - PyGithub
         - black
-        - emacs
+        - emacs  # [not win]
         - ipython
         - pre-commit
   - name: yggdrasil.astropy

@@ -801,7 +801,8 @@
         "pre-commit",
         {
           "emacs": {
-            "method": "conda"
+            "method": "conda",
+            "os": "unix"
           }
         }
       ]

@@ -1,5 +1,5 @@
 PyGithub
 black
-emacs            # [conda]
+emacs; platform_system != 'Windows'  # [conda]
 ipython
 pre-commit
