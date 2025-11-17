@@ -1621,7 +1621,6 @@ def register_weakref():
     r"""Register a weak ref for use by another fixture."""
     def register_weakref_w(x):
         import weakref
-        global _weakref_registry
         _weakref_registry.append(weakref.ref(x))
     return register_weakref_w
 
@@ -1640,9 +1639,13 @@ def close_comm():
 @pytest.fixture(scope="session")
 def drain_proxy_signon_messages(wait_on_function):
     r"""Drain signon messages."""
+    from yggdrasil.communication.ServerComm import ServerComm
+
     def drain_proxy_signon_messages_w(comm):
-        if not (comm.proxy and comm.direction == 'recv'
-                and comm.proxy.is_partner):
+        if isinstance(comm, ServerComm):
+            return drain_proxy_signon_messages_w(comm.icomm)
+        if not (comm.direction == 'recv'
+                and comm.proxy and comm.proxy.is_partner):
             return
 
         def _drain_signon():
@@ -1838,7 +1841,6 @@ def verify_count_fds(wait_on_function, first_test, count_fds,
     gc.collect()
     if not (first_test or _dont_verify_count_fds or platform._is_win):
         def on_timeout():  # pragma: debug
-            global _weakref_registry
             for x in _weakref_registry:
                 if x():
                     import pdb
@@ -1931,7 +1933,6 @@ def new_mpi_exchange():
 @pytest.fixture(scope="session")
 def adv_global_mpi_tag():
     def adv_global_mpi_tag_w(value=1):
-        global _mpi_error_exchange
         assert _mpi_error_exchange is not None
         out = _mpi_error_exchange.global_tag
         _mpi_error_exchange.global_tag += value
@@ -1942,7 +1943,6 @@ def adv_global_mpi_tag():
 @pytest.fixture(scope="session")
 def sync_mpi_exchange():
     def sync_mpi_exchange_w(*args, **kwargs):
-        global _mpi_error_exchange
         assert _mpi_error_exchange is not None
         return _mpi_error_exchange.sync(*args, **kwargs)
     return sync_mpi_exchange_w

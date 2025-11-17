@@ -689,7 +689,12 @@
             "method": "conda"
           }
         },
-        "coverage[toml]",
+        "coverage",
+        {
+          "coverage[toml]": {
+            "method": "pip"
+          }
+        },
         "flake8",
         "flaky",
         "pytest",

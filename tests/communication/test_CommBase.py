@@ -88,6 +88,7 @@ class BaseComm(TestComponentBase):
         kws = dict(send_comm.opp_comm_kwargs(), commtype=commtype)
         kws.update(testing_options.get('recv_kwargs', {}))
         kws.update(kwargs)
+        kws.pop('name')
         return kws
 
     def create_send_comm(self, name, commtype, use_async, testing_options,

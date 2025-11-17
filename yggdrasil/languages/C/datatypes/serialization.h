@@ -11,13 +11,15 @@
 #include "../constants.h"
 #include "utils.h"
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/schema.h"
-#include "rapidjson/va_list.h"
+#include "yggdrasil_rapidjson/document.h"
+#include "yggdrasil_rapidjson/writer.h"
+#include "yggdrasil_rapidjson/prettywriter.h"
+#include "yggdrasil_rapidjson/stringbuffer.h"
+#include "yggdrasil_rapidjson/schema.h"
+#include "yggdrasil_rapidjson/va_list.h"
 #include <string.h>
+
+namespace rapidjson = yggdrasil_rapidjson;
 
 
 #define STRLEN_RJ(var)				\

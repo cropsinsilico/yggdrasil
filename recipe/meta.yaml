@@ -260,7 +260,7 @@ outputs:
       run:
         - {{ pin_subpackage('yggdrasil', exact=True) }}
         - conda-tree
-        - coverage[toml]
+        - coverage
         - flake8
         - flaky
         - pytest

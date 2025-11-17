@@ -387,8 +387,8 @@ class CommProxy(multitasking.YggTaskLoop):
         to."""
         with self.lock:
             return (
-                self.nsignon_proxy_send > 0
-                and self.nsignon_proxy_send == self.nsignon_proxy_recv
+                self.nsignon_proxy_sent > 0
+                and self.nsignon_proxy_sent == self.nsignon_proxy_recv
             )
             # if not self.is_partner:
             #     if self.srv_count > 0 and self.nsignon_server_send == 0:
@@ -403,6 +403,49 @@ class CommProxy(multitasking.YggTaskLoop):
         r"""bool: True if there were more server sign-on messages sent
         than have been responded to by the proxy."""
         return (not self.signons_processed)
+
+    def format_signon(self, prefix, payload=None, count=None):
+        r"""Format a signon message with a count of messages.
+
+        Args:
+            prefix (str): Message prefix to use identifying the type of
+                signon.
+            payload (str, optional): Message payload.
+            count (int, optional): Message count to include in the
+                generated message.
+
+        Returns:
+            bytes: Generated message.
+
+        """
+        if prefix == self.proxy_signon_msg:
+            if payload is None:
+                payload = self.cli_address
+            if count is None:
+                count = self.nsignon_proxy_sent
+        if count is None:
+            count = 0
+        assert payload is not None
+        if isinstance(payload, str):
+            payload = payload.encode('utf-8')
+        return prefix + f'{count}::'.encode('utf-8') + payload
+
+    def process_signon(self, msg, decode=False):
+        r"""Process a signon message.
+
+        Args:
+            msg (bytes): Message.
+            decode (bool, optional): If True, the payload should be
+                decoded before it is returned.
+
+        Returns:
+            tuple(bytes, int): The message payload and count.
+
+        """
+        _, count, payload = msg.split(b'::', maxsplit=2)
+        if decode:
+            payload = payload.decode('utf-8')
+        return payload, int(count.decode('utf-8'))
 
     def run_loop(self):
         r"""Forward messages from client to server."""
@@ -660,7 +703,7 @@ class CommProxy(multitasking.YggTaskLoop):
     def send_proxy_signon(self):
         r"""Send a proxy signon message requesting the server to
         acknowledge it is ready to receive messages."""
-        msg = self.proxy_signon_msg + self.cli_address.encode('utf-8')
+        msg = self.format_signon(self.proxy_signon_msg)
         with self.lock:
             self.debug(
                 f"Sending proxy signon message "
@@ -703,16 +746,18 @@ class CommProxy(multitasking.YggTaskLoop):
         """
         assert not self.is_partner
         if msg.startswith(self.server_signon_msg):
-            name = msg.split(self.server_signon_msg)[-1]
+            name, count = self.process_signon(msg)
             self.debug(f"Received server signon from {name}")
             if self.srv_count == 0:
                 self.debug(f"A server signed on after "
                            f"{self.nsignon_proxy_sent} proxy signon "
-                           f"messages.")
+                           f"messages in response to message"
+                           f"#{count + 1} so {count} messages may have "
+                           f"been dropped.")
             self.add_server(name)
             self.server_send(
                 self.proxy_signon_count_msg
-                + str(self.nsignon_proxy_sent).encode('utf-8')
+                + str(self.nsignon_proxy_sent - count).encode('utf-8')
             )
             return None
         elif msg.startswith(self.client_signon_msg):
@@ -770,7 +815,7 @@ class CommProxy(multitasking.YggTaskLoop):
 
         """
         assert msg.startswith(self.proxy_signon_msg)
-        cli_address = msg.split(self.proxy_signon_msg)[-1].decode('utf-8')
+        cli_address, count = self.process_signon(msg, decode=True)
         with self.lock:
             self.nsignon_proxy_recv += 1
             if self.cli_address is None:
@@ -779,8 +824,8 @@ class CommProxy(multitasking.YggTaskLoop):
                 assert cli_address == self.cli_address
             if self.nsignon_proxy_recv == 1:
                 self.debug(f"Received proxy signon from proxy: {msg}")
-                self.client_send(self.server_signon_msg
-                                 + name.encode('utf-8'))
+                self.client_send(self.format_signon(
+                    self.server_signon_msg, name, count))
             else:
                 self.verbose_debug(f"Received extra client signon from "
                                    f"proxy: {msg}")
@@ -811,8 +856,8 @@ class CommProxy(multitasking.YggTaskLoop):
                     and cli_address is not None):
                 return
             self.cli_address = cli_address
-            self.client_send(self.server_signon_msg
-                             + name.encode('utf-8'))
+            self.client_send(self.format_signon(
+                self.server_signon_msg, name))
 
     def preparse_message(self, name, msg):
         if self.is_partner or msg.flag == FLAG_EOF:

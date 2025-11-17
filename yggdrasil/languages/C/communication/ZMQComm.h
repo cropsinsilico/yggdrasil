@@ -1018,8 +1018,12 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       return ret;
     }
     ygglog_debug("zmq_comm_recv(%s): proxy signed on", x->name);
-    char* client_address = (char*)zframe_data(out) + YGG_PROXY_SIGNON_LEN;
-    client_address[zframe_size(out) - YGG_PROXY_SIGNON_LEN] = '\0';
+    char* client_address = NULL;
+    long msg_count = strtol((char*)zframe_data(out) + YGG_PROXY_SIGNON_LEN, &client_address, 10);
+    client_address += 2; // double colon
+    size_t start_client = client_address - (char*)zframe_data(out);
+    size_t size_count = start_client - YGG_PROXY_SIGNON_LEN;
+    client_address[zframe_size(out) - start_client] = '\0';
     ygglog_debug("zmq_comm_recv(%s): Received sign-on: %s", x->name, client_address);
     
     // create a DEALER socket and connect to address
@@ -1038,7 +1042,7 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       ygg_zsock_destroy(&client_socket);
       return ret;
     }
-    size_t response_len = YGG_SERVER_SIGNON_LEN + strlen(x->name) + 1;
+    size_t response_len = YGG_SERVER_SIGNON_LEN + strlen(x->name) + 1 + size_count;
     zframe_t *response = zframe_new(NULL, response_len);
     if (response == NULL) {
       ygglog_error("zmq_comm_recv(%s): Error creating response message frame.", x->name);
@@ -1047,8 +1051,8 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       ygg_zsock_destroy(&client_socket);
       return ret;
     }
-    snprintf((char*)(zframe_data(response)), response_len, "%s%s",
-             YGG_SERVER_SIGNON, x->name);
+    snprintf((char*)(zframe_data(response)), response_len, "%s::%d%s",
+             YGG_SERVER_SIGNON, msg_count, x->name);
     ygglog_debug("zmq_comm_recv(%s): sending server signon \"%s\"",
                  x->name, (char*)(zframe_data(response)));
     if (zframe_send(&response, client_socket, 0) < 0) {

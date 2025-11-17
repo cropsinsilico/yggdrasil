@@ -50,7 +50,7 @@ if [ ! -n "$DONT_BUILD" ]; then
        rm -rf "${CONDA_PREFIX}/lib/python3.9/site-packages/yggdrasil_framework*"
     fi
     pip install \
-	--config-settings=cmake.define.RAPIDJSON_INCLUDE_DIRS=../yggdrasil_rapidjson/include/ \
+	--config-settings=cmake.define.YGGDRASIL_RAPIDJSON_INCLUDE_DIRS=../yggdrasil_rapidjson/include/ \
 	--config-settings=cmake.define.PYRJ_DIR=../yggdrasil-python-rapidjson/ \
 	$BUILD_ARGS .
 fi
@@ -74,7 +74,7 @@ fi
 
 # yggschema
 # yggcompile c cpp fortran  # --with-asan
-# export CMAKE_SOURCE_DIR=/Users/langmm/rapidjson/
+# export CMAKE_SOURCE_DIR=/Users/langmm/yggdrasil_rapidjson/
 # valgrind --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind-python.supp --leak-check=full --error-exitcode=1 --track-origins=yes --dsymutil=no --keep-debuginfo=yes --read-var-info=yes python -m pytest -sv tests/test_schema.py::test_normalize &> log.txt
 # pytest -sv tests/test_schema.py tests/test_yamlfile.py tests/serialize/ &> log.txt
 # cd ..
