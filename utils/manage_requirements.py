@@ -1057,8 +1057,8 @@ class YggRequirementsList(UserList):
                 exports_flags = {'pin': True}
                 if rattler:
                     out['package'] = {'name': name}
-                    if name == 'yggdrasil':
-                        exports_flags['upper_bound'] = 'x.x.x'
+                    # if name == 'yggdrasil':
+                    #     exports_flags['upper_bound'] = 'x.x.x'
                 else:
                     out['name'] = name
                 out['build'] = OrderedDict()
@@ -1066,10 +1066,9 @@ class YggRequirementsList(UserList):
                     out['build']['number'] = '${{ build_number }}'
                 out['build']['string'] = self.conda_build_string(
                     rattler=rattler)
-                if name != 'yggdrasil':
-                    out['build']['run_exports'] = [
-                        YggRequirement(name, flags=exports_flags)
-                    ]
+                out['build']['run_exports'] = [
+                    YggRequirement(name, flags=exports_flags)
+                ]
             if self.requires_extras:
                 extra_count = 0
                 for x in self.requires_extras:
@@ -1084,10 +1083,13 @@ class YggRequirementsList(UserList):
                 core.insert(0, YggRequirement('yggdrasil',
                                               flags={'pin': 'exact'}))
             out['requirements'] = OrderedDict()
-            if rattler and name == 'yggdrasil':
-                out['requirements']['run_exports'] = [
-                    YggRequirement(name, flags={'pin': True})
-                ]
+            if rattler:
+                out['requirements']['run_exports'] = out['build'].pop(
+                    'run_exports')
+            # if rattler and name == 'yggdrasil':
+            #     out['requirements']['run_exports'] = [
+            #         YggRequirement(name, flags={'pin': True})
+            #     ]
             if build_req:
                 out['requirements']['build'] = build_req
             if host_req:
@@ -2112,6 +2114,10 @@ def select_requirements_from_args(args, install_opts, target_os=None):
     args.dry_run = True
     if args.method == 'pip':
         args.fallback_to_conda = False
+        args.exclude_dep = copy.deepcopy(args.exclude_dep)
+        if not args.exclude_dep:
+            args.exclude_dep = []
+        args.exclude_dep.append('r-base')
     param = SetupParam.from_args(args, install_opts)
     x = select_requirements(
         param, varient=args.varient,

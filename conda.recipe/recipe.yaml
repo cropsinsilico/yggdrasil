@@ -124,9 +124,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.c') }}
-    requirements:
       host:
         - python
       run:
@@ -146,9 +146,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.fortran') }}
-    requirements:
       host:
         - python
       run:
@@ -159,9 +159,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.r') }}
-    requirements:
       host:
         - python
         - r-base >3.5
@@ -190,9 +190,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.zmq') }}
-    requirements:
       host:
         - czmq
         - lz4
@@ -208,9 +208,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.julia') }}
-    requirements:
       host:
         - juliaup
         - python
@@ -222,9 +222,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.mpi') }}
-    requirements:
       host:
         - python
       run:
@@ -244,9 +244,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.rmq') }}
-    requirements:
       host:
         - python
       run:
@@ -257,9 +257,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.images') }}
-    requirements:
       host:
         - python
       run:
@@ -271,9 +271,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.seq') }}
-    requirements:
       host:
         - python
       run:
@@ -284,9 +284,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.pytorch') }}
-    requirements:
       host:
         - python
       run:
@@ -300,9 +300,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.excel') }}
-    requirements:
       host:
         - python
       run:
@@ -314,9 +314,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.testing') }}
-    requirements:
       host:
         - python
       run:
@@ -337,9 +337,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.docs') }}
-    requirements:
       host:
         - python
       run:
@@ -357,9 +357,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.dev') }}
-    requirements:
       host:
         - python
       run:
@@ -376,9 +376,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.astropy') }}
-    requirements:
       host:
         - python
       run:
@@ -389,9 +389,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.pygments') }}
-    requirements:
       host:
         - python
       run:
@@ -402,9 +402,9 @@ outputs:
     build:
       number: ${{ build_number }}
       string: py${{ python | version_to_buildstring }}h${{ hash }}_${{ build_number }}
+    requirements:
       run_exports:
         - ${{ pin_subpackage('yggdrasil.trimesh') }}
-    requirements:
       host:
         - python
       run:

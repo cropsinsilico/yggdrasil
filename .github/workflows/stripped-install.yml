@@ -32,7 +32,7 @@ jobs:
         python-install: [pip, conda]
         python-version: ["3.11"]
         install-c: [true]
-        install-fortran: [false]
+        install-fortran: [true]
         install-r: [false]
         install-julia: [false]
         install-matlab: [false]
@@ -73,7 +73,7 @@ jobs:
       - name: Create files containing lists of dependencies
         run: |
           python -m pip install pyyaml
-          python utils/manage_requirements.py select --output-per-method --output-file=ci_requirements.txt --install-c=${{ matrix.install-c }} --install-fortran=${{ matrix.install-fortran }} --install-r=${{ matrix.install-r }} --install-julia=${{ matrix.install-julia }} --install-matlab=${{ matrix.install-matlab }} --install-lpy=${{ matrix.install-lpy }} --install-sbml=${{ matrix.install-sbml }} --install-pytorch=${{ matrix.install-pytorch }} --install-zmq=${{ matrix.install-zmq }} --install-mpi=${{ matrix.install-mpi }} --install-rmq=${{ matrix.install-rmq }} --install-omp=${{ matrix.install-omp }} --install-testing=true --install-dev=true --exclude-dep=r-base ${{ matrix.python-install }}
+          python utils/manage_requirements.py select --output-per-method --output-file=ci_requirements.txt --install-c=${{ matrix.install-c }} --install-fortran=${{ matrix.install-fortran }} --install-r=${{ matrix.install-r }} --install-julia=${{ matrix.install-julia }} --install-matlab=${{ matrix.install-matlab }} --install-lpy=${{ matrix.install-lpy }} --install-sbml=${{ matrix.install-sbml }} --install-pytorch=${{ matrix.install-pytorch }} --install-zmq=${{ matrix.install-zmq }} --install-mpi=${{ matrix.install-mpi }} --install-rmq=${{ matrix.install-rmq }} --install-omp=${{ matrix.install-omp }} --install-testing=true --install-dev=true ${{ matrix.python-install }}
 
       ###################################
       # PIP SETUP
@@ -91,7 +91,7 @@ jobs:
       - name: Install dependencies using vcpkg (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
-          cat ci_requirements_vcpkg.txt | tr '\n' ' ' | xargs -n1 vcpkg.exe install --classic --triplet ${{ env.VCPKG_TRIPLET }}
+          ./utils/vcpkg_install.sh ci_requirements_vcpkg.txt
       - name: Install dependencies using choco (Windows)
         if: matrix.os-base == 'windows' && matrix.python-install == 'pip'
         run: |
@@ -149,8 +149,8 @@ jobs:
           python-version: ${{ env.PYTHONVERSION }}
           channels: conda-forge
           channel-priority: strict
+          conda-remove-defaults: true
           miniforge-version: latest
-
 
       ###################################
       # SETUP FOR BOTH PIP & CONDA
@@ -189,6 +189,9 @@ jobs:
         if: matrix.os-base == 'windows' && matrix.install-method == 'pip' && matrix.install-r
         run: |
           ygginstall R --update-r-requirements
+      - name: Create coverage file
+        run: |
+          python -m yggdrasil coveragerc
       - name: Verify installation
         run: |
           ygginfo
