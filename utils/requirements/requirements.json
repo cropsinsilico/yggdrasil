@@ -70,13 +70,7 @@
     {
       "git": [
         {
-          "method": "conda",
-          "os": "unix"
-        },
-        {
-          "name": "m2w64-crt-git",
-          "method": "conda",
-          "os": "win"
+          "method": "conda"
         }
       ]
     },

@@ -70,8 +70,7 @@ requirements:
     - chevron
     - deprecation
     - flask
-    - git  # [not win]
-    - m2w64-crt-git  # [win]
+    - git
     - matplotlib-base
     - numpy >=1.13.0
     - pandas

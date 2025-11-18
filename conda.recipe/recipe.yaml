@@ -80,6 +80,7 @@ outputs:
         - chevron
         - deprecation
         - flask
+        - git
         - matplotlib-base
         - numpy >=1.13.0
         - pandas
@@ -95,11 +96,7 @@ outputs:
         - unyt
         - if: unix
           then:
-            - git
             - sysv_ipc
-        - if: win
-          then:
-            - m2w64-crt-git
     tests:
       - python:
           imports:

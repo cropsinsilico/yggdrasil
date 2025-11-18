@@ -191,7 +191,8 @@ jobs:
           ygginstall R --update-r-requirements
       - name: Create coverage file
         run: |
-          python -m yggdrasil coveragerc
+          cd ..
+          python -I -m yggdrasil coveragerc
       - name: Verify installation
         run: |
           ygginfo
