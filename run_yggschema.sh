@@ -84,7 +84,15 @@ if [ -n "$OUTSIDE_DIR" ]; then
     cd ..
     PREFIX_PATH="yggdrasil/"
 fi
-pytest -svx -n0 -p no:rerunfailures tests/languages/test_YggInterface.py
+pytest -svx --suite=comms
+# pytest -svx tests/test_dependencies.py
+# pytest -svx tests/test_dependencies.py::TestManagedDependencyBase --parametrize-package-manager=options
+# pytest -svx --suite=examples tests/examples/test_timed_pipe.py
+# pytest -svx --suite=examples --parametrize-language=make --parametrize-language=cmake
+# pytest -svx tests/drivers/test_MakeModelDriver.py tests/drivers/test_CMakeModelDriver.py
+# pytest -svx tests/drivers/test_FileOutputDriver.py
+# pytest -svx tests/test_services.py::test_validate_model_repo
+# pytest -svx -n0 -p no:rerunfailures tests/languages/test_YggInterface.py
 # pytest -svx --ygg-debug ${PREFIX_PATH}tests/test_runner.py::test_run_compilation_opt
 # pytest -svx --import-mode importlib tests/drivers/test_ConnectionDriver.py::TestConnectionDriverProcess
 # pytest -svx tests/drivers/test_ConnectionDriver.py::TestConnectionDriverProcess
