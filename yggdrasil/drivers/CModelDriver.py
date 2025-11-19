@@ -507,7 +507,8 @@ class CModelDriver(CompiledModelDriver):
     external_libraries = {
         'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
                                               'rapidjson', 'include',
-                                              'rapidjson', 'rapidjson.h'),
+                                              'yggdrasil_rapidjson',
+                                              'yggdrasil_rapidjson.h'),
                       'libtype': 'header_only',
                       'language': 'c'},
         'zmq': {'include': 'zmq.h',

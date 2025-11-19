@@ -657,7 +657,8 @@ class CommProxy(multitasking.YggTaskLoop):
         """
         if messages:
             self.requeue_messages(messages)
-        self.debug(f"Removing server \"{name}\" from proxy")
+        self.info(f"Removing server \"{name}\" from proxy "
+                  f"(nservers = {self.srv_count})")
         if self.is_partner:
             try:
                 self.client_send(self.server_signoff_msg
@@ -690,7 +691,8 @@ class CommProxy(multitasking.YggTaskLoop):
                              + name.encode('utf-8'))
             self.terminate()
             return
-        self.debug(f"Removing client \"{name}\" from proxy")
+        self.info(f"Removing client \"{name}\" from proxy "
+                  f"(nclients = {self.cli_count})")
         self.clients.remove(name)
         if (not self.allow_no_clients) and self.cli_count == 0:
             self.debug(f"Shutting down proxy due to absence of clients. "
@@ -2298,7 +2300,7 @@ class CommBase(tools.YggClass):
         with _registered_proxies.lock:
             if self.proxy is None:
                 return
-            self.debug("Signing off from proxy")
+            self.info(f"Signing off from proxy ({self.direction})")
             if self.direction == 'send':
                 self.proxy.remove_client(self.name, **kwargs)
             else:

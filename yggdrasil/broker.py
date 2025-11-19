@@ -243,6 +243,7 @@ class YggBroker(multitasking.YggTaskLoop):
 
     def run_finally(self):
         r"""Cleanup."""
+        self.info("Broker exiting")
         self.server_comm.close()
         self.server_comm = None
         super(YggBroker, self).run_finally()
@@ -256,6 +257,7 @@ class YggBroker(multitasking.YggTaskLoop):
                 x.terminate()
         # Terminate drivers?
         os.environ.pop(self._server_address_env, None)
+        self.info("Broker finished exiting")
 
     def complete_request(self, request):
         r"""Complete a request by processing it and either delaying it

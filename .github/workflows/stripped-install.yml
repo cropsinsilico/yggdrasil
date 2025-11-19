@@ -245,7 +245,7 @@ jobs:
       - name: Generated integration tests for each type
         if: matrix.test-type == 'types'
         run: |
-          pytest --ci --cov-append --suites types
+          pytest --ci --cov-append --suites types --nocapture
       - name: Basic communication tests
         if: matrix.test-type == 'comms'
         run: |

@@ -1694,7 +1694,7 @@ def count_fds():
         if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
-            conn = proc.connections()
+            conn = proc.net_connections()
             out = proc.num_fds()
             if not dont_subtract_closed:
                 out -= len([x for x in conn if x.status == 'CLOSE'])
@@ -1772,6 +1772,8 @@ def verify_count_threads(wait_on_function):
     global _dont_verify_count_thrads
     _dont_verify_count_thrads = False
     nthread = threading.active_count()
+    prev_threads = '\n\t'.join([x.name for x in threading.enumerate()])
+
     yield
 
     if not _dont_verify_count_thrads:
@@ -1779,7 +1781,9 @@ def verify_count_threads(wait_on_function):
             threads = '\n\t'.join([x.name for x in threading.enumerate()])
             raise AssertionError(f"{threading.active_count()} threads "
                                  f"running, but the test started with "
-                                 f"{nthread}. Running threads:\n\t{threads}")
+                                 f"{nthread}.\n"
+                                 f"PREVIOUS:\n\t{prev_threads}\n"
+                                 f"CURRENT:\n\t{threads}")
         # Subtract one as it will be the thread checking function
         wait_on_function(lambda: threading.active_count() <= (nthread + 1),
                          on_timeout=on_timeout,
