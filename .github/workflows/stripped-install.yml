@@ -28,6 +28,7 @@ jobs:
     #     options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
     strategy:
       matrix:
+        # ORDER FOR RE-ENABLING: install-r, install-julia, install-matlab
         os-base: [ubuntu, macos, windows]
         python-version: ["3.11"]
         python-install: [pip, conda]
@@ -240,7 +241,7 @@ jobs:
       - name: Basic integration test for combination of installed languages/comms
         if: matrix.test-type == 'base'
         run: |
-          pytest --ci --cov-append --suites examples tests/examples/test_timed_pipe.py
+          pytest --ci --cov-append --suites=examples tests/examples/test_timed_pipe.py
       - name: Generated integration tests for each type
         if: matrix.test-type == 'types'
         run: |
