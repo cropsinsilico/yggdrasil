@@ -43,32 +43,42 @@ jobs:
         install-mpi: [false]
         install-rmq: [false]
         install-omp: [false]
+        test-type: [base, types]
         # astropy, trimesh, pygments, images, seq, excel, docs, dev
+        exclude:
+          test-type: types
+          python-install: pip
         include:
           - os-base: ubuntu
             python-install: conda
             python-version: "3.9"
             install-c: true
             install-fortran: true
+            test-type: base
           - os-base: ubuntu
             python-install: conda
             python-version: "3.10"
             install-c: true
             install-fortran: true
+            test-type: base
           - os-base: ubuntu
             python-install: conda
             python-version: "3.12"
             install-c: true
             install-fortran: true
+            test-type: base
           - os-base: ubuntu
             python-install: conda
             python-version: "3.13"
             install-c: true
             install-fortran: true
+            test-type: base
           - os-base: windows
+            python-install: conda
             python-version: "3.11"
             install-c: false
             install-fortran: false
+            test-type: base
       fail-fast: false
     defaults:
       run:
@@ -227,7 +237,16 @@ jobs:
       # TEST
       ###################################
 
+      - name: Basic integration test for combination of installed languages/comms
+        if: matrix.test-type == 'base'
+        run: |
+          pytest --ci --cov-append --suites examples tests/examples/test_timed_pipe.py
+      - name: Generated integration tests for each type
+        if: matrix.test-type == 'types'
+        run: |
+          pytest --ci --cov-append --suites types
       - name: Basic communication tests
+        if: matrix.test-type == 'comms'
         run: |
           pytest --ci --cov-append --suites comms
 
