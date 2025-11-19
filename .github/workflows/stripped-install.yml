@@ -46,8 +46,8 @@ jobs:
         test-type: [base, types]
         # astropy, trimesh, pygments, images, seq, excel, docs, dev
         exclude:
-          test-type: types
-          python-install: pip
+          - test-type: types
+            python-install: pip
         include:
           - os-base: ubuntu
             python-install: conda
