@@ -31,7 +31,7 @@ jobs:
         os-base: [ubuntu, macos, windows]
         python-install: [pip, conda]
         install-fortran: [true]
-        # install-r: [false]
+        install-r: [false]
         install-julia: [false]
         install-matlab: [false]
         install-lpy: [false]
