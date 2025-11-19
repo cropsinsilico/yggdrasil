@@ -8,7 +8,10 @@ import copy
 import types
 import functools
 import subprocess
+from collections import OrderedDict
 # from tests import communication, demos, drivers, examples, languages
+_python_version = (sys.version_info[0], sys.version_info[1],
+                   sys.version_info[2])
 
 
 # Test data
@@ -237,7 +240,7 @@ class TestClassBase(TestBase):
         del out
 
 
-class TestComponentMeta(type):
+class TComponentMeta(type):
     r"""Meta class for component tests."""
 
     def __new__(meta, name, bases, class_dict):
@@ -248,7 +251,7 @@ class TestComponentMeta(type):
                 class_dict.get('_component_instance_param', None))
             k = constants.COMPONENT_REGISTRY[component_type]['key']
             k_param = f'{k}_param_raw'
-            new_methods = {}
+            new_methods = OrderedDict()
             if use_param:
                 new_methods[k_param] = (
                     f'def {k_param}(self, request):\n'
@@ -277,14 +280,17 @@ class TestComponentMeta(type):
             )
             if not any(k in class_dict for k in new_methods.keys()):
                 for k, v in new_methods.items():
-                    exec(v)
+                    if _python_version[:2] >= (3, 13):
+                        exec(v, locals=sys._getframe(0).f_locals)
+                    else:
+                        exec(v)
                     class_dict[k] = pytest.fixture(
                         scope="class", autouse=True, name=k)(eval(k))
         cls = type.__new__(meta, name, bases, class_dict)
         return cls
 
 
-class TestComponentBase(TestClassBase, metaclass=TestComponentMeta):
+class TestComponentBase(TestClassBase, metaclass=TComponentMeta):
 
     _component_type = None
     _component_instance_param = {}

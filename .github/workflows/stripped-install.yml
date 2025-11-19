@@ -30,10 +30,8 @@ jobs:
       matrix:
         os-base: [ubuntu, macos, windows]
         python-install: [pip, conda]
-        python-version: ["3.11"]
-        install-c: [true]
         install-fortran: [true]
-        install-r: [false]
+        # install-r: [false]
         install-julia: [false]
         install-matlab: [false]
         install-lpy: [false]
@@ -44,6 +42,23 @@ jobs:
         install-rmq: [false]
         install-omp: [false]
         # astropy, trimesh, pygments, images, seq, excel, docs, dev
+        include:
+          - os-base: ubuntu
+            python-version: "3.9"
+            install-c: true
+          - os-base: ubuntu
+            python-version: "3.10"
+            install-c: true
+          - python-version: "3.11"
+            install-c: true
+          - os-base: ubuntu
+            python-version: "3.12"
+            install-c: true
+          - os-base: ubuntu
+            python-version: "3.13"
+            install-c: true
+          - os-base: windows
+            install-c: false
       fail-fast: false
     defaults:
       run:
@@ -146,7 +161,7 @@ jobs:
           activate-environment: yggdrasil
           environment-file: ci_requirements_conda.yml
           auto-update-conda: true
-          python-version: ${{ env.PYTHONVERSION }}
+          python-version: ${{ matrix.python-version }}
           channels: conda-forge
           channel-priority: strict
           conda-remove-defaults: true

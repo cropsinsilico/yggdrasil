@@ -13,6 +13,7 @@ _numpy2 = (np.lib.NumpyVersion(np.__version__) >= '2.0.0b1')
 _machine = machine
 _default_numpy_int = 'i4' if ((not _is_64bit)
                               or (_is_win and not _numpy2)) else 'i8'
+_python_version = (sys.version_info[0], sys.version_info[1])
 
 if _is_win:  # pragma: windows
     _newline = b'\r\n'
