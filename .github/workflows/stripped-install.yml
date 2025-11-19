@@ -29,9 +29,11 @@ jobs:
     strategy:
       matrix:
         os-base: [ubuntu, macos, windows]
+        python-version: ["3.11"]
         python-install: [pip, conda]
+        install-c: [true]
         install-fortran: [true]
-        install-r: [false]
+        # install-r: [false]
         install-julia: [false]
         install-matlab: [false]
         install-lpy: [false]
@@ -44,21 +46,29 @@ jobs:
         # astropy, trimesh, pygments, images, seq, excel, docs, dev
         include:
           - os-base: ubuntu
+            python-install: conda
             python-version: "3.9"
             install-c: true
+            install-fortran: true
           - os-base: ubuntu
+            python-install: conda
             python-version: "3.10"
             install-c: true
-          - python-version: "3.11"
-            install-c: true
+            install-fortran: true
           - os-base: ubuntu
+            python-install: conda
             python-version: "3.12"
             install-c: true
+            install-fortran: true
           - os-base: ubuntu
+            python-install: conda
             python-version: "3.13"
             install-c: true
+            install-fortran: true
           - os-base: windows
+            python-version: "3.11"
             install-c: false
+            install-fortran: false
       fail-fast: false
     defaults:
       run:

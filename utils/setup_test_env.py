@@ -85,7 +85,7 @@ def boolean_str(x):
         raise TypeError(type(x))
     if x.lower() in ['true', 'on']:
         return True
-    elif x.lower() in ['false', 'off']:
+    elif x.lower() in ['false', 'off', '']:
         return False
     raise ValueError(f'Error parsing string as boolean: \"{x}\"')
 
