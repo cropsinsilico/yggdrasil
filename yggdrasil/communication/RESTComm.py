@@ -79,6 +79,7 @@ class RESTComm(CommBase.CommBase):
     def atexit(self):  # pragma: debug
         r"""Close operations."""
         if self.direction == 'send':
+            self.send_eof()
             self.linger()
         super(RESTComm, self).atexit()
         

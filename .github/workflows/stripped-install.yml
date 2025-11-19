@@ -241,11 +241,11 @@ jobs:
       - name: Basic integration test for combination of installed languages/comms
         if: matrix.test-type == 'base'
         run: |
-          pytest --ci --cov-append --suites=examples tests/examples/test_timed_pipe.py
+          pytest --ci --cov-append --suites=examples tests/examples/test_timed_pipe.py --nocapture
       - name: Generated integration tests for each type
         if: matrix.test-type == 'types'
         run: |
-          pytest --ci --cov-append --suites types --nocapture
+          pytest --ci --cov-append --suites types
       - name: Basic communication tests
         if: matrix.test-type == 'comms'
         run: |
