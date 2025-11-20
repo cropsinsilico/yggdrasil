@@ -447,11 +447,11 @@ class SetupParam(object):
                 new_opts[k] = bool(getattr(args, k, False))
             elif args.install_all:
                 new_opts[k] = True
-            elif getattr(args, f'dont_install_{k}', False):
-                assert not getattr(args, f'install_{k}', False)
-                new_opts[k] = False
-            elif getattr(args, f'install_{k}', False):
-                new_opts[k] = True
+            elif isinstance(getattr(args, f'dont_install_{k}', None), bool):
+                assert not isinstance(getattr(args, f'install_{k}', False), bool)
+                new_opts[k] = (not getattr(args, f'dont_install_{k}'))
+            elif isinstance(getattr(args, f'install_{k}', None), bool):
+                new_opts[k] = getattr(args, f'install_{k}')
             elif getattr(args, 'default_install', None) is not None:
                 new_opts[k] = args.default_install
         install_opts.update(new_opts)
