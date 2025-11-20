@@ -341,7 +341,8 @@ class CommProxy(multitasking.YggTaskLoop):
 
     def __init__(self, srv_address=None, cli_address=None, name=None,
                  allow_no_servers=False, allow_no_clients=False,
-                 is_partner=False, servers=None, clients=None, **kwargs):
+                 is_partner=False, servers=None, clients=None,
+                 local_to_server=False, **kwargs):
         if servers is None:
             servers = []
         if clients is None:
@@ -359,6 +360,7 @@ class CommProxy(multitasking.YggTaskLoop):
         self.cli_address = cli_address
         self.allow_no_servers = allow_no_servers
         self.allow_no_clients = allow_no_clients
+        self.local_to_server = local_to_server
         self.backlog = []
         self.nsignon_proxy_sent = 0
         self.nsignon_proxy_recv = 0
@@ -469,11 +471,19 @@ class CommProxy(multitasking.YggTaskLoop):
         if sleep:
             self.sleep()
 
+    def on_main_terminated(self, dont_break=False):  # pragma: debug
+        r"""Actions taken on the backlog thread when the main thread stops."""
+        # Allow the parent comm to close the proxy
+        if not self.is_partner:
+            dont_break = True
+        super(CommProxy, self).on_main_terminated(dont_break=dont_break)
+        
     def after_loop(self):
         r"""Close sockets after the loop finishes."""
         if not self.is_partner:
             try:
                 with self.lock:
+                    # One message per server?
                     self.server_send(self.proxy_signoff_msg)
             except BaseException:
                 pass
@@ -648,8 +658,8 @@ class CommProxy(multitasking.YggTaskLoop):
             self.backlog.append(x)
 
     def remove_server(self, name, in_loop=False, messages=None):
-        r"""Decrement the client count, closing the server if all
-        clients done.
+        r"""Decrement the server count, closing the proxy if all
+        servers done.
 
         Args:
             name (str): Name of the server to remove.
@@ -682,7 +692,8 @@ class CommProxy(multitasking.YggTaskLoop):
                     _registered_proxies.pop(self.srv_address)
             
     def remove_client(self, name, in_loop=False):
-        r"""Decrement the client count, closing the server if all clients done.
+        r"""Decrement the client count, closing the proxy if all
+        clients done.
 
         Args:
             name (str): Name of the client to remove.
@@ -695,8 +706,9 @@ class CommProxy(multitasking.YggTaskLoop):
                              + name.encode('utf-8'))
             self.terminate()
             return
-        self.info(f"Removing client \"{name}\" from proxy "
-                  f"(nclients = {self.cli_count})")
+        self.debug(f"Removing client \"{name}\" from proxy: "
+                   f"clients = {self.clients} "
+                   f"(nclients = {self.cli_count})")
         self.clients.remove(name)
         if (not self.allow_no_clients) and self.cli_count == 0:
             self.debug(f"Shutting down proxy due to absence of clients. "
@@ -752,15 +764,20 @@ class CommProxy(multitasking.YggTaskLoop):
         """
         assert not self.is_partner
         if msg.startswith(self.server_signon_msg):
-            name, count = self.process_signon(msg)
-            self.info(f"Received server signon from {name}")
+            name, count = self.process_signon(msg, decode=True)
+            self.debug(f"Received server signon from {name}")
             if self.srv_count == 0:
                 self.debug(f"A server signed on after "
                            f"{self.nsignon_proxy_sent} proxy signon "
                            f"messages in response to message"
                            f"#{count + 1} so {count} messages may have "
                            f"been dropped.")
-            self.add_server(name)
+            if ((self.local_to_server and self.srv_count == 1
+                 and self.local_to_server == name)):
+                # Prevent adding the local server name twice
+                self.local_to_server = False
+            else:
+                self.add_server(name)
             self.server_send(
                 self.proxy_signon_count_msg
                 + str(self.nsignon_proxy_sent - count).encode('utf-8')
@@ -847,7 +864,7 @@ class CommProxy(multitasking.YggTaskLoop):
         assert msg.startswith(self.proxy_signon_count_msg)
         nsignon_proxy_sent = int(
             msg.split(self.proxy_signon_count_msg)[-1].decode('utf-8'))
-        self.debug(f"Received proxy signon from proxy: {msg}")
+        self.debug(f"Received proxy signon count from proxy: {msg}")
         with self.lock:
             if self.is_partner:
                 self.nsignon_proxy_sent = nsignon_proxy_sent
@@ -862,6 +879,8 @@ class CommProxy(multitasking.YggTaskLoop):
                     and cli_address is not None):
                 return
             self.cli_address = cli_address
+            self.debug(f'Received proxy client address in header for '
+                       f'{name}')
             self.client_send(self.format_signon(
                 self.server_signon_msg, name))
 
@@ -1243,7 +1262,8 @@ class CommBase(tools.YggClass):
         if create_proxy is None:
             create_proxy = (
                 (self.is_client or self.allow_multiple_comms)
-                and (not self.is_interface)
+                and ((not self.is_interface)
+                     or self.direct_connection)
                 and (self.direction != 'recv')
                 and (self._commtype not in ['mpi', 'rest'])
             )
@@ -2281,6 +2301,7 @@ class CommBase(tools.YggClass):
                         kws['cli_address'] = self.address
                         # Initialize with servers to prevent proxy
                         # signon since this server is already ready
+                        kws['local_to_server'] = self.name
                         kws['servers'] = [self.name]
                     self.proxy = self._proxy_class(**kws)
                     self.proxy.start()
@@ -2298,17 +2319,18 @@ class CommBase(tools.YggClass):
                 self.proxy.start()
             if self.proxy:
                 if self.direction == 'send':
+                    self.debug(f"Adding client {self.name} to local proxy")
                     self.proxy.add_client(self.name)
-                else:
-                    self.info(f"Adding server {self.name} to local proxy")
-                    # self.proxy.add_server(self.name)
+                # else:
+                #     self.debug(f"Adding server {self.name} to local proxy")
+                #     self.proxy.add_server(self.name)
 
     def signoff_from_proxy(self, **kwargs):
         r"""Remove a client/server from the proxy."""
         with _registered_proxies.lock:
             if self.proxy is None:
                 return
-            self.info(f"Signing off from proxy ({self.direction})")
+            self.debug(f"Signing off from proxy ({self.direction})")
             if self.direction == 'send':
                 self.proxy.remove_client(self.name, **kwargs)
             else:

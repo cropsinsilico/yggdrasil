@@ -114,6 +114,12 @@ class PandasSerialize(AsciiTableSerialize):
             frame = frame[field_names]
         return frame
 
+    @property
+    def str_as_unicode(self):
+        r"""bool: True if C-format strings should be interpreted as
+        unicode."""
+        return (not self.str_as_bytes)
+
     def cformat2nptype(self, *args, **kwargs):
         r"""Method to convert c format string to numpy data type.
 

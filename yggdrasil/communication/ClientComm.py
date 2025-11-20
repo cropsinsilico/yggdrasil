@@ -51,13 +51,18 @@ class ClientComm(CommBase.CommBase):
         self.response_kwargs.setdefault('language', self.ocomm.language)
         self.response_kwargs.setdefault('use_async', self.ocomm.is_async)
         self.response_kwargs.setdefault('env', self.ocomm.env)
-        super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
-                                         recv_timeout=self.ocomm.recv_timeout,
-                                         is_interface=self.ocomm.is_interface,
-                                         direction='send', no_suffix=True,
-                                         address=self.ocomm.address,
-                                         is_async=self.ocomm.is_async,
-                                         env=self.ocomm.env)
+        preserved_kwargs = {
+            k: getattr(self.ocomm, k) for k in [
+                'address', 'is_async', 'env', 'recv_timeout',
+                'is_interface',
+                'partner_name', 'partner_language', 'partner_model',
+                'direct_connection',
+            ]
+        }
+        super(ClientComm, self).__init__(
+            self.ocomm.name, dont_open=dont_open,
+            direction='send', no_suffix=True,
+            **preserved_kwargs)
 
     def get_status_message(self, nindent=0, **kwargs):
         r"""Return lines composing a status message.
@@ -146,6 +151,14 @@ class ClientComm(CommBase.CommBase):
         r"""dict: Name/address pairs for opposite comms."""
         out = super(ClientComm, self).opp_comms
         out.update(**self.ocomm.opp_comms)
+        return out
+
+    @property
+    def opp_model(self):
+        r"""str: Name of the model for the opposite comm."""
+        out = super(ClientComm, self).opp_model
+        if not out:
+            out = self.ocomm.opp_model
         return out
 
     def opp_comm_kwargs(self, for_yaml=False):

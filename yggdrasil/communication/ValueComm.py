@@ -34,6 +34,14 @@ class ValueComm(CommBase):
             return True
         return False
         
+    @property
+    def model_comm_kwargs(self):
+        r"""dict: Parameters that should be used for initializing the
+        partner comm created by the model interface."""
+        out = super(ValueComm, self).model_comm_kwargs()
+        out['count'] = self.count
+        return out
+
     def open(self):
         r"""Open the connection."""
         super(ValueComm, self).open()

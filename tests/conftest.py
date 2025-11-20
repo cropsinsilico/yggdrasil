@@ -1381,6 +1381,20 @@ def recv_message_list(timeout, wait_on_function, nested_approx):
 
 
 @pytest.fixture(scope="session")
+def assert_unchanged():
+
+    @contextlib.contextmanager
+    def assert_unchanged_context(obj):
+        orig = copy.deepcopy(obj)
+        try:
+            yield
+        finally:
+            assert obj == orig
+
+    return assert_unchanged_context
+
+
+@pytest.fixture(scope="session")
 def assert_equal_file_contents():
     r"""Assert that the contents of two files are equivalent.
 

@@ -52,7 +52,7 @@ class DirectConnectionDriver(ConnectionDriver):
                 raise DirectConnectionError(
                     "Cannot make a direct connection to a file.")
             x.update(
-                model=x.pop('partner_model'),
+                model=x.pop('partner_model', None),
                 direct_connection=True,
             )
             models.append(x['model'])
@@ -67,6 +67,10 @@ class DirectConnectionDriver(ConnectionDriver):
             if x['commtype'] == 'mpi':
                 raise DirectConnectionError(
                     "Cannot make a direct connection with an MPI comm")
+            # TODO: This is only true for C based interfaces
+            if x['commtype'] == 'value':
+                raise DirectConnectionError(
+                    "Cannot make a direct connection with an value comm")
             for k in ['client', 'servier']:
                 if x.get(f'is_{k}', False):
                     x.update(
@@ -95,6 +99,10 @@ class DirectConnectionDriver(ConnectionDriver):
         self.models[io] = models
 
     def _add_partner_single(self, x, x_opp):
+        if x['model'] == x_opp['model']:
+            # TODO: This is only true if aync comms are not used
+            raise DirectConnectionError(
+                "Cannot make a direct connection within the same model")
         x.update(
             partner_name=x_opp['name'],
             partner_language=x_opp['language'],

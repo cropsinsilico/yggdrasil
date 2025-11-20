@@ -1578,6 +1578,9 @@ class YggRunner(YggClass):
         for srv_name in model.get('client_of', []):
             iod = self.connectiondrivers[srv_name]
             iod['instance'].remove_model('input', model['name'])
+            if isinstance(iod['instance'],
+                          DirectConnectionDriver.DirectConnectionDriver):
+                continue
             if iod['instance'].nclients == 0:
                 self.stop_server(srv_name)
 

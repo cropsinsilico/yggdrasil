@@ -1216,11 +1216,14 @@ def list2numpy(arrays, names=None):
     return dict2numpy(list2dict(arrays, names=names), order=names)
 
 
-def numpy2dict(arr):
+def numpy2dict(arr, names=None):
     r"""Covert a numpy structured array to a dictionary of arrays.
 
     Args:
         arr (np.ndarray): Array to convert.
+        names (list, optional): Names to give to the new fields.
+            Defaults to names based on array fields or order (if array
+            does not contain fields).
 
     Returns:
         dict: Dictionary with contents from the input array.
@@ -1229,11 +1232,17 @@ def numpy2dict(arr):
     if not isinstance(arr, np.ndarray):
         raise TypeError("arr must be a numpy array, not %s." % type(arr))
     out = dict()
+    if names is None:
+        names = arr.dtype.names
     if arr.dtype.names is None:
-        out['0'] = arr
+        if names is None:
+            names = ['0']
+        assert len(names) == 1
+        out[names[0]] = arr
     else:
-        for n in arr.dtype.names:
-            out[n] = arr[n]
+        assert len(names) == len(arr.dtype.names)
+        for n0, n1 in zip(arr.dtype.names, names):
+            out[n1] = arr[n0]
     return out
 
 
@@ -1277,6 +1286,8 @@ def numpy2pandas(arr):
     if not isinstance(arr, np.ndarray):
         raise TypeError("arr must be a numpy array, not %s." % type(arr))
     out = pandas.DataFrame(arr)
+    if not arr.dtype.names:
+        out.columns = pandas.RangeIndex(len(out.columns))
     return out
 
 
@@ -1334,10 +1345,7 @@ def dict2pandas(d, order=None):
         pandas.DataFrame: Pandas data frame with contents from the input dict.
 
     """
-    out = numpy2pandas(dict2numpy(d, order=order))
-    if order is None:
-        out.columns = pandas.RangeIndex(len(out.columns))
-    return out
+    return numpy2pandas(dict2numpy(d, order=order))
 
 
 def pandas2dict(frame):

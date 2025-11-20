@@ -501,6 +501,7 @@ class ZMQComm(CommBase.CommBase):
         self.reply_socket_lock = multitasking.RLock()
         self.socket_lock = multitasking.RLock()
         self._reply_thread = None
+
         # Client/Server things
         if self.allow_multiple_comms:
             socket_type = 'DEALER'

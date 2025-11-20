@@ -87,12 +87,16 @@ class DefaultSerialize(SerializeBase):
 
         """
         if field_names is None:
+            if as_array and isinstance(obj, np.ndarray):
+                return serialize.numpy2dict(obj)
             assert not as_array
             return super(DefaultSerialize, cls).object2dict(obj, **kwargs)
-        if len(field_names) == 1 and not isinstance(obj, (list, tuple)):
+        if ((len(field_names) == 1 and not isinstance(obj, (list, tuple))
+             and not (isinstance(obj, np.ndarray)
+                      and tuple(field_names) == obj.dtype.names))):
             return {field_names[0]: obj}
         if isinstance(obj, np.ndarray):
-            return serialize.numpy2dict(obj)
+            return serialize.numpy2dict(obj, names=field_names)
         return serialize.list2dict(obj, names=field_names)
 
     @classmethod

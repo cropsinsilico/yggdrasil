@@ -61,13 +61,18 @@ class ServerComm(CommBase.CommBase):
         self.clients = []
         self.closed_clients = []
         self.nclients_expected = int(os.environ.get('YGG_NCLIENTS', 0))
-        super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
-                                         recv_timeout=self.icomm.recv_timeout,
-                                         is_interface=self.icomm.is_interface,
-                                         direction='recv', no_suffix=True,
-                                         address=self.icomm.address,
-                                         is_async=self.icomm.is_async,
-                                         env=self.icomm.env)
+        preserved_kwargs = {
+            k: getattr(self.icomm, k) for k in [
+                'address', 'is_async', 'env', 'recv_timeout',
+                'is_interface',
+                'partner_name', 'partner_language', 'partner_model',
+                'direct_connection',
+            ]
+        }
+        super(ServerComm, self).__init__(
+            self.icomm.name, dont_open=dont_open,
+            direction='recv', no_suffix=True,
+            **preserved_kwargs)
 
     def get_status_message(self, nindent=0, **kwargs):
         r"""Return lines composing a status message.
@@ -156,6 +161,14 @@ class ServerComm(CommBase.CommBase):
         r"""dict: Name/address pairs for opposite comms."""
         out = super(ServerComm, self).opp_comms
         out.update(**self.icomm.opp_comms)
+        return out
+
+    @property
+    def opp_model(self):
+        r"""str: Name of the model for the opposite comm."""
+        out = super(ServerComm, self).opp_model
+        if not out:
+            out = self.icomm.opp_model
         return out
 
     def opp_comm_kwargs(self, for_yaml=False):

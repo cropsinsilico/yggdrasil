@@ -37,9 +37,9 @@ jobs:
         install-julia: [false]
         install-matlab: [false]
         # astropy, trimesh, pygments, images, seq, excel, docs, dev
-        # exclude:
-        #   - test-type: types-compiled
-        #     python-install: pip
+        exclude:
+          - python-install: pip
+            test-base: false
         include:
           - python-install: conda
             test-base: false

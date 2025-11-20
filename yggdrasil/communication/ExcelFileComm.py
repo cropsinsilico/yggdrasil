@@ -61,11 +61,12 @@ class ExcelFileComm(DedicatedFileBase):
     concats_as_str = True
 
     def __init__(self, *args, **kwargs):
-        if kwargs.get('direction', 'send') == 'send':
-            kwargs['serializer'] = {'seritype': 'pandas'}
-        else:
-            kwargs['serializer'] = {
-                'seritype': 'table', 'as_array': True}
+        kwargs['serializer'] = {'seritype': 'pandas'}
+        # if kwargs.get('direction', 'send') == 'send':
+        #     kwargs['serializer'] = {'seritype': 'pandas'}
+        # else:
+        #     kwargs['serializer'] = {
+        #         'seritype': 'table', 'as_array': True}
         super(ExcelFileComm, self).__init__(*args, **kwargs)
 
     def _init_before_open(self, **kwargs):
@@ -264,7 +265,9 @@ class ExcelFileComm(DedicatedFileBase):
             table_string_type='bytes', read_meth='readline')
         out.update(contents=None,
                    exact_contents=False)
-        out.setdefault('kwargs', {})
+        for k in ['field_names', 'field_units']:
+            out.pop(k, None)
+        out['kwargs'] = {}
         out['kwargs']['str_as_bytes'] = True
         if sheets:
             out['kwargs']['sheets'] = sheets

@@ -752,10 +752,10 @@
               "method": "brew"
             },
             {
-              "method": "choco"
+              "method": "vcpkg"
             },
             {
-              "method": "vcpkg"
+              "method": "choco"
             }
           ]
         },

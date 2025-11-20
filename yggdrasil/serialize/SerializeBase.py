@@ -606,6 +606,12 @@ class SerializeBase(tools.YggClass):
             if isinstance(v, (str, bytes)):
                 setattr(self, k, tools.str2bytes(v))
 
+    @property
+    def str_as_unicode(self):
+        r"""bool: True if C-format strings should be interpreted as
+        unicode."""
+        return False
+
     def cformat2nptype(self, *args, **kwargs):
         r"""Method to convert c format string to numpy data type.
 
@@ -631,6 +637,7 @@ class SerializeBase(tools.YggClass):
             dict: Updated typedef.
 
         """
+        xtypedef = None
         for k in self._oldstyle_kws:
             used = []
             updated = []
@@ -640,53 +647,27 @@ class SerializeBase(tools.YggClass):
             # Check status
             if ((k != 'format_str') and (typedef.get('type', None) != 'array')):
                 continue
+            if xtypedef is None:
+                if typedef == self.default_datatype:
+                    typedef.clear()
+                try:
+                    xtypedef = datatypes.TableDatatype.from_schema(
+                        typedef, str_as_unicode=self.str_as_unicode)
+                except datatypes.TableDatatypeError:
+                    return typedef
             # Key specific changes to type
             if k == 'format_str':
                 v = tools.bytes2str(v)
                 fmts = serialize.extract_formats(v)
-                if typedef == self.default_datatype:
-                    typedef.clear()
-                if 'type' in typedef:
-                    if (typedef.get('type', None) == 'array'):
-                        if isinstance(typedef.get('items', []), dict):
-                            typedef['items'] = [
-                                copy.deepcopy(typedef['items'])
-                                for _ in range(len(fmts))
-                            ]
-                        assert len(typedef.get('items', [])) == len(fmts)
-                    elif len(fmts) == 1:
-                        cpy = copy.deepcopy(typedef)
-                        typedef.clear()
-                        typedef.update(type='array', items=[cpy])
-                    else:  # pragma: debug
-                        continue
                 as_array = self.extra_kwargs.get('as_array',
                                                  getattr(self, 'as_array', False))
-                typedef.setdefault('type', 'array')
-                typedef.setdefault('items', [])
-                for i, fmt in enumerate(fmts):
-                    nptype = self.cformat2nptype(fmt)
-                    itype_fmt = rapidjson.encode_schema(
-                        np.ones(1, nptype), minimal=True)
-                    if as_array:
-                        itype_fmt['type'] = '1darray'
-                    else:
-                        itype_fmt['type'] = 'scalar'
-                        if itype_fmt['subtype'] in constants.FLEXIBLE_TYPES:
-                            itype_fmt.pop('precision', None)
-                    if len(typedef['items']) < (i + 1):
-                        typedef['items'].append(itype_fmt)
-                        continue
-                    itype = typedef['items'][i]
-                    if itype['type'] in ['scalar', '1darray', 'ndarray']:
-                        itype_fmt['type'] = itype['type']
-                    if ((itype_fmt['subtype'] in constants.FLEXIBLE_TYPES
-                         and (itype_fmt['type'] == 'scalar'
-                              or ('encoding' in itype
-                                  and 'encoding' not in itype_fmt
-                                  and 'precision' in itype)))):
-                        itype_fmt.pop('precision', None)
-                    typedef['items'][i].update(itype_fmt)
+                try:
+                    xtypedef.update_columns(
+                        format_str=fmts,
+                        as_array=as_array,
+                    )
+                except datatypes.TableDatatypeError:
+                    continue
                 used.append('as_array')
                 updated.append('format_str')
             elif k == 'as_array':
@@ -698,39 +679,11 @@ class SerializeBase(tools.YggClass):
                     tk = 'title'
                 else:
                     tk = 'units'
-                if isinstance(typedef.get('items', []), dict):
-                    typedef['items'] = [copy.deepcopy(typedef['items'])
-                                        for _ in range(len(v))]
-                if ((len(v) != len(typedef.get('items', []))
-                     and (len(v) == 1)
-                     and (len(v[0].split(',')) == len(typedef.get(
-                         'items', []))))):
-                    valt = v[0].split(',')
-                    v[0] = valt[0]
-                    for vv in valt[1:]:
-                        v.append(vv)
-                assert len(v) == len(typedef.get('items', []))
-                # if len(v) != len(typedef.get('items', [])):
-                #     warnings.warn('%d %ss provided, but only %d items in typedef.'
-                #                   % (len(v), k, len(typedef.get('items', []))))
-                #     continue
-                all_updated = True
-                for iv, itype in zip(v, typedef.get('items', [])):
-                    if tk in itype:
-                        all_updated = False
-                    if tk == 'units':
-                        if units.is_null_unit(iv):
-                            continue
-                        iv = str(units.Units(iv))
-                        type_map = {'number': 'float',
-                                    'integer': 'int'}
-                        if itype['type'] in type_map:
-                            itype.update(type='scalar',
-                                         subtype=type_map[itype['type']],
-                                         precision=8)
-                    itype.setdefault(tk, iv)
-                if all_updated:
-                    used.append(k)
+                try:
+                    xtypedef.add_column_field(tk, v)
+                except datatypes.TableDatatypeError:
+                    continue
+                used.append(k)
                 updated.append(k)  # Won't change anything unless its an attribute
             else:  # pragma: debug
                 raise ValueError(

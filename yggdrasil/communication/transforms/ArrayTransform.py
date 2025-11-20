@@ -1,9 +1,9 @@
 import numpy as np
 import copy
 import pandas
-from yggdrasil import constants
+import pprint
 from yggdrasil.communication.transforms.TransformBase import TransformBase
-from yggdrasil.datatypes import type2numpy
+from yggdrasil.datatypes import TableDatatype, TableDatatypeError
 from yggdrasil.serialize import (
     consolidate_array, pandas2numpy, numpy2pandas, dict2list,
     object2names)
@@ -32,176 +32,12 @@ class ArrayTransform(TransformBase):
         if not self.field_names:
             self.field_names = self.original_datatype.get('field_names', None)
         if not self.field_names:
-            if (((datatype['type'] == 'array')
-                 and isinstance(datatype['items'], list)
-                 and all([('title' in x) for x in
-                          self.original_datatype['items']]))):
-                self.field_names = [x.get('title', 'f%d' % i) for i, x in
-                                    enumerate(self.original_datatype['items'])]
-            elif datatype['type'] == 'object':
-                self.field_names = list(datatype['properties'].keys())
-
-    @classmethod
-    def get_summary(cls, x, subtype=False):
-        r"""Get subset of information summarizing an array element
-        that can be used for comparison with other elements in the
-        same row/column.
-
-        Args:
-            x (dict): Type definition for an array element.
-            subtype (bool, optional): If True, the subtype, shape,
-                and title information is included. Defaults to False.
-
-        Returns:
-            dict: Information about the array element.
-
-        Raises:
-            AssertionError: If x is not a valid type defintion for an
-                array element.
-
-        """
-        if x['type'] == 'ndarray':
-            s = x.get('shape', None)
-            t = 'ndarray'
-        elif x['type'] == '1darray':
-            s = x.get('shape', None)
-            if s is None:
-                s = x.get('length', None)
-                if s is not None:
-                    s = (s,)
-            t = '1darray'
-        elif ((x['type'] == 'scalar')
-              or (x['type'] in constants.VALID_TYPES)):
-            s = (1,)
-            t = 'scalar'
-        else:
-            raise AssertionError(("Cannot convert elements of type '%s' "
-                                  "to array elements.") % x['type'])
-        subt = x.get('subtype', x['type'])
-        title = x.get('title', None)
-        assert subt in constants.VALID_TYPES
-        if subtype:
-            out = {'type': t, 'subtype': subt,
-                   'shape': s, 'title': title}
-            if subt not in constants.FLEXIBLE_TYPES:
-                out['precision'] = x.get('precision', 0)
-        else:
-            out = {'type': t, 'shape': s}
-        return out
-
-    @classmethod
-    def check_summary(cls, a, aidx, b, bidx):
-        r"""Determine if two summary structures are equivalent,
-        printing differences in the error if they are not.
-
-        Args:
-            a (dict): Summary information for an element type defintion.
-            aidx (int): Index of element summarized by a that is used
-                in the error message.
-            b (dict): Summary information for an element type defintion.
-            bidx (int): Index of element summarized by b that is used
-                in the error message.
-
-        Raises:
-            AssertionError: If a and b are not equivalent.
-
-        """
-        if a == b:
-            return
-        assert len(a) == len(b)
-        err_msg = []
-        for k in a.keys():
-            if a[k] != b[k]:
-                err_msg.append(("The %s of element %d (%s) dosn't "
-                                "match element %d (%s=%s)")
-                               % (k, aidx, a[k], bidx, k, b[k]))
-        raise AssertionError('\n'.join(err_msg))
-
-    @classmethod
-    def check_element(cls, items, subtype=False):
-        r"""Check that all elements in set of elements (e.g. row or
-        column) are consistent.
-
-        Args:
-            items (list): Set of element type definitions.
-            subtype (bool, optional): If True, subtype, precision, and
-                title information are used in the comparison. Defaults
-                to False. subtype should be True if checking column
-                elements and False if checking row elements.
-
-        Raises:
-            AssertionError: If any elements are not consistent.
-
-        """
-        base_summary = cls.get_summary(items[0], subtype=subtype)
-        for i, x in zip(range(1, len(items)), items[1:]):
-            x_summary = cls.get_summary(x, subtype=subtype)
-            cls.check_summary(x_summary, i, base_summary, 0)
-
-    @classmethod
-    def check_array_items(cls, items, order=None, items_as_columns=None):
-        r"""Check that items are valid types for array columns.
-
-        Args:
-            items (list): Type definitions for elements.
-            order (list, optional): Order that properties should be
-                compared in for object schemas. Defaults to None and
-                will be set based on the order of the keys in the
-                first element (non-deterministic for Python 2.7).
-            items_as_columns (bool, optional): If True, the items will
-                be parsed under the assumption that each item contains
-                the schema describing a column, possible as an array
-                of elements. If None and the initial check fails
-                when assuming items are rows, columns will be tried.
-                Defaults to None.
-
-        Raises:
-            AssertionError: If the items are not valid.
-
-        """
-        if isinstance(items, dict):
-            items = [items]
-        assert isinstance(items, (list, tuple))
-        if items[0]['type'] == 'array':
-            base_types = items[0]['items']
-            assert isinstance(base_types, list)
-        elif items[0]['type'] == 'object':
-            if order is None:
-                order = list(items[0]['properties'].keys())
-            base_types = [items[0]['properties'][k] for k in order]
-        elif items[0]['type'] in ['1darray', 'ndarray']:
-            cls.check_element(items)
-            return
-        else:
-            raise AssertionError("Per-element types of '%s' not supported."
-                                 % items[0]['type'])
-        try:
-            cls.check_element(base_types, subtype=items_as_columns)
-            base_summary = [cls.get_summary(x, subtype=(not items_as_columns))
-                            for x in base_types]
-            for i, x in zip(range(1, len(items)), items[1:]):
-                assert x['type'] == items[0]['type']
-                if x['type'] == 'array':
-                    x_types = x['items']
-                else:
-                    x_types = [x['properties'][k] for k in order]
-                assert len(x_types) == len(base_types)
-                if items_as_columns:
-                    cls.check_element(x_types, subtype=True)
-                x_summary = [cls.get_summary(t, subtype=(not items_as_columns))
-                             for t in x_types]
-                for ix, ibase in zip(x_summary, base_summary):
-                    cls.check_summary(x_summary, i, base_summary, 0)
-        except BaseException as e:
-            if (((items_as_columns is None)
-                 and all([(x['type'] == 'array') for x in items]))):
-                try:
-                    cls.check_array_items(items, order=order,
-                                          items_as_columns=True)
-                    return
-                except BaseException:
-                    pass
-            raise e
+            x = TableDatatype.from_schema(
+                copy.deepcopy(self.original_datatype),
+                field_names=self.field_names)
+            x.ensure_field_names()
+            if x.field_names and None not in x.field_names:
+                self.field_names = x.field_names
 
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
@@ -215,101 +51,13 @@ class ArrayTransform(TransformBase):
         """
         if datatype['type'] in ['1darray', 'ndarray']:
             pass
-        elif datatype['type'] == 'array':
-            self.check_array_items(datatype['items'],
-                                   order=self.field_names)
-        elif datatype['type'] == 'object':
-            order = self.field_names
-            if 'properties' in datatype:
-                if order is None:
-                    order = list(datatype['properties'].keys())
-                self.check_array_items([datatype['properties'][k]
-                                        for k in order])
-            if 'additionalProperties' in datatype:
-                self.check_array_items(datatype['additionalProperties'])
         else:
-            raise AssertionError("Invalid datatypes: %s" % datatype)
-
-    @classmethod
-    def transform_array_items(cls, items, order=None):
-        r"""Transform elements in an array.
-
-        Args:
-            items (list): Set of type definitions for array rows or
-                columns that should be transformed into type
-                definitions for a set of array columns.
-            order (list, optional): Order in which properties should
-                be added as columns for object type defintions. Defaults
-                to None if not provided and the first object element will
-                be used to get the order (non-deterministic on Python 2.7).
-
-        Returns:
-            list: Transformed array column type definitions.
-
-        """
-        no_length = False
-        if isinstance(items, dict):
-            if order is None:
-                if 'title' in items:
-                    items = [items]
-                elif items['type'] in ['1darray', 'ndarray']:
-                    return copy.deepcopy(items)
-                else:
-                    no_length = True
-                    items = [items]
-            else:
-                items = [copy.deepcopy(items) for _ in range(len(order))]
-        assert isinstance(items, (list, tuple))
-        if items[0]['type'] == 'array':
-            base_types = items[0]['items']
-            assert isinstance(base_types, list)
-        elif items[0]['type'] == 'object':
-            if order is None:
-                order = list(items[0]['properties'].keys())
-            items = [dict(x, items=[dict(x['properties'][k], title=k)
-                                    for k in order])
-                     for x in items]
-            base_types = items[0]['items']
-        elif items[0]['type'] in ['1darray', 'ndarray']:
-            return items
-        base_summary = [cls.get_summary(x, subtype=True)
-                        for x in base_types]
-        length = len(items)
-        # Transpose so that the inside arrays contain structured types
-        if not all([(base_summary == [cls.get_summary(t, subtype=True)
-                                      for t in x['items']])
-                    for x in items[1:]]):
-            items = [{'items': [copy.deepcopy(items[j]['items'][i])
-                                for j in range(len(items))]}
-                     for i in range(len(items[0]['items']))]
-            base_types = items[0]['items']
-            length = len(items)
-        shape = cls.get_summary(base_types[0])['shape']
-        new_shape = [length] + list(shape)
-        while new_shape and new_shape[-1] == 1:
-            new_shape.pop()
-        out_kws = {}
-        if len(new_shape) > 1:
-            out_kws['type'] = 'ndarray'
-        else:
-            out_kws['type'] = '1darray'
-        out = [dict(x, subtype=x.get('subtype', x['type']), **out_kws)
-               for x in base_types]
-        if new_shape and not no_length:
-            for x in out:
-                x.pop('length', None)
-                x.pop('shape', None)
-                if len(new_shape) == 1:
-                    x['length'] = new_shape[0]
-                else:
-                    x['shape'] = tuple(new_shape)
-        for i, x in enumerate(out):
-            if x['subtype'] in constants.FLEXIBLE_TYPES:
-                x['precision'] = max(
-                    [y['items'][i].get('precision', 0) for y in items])
-                if x['precision'] == 0:
-                    x.pop('precision')
-        return out
+            try:
+                x = TableDatatype.from_schema(datatype)
+                assert x.is_table
+            except TableDatatypeError as e:
+                raise AssertionError(
+                    f"Invalid datatype:\n{pprint.pformat(datatype)}\n{e}")
         
     def transform_datatype(self, datatype, order=None):
         r"""Determine the datatype that will result from applying the transform
@@ -325,38 +73,13 @@ class ArrayTransform(TransformBase):
             dict: Transformed datatype.
 
         """
+        x = TableDatatype.from_schema(
+            copy.deepcopy(datatype), field_names=self.field_names)
         if order is None:
-            order = self.field_names
-        elif self.field_names is not None:
-            assert len(order) == len(self.field_names)
-        out = copy.deepcopy(datatype)
-        if datatype['type'] == 'array':
-            out['items'] = self.transform_array_items(
-                out['items'], order=order)
-        elif datatype['type'] == 'object':
-            out['type'] = 'array'
-            if 'properties' in out:
-                if order is None:
-                    order = list(out['properties'].keys())
-                if 'additionalProperties' in out:
-                    for k in order:
-                        if k not in out['properties']:
-                            out['properties'][k] = dict(
-                                out['additionalProperties'])
-                out['items'] = self.transform_array_items(
-                    [dict(out['properties'][k], title=k)
-                     for k in order])
-            elif 'additionalProperties' in out:
-                assert order is not None
-                out['items'] = self.transform_array_items(
-                    [dict(out['additionalProperties'], title=k)
-                     for k in order])
-            out.pop('properties', None)
-            out.pop('additionalProperties', None)
-        if order is not None:
-            assert len(order) == len(out['items'])
-            for x, n in zip(out['items'], order):
-                x['title'] = n
+            order = x.field_names
+        if order != x.field_names:
+            x.reorder_columns(order)
+        out = x.flatten().datatype
         return out
     
     def evaluate_transform(self, x, no_copy=False):
@@ -373,13 +96,16 @@ class ArrayTransform(TransformBase):
 
         """
         out = x
-        out_type = self.transformed_datatype
-        if isinstance(out_type.get('items', None), dict):
+        out_type = copy.deepcopy(self.transformed_datatype)
+        x_type = TableDatatype.from_schema(out_type)
+        x_type.ensure_field_names(generate=True)
+        if not x_type.field_names:
             assert not self.field_names
             names = object2names(x)
             if names:
                 out_type = self.transform_datatype(out_type, order=names)
-        np_dtype = type2numpy(out_type, array=x)
+                x_type = TableDatatype.from_schema(out_type)
+        np_dtype = x_type.nptype
         if isinstance(x, pandas.DataFrame):
             out = pandas2numpy(x)
             if np_dtype:

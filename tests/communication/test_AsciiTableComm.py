@@ -82,11 +82,11 @@ class TestAsciiTableComm_single(TestAsciiTableComm):
                    b'# f0\n# %g\n'
                    + nele * b'0\n' + nele * b'1\n'),
                'send': [[arr1['f0']], [arr2['f0']]],
-               'recv': [[np.hstack([arr1, arr2])['f0']]],
-               'recv_partial': [[[arr1['f0']]], [[arr2['f0']]]],
+               'recv': [np.hstack([arr1, arr2])],
+               'recv_partial': [[arr1], [arr2]],
                'dict': {'f0': arr1['f0']},
-               'objects': [[arr1['f0']], [arr2['f0']]]}
-        out['msg'] = out['send'][0]
+               'objects': [arr1, arr2]}
+        out['msg'] = arr1
         out['msg_array'] = arr1
         return out
 

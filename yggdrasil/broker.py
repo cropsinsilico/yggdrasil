@@ -102,7 +102,7 @@ class YggBroker(multitasking.YggTaskLoop):
         else:
             name = comm.opp_name
             direction = comm.opp_direction
-            model = comm.partner_model
+            model = comm.opp_model
             name = strip_model_prefix(name, model)
             if comm._commtype == 'fork':
                 commlist = comm.comm_list
@@ -172,7 +172,7 @@ class YggBroker(multitasking.YggTaskLoop):
                 out[model][direction][name] = comm
             else:
                 out[model][direction].append(name)
-        elif commlist:
+        if commlist:
             for x in commlist:
                 out = cls._add_model_comms(x, out=out,
                                            return_comms=return_comms)
@@ -454,7 +454,7 @@ class YggBroker(multitasking.YggTaskLoop):
         if model not in cls._clients:
             server_address = cls.get_env(cls._server_address_env)
             cls._clients[model] = get_comm(
-                f"YggBroker-{model}", commtype='client',
+                f"YggBroker-CLIENT-{model}", commtype='client',
                 address=server_address,
                 use_async=False, direct_connection=True,
                 create_proxy=False, no_request_reply=True,

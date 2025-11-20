@@ -519,8 +519,8 @@ extras:
           add: [graphviz]
         - method: apt
         - method: brew
-        - method: choco
         - method: vcpkg
+        - method: choco
     - pandoc:
         - method: apt
         - name: pandoc-citeproc
