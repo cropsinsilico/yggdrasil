@@ -4887,9 +4887,13 @@ class ModelDriver(Driver):
         # TODO: Composite if inputs/outputs split between multiple
         #   models
         for io in yml['input_drivers']:
+            if any(x.get('filetype', False) for x in io['inputs']):
+                return False
             src_models += io['src_models']
             src_languages += [x['partner_language'] for x in io['inputs']]
         for io in yml['output_drivers']:
+            if any(x.get('filetype', False) for x in io['outputs']):
+                return False
             dst_models += io['dst_models']
             dst_languages += [x['partner_language'] for x in io['outputs']]
         src_models = set(src_models)

@@ -2119,6 +2119,14 @@ def select_requirements_from_args(args, install_opts, target_os=None):
             args.exclude_dep = []
         args.exclude_dep.append('r-base')
     param = SetupParam.from_args(args, install_opts)
+    if args.output_disabled_languages:
+        with open(args.output_disabled_languages, 'w') as fd:
+            fd.write(' '.join(param.disabled_languages))
+        args.output_disabled_languages = False
+    if args.output_enabled_languages:
+        with open(args.output_enabled_languages, 'w') as fd:
+            fd.write(' '.join(param.enabled_languages))
+        args.output_enabled_languages = False
     x = select_requirements(
         param, varient=args.varient,
         allow_missing=(not args.dont_allow_missing),
@@ -2403,7 +2411,7 @@ if __name__ == "__main__":
     parser_req = subparsers.add_parser(
         'select', help="Determine what dependencies are required.")
     SetupParam.add_parser_args(
-        parser_req, install_opts=install_opts,
+        parser_req, install_opts='agnostic',
         skip=['conda-env', 'python'],
         method_choices=['conda', 'pip', 'mamba',
                         'conda-dev', 'pip-dev', 'mamba-dev'],
@@ -2430,6 +2438,14 @@ if __name__ == "__main__":
             (('--output-name-only', ),
              {'action': 'store_true',
               'help': "Only output dependencies as names."}),
+            (('--output-enabled-languages', ),
+             {'type': str,
+              'help': ("File where a list of enabled languages should "
+                       "be saved")}),
+            (('--output-disabled-languages', ),
+             {'type': str,
+              'help': ("File where a list of disabled languages should "
+                       "be saved")}),
             (('--dont-allow-missing', ),
              {'action': 'store_true',
               'help': "Don\'t ignore requirements with no valid options"}),

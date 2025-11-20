@@ -361,6 +361,24 @@ class SetupParam(object):
         self.call_kws = {}
 
     @classmethod
+    def optioned_languages(cls):
+        r"""list: Set of languages with CLI options"""
+        return ['c', 'fortran', 'R', 'julia', 'matlab', 'osr', 'sbml',
+                'lpy', 'pytorch']
+
+    @property
+    def enabled_languages(self):
+        r"""list: Set of languages enabled by installation options."""
+        return [x for x in self.optioned_languages()
+                if self.install_opts[x.lower()]]
+
+    @property
+    def disabled_languages(self):
+        r"""list: Set of languages disabled by installation options."""
+        return [x for x in self.optioned_languages()
+                if not self.install_opts[x.lower()]]
+
+    @classmethod
     def find_args(cls, x):
         x_try = [x, '--' + x.replace('_', '-')]
         for k, types, v in cls._args:
@@ -429,17 +447,20 @@ class SetupParam(object):
                 new_opts[k] = bool(getattr(args, k, False))
             elif args.install_all:
                 new_opts[k] = True
-            elif v and getattr(args, f'dont_install_{k}', False):
+            elif getattr(args, f'dont_install_{k}', False):
+                assert not getattr(args, f'install_{k}', False)
                 new_opts[k] = False
-            elif (not v) and getattr(args, f'install_{k}', False):
+            elif getattr(args, f'install_{k}', False):
                 new_opts[k] = True
+            elif getattr(args, 'default_install', None) is not None:
+                new_opts[k] = args.default_install
         install_opts.update(new_opts)
     
     @staticmethod
     def add_parser_args(parser, skip=None, skip_types=None,
                         skip_all=False, include=None,
                         install_opts=None, additional_args=None,
-                        **kwargs):
+                        all_install_opts=True, **kwargs):
         r"""Add arguments to a parser for installation options.
 
         Args:
@@ -533,12 +554,20 @@ class SetupParam(object):
         if 'install' in skip_types:
             return
         # Begin install_opts specific options
+        add_both_flags = (install_opts == 'agnostic')
         if not isinstance(install_opts, dict):
+            if add_both_flags:
+                install_opts = 'empty'
             install_opts = get_install_opts(
                 empty=(install_opts == 'empty'))
         parser.add_argument(
-            '--install-all', action='store_true',
+            '--install-all', default=None,
+            type=boolean_str, nargs='?', const=True,
             help='Set all install options to true')
+        parser.add_argument(
+            '--default-install', type=boolean_str,
+            help=('Default install status when no other flag '
+                  'controlling an option is specified'))
         for k, v in install_opts.items():
             if k in ['os'] or args_match((f'--dont-install-{k}', ), skip):
                 continue
@@ -548,12 +577,12 @@ class SetupParam(object):
                     type=boolean_str, nargs='?', const=True,
                     help="Don't use sudo during installation.")
                 continue
-            if v:
+            if add_both_flags or v:
                 parser.add_argument(
                     '--dont-install-%s' % k, default=None,
                     type=boolean_str, nargs='?', const=True,
                     help=("Don't install %s" % k))
-            else:
+            if add_both_flags or (not v):
                 parser.add_argument(
                     '--install-%s' % k, default=None,
                     type=boolean_str, nargs='?', const=True,
@@ -906,6 +935,7 @@ def get_install_opts(old=None, empty=False):
             'matlab': False,
             'zmq': False,
             'sbml': False,
+            'osr': False,
             'astropy': False,
             'rmq': False,
             'trimesh': False,
@@ -932,6 +962,7 @@ def get_install_opts(old=None, empty=False):
             'matlab': (os.environ.get('INSTALLMATLAB', '0') == '1'),
             'zmq': (os.environ.get('INSTALLZMQ', '0') == '1'),
             'sbml': (os.environ.get('INSTALLSBML', '0') == '1'),
+            'osr': (os.environ.get('INSTALLOSR', '0') == '1'),
             'astropy': (os.environ.get('INSTALLAPY', '0') == '1'),
             'rmq': (os.environ.get('INSTALLRMQ', '0') == '1'),
             'trimesh': (os.environ.get('INSTALLTRIMESH', '0') == '1'),
@@ -959,6 +990,7 @@ def get_install_opts(old=None, empty=False):
             'matlab': True,
             'zmq': True,
             'sbml': False,
+            'osr': False,
             'astropy': False,
             'rmq': False,
             'trimesh': True,
@@ -1645,7 +1677,7 @@ def config_pkg(param=None, return_commands=False, allow_missing=False,
         else:
             cover = []
             dont_cover = []
-            for k in ['c', 'lpy', 'R', 'fortran', 'sbml']:
+            for k in ['c', 'lpy', 'R', 'fortran', 'sbml', 'osr']:
                 if param.install_opts[k.lower()]:
                     cover.append(k)
                 else:

@@ -341,9 +341,13 @@ class CommProxy(multitasking.YggTaskLoop):
 
     def __init__(self, srv_address=None, cli_address=None, name=None,
                  allow_no_servers=False, allow_no_clients=False,
-                 is_partner=False, **kwargs):
-        self.servers = []
-        self.clients = []
+                 is_partner=False, servers=None, clients=None, **kwargs):
+        if servers is None:
+            servers = []
+        if clients is None:
+            clients = []
+        self.servers = servers
+        self.clients = clients
         self.is_partner = is_partner
         if not self.is_partner:
             if cli_address is None:
@@ -600,8 +604,8 @@ class CommProxy(multitasking.YggTaskLoop):
             # client address
             return
         self.servers.append(name)
-        self.debug(f"Added server \"{name}\" to proxy: "
-                   f"nservers = {self.srv_count}")
+        self.info(f"Added server \"{name}\" to proxy: "
+                  f"nservers = {self.srv_count}")
 
     def add_client(self, name):
         r"""Increment the client count.
@@ -749,7 +753,7 @@ class CommProxy(multitasking.YggTaskLoop):
         assert not self.is_partner
         if msg.startswith(self.server_signon_msg):
             name, count = self.process_signon(msg)
-            self.debug(f"Received server signon from {name}")
+            self.info(f"Received server signon from {name}")
             if self.srv_count == 0:
                 self.debug(f"A server signed on after "
                            f"{self.nsignon_proxy_sent} proxy signon "
@@ -2275,6 +2279,9 @@ class CommBase(tools.YggClass):
                         kws['srv_address'] = self.address
                     else:
                         kws['cli_address'] = self.address
+                        # Initialize with servers to prevent proxy
+                        # signon since this server is already ready
+                        kws['servers'] = [self.name]
                     self.proxy = self._proxy_class(**kws)
                     self.proxy.start()
                 if self.direction == 'send':
@@ -2293,7 +2300,8 @@ class CommBase(tools.YggClass):
                 if self.direction == 'send':
                     self.proxy.add_client(self.name)
                 else:
-                    self.proxy.add_server(self.name)
+                    self.info(f"Adding server {self.name} to local proxy")
+                    # self.proxy.add_server(self.name)
 
     def signoff_from_proxy(self, **kwargs):
         r"""Remove a client/server from the proxy."""

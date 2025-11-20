@@ -32,54 +32,57 @@ jobs:
         os-base: [ubuntu, macos, windows]
         python-version: ["3.11"]
         python-install: [pip, conda]
-        install-c: [true]
-        install-fortran: [true]
-        # install-r: [false]
+        test-base: [false, true]
+        install-r: [false]
         install-julia: [false]
         install-matlab: [false]
-        install-lpy: [false]
-        install-sbml: [false]
-        install-pytorch: [false]
-        install-zmq: [true]
-        install-mpi: [false]
-        install-rmq: [false]
-        install-omp: [false]
-        test-type: [base, types]
         # astropy, trimesh, pygments, images, seq, excel, docs, dev
-        exclude:
-          - test-type: types
-            python-install: pip
+        # exclude:
+        #   - test-type: types-compiled
+        #     python-install: pip
         include:
+          - python-install: conda
+            test-base: false
+            test-types-compiled: true
           - os-base: ubuntu
-            python-install: conda
             python-version: "3.9"
-            install-c: true
-            install-fortran: true
-            test-type: base
-          - os-base: ubuntu
             python-install: conda
+            test-base: true
+          - os-base: ubuntu
             python-version: "3.10"
-            install-c: true
-            install-fortran: true
-            test-type: base
+            python-install: conda
+            test-base: true
           - os-base: ubuntu
-            python-install: conda
-            python-version: "3.12"
-            install-c: true
-            install-fortran: true
-            test-type: base
-          - os-base: ubuntu
-            python-install: conda
-            python-version: "3.13"
-            install-c: true
-            install-fortran: true
-            test-type: base
-          - os-base: windows
-            python-install: conda
             python-version: "3.11"
-            install-c: false
-            install-fortran: false
-            test-type: base
+            python-install: conda
+            test-types-interpreted: true
+          - os-base: ubuntu
+            python-version: "3.12"
+            python-install: conda
+            test-base: true
+          - os-base: ubuntu
+            python-version: "3.13"
+            python-install: conda
+            test-base: true
+          # Test windows detection of missing C libraries
+          - os-base: windows
+            python-version: "3.11"
+            python-install: conda
+            test-base: true
+            dont-install-zmq: true
+          # Test specific language installations
+          # - os-base: ubuntu
+          #   python-version: "3.11"
+          #   python-install: conda
+          #   install-r: true
+          # - os-base: ubuntu
+          #   python-version: "3.11"
+          #   python-install: conda
+          #   install-julia: true
+          # - os-base: ubuntu
+          #   python-version: "3.11"
+          #   python-install: conda
+          #   install-matlab: true
       fail-fast: false
     defaults:
       run:
@@ -109,7 +112,10 @@ jobs:
       - name: Create files containing lists of dependencies
         run: |
           python -m pip install pyyaml
-          python utils/manage_requirements.py select --output-per-method --output-file=ci_requirements.txt --install-c=${{ matrix.install-c }} --install-fortran=${{ matrix.install-fortran }} --install-r=${{ matrix.install-r }} --install-julia=${{ matrix.install-julia }} --install-matlab=${{ matrix.install-matlab }} --install-lpy=${{ matrix.install-lpy }} --install-sbml=${{ matrix.install-sbml }} --install-pytorch=${{ matrix.install-pytorch }} --install-zmq=${{ matrix.install-zmq }} --install-mpi=${{ matrix.install-mpi }} --install-rmq=${{ matrix.install-rmq }} --install-omp=${{ matrix.install-omp }} --install-testing=true --install-dev=true ${{ matrix.python-install }}
+          python utils/manage_requirements.py select --output-per-method --output-file=ci_requirements.txt --output-disabled-languages=ci_disabled_languages.txt --default-install=true --install-r=${{ matrix.install-r }} --install-julia=${{ matrix.install-julia }} --install-matlab=${{ matrix.install-matlab }} --install-lpy=${{ matrix.install-lpy }} --install-sbml=${{ matrix.install-sbml }} --install-pytorch=${{ matrix.install-pytorch }} --dont-install-zmq=${{ matrix.dont-install-zmq }} --install-mpi=${{ matrix.install-mpi }} --install-rmq=${{ matrix.install-rmq }} --install-omp=${{ matrix.install-omp }} --install-testing=true --install-dev=true ${{ matrix.python-install }}
+          DISABLED_LANGUAGES=$(cat "ci_disabled_languages.txt")
+          echo "DISABLED_LANGUAGES=${DISABLED_LANGUAGES}"
+          echo "DISABLED_LANGUAGES=${DISABLED_LANGUAGES}" >> "$GITHUB_ENV"
 
       ###################################
       # PIP SETUP
@@ -218,7 +224,7 @@ jobs:
           yggconfig
           ygginfo
       - name: (WINDOWS,PIP) Set the vcpkg root config value
-        if: matrix.os-base == 'windows' && matrix.install-method == 'pip' && matrix.install-c
+        if: matrix.os-base == 'windows' && matrix.install-method == 'pip'
         run: |
           yggconfig --vcpkg-dir=C:\\vcpkg
       - name: (WINDOWS,PIP) Update R requirements
@@ -230,6 +236,11 @@ jobs:
           python -I -m yggdrasil coveragerc
       - name: Verify installation
         run: |
+          # TODO: Check windows installation
+          ygginfo
+      - name: Disable languages based on job matrix
+        run: |
+          yggconfig --disable-languages ${DISABLED_LANGUAGES}
           ygginfo
       - name: Compile libraries
         run: yggcompile
@@ -239,17 +250,40 @@ jobs:
       ###################################
 
       - name: Basic integration test for combination of installed languages/comms
-        if: matrix.test-type == 'base'
+        if: matrix.test-base
+        timeout-minutes: 180
         run: |
           pytest --ci --cov-append --suites=examples tests/examples/test_timed_pipe.py --nocapture
-      - name: Generated integration tests for each type
-        if: matrix.test-type == 'types'
+      - name: Generated integration tests for each type [interpreted languages]
+        if: matrix.test-types-interpreted
+        timeout-minutes: 180
         run: |
-          pytest --ci --cov-append --suites types
+          pytest --ci --cov-append --suites types --skip-languages c cpp fortran
+      - name: Generated integration tests for each type [compiled languages]
+        if: matrix.test-types-compiled
+        timeout-minutes: 180
+        run: |
+          pytest --ci --cov-append --suites types --languages c cpp fortran
       - name: Basic communication tests
-        if: matrix.test-type == 'comms'
+        if: matrix.test-comms
+        timeout-minutes: 180
         run: |
           pytest --ci --cov-append --suites comms
+      - name: Test R interface
+        if: matrix.install-r
+        timeout-minutes: 180
+        run: |
+          pytest --ci --cov-append --language=R --suites models examples types
+      - name: Test Julia interface
+        if: matrix.install-julia
+        timeout-minutes: 180
+        run: |
+          pytest --ci --cov-append --language=julia --suites models examples types
+      - name: Test MATLAB interface
+        if: matrix.install-matlab
+        timeout-minutes: 180
+        run: |
+          pytest --ci --cov-append --language=matlab --suites models examples types
 
   all_tests_passed:
     runs-on: ubuntu-latest
