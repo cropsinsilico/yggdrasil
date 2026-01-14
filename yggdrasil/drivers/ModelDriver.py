@@ -18,7 +18,6 @@ from yggdrasil import (
     dependencies)
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
-from queue import Empty
 logger = logging.getLogger(__name__)
 
 
@@ -2200,22 +2199,27 @@ class ModelDriver(Driver):
             else:
                 self.sleep()
             return
-        try:
-            line = self.queue.get_nowait()
-        except Empty:
-            # This sleep is necessary to allow changes in queue without lock
-            self.sleep()
-            return
-        except multitasking.AliasDisconnectError:  # pragma: debug
-            self.error("Queue disconnected")
+        if self.check_mpi_request('stop') or self.drain_queue():
             self.set_break_flag()
         else:
-            if (line == self._exit_line) or self.check_mpi_request('stopped'):
-                self.debug("No more output")
-                self.set_break_flag()
-            else:
-                self.print_encoded(line, end="")
-                sys.stdout.flush()
+            self.sleep()
+        # This is the older version
+        # try:
+        #     line = self.queue.get_nowait()
+        # except Empty:
+        #     # This sleep is necessary to allow changes in queue without lock
+        #     self.sleep()
+        #     return
+        # except multitasking.AliasDisconnectError:  # pragma: debug
+        #     self.error("Queue disconnected")
+        #     self.set_break_flag()
+        # else:
+        #     if (line == self._exit_line) or self.check_mpi_request('stopped'):
+        #         self.info("No more output")
+        #         self.set_break_flag()
+        #     else:
+        #         self.print_encoded(line, end="")
+        #         sys.stdout.flush()
 
     def run_finally(self):
         r"""Actions to perform in finally clause of try/except wrapping
@@ -2224,19 +2228,47 @@ class ModelDriver(Driver):
         self.stop_mpi_partner()
         super(ModelDriver, self).run_finally()
 
+    def drain_queue(self):
+        r"""Drain messages from the queue.
+
+        Returns:
+            bool: True if the last loop should be broken, False otherwise.
+
+        """
+        if self.dont_queue_output:
+            return False
+        out = False
+        try:
+            while not self.queue.empty():
+                line = self.queue.get()
+                if line == self._exit_line:
+                    self.info("No more output")
+                    out = True
+                else:
+                    self.print_encoded(line, end="")
+                    sys.stdout.flush()
+        except multitasking.AliasDisconnectError:  # pragma: debug
+            self.error("Queue disconnected")
+            out = True
+        return out
+
     def after_loop(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug('')
         self.stop_mpi_partner()
+        self.drain_queue()
         if self.queue_thread is not None:
             self.queue_thread.join(self.sleeptime)
             if self.queue_thread.is_alive():
-                self.debug("Queue thread still alive")
+                self.debug(f"Queue thread still alive (model complete = "
+                           f"{self.model_process_complete})")
                 # Loop was broken from outside, kill the queueing thread
                 self.kill_process()
+                self.drain_queue()
                 return
         self.wait_process(self.timeout, key_suffix='.after_loop')
+        self.drain_queue()
         self.kill_process()
         self.close_connections()
 

@@ -56,7 +56,8 @@ class ServerComm(CommBase.CommBase):
         self.requests = OrderedDict()
         for k in ['is_interface', 'recv_timeout', 'language', 'env']:
             self.response_kwargs.setdefault(k, getattr(self.icomm, k))
-        self.response_kwargs.setdefault('commtype', self.icomm._commtype)
+        for k, v in self.icomm.get_response_comm_kwargs.items():
+            self.response_kwargs.setdefault(k, v)
         self.response_kwargs.setdefault('use_async', self.icomm.is_async)
         self.clients = []
         self.closed_clients = []

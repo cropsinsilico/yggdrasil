@@ -75,7 +75,7 @@ class YggFunction(YggClass):
             kwargs, name=name,
             complete_partial=self.dummy_name,
         )
-        self.runner_kwargs['complete_partial'] = self.dummy_name
+        self._1st_run = False
         self._stop_called = False
         self._comms = {'input': {}, 'output': {}}
         self._opp_comms = {'input': {}, 'output': {}}
@@ -139,6 +139,7 @@ class YggFunction(YggClass):
             if io == 'input':
                 out = comm.ocomm.serializer.datatype
             else:
+                comm.create_response_comm(outside_send=True)
                 out = comm.icomm.serializer.datatype
         else:
             out = comm.serializer.datatype
@@ -357,7 +358,7 @@ class YggFunction(YggClass):
                 flag = v['comm'].send(*data[k])
                 if not flag:  # pragma: debug
                     raise IntegrationFunctionError(
-                        f"Failed to send {k}")
+                        f"Failed to send to {k}")
             self.runner.pause()
         except BaseException as e:
             self.info(f"STOPPING DUE TO ERROR DURING SEND: {e}")
@@ -520,16 +521,25 @@ class YggFunction(YggClass):
                     channel_name = list(channels.keys())[0]
                     var_name = channel_name
                     self._comms[io][var_name] = drv.copy()
+                    is_server = (
+                        drv['instance']._connection_type == 'rpc_request'
+                        or (drv['instance']._connection_type == 'direct'
+                            and (drv['instance'].direct_driver_replaces
+                                 == 'RPCRequestDriver'))
+                    )
                     kws = {
                         'direction': direction,
                         'no_suffix': True,
                         # 'context': ctx,
+                        'is_interface': False,  # Required to allow async
                     }
-                    if drv['instance']._connection_type == 'rpc_request':
+                    if channels[channel_name].get('direct_connection', False):
+                        kws['use_async'] = True
+                    if is_server:
                         kws['commtype'] = 'client'
                     self._comms[io][var_name]['comm'] = InterfaceComm(
                         channel_name, **kws)
-                    if drv['instance']._connection_type == 'rpc_request':
+                    if is_server:
                         self._comms[io_opp][var_name] = drv.copy()
                         self._comms[io_opp][var_name]['comm'] = (
                             self._comms[io][var_name]['comm'])
@@ -541,7 +551,7 @@ class YggFunction(YggClass):
                                 srv[io_opp]['vars'])
                         else:
                             self._comms[io_opp][var_name]['vars'] = (
-                                drv[f'{io_opp}'][0].get(
+                                drv[f'{io_opp}s'][0].get(
                                     'response_kwargs', {}).get(
                                         'vars', [var_name]))
                     if 'vars' not in self._comms[io][var_name]:
@@ -549,7 +559,8 @@ class YggFunction(YggClass):
                             drv[f'{io_opp}s'][0].get('vars', [var_name]))
         self.debug(f'inputs: {list(self.inputs.keys())}, '
                    f'outputs: {list(self.outputs.keys())}')
-        atexit.register(self.stop)
+        if self._1st_run:
+            atexit.register(self.stop)
         # Ensure that vars are strings
         for io in ['input', 'output']:
             for k, v in getattr(self, f'{io}s').items():
@@ -568,6 +579,7 @@ class YggFunction(YggClass):
         self.debug(f"arguments: {self.arguments}, "
                    f"returns: {self.returns}")
         self.runner.pause()
+        self._1st_run = False
 
     def reload(self):
         r"""Reload the model"""
@@ -590,12 +602,9 @@ class YggFunction(YggClass):
         self.runner.resume()
         if not self._stop_called:
             self._stop_called = True
+            YggBroker.remove_client(self.dummy_name)
             if not error:
-                for x in self.inputs.values():
-                    if 'comm' in x:
-                        x['comm'].send_eof()
-            if not error:
-                self.runner.waitModels()
+                self.close_via_signoff()
             for x in self.inputs.values():
                 if 'comm' in x:
                     x['comm'].close()
@@ -606,6 +615,31 @@ class YggFunction(YggClass):
             self.runner.atexit()
             self.runner = None
             self._stop_called = False
+
+    def close_via_signoff(self):
+        r"""Send EOF to input comms and wait for output comms to close."""
+        eof_sent = False
+        for x in self.inputs.values():
+            if 'comm' in x and x['comm'].is_open:
+                x['comm'].send_eof()
+                eof_sent = True
+        # for x in self.inputs.values():
+        #     if 'comm' in x and x['comm'].is_open:
+        #         print(x['name'], x['comm'].wait_for_confirm(0.01))
+        if not eof_sent:
+            return
+        # open_recv = {
+        #     k: v['comm'].is_open for k, v in self.outputs.items()
+        #     if 'comm' in v
+        # }
+        # while any(open_recv.values()):
+        #     for k, v in self.outputs.items():
+        #         if 'comm' not in v:
+        #             continue
+        #         if v['comm'].is_open:
+        #             v['comm'].recv()
+        #         open_recv[k] = v['comm'].is_open
+        self.runner.waitModels()
 
     def printStatus(self, level='info', return_str=False):
         r"""Print the status of the function as a log message.
@@ -842,6 +876,10 @@ class YggRunner(YggClass):
         complete_partial (bool, optional): If True, unpaired input/output
             channels are allowed and reserved for use (e.g. for calling the
             model as a function). Defaults to False.
+        partial_timesync (bool, optional): If True, add timesync comms to
+            the comms reserved for local use.
+        partial_comms (list, optional): Names of comms to reserve for
+            local use.
         partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels when
             complete_partial is True. Defaults to None and will be ignored.
@@ -884,6 +922,7 @@ class YggRunner(YggClass):
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None, connection_task_method='thread',
                  as_service=False, complete_partial=False,
+                 partial_timesync=False, partial_comms=None,
                  partial_commtype=None, production_run=False,
                  mpi_tag_start=None, validate=False,
                  with_debugger=None, disable_python_c_api=False,
@@ -923,6 +962,8 @@ class YggRunner(YggClass):
         self.production_run = production_run
         self.error_flag = False
         self.complete_partial = complete_partial
+        self.partial_timesync = partial_timesync
+        self.partial_comms = partial_comms
         self.partial_commtype = partial_commtype
         self.validate = validate
         self.debug("Running in %s with path %s namespace %s rank %d",
@@ -936,6 +977,8 @@ class YggRunner(YggClass):
         else:
             self.drivers = yamlfile.parse_yaml(
                 modelYmls, complete_partial=complete_partial,
+                partial_timesync=partial_timesync,
+                partial_comms=partial_comms,
                 partial_commtype=partial_commtype, **kwargs)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
@@ -1223,7 +1266,7 @@ class YggRunner(YggClass):
         driver0 = yml['driver']
         try:
             yml['driver'] = 'DirectConnectionDriver'
-            drv = self.create_driver(yml)
+            drv = self.create_driver(yml, direct_driver_replaces=driver0)
         except DirectConnectionDriver.DirectConnectionError:
             yml['driver'] = driver0
             drv = self.create_driver(yml)

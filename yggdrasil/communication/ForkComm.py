@@ -147,7 +147,7 @@ class ForkComm(CommBase.CommBase):
         kwargs.update(noprop_kwargs)
         super(ForkComm, self).__init__(name, is_async=is_async, **kwargs)
         assert not self.single_use
-        assert not self.is_server
+        assert not (self.is_server and (self.pattern != 'cycle'))
         assert not (self.is_client and (self.pattern != 'cycle'))
 
     def disconnect(self):

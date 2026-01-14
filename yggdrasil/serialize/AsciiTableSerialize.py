@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 from yggdrasil import serialize, tools, constants, datatypes
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
@@ -79,9 +80,9 @@ class AsciiTableSerialize(DefaultSerialize):
             kwargs['format_str'] = serialize.table2format(**info)
         # Transform scalar into array for table
         old_typedef = kwargs.get('datatype', {})
+        new_typedef = None
         if old_typedef.get('type', 'array') != 'array':
-            new_typedef = None
-            old_typedef = kwargs.pop('datatype')
+            old_typedef = copy.deepcopy(kwargs.pop('datatype'))
             if old_typedef['type'] == 'object':
                 names = self.get_field_names()
                 if not names:
@@ -94,8 +95,8 @@ class AsciiTableSerialize(DefaultSerialize):
                             old_typedef['properties'][n], title=n))
             else:
                 new_typedef = {'type': 'array', 'items': [old_typedef]}
-            if new_typedef:
-                kwargs['datatype'] = new_typedef
+        if new_typedef:
+            kwargs['datatype'] = new_typedef
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
         if ((kwargs.get('from_message', False) is not False
              and self.initialized

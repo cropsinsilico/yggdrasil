@@ -90,15 +90,26 @@ class YggBroker(multitasking.YggTaskLoop):
         return itertools.chain(self.models, self.connections)
 
     @classmethod
+    def _get_commlist(cls, comm):
+        if isinstance(comm['commtype'], list):
+            return comm['commtype']
+        elif (comm['commtype'] in ['server', 'client', 'fork']
+              and isinstance(comm.get('comm_list', None), list)):
+            return comm['comm_list']
+        elif (comm['commtype'] in ['server', 'client']
+              and isinstance(comm.get('request_commtype', None), list)):
+            return comm['request_commtype']
+        return None
+
+    @classmethod
     def _param_model_comm(cls, comm):
         commlist = None
         if isinstance(comm, dict):
             name = comm['name']
             direction = comm['direction']
-            model = comm['model']
+            model = comm.get('model', None)
             name = strip_model_prefix(name, model)
-            if isinstance(comm['commtype'], list):
-                commlist = comm['commtype']
+            commlist = cls._get_commlist(comm)
         else:
             name = comm.opp_name
             direction = comm.opp_direction
@@ -107,9 +118,15 @@ class YggBroker(multitasking.YggTaskLoop):
             if comm._commtype == 'fork':
                 commlist = comm.comm_list
             elif comm._commtype == 'server' and direction == 'send':
-                commlist = [comm.icomm]
+                if comm.icomm._commtype == 'fork':
+                    commlist = comm.icomm.comm_list
+                else:
+                    commlist = [comm.icomm]
             elif comm._commtype == 'client' and direction == 'recv':
-                commlist = [comm.ocomm]
+                if comm.ocomm._commtype == 'fork':
+                    commlist = comm.ocomm.comm_list
+                else:
+                    commlist = [comm.ocomm]
         return (model, direction, name, commlist)
 
     @classmethod
@@ -126,7 +143,8 @@ class YggBroker(multitasking.YggTaskLoop):
                     pass
         raise CommBase.CommError("no match")
 
-    def find_model_comm(self, model, direction, name):
+    def find_model_comm(self, model, direction, name,
+                        is_split_server=False):
         r"""Locate a matching communicator from the registered
         connections.
 
@@ -135,6 +153,8 @@ class YggBroker(multitasking.YggTaskLoop):
             direction (str): Direction that the model communicator
                 operates in.
             name (str): Channel name for the communicator.
+            is_split_server (bool, optional): If True, the comm is part
+                of a split server comm.
 
         Returns:
             dict, CommBase: Partner communicator or parameters for the
@@ -155,8 +175,13 @@ class YggBroker(multitasking.YggTaskLoop):
                         comm, model, direction, name)
                 except CommBase.CommError:
                     pass
+        if is_split_server:
+            try:
+                return self.find_model_comm(model, 'recv', model)
+            except BrokerError:
+                pass
         raise BrokerError(f"Could not locate a {direction} communicator "
-                          f"with name \"{name}\" for model \"{model}\": "
+                          f"with name \"{name}\" for model \"{model}\":\n"
                           f"{pprint.pformat(self.comms)}")
 
     @classmethod
@@ -513,6 +538,24 @@ class YggBroker(multitasking.YggTaskLoop):
         return response['return']
 
     @classmethod
+    def is_address_set(cls, comm):
+        r"""Check if an address is defined.
+
+        Args:
+            comm (dict): Communication definition.
+
+        Returns:
+            bool: True if the address is defined, False otherwise.
+
+        """
+        if 'address' in comm:
+            return True
+        commlist = cls._get_commlist(comm)
+        if commlist is None:
+            return False
+        return all('address' in x for x in commlist)
+
+    @classmethod
     def update_model_comm_kwargs(cls, name, kwargs, self=None):
         r"""Update the communicator parameters for the partner model
         communicator in the case of a direct connection.
@@ -525,15 +568,31 @@ class YggBroker(multitasking.YggTaskLoop):
         if self is None:
             return cls._send_request('update_model_comm_kwargs',
                                      name, kwargs)
+        partner_model = kwargs.pop('partner_model', None)
         model = kwargs.pop('model')
         direction = kwargs.pop('direction')
         comm = self.find_model_comm(model, direction, name)
         assert isinstance(comm, dict)
+        comm0 = comm
+        commlist = self._get_commlist(comm)
+        if commlist is not None:
+            assert partner_model is not None
+            partners = [x['partner_model'] for x in commlist]
+            assert sum(x == partner_model for x in partners) == 1
+            idx = partners.index(partner_model)
+            comm = commlist[idx]
+            if kwargs['commtype'] in ['server', 'client']:
+                assert comm0['commtype'] == kwargs['commtype']
+                kwargs.pop('commtype')
+                if 'request_commtype' in kwargs:
+                    kwargs['commtype'] = kwargs.pop('request_commtype')
         comm.update(kwargs)
         assert comm['direction'] == direction
-        if name in self._awaiting_comm:
+        if commlist is None:
             assert 'address' in comm
-            # self.server_comm.info(f"UNLOCKING: {name}")
+        if name in self._awaiting_comm and self.is_address_set(comm0):
+            # self.server_comm.info(f"UNLOCKING: {name} "
+            #                       f"{self._awaiting_comm}")
             self._awaiting_comm.remove(name)
 
     @classmethod
@@ -569,9 +628,9 @@ class YggBroker(multitasking.YggTaskLoop):
             if isinstance(model_driver.is_server, dict):
                 if ((name == model_driver.is_server['input']
                      or name == model_driver.is_server['output'])):
-                    # TODO: Verify that this works
                     is_split_server = True
-        comm = self.find_model_comm(model, direction, name)
+        comm = self.find_model_comm(model, direction, name,
+                                    is_split_server)
         if isinstance(comm, dict):
             out = copy.deepcopy(comm)
             if (('address' not in comm
@@ -591,8 +650,11 @@ class YggBroker(multitasking.YggTaskLoop):
         )
         if is_split_server or out['commtype'] == 'model_function':
             out['global_scope'] = model
-        if 'address' not in out and 'partner_name' in out:
-            # self.server_comm.info(f"LOCKING {out['partner_name']}")
+        if (('partner_name' in out
+             and out['partner_name'] not in self._awaiting_comm
+             and (not self.is_address_set(out)))):
+            # self.server_comm.info(f"LOCKING: {out['partner_name']} "
+            #                       f"{self._awaiting_comm}")
             self._awaiting_comm.append(out['partner_name'])
         return out
 
@@ -611,7 +673,8 @@ class YggBroker(multitasking.YggTaskLoop):
 
         """
         kwargs = dict(cls.model_comm_kwargs(name, direction), **kwargs)
-        assert direction == kwargs['direction']
+        if kwargs.get('commtype', None) not in ['client', 'server']:
+            assert direction == kwargs['direction']
         name = kwargs['name']
         global_scope = kwargs.pop('global_scope', False)
         global_name = name
@@ -622,13 +685,16 @@ class YggBroker(multitasking.YggTaskLoop):
             # for case where server or function comm is split between
             # two aliases
             return cls._global_scope_comms[global_name]
-        if 'address' in kwargs:
+        if cls.is_address_set(kwargs):
             out = get_comm(**kwargs)
         else:
             partner_name = kwargs['partner_name']
             out = new_comm(**kwargs)
             cls.update_model_comm_kwargs(
-                partner_name, out.model_comm_kwargs)
+                partner_name,
+                dict(out.model_comm_kwargs,
+                     partner_model=kwargs['model']),
+            )
         if global_scope:
             cls._global_scope_comms[global_name] = out
         return out

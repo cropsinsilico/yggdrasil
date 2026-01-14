@@ -221,17 +221,28 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).atexit()
         
     # RESPONSE COMM
-    def create_response_comm(self):
-        r"""Create a response comm based on information from the last header."""
-        header = {'request_id': str(uuid.uuid4())}
-        while header['request_id'] in self.request_order:  # pragma: debug
-            header['request_id'] += str(uuid.uuid4())
+    def create_response_comm(self, outside_send=False):
+        r"""Create a response comm based on information from the last header.
+
+        Args:
+            outside_send (bool, optional): If True, don't add a request
+                id to the request order or create a header.
+
+        Returns:
+            dict: Header information for the next request.
+
+        """
         if self.icomm is None:
             comm_kwargs = dict(direction='recv', is_response_client=True,
                                **self.response_kwargs)
             if comm_kwargs.get('use_async', False):
                 comm_kwargs['async_recv_method'] = 'recv_message'
             self.icomm = new_comm(self.name + '-client_response_comm', **comm_kwargs)
+        if outside_send:
+            return
+        header = {'request_id': str(uuid.uuid4())}
+        while header['request_id'] in self.request_order:  # pragma: debug
+            header['request_id'] += str(uuid.uuid4())
         header['response_address'] = self.icomm.opp_address
         self.request_order.append(header['request_id'])
         return header

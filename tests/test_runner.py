@@ -91,23 +91,26 @@ def test_import_as_function():
     r"""Test import_as_function."""
     yamlfile = ex_yamls['fakeplant']['python']
     fmodel = import_as_function(yamlfile, remove_products=True)
-    input_args = {}
-    for x in fmodel.arguments:
-        input_args[x] = 1.0
-    fmodel.model_info()
-    result = fmodel(**input_args)
-    for x in fmodel.returns:
-        assert x in result
-    result = fmodel(*list(input_args.values()))
-    for x in fmodel.returns:
-        assert x in result
-    fmodel.reload()
-    fmodel.run()
-    result = fmodel(**input_args)
-    for x in fmodel.returns:
-        assert x in result
-    fmodel.stop()
-    fmodel.stop()
+    try:
+        input_args = {}
+        for x in fmodel.arguments:
+            input_args[x] = 1.0
+        fmodel.function_info
+        assert len(fmodel.returns) == 1
+        result = fmodel(**input_args)
+        for x in fmodel.returns:
+            assert x in result
+        result = fmodel(*list(input_args.values()))
+        for x in fmodel.returns:
+            assert x in result
+        fmodel.reload()
+        fmodel.run()
+        result = fmodel(**input_args)
+        for x in fmodel.returns:
+            assert x in result
+        fmodel.stop()
+    finally:
+        fmodel.stop()
 
 
 def test_import_as_function_server():
@@ -119,18 +122,67 @@ def test_import_as_function_server():
             break
     assert yamlfile
     fmodel = import_as_function(yamlfile, remove_products=True)
-    input_args = {}
-    for x in fmodel.arguments:
-        input_args[x] = 'hello'
-    fmodel.model_info()
-    result = fmodel(**input_args)
-    for x in fmodel.returns:
-        assert x in result
-    result = fmodel(*list(input_args.values()))
-    for x in fmodel.returns:
-        assert x in result
-    fmodel.stop()
-    fmodel.stop()
+    try:
+        input_args = {}
+        for x in fmodel.arguments:
+            input_args[x] = 'hello'
+        fmodel.function_info
+        assert len(fmodel.returns) == 1
+        result = fmodel(**input_args)
+        for x in fmodel.returns:
+            assert x in result
+        result = fmodel(*list(input_args.values()))
+        for x in fmodel.returns:
+            assert x in result
+        fmodel.stop()
+    finally:
+        fmodel.stop()
+
+
+def test_import_as_function_timesync():
+    r"""Test import_as_function with timesync."""
+    from yggdrasil import units
+    contents = r"""models:
+      - name: modelA
+        language: python
+        args:
+          - ./src/timesync.py
+          - 2
+          - day
+        timesync: True
+        outputs:
+          name: output
+          default_file:
+            name: modelA_output.txt
+            in_temp: True
+            filetype: table"""
+    yamlfile = os.path.join(os.path.dirname(ex_yamls['timesync1']['python']),
+                            'test_import_timesync.yml')
+    assert not os.path.isfile(yamlfile)
+    with open(yamlfile, 'w') as fd:
+        fd.write(contents)
+    fmodel = None
+    try:
+        # TODO: Test where x/y modified in call
+        steps = [
+            ({'timesync': (units.add_units(0.0, 'day'), {})},
+             {'x': 0.0, 'y': 1.0}),
+            ({'timesync': (units.add_units(1.0, 'day'), {})},
+             {'x': 0.47552825814757677, 'y': 0.09549150281252626}),
+        ]
+        fmodel = import_as_function(yamlfile, remove_products=True,
+                                    partial_timesync=True,
+                                    partial_comms=['timesync'])
+        fmodel.function_info
+        input_args = {}
+        for input_args, output_args in steps:
+            result = fmodel(**input_args)
+            assert result == output_args
+        fmodel.stop()
+    finally:
+        if fmodel is not None:
+            fmodel.stop()
+        os.remove(yamlfile)
 
 
 @pytest.mark.language('c')
@@ -148,9 +200,10 @@ def test_import_as_function_C():
     assert not os.path.isfile(yamlfile)
     with open(yamlfile, 'w') as fd:
         fd.write(contents)
+    fmodel = None
     try:
         fmodel = import_as_function(yamlfile, remove_products=True)
-        fmodel.model_info()
+        fmodel.function_info
         input_args = {}
         for x in fmodel.arguments:
             input_args[x] = b'hello'
@@ -161,6 +214,7 @@ def test_import_as_function_C():
         for x in fmodel.returns:
             assert x in result
         fmodel.stop()
-        fmodel.stop()
     finally:
+        if fmodel is not None:
+            fmodel.stop()
         os.remove(yamlfile)

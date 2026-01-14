@@ -3474,7 +3474,9 @@ definitions:
         additionalProperties:
           items:
             type: string
-          type: array
+          type:
+          - boolean
+          - array
         default: {}
         type: object
       aggregation:
@@ -5453,7 +5455,9 @@ definitions:
         additionalProperties:
           items:
             type: string
-          type: array
+          type:
+          - boolean
+          - array
         default: {}
         type: object
       aggregation:

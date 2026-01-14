@@ -16,6 +16,8 @@ class DirectConnectionDriver(ConnectionDriver):
     _connection_type = 'direct'
 
     def __init__(self, *args, **kwargs):
+        self.direct_driver_replaces = kwargs.pop(
+            'direct_driver_replaces', None)
         kwargs.setdefault('disabled', True)
         super(DirectConnectionDriver, self).__init__(*args, **kwargs)
         assert not self.single_use
@@ -29,10 +31,14 @@ class DirectConnectionDriver(ConnectionDriver):
             direction = 'send'
             attr_comm = 'icomm'
             comm_type = self._icomm_type
+            if self.direct_driver_replaces == 'RPCRequestDriver':
+                comm_type = 'client'
         else:
             direction = 'recv'
             attr_comm = 'ocomm'
             comm_type = self._ocomm_type
+            if self.direct_driver_replaces == 'RPCRequestDriver':
+                comm_type = 'server'
         comm_kws['direction'] = direction
         comm_kws['name'] = self.name
         for i, x in enumerate(comm_list):
@@ -54,6 +60,7 @@ class DirectConnectionDriver(ConnectionDriver):
             x.update(
                 model=x.pop('partner_model', None),
                 direct_connection=True,
+                direction=direction,
             )
             models.append(x['model'])
             if 'partner_copies' in x:
@@ -71,13 +78,16 @@ class DirectConnectionDriver(ConnectionDriver):
             if x['commtype'] == 'value':
                 raise DirectConnectionError(
                     "Cannot make a direct connection with an value comm")
-            for k in ['client', 'servier']:
+            for k in ['client', 'server']:
                 if x.get(f'is_{k}', False):
                     x.update(
                         request_commtype=x['commtype'],
                         commtype=k,
                     )
                     x.pop(f'is_{k}')
+            if x['commtype'] in ['client', 'server']:
+                x.setdefault('request_commtype',
+                             getattr(self, f'_{io[0]}comm_type'))
             if direction == 'send' and self._raw_transform:
                 x.setdefault('transform', [])
                 x['transform'] += self._raw_transform
@@ -92,21 +102,20 @@ class DirectConnectionDriver(ConnectionDriver):
         if len(comm_kws['commtype']) == 1:
             comm_kws.update(comm_kws.pop('commtype')[0])
         if len(models) == 1:
-            x['model'] = models[0]
+            comm_kws['model'] = models[0]
         self.debug(f'{attr_comm} comm_kws:\n{self.pprint(comm_kws, 1)}')
         setattr(self, attr_comm, comm_kws)
         setattr(self, '%s_kws' % attr_comm, comm_kws)
         self.models[io] = models
 
     def _add_partner_single(self, x, x_opp):
-        if x['model'] == x_opp['model']:
+        if 'model' in x and x['model'] == x_opp.get('model', None):
             # TODO: This is only true if aync comms are not used
             raise DirectConnectionError(
                 "Cannot make a direct connection within the same model")
-        x.update(
-            partner_name=x_opp['name'],
-            partner_language=x_opp['language'],
-        )
+        for k in ['name', 'language']:
+            if k in x_opp:
+                x[f'partner_{k}'] = x_opp[k]
         if 'model_copies' in x_opp:
             x['partner_copies'] = x_opp['model_copies']
         x_opp_list = []
@@ -127,23 +136,32 @@ class DirectConnectionDriver(ConnectionDriver):
                 for idx in range(x_opp['model_copies'])
             ]
             x_pattern = 'cycle'
-        if ((x_opp_list
-             and (x_pattern != 'cycle'
-                  or x['commtype'] not in ['server', 'client']))):
-            if isinstance(x['commtype'], list):
-                raise DirectConnectionError(
-                    "Cannot handle multiple-to-multiple communication "
-                    "pattern without a connection driver")
-            assert not isinstance(x['commtype'], list)
+        if x_opp_list and isinstance(x['commtype'], list):
+            raise DirectConnectionError(
+                "Cannot handle multiple-to-multiple communication "
+                "pattern without a connection driver")
+        if x_opp_list:
             commtype = x['commtype']
-            x.update(
-                pattern=x_pattern,
-                commtype=[dict(x, commtype=commtype) for xx in x_opp_list],
-            )
-            for xx, xx_opp in zip(x['commtype'], x_opp_list):
+            commlist = [copy.deepcopy(x) for xx in x_opp_list]
+            commlist_dest = 'commtype'
+            if commtype in ['server', 'client']:
+                assert x_pattern == 'cycle'
+                commtype = x.get('request_commtype', None)
+                commlist_dest = 'comm_list'
+                x['request_commtype'] = 'fork'
+                for xx in commlist:
+                    xx.pop('request_commtype', None)
+                # commlist_dest = 'request_commtype'
+            for xx, xx_opp in zip(commlist, x_opp_list):
+                xx['commtype'] = commtype
                 self._add_partner_single(xx, xx_opp)
+            x['pattern'] = x_pattern
+            x[commlist_dest] = commlist
+            if 'model' in x_opp:
+                x['partner_model'] = x_opp['model']
         else:
-            x['partner_model'] = x_opp['model']
+            if 'model' in x_opp:
+                x['partner_model'] = x_opp['model']
             if isinstance(x['commtype'], list):
                 for xx in x['commtype']:
                     self._add_partner_single(xx, x_opp)

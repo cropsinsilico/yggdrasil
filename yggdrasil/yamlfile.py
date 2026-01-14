@@ -422,7 +422,8 @@ def prep_yaml(files, model_submission=False, **kwargs):
     return yml_all
 
 
-def parse_yaml(files, complete_partial=False, partial_commtype=None,
+def parse_yaml(files, complete_partial=False, partial_timesync=False,
+               partial_comms=None, partial_commtype=None,
                model_only=False, model_submission=False,
                verbose=False, **kwargs):
     r"""Parse list of yaml files.
@@ -433,6 +434,10 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
         complete_partial (bool, optional): If True, unpaired input/output
             channels are allowed and reserved for use (e.g. for calling the
             model as a function). Defaults to False.
+        partial_timesync (bool, optional): If True, add timesync comms to
+            the comms reserved for local use.
+        partial_comms (list, optional): Names of comms to reserve for
+            local use.
         partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels when
             complete_partial is True. Defaults to None and will be ignored.
@@ -536,7 +541,10 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None,
     # Add stand-in model that uses unpaired channels
     if complete_partial:
         existing = complete_partial_integration(
-            existing, complete_partial, partial_commtype=partial_commtype)
+            existing, complete_partial,
+            partial_timesync=partial_timesync,
+            partial_comms=partial_comms,
+            partial_commtype=partial_commtype)
         __display_progress(verbose, existing,
                            "After completing partial integration")
     # Create server/client connections
@@ -645,12 +653,18 @@ def init_yaml(files, **kwargs):
     runner.terminate()
 
 
-def complete_partial_integration(existing, name, partial_commtype=None):
+def complete_partial_integration(existing, name, partial_timesync=False,
+                                 partial_comms=None,
+                                 partial_commtype=None):
     r"""Patch input/output channels that are not connected to a stand-in model.
 
     Args:
         existing (dict): Dictionary of existing components.
         name (str): Name that should be given to the new model.
+        partial_timesync (bool, optional): If True, add timesync comms to
+            the comms reserved for local use.
+        partial_comms (list, optional): Names of comms to reserve for
+            local use.
         partial_commtype (dict, optional): Communicator kwargs that should be
             be used for the connections to the unpaired channels. Defaults to
             None and will be ignored.
@@ -674,14 +688,37 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     miss = {}
     dir2opp = {'input': 'output', 'output': 'input'}
     for io in dir2opp.keys():
-        miss[io] = [k for k in existing[io].keys()
-                    if not (((io == 'input') and (k in existing['server']))
-                            or existing[io][k].get('is_default', False)
-                            or existing[io][k].get('__connection_count', 0) > 0)]
+        miss[io] = [
+            k for k in existing[io].keys()
+            if ((partial_comms is not None and k in partial_comms)
+                or not (
+                    ((io == 'input') and (k in existing['server']))
+                    or existing[io][k].get('is_default', False)
+                    or existing[io][k].get('__connection_count', 0) > 0
+                    or (partial_comms is not None
+                        and k not in partial_comms
+                        and existing[io][k].get('default_file', False))))
+        ]
     for srv_info in existing['server'].values():
-        if not srv_info['clients']:
-            new_model.setdefault('client_of', [])
-            new_model['client_of'].append(srv_info['model_name'])
+        isrv = srv_info['model_name']
+        itimesync = (
+            existing['model'][isrv]['driver'] == 'TimeSyncModelDriver')
+        for k in srv_info.get('clients', []):
+            if k in miss['output']:
+                miss['output'].remove(k)
+        if (((partial_comms is not None and isrv in partial_comms)
+             or (not srv_info['clients'])
+             or (itimesync and partial_timesync))):
+            if itimesync:
+                new_model.setdefault('timesync_client_of', [])
+                new_model['timesync_client_of'].append(isrv)
+                existing['model'][isrv].setdefault(
+                    'additional_variables', {})
+                existing['model'][isrv]['additional_variables'].setdefault(
+                    new_model['name'], True)
+            else:
+                new_model.setdefault('client_of', [])
+                new_model['client_of'].append(isrv)
     # TODO: Check that there arn't any missing servers
     # for conn in existing['connection'].values():
     #     for io1, io2 in dir2opp.items():
@@ -692,7 +729,8 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     # Create connections to dummy model
     for io1, io2 in dir2opp.items():
         for i in miss[io1]:
-            dummy_comm = copy.deepcopy(existing[io1][i])
+            orig_comm = existing[io1][i]
+            dummy_comm = copy.deepcopy(orig_comm)
             dummy_channel = add_model_prefix(strip_model_prefix(
                 i, dummy_comm.get('partner_model', None)), name)
             for k in ['address', 'for_service', 'commtype', 'host',
@@ -702,10 +740,12 @@ def complete_partial_integration(existing, name, partial_commtype=None):
             dummy_comm['name'] = dummy_channel
             if partial_commtype is not None:
                 dummy_comm.update(partial_commtype)
+            dummy_comm.setdefault('model', name)
+            if 'model' in orig_comm:
+                dummy_comm.setdefault('partner_model', orig_comm['model'])
             new_model[io2 + 's'].append(dummy_comm)
             new_connections.append({io1 + 's': [{'name': dummy_channel}],
                                     io2 + 's': [{'name': i}]})
-    # Parse new components
     existing = parse_component(new_model, 'model', existing=existing)
     for new_conn in new_connections:
         existing = parse_component(new_conn, 'connection', existing=existing)
@@ -767,10 +807,10 @@ def parse_model(yml, existing):
         yml['language'] = 'cpp'
     language = yml.pop('language')
     yml['driver'] = constants.COMPONENT_REGISTRY['model']['subtypes'][language]
+    prefix = yml['name'] + ':'
     # Add server input
     if yml.get('is_server', False):
-        srv = {'name': yml['name'] + ':' + yml['name'],
-               'commtype': 'default',
+        srv = {'name': prefix + yml['name'],
                'datatype': {'type': 'bytes'},
                'args': yml['name'] + '_SERVER',
                'working_dir': yml['working_dir']}
@@ -794,10 +834,11 @@ def parse_model(yml, existing):
             replaces = {}
             for io in ['input', 'output']:
                 replaces[io] = None
-                # if not yml['is_server'][io].startswith('%s:' % yml['name']):
-                #     yml['is_server'][io] = yml['name'] + ':' + yml['is_server'][io]
+                if not yml['is_server'][io].startswith(prefix):
+                    yml['is_server'][io] = prefix + yml['is_server'][io]
                 for i, x in enumerate(yml[io + 's']):
-                    if x['name'] == yml['is_server'][io]:
+                    if yml['is_server'][io] in [x['name'],
+                                                prefix + x['name']]:
                         replaces[io] = x
                         replaces[io + '_index'] = i
                         yml[io + 's'].pop(i)
@@ -827,9 +868,9 @@ def parse_model(yml, existing):
         client_of = []
         for srv in yml['client_of']:
             if srv in timesync:
-                cli_name = '%s:%s' % (yml['name'], srv)
+                cli_name = f'{prefix}{srv}'
             else:
-                cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
+                cli_name = f'{prefix}{srv}_{yml["name"]}'
             cli = {'name': cli_name,
                    'working_dir': yml['working_dir']}
             srv_alias = existing['aliases']['models'].get(srv, srv)

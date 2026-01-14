@@ -13,6 +13,9 @@ History
 * Migrate from setup.py + setup.cfg to pyproject.toml
 * Migrate build system to scikit-build-core
 * Introduce disassembler compilation tool class for dissecting compiled binaries
+* Added support for accessing timesync channels from models imported as functions
+* Added support for returning all variables to models via a timesync conneciton if True passed in the timesync parameter 'additional_variables' for a model
+* Fix bugs in model queue handling which dropped some buffered messages from the model stdout
 
 1.10.2 (2023-10-12) Minor bug fixes and dependency updates
 -------------------

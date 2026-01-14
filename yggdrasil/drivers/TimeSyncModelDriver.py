@@ -49,7 +49,9 @@ class TimeSyncModelDriver(DSLModelDriver):
         additional_variables (dict, optional): Mapping from model
             name to a list of variables from other models that are
             not provided by the model, but should still be returned
-            to the model. Defaults to empty dictionary.
+            to the model. If True is provided for a model key, all of
+            the available variables will be returned to the model.
+            Defaults to empty dictionary.
 
     """
 
@@ -95,7 +97,7 @@ class TimeSyncModelDriver(DSLModelDriver):
             'default': _default_agg},
         'additional_variables': {
             'type': 'object',
-            'additionalProperties': {'type': 'array',
+            'additionalProperties': {'type': ['boolean', 'array'],
                                      'items': {'type': 'string'}},
             'default': {}},
         'args': {'type': 'array', 'default': [],
@@ -179,6 +181,7 @@ class TimeSyncModelDriver(DSLModelDriver):
                                                      quiet_timeout=True)
             if not flag:
                 print("timesync server: End of input.")
+                rpc.close()
                 break
             if len(values) == 0:
                 rpc.sleep()
@@ -189,8 +192,11 @@ class TimeSyncModelDriver(DSLModelDriver):
                 rpc.requests[request_id].response_address].client_model
             # Remove variables marked as external so they are not merged
             external_variables = additional_variables.get(client_model, [])
-            for k in external_variables:
-                state.pop(k, None)
+            if external_variables is False:
+                external_variables = []
+            if isinstance(external_variables, list):
+                for k in external_variables:
+                    state.pop(k, None)
             internal_variables = list(state.keys())
             # Update record
             with table_lock:
@@ -324,6 +330,11 @@ class TimeSyncModelDriver(DSLModelDriver):
             return
         tot = cls.merge(tables, table_units, table_lock, rpc.open_clients,
                         synonyms, interpolation, aggregation)
+        if external_variables is True:
+            external_variables = [
+                k for k in tot.columns
+                if k not in internal_variables
+            ]
         # Update external units
         for k in external_variables:
             if k not in table_units[client_model]:

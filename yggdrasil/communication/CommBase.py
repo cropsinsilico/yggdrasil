@@ -671,8 +671,10 @@ class CommProxy(multitasking.YggTaskLoop):
         """
         if messages:
             self.requeue_messages(messages)
+        assert isinstance(name, str)
         self.info(f"Removing server \"{name}\" from proxy "
-                  f"(nservers = {self.srv_count})")
+                  f"(nservers = {self.srv_count}, "
+                  f"is_partner = {self.is_partner})")
         if self.is_partner:
             try:
                 self.client_send(self.server_signoff_msg
@@ -784,17 +786,17 @@ class CommProxy(multitasking.YggTaskLoop):
             )
             return None
         elif msg.startswith(self.client_signon_msg):
-            name = msg.split(self.client_signon_msg)[-1]
+            name = msg.split(self.client_signon_msg)[-1].decode('utf-8')
             self.debug(f"Received client signon from {name}")
             self.add_client(name)
             return None
         elif msg.startswith(self.server_signoff_msg):
-            name = msg.split(self.server_signoff_msg)[-1]
+            name = msg.split(self.server_signoff_msg)[-1].decode('utf-8')
             self.debug(f"Received server signoff from {name}")
             self.remove_server(name, in_loop=True)
             return None
         elif msg.startswith(self.client_signoff_msg):
-            name = msg.split(self.client_signoff_msg)[-1]
+            name = msg.split(self.client_signoff_msg)[-1].decode('utf-8')
             self.debug(f"Received client signoff from {name}")
             self.remove_client(name, in_loop=True)
             return None
