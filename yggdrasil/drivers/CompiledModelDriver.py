@@ -3898,6 +3898,7 @@ class CompilationDependency(object):
             out = self._search_brute(search_param=search_param,
                                      libtype=filetype, **kwargs)
         if (((not out) and self.origin in ['standard', 'language']
+             and not self.get('dep_shared_flags', False)
              and filetype in self.library_files)):
             out = self._build_output_base(filetype=filetype, **kwargs)
         if out:
@@ -4026,6 +4027,12 @@ class CompilationDependency(object):
         out = False
         search_list = self.tool(libtype).get_search_path(
             libtype=libtype, cfg=self.cfg, **kwargs)
+        if libtype == 'include':
+            directory = self.get('directory', False)
+            if directory:
+                search_list = [
+                    os.path.join(x, directory) for x in search_list
+                ] + search_list
         for fname_base, fname_ext, fname, use_regex in search_param:
             if os.path.isfile(fname):
                 return fname

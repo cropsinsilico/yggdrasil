@@ -9,7 +9,7 @@ import tempfile
 import contextlib
 from yggdrasil import tools, platform, yamlfile
 from yggdrasil.services import _service_repo_dir
-from yggdrasil.rapidjson import NormalizationError
+from yggdrasil_rapidjson import NormalizationError
 from yggdrasil.components import (
     ComponentBase, import_component, create_component, ComponentError,
     identify_component_subtype, get_component_classes)
@@ -1642,10 +1642,7 @@ class ManagedDependencyBase(ComponentBase):
             cmd = cmd.split()
         if conda_env:
             kwargs['shell'] = True
-            cmd = [CondaDependency.manager_executable(), 'run', '-n',
-                   conda_env, '--live-stream'] + cmd
-            if platform._is_win:  # pragma: windows
-                cmd.insert(0, 'call')
+            cmd = CondaDependency.command_run_in_env(conda_env) + cmd
         cmdstr = ' '.join(cmd)
         if kwargs.get('shell', False):
             cmd = cmdstr
@@ -1718,10 +1715,10 @@ class ManagedDependencyBase(ComponentBase):
             context = f'{context.rstrip()} step '
         if conda_env:
             kwargs['shell'] = True
-            call = 'call ' if platform._is_win else ''
-            executable = CondaDependency.manager_executable()
+            run_prefix = ' '.join(
+                CondaDependency.command_run_in_env(conda_env))
             steps = [
-                f'{call}{executable} run -n {conda_env} --live-stream {x}'
+                f'{run_prefix} {x}'
                 for x in steps
             ]
         script_file = tools.TemporaryGeneratedFile(
@@ -2302,6 +2299,29 @@ class CondaDependency(ManagedDependencyBase):
         if shutil.which('mamba'):
             return 'mamba'
         return 'conda'
+
+    @classmethod
+    def command_run_in_env(cls, conda_env):
+        r"""Get the command prefix that should be used to run commands in
+        a conda/mamba environment.
+
+        Args:
+            conda_env (str): Conda environment that the command prefix
+                should run commands in.
+
+        Returns:
+            list: Command prefix.
+
+        """
+        executable = cls.manager_executable()
+        out = [executable, 'run', '-n', conda_env]
+        if 'mamba' not in executable:
+            # Mamba2 doesn't support these
+            # https://github.com/mamba-org/mamba/issues/3535
+            out += ['--live-stream', '--']
+        if platform._is_win:  # pragma: windows
+            out.insert(0, 'call')
+        return out
 
     def check_validity(self, **kwargs):
         r"""Check if the dependency can be installed.

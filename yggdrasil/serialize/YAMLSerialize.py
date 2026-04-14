@@ -1,5 +1,5 @@
 import yaml
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 from yggdrasil.serialize.JSONSerialize import (
     JSONSerialize, indent_char2int)
 
@@ -45,14 +45,14 @@ def encode_yaml(obj, fd=None, indent=None,
             OrderedDumper.add_representer(x, _dict_representer)
         kwargs['Dumper'] = OrderedDumper
         
-        class OrderedDecoder(rapidjson.Decoder):
+        class OrderedDecoder(yggrj.Decoder):
             def start_object(self):
                 return sorted_dict_type[0]()
         json_kws['decoder'] = OrderedDecoder()
         if sort_keys:
-            json_kws['mapping_mode'] = rapidjson.MM_SORT_KEYS
+            json_kws['mapping_mode'] = yggrj.MM_SORT_KEYS
     
-    obj = rapidjson.as_pure_json(obj, **json_kws)
+    obj = yggrj.as_pure_json(obj, **json_kws)
     return yaml.dump(obj, sort_keys=sort_keys, **kwargs)
 
 
@@ -82,7 +82,7 @@ def decode_yaml(msg, sorted_dict_type=None, **kwargs):
             yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
             construct_mapping)
 
-    # If this is required, add a method to rapidjson python wrapper
+    # If this is required, add a method to yggrj python wrapper
     # def construct_scalar(loader, node):
     #     out = loader.construct_scalar(node)
     #     out = string2import(out)

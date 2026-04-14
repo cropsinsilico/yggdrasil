@@ -309,12 +309,12 @@ class TableDatatype(object, metaclass=TableDatatypeMeta):
             TableDatatypeError: If the datatype does not match.
 
         """
-        from yggdrasil import rapidjson
+        import yggdrasil_rapidjson as yggrj
         try:
-            rapidjson.validate(self.datatype, {'type': 'schema'})
+            yggrj.validate(self.datatype, {'type': 'schema'})
             if self.metaschema:
-                rapidjson.validate(self.datatype, self.metaschema)
-        except rapidjson.ValidationError as e:
+                yggrj.validate(self.datatype, self.metaschema)
+        except yggrj.ValidationError as e:
             raise TableDatatypeError(str(e))
 
     def reset_cache_var(self, name, dont_check=False):
@@ -1611,12 +1611,12 @@ class TableDatatypeElement(TableDatatype):
                 datatype_preserved.
 
         """
-        from yggdrasil import rapidjson
+        import yggdrasil_rapidjson as yggrj
         from yggdrasil.serialize import cformat2nptype
         with self.datatype_preserved(**kwargs):
             nptype = cformat2nptype(
                 fmt, str_as_unicode=self.str_as_unicode)
-            typedef = rapidjson.encode_schema(
+            typedef = yggrj.encode_schema(
                 np.ones(1, nptype), minimal=True)
             self.promote_scalars()
             set_default = (not overwrite)

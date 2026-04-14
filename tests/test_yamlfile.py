@@ -3,7 +3,8 @@ import tempfile
 import os
 import yaml
 import io as sio
-from yggdrasil import yamlfile, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import yamlfile
 from yaml.constructor import ConstructorError
 from tests import TestBase as base_class
 _yaml_env = 'TEST_YAML_FILE'
@@ -787,7 +788,7 @@ class TestYamlServerDictNoOutput(YamlTestBaseError):
 
 class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models: error'],)
 
 
@@ -915,7 +916,7 @@ class TestYamlConnectionError_writemeth(YamlTestBaseError):
 
 class TestYamlMissingModelArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a model."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    inputs:',
@@ -926,7 +927,7 @@ class TestYamlMissingModelArgsError(YamlTestBaseError):
 
 class TestYamlMissingModelNameError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a model."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models:',
                   '  - args: modelA',
                   '    inputs:',
@@ -937,7 +938,7 @@ class TestYamlMissingModelNameError(YamlTestBaseError):
 
 class TestYamlMissingIOArgsError_input(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an input driver."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -949,7 +950,7 @@ class TestYamlMissingIOArgsError_input(YamlTestBaseError):
 
 class TestYamlMissingIOArgsError_output(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an output driver."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -961,7 +962,7 @@ class TestYamlMissingIOArgsError_output(YamlTestBaseError):
 
 class TestYamlMissingConnArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a connection."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1030,7 +1031,7 @@ class TestYamlMissingConnIOError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
     r"""Test error for invalid read_meth."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -1050,7 +1051,7 @@ class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileWriteMethError(YamlTestBaseError):
     r"""Test error for invalid write_meth."""
-    _error = rapidjson.NormalizationError
+    _error = yggrj.NormalizationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',

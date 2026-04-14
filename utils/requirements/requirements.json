@@ -168,6 +168,19 @@
         "os": "unix",
         "host": true
       }
+    },
+    {
+      "yggdrasil-rapidjson": {
+        "method": "conda",
+        "flags": {
+          "build": true
+        }
+      }
+    },
+    {
+      "yggdrasil-python-rapidjson": {
+        "method": "pip"
+      }
     }
   ],
   "extras": {
@@ -210,6 +223,9 @@
             {
               "name": "{{ stdlib('c') }}",
               "method": "conda_recipe"
+            },
+            {
+              "method": "conda_skip"
             }
           ]
         },
@@ -598,7 +614,7 @@
           "flags": {
             "install_flags": [
               "-c",
-              "openalea"
+              "openalea3"
             ],
             "not_in_recipe": true,
             "not_in_txt": true

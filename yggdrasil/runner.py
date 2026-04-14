@@ -9,9 +9,10 @@ from pprint import pformat
 from itertools import chain
 import socket
 from collections import OrderedDict
+import yggdrasil_rapidjson as yggrj
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
-from yggdrasil import platform, yamlfile, rapidjson
+from yggdrasil import platform, yamlfile
 from yggdrasil.drivers import create_driver, DirectConnectionDriver
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import init_mpi, YggTaskLoop, AsyncResult
@@ -1333,14 +1334,14 @@ class YggRunner(YggClass):
             for x in models:
                 while len(x) < max_len:
                     x.append(None)
-            models = [rapidjson.dumps(x) for x in models]
-            connections = [rapidjson.dumps(x) for x in connections]
+            models = [yggrj.dumps(x) for x in models]
+            connections = [yggrj.dumps(x) for x in connections]
         else:
             models = None
             connections = None
-        self.modeldrivers = rapidjson.loads(
+        self.modeldrivers = yggrj.loads(
             self.mpi_comm.scatter(models, root=0))
-        self.connectiondrivers = rapidjson.loads(
+        self.connectiondrivers = yggrj.loads(
             self.mpi_comm.scatter(connections, root=0))
         self.modeldrivers = dict(
             [x for x in self.modeldrivers if (x is not None)])

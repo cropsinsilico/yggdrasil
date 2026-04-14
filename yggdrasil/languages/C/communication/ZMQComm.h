@@ -9,6 +9,8 @@
 #include <czmq.h>
 #endif
 
+#define POLLER_DISABLED 1
+
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
@@ -278,7 +280,7 @@ int do_reply_send(const comm_t *comm) {
   // Poll
   ygglog_debug("do_reply_send(%s): address=%s, begin", comm->name,
   	       zrep->addresses[0]);
-#if defined(__cplusplus) && defined(_WIN32)
+#if defined(POLLER_DISABLED) || (defined(__cplusplus) && defined(_WIN32))
   // TODO: There seems to be an error in the poller when using it in C++
 #else
   zpoller_t *poller = zpoller_new(s, NULL);
@@ -290,7 +292,7 @@ int do_reply_send(const comm_t *comm) {
   ygglog_debug("do_reply_send(%s): waiting on poller...", comm->name);
   void *p = zpoller_wait(poller, -1);
   //void *p = zpoller_wait(poller, 1000);
-  ygglog_debug("do_reply_send(%s): poller returned", comm->name); 
+  ygglog_debug("do_reply_send(%s): poller returned", comm->name);
   if (p == NULL) {
     if (zpoller_terminated(poller)) {
       ygglog_error("do_reply_send(%s): Poller interrupted", comm->name);
@@ -340,7 +342,7 @@ int do_reply_send(const comm_t *comm) {
   }
   ygglog_debug("do_reply_send(%s): address=%s, end", comm->name,
 	       zrep->addresses[0]);
-#if defined(__cplusplus) && defined(_WIN32)
+#if defined(POLLER_DISABLED) || (defined(__cplusplus) && defined(_WIN32))
   // TODO: There seems to be an error in the poller when using it in C++
 #else
   if (ret >= 0) {
@@ -352,7 +354,7 @@ int do_reply_send(const comm_t *comm) {
     assert(poller);
     ygglog_debug("do_reply_send(%s): waiting on poller...", comm->name);
     p = zpoller_wait(poller, 10);
-    ygglog_debug("do_reply_send(%s): poller returned", comm->name); 
+    ygglog_debug("do_reply_send(%s): poller returned", comm->name);
     zpoller_destroy(&poller);
   }
 #endif
@@ -403,7 +405,7 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
   // Poll to prevent block
   ygglog_debug("do_reply_recv(%s): address=%s, polling for reply", comm->name,
 	       zrep->addresses[isock]);
-#if defined(__cplusplus) && defined(_WIN32)
+#if defined(POLLER_DISABLED) || (defined(__cplusplus) && defined(_WIN32))
   // TODO: There seems to be an error in the poller when using it in C++
 #else
   zpoller_t *poller = zpoller_new(s, NULL);
@@ -835,6 +837,9 @@ int zmq_comm_nmsg(const comm_t *x) {
   int out = 0;
   if (is_recv(x->direction)) {
     if (x->handle != NULL) {
+#if defined(POLLER_DISABLED)
+      out = 1;
+#else
       zsock_t *s = (zsock_t*)(x->handle);
       zpoller_t *poller = zpoller_new(s, NULL);
       if (poller == NULL) {
@@ -853,6 +858,7 @@ int zmq_comm_nmsg(const comm_t *x) {
 	out = 1;
       }
       zpoller_destroy(&poller);
+#endif
     }
   } else {
     /* if (x->last_send[0] != 0) { */

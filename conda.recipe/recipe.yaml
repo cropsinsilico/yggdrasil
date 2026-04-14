@@ -57,6 +57,7 @@ outputs:
         - ninja
         - numpy >=1.13.0
         - python-build
+        - yggdrasil-rapidjson
         - ${{ compiler('c') }}
         - ${{ compiler('cxx') }}
         - ${{ stdlib('c') }}
@@ -94,6 +95,7 @@ outputs:
         - six
         - toml
         - unyt
+        - yggdrasil-rapidjson
         - if: unix
           then:
             - sysv_ipc

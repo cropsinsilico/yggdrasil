@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
-from yggdrasil import units, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import units
 from tests.serialize import TestSerializeBase as base_class
 
 
@@ -93,5 +94,5 @@ class TestDefaultSerialize(base_class):
         compatible."""
         if (len(instance_kwargs) == 0) and (class_name == 'DefaultSerialize'):
             instance.initialize_from_message(np.int64(1))
-            with pytest.raises(rapidjson.ComparisonError):
+            with pytest.raises(yggrj.ComparisonError):
                 instance.update_serializer(datatype={'type': 'ply'})

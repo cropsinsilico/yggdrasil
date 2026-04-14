@@ -1,7 +1,8 @@
 import pytest
 import os
 import copy
-from yggdrasil import constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import constants
 from yggdrasil.languages import get_language_ext
 from yggdrasil.examples import _example_dir
 from yggdrasil.components import import_component
@@ -32,7 +33,7 @@ class TestExampleTransforms(base_class):
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
         testdata = example_module.get_test_data(transform)
-        testtype = rapidjson.encode_schema(testdata)
+        testtype = yggrj.encode_schema(testdata)
         inputs = [{'name': 'x',
                    'datatype': copy.deepcopy(testtype)}]
         outputs = [{'name': 'y',

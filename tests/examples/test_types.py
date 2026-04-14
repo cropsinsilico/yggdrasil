@@ -3,7 +3,8 @@ import os
 import copy
 import yaml
 import importlib
-from yggdrasil import constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import constants
 from yggdrasil.components import import_component
 from yggdrasil.languages import get_language_ext
 from tests.examples import TestExample as base_class
@@ -192,7 +193,7 @@ class TestExampleTypes(base_class):
             testtype = {'type': 'any'}
         else:
             testdata = example_module.get_test_data(typename)
-            testtype = rapidjson.encode_schema(testdata)
+            testtype = yggrj.encode_schema(testdata)
             using_generics = False
         if split_array and (typename == 'array'):
             inputs = [{'name': 'x%d' % i, 'datatype': x} for i, x in

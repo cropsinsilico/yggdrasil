@@ -1,6 +1,6 @@
 import os
 from yggdrasil.drivers.DSLModelDriver import DSLModelDriver
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 # TODO: Allow model to be trained by input and return weights?
 
 
@@ -103,7 +103,7 @@ class PyTorchModelDriver(DSLModelDriver):
                 output_map[x['name']]['vars'].append(x['name'])
             output_vars += output_map[x['name']]['vars']
         # Create model
-        model = rapidjson.normalize(model_file, {'type': 'class'})()
+        model = yggrj.normalize(model_file, {'type': 'class'})()
         model.load_state_dict(torch.load(weights_file))
         model.eval()
         while True:

@@ -12,7 +12,8 @@ import subprocess
 import contextlib
 import numpy as np
 import pprint
-from yggdrasil import platform, constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import platform, constants
 from yggdrasil.serialize.ObjSerialize import ObjDict
 from yggdrasil.serialize.PlySerialize import PlyDict
 from yggdrasil.tools import (
@@ -94,6 +95,10 @@ _suites = [
     ("mpi", "MPI based communication", _mpi_paths, []),
 ]
 
+# unit tests that can be completed w/ just python
+# - tests/serialize
+# - tests/communication
+
 
 class DummyParser(argparse.ArgumentParser):
 
@@ -130,8 +135,7 @@ def setup_ci(opts, disable_extra=False):
              # '--import-mode=append',
              f'--cov={package_dir}',
              '--config-file=pyproject.toml',
-             '--cov-config=.coveragerc',
-             '--ignore=yggdrasil/rapidjson/']
+             '--cov-config=.coveragerc']
     # f'--rootdir={package_dir}']
     # if not any(x.startswith('--with-mpi') for x in args):
     #     args += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
@@ -1078,6 +1082,7 @@ def change_default_comm():
         else:
             os.environ['YGG_DEFAULT_COMM'] = default_comm
         DefaultComm._reset_alias()
+        print("DEFAULT_COMM", default_comm)
         yield
         del os.environ['YGG_DEFAULT_COMM']
         if old_default_comm is not None:
@@ -1541,8 +1546,8 @@ def nested_approx(patch_equality, pandas_equality):
             return tuple([nested_approx_(xx, **kwargs) for xx in x])
         elif isinstance(x, (pandas.DataFrame, ObjDict, PlyDict)):
             return x
-        elif isinstance(x, (rapidjson.units.Quantity,
-                            rapidjson.units.QuantityArray)):
+        elif isinstance(x, (yggrj.units.Quantity,
+                            yggrj.units.QuantityArray)):
             
             def units_equality(a, b):
                 if a.units != b.units:

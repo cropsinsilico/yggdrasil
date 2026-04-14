@@ -2,7 +2,6 @@ import os
 import argparse
 ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                          '..', '..', '..'))
-rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
 
 
 def update_argparser(parser=None):
@@ -20,8 +19,8 @@ def update_argparser(parser=None):
     if parser is None:
         parser = argparse.ArgumentParser("Run C installation script.")
     parser.add_argument('--rj-include-dir', '--rapidjson-include-dir',
-                        default=rj_include_dir0,
-                        nargs=1, help='Rapidjson include directory.')
+                        nargs=1,
+                        help='YggdrasilRapidJSON include directory.')
     return parser
 
 
@@ -43,13 +42,11 @@ def install(args=None, rj_include_dir=None):
         args = update_argparser().parse_args()
     if rj_include_dir is None:
         rj_include_dir = args.rj_include_dir
-    if not os.path.isdir(rj_include_dir):
-        raise RuntimeError("RapidJSON sources could not be located. If you "
-                           "cloned the git repository, initialize the rapidjson "
-                           "git submodule by calling "
-                           "'git submodule update --init --recursive' "
-                           "from inside the repository.")
-    if rj_include_dir != rj_include_dir0:
+    if rj_include_dir is not None:
+        if not os.path.isdir(rj_include_dir):
+            raise RuntimeError(
+                "YggdrasilRapidJSON sources do not exist at specified "
+                "location \"{rj_include_dir}\"")
         def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
         try:
             import ConfigParser as configparser

@@ -946,7 +946,7 @@ class FileComm(CommBase.CommBase):
             SerializationError: If the first recv call fails.
 
         """
-        from yggdrasil import rapidjson
+        import yggdrasil_rapidjson as yggrj
         msg = self.recv(return_message_object=True, **kwargs)
         if not msg.flag:
             raise serialize.SerializationError(
@@ -959,7 +959,7 @@ class FileComm(CommBase.CommBase):
         if len(out) > 1:
             out[0].args = self.serializer.concatenate(
                 [x.args for x in out])
-            out[0].sinfo['datatype'] = rapidjson.encode_schema(
+            out[0].sinfo['datatype'] = yggrj.encode_schema(
                 out[0].args, minimal=True)
             out[0].stype = out[0].sinfo['datatype']
             for k in ['format_str', 'field_names', 'field_units']:

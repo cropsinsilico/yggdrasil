@@ -3,7 +3,8 @@ import os
 import pprint
 import tempfile
 import subprocess
-from yggdrasil import schema, components, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import schema, components
 
 
 def filter_func_ex():  # pragma: no cover
@@ -190,7 +191,7 @@ def test_normalize(normalize_objects, display_diff):
     for x, y in normalize_objects:
         try:
             a = s.normalize(x)
-        except (rapidjson.ValidationError, rapidjson.NormalizationError):  # pragma: debug
+        except (yggrj.ValidationError, yggrj.NormalizationError):  # pragma: debug
             print("A:")
             pprint.pprint(x)
             print("\nB:")
@@ -219,7 +220,7 @@ def test_get_schema_subtype():
     kwargs = {'subtype': subtype, 'allow_instance': True}
     s.validate_component(component, doc, **kwargs)
     s.validate_component(component, valid, **kwargs)
-    with pytest.raises(rapidjson.ValidationError):
+    with pytest.raises(yggrj.ValidationError):
         s.validate_component(component, invalid, **kwargs)
     s.validate_component(component, doc, subtype=subtype)
     s.validate_component(component, valid, subtype=subtype)

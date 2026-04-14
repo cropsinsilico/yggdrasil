@@ -3,7 +3,7 @@ import sys
 import signal
 import uuid
 import json
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 import traceback
 import yaml
 import glob
@@ -1050,7 +1050,7 @@ def create_service_manager_class(service_type=None):
                     self.respond_function(name, 'delete')
                     raise
                 if not isinstance(response, AsyncResult):
-                    response = rapidjson.as_pure_json(response)
+                    response = yggrj.as_pure_json(response)
             elif action == 'info':
                 response = function.function_info
             elif action == 'n8n_form_node':
@@ -1175,7 +1175,7 @@ def create_service_manager_class(service_type=None):
                     response = {'status': 'async task',
                                 'task_id': async_result.id}
                     if async_result.is_complete():
-                        response['result'] = rapidjson.as_pure_json(
+                        response['result'] = yggrj.as_pure_json(
                             async_result.get())
                         self.async_tasks.pop(async_result.id, None)
                     elif action != 'async task':

@@ -245,7 +245,7 @@ def cformat2schema(cfmt, as_array=False, minimal=False, **kwargs):
         dict: JSON schema.
 
     """
-    from yggdrasil import rapidjson
+    import yggdrasil_rapidjson as yggrj
     nptype = cformat2nptype(cfmt, **kwargs)
     if nptype.names:
         dtypes = [nptype.fields[x] for x in nptype.names]
@@ -253,7 +253,7 @@ def cformat2schema(cfmt, as_array=False, minimal=False, **kwargs):
         dtypes = [nptype]
     items = []
     for i, idtype in enumerate(dtypes):
-        item = rapidjson.encode_schema(np.ones(1, nptype), minimal=minimal)
+        item = yggrj.encode_schema(np.ones(1, nptype), minimal=minimal)
         if as_array:
             item['type'] = '1darray'
         else:

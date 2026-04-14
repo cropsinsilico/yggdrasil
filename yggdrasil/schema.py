@@ -5,7 +5,7 @@ import yaml
 import json
 import importlib
 from collections import OrderedDict
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 
 
 _schema_fname = os.path.abspath(os.path.join(
@@ -193,7 +193,7 @@ def get_json_schema(fname_dst=None, indent=None):
     """
     s = get_schema()
     out = s.get_schema()
-    out['definitions']['schema'] = copy.deepcopy(rapidjson.get_metaschema())
+    out['definitions']['schema'] = copy.deepcopy(yggrj.get_metaschema())
     out = convert_extended2base(out)
     if fname_dst is not None:
         with open(fname_dst, 'w') as fd:
@@ -457,9 +457,9 @@ class ComponentSchema(object):
         for subtype in self.subtypes:
             subtype_schema = self.get_subtype_schema(subtype)
             try:
-                rapidjson.validate(doc, subtype_schema)
+                yggrj.validate(doc, subtype_schema)
                 return subtype
-            except rapidjson.ValidationError:
+            except yggrj.ValidationError:
                 pass
         raise SchemaError(f"Could not determine subtype "
                           f"for document: {doc}")  # pragma: debug
@@ -1212,7 +1212,7 @@ class ComponentSchema(object):
             self.default_subtype = default
         # Verify that the schema is valid
         if verify:
-            rapidjson.Normalizer.check_schema(self.get_schema())
+            yggrj.Normalizer.check_schema(self.get_schema())
             self._base_schema = None  # Reset so that it will be regen
 
     def append_class(self, comp_cls, verify=False):
@@ -1336,7 +1336,7 @@ class SchemaRegistry(object):
                 import pprint
                 pprint.pprint(self.get_schema())
             try:
-                rapidjson.Normalizer.check_schema(self.get_schema())
+                yggrj.Normalizer.check_schema(self.get_schema())
             except BaseException:
                 print("HERE", k)
                 raise
@@ -1515,7 +1515,7 @@ class SchemaRegistry(object):
     def form_schema(self):
         r"""dict: Schema for generating a YAML form."""
         out = self.get_schema(for_form=True)
-        out['definitions']['schema'] = copy.deepcopy(rapidjson.get_metaschema())
+        out['definitions']['schema'] = copy.deepcopy(yggrj.get_metaschema())
         out = convert_extended2base(out)
         return out
 
@@ -1591,7 +1591,7 @@ class SchemaRegistry(object):
         from yggdrasil import constants
         out = self.get_schema(for_form=True)
         scalar_types = list(constants.VALID_TYPES.keys())
-        meta = copy.deepcopy(rapidjson.get_metaschema())
+        meta = copy.deepcopy(yggrj.get_metaschema())
         meta_prop = {
             'subtype': ['1darray', 'ndarray'],
             'units': ['1darray', 'ndarray'] + scalar_types,
@@ -1756,7 +1756,7 @@ class SchemaRegistry(object):
     #     if normalize:
     #         return self.normalize(obj, **kwargs)
     #     # TODO: Check schema?
-    #     return rapidjson.validate(obj, self.get_schema(**kwargs))
+    #     return yggrj.validate(obj, self.get_schema(**kwargs))
 
     def validate_model_submission(self, obj):
         r"""Validate an object against the schema for models submitted to
@@ -1766,7 +1766,7 @@ class SchemaRegistry(object):
             obj (object): Object to validate.
 
         """
-        rapidjson.validate(obj, self.model_form_schema)
+        yggrj.validate(obj, self.model_form_schema)
         return obj
 
     def validate_component(self, comp_name, obj, **kwargs):
@@ -1780,7 +1780,7 @@ class SchemaRegistry(object):
 
         """
         comp_schema = self.get_component_schema(comp_name, **kwargs)
-        return rapidjson.validate(obj, comp_schema)
+        return yggrj.validate(obj, comp_schema)
 
     def normalize(self, obj, norm_kws=None, **kwargs):
         r"""Normalize an object against this schema.
@@ -1788,7 +1788,7 @@ class SchemaRegistry(object):
         Args:
             obj (object): Object to normalize.
             norm_kws (dict, optional): Keyword arguments that should be
-                passed to rapidjson.normalize. Defaults to {}.
+                passed to yggrj.normalize. Defaults to {}.
             **kwargs: Additional keyword arguments are passed to get_schema.
 
         Returns:
@@ -1798,8 +1798,8 @@ class SchemaRegistry(object):
         # TODO: Check schema?
         if norm_kws is None:
             norm_kws = {}
-        return rapidjson.normalize(obj, self.get_schema(**kwargs),
-                                   **norm_kws)
+        return yggrj.normalize(obj, self.get_schema(**kwargs),
+                               **norm_kws)
 
     # def is_valid(self, obj):
     #     r"""Determine if an object is valid under this schema.
@@ -1813,7 +1813,7 @@ class SchemaRegistry(object):
     #     """
     #     try:
     #         self.validate(obj)
-    #     except rapidjson.ValidationError:
+    #     except yggrj.ValidationError:
     #         return False
     #     return True
 
@@ -1830,7 +1830,7 @@ class SchemaRegistry(object):
     #     """
     #     try:
     #         self.validate_component(comp_name, obj)
-    #     except rapidjson.ValidationError:
+    #     except yggrj.ValidationError:
     #         return False
     #     return True
 

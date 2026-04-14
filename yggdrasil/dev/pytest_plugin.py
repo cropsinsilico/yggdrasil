@@ -4,7 +4,7 @@ import pprint
 import numpy as np
 import sys
 import os
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 
 
 def add_tests_to_modules(rootdir):
@@ -76,7 +76,7 @@ def get_test_data(typename):
         return ExampleClass
     elif typename == 'instance':
         return ExampleClass(1, 'b', c=2, d='d')
-    return rapidjson.generate_data(x)
+    return yggrj.generate_data(x)
 
 
 def check_received_data(typename, x_recv):

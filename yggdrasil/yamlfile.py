@@ -8,7 +8,8 @@ import git
 import io as sio
 import tempfile
 import shutil
-from yggdrasil import constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import constants
 from yggdrasil.schema import get_schema
 from urllib.parse import urlparse
 from yaml.constructor import (
@@ -346,7 +347,7 @@ def load_yaml(fname, yaml_param=None, model_submission=False,
         yml_norm = s.normalize(
             yamlparsed, partial=True,
             norm_kws={'relative_path_root': yamlparsed['working_dir']})
-    except rapidjson.NormalizationError:
+    except yggrj.NormalizationError:
         __display_progress(True, yamlparsed, 'un-normalized')
         raise
     __display_progress(verbose, yml_norm, 'normalized')
@@ -354,7 +355,7 @@ def load_yaml(fname, yaml_param=None, model_submission=False,
 
 
 def prep_yaml(files, model_submission=False, **kwargs):
-    r"""Prepare yaml to be parsed by rapidjson including covering
+    r"""Prepare yaml to be parsed by yggrj including covering
     backwards compatible options.
 
     Args:
@@ -1155,10 +1156,10 @@ def backward_compat_connections(instance, iodict):
 
 def backward_compat(instance, iodict):
     r"""Normalize a yggdrasil input file for use with backward compatible
-    features after it has been normalized via rapidjson.
+    features after it has been normalized via yggrj.
 
     Args:
-        instance (dict): JSON document pre-normalized via rapidjson.
+        instance (dict): JSON document pre-normalized via yggrj.
         iodict (dict): Utility dictionary tracking processed elements.
 
     Returns:

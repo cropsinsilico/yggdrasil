@@ -5,10 +5,10 @@ import deprecation
 from collections import OrderedDict
 from ._version import __version__  # prevent circular import
 from yggdrasil import tools, constants
-from yggdrasil.rapidjson import units as units_
+from yggdrasil_rapidjson import units as units_
 # TODO: This import fails saying yggdrasil.rapidjson is not a package so
 # we need to find a work around
-# from yggdrasil.rapidjson.units import Quantity, QuantityArray, Units,
+# from yggdrasil_rapidjson.units import Quantity, QuantityArray, Units,
 # UnitsError
 Quantity = units_.Quantity
 QuantityArray = units_.QuantityArray

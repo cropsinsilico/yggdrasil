@@ -660,11 +660,11 @@ class ComponentBase(ComponentBaseUnregistered, metaclass=ComponentMeta):
                     if k in kwargs:
                         extra_kwargs[k] = kwargs.pop(k)
                 # Validate and normalize
-                from yggdrasil import rapidjson
+                import yggdrasil_rapidjson as yggrj
                 # import pprint
                 # print(f'before: {self}\n{pprint.pformat(kwargs)}')
                 try:
-                    kwargs = rapidjson.normalize(kwargs, s)
+                    kwargs = yggrj.normalize(kwargs, s)
                     kwargs.update(extra_kwargs)
                 except BaseException:  # pragma: debug
                     import pprint

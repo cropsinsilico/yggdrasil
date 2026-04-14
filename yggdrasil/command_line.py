@@ -1967,13 +1967,13 @@ class file_converter(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.communication.FileComm import convert_file
-        from yggdrasil import rapidjson
+        import yggdrasil_rapidjson as yggrj
         if args.src_kwargs is not None:
-            args.src_kwargs = rapidjson.loads(args.src_kwargs)
+            args.src_kwargs = yggrj.loads(args.src_kwargs)
         if args.dst_kwargs is not None:
-            args.dst_kwargs = rapidjson.loads(args.dst_kwargs)
+            args.dst_kwargs = yggrj.loads(args.dst_kwargs)
         if args.transform is not None:
-            args.transform = rapidjson.loads(args.transform)
+            args.transform = yggrj.loads(args.transform)
         convert_file(args.src, args.dst,
                      src_type=args.src_type, src_kwargs=args.src_kwargs,
                      dst_type=args.dst_type, dst_kwargs=args.dst_kwargs,

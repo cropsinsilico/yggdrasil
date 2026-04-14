@@ -2,7 +2,8 @@ import uuid
 import copy
 import numpy as np
 import warnings
-from yggdrasil import tools, units, serialize, constants, rapidjson, datatypes
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import tools, units, serialize, constants, datatypes
 
 
 class SerializeBase(tools.YggClass):
@@ -331,7 +332,7 @@ class SerializeBase(tools.YggClass):
                 arr = np.array(rows, dtype=dtype)
                 if no_names:
                     arr = [arr[n] for n in arr.dtype.names]
-                lst = rapidjson.normalize(arr, out['datatype'])
+                lst = yggrj.normalize(arr, out['datatype'])
                 out['objects'] = [lst, lst]
         else:
             out = {'kwargs': {}, 'empty': b'', 'dtype': None,
@@ -516,7 +517,7 @@ class SerializeBase(tools.YggClass):
             serializer = {}
         if 'datatype' not in serializer:
             try:
-                serializer['datatype'] = rapidjson.encode_schema(msg, minimal=True)
+                serializer['datatype'] = yggrj.encode_schema(msg, minimal=True)
             except TypeError as e:
                 raise serialize.SerializationError(e)
         self.update_serializer(from_message=msg, **serializer)
@@ -579,8 +580,8 @@ class SerializeBase(tools.YggClass):
                           or datatype != self.default_datatype))):
                     datatype.update(self.partial_datatype)
                     self.partial_datatype = None
-                self.datatype = rapidjson.normalize(datatype,
-                                                    {'type': 'schema'})
+                self.datatype = yggrj.normalize(datatype,
+                                                {'type': 'schema'})
                 if from_message is not False:
                     self._initialized = True
                 if ((self.datatype['type'] == 'array'
@@ -593,8 +594,8 @@ class SerializeBase(tools.YggClass):
             # Check to see if new datatype is compatible with new one
             if old_datatype and datatype:
                 try:
-                    rapidjson.compare_schemas(self.datatype, old_datatype)
-                except rapidjson.ComparisonError:
+                    yggrj.compare_schemas(self.datatype, old_datatype)
+                except yggrj.ComparisonError:
                     import pprint
                     self.error(
                         f"BEFORE:\n{pprint.pformat(old_datatype)}\n"
@@ -736,13 +737,13 @@ class SerializeBase(tools.YggClass):
         """
         if self.initialized:
             # try:
-            args = rapidjson.normalize(args, self.datatype)
-            # except rapidjson.NormalizationError:
+            args = yggrj.normalize(args, self.datatype)
+            # except yggrj.NormalizationError:
             #     self.info(f"args = {args}, datatype = {self.datatype}")
             #     if ((isinstance(args, (list, tuple)) and len(args) == 1
             #          and 'allowWrapped' not in self.datatype)):
             #         self.datatype['allowWrapped'] = True
-            #         return rapidjson.normalize(args, self.datatype)
+            #         return yggrj.normalize(args, self.datatype)
             #     raise
         return args
 
@@ -821,17 +822,17 @@ class SerializeBase(tools.YggClass):
         metadata['__meta__']['size'] = len(data)
         metadata['__meta__'].setdefault('id', str(uuid.uuid4()))
         header = (constants.YGG_MSG_HEAD
-                  + tools.str2bytes(rapidjson.dumps(metadata))
+                  + tools.str2bytes(yggrj.dumps(metadata))
                   + constants.YGG_MSG_HEAD)
         if (max_header_size > 0) and (len(header) > max_header_size):
             metadata_required = {'__meta__': metadata['__meta__']}
             metadata = {k: v for k, v in metadata.items() if k != '__meta__'}
-            data = (tools.str2bytes(rapidjson.dumps(metadata))
+            data = (tools.str2bytes(yggrj.dumps(metadata))
                     + constants.YGG_MSG_HEAD + data)
             metadata_required['__meta__']['size'] = len(data)
             metadata_required['__meta__']['in_data'] = True
             header = (constants.YGG_MSG_HEAD
-                      + tools.str2bytes(rapidjson.dumps(metadata_required))
+                      + tools.str2bytes(yggrj.dumps(metadata_required))
                       + constants.YGG_MSG_HEAD)
             if len(header) > max_header_size:  # pragma: debug
                 raise AssertionError(f"The header is larger ({len(header)})"
@@ -896,12 +897,12 @@ class SerializeBase(tools.YggClass):
             if metadata is not None:  # pragma: debug
                 raise ValueError("Metadata in header and provided by keyword.")
             _, metadata, data = msg.split(constants.YGG_MSG_HEAD, 2)
-            metadata = rapidjson.loads(metadata)
+            metadata = yggrj.loads(metadata)
         elif isinstance(metadata, dict) and metadata['__meta__'].get('in_data', False):
             assert msg.count(constants.YGG_MSG_HEAD) == 1
             metadata_remainder, data = msg.split(constants.YGG_MSG_HEAD, 1)
             if len(metadata_remainder) > 0:
-                metadata.update(rapidjson.loads(metadata_remainder))
+                metadata.update(yggrj.loads(metadata_remainder))
             metadata['__meta__'].pop('in_data')
             # Data no longer contains the additional metadata
             metadata['__meta__']['size'] = len(data)

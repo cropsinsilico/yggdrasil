@@ -1,4 +1,5 @@
-from yggdrasil import tools, constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import tools, constants
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -40,7 +41,7 @@ class AsciiMapSerialize(SerializeBase):
             v = args[k]
             out += tools.bytes2str(k)
             out += self.delimiter
-            out += rapidjson.dumps(v, yggdrasil_mode=rapidjson.YM_READABLE)
+            out += yggrj.dumps(v, yggdrasil_mode=yggrj.YM_READABLE)
             out += newline_str
         return tools.str2bytes(out)
 
@@ -66,7 +67,7 @@ class AsciiMapSerialize(SerializeBase):
                     out[kv[0]] = kv[1].strip("'")
                 else:
                     try:
-                        out[kv[0]] = rapidjson.loads(kv[1])
+                        out[kv[0]] = yggrj.loads(kv[1])
                     except BaseException:
                         out[kv[0]] = kv[1]
             else:

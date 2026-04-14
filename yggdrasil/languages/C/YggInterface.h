@@ -84,7 +84,7 @@ yggOutput_t yggOutputType(const char *name, dtype_t *datatype) {
       }
     }
   }
-  return init_comm(name, "send", _default_comm, datatype);
+  return init_comm(name, "send", NULL_COMM, datatype);
 };
 
 /*!
@@ -112,7 +112,7 @@ yggInput_t yggInputType(const char *name, dtype_t *datatype) {
       }
     }
   }
-  return init_comm(name, "recv", _default_comm, datatype);
+  return init_comm(name, "recv", NULL_COMM, datatype);
 };
   
 /*!
@@ -842,7 +842,7 @@ int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
  */
 static inline
 comm_t* yggAsciiFileOutput(const char *name) {
-  comm_t* out = init_comm(name, "send", _default_comm, NULL);
+  comm_t* out = init_comm(name, "send", NULL_COMM, NULL);
   return out;
 };
 
@@ -853,7 +853,7 @@ comm_t* yggAsciiFileOutput(const char *name) {
  */
 static inline
 comm_t* yggAsciiFileInput(const char *name) {
-  comm_t* out = init_comm(name, "recv", _default_comm, NULL);
+  comm_t* out = init_comm(name, "recv", NULL_COMM, NULL);
   return out;
 };
 
@@ -966,7 +966,7 @@ comm_t* yggAsciiFileInput(const char *name) {
  */
 static inline
 comm_t* yggAsciiTableOutput(const char *name, const char *format_str) {
-  return init_comm_format(name, "send", _default_comm, format_str, 0);
+  return init_comm_format(name, "send", NULL_COMM, format_str, 0);
 };
 
 /*!
@@ -976,7 +976,7 @@ comm_t* yggAsciiTableOutput(const char *name, const char *format_str) {
  */
 static inline
 comm_t* yggAsciiTableInput(const char *name) {
-  return init_comm(name, "recv", _default_comm, NULL);
+  return init_comm(name, "recv", NULL_COMM, NULL);
 };
 
 /*!
@@ -988,7 +988,7 @@ comm_t* yggAsciiTableInput(const char *name) {
  */
 static inline
 comm_t* yggAsciiArrayOutput(const char *name, const char *format_str) {
-  return init_comm_format(name, "send", _default_comm, format_str, 1);
+  return init_comm_format(name, "send", NULL_COMM, format_str, 1);
 };
 
 /*!
@@ -1057,7 +1057,7 @@ comm_t* yggAsciiArrayInput(const char *name) {
  */
 static inline
 comm_t* yggPlyOutput(const char *name) {
-  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply(false));
+  comm_t* out = init_comm(name, "send", NULL_COMM, create_dtype_ply(false));
   if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
@@ -1071,7 +1071,7 @@ comm_t* yggPlyOutput(const char *name) {
  */
 static inline
 comm_t* yggPlyInput(const char *name) {
-  return init_comm(name, "recv", _default_comm, NULL);
+  return init_comm(name, "recv", NULL_COMM, NULL);
 };
 
 
@@ -1130,7 +1130,7 @@ comm_t* yggPlyInput(const char *name) {
  */
 static inline
 comm_t* yggObjOutput(const char *name) {
-  comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj(false));
+  comm_t* out = init_comm(name, "send", NULL_COMM, create_dtype_obj(false));
   if ((out->flags & COMM_FLAG_VALID) && (out->datatype->metadata == NULL)) {
     out->flags = out->flags & ~COMM_FLAG_VALID;
   }
@@ -1144,7 +1144,7 @@ comm_t* yggObjOutput(const char *name) {
  */
 static inline
 comm_t* yggObjInput(const char *name) {
-  return init_comm(name, "recv", _default_comm, NULL);
+  return init_comm(name, "recv", NULL_COMM, NULL);
 };
 
 

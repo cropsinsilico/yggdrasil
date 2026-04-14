@@ -7,7 +7,8 @@ import numpy as np
 import sysconfig
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, tools, constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import platform, constants
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
     _osx_sysroot, InvalidCompilationTool)
@@ -505,10 +506,8 @@ class CModelDriver(CompiledModelDriver):
               'toolsets': ['gnu']}
     }
     external_libraries = {
-        'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
-                                              'rapidjson', 'include',
-                                              'yggdrasil_rapidjson',
-                                              'yggdrasil_rapidjson.h'),
+        'rapidjson': {'include': 'yggdrasil_rapidjson.h',
+                      'directory': 'yggdrasil_rapidjson',
                       'libtype': 'header_only',
                       'language': 'c'},
         'zmq': {'include': 'zmq.h',
@@ -906,7 +905,7 @@ class CModelDriver(CompiledModelDriver):
                     'name': x['name'] + '_length',
                     'datatype': {
                         'type': 'uint',
-                        'precision': rapidjson.SIZE_OF_SIZE_T},
+                        'precision': yggrj.SIZE_OF_SIZE_T},
                     'is_length_var': True}
                 x.setdefault('extra_vars', {})
                 x['extra_vars']['length'] = x['length_var']
@@ -937,7 +936,7 @@ class CModelDriver(CompiledModelDriver):
             #             'name': x['name'] + '_ndim',
             #             'datatype': {
             #                 'type': 'uint',
-            #                 'precision': rapidjson.SIZE_OF_SIZE_T},
+            #                 'precision': yggrj.SIZE_OF_SIZE_T},
             #             'is_length_var': True}
             #         x.setdefault('extra_vars', {})
             #         x['extra_vars']['ndim'] = x['ndim_var']
@@ -947,7 +946,7 @@ class CModelDriver(CompiledModelDriver):
             #             'datatype': {
             #                 'type': '1darray',
             #                 'subtype': 'uint',
-            #                 'precision': rapidjson.SIZE_OF_SIZE_T},
+            #                 'precision': yggrj.SIZE_OF_SIZE_T},
             #             'is_length_var': True}
             #         x.setdefault('extra_vars', {})
             #         x['extra_vars']['shape'] = x['shape_var']
@@ -1563,7 +1562,7 @@ class CModelDriver(CompiledModelDriver):
                                 'name': v_length,
                                 'datatype': {
                                     'type': 'uint',
-                                    'precision': rapidjson.SIZE_OF_SIZE_T},
+                                    'precision': yggrj.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['length_var'])
                     elif cls.requires_shape_var(x):
@@ -1572,7 +1571,7 @@ class CModelDriver(CompiledModelDriver):
                                 'name': v_ndim,
                                 'datatype': {
                                     'type': 'uint',
-                                    'precision': rapidjson.SIZE_OF_SIZE_T},
+                                    'precision': yggrj.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['ndim_var'])
                         if not x.get('shape_var', False):
@@ -1581,14 +1580,14 @@ class CModelDriver(CompiledModelDriver):
                                 'datatype': {
                                     'type': '1darray',
                                     'subtype': 'uint',
-                                    'precision': rapidjson.SIZE_OF_SIZE_T},
+                                    'precision': yggrj.SIZE_OF_SIZE_T},
                                 'is_length_var': True}
                             io_var.append(x['shape_var'])
                         length_var = {
                             'name': v_length,
                             'datatype': {
                                 'type': 'uint',
-                                'precision': rapidjson.SIZE_OF_SIZE_T},
+                                'precision': yggrj.SIZE_OF_SIZE_T},
                             'is_length_var': True}
                         kwargs['function_contents'] = (
                             cls.write_declaration(length_var)
@@ -1723,12 +1722,12 @@ class CModelDriver(CompiledModelDriver):
                 src_var_ndim = {'name': src_var_ndim,
                                 'datatype': {
                                     'type': 'uint',
-                                    'precision': rapidjson.SIZE_OF_SIZE_T}}
+                                    'precision': yggrj.SIZE_OF_SIZE_T}}
             if isinstance(dst_var_ndim, str):
                 dst_var_ndim = {'name': dst_var_ndim,
                                 'datatype': {
                                     'type': 'uint',
-                                    'precision': rapidjson.SIZE_OF_SIZE_T}}
+                                    'precision': yggrj.SIZE_OF_SIZE_T}}
 
             out += cls.write_assign_to_output(
                 dst_var_ndim, src_var_ndim,
@@ -1755,14 +1754,14 @@ class CModelDriver(CompiledModelDriver):
                                  'datatype': {
                                      'type': '1darray',
                                      'subtype': 'uint',
-                                     'precision': rapidjson.SIZE_OF_SIZE_T},
+                                     'precision': yggrj.SIZE_OF_SIZE_T},
                                  'length_var': src_var_ndim['name']}
             if isinstance(dst_var_shape, str):
                 dst_var_shape = {'name': dst_var_shape,
                                  'datatype': {
                                      'type': '1darray',
                                      'subtype': 'uint',
-                                     'precision': rapidjson.SIZE_OF_SIZE_T},
+                                     'precision': yggrj.SIZE_OF_SIZE_T},
                                  'length_var': dst_var_ndim['name']}
             out += cls.write_assign_to_output(
                 dst_var_shape, src_var_shape,
@@ -1865,7 +1864,7 @@ class CModelDriver(CompiledModelDriver):
                                       'units': ''}},
                         {'name': 'length_x', 'value': 5,
                          'datatype': {'type': 'uint',
-                                      'precision': rapidjson.SIZE_OF_SIZE_T},
+                                      'precision': yggrj.SIZE_OF_SIZE_T},
                          'is_length_var': True}],
              'outputs': [{'name': 'y',
                           'length_var': 'length_y',
@@ -1874,7 +1873,7 @@ class CModelDriver(CompiledModelDriver):
                                        'units': ''}},
                          {'name': 'length_y',
                           'datatype': {'type': 'uint',
-                                       'precision': rapidjson.SIZE_OF_SIZE_T},
+                                       'precision': yggrj.SIZE_OF_SIZE_T},
                           'is_length_var': True}],
              'dont_add_lengths': True},
         ]

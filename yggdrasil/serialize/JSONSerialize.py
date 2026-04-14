@@ -1,5 +1,6 @@
+import yggdrasil_rapidjson as yggrj
 from yggdrasil.serialize.SerializeBase import SerializeBase
-from yggdrasil import tools, rapidjson
+from yggdrasil import tools
 
 
 def indent_char2int(indent):
@@ -30,7 +31,7 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
         sort_keys (bool, optional): If True, the keys will be output in sorted
             order. Defaults to True.
         **kwargs: Additional keyword arguments are passed to
-            rapidjson.dumps.
+            yggrj.dumps.
 
     Returns:
         str, bytes: Encoded object.
@@ -45,9 +46,9 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     if 'cls' in kwargs:
         kwargs.setdefault('default', kwargs.pop('cls')().default)
     if fd is None:
-        return tools.str2bytes(rapidjson.dumps(obj, **kwargs))
+        return tools.str2bytes(yggrj.dumps(obj, **kwargs))
     else:
-        return rapidjson.dump(obj, fd, **kwargs)
+        return yggrj.dump(obj, fd, **kwargs)
 
 
 def decode_json(msg, **kwargs):
@@ -56,7 +57,7 @@ def decode_json(msg, **kwargs):
     Args:
         msg (str): JSON serialization to decode.
         **kwargs: Additional keyword arguments are passed to
-            rapidjson.loads.
+            yggrj.loads.
 
     Returns:
         object: Deserialized Python object.
@@ -64,10 +65,10 @@ def decode_json(msg, **kwargs):
     """
     if isinstance(msg, (str, bytes)):
         msg_decode = tools.bytes2str(msg)
-        func_decode = rapidjson.loads
+        func_decode = yggrj.loads
     else:
         msg_decode = msg
-        func_decode = rapidjson.load
+        func_decode = yggrj.load
     return func_decode(msg_decode, **kwargs)
 
 
@@ -104,7 +105,7 @@ class JSONSerialize(SerializeBase):
 
         """
         return encode_json(args, indent=self.indent,
-                           yggdrasil_mode=rapidjson.YM_READABLE)
+                           yggdrasil_mode=yggrj.YM_READABLE)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

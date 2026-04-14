@@ -1,10 +1,10 @@
 import warnings
 import numpy as np
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 from yggdrasil.serialize.PlySerialize import PlySerialize, GeometryBase
 
 
-class ObjDict(GeometryBase, rapidjson.geometry.ObjWavefront):
+class ObjDict(GeometryBase, yggrj.geometry.ObjWavefront):
     r"""Enhanced dictionary class for storing Obj information."""
 
     @classmethod

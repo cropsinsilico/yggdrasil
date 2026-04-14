@@ -250,12 +250,12 @@ class CPPModelDriver(CModelDriver):
     }
     type_map = dict(
         CModelDriver.type_map,
-        array='rapidjson::Document',
-        object='rapidjson::Document',
-        any='rapidjson::Document',
-        schema='rapidjson::Document',
-        ply='rapidjson::Ply',
-        obj='rapidjson::ObjWavefront')
+        array='yggdrasil_rapidjson::Document',
+        object='yggdrasil_rapidjson::Document',
+        any='yggdrasil_rapidjson::Document',
+        schema='yggdrasil_rapidjson::Document',
+        ply='yggdrasil_rapidjson::Ply',
+        obj='yggdrasil_rapidjson::ObjWavefront')
     function_param = dict(
         CModelDriver.function_param,
         input='YggInput {channel}(\"{channel_name}\", {channel_type});',
@@ -522,7 +522,7 @@ class CPPModelDriver(CModelDriver):
                 v_str = cls.prepare_input_variables([v], for_yggdrasil=True)
                 out += [
                     "{",
-                    "  rapidjson::Value tmp;",
+                    "  yggdrasil_rapidjson::Value tmp;",
                     f"  tmp.Set({v_str}, {std['name']}.GetAllocator());",
                     f"  {std['name']}.PushBack(tmp,"
                     f" {std['name']}.GetAllocator());",

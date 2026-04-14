@@ -13,8 +13,9 @@ import threading
 import contextlib
 from collections import OrderedDict
 from pprint import pformat
+import yggdrasil_rapidjson as yggrj
 from yggdrasil import (
-    platform, tools, languages, multitasking, constants, rapidjson,
+    platform, tools, languages, multitasking, constants,
     dependencies)
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
@@ -3376,7 +3377,7 @@ class ModelDriver(Driver):
                     {'name': '%s_shape' % name_base,
                      'datatype': {
                          'type': '1darray', 'subtype': 'int',
-                         'precision': rapidjson.SIZE_OF_SIZE_T,
+                         'precision': yggrj.SIZE_OF_SIZE_T,
                          'length': len(datatype['shape'])}},
                     definitions=definitions,
                     requires_freeing=requires_freeing)
@@ -3430,7 +3431,7 @@ class ModelDriver(Driver):
                 datatype_['shape'] = [datatype_.pop('length')]
             if 'shape' not in datatype_:
                 datatype_['ndim'] = 1
-        keys['schema'] = rapidjson.dumps(datatype_).replace(
+        keys['schema'] = yggrj.dumps(datatype_).replace(
             '"', cls.function_param.get('escaped_double_quote', '\\"'))
         fmt = cls.format_function_param(
             'init_type_from_schema', **keys)
@@ -4324,9 +4325,9 @@ class ModelDriver(Driver):
                 length = json_type.pop('length', None)
                 if json_type.get('type', None) != 'length':
                     try:
-                        json_type = rapidjson.normalize(
+                        json_type = yggrj.normalize(
                             json_type, {'type': 'schema'})
-                    except rapidjson.NormalizationError:  # pragma: debug
+                    except yggrj.NormalizationError:  # pragma: debug
                         print(f"Invalid schema: {json_type}")
                         raise
                     if length is not None:

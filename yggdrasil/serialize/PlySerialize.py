@@ -1,11 +1,12 @@
 import copy
 import numpy as np
-from yggdrasil import constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import constants
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
 class GeometryBase:
-    r"""Base class for extening rapidjson geometry classes."""
+    r"""Base class for extening yggrj geometry classes."""
 
     @classmethod
     def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
@@ -245,7 +246,7 @@ class GeometryBase:
         return out
 
 
-class PlyDict(GeometryBase, rapidjson.geometry.Ply):
+class PlyDict(GeometryBase, yggrj.geometry.Ply):
     r"""Enhanced dictionary class for storing Ply information."""
     pass
 

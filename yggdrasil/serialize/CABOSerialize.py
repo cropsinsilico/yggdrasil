@@ -1,6 +1,7 @@
 import re
 import numpy as np
-from yggdrasil import tools, units, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import tools, units
 from yggdrasil.serialize.AsciiMapSerialize import AsciiMapSerialize
 
 
@@ -49,12 +50,12 @@ class CABOSerialize(AsciiMapSerialize):
             elif isinstance(v, str):
                 iline += "\'%s\'" % v
             elif hasattr(v, 'units'):
-                iline += rapidjson.dumps(
-                    float(v), yggdrasil_mode=rapidjson.YM_READABLE)
+                iline += yggrj.dumps(
+                    float(v), yggdrasil_mode=yggrj.YM_READABLE)
                 iline += f'\t! [{v.units}]'
             else:
-                iline += rapidjson.dumps(
-                    v, yggdrasil_mode=rapidjson.YM_READABLE)
+                iline += yggrj.dumps(
+                    v, yggdrasil_mode=yggrj.YM_READABLE)
             lines.append(iline)
         return tools.str2bytes('\n'.join(lines))
 
@@ -151,14 +152,14 @@ class CABOSerialize(AsciiMapSerialize):
                     v1 = match['value1'].strip('\'')
                 else:
                     try:
-                        v1 = rapidjson.loads(match['value1'])
-                    except rapidjson.JSONDecodeError:
+                        v1 = yggrj.loads(match['value1'])
+                    except yggrj.JSONDecodeError:
                         if match['value1'].endswith('.'):
-                            v1 = rapidjson.loads(match['value1'] + '0')
+                            v1 = yggrj.loads(match['value1'] + '0')
                         else:  # pragma: debug
                             raise
                 if is_arr:
-                    v2 = rapidjson.loads(match['value2'])
+                    v2 = yggrj.loads(match['value2'])
                     out[k][0].append(v1)
                     out[k][1].append(v2)
                 else:

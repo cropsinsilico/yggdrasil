@@ -3,7 +3,8 @@ import re
 import copy
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, tools, constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import platform, tools, constants
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -1298,7 +1299,7 @@ class FortranModelDriver(CompiledModelDriver):
                                       'units': ''}},
                         {'name': 'length_x', 'value': 5,
                          'datatype': {'type': 'uint',
-                                      'precision': rapidjson.SIZE_OF_SIZE_T},
+                                      'precision': yggrj.SIZE_OF_SIZE_T},
                          'is_length_var': True}],
              'outputs': [{'name': 'y',
                           'length_var': 'length_y',
@@ -1307,7 +1308,7 @@ class FortranModelDriver(CompiledModelDriver):
                                        'units': ''}},
                          {'name': 'length_y',
                           'datatype': {'type': 'uint',
-                                       'precision': rapidjson.SIZE_OF_SIZE_T},
+                                       'precision': yggrj.SIZE_OF_SIZE_T},
                           'is_length_var': True}],
              'dont_add_lengths': True},
             # Returns output instead of parameter

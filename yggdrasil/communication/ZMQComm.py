@@ -592,14 +592,13 @@ class ZMQComm(CommBase.CommBase):
             self._bound = True
         state = super(ZMQComm, self).__getstate__()
         del state['context']
-        state['_server_kwargs'].pop('zmq_context', None)
-        # del state['_server_kwargs']['zmq_context']
+        state['proxy_kwargs'].pop('zmq_context', None)
         del state['socket']
         return state
 
     def __setstate__(self, state):
         state['context'] = zmq.Context()
-        state['_server_kwargs']['zmq_context'] = state['context']
+        state['proxy_kwargs']['zmq_context'] = state['context']
         super(ZMQComm, self).__setstate__(state)
         self.socket = create_socket(self.context, self.socket_type)
         if self._bound:

@@ -1,5 +1,6 @@
 import numpy as np
-from yggdrasil import serialize, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import serialize
 from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
@@ -30,7 +31,7 @@ class DefaultSerialize(SerializeBase):
             bytes, str: Serialized message.
 
         """
-        return rapidjson.dumps(args).encode('utf8')
+        return yggrj.dumps(args).encode('utf8')
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -42,7 +43,7 @@ class DefaultSerialize(SerializeBase):
             obj: Deserialized message.
 
         """
-        return rapidjson.loads(msg.decode('utf8'))
+        return yggrj.loads(msg.decode('utf8'))
     
     @classmethod
     def dict2object(cls, obj, as_array=False, field_names=None, **kwargs):

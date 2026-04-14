@@ -100,8 +100,8 @@ def test_conda_uninstall_pip(requires_conda):
     x_pip = create_component('dependency', 'pip', package='astropy')
     if x_conda.is_installed or x_pip.is_installed:
         pytest.skip("astropy already installed")
-    if not (x_conda.manager_installed(always_yes=always_yes)
-            and x_pip.manager_installed(always_yes=always_yes)):
+    if not (x_conda.manager_installed(dont_allow_conda_install=False)
+            and x_pip.manager_installed(dont_allow_conda_install=False)):
         pytest.skip("conda & pip must be installed")
     x_pip.install(always_yes=always_yes)
     try:

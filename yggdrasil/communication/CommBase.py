@@ -8,7 +8,8 @@ import time
 import collections
 import pprint
 import numpy as np
-from yggdrasil import tools, multitasking, constants, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import tools, multitasking, constants
 from yggdrasil.communication import (
     new_comm, get_comm, TemporaryCommunicationError,
     CloseCommunicatorError, import_comm, checkEnv, envName, AddressError,
@@ -1344,7 +1345,7 @@ class CommBase(tools.YggClass):
             if datatype == constants.DEFAULT_DATATYPE:
                 partial_datatype = {
                     k: kwargs[k] for k in list(
-                        rapidjson.get_metaschema()['properties'].keys())
+                        yggrj.get_metaschema()['properties'].keys())
                     if k in kwargs and k not in ['pattern', 'args']}
                 if partial_datatype:
                     seri_kws.setdefault('partial_datatype',

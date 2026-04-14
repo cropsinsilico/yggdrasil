@@ -75,6 +75,38 @@ void display_other(comm_t *x) {
 
 
 /*!
+  @brief Select the comm type enumerator based on a string.
+  @param[in] name Name of comm type enumerator to return.
+  @returns Comm type enumerator.
+*/
+static inline
+comm_type commtype_str2enum(const char* name) {
+  if (strncmp(name, "ipc", 3) == 0) {
+    return IPC_COMM;
+  } else if (strncmp(name, "zmq", 3) == 0) {
+    return ZMQ_COMM;
+  }
+  return NULL_COMM;
+}
+
+/*!
+  @brief Cat a string, replacing ":" with "__COLON__"
+  @param[in,out] dst Destination to cat src to.
+  @param[in] src Source string to cat onto dst.
+  @param[in] n Number of characters from src to cat onto dst.
+ */
+static inline
+void strcat_replace_colon(char* dst, const char* src, const size_t n) {
+  for (size_t i = 0; i < n; i++) {
+    if (src[i] == ':') {
+      strcat(dst, "__COLON__");
+    } else {
+      strncat(dst, src + i , 1);
+    }
+  }
+}
+
+/*!
   @brief Perform deallocation for basic communicator.
   @param[in] x comm_t * Pointer to communicator to deallocate.
   @returns int 1 if there is and error, 0 otherwise.
@@ -198,10 +230,12 @@ comm_t* new_comm_base(const char *address, const char *direction,
  */
 static inline
 comm_t* init_comm_base(const char *name, const char *direction,
-		       const comm_type t, dtype_t* datatype) {
+		       const comm_type t0, dtype_t* datatype) {
   char full_name[COMM_NAME_SIZE];
   char *model_name = NULL;
   char *address = NULL;
+  char *default_comm_type = NULL;
+  comm_type tlocal = t0;
   if (name != NULL) {
     strncpy(full_name, name, COMM_NAME_SIZE);
     if ((direction != NULL) && (strlen(direction) > 0)) {
@@ -223,20 +257,42 @@ comm_t* init_comm_base(const char *name, const char *direction,
     }
     if (address == NULL) {
       char temp_name[COMM_NAME_SIZE] = "";
-      size_t i;
-      for (i = 0; i < strlen(full_name); i++) {
-	if (full_name[i] == ':') {
-	  strcat(temp_name, "__COLON__");
-	} else {
-	  strncat(temp_name, full_name + i, 1);
-	}
-      }
+      strcat_replace_colon(temp_name, full_name, strlen(full_name));
       address = getenv(temp_name);
     }
     ygglog_debug("init_comm_base: model_name = %s, full_name = %s, address = %s",
-		 model_name, full_name, address);
+                 model_name, full_name, address);
   }
-  comm_t *ret = new_comm_base(address, direction, t, datatype);
+  if (tlocal == NULL_COMM) {
+    if (name != NULL) {
+      char temp_name[COMM_NAME_SIZE + 5] = "";
+      strcpy(temp_name, full_name);
+      strcat(temp_name, "_COMM");
+      default_comm_type = getenv(temp_name);
+      if (default_comm_type == NULL) {
+        temp_name[0] = '\0';
+        strcat_replace_colon(temp_name, full_name, strlen(full_name));
+        strcat(temp_name, "_COMM");
+        default_comm_type = getenv(temp_name);
+      }
+    }
+    if (default_comm_type == NULL)
+      default_comm_type = getenv("YGG_DEFAULT_COMM");
+    if (default_comm_type == NULL) {
+#ifdef IPCDEF
+      tlocal = IPC_COMM;
+#else
+      tlocal = ZMQ_COMM;
+#endif
+    } else {
+      tlocal = commtype_str2enum(default_comm_type);
+    }
+    if (tlocal == NULL_COMM) {
+      ygglog_error("init_comm_base: NULL_COMM");
+      return NULL;
+    }
+  }
+  comm_t *ret = new_comm_base(address, direction, tlocal, datatype);
   if (ret == NULL) {
     ygglog_error("init_comm_base: Error in new_comm_base");
     return ret;
@@ -246,7 +302,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
   } else {
     strncpy(ret->name, full_name, COMM_NAME_SIZE);
   }
-  if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
+  if ((strlen(ret->address) == 0) && (tlocal != SERVER_COMM) && (tlocal != CLIENT_COMM)) {
     ygglog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);
     ret->flags = ret->flags & ~COMM_FLAG_VALID;

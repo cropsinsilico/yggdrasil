@@ -1,6 +1,6 @@
 import copy
 import collections
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 from yggdrasil.components import ComponentBase
 
 
@@ -53,7 +53,7 @@ class TransformBase(ComponentBase):
             data (object): Data object.
 
         """
-        self.set_original_datatype(rapidjson.encode_schema(data, minimal=True))
+        self.set_original_datatype(yggrj.encode_schema(data, minimal=True))
 
     def set_transformed_datatype(self, datatype):
         r"""Set datatype.
@@ -74,7 +74,7 @@ class TransformBase(ComponentBase):
         if isinstance(data, collections.abc.Iterator):
             item_type = None
             for x in copy.deepcopy(data):
-                x_type = rapidjson.encode_schema(x, minimal=True)
+                x_type = yggrj.encode_schema(x, minimal=True)
                 if item_type is None:
                     item_type = x_type
                 elif item_type != x_type:
@@ -82,7 +82,7 @@ class TransformBase(ComponentBase):
                     break
             return self.set_transformed_datatype(item_type)
         self.set_transformed_datatype(
-            rapidjson.encode_schema(data, minimal=True))
+            yggrj.encode_schema(data, minimal=True))
         
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
@@ -108,8 +108,8 @@ class TransformBase(ComponentBase):
 
         """
         try:
-            out = rapidjson.encode_schema(self(rapidjson.generate_data(datatype)),
-                                          minimal=True)
+            out = yggrj.encode_schema(self(yggrj.generate_data(datatype)),
+                                      minimal=True)
             if (((out['type'] == 'array') and (datatype['type'] == 'array')
                  and isinstance(out['items'], list)
                  and isinstance(datatype['items'], list)

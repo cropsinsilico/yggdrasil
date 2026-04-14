@@ -1,5 +1,6 @@
 import numpy as np
-from yggdrasil import units, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import units
 from yggdrasil.tools import safe_eval
 from yggdrasil.communication.filters.FilterBase import FilterBase
 
@@ -41,7 +42,7 @@ class StatementFilter(FilterBase):
         """
         try:
             return safe_eval(self.statement, x=x)
-        except rapidjson.units.UnitsError:
+        except yggrj.units.UnitsError:
             return safe_eval(self.statement, x=x.value)
 
     @classmethod

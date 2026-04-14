@@ -117,14 +117,14 @@ class TestUnits(base_class):
 
     def test_serialization_units(self):
         r"""Test rapidjson serialization of rapidjson.Units"""
-        from yggdrasil import rapidjson
+        import yggdrasil_rapidjson as yggrj
         x = units.Units("cm")
         print(units.Units.__module__)
-        print(rapidjson.dumps(x))
-        assert rapidjson.dumps(x) == "\"cm\""
+        print(yggrj.dumps(x))
+        assert yggrj.dumps(x) == "\"cm\""
 
     def test_pickle_units(self):
-        r"""Test pickling of rapidjson.Units"""
+        r"""Test pickling of yggrj.Units"""
         import pickle
         x = units.Units("cm")
         dumped = pickle.dumps(x)
@@ -132,7 +132,7 @@ class TestUnits(base_class):
         assert loaded == x
 
     def test_pickle_quantity(self):
-        r"""Test pickling of rapidjson.Quantity"""
+        r"""Test pickling of yggrj.Quantity"""
         import pickle
         x = units.Quantity(1, "cm")
         dumped = pickle.dumps(x)
@@ -140,7 +140,7 @@ class TestUnits(base_class):
         assert loaded == x
 
     def test_pickle_quantity_array(self):
-        r"""Test pickling of rapidjson.QuantityArray"""
+        r"""Test pickling of yggrj.QuantityArray"""
         import pickle
         x = units.QuantityArray([1, 1, 1], "cm")
         dumped = pickle.dumps(x)

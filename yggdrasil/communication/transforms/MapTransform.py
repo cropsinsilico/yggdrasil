@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 import pandas as pd
-from yggdrasil import rapidjson
+import yggdrasil_rapidjson as yggrj
 from yggdrasil.communication.transforms.TransformBase import TransformBase
 
 
@@ -92,8 +92,8 @@ class MapTransform(TransformBase):
                 out = {k: x[k].iloc[0] for k in field_names}
             else:
                 out = {k: x[k].to_numpy() for k in field_names}
-        elif isinstance(x, (rapidjson.geometry.Ply,
-                            rapidjson.geometry.ObjWavefront)):
+        elif isinstance(x, (yggrj.geometry.Ply,
+                            yggrj.geometry.ObjWavefront)):
             out = x.as_dict()
         else:
             field_names = self._get_field_names(1)
@@ -146,8 +146,8 @@ class MapTransform(TransformBase):
                              {k: np.zeros(3) for k in 'abc'})]},
                 {'kwargs': {},
                  'in/out': [
-                     (rapidjson.generate_data({'type': 'ply'}),
-                      rapidjson.generate_data({'type': 'ply'}).as_dict())],
+                     (yggrj.generate_data({'type': 'ply'}),
+                      yggrj.generate_data({'type': 'ply'}).as_dict())],
                  'in/out_t': [
                      ({'type': 'ply'},
                       {'type': 'object'})]}]

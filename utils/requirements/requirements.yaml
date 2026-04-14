@@ -146,7 +146,12 @@ general:
   - sysv_ipc:
       os: unix
       host: True
-  
+  - yggdrasil-rapidjson:
+      method: conda
+      flags:
+        build: True
+  - yggdrasil-python-rapidjson:
+      method: pip
 extras:
   c:
     description: Dependencies required to compile and run models written in C/C++ as part of yggdrasil integrations
@@ -174,6 +179,7 @@ extras:
     - c-stdlib:
       - name: "{{ stdlib('c') }}"
         method: conda_recipe
+      - method: conda_skip
     - c-compiler:
       - name: "{{ compiler('c') }}"
         method: conda_recipe
@@ -415,7 +421,7 @@ extras:
       add:
         - boost==1.66.0
       flags:
-        install_flags: [-c, openalea]
+        install_flags: [-c, openalea3]
         not_in_recipe: true
         not_in_txt: true
   images:

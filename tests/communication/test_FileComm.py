@@ -2,7 +2,8 @@ import pytest
 import tempfile
 import os
 import uuid
-from yggdrasil import schema, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import schema
 from yggdrasil.communication import new_comm, AddressError
 from tests.communication.test_CommBase import TestComm as base_class
 
@@ -173,7 +174,7 @@ class TestFileComm(base_class):
         kws = self.get_send_comm_kwargs(
             commtype, use_async, testing_options, read_meth='invalid',
             skip_component_schema_normalization=False)
-        with pytest.raises(rapidjson.NormalizationError):
+        with pytest.raises(yggrj.NormalizationError):
             new_comm(name, **kws)
 
     def test_append(self, uuid, commtype, use_async, testing_options,

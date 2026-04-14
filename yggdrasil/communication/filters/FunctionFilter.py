@@ -1,5 +1,6 @@
 import numpy as np
-from yggdrasil import units, rapidjson
+import yggdrasil_rapidjson as yggrj
+from yggdrasil import units
 from yggdrasil.communication.filters.FilterBase import FilterBase
 
 
@@ -33,7 +34,7 @@ class FunctionFilter(FilterBase):
         """
         try:
             return self.function(x)
-        except rapidjson.units.UnitsError:
+        except yggrj.units.UnitsError:
             return self.function(x.value)
 
     @classmethod

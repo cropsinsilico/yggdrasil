@@ -233,7 +233,9 @@ class TimeSyncModelDriver(DSLModelDriver):
                                          for k, v in state.items()})
                     new_data = pd.DataFrame(new_data)
                     idx = table['time'].isin([t_pd])
-                    if not idx.any():
+                    if table.empty:
+                        table = new_data
+                    elif not idx.any():
                         table = pd.concat([table, new_data], sort=False)
                     elif model == client_model:
                         table = table.drop(table.index[idx])
